@@ -1,8 +1,9 @@
 ---
 name: skill-finder
 description: "Full-featured Agent Skills management: Search 35+ skills, install locally, star favorites, update from sources. Supports tag search (#azure #bicep), category filtering, and similar skill recommendations."
-author: yamapan (https://github.com/aktsmm)
 license: MIT
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Skill Finder
@@ -155,69 +156,67 @@ This will:
 
 ## Agent Instructions
 
-> This section provides guidance for AI agents (Copilot, Claude, etc.).
+> Guidance for AI agents. Prefer action proposals over verbose explanations.
+
+### Core Principle
+
+**Use "Do it? Yes/No?" style proposals.**
+
+- ❌ Bad: "If you want to add new skills, you can run the following command..."
+- ✅ Good: "Update the index?"
 
 ### Skill Search Workflow
 
 1. **Check local index first**
 
    - Read `references/skill-index.json`
-   - Suggest skills matching user's requirements
+   - Suggest matching skills
 
-2. **Suggest web search if not found**
-
-   ```
-   💡 No matching skills found in local index.
-   Search on the web?
-   - Google: https://www.google.com/search?q=claude+skill+{query}+SKILL.md
-   - GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
-   ```
-
-3. **After returning results, always confirm these options:**
-
-   a. **Ask about adding new repository** (if user found a good repo):
+2. **If not found → Propose web search**
 
    ```
-   💡 Found a good repository with skills?
-   Share the URL and I'll add it to the index:
-   → python scripts/search_skills.py --add-source https://github.com/owner/repo
+   Not found locally. Search the web?
+   → GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
    ```
 
-   b. **Suggest index update** (check `lastUpdated` in skill-index.json):
+3. **After returning results → Propose next action**
 
-   - Normal case (less than 7 days):
-     ```
-     💡 Want to update the index to get the latest skills?
-     → python scripts/search_skills.py --update
-     ```
-   - If `lastUpdated` is older than 7 days, **strongly recommend**:
-     ```
-     ⚠️ Index is outdated (last updated: {date}).
-     You may be missing new skills. Strongly recommend updating!
-     → python scripts/search_skills.py --update
-     ```
+   **⚠️ MUST ALWAYS propose these options after every search result:**
 
-   c. **Offer web search** (optional, takes more time):
+   | Situation            | Proposal                     |
+   | -------------------- | ---------------------------- |
+   | Skill found          | "Install it?"                |
+   | Good repo discovered | "Add to sources?"            |
+   | lastUpdated > 7 days | "⚠️ Index outdated. Update?" |
+   | lastUpdated ≤ 7 days | "Fetch latest?" (optional)   |
 
-   ```
-   💡 Want to search the web too? (takes a bit longer)
-   - Google: https://www.google.com/search?q=claude+skill+{query}+SKILL.md
-   - GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
-   ```
+### Proposal Templates
+
+**Always include this block after search results:**
+
+```
+📦 Install {skill-name}?
+
+🔄 Update index? (last updated: {date})
+
+🔍 Search the web for more?
+   → GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
+
+➕ Have your own skill repositories? I can add them to the index!
+   → python scripts/search_skills.py --add-source {your-repo-url}
+```
 
 ### Output Format
 
 ```markdown
-| Skill      | Description | Source |
-| ---------- | ----------- | ------ |
-| skill-name | Description | Source |
+| Skill | Description | Source |
+| ----- | ----------- | ------ |
+| name  | Description | Source |
 ```
 
-### Additional Actions
+### Additional Actions (propose as needed)
 
-After search, suggest these options:
-
-- `--info {skill}` to view details
-- `--install {skill}` to install locally
-- `--similar {skill}` to discover similar skills
-- `--star {skill}` to add to favorites
+- `--info {skill}` → View details?
+- `--install {skill}` → Install?
+- `--similar {skill}` → Find similar?
+- `--star {skill}` → Star it?
