@@ -1,0 +1,476 @@
+{
+  "$schema": "./skill-index.schema.json",
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-24",
+  "sources": [
+    {
+      "id": "anthropics-skills",
+      "name": "Anthropic Skills (Official)",
+      "url": "https://github.com/anthropics/skills",
+      "type": "official",
+      "description": "Anthropic 公式の Claude Skills リポジトリ"
+    },
+    {
+      "id": "github-awesome-copilot",
+      "name": "GitHub Awesome Copilot (Official)",
+      "url": "https://github.com/github/awesome-copilot",
+      "type": "official",
+      "description": "GitHub 公式の Copilot リソース集"
+    },
+    {
+      "id": "obra-superpowers",
+      "name": "Superpowers",
+      "url": "https://github.com/obra/superpowers",
+      "type": "community",
+      "description": "高品質なスキル・エージェント・コマンド集"
+    },
+    {
+      "id": "composio-awesome",
+      "name": "Awesome Claude Skills (ComposioHQ)",
+      "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "type": "awesome-list",
+      "description": "Claude Skills のキュレーションリスト"
+    },
+    {
+      "id": "claude-scientific-skills",
+      "name": "claude-scientific-skills",
+      "url": "https://github.com/K-Dense-AI/claude-scientific-skills",
+      "type": "community",
+      "description": "K-Dense-AI/claude-scientific-skills からのスキル"
+    },
+    {
+      "id": "playwright-skill",
+      "name": "playwright-skill",
+      "url": "https://github.com/lackeyjb/playwright-skill",
+      "type": "community",
+      "description": "lackeyjb/playwright-skill からのスキル"
+    },
+    {
+      "id": "aktsmm-agent-skills",
+      "name": "Agent Skills (aktsmm)",
+      "url": "https://github.com/aktsmm/Agent-Skills",
+      "type": "community",
+      "description": "Azure・開発系スキル by yamapan"
+    }
+  ],
+  "skills": [
+    {
+      "name": "algorithmic-art",
+      "source": "anthropics-skills",
+      "path": "skills/algorithmic-art",
+      "categories": ["creative", "art"],
+      "description": "アルゴリズミックアートの生成"
+    },
+    {
+      "name": "brand-guidelines",
+      "source": "anthropics-skills",
+      "path": "skills/brand-guidelines",
+      "categories": ["design", "branding"],
+      "description": "ブランドガイドラインの作成・管理"
+    },
+    {
+      "name": "canvas-design",
+      "source": "anthropics-skills",
+      "path": "skills/canvas-design",
+      "categories": ["design", "creative"],
+      "description": "キャンバスデザインの作成"
+    },
+    {
+      "name": "doc-coauthoring",
+      "source": "anthropics-skills",
+      "path": "skills/doc-coauthoring",
+      "categories": ["document", "collaboration"],
+      "description": "ドキュメントの共同執筆"
+    },
+    {
+      "name": "docx",
+      "source": "anthropics-skills",
+      "path": "skills/docx",
+      "categories": ["document", "office"],
+      "description": "Word ドキュメント (.docx) の処理"
+    },
+    {
+      "name": "pdf",
+      "source": "anthropics-skills",
+      "path": "skills/pdf",
+      "categories": ["document"],
+      "description": "PDF ファイルの処理"
+    },
+    {
+      "name": "pptx",
+      "source": "anthropics-skills",
+      "path": "skills/pptx",
+      "categories": ["document", "office", "presentation"],
+      "description": "PowerPoint (.pptx) の処理"
+    },
+    {
+      "name": "xlsx",
+      "source": "anthropics-skills",
+      "path": "skills/xlsx",
+      "categories": ["document", "office", "data"],
+      "description": "Excel (.xlsx) の処理"
+    },
+    {
+      "name": "frontend-design",
+      "source": "anthropics-skills",
+      "path": "skills/frontend-design",
+      "categories": ["web", "design", "frontend"],
+      "description": "フロントエンドデザインの作成"
+    },
+    {
+      "name": "web-artifacts-builder",
+      "source": "anthropics-skills",
+      "path": "skills/web-artifacts-builder",
+      "categories": ["web", "frontend"],
+      "description": "Web アーティファクトのビルド"
+    },
+    {
+      "name": "webapp-testing",
+      "source": "anthropics-skills",
+      "path": "skills/webapp-testing",
+      "categories": ["web", "testing"],
+      "description": "Web アプリケーションのテスト"
+    },
+    {
+      "name": "mcp-builder",
+      "source": "anthropics-skills",
+      "path": "skills/mcp-builder",
+      "categories": ["mcp", "development"],
+      "description": "MCP サーバーの構築"
+    },
+    {
+      "name": "skill-creator",
+      "source": "anthropics-skills",
+      "path": "skills/skill-creator",
+      "categories": ["meta", "development"],
+      "description": "新しいスキルの作成ガイド"
+    },
+    {
+      "name": "slack-gif-creator",
+      "source": "anthropics-skills",
+      "path": "skills/slack-gif-creator",
+      "categories": ["creative", "communication"],
+      "description": "Slack 用 GIF の作成"
+    },
+    {
+      "name": "theme-factory",
+      "source": "anthropics-skills",
+      "path": "skills/theme-factory",
+      "categories": ["design", "theming"],
+      "description": "テーマの作成"
+    },
+    {
+      "name": "internal-comms",
+      "source": "anthropics-skills",
+      "path": "skills/internal-comms",
+      "categories": ["communication", "business"],
+      "description": "社内コミュニケーション"
+    },
+    {
+      "name": "brainstorming",
+      "source": "obra-superpowers",
+      "path": "skills/brainstorming",
+      "categories": ["planning", "ideation"],
+      "description": "ブレインストーミングの実施"
+    },
+    {
+      "name": "writing-plans",
+      "source": "obra-superpowers",
+      "path": "skills/writing-plans",
+      "categories": ["planning", "documentation"],
+      "description": "計画書の作成"
+    },
+    {
+      "name": "executing-plans",
+      "source": "obra-superpowers",
+      "path": "skills/executing-plans",
+      "categories": ["planning", "execution"],
+      "description": "計画の実行"
+    },
+    {
+      "name": "test-driven-development",
+      "source": "obra-superpowers",
+      "path": "skills/test-driven-development",
+      "categories": ["development", "testing", "tdd"],
+      "description": "テスト駆動開発 (TDD)"
+    },
+    {
+      "name": "systematic-debugging",
+      "source": "obra-superpowers",
+      "path": "skills/systematic-debugging",
+      "categories": ["development", "debugging"],
+      "description": "体系的なデバッグ手法"
+    },
+    {
+      "name": "subagent-driven-development",
+      "source": "obra-superpowers",
+      "path": "skills/subagent-driven-development",
+      "categories": ["development", "agents"],
+      "description": "サブエージェント駆動開発"
+    },
+    {
+      "name": "dispatching-parallel-agents",
+      "source": "obra-superpowers",
+      "path": "skills/dispatching-parallel-agents",
+      "categories": ["development", "agents", "parallel"],
+      "description": "並列エージェントのディスパッチ"
+    },
+    {
+      "name": "using-git-worktrees",
+      "source": "obra-superpowers",
+      "path": "skills/using-git-worktrees",
+      "categories": ["git", "development"],
+      "description": "Git worktree の活用"
+    },
+    {
+      "name": "receiving-code-review",
+      "source": "obra-superpowers",
+      "path": "skills/receiving-code-review",
+      "categories": ["git", "code-review"],
+      "description": "コードレビューの受け取り方"
+    },
+    {
+      "name": "requesting-code-review",
+      "source": "obra-superpowers",
+      "path": "skills/requesting-code-review",
+      "categories": ["git", "code-review"],
+      "description": "コードレビューのリクエスト"
+    },
+    {
+      "name": "finishing-a-development-branch",
+      "source": "obra-superpowers",
+      "path": "skills/finishing-a-development-branch",
+      "categories": ["git", "development"],
+      "description": "開発ブランチの完了処理"
+    },
+    {
+      "name": "verification-before-completion",
+      "source": "obra-superpowers",
+      "path": "skills/verification-before-completion",
+      "categories": ["quality", "verification"],
+      "description": "完了前の検証"
+    },
+    {
+      "name": "writing-skills",
+      "source": "obra-superpowers",
+      "path": "skills/writing-skills",
+      "categories": ["meta", "development"],
+      "description": "スキルの書き方"
+    },
+    {
+      "name": "using-superpowers",
+      "source": "obra-superpowers",
+      "path": "skills/using-superpowers",
+      "categories": ["meta"],
+      "description": "Superpowers の使い方"
+    },
+    {
+      "name": "artifacts-builder",
+      "source": "composio-awesome",
+      "path": "artifacts-builder",
+      "categories": ["web", "frontend"],
+      "description": "アーティファクトビルダー"
+    },
+    {
+      "name": "changelog-generator",
+      "source": "composio-awesome",
+      "path": "changelog-generator",
+      "categories": ["documentation", "git"],
+      "description": "CHANGELOG の自動生成"
+    },
+    {
+      "name": "content-research-writer",
+      "source": "composio-awesome",
+      "path": "content-research-writer",
+      "categories": ["writing", "research"],
+      "description": "コンテンツリサーチ・ライティング"
+    },
+    {
+      "name": "developer-growth-analysis",
+      "source": "composio-awesome",
+      "path": "developer-growth-analysis",
+      "categories": ["analytics", "development"],
+      "description": "開発者成長分析"
+    },
+    {
+      "name": "document-skills",
+      "source": "composio-awesome",
+      "path": "document-skills",
+      "categories": ["document"],
+      "description": "ドキュメント処理スキル"
+    },
+    {
+      "name": "domain-name-brainstormer",
+      "source": "composio-awesome",
+      "path": "domain-name-brainstormer",
+      "categories": ["ideation", "business"],
+      "description": "ドメイン名のブレインストーミング"
+    },
+    {
+      "name": "file-organizer",
+      "source": "composio-awesome",
+      "path": "file-organizer",
+      "categories": ["utility", "organization"],
+      "description": "ファイル整理"
+    },
+    {
+      "name": "image-enhancer",
+      "source": "composio-awesome",
+      "path": "image-enhancer",
+      "categories": ["image", "creative"],
+      "description": "画像の強化・編集"
+    },
+    {
+      "name": "invoice-organizer",
+      "source": "composio-awesome",
+      "path": "invoice-organizer",
+      "categories": ["business", "finance"],
+      "description": "請求書の整理"
+    },
+    {
+      "name": "lead-research-assistant",
+      "source": "composio-awesome",
+      "path": "lead-research-assistant",
+      "categories": ["research", "business"],
+      "description": "リード調査アシスタント"
+    },
+    {
+      "name": "meeting-insights-analyzer",
+      "source": "composio-awesome",
+      "path": "meeting-insights-analyzer",
+      "categories": ["business", "analytics"],
+      "description": "会議インサイト分析"
+    },
+    {
+      "name": "raffle-winner-picker",
+      "source": "composio-awesome",
+      "path": "raffle-winner-picker",
+      "categories": ["utility"],
+      "description": "抽選ツール"
+    },
+    {
+      "name": "video-downloader",
+      "source": "composio-awesome",
+      "path": "video-downloader",
+      "categories": ["utility", "media"],
+      "description": "動画ダウンローダー"
+    },
+    {
+      "name": "competitive-ads-extractor",
+      "source": "composio-awesome",
+      "path": "competitive-ads-extractor",
+      "categories": ["business", "marketing"],
+      "description": "競合広告の抽出・分析"
+    },
+    {
+      "name": "playwright-skill",
+      "source": "playwright-skill",
+      "path": "skills/playwright-skill",
+      "categories": ["community"],
+      "description": "playwright-skill スキル"
+    },
+    {
+      "name": "azure-env-builder",
+      "source": "aktsmm-agent-skills",
+      "path": "azure-env-builder",
+      "categories": ["development", "azure"],
+      "description": "Azure 環境を Bicep で構築"
+    },
+    {
+      "name": "skill-creator",
+      "source": "aktsmm-agent-skills",
+      "path": "skill-creator",
+      "categories": ["meta", "development"],
+      "description": "新しい Agent Skills を作成"
+    },
+    {
+      "name": "skill-finder",
+      "source": "aktsmm-agent-skills",
+      "path": "skill-finder",
+      "categories": ["meta"],
+      "description": "Agent Skills を検索・発見"
+    }
+  ],
+  "categories": [
+    {
+      "id": "development",
+      "name": "開発",
+      "description": "ソフトウェア開発関連"
+    },
+    {
+      "id": "testing",
+      "name": "テスト",
+      "description": "テスト・品質保証"
+    },
+    {
+      "id": "document",
+      "name": "ドキュメント",
+      "description": "ドキュメント処理"
+    },
+    {
+      "id": "office",
+      "name": "Office",
+      "description": "Microsoft Office 関連"
+    },
+    {
+      "id": "web",
+      "name": "Web",
+      "description": "Web 開発"
+    },
+    {
+      "id": "frontend",
+      "name": "フロントエンド",
+      "description": "フロントエンド開発"
+    },
+    {
+      "id": "design",
+      "name": "デザイン",
+      "description": "デザイン・UI/UX"
+    },
+    {
+      "id": "creative",
+      "name": "クリエイティブ",
+      "description": "クリエイティブ・アート"
+    },
+    {
+      "id": "git",
+      "name": "Git",
+      "description": "Git・バージョン管理"
+    },
+    {
+      "id": "planning",
+      "name": "計画",
+      "description": "プロジェクト計画"
+    },
+    {
+      "id": "agents",
+      "name": "エージェント",
+      "description": "AI エージェント関連"
+    },
+    {
+      "id": "mcp",
+      "name": "MCP",
+      "description": "Model Context Protocol"
+    },
+    {
+      "id": "business",
+      "name": "ビジネス",
+      "description": "ビジネス・業務"
+    },
+    {
+      "id": "utility",
+      "name": "ユーティリティ",
+      "description": "汎用ツール"
+    },
+    {
+      "id": "meta",
+      "name": "メタ",
+      "description": "スキル作成・管理"
+    },
+    {
+      "id": "azure",
+      "name": "Azure",
+      "description": "Microsoft Azure・クラウドインフラ"
+    }
+  ]
+}
