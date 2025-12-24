@@ -167,11 +167,12 @@ This will:
 
 ### Skill Search Workflow
 
-1. **Check local index first**
+1. **Search ALL sources in local index**
 
    - Read `references/skill-index.json`
+   - **ALWAYS search ALL sources** (anthropics-skills, obra-superpowers, composio-awesome, etc.)
    - Check `lastUpdated` field
-   - Suggest matching skills
+   - Suggest matching skills from every source
 
 2. **If not found → Propose web search**
 
@@ -195,40 +196,61 @@ This will:
 
 **ALWAYS include this block at the end of every search response. No exceptions.**
 
+**CRITICAL: Do NOT show commands. Agent executes directly. Keep proposals SHORT.**
+
 ```
-📦 Install {skill-name}?
-
-🔄 Update index? (last updated: {date})
-
-🔍 Search the web for more?
-   → GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
-
-➕ Have your own skill repositories? I can add them to the index!
-   → python scripts/search_skills.py --add-source {your-repo-url}
+**Next?**
+1. 📦 Install? (which skill?)
+2. 🔍 Details?
+3. 🔄 Update index? (last: {date})
+4. 🌐 Web search?
+5. ➕ Add source?
 ```
 
 ### Checklist Before Responding
 
 Before sending a search result response, verify:
 
-- [ ] Included skill table with results
+- [ ] Included skill table with results (from ALL sources)
+- [ ] Included **source breakdown table** showing count per source
 - [ ] Showed `lastUpdated` date from index
-- [ ] Added "📦 Install?" proposal
-- [ ] Added "🔄 Update index?" proposal
-- [ ] Added "🔍 Search the web?" proposal with GitHub link
-- [ ] Added "➕ Add source?" proposal
+- [ ] Added numbered action menu (NOT command examples)
+- [ ] Included web search option with GitHub link ready to open
+- [ ] Asked user to choose by number or skill name
 
 ### Output Format
 
+**Skill Table (include Source with URL):**
+
 ```markdown
-| Skill | Description | Source |
-| ----- | ----------- | ------ |
-| name  | Description | Source |
+| Skill | Description | Source                                     | Link                                                       |
+| ----- | ----------- | ------------------------------------------ | ---------------------------------------------------------- |
+| name  | Description | [source-id](https://github.com/owner/repo) | [View](https://github.com/{owner}/{repo}/tree/main/{path}) |
 ```
 
-### Additional Actions (propose as needed)
+**Source Breakdown Table (MANDATORY):**
 
-- `--info {skill}` → View details?
-- `--install {skill}` → Install?
-- `--similar {skill}` → Find similar?
-- `--star {skill}` → Star it?
+```markdown
+### 📊 Source Breakdown
+
+| Source              | Skills Found | Repository                                                  |
+| ------------------- | ------------ | ----------------------------------------------------------- |
+| anthropics-skills   | N            | [View](https://github.com/anthropics/skills)                |
+| obra-superpowers    | N            | [View](https://github.com/obra/superpowers)                 |
+| composio-awesome    | N            | [View](https://github.com/ComposioHQ/awesome-claude-skills) |
+| aktsmm-agent-skills | N            | [View](https://github.com/aktsmm/Agent-Skills)              |
+```
+
+**URL Construction:**
+
+- Combine source URL + path from skill-index.json
+- Example: `anthropics-skills` + `skills/docx` → `https://github.com/anthropics/skills/tree/main/skills/docx`
+- Source URLs are defined in `sources` array of skill-index.json
+
+### Agent Behavior Rules
+
+- ❌ **NEVER** show commands like `python scripts/search_skills.py --install`
+- ❌ **NEVER** say "you can run the following command..."
+- ✅ **ALWAYS** execute commands directly when user chooses an action
+- ✅ **ALWAYS** present options as numbered menu
+- ✅ **ALWAYS** include web search option for cases not found locally
