@@ -1,45 +1,78 @@
 # 環境定義テンプレート
 
+環境フォルダ (`Az-env/<environment>/`) を構成するためのテンプレート。
+
 ## 基本情報
 
-| 項目                     | 値                                          |
-| ------------------------ | ------------------------------------------- |
-| 環境名                   | <!-- dev / staging / prod など -->          |
-| リソースグループ名       | <!-- rg-<environment>-<region>-001 など --> |
-| Azure リージョン         | <!-- japaneast / japanwest など -->         |
-| Azure サブスクリプション | <!-- サブスクリプション名 or GUID -->       |
-| デプロイ方式             | <!-- Azure CLI / Bicep -->                  |
+```markdown
+| 項目               | 値                           |
+| ------------------ | ---------------------------- |
+| 環境名             |                              |
+| リソースグループ   |                              |
+| Azure リージョン   |                              |
+| サブスクリプション |                              |
+| デプロイ方式       | Bicep / Azure CLI            |
+| スコープ           | ResourceGroup / Subscription |
+```
 
-## 目的・スコープ
+## 構成概要
 
-<!-- この環境で実現したいことを簡潔に記載 -->
+| カテゴリ     | リソース | SKU | 備考 |
+| ------------ | -------- | --- | ---- |
+| 監視         |          |     |      |
+| ネットワーク |          |     |      |
+| コンピュート |          |     |      |
+| データ       |          |     |      |
+| セキュリティ |          |     |      |
+| DR           |          |     |      |
 
-## 構成リソース一覧
+→ ヒアリング詳細: [hearing-checklist.md](hearing-checklist.md)  
+→ Bicep パターン: [resource-patterns.md](resource-patterns.md)
 
-| リソース種別         | リソース名パターン  | SKU / Tier   | 備考                             |
-| -------------------- | ------------------- | ------------ | -------------------------------- |
-| App Service Plan     | asp-<env>-<region>  | S1           |                                  |
-| App Service          | app-<env>-<region>  | -            | Managed Identity 有効化          |
-| Storage Account      | st<env><region>001  | Standard_LRS |                                  |
-| Key Vault            | kv-<env>-<region>   | Standard     | RBAC モード                      |
-| Application Insights | appi-<env>-<region> | -            | Log Analytics ワークスペース連携 |
+## フォルダ構造
 
-## ネットワーク / セキュリティ
+```
+Az-env/<environment>/
+├── README.md          # この環境の概要
+├── bicep/
+│   ├── main.bicep     # メインテンプレート
+│   ├── main.bicepparam # パラメータファイル
+│   └── modules/       # モジュール (オプション)
+├── config/
+│   └── parameters.json # 環境固有の値
+└── scripts/
+    ├── deploy.ps1     # デプロイスクリプト
+    └── validate.ps1   # 検証スクリプト
+```
 
-- VNet 統合の要否: <!-- Yes / No -->
-- Private Endpoint: <!-- 対象サービス -->
-- 既存の Hub VNet / Firewall: <!-- あれば記載 -->
-- NSG / UDR: <!-- 必要なルール概要 -->
+## 接続パターン
 
-## パラメータ / シークレット管理
+- [ ] パブリック
+- [ ] 閉域 (Private Endpoint)
+- [ ] ハイブリッド (VPN / ExpressRoute)
 
-- 環境変数: `env/<environment>/config/*.json`
-- シークレット: Key Vault に一括格納、App Service は `@Microsoft.KeyVault(...)` で参照
+## 高可用性・DR
 
-## 備考 / 前提条件
+| 項目           | 設定                |
+| -------------- | ------------------- |
+| ゾーン冗長     | Yes / No            |
+| ストレージ冗長 | LRS / GRS / ZRS     |
+| バックアップ   | Azure Backup / 手動 |
+| DR サイト      |                     |
 
-<!-- 既存の Policy、Blueprint、RBAC アサインメントなど -->
+## 命名規則
 
----
+| リソース種別    | パターン                      | 例                |
+| --------------- | ----------------------------- | ----------------- |
+| Resource Group  | `rg-<env>-<region>-<purpose>` | `rg-prod-jpe-web` |
+| Virtual Network | `vnet-<env>-<region>`         | `vnet-prod-jpe`   |
+| Storage Account | `st<purpose><env>###`         | `stwebprod001`    |
+| AKS             | `aks-<env>-<region>`          | `aks-prod-jpe`    |
 
-このテンプレートを `env/<environment>/README.md` にコピーして編集してください。
+## 使い方
+
+1. このテンプレートを `Az-env/<environment>/README.md` にコピー
+2. [hearing-checklist.md](hearing-checklist.md) でヒアリング実施
+3. [resource-patterns.md](resource-patterns.md) から Bicep パターンを参照
+4. `bicep/` フォルダにテンプレートを配置
+5. 検証 & デプロイ実行

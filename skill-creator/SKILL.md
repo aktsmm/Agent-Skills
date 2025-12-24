@@ -8,6 +8,14 @@ license: Complete terms in LICENSE.txt
 
 This skill provides guidance for creating effective skills.
 
+## When to Use This Skill
+
+- **Creating a new skill** - When you want to build a new skill from scratch
+- **Extending an existing skill** - When adding new features, resources, or capabilities to a skill
+- **Modifying a skill** - When refactoring, updating, or improving existing skill content
+
+**Important**: Always refer to this skill's principles when making ANY changes to skills. This ensures consistency, maintainability, and adherence to best practices across all skills.
+
 ## About Skills
 
 Skills are modular, self-contained packages that extend Claude's capabilities by providing
