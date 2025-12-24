@@ -293,6 +293,7 @@ When editing the (newly-generated or existing) skill, remember that the skill is
 Consult these helpful guides based on your skill's needs:
 
 - **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
+- **Improving existing skills**: See references/workflows.md for skill improvement workflow and Agent Instructions template
 - **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
 
 These files contain established best practices for effective skill design.
@@ -372,4 +373,5 @@ This skill is based on [skill-creator](https://github.com/anthropics/skills/tree
 Copyright 2025 Anthropic, PBC
 
 Modifications by yamapan (aktsmm):
+
 - Added "When to Use This Skill" section
