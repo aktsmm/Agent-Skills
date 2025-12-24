@@ -6,11 +6,11 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ## Skills
 
-| Skill | Description / 説明 | License | Status |
-| ----- | ------------------ | ------- | ------ |
-| [azure-env-builder](azure-env-builder/) | Azure environment builder with Bicep templates / Azure 環境構築支援 | MIT | 🚧 Alpha |
-| [skill-creator](skill-creator/) | Create new Agent Skills / 新しい Agent Skill を作成 | Apache 2.0 (based on Anthropic) | ✅ Stable |
-| [skill-finder](skill-finder/) | Search, install, and manage Agent Skills / スキル検索・管理 | MIT | ✅ Stable |
+| Skill                                   | Description / 説明                                                  | License                         |
+| --------------------------------------- | ------------------------------------------------------------------- | ------------------------------- |
+| [azure-env-builder](azure-env-builder/) | Azure environment builder with Bicep templates / Azure 環境構築支援 | MIT                             |
+| [skill-creator](skill-creator/)         | Create new Agent Skills / 新しい Agent Skill を作成                 | Apache 2.0 (based on Anthropic) |
+| [skill-finder](skill-finder/)           | Search, install, and manage Agent Skills / スキル検索・管理         | MIT                             |
 
 ## Usage / 使い方
 
@@ -42,11 +42,11 @@ skill-name/
 
 **各スキルには個別のライセンスがあります。各スキルディレクトリ内の LICENSE ファイルを参照してください。**
 
-| Skill | License | Source |
-| ----- | ------- | ------ |
-| azure-env-builder | MIT | Original |
-| skill-creator | Apache 2.0 | Based on [Anthropic skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) |
-| skill-finder | MIT | Original |
+| Skill             | License    | Source                                                                                                  |
+| ----------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| azure-env-builder | MIT        | Original                                                                                                |
+| skill-creator     | Apache 2.0 | Based on [Anthropic skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) |
+| skill-finder      | MIT        | Original                                                                                                |
 
 ## Author / 作者
 
