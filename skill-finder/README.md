@@ -52,7 +52,9 @@ Skill Finder をスキルとして配置後、AI エージェントにスキル�
 
 ### Demo / デモ
 
-![Skill Finder Demo](assets/demo.png)
+https://github.com/user-attachments/assets/demo.mp4
+
+> ※ 動画が表示されない場合: [assets/demo.mp4](assets/demo.mp4)
 
 ## Quick Start / クイックスタート
 
