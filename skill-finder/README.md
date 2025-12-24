@@ -31,6 +31,29 @@
 - 🔄 **自動更新** - 全ソースを GitHub から更新
 - 💡 **類似スキル** - カテゴリベースのおすすめ表示
 
+## How to Use Skills / スキルの使い方
+
+### 1. Install to designated directory / 所定のディレクトリに配置
+
+```bash
+~/.github/skills/        # GitHub Copilot
+~/.claude/skills/        # Claude Code
+```
+
+### 2. Just prompt / プロンプトを指示するだけ
+
+Skill Finder をスキルとして配置後、AI エージェントにスキルを探すよう指示するだけ：
+
+```
+「Azure関連のスキルを探して」    → #azure タグで検索
+「ドキュメント処理のスキルある？」→ #document で検索
+「PDFを扱えるスキルを教えて」    → pdf で検索
+```
+
+### Demo / デモ
+
+![Skill Finder Demo](assets/demo.png)
+
 ## Quick Start / クイックスタート
 
 ### Search / 検索
