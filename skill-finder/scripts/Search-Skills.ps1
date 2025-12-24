@@ -236,17 +236,17 @@ function Test-IndexOutdated {
 function Invoke-AutoUpdateCheck {
     param($Index)
     if (Test-IndexOutdated -Index $Index) {
-        $lastUpdated = if ($Index.lastUpdated) { $Index.lastUpdated } else { "不明" }
-        Write-Host "`n⚠️ インデックスが古くなっています（最終更新: $lastUpdated）" -ForegroundColor Yellow
+        $lastUpdated = if ($Index.lastUpdated) { $Index.lastUpdated } else { "unknown" }
+        Write-Host "`n⚠️ Index is outdated (last updated: $lastUpdated)" -ForegroundColor Yellow
         try {
-            $answer = Read-Host "🔄 今すぐ更新しますか？ [Y/n]"
+            $answer = Read-Host "🔄 Update now? [Y/n]"
             if ($answer -eq "" -or $answer -match "^[Yy]") {
                 Update-AllSources
                 return Get-SkillIndex
             }
         }
         catch {
-            Write-Host "  スキップしました" -ForegroundColor Gray
+            Write-Host "  Skipped" -ForegroundColor Gray
         }
     }
     return $Index
@@ -259,9 +259,9 @@ function Show-PostSearchSuggestions {
     param($Index, [string]$Query, $Results)
     
     Write-Host "`n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
-    Write-Host "💡 おすすめ" -ForegroundColor Cyan
+    Write-Host "💡 Suggestions" -ForegroundColor Cyan
     
-    # 1. カテゴリから関連スキル
+    # 1. Related categories
     if ($Results -and $Results.Count -gt 0) {
         $allCategories = @()
         $Results | Select-Object -First 3 | ForEach-Object {
@@ -270,18 +270,18 @@ function Show-PostSearchSuggestions {
         $allCategories = $allCategories | Select-Object -Unique | Select-Object -First 3
         if ($allCategories.Count -gt 0) {
             $catsStr = $allCategories -join ", "
-            Write-Host "  🏷️ 関連カテゴリ: $catsStr" -ForegroundColor Gray
-            Write-Host "     → 例: .\Search-Skills.ps1 -Query `"#$($allCategories[0])`"" -ForegroundColor DarkGray
+            Write-Host "  🏷️ Related categories: $catsStr" -ForegroundColor Gray
+            Write-Host "     → Example: .\Search-Skills.ps1 -Query `"#$($allCategories[0])`"" -ForegroundColor DarkGray
         }
     }
     
-    # 2. 類似スキル
+    # 2. Similar skills
     if ($Query -and $Index) {
         $similar = $Index.skills | Where-Object { 
             $_.name -like "*$Query*" -or $_.description -like "*$Query*"
         } | Where-Object { $_ -notin $Results } | Select-Object -First 3
         if ($similar) {
-            Write-Host "`n  🔍 こちらもどうぞ:" -ForegroundColor Gray
+            Write-Host "`n  🔍 You might also like:" -ForegroundColor Gray
             foreach ($s in $similar) {
                 $desc = if ($s.description.Length -gt 40) { $s.description.Substring(0, 40) } else { $s.description }
                 Write-Host "     - $($s.name): $desc" -ForegroundColor DarkGray
@@ -289,10 +289,10 @@ function Show-PostSearchSuggestions {
         }
     }
     
-    # 3. お気に入り表示
+    # 3. Starred skills count
     $starred = Get-StarredSkills
     if ($starred.Count -gt 0) {
-        Write-Host "`n  ⭐ あなたのお気に入り: $($starred.Count) 件" -ForegroundColor Yellow
+        Write-Host "`n  ⭐ Your favorites: $($starred.Count) skills" -ForegroundColor Yellow
     }
 }
 
@@ -301,14 +301,14 @@ function Invoke-DiscoverNewRepos {
     
     Write-Host "`n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
     try {
-        $answer = Read-Host "🌐 他のリポジトリからスキルを探しますか？ [y/N]"
+        $answer = Read-Host "🌐 Search for more repositories? [y/N]"
         if ($answer -match "^[Yy]") {
-            Write-Host "`n🔍 GitHub で関連リポジトリを検索中..." -ForegroundColor Cyan
+            Write-Host "`n🔍 Searching GitHub for related repositories..." -ForegroundColor Cyan
             Find-NewRepos -Query $Query
         }
     }
     catch {
-        Write-Host "  スキップしました" -ForegroundColor Gray
+        Write-Host "  Skipped" -ForegroundColor Gray
     }
 }
 
@@ -322,26 +322,25 @@ function Find-NewRepos {
         if ($LASTEXITCODE -eq 0 -and $result) {
             $repos = $result | ConvertFrom-Json
             if ($repos -and $repos.Count -gt 0) {
-                Write-Host "`n📦 関連リポジトリ候補 ($($repos.Count) 件):" -ForegroundColor Cyan
+                Write-Host "`n📦 Found $($repos.Count) repositories:" -ForegroundColor Cyan
                 $i = 1
                 foreach ($repo in $repos) {
                     $desc = if ($repo.description.Length -gt 50) { $repo.description.Substring(0, 50) } else { $repo.description }
-                    if (-not $desc) { $desc = "説明なし" }
+                    if (-not $desc) { $desc = "No description" }
                     Write-Host "`n  [$i] $($repo.nameWithOwner) ⭐$($repo.stargazersCount)" -ForegroundColor White
                     Write-Host "      $desc" -ForegroundColor Gray
                     $i++
                 }
                 
-                # インデックスに追加するか聞く
+                # Ask to add to index
                 Write-Host "`n────────────────────────────────────────" -ForegroundColor DarkGray
                 try {
-                    $choice = Read-Host "📥 追加したいリポジトリ番号を入力 (空白でスキップ)"
+                    $choice = Read-Host "📥 Enter repository number to add (blank to skip)"
                     if ($choice -match "^\d+$") {
                         $idx = [int]$choice - 1
                         if ($idx -ge 0 -and $idx -lt $repos.Count) {
                             $repoName = $repos[$idx].nameWithOwner
-                            # AddSource を呼び出す代わりに直接処理
-                            Write-Host "`n📦 $repoName を追加中..." -ForegroundColor Cyan
+                            Write-Host "`n📦 Adding $repoName..." -ForegroundColor Cyan
                             & $PSCommandPath -AddSource -RepoUrl "https://github.com/$repoName"
                         }
                     }
@@ -349,15 +348,15 @@ function Find-NewRepos {
                 catch { }
             }
             else {
-                Write-Host "  該当するリポジトリが見つかりませんでした" -ForegroundColor Yellow
+                Write-Host "  No matching repositories found" -ForegroundColor Yellow
             }
         }
         else {
-            Write-Host "  ⚠️ 検索に失敗しました" -ForegroundColor Yellow
+            Write-Host "  ⚠️ Search failed" -ForegroundColor Yellow
         }
     }
     catch {
-        Write-Host "  ⚠️ GitHub CLI (gh) が見つかりません" -ForegroundColor Yellow
+        Write-Host "  ⚠️ GitHub CLI (gh) not found" -ForegroundColor Yellow
     }
 }
 
