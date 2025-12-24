@@ -163,8 +163,14 @@ param(
     [switch]$ListCategories,
 
     [Parameter(ParameterSetName = 'ListSources')]
-    [switch]$ListSources
+    [switch]$ListSources,
+
+    [Parameter()]
+    [switch]$NoInteractive
 )
+
+# Configuration
+$AutoUpdateDays = 7  # Auto-update if index is older than this
 
 # Get script directory
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -208,6 +214,151 @@ function Save-StarredSkills {
     }
     $json = $data | ConvertTo-Json -Depth 5
     Set-Content -Path $starsPath -Value $json -Encoding UTF8
+}
+
+# ============================================================================
+# Auto-Update Check
+# ============================================================================
+function Test-IndexOutdated {
+    param($Index)
+    $lastUpdated = $Index.lastUpdated
+    if (-not $lastUpdated) { return $true }
+    try {
+        $lastDate = [datetime]::Parse($lastUpdated)
+        $age = (Get-Date) - $lastDate
+        return $age.TotalDays -gt $AutoUpdateDays
+    }
+    catch {
+        return $true
+    }
+}
+
+function Invoke-AutoUpdateCheck {
+    param($Index)
+    if (Test-IndexOutdated -Index $Index) {
+        $lastUpdated = if ($Index.lastUpdated) { $Index.lastUpdated } else { "不明" }
+        Write-Host "`n⚠️ インデックスが古くなっています（最終更新: $lastUpdated）" -ForegroundColor Yellow
+        try {
+            $answer = Read-Host "🔄 今すぐ更新しますか？ [Y/n]"
+            if ($answer -eq "" -or $answer -match "^[Yy]") {
+                Update-AllSources
+                return Get-SkillIndex
+            }
+        }
+        catch {
+            Write-Host "  スキップしました" -ForegroundColor Gray
+        }
+    }
+    return $Index
+}
+
+# ============================================================================
+# Post-Search Suggestions
+# ============================================================================
+function Show-PostSearchSuggestions {
+    param($Index, [string]$Query, $Results)
+    
+    Write-Host "`n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+    Write-Host "💡 おすすめ" -ForegroundColor Cyan
+    
+    # 1. カテゴリから関連スキル
+    if ($Results -and $Results.Count -gt 0) {
+        $allCategories = @()
+        $Results | Select-Object -First 3 | ForEach-Object {
+            $allCategories += $_.categories
+        }
+        $allCategories = $allCategories | Select-Object -Unique | Select-Object -First 3
+        if ($allCategories.Count -gt 0) {
+            $catsStr = $allCategories -join ", "
+            Write-Host "  🏷️ 関連カテゴリ: $catsStr" -ForegroundColor Gray
+            Write-Host "     → 例: .\Search-Skills.ps1 -Query `"#$($allCategories[0])`"" -ForegroundColor DarkGray
+        }
+    }
+    
+    # 2. 類似スキル
+    if ($Query -and $Index) {
+        $similar = $Index.skills | Where-Object { 
+            $_.name -like "*$Query*" -or $_.description -like "*$Query*"
+        } | Where-Object { $_ -notin $Results } | Select-Object -First 3
+        if ($similar) {
+            Write-Host "`n  🔍 こちらもどうぞ:" -ForegroundColor Gray
+            foreach ($s in $similar) {
+                $desc = if ($s.description.Length -gt 40) { $s.description.Substring(0, 40) } else { $s.description }
+                Write-Host "     - $($s.name): $desc" -ForegroundColor DarkGray
+            }
+        }
+    }
+    
+    # 3. お気に入り表示
+    $starred = Get-StarredSkills
+    if ($starred.Count -gt 0) {
+        Write-Host "`n  ⭐ あなたのお気に入り: $($starred.Count) 件" -ForegroundColor Yellow
+    }
+}
+
+function Invoke-DiscoverNewRepos {
+    param([string]$Query)
+    
+    Write-Host "`n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+    try {
+        $answer = Read-Host "🌐 他のリポジトリからスキルを探しますか？ [y/N]"
+        if ($answer -match "^[Yy]") {
+            Write-Host "`n🔍 GitHub で関連リポジトリを検索中..." -ForegroundColor Cyan
+            Find-NewRepos -Query $Query
+        }
+    }
+    catch {
+        Write-Host "  スキップしました" -ForegroundColor Gray
+    }
+}
+
+function Find-NewRepos {
+    param([string]$Query)
+    
+    $searchTerms = if ($Query) { "$Query SKILL.md agent skills" } else { "SKILL.md agent skills claude copilot" }
+    
+    try {
+        $result = gh search repos $searchTerms --json nameWithOwner,description,stargazersCount --limit 10 2>&1
+        if ($LASTEXITCODE -eq 0 -and $result) {
+            $repos = $result | ConvertFrom-Json
+            if ($repos -and $repos.Count -gt 0) {
+                Write-Host "`n📦 関連リポジトリ候補 ($($repos.Count) 件):" -ForegroundColor Cyan
+                $i = 1
+                foreach ($repo in $repos) {
+                    $desc = if ($repo.description.Length -gt 50) { $repo.description.Substring(0, 50) } else { $repo.description }
+                    if (-not $desc) { $desc = "説明なし" }
+                    Write-Host "`n  [$i] $($repo.nameWithOwner) ⭐$($repo.stargazersCount)" -ForegroundColor White
+                    Write-Host "      $desc" -ForegroundColor Gray
+                    $i++
+                }
+                
+                # インデックスに追加するか聞く
+                Write-Host "`n────────────────────────────────────────" -ForegroundColor DarkGray
+                try {
+                    $choice = Read-Host "📥 追加したいリポジトリ番号を入力 (空白でスキップ)"
+                    if ($choice -match "^\d+$") {
+                        $idx = [int]$choice - 1
+                        if ($idx -ge 0 -and $idx -lt $repos.Count) {
+                            $repoName = $repos[$idx].nameWithOwner
+                            # AddSource を呼び出す代わりに直接処理
+                            Write-Host "`n📦 $repoName を追加中..." -ForegroundColor Cyan
+                            & $PSCommandPath -AddSource -RepoUrl "https://github.com/$repoName"
+                        }
+                    }
+                }
+                catch { }
+            }
+            else {
+                Write-Host "  該当するリポジトリが見つかりませんでした" -ForegroundColor Yellow
+            }
+        }
+        else {
+            Write-Host "  ⚠️ 検索に失敗しました" -ForegroundColor Yellow
+        }
+    }
+    catch {
+        Write-Host "  ⚠️ GitHub CLI (gh) が見つかりません" -ForegroundColor Yellow
+    }
 }
 
 # ============================================================================
@@ -889,6 +1040,15 @@ function Search-Web {
 # メイン検索処理
 Write-Host "`n🔍 スキルを検索中..." -ForegroundColor Cyan
 
+# インデックス読み込み
+$index = Get-SkillIndex
+if (-not $index) { exit 1 }
+
+# 自動更新チェック（インタラクティブモード時のみ）
+if (-not $NoInteractive) {
+    $index = Invoke-AutoUpdateCheck -Index $index
+}
+
 # 1. ローカル検索
 $localResults = Search-LocalIndex -Query $Query -Category $Category -Source $Source
 
@@ -950,18 +1110,25 @@ if ((-not $totalFound -and $Query) -or $SearchWeb) {
 
 # 4. 類似スキル提案 (結果が少ない場合)
 if ($Query -and $localResults.Count -lt 3) {
-    $index = Get-SkillIndex
-    if ($index) {
-        $similar = $index.skills | Where-Object { 
-            $_.name -like "*$Query*" -and $_ -notin $localResults 
-        } | Select-Object -First 3
-        if ($similar) {
-            Write-Host "`n💡 こちらもおすすめ:" -ForegroundColor Cyan
-            foreach ($s in $similar) {
-                Write-Host "  - $($s.name)" -ForegroundColor Gray
-            }
+    $similar = $index.skills | Where-Object { 
+        $_.name -like "*$Query*" -and $_ -notin $localResults 
+    } | Select-Object -First 3
+    if ($similar) {
+        Write-Host "`n💡 こちらもおすすめ:" -ForegroundColor Cyan
+        foreach ($s in $similar) {
+            Write-Host "  - $($s.name)" -ForegroundColor Gray
         }
     }
+}
+
+# 5. 検索後のサジェスト表示
+if ($Query) {
+    Show-PostSearchSuggestions -Index $index -Query $Query -Results $localResults
+}
+
+# 6. 他のリポジトリを探すか聞く（ローカル結果が少ない場合、インタラクティブモード時のみ）
+if ($Query -and $localResults.Count -lt 5 -and (-not $SearchExternal) -and (-not $NoInteractive)) {
+    Invoke-DiscoverNewRepos -Query $Query
 }
 
 Write-Host ""
