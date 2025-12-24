@@ -221,12 +221,12 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 
    **This step is NOT optional. ALWAYS include the proposal block below.**
 
-   | Situation            | Proposal                     |
-   | -------------------- | ---------------------------- |
-   | Skill found          | "Install it?"                |
-   | Good repo discovered | "Add to sources?"            |
-   | lastUpdated > 7 days | "⚠️ Index outdated. Update?" |
-   | lastUpdated ≤ 7 days | "Fetch latest?" (optional)   |
+   | Situation            | Proposal                                        |
+   | -------------------- | ----------------------------------------------- |
+   | Skill found          | "Install it?"                                   |
+   | Good repo discovered | "Add to sources?"                               |
+   | lastUpdated > 7 days | "⚠️ Index outdated. Update?" (strongly suggest) |
+   | lastUpdated ≤ 7 days | "🔄 Update index?" (always show)                |
 
 ### 🚨 Mandatory Proposal Block
 
@@ -234,11 +234,14 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 
 **CRITICAL: Do NOT show commands. Agent executes directly. Keep proposals SHORT.**
 
+**Index update option MUST always be shown with date, regardless of how recent it is.**
+
 ```
 **Next?**
 1. 📦 Install? (which skill?)
 2. 🔍 Details?
-3. 🔄 Update index? (last: {date})
+3. 🔄 Update index? (last: {date})       ← ALWAYS show
+   ⚠️ If > 7 days: "Index outdated!"    ← Add warning
 4. 🌐 Web search?
 5. ➕ Add source?
 ```
@@ -264,6 +267,7 @@ Before sending a search result response, verify:
 ```
 
 Example:
+
 ```
 🔎 7 リポジトリ、195 スキルから検索しました（最終更新: 2025-12-25）
 ```
