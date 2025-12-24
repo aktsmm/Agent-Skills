@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
+description: Guide for creating and editing skills. Use when creating new skills, editing SKILL.md, updating references/scripts/assets, or reviewing skills in .github/skills/ directory. Ensures consistency, maintainability, and best practices.
 license: Complete terms in LICENSE.txt
 ---
 
