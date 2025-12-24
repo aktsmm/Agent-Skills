@@ -165,6 +165,25 @@ This will:
 - ❌ Bad: "If you want to add new skills, you can run the following command..."
 - ✅ Good: "Update the index?"
 
+### Recommendation Workflow
+
+When user asks for recommendations (e.g., "おすすめは？", "何かいいスキルある？"), suggest skills based on persona:
+
+| Persona          | Categories                      | Recommended Skills                                                 |
+| ---------------- | ------------------------------- | ------------------------------------------------------------------ |
+| オフィスワーカー | document, office, communication | docx, xlsx, pptx, pdf, internal-comms, brainstorming               |
+| 開発者           | development, testing, git       | test-driven-development, systematic-debugging, using-git-worktrees |
+| Azure エンジニア | azure, development              | azure-env-builder, mcp-builder                                     |
+| デザイナー       | design, creative, web           | brand-guidelines, canvas-design, frontend-design                   |
+| 初心者           | meta, planning                  | skill-creator, brainstorming, writing-plans                        |
+
+**Response Format:**
+
+1. Ask about user's role/context if unclear
+2. Show top 3-5 skills with descriptions
+3. Include source breakdown table
+4. Propose next actions
+
 ### Skill Search Workflow
 
 1. **Search ALL sources in local index**
@@ -174,14 +193,31 @@ This will:
    - Check `lastUpdated` field
    - Suggest matching skills from every source
 
-2. **If not found → Propose web search**
+2. **🌟 Recommend from results (when multiple hits)**
+
+   When search returns 3+ skills, pick the BEST one and explain why:
+
+   ```
+   ### 🌟 おすすめ: {skill-name}
+
+   {理由: 公式スキル、機能が豊富、人気が高い、用途にマッチ など}
+   ```
+
+   **Selection criteria (in order):**
+
+   1. **Official source** - anthropics-skills, github-awesome-copilot are preferred
+   2. **Feature richness** - More capabilities = better
+   3. **Relevance** - Best match for user's stated purpose
+   4. **Recency** - Recently updated skills preferred
+
+3. **If not found → Propose web search**
 
    ```
    Not found locally. Search the web?
    → GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
    ```
 
-3. **🚨 MANDATORY: After returning results → Propose next actions**
+4. **🚨 MANDATORY: After returning results → Propose next actions**
 
    **This step is NOT optional. ALWAYS include the proposal block below.**
 
@@ -211,12 +247,26 @@ This will:
 
 Before sending a search result response, verify:
 
+- [ ] **Started with search summary** (e.g., "🔎 7 リポジトリ、195 スキルから検索しました")
 - [ ] Included skill table with results (from ALL sources)
 - [ ] Included **source breakdown table** showing count per source
 - [ ] Showed `lastUpdated` date from index
 - [ ] Added numbered action menu (NOT command examples)
 - [ ] Included web search option with GitHub link ready to open
 - [ ] Asked user to choose by number or skill name
+
+### Search Summary Format
+
+**ALWAYS start search responses with this format:**
+
+```
+🔎 {N} リポジトリ、{M} スキルから検索しました（最終更新: {date}）
+```
+
+Example:
+```
+🔎 7 リポジトリ、195 スキルから検索しました（最終更新: 2025-12-25）
+```
 
 ### Output Format
 
@@ -249,8 +299,27 @@ Before sending a search result response, verify:
 
 ### Agent Behavior Rules
 
+**CRITICAL: Commands are for agents to execute, NOT to show users.**
+
 - ❌ **NEVER** show commands like `python scripts/search_skills.py --install`
-- ❌ **NEVER** say "you can run the following command..."
-- ✅ **ALWAYS** execute commands directly when user chooses an action
-- ✅ **ALWAYS** present options as numbered menu
-- ✅ **ALWAYS** include web search option for cases not found locally
+- ❌ **NEVER** show code blocks with installation/update commands
+- ❌ **NEVER** say "you can run the following command..." or "以下のコマンドを実行..."
+- ✅ **ALWAYS** execute scripts silently when user approves
+- ✅ **ALWAYS** present options as natural language numbered menu
+- ✅ **ALWAYS** report results after execution, not how to execute
+
+**Bad Example:**
+
+```
+📦 インストールする？
+python scripts/search_skills.py --install docx  ← NG!
+```
+
+**Good Example:**
+
+```
+📦 インストールする？（どのスキル？）
+```
+
+→ User: "docx お願い"
+→ Agent: (executes script silently) → "✅ docx をインストールしました！"

@@ -11,7 +11,7 @@
 
 ## Features / 機能
 
-- 🔍 **Local Index Search** - Fast offline search from 35+ pre-indexed skills
+- 🔍 **Local Index Search** - Fast offline search from 48+ pre-indexed skills
 - 🏷️ **Tag Search** - Search by tags like `#azure #bicep`
 - 🌐 **GitHub Search** - Search SKILL.md files on GitHub
 - 📦 **Install Skills** - Download skills to local directory
@@ -22,7 +22,7 @@
 
 ---
 
-- 🔍 **ローカル検索** - 35 以上のスキルから高速オフライン検索
+- 🔍 **ローカル検索** - 48 以上のスキルから高速オフライン検索
 - 🏷️ **タグ検索** - `#azure #bicep` のようなタグで検索
 - 🌐 **GitHub 検索** - GitHub 上の SKILL.md を検索
 - 📦 **インストール** - スキルをローカルにダウンロード
@@ -138,8 +138,8 @@ python scripts/search_skills.py --check
 ## Search Flow / 検索フロー
 
 ```
-1. Local Index     → Fast, offline (35+ skills)
-   ローカル検索      高速・オフライン (35以上のスキル)
+1. Local Index     → Fast, offline (48+ skills)
+   ローカル検索      高速・オフライン (48以上のスキル)
         ↓ not found / 見つからない
 2. GitHub API      → Search SKILL.md files
    GitHub 検索       SKILL.md を検索
@@ -208,11 +208,13 @@ skill-finder/
 ├── SKILL.md                      # Skill definition / スキル定義
 ├── README.md                     # This file / このファイル
 ├── LICENSE                       # MIT License
+├── assets/
+│   └── demo.mp4                  # Demo video / デモ動画
 ├── scripts/
 │   ├── search_skills.py          # Python script
 │   └── Search-Skills.ps1         # PowerShell script
 └── references/
-    ├── skill-index.json          # Skill index (35+ skills)
+    ├── skill-index.json          # Skill index (48+ skills)
     └── starred-skills.json       # Starred skills
 ```
 
