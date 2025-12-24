@@ -76,17 +76,17 @@ def is_index_outdated(index: Dict[str, Any]) -> bool:
 def check_and_auto_update(index: Dict[str, Any], silent: bool = False) -> Dict[str, Any]:
     """Check if index needs update and prompt user."""
     if is_index_outdated(index):
-        last_updated = index.get("lastUpdated", "不明")
+        last_updated = index.get("lastUpdated", "unknown")
         if not silent:
-            print(f"\n⚠️ インデックスが古くなっています（最終更新: {last_updated}）")
+            print(f"\n⚠️ Index is outdated (last updated: {last_updated})")
             try:
-                answer = input("🔄 今すぐ更新しますか？ [Y/n]: ").strip().lower()
+                answer = input("🔄 Update now? [Y/n]: ").strip().lower()
                 if answer in ["", "y", "yes"]:
                     update_all_sources()
                     # Reload index
                     return load_index() or index
             except (EOFError, KeyboardInterrupt):
-                print("\n  スキップしました")
+                print("\n  Skipped")
     return index
 
 
@@ -571,42 +571,42 @@ def show_similar(skill_name: str) -> None:
 def show_post_search_suggestions(index: Dict, query: str, results: List[Dict]) -> None:
     """Show helpful suggestions after search."""
     print("\n" + "━" * 50)
-    print("💡 おすすめ")
+    print("💡 Suggestions")
     
-    # 1. カテゴリから関連スキル
+    # 1. Related categories
     if results:
         all_categories = set()
         for r in results[:3]:
             all_categories.update(r.get("categories", []))
         if all_categories:
             cats_str = ", ".join(list(all_categories)[:3])
-            print(f"  🏷️ 関連カテゴリ: {cats_str}")
-            print(f"     → 例: python scripts/search_skills.py \"#{list(all_categories)[0]}\"")
+            print(f"  🏷️ Related categories: {cats_str}")
+            print(f"     → Example: python scripts/search_skills.py \"#{list(all_categories)[0]}\"")
     
-    # 2. 類似スキル
+    # 2. Similar skills
     similar = find_similar_skills(index, query, limit=3)
     unshown = [s for s in similar if s not in results]
     if unshown:
-        print(f"\n  🔍 こちらもどうぞ:")
+        print(f"\n  🔍 You might also like:")
         for s in unshown[:3]:
             print(f"     - {s['name']}: {s.get('description', '')[:40]}")
     
-    # 3. 人気のスキル（スター数が多い or 人気カテゴリ）
+    # 3. Starred skills count
     starred = load_stars()
     if starred and len(starred) > 0:
-        print(f"\n  ⭐ あなたのお気に入り: {len(starred)} 件")
+        print(f"\n  ⭐ Your favorites: {len(starred)} skills")
 
 
 def prompt_discover_new_repos(query: str) -> None:
     """Ask user if they want to discover new repositories."""
     print("\n" + "━" * 50)
     try:
-        answer = input("🌐 他のリポジトリからスキルを探しますか？ [y/N]: ").strip().lower()
+        answer = input("🌐 Search for more repositories? [y/N]: ").strip().lower()
         if answer in ["y", "yes"]:
-            print("\n🔍 GitHub で関連リポジトリを検索中...")
+            print("\n🔍 Searching GitHub for related repositories...")
             discover_new_repos(query)
     except (EOFError, KeyboardInterrupt):
-        print("\n  スキップしました")
+        print("\n  Skipped")
 
 
 def discover_new_repos(query: str) -> None:
@@ -614,7 +614,7 @@ def discover_new_repos(query: str) -> None:
     search_terms = f"{query} SKILL.md agent skills" if query else "SKILL.md agent skills claude copilot"
     
     try:
-        # リポジトリ検索
+        # Repository search
         result = subprocess.run(
             ["gh", "search", "repos", search_terms, "--json", "nameWithOwner,description,stargazersCount", "--limit", "10"],
             capture_output=True, text=True, timeout=30
@@ -622,18 +622,18 @@ def discover_new_repos(query: str) -> None:
         if result.returncode == 0:
             repos = json.loads(result.stdout)
             if repos:
-                print(f"\n📦 関連リポジトリ候補 ({len(repos)} 件):")
+                print(f"\n📦 Found {len(repos)} repositories:")
                 for i, repo in enumerate(repos, 1):
                     name = repo.get("nameWithOwner", "")
-                    desc = repo.get("description", "")[:50] or "説明なし"
+                    desc = repo.get("description", "")[:50] or "No description"
                     stars = repo.get("stargazersCount", 0)
                     print(f"\n  [{i}] {name} ⭐{stars}")
                     print(f"      {desc}")
                 
-                # インデックスに追加するか聞く
+                # Ask to add to index
                 print("\n" + "-" * 40)
                 try:
-                    choice = input("📥 追加したいリポジトリ番号を入力 (空白でスキップ): ").strip()
+                    choice = input("📥 Enter repository number to add (blank to skip): ").strip()
                     if choice.isdigit():
                         idx = int(choice) - 1
                         if 0 <= idx < len(repos):
@@ -642,15 +642,15 @@ def discover_new_repos(query: str) -> None:
                 except (EOFError, KeyboardInterrupt):
                     pass
             else:
-                print("  該当するリポジトリが見つかりませんでした")
+                print("  No matching repositories found")
         else:
-            print(f"  ⚠️ 検索に失敗しました: {result.stderr}")
+            print(f"  ⚠️ Search failed: {result.stderr}")
     except FileNotFoundError:
-        print("  ⚠️ GitHub CLI (gh) が見つかりません")
+        print("  ⚠️ GitHub CLI (gh) not found")
     except subprocess.TimeoutExpired:
-        print("  ⚠️ 検索がタイムアウトしました")
+        print("  ⚠️ Search timed out")
     except Exception as e:
-        print(f"  ⚠️ エラー: {e}")
+        print(f"  ⚠️ Error: {e}")
 
 
 # =============================================================================
