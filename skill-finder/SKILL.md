@@ -150,3 +150,74 @@ This will:
 - PowerShell 7+ or Python 3.8+
 - GitHub CLI (`gh`) for search/install
 - curl for file downloads
+
+---
+
+## Agent Instructions
+
+> This section provides guidance for AI agents (Copilot, Claude, etc.).
+
+### Skill Search Workflow
+
+1. **Check local index first**
+
+   - Read `references/skill-index.json`
+   - Suggest skills matching user's requirements
+
+2. **Suggest web search if not found**
+
+   ```
+   💡 No matching skills found in local index.
+   Search on the web?
+   - Google: https://www.google.com/search?q=claude+skill+{query}+SKILL.md
+   - GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
+   ```
+
+3. **After returning results, always confirm these options:**
+
+   a. **Ask about adding new repository** (if user found a good repo):
+
+   ```
+   💡 Found a good repository with skills?
+   Share the URL and I'll add it to the index:
+   → python scripts/search_skills.py --add-source https://github.com/owner/repo
+   ```
+
+   b. **Suggest index update** (check `lastUpdated` in skill-index.json):
+
+   - Normal case (less than 7 days):
+     ```
+     💡 Want to update the index to get the latest skills?
+     → python scripts/search_skills.py --update
+     ```
+   - If `lastUpdated` is older than 7 days, **strongly recommend**:
+     ```
+     ⚠️ Index is outdated (last updated: {date}).
+     You may be missing new skills. Strongly recommend updating!
+     → python scripts/search_skills.py --update
+     ```
+
+   c. **Offer web search** (optional, takes more time):
+
+   ```
+   💡 Want to search the web too? (takes a bit longer)
+   - Google: https://www.google.com/search?q=claude+skill+{query}+SKILL.md
+   - GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
+   ```
+
+### Output Format
+
+```markdown
+| Skill      | Description | Source |
+| ---------- | ----------- | ------ |
+| skill-name | Description | Source |
+```
+
+### Additional Actions
+
+After search, suggest these options:
+
+- `--info {skill}` to view details
+- `--install {skill}` to install locally
+- `--similar {skill}` to discover similar skills
+- `--star {skill}` to add to favorites
