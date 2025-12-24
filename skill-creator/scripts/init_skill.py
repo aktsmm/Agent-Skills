@@ -185,84 +185,43 @@ Example asset files from other skills:
 Note: This is a text placeholder. Actual assets can be any file type.
 """
 
-# CC BY-NC 4.0 License template for self-created skills
-LICENSE_TEMPLATE = """# Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+# MIT License template for self-created skills (development repository)
+# Note: For public repository, use CC BY-NC 4.0 instead
+LICENSE_TEMPLATE = """MIT License / MIT ライセンス
 
-## English
+Copyright (c) 2025 yamapan (aktsmm)
+https://github.com/aktsmm
 
-Copyright (c) 2025 aktsmm
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-This work is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License.
+本ソフトウェアおよび関連ドキュメントファイル（以下「ソフトウェア」）のコピーを
+取得するすべての人に対し、無償で以下の許可を与えます：ソフトウェアを無制限に
+使用、コピー、変更、マージ、公開、配布、サブライセンス、および/または販売する
+権利。ただし、以下の条件に従うものとします：
 
-You are free to:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-- **Share** - copy and redistribute the material in any medium or format
-- **Adapt** - remix, transform, and build upon the material
+上記の著作権表示および本許諾表示を、ソフトウェアのすべてのコピーまたは
+重要な部分に含めること。
 
-Under the following terms:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-- **Attribution** - You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
-- **NonCommercial** - You may not use the material for commercial purposes.
-  *(Please contact the author if you wish to use this material for commercial purposes.)*
-
-No additional restrictions - You may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
-
-Full license text: https://creativecommons.org/licenses/by-nc/4.0/legalcode
-
----
-
-## 日本語
-
-Copyright (c) 2025 aktsmm
-
-この作品はクリエイティブ・コモンズ 表示-非営利 4.0 国際ライセンスの下に提供されています。
-
-あなたは以下の条件に従う限り、自由に：
-
-- **共有** - どのようなメディアやフォーマットでも資料を複製・再配布できます
-- **翻案** - 資料をリミックス、変形、および加工することができます
-
-以下の条件に従ってください：
-
-- **表示** - あなたは適切なクレジットを表示し、ライセンスへのリンクを提供し、変更があったらその旨を示さなければなりません。これらは合理的であればどのような方法で行っても構いませんが、許諾者があなたやあなたの利用行為を支持していると示唆するような方法は除きます。
-- **非営利** - あなたは営利目的でこの資料を利用してはなりません。
-  （※商用利用をご希望の場合は、別途ご連絡ください。）
-
-追加的な制約は課せません - あなたは、このライセンスが他の者に許諾することを法的に制限するようないかなる法的規定や技術的手段も適用してはなりません。
-
-ライセンス全文: https://creativecommons.org/licenses/by-nc/4.0/legalcode.ja
-
----
-
-## Special Permission for Microsoft Employees / Microsoft 社員向け特別許諾
-
-### English
-
-Microsoft Corporation employees are granted permission to use, copy, modify, and distribute this material for any purpose within the scope of their employment duties at Microsoft, including internal business use and customer-facing activities, without the NonCommercial restriction of this license.
-
-This special permission applies only to work performed as part of official Microsoft business activities.
-
-### 日本語
-
-Microsoft Corporation の社員は、Microsoft での業務の範疇において、本資料を社内業務および顧客対応を含むあらゆる目的で使用、複製、改変、配布することが許諾されます。この場合、本ライセンスの「非営利」制限は適用されません。
-
-この特別許諾は、Microsoft の公式な業務活動の一環として行われる作業にのみ適用されます。
-
----
-
-## Disclaimer / 免責事項
-
-### English
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-### 日本語
-
-本ソフトウェアは「現状のまま」で提供され、明示または黙示を問わず、商品性、特定目的への適合性、および権利非侵害についての保証を含むがこれに限定されない、いかなる種類の保証も伴いません。
-
-**作者または著作権者は、契約行為、不法行為、またはそれ以外であろうと、ソフトウェアに起因または関連し、あるいはソフトウェアの使用またはその他の扱いによって生じる一切の請求、損害、その他の義務について何らの責任も負わないものとします。**
-
-⚠️ **本ソフトウェアの使用は自己責任でお願いします。**
+本ソフトウェアは「現状有姿」で提供され、商品性、特定目的への適合性、
+権利非侵害を含むいかなる明示的または黙示的な保証もありません。
+著者または著作権者は、契約行為、不法行為、またはその他に起因する
+いかなる請求、損害、その他の責任についても責任を負いません。
 """
 
 
@@ -313,13 +272,13 @@ def init_skill(skill_name, path):
         print(f"❌ Error creating SKILL.md: {e}")
         return None
 
-    # Create LICENSE file (CC BY-NC 4.0 for self-created skills)
-    license_path = skill_dir / 'LICENSE'
+    # Create LICENSE.txt file (MIT for development repository)
+    license_path = skill_dir / 'LICENSE.txt'
     try:
         license_path.write_text(LICENSE_TEMPLATE)
-        print("✅ Created LICENSE (CC BY-NC 4.0)")
+        print("✅ Created LICENSE.txt (MIT)")
     except Exception as e:
-        print(f"❌ Error creating LICENSE: {e}")
+        print(f"❌ Error creating LICENSE.txt: {e}")
         return None
 
     # Create resource directories with example files
@@ -354,7 +313,8 @@ def init_skill(skill_name, path):
     print("\nNext steps:")
     print("1. Edit SKILL.md to complete the TODO items and update the description")
     print("2. Customize or delete the example files in scripts/, references/, and assets/")
-    print("3. LICENSE is set to CC BY-NC 4.0 (change if derived from external source)")
+    print("3. LICENSE is set to MIT (change if derived from external source)")
+    print("   Note: Public repo uses CC BY-NC 4.0 - sync script handles this automatically")
     print("4. Run the validator when ready to check the skill structure")
 
     return skill_dir
