@@ -214,7 +214,7 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 
    ```
    Not found locally. Search the web?
-   → GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
+   → GitHub: https://github.com/search?q=path%3A**%2FSKILL.md+{query}&type=code
    ```
 
 4. **🚨 MANDATORY: After returning results → Propose next actions**
