@@ -6,11 +6,11 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ## Skills
 
-| Skill                                   | Description / 説明                                                  | License                         |
-| --------------------------------------- | ------------------------------------------------------------------- | ------------------------------- |
-| [azure-env-builder](azure-env-builder/) | Azure environment builder with Bicep templates / Azure 環境構築支援 | MIT                             |
-| [skill-creator](skill-creator/)         | Create new Agent Skills / 新しい Agent Skill を作成                 | Apache 2.0 (based on Anthropic) |
-| [skill-finder](skill-finder/)           | Search, install, and manage Agent Skills / スキル検索・管理         | MIT                             |
+| Skill                                   | Description / 説明                                                                                  |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [azure-env-builder](azure-env-builder/) | Azure environment builder with Bicep templates / Azure 環境構築支援（Bicep テンプレート生成・検証） |
+| [skill-creator](skill-creator/)         | Create new Agent Skills / 新しい Agent Skill を作成                                                 |
+| [skill-finder](skill-finder/)           | Search, install, and manage Agent Skills / Agent Skills の検索・インストール・管理                  |
 
 ## Usage / 使い方
 
@@ -31,22 +31,16 @@ Each skill follows this structure / 各スキルは以下の構成です：
 skill-name/
 ├── SKILL.md          # Skill definition / スキル定義
 ├── README.md         # Documentation / ドキュメント (optional)
-├── LICENSE.txt       # License / ライセンス
+├── LICENSE           # License / ライセンス (optional)
 ├── references/       # Reference files / 参照ファイル
 └── scripts/          # Helper scripts / ヘルパースクリプト
 ```
 
 ## License / ライセンス
 
-**Each skill has its own license. See the LICENSE file in each skill directory.**
+MIT License - see [LICENSE](LICENSE) for details.
 
-**各スキルには個別のライセンスがあります。各スキルディレクトリ内の LICENSE ファイルを参照してください。**
-
-| Skill             | License    | Source                                                                                                  |
-| ----------------- | ---------- | ------------------------------------------------------------------------------------------------------- |
-| azure-env-builder | MIT        | Original                                                                                                |
-| skill-creator     | Apache 2.0 | Based on [Anthropic skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) |
-| skill-finder      | MIT        | Original                                                                                                |
+MIT ライセンス - 詳細は [LICENSE](LICENSE) を参照してください。
 
 ## Author / 作者
 

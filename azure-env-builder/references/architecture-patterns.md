@@ -5,7 +5,7 @@
 ## 目次
 
 1. [Landing Zone (Hub-Spoke)](#1-landing-zone-hub-spoke)
-2. [Web + DB (3層アーキテクチャ)](#2-web--db-3層アーキテクチャ)
+2. [Web + DB (3 層アーキテクチャ)](#2-web--db-3層アーキテクチャ)
 3. [コンテナ基盤 (AKS / Container Apps)](#3-コンテナ基盤)
 4. [AI/ML 基盤](#4-aiml-基盤)
 5. [データ分析基盤](#5-データ分析基盤)
@@ -63,15 +63,15 @@ module bastion 'br/public:avm/res/network/bastion-host:0.8.2' = {
 
 ### 設定値連携
 
-| Hub リソース | 連携先 Spoke | 連携内容 |
-|-------------|-------------|---------|
-| Azure Firewall | UDR | 0.0.0.0/0 → Firewall Private IP |
-| Private DNS Zone | VNet Link | Spoke VNet への DNS 解決 |
-| Log Analytics | Diagnostic Settings | 全リソースのログ収集先 |
+| Hub リソース     | 連携先 Spoke        | 連携内容                        |
+| ---------------- | ------------------- | ------------------------------- |
+| Azure Firewall   | UDR                 | 0.0.0.0/0 → Firewall Private IP |
+| Private DNS Zone | VNet Link           | Spoke VNet への DNS 解決        |
+| Log Analytics    | Diagnostic Settings | 全リソースのログ収集先          |
 
 ---
 
-## 2. Web + DB (3層アーキテクチャ)
+## 2. Web + DB (3 層アーキテクチャ)
 
 ### 概要
 
@@ -145,11 +145,11 @@ module sqlServer 'br/public:avm/res/sql/server:0.21.1' = {
 
 ### 設定値連携
 
-| ソース | ターゲット | 連携内容 |
-|-------|----------|---------|
-| SQL Server | Web App | 接続文字列 (Key Vault 経由) |
-| App Insights | Web App | InstrumentationKey |
-| Storage | Web App | Blob 接続文字列 |
+| ソース       | ターゲット | 連携内容                    |
+| ------------ | ---------- | --------------------------- |
+| SQL Server   | Web App    | 接続文字列 (Key Vault 経由) |
+| App Insights | Web App    | InstrumentationKey          |
+| Storage      | Web App    | Blob 接続文字列             |
 
 ---
 
@@ -392,7 +392,7 @@ module nginxVm 'br/public:avm/res/compute/virtual-machine:0.21.0' = {
     nicConfigurations: [
       {
         ipConfigurations: [
-          { 
+          {
             subnetResourceId: subnetId
             publicIPAddressResourceId: publicIpId
           }
@@ -429,7 +429,7 @@ module sqlConnectionSecret 'br/public:avm/res/key-vault/vault/secret:0.1.0' = {
 
 // App Service から参照
 var appSettings = [
-  { 
+  {
     name: 'ConnectionStrings__DefaultConnection'
     value: '@Microsoft.KeyVault(SecretUri=${sqlConnectionSecret.outputs.secretUri})'
   }
