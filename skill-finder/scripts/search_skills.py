@@ -25,7 +25,7 @@ import re
 import subprocess
 import sys
 import urllib.parse
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
@@ -34,6 +34,9 @@ SCRIPT_DIR = Path(__file__).parent
 INDEX_PATH = SCRIPT_DIR / ".." / "references" / "skill-index.json"
 STARS_PATH = SCRIPT_DIR / ".." / "references" / "starred-skills.json"
 INSTALL_DIR = Path.home() / ".skills"  # Default install directory
+
+# Configuration
+AUTO_UPDATE_DAYS = 7  # Auto-update if index is older than this
 
 
 # =============================================================================
@@ -55,6 +58,36 @@ def save_index(index: Dict[str, Any]) -> None:
     with open(INDEX_PATH, "w", encoding="utf-8") as f:
         json.dump(index, f, indent=2, ensure_ascii=False)
     print(f"✅ Index saved: {INDEX_PATH}")
+
+
+def is_index_outdated(index: Dict[str, Any]) -> bool:
+    """Check if index is older than AUTO_UPDATE_DAYS."""
+    last_updated = index.get("lastUpdated", "")
+    if not last_updated:
+        return True
+    try:
+        last_date = datetime.fromisoformat(last_updated)
+        age = datetime.now() - last_date
+        return age > timedelta(days=AUTO_UPDATE_DAYS)
+    except ValueError:
+        return True
+
+
+def check_and_auto_update(index: Dict[str, Any], silent: bool = False) -> Dict[str, Any]:
+    """Check if index needs update and prompt user."""
+    if is_index_outdated(index):
+        last_updated = index.get("lastUpdated", "不明")
+        if not silent:
+            print(f"\n⚠️ インデックスが古くなっています（最終更新: {last_updated}）")
+            try:
+                answer = input("🔄 今すぐ更新しますか？ [Y/n]: ").strip().lower()
+                if answer in ["", "y", "yes"]:
+                    update_all_sources()
+                    # Reload index
+                    return load_index() or index
+            except (EOFError, KeyboardInterrupt):
+                print("\n  スキップしました")
+    return index
 
 
 def load_stars() -> List[str]:
@@ -532,6 +565,95 @@ def show_similar(skill_name: str) -> None:
 
 
 # =============================================================================
+# Post-Search Suggestions
+# =============================================================================
+
+def show_post_search_suggestions(index: Dict, query: str, results: List[Dict]) -> None:
+    """Show helpful suggestions after search."""
+    print("\n" + "━" * 50)
+    print("💡 おすすめ")
+    
+    # 1. カテゴリから関連スキル
+    if results:
+        all_categories = set()
+        for r in results[:3]:
+            all_categories.update(r.get("categories", []))
+        if all_categories:
+            cats_str = ", ".join(list(all_categories)[:3])
+            print(f"  🏷️ 関連カテゴリ: {cats_str}")
+            print(f"     → 例: python scripts/search_skills.py \"#{list(all_categories)[0]}\"")
+    
+    # 2. 類似スキル
+    similar = find_similar_skills(index, query, limit=3)
+    unshown = [s for s in similar if s not in results]
+    if unshown:
+        print(f"\n  🔍 こちらもどうぞ:")
+        for s in unshown[:3]:
+            print(f"     - {s['name']}: {s.get('description', '')[:40]}")
+    
+    # 3. 人気のスキル（スター数が多い or 人気カテゴリ）
+    starred = load_stars()
+    if starred and len(starred) > 0:
+        print(f"\n  ⭐ あなたのお気に入り: {len(starred)} 件")
+
+
+def prompt_discover_new_repos(query: str) -> None:
+    """Ask user if they want to discover new repositories."""
+    print("\n" + "━" * 50)
+    try:
+        answer = input("🌐 他のリポジトリからスキルを探しますか？ [y/N]: ").strip().lower()
+        if answer in ["y", "yes"]:
+            print("\n🔍 GitHub で関連リポジトリを検索中...")
+            discover_new_repos(query)
+    except (EOFError, KeyboardInterrupt):
+        print("\n  スキップしました")
+
+
+def discover_new_repos(query: str) -> None:
+    """Search for new skill repositories on GitHub."""
+    search_terms = f"{query} SKILL.md agent skills" if query else "SKILL.md agent skills claude copilot"
+    
+    try:
+        # リポジトリ検索
+        result = subprocess.run(
+            ["gh", "search", "repos", search_terms, "--json", "nameWithOwner,description,stargazersCount", "--limit", "10"],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            repos = json.loads(result.stdout)
+            if repos:
+                print(f"\n📦 関連リポジトリ候補 ({len(repos)} 件):")
+                for i, repo in enumerate(repos, 1):
+                    name = repo.get("nameWithOwner", "")
+                    desc = repo.get("description", "")[:50] or "説明なし"
+                    stars = repo.get("stargazersCount", 0)
+                    print(f"\n  [{i}] {name} ⭐{stars}")
+                    print(f"      {desc}")
+                
+                # インデックスに追加するか聞く
+                print("\n" + "-" * 40)
+                try:
+                    choice = input("📥 追加したいリポジトリ番号を入力 (空白でスキップ): ").strip()
+                    if choice.isdigit():
+                        idx = int(choice) - 1
+                        if 0 <= idx < len(repos):
+                            repo_name = repos[idx].get("nameWithOwner", "")
+                            add_source(f"https://github.com/{repo_name}")
+                except (EOFError, KeyboardInterrupt):
+                    pass
+            else:
+                print("  該当するリポジトリが見つかりませんでした")
+        else:
+            print(f"  ⚠️ 検索に失敗しました: {result.stderr}")
+    except FileNotFoundError:
+        print("  ⚠️ GitHub CLI (gh) が見つかりません")
+    except subprocess.TimeoutExpired:
+        print("  ⚠️ 検索がタイムアウトしました")
+    except Exception as e:
+        print(f"  ⚠️ エラー: {e}")
+
+
+# =============================================================================
 # Statistics
 # =============================================================================
 
@@ -684,6 +806,8 @@ Examples:
     # Other
     parser.add_argument("--stats", action="store_true", help="Show statistics")
     parser.add_argument("--check", action="store_true", help="Check dependencies")
+    parser.add_argument("--no-interactive", action="store_true", 
+                        help="Disable interactive prompts (for CI/automation)")
     
     args = parser.parse_args()
     
@@ -732,6 +856,10 @@ Examples:
     index = load_index()
     if not index:
         sys.exit(1)
+    
+    # 自動更新チェック（1週間以上経過していたら）
+    if not args.no_interactive:
+        index = check_and_auto_update(index)
     
     # List mode
     if args.list_categories:
@@ -786,6 +914,14 @@ Examples:
             for s in similar:
                 if s not in local_results:
                     print(f"  - {s['name']}")
+    
+    # 検索後のサジェスト表示
+    if args.query:
+        show_post_search_suggestions(index, args.query, local_results)
+    
+    # 他のリポジトリを探すか聞く（ローカル結果が少ない場合、インタラクティブモード時のみ）
+    if args.query and len(local_results) < 5 and not args.external and not args.no_interactive:
+        prompt_discover_new_repos(args.query)
 
 
 if __name__ == "__main__":
