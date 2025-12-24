@@ -362,3 +362,14 @@ After testing the skill, users may request improvements. Often this happens righ
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+---
+
+## License & Attribution
+
+This skill is based on [skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) from Anthropic, licensed under Apache 2.0.
+
+Copyright 2025 Anthropic, PBC
+
+Modifications by yamapan (aktsmm):
+- Added "When to Use This Skill" section
