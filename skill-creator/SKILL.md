@@ -372,4 +372,5 @@ This skill is based on [skill-creator](https://github.com/anthropics/skills/tree
 Copyright 2025 Anthropic, PBC
 
 Modifications by yamapan (aktsmm):
+
 - Added "When to Use This Skill" section
