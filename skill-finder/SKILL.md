@@ -156,7 +156,7 @@ This will:
 
 ## Agent Instructions
 
-> Guidance for AI agents. Prefer action proposals over verbose explanations.
+> ⚠️ **CRITICAL**: AI agents MUST follow these instructions. Prefer action proposals over verbose explanations.
 
 ### Core Principle
 
@@ -170,6 +170,7 @@ This will:
 1. **Check local index first**
 
    - Read `references/skill-index.json`
+   - Check `lastUpdated` field
    - Suggest matching skills
 
 2. **If not found → Propose web search**
@@ -179,9 +180,9 @@ This will:
    → GitHub: https://github.com/search?q={query}+filename%3ASKILL.md
    ```
 
-3. **After returning results → Propose next action**
+3. **🚨 MANDATORY: After returning results → Propose next actions**
 
-   **⚠️ MUST ALWAYS propose these options after every search result:**
+   **This step is NOT optional. ALWAYS include the proposal block below.**
 
    | Situation            | Proposal                     |
    | -------------------- | ---------------------------- |
@@ -190,9 +191,9 @@ This will:
    | lastUpdated > 7 days | "⚠️ Index outdated. Update?" |
    | lastUpdated ≤ 7 days | "Fetch latest?" (optional)   |
 
-### Proposal Templates
+### 🚨 Mandatory Proposal Block
 
-**Always include this block after search results:**
+**ALWAYS include this block at the end of every search response. No exceptions.**
 
 ```
 📦 Install {skill-name}?
@@ -205,6 +206,17 @@ This will:
 ➕ Have your own skill repositories? I can add them to the index!
    → python scripts/search_skills.py --add-source {your-repo-url}
 ```
+
+### Checklist Before Responding
+
+Before sending a search result response, verify:
+
+- [ ] Included skill table with results
+- [ ] Showed `lastUpdated` date from index
+- [ ] Added "📦 Install?" proposal
+- [ ] Added "🔄 Update index?" proposal
+- [ ] Added "🔍 Search the web?" proposal with GitHub link
+- [ ] Added "➕ Add source?" proposal
 
 ### Output Format
 
