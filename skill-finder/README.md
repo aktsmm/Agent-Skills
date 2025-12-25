@@ -11,7 +11,7 @@
 
 ## Features / 機能
 
-- 🔍 **Local Index Search** - Fast offline search from 48+ pre-indexed skills
+- 🔍 **Local Index Search** - Fast offline search from 220+ pre-indexed skills
 - 🏷️ **Tag Search** - Search by tags like `#azure #bicep`
 - 🌐 **GitHub Search** - Search SKILL.md files on GitHub
 - 📦 **Install Skills** - Download skills to local directory
@@ -22,7 +22,7 @@
 
 ---
 
-- 🔍 **ローカル検索** - 48 以上のスキルから高速オフライン検索
+- 🔍 **ローカル検索** - 220 以上のスキルから高速オフライン検索
 - 🏷️ **タグ検索** - `#azure #bicep` のようなタグで検索
 - 🌐 **GitHub 検索** - GitHub 上の SKILL.md を検索
 - 📦 **インストール** - スキルをローカルにダウンロード
@@ -144,8 +144,8 @@ python scripts/search_skills.py --check
 ## Search Flow / 検索フロー
 
 ```
-1. Local Index     → Fast, offline (48+ skills)
-   ローカル検索      高速・オフライン (48以上のスキル)
+1. Local Index     → Fast, offline (220+ skills)
+   ローカル検索      高速・オフライン (220以上のスキル)
         ↓ not found / 見つからない
 2. GitHub API      → Search SKILL.md files
    GitHub 検索       SKILL.md を検索
@@ -185,27 +185,65 @@ python scripts/search_skills.py --check
 
 ## Requirements / 必要環境
 
-- **Python**: 3.8+ (standard library only / 標準ライブラリのみ)
-- **PowerShell**: 7+ (pwsh)
-- **GitHub CLI**: `gh` (for search/install / 検索・インストール用)
-- **curl**: for downloading files / ファイルダウンロード用
+### Required / 必須
+
+| Tool           | Version | Purpose               | Install                                   |
+| -------------- | ------- | --------------------- | ----------------------------------------- |
+| **GitHub CLI** | 2.0+    | Search/install skills | [cli.github.com](https://cli.github.com/) |
+| **curl**       | Any     | Download files        | Pre-installed                             |
+
+### Optional (choose one) / いずれか選択
+
+| Runtime    | Version | Script                      |
+| ---------- | ------- | --------------------------- |
+| PowerShell | 7+      | `scripts/Search-Skills.ps1` |
+| Python     | 3.8+    | `scripts/search_skills.py`  |
+
+### Setup / セットアップ
+
+```bash
+# 1. Install GitHub CLI / GitHub CLI をインストール
+# Windows (winget)
+winget install GitHub.cli
+
+# macOS (Homebrew)
+brew install gh
+
+# Linux (apt)
+sudo apt install gh
+
+# 2. Authenticate / 認証
+gh auth login
+
+# 3. Verify / 確認
+gh --version
+curl --version
+```
 
 ### Check Dependencies / 依存関係チェック
 
 ```bash
-# Python
+# Check all at once / 一括チェック
 python scripts/search_skills.py --check
-
-# PowerShell
 pwsh scripts/Search-Skills.ps1 -Check
 ```
 
-### GitHub CLI Setup / GitHub CLI セットアップ
+**Expected output / 期待される出力:**
 
-```bash
-# Install: https://cli.github.com/
-gh auth login  # Authenticate for better rate limits
 ```
+✅ gh: installed (version 2.x.x)
+✅ curl: installed
+✅ All dependencies satisfied
+```
+
+### Troubleshooting / トラブルシューティング
+
+| Issue                   | Solution                                  |
+| ----------------------- | ----------------------------------------- |
+| `gh: command not found` | Install GitHub CLI and add to PATH        |
+| `gh auth login` fails   | Run `gh auth login` and follow prompts    |
+| Rate limit exceeded     | Wait or authenticate with `gh auth login` |
+| curl SSL errors         | Update curl or check network/proxy        |
 
 ## File Structure / ファイル構成
 
@@ -220,7 +258,7 @@ skill-finder/
 │   ├── search_skills.py          # Python script
 │   └── Search-Skills.ps1         # PowerShell script
 └── references/
-    ├── skill-index.json          # Skill index (48+ skills)
+    ├── skill-index.json          # Skill index (220+ skills)
     └── starred-skills.json       # Starred skills
 ```
 
