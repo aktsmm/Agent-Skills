@@ -1,103 +1,104 @@
 ---
 name: agentic-workflow-guide
-description: "エージェントワークフローの設計・レビュー・改善ガイド。設計原則（SSOT, SRP, Fail Fast, Iterative Refinement）に基づき構築・検証。Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer パターンをサポート。Use when: (1) ワークフローを新規設計・ヒアリング, (2) 既存ワークフローのレビュー・改善, (3) マルチエージェント構成の検討, (4) アンチパターン検出, (5) テンプレート/雛形/ディレクトリ構成の生成 (scaffold), (6) エージェント定義・プロンプト・copilot-instructions の作成"
+description: "Design, review, and improve agent workflows based on proven design principles (SSOT, SRP, Fail Fast, Iterative Refinement). Supports Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer patterns. Use when: (1) Designing new agent workflows, (2) Reviewing/improving existing workflows, (3) Planning multi-agent architectures, (4) Detecting anti-patterns, (5) Scaffolding workflow templates/directory structures, (6) Creating agent definitions, prompts, or copilot-instructions"
 ---
 
 # Agentic Workflow Guide
 
-エージェントワークフローを設計原則に基づいて設計・レビュー・改善するためのガイド。
+A comprehensive guide for designing, reviewing, and improving agent workflows based on proven design principles.
 
 ## When to Use
 
-- **新規ワークフロー設計** - エージェントの役割分担・実行順序を決める
-- **既存ワークフローのレビュー** - 設計原則に照らして問題を検出
-- **パターン選択** - タスク特性に合ったワークフローパターンを選ぶ
-- **品質改善** - Iterative Refinement でワークフローを段階的に改善
+- **New Workflow Design** - Define agent roles, responsibilities, and execution order
+- **Workflow Review** - Detect issues by checking against design principles
+- **Pattern Selection** - Choose the right workflow pattern for your task
+- **Quality Improvement** - Iteratively refine workflows step by step
+- **Scaffolding** - Generate workflow directory structures and templates
 
 ## Core Principles
 
-→ 詳細は **[references/design-principles.md](references/design-principles.md)** 参照
+→ See **[references/design-principles.md](references/design-principles.md)** for details
 
-### Tier 1: 必須原則
+### Tier 1: Essential Principles
 
-| 原則                     | 説明                        | チェック観点                                   |
-| ------------------------ | --------------------------- | ---------------------------------------------- |
-| **SSOT**                 | 情報は一箇所で管理          | 同じ情報が複数箇所で定義されていないか？       |
-| **SRP**                  | 1 エージェント = 1 責務     | 1 つのエージェントが複数責務を持っていないか？ |
-| **Simplicity First**     | 最もシンプルな解から始める  | 過剰に複雑な設計になっていないか？             |
-| **Fail Fast**            | 早期検知・早期修正          | エラー時に即座に検知・停止できるか？           |
-| **Iterative Refinement** | 小さく作って繰り返し改善    | 小さなステップに分割されているか？             |
-| **Feedback Loop**        | 各ステップで成果確認 → 調整 | 各ステップで成果を確認できるか？               |
+| Principle                | Description                      | Check Point                                      |
+| ------------------------ | -------------------------------- | ------------------------------------------------ |
+| **SSOT**                 | Single source of truth           | Is the same info defined in multiple places?     |
+| **SRP**                  | 1 agent = 1 responsibility       | Does one agent handle multiple responsibilities? |
+| **Simplicity First**     | Start with the simplest solution | Is the design overly complex?                    |
+| **Fail Fast**            | Detect and fix errors early      | Can errors be detected and stopped immediately?  |
+| **Iterative Refinement** | Build small, improve repeatedly  | Is it broken into small steps?                   |
+| **Feedback Loop**        | Verify results at each step      | Can results be verified at each step?            |
 
-### Tier 2: 品質原則
+### Tier 2: Quality Principles
 
-| 原則                | 説明                       | チェック観点                       |
-| ------------------- | -------------------------- | ---------------------------------- |
-| **Transparency**    | 計画・進捗を明示的に見せる | 何をしているか可視化されているか？ |
-| **Gate/Checkpoint** | 各ステップで検証ゲート     | 次に進む前に検証しているか？       |
-| **DRY**             | 重複排除、再利用           | 共通処理は再利用されているか？     |
-| **ISP**             | 必要最小限のコンテキスト   | 不要な情報を渡していないか？       |
-| **Idempotency**     | 冪等性（リトライ安全）     | リトライしても安全か？             |
+| Principle           | Description                        | Check Point                           |
+| ------------------- | ---------------------------------- | ------------------------------------- |
+| **Transparency**    | Show plans and progress explicitly | Is progress visible?                  |
+| **Gate/Checkpoint** | Validate at each step              | Is validation done before proceeding? |
+| **DRY**             | Don't repeat yourself              | Are common processes reused?          |
+| **ISP**             | Minimal context only               | Is unnecessary info being passed?     |
+| **Idempotency**     | Safe to retry                      | Is it safe to retry operations?       |
 
 ## Workflow Patterns
 
-→ 詳細は **[references/workflow-patterns.md](references/workflow-patterns.md)** 参照
+→ See **[references/workflow-patterns.md](references/workflow-patterns.md)** for details
 
-### パターン選択ガイド
+### Pattern Selection Guide
 
 ```
-タスクの性質は？
-├─ 順次処理が必要 ────────→ Prompt Chaining
-├─ 独立タスクが複数 ──────→ Parallelization
-├─ 動的にタスク分割 ──────→ Orchestrator-Workers
-├─ 品質基準を満たすまで ──→ Evaluator-Optimizer
-└─ 入力で処理が変わる ────→ Routing
+What's the nature of the task?
+├─ Sequential processing needed ──→ Prompt Chaining
+├─ Multiple independent tasks ────→ Parallelization
+├─ Dynamic task decomposition ────→ Orchestrator-Workers
+├─ Until quality criteria met ────→ Evaluator-Optimizer
+└─ Processing varies by input ────→ Routing
 ```
 
-### パターン一覧
+### Pattern Overview
 
-| パターン                 | 用途                            | 「小さく回す」度 |
-| ------------------------ | ------------------------------- | ---------------- |
-| **Prompt Chaining**      | 順次処理、各ステップで検証      | ⭐⭐⭐           |
-| **Routing**              | 入力を分類 → 専門処理へ振り分け | ⭐⭐             |
-| **Parallelization**      | 独立タスクを同時実行            | ⭐⭐             |
-| **Orchestrator-Workers** | 動的にタスク分割 → ワーカーへ   | ⭐⭐⭐           |
-| **Evaluator-Optimizer**  | 生成 → 評価 → 改善ループ        | ⭐⭐⭐⭐⭐       |
+| Pattern                  | Use Case                           | Iterative Level |
+| ------------------------ | ---------------------------------- | --------------- |
+| **Prompt Chaining**      | Sequential with validation         | ⭐⭐⭐          |
+| **Routing**              | Classify → route to specialists    | ⭐⭐            |
+| **Parallelization**      | Execute independent tasks together | ⭐⭐            |
+| **Orchestrator-Workers** | Dynamic decomposition → workers    | ⭐⭐⭐          |
+| **Evaluator-Optimizer**  | Generate → evaluate → improve loop | ⭐⭐⭐⭐⭐      |
 
 ## Design Workflow
 
-### Step 1: ヒアリング
+### Step 1: Requirements Gathering
 
 ```markdown
-## ワークフロー設計ヒアリング
+## Workflow Design Interview
 
-1. **目的**: 何を達成したいか？
-2. **タスク分解**: どんなサブタスクに分けられるか？
-3. **依存関係**: タスク間に順序依存はあるか？
-4. **並列可能性**: 独立して実行できるタスクはあるか？
-5. **品質基準**: 成功/失敗の判断基準は何か？
-6. **エラー処理**: 失敗時にどう対応するか？
+1. **Goal**: What do you want to achieve?
+2. **Task Decomposition**: What subtasks can this be broken into?
+3. **Dependencies**: Are there ordering dependencies between tasks?
+4. **Parallelism**: Which tasks can run independently?
+5. **Quality Criteria**: What defines success/failure?
+6. **Error Handling**: How should failures be handled?
 ```
 
-### Step 2: パターン選択
+### Step 2: Pattern Selection
 
-ヒアリング結果から最適なパターンを選択：
+Choose the optimal pattern based on requirements:
 
-| 条件                         | 推奨パターン         |
-| ---------------------------- | -------------------- |
-| タスクに明確な順序がある     | Prompt Chaining      |
-| タスクが独立している         | Parallelization      |
-| タスク数が動的に変わる       | Orchestrator-Workers |
-| 品質基準を満たすまで繰り返す | Evaluator-Optimizer  |
-| 入力によって処理が分岐       | Routing              |
+| Condition                         | Recommended Pattern  |
+| --------------------------------- | -------------------- |
+| Tasks have clear ordering         | Prompt Chaining      |
+| Tasks are independent             | Parallelization      |
+| Number of tasks is dynamic        | Orchestrator-Workers |
+| Repeat until quality criteria met | Evaluator-Optimizer  |
+| Processing varies by input type   | Routing              |
 
-### Step 3: 設計図作成
+### Step 3: Create Design Diagram
 
-Mermaid で可視化：
+Visualize with Mermaid:
 
 ```mermaid
 graph TD
-    A[Start] --> B{タスク分類}
+    A[Start] --> B{Task Classification}
     B -->|Type A| C[Agent 1]
     B -->|Type B| D[Agent 2]
     C --> E[Reviewer]
@@ -108,124 +109,124 @@ graph TD
     G --> D
 ```
 
-### Step 4: 原則チェック
+### Step 4: Principle Check
 
-設計を原則に照らして検証（レビューチェックリスト使用）
+Validate design against principles (use review checklist)
 
-### Step 5: 実装 & Iterate
+### Step 5: Implement & Iterate
 
-小さく実装 → 動作確認 → フィードバック → 改善
+Build small → verify → get feedback → improve
 
 ## Review Checklist
 
-→ 詳細は **[references/review-checklist.md](references/review-checklist.md)** 参照
+→ See **[references/review-checklist.md](references/review-checklist.md)** for details
 
-### クイックチェック
+### Quick Check
 
 ```markdown
-## ワークフローレビューチェックリスト
+## Workflow Review Checklist
 
-### コア原則
+### Core Principles
 
-- [ ] **SSOT**: 同じ情報が複数箇所で定義されていないか？
-- [ ] **SRP**: 各エージェントは 1 つの責務に集中しているか？
-- [ ] **Simplicity**: 最もシンプルな解になっているか？
-- [ ] **Fail Fast**: エラー時に即座に検知・停止できるか？
-- [ ] **Iterative**: 小さなステップに分割されているか？
-- [ ] **Feedback Loop**: 各ステップで成果を確認できるか？
+- [ ] **SSOT**: Is the same info defined in multiple places?
+- [ ] **SRP**: Is each agent focused on a single responsibility?
+- [ ] **Simplicity**: Is this the simplest possible solution?
+- [ ] **Fail Fast**: Can errors be detected and stopped immediately?
+- [ ] **Iterative**: Is it broken into small steps?
+- [ ] **Feedback Loop**: Can results be verified at each step?
 
-### 品質原則
+### Quality Principles
 
-- [ ] **Transparency**: 計画・進捗が可視化されているか？
-- [ ] **Gate/Checkpoint**: 各ステップで検証しているか？
-- [ ] **DRY**: 共通処理は再利用されているか？
-- [ ] **ISP**: 必要最小限の情報だけ渡しているか？
-- [ ] **Idempotency**: リトライしても安全か？
+- [ ] **Transparency**: Are plans and progress visible?
+- [ ] **Gate/Checkpoint**: Is validation done at each step?
+- [ ] **DRY**: Are common processes reused?
+- [ ] **ISP**: Is only necessary info being passed?
+- [ ] **Idempotency**: Is it safe to retry?
 
-### アンチパターン検出
+### Anti-Pattern Detection
 
-- [ ] 1 つのエージェントに責務を詰め込みすぎていないか？
-- [ ] コンテキストを過剰に渡していないか？
-- [ ] エラー処理が欠落していないか？
-- [ ] 無限ループの可能性はないか？
-- [ ] Human-in-the-Loop が必要な箇所はあるか？
+- [ ] Is too much responsibility packed into one agent?
+- [ ] Is excessive context being passed?
+- [ ] Is error handling missing?
+- [ ] Is there potential for infinite loops?
+- [ ] Are there points where human-in-the-loop is needed?
 ```
 
 ## Anti-Patterns
 
-→ 詳細は **[references/anti-patterns.md](references/anti-patterns.md)** 参照
+→ See **[references/anti-patterns.md](references/anti-patterns.md)** for details
 
-| アンチパターン       | 問題                   | 対策                   |
-| -------------------- | ---------------------- | ---------------------- |
-| **God Agent**        | 1 エージェントに全責務 | SRP で分割             |
-| **Context Overload** | 不要な情報を大量に渡す | ISP で最小化           |
-| **Silent Failure**   | エラーを無視して続行   | Fail Fast で即停止     |
-| **Infinite Loop**    | 終了条件なしのループ   | 最大イテレーション設定 |
-| **Big Bang**         | 一度に大きく作る       | Iterative で小さく回す |
+| Anti-Pattern         | Problem                         | Solution                        |
+| -------------------- | ------------------------------- | ------------------------------- |
+| **God Agent**        | All responsibilities in 1 agent | Split with SRP                  |
+| **Context Overload** | Passing excessive info          | Minimize with ISP               |
+| **Silent Failure**   | Ignoring errors and continuing  | Stop immediately with Fail Fast |
+| **Infinite Loop**    | No termination condition        | Set max iterations              |
+| **Big Bang**         | Building everything at once     | Build small with Iterative      |
 
 ## Scaffold Workflow
 
-ワークフローのディレクトリ構成を自動生成できます。
+Automatically generate workflow directory structures.
 
 ### Usage
 
 ```bash
-# 基本的なワークフロー
+# Basic workflow
 python scripts/scaffold_workflow.py my-workflow
 
-# パターン指定
+# Specify pattern
 python scripts/scaffold_workflow.py code-review --pattern evaluator-optimizer
 
-# 出力先指定
+# Specify output path
 python scripts/scaffold_workflow.py data-pipeline --pattern orchestrator-workers --path ./projects
 
-# 利用可能なパターン一覧
+# List available patterns
 python scripts/scaffold_workflow.py --list-patterns
 ```
 
 ### Available Patterns
 
-| パターン               | 説明                          |
-| ---------------------- | ----------------------------- |
-| `basic`                | 基本的なワークフロー構成      |
-| `prompt-chaining`      | 順次処理パターン              |
-| `parallelization`      | 並列処理パターン              |
-| `orchestrator-workers` | オーケストレーター + ワーカー |
-| `evaluator-optimizer`  | 評価・改善ループ              |
-| `routing`              | ルーティングパターン          |
+| Pattern                | Description                    |
+| ---------------------- | ------------------------------ |
+| `basic`                | Basic workflow structure       |
+| `prompt-chaining`      | Sequential processing pattern  |
+| `parallelization`      | Parallel processing pattern    |
+| `orchestrator-workers` | Orchestrator + workers pattern |
+| `evaluator-optimizer`  | Evaluation-improvement loop    |
+| `routing`              | Routing pattern                |
 
 ### Generated Structure
 
 ```
 my-workflow/
-├── Agent.md                    # ワークフロー概要・エージェント一覧
-├── README.md                   # 使い方ガイド
+├── Agent.md                    # Workflow overview & agent list
+├── README.md                   # Usage guide
 ├── .github/
-│   ├── copilot-instructions.md # GitHub Copilot 用インストラクション
-│   └── instructions/           # ファイルパターン別ルール
+│   ├── copilot-instructions.md # GitHub Copilot instructions
+│   └── instructions/           # File-pattern-specific rules
 │       ├── workflow.instructions.md
 │       ├── agents.instructions.md
 │       └── prompts.instructions.md
-├── agents/                     # エージェント定義
-├── prompts/                    # プロンプトテンプレート
+├── agents/                     # Agent definitions
+├── prompts/                    # Prompt templates
 │   ├── system_prompt.md
 │   ├── task_prompt.md
 │   └── error_handling_prompt.md
-├── docs/                       # 設計ドキュメント
+├── docs/                       # Design documentation
 │   ├── design.md
 │   └── review_notes.md
-└── config/                     # 設定ファイル
+└── config/                     # Configuration files
 ```
 
 ## Resources
 
-| ファイル                                                | 内容                           |
-| ------------------------------------------------------- | ------------------------------ |
-| [design-principles.md](references/design-principles.md) | 設計原則の詳細説明             |
-| [workflow-patterns.md](references/workflow-patterns.md) | ワークフローパターン詳細       |
-| [review-checklist.md](references/review-checklist.md)   | レビューチェックリスト         |
-| [anti-patterns.md](references/anti-patterns.md)         | アンチパターン集               |
-| [scaffold_workflow.py](scripts/scaffold_workflow.py)    | ディレクトリ構成生成スクリプト |
+| File                                                    | Content                       |
+| ------------------------------------------------------- | ----------------------------- |
+| [design-principles.md](references/design-principles.md) | Detailed design principles    |
+| [workflow-patterns.md](references/workflow-patterns.md) | Workflow pattern details      |
+| [review-checklist.md](references/review-checklist.md)   | Review checklist              |
+| [anti-patterns.md](references/anti-patterns.md)         | Anti-pattern collection       |
+| [scaffold_workflow.py](scripts/scaffold_workflow.py)    | Directory structure generator |
 
 ## References
 

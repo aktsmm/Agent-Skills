@@ -1,225 +1,225 @@
 # Review Checklist
 
-エージェントワークフローのレビューチェックリスト。
+Review checklist for agent workflows.
 
-## 使い方
+## How to Use
 
-1. ワークフロー設計完了後にこのチェックリストを確認
-2. 各項目を ✅ または ❌ でマーク
-3. ❌ がある場合は対策を検討
-4. 全て ✅ になるまで改善
+1. Review this checklist after completing workflow design
+2. Mark each item as ✅ or ❌
+3. If there are ❌ items, consider solutions
+4. Improve until all items are ✅
 
 ---
 
-## クイックチェック（5 分）
+## Quick Check (5 minutes)
 
-最低限確認すべき項目：
+Minimum items to verify:
 
 ```markdown
-- [ ] 各エージェントは 1 つの責務に集中しているか？ (SRP)
-- [ ] エラー時に即座に検知・停止できるか？ (Fail Fast)
-- [ ] 小さなステップに分割されているか？ (Iterative)
-- [ ] 各ステップで成果を確認できるか？ (Feedback Loop)
-- [ ] 無限ループの可能性はないか？
+- [ ] Is each agent focused on a single responsibility? (SRP)
+- [ ] Can errors be detected and stopped immediately? (Fail Fast)
+- [ ] Is it divided into small steps? (Iterative)
+- [ ] Can results be verified at each step? (Feedback Loop)
+- [ ] Is there any possibility of infinite loops?
 ```
 
 ---
 
-## 詳細チェック
+## Detailed Check
 
-### コア原則チェック
+### Core Principles Check
 
 ```markdown
 ## SSOT (Single Source of Truth)
 
-- [ ] 同じ情報が複数箇所で定義されていないか？
-- [ ] 設定・コンテキストは一元管理されているか？
-- [ ] 情報の更新が全体に反映される仕組みがあるか？
+- [ ] Is the same information defined in multiple places?
+- [ ] Is configuration/context centrally managed?
+- [ ] Is there a mechanism to reflect updates across the entire system?
 
 ## SRP (Single Responsibility Principle)
 
-- [ ] 各エージェントは 1 つの責務に集中しているか？
-- [ ] 責務の境界は明確か？
-- [ ] エージェント間の役割重複はないか？
+- [ ] Is each agent focused on a single responsibility?
+- [ ] Are responsibility boundaries clear?
+- [ ] Is there role overlap between agents?
 
 ## Simplicity First
 
-- [ ] 最もシンプルな解になっているか？
-- [ ] 不要なエージェントやステップはないか？
-- [ ] より単純な方法で達成できないか？
+- [ ] Is this the simplest possible solution?
+- [ ] Are there unnecessary agents or steps?
+- [ ] Could this be achieved with a simpler approach?
 
 ## Fail Fast
 
-- [ ] エラー時に即座に検知できるか？
-- [ ] エラー時に適切に停止できるか？
-- [ ] エラーメッセージは明確か？
+- [ ] Can errors be detected immediately?
+- [ ] Can the system stop appropriately on errors?
+- [ ] Are error messages clear?
 
 ## Iterative Refinement
 
-- [ ] 小さなステップに分割されているか？
-- [ ] 各ステップで検証できるか？
-- [ ] 段階的に改善できる構造か？
+- [ ] Is it divided into small steps?
+- [ ] Can each step be verified?
+- [ ] Is the structure suitable for gradual improvement?
 
 ## Feedback Loop
 
-- [ ] 各ステップで成果を確認できるか？
-- [ ] フィードバックを次のステップに活かせるか？
-- [ ] 改善のサイクルが回る構造か？
+- [ ] Can results be verified at each step?
+- [ ] Can feedback be applied to the next step?
+- [ ] Is there a structure for improvement cycles?
 ```
 
-### 品質原則チェック
+### Quality Principles Check
 
 ```markdown
 ## Transparency
 
-- [ ] 計画・進捗が可視化されているか？
-- [ ] 何をしているかユーザーに伝わるか？
-- [ ] ログは十分に出力されるか？
+- [ ] Are plans and progress visualized?
+- [ ] Is it clear to users what's happening?
+- [ ] Are logs being output sufficiently?
 
 ## Gate/Checkpoint
 
-- [ ] 各ステップで検証しているか？
-- [ ] 次に進む条件は明確か？
-- [ ] 検証失敗時の処理は定義されているか？
+- [ ] Is validation performed at each step?
+- [ ] Are conditions for proceeding clearly defined?
+- [ ] Is handling for validation failures defined?
 
 ## DRY (Don't Repeat Yourself)
 
-- [ ] 共通処理は再利用されているか？
-- [ ] プロンプトテンプレートを活用しているか？
-- [ ] 同じロジックの重複はないか？
+- [ ] Are common processes being reused?
+- [ ] Are prompt templates being utilized?
+- [ ] Is there duplication of the same logic?
 
 ## ISP (Interface Segregation Principle)
 
-- [ ] 必要最小限の情報だけ渡しているか？
-- [ ] 不要なコンテキストを含めていないか？
-- [ ] 各エージェントに必要な情報は明確か？
+- [ ] Is only the minimum necessary information being passed?
+- [ ] Is unnecessary context being included?
+- [ ] Is required information for each agent clear?
 
 ## Idempotency
 
-- [ ] リトライしても安全か？
-- [ ] 同じ操作を複数回実行しても結果は同じか？
-- [ ] 副作用は管理されているか？
+- [ ] Is it safe to retry?
+- [ ] Does executing the same operation multiple times produce the same result?
+- [ ] Are side effects being managed?
 ```
 
-### スケール・安全性チェック
+### Scale & Safety Check
 
 ```markdown
 ## Human-in-the-Loop
 
-- [ ] 重要な決定に人間確認が必要か？
-- [ ] リスクの高い操作前に確認があるか？
-- [ ] 自動化と人間判断のバランスは適切か？
+- [ ] Are important decisions requiring human confirmation?
+- [ ] Is there confirmation before high-risk operations?
+- [ ] Is the balance between automation and human judgment appropriate?
 
-## 終了条件
+## Termination Conditions
 
-- [ ] 無限ループの可能性はないか？
-- [ ] 最大イテレーション数は設定されているか？
-- [ ] タイムアウトは設定されているか？
+- [ ] Is there any possibility of infinite loops?
+- [ ] Is a maximum iteration count set?
+- [ ] Is a timeout set?
 
-## エラーハンドリング
+## Error Handling
 
-- [ ] エラー処理が欠落していないか？
-- [ ] 予期しないエラーへの対応はあるか？
-- [ ] リカバリ手順は定義されているか？
+- [ ] Is error handling missing anywhere?
+- [ ] Is there handling for unexpected errors?
+- [ ] Are recovery procedures defined?
 
-## セキュリティ
+## Security
 
-- [ ] 機密情報の取り扱いは適切か？
-- [ ] 権限は最小限に設定されているか？
-- [ ] 監査ログは取得できるか？
+- [ ] Is sensitive information being handled appropriately?
+- [ ] Are permissions set to minimum?
+- [ ] Can audit logs be collected?
 ```
 
 ---
 
-## アンチパターン検出
+## Anti-Pattern Detection
 
-以下に該当する場合は設計を見直す：
+If any of the following apply, review the design:
 
 ```markdown
-- [ ] **God Agent**: 1 つのエージェントに責務を詰め込みすぎていないか？
-      → SRP で分割
+- [ ] **God Agent**: Is too much responsibility packed into one agent?
+      → Split with SRP
 
-- [ ] **Context Overload**: コンテキストを過剰に渡していないか？
-      → ISP で最小化
+- [ ] **Context Overload**: Is excessive context being passed?
+      → Minimize with ISP
 
-- [ ] **Silent Failure**: エラーを無視して続行していないか？
-      → Fail Fast で即停止
+- [ ] **Silent Failure**: Are errors being ignored and continuing?
+      → Stop immediately with Fail Fast
 
-- [ ] **Infinite Loop**: 終了条件なしのループはないか？
-      → 最大イテレーション設定
+- [ ] **Infinite Loop**: Are there loops without termination conditions?
+      → Set maximum iterations
 
-- [ ] **Big Bang**: 一度に大きく作ろうとしていないか？
-      → Iterative で小さく回す
+- [ ] **Big Bang**: Trying to build everything at once?
+      → Build small with Iterative
 
-- [ ] **Premature Optimization**: 必要以上に複雑にしていないか？
-      → Simplicity First を適用
+- [ ] **Premature Optimization**: Making it more complex than necessary?
+      → Apply Simplicity First
 ```
 
 ---
 
-## レビュー結果テンプレート
+## Review Result Template
 
 ```markdown
-# ワークフローレビュー結果
+# Workflow Review Results
 
-## 概要
+## Overview
 
-- **ワークフロー名**:
-- **レビュー日**:
-- **レビュアー**:
+- **Workflow Name**:
+- **Review Date**:
+- **Reviewer**:
 
-## チェック結果
+## Check Results
 
-### コア原則
+### Core Principles
 
-| 原則                 | 結果  | コメント |
-| -------------------- | ----- | -------- |
-| SSOT                 | ✅/❌ |          |
-| SRP                  | ✅/❌ |          |
-| Simplicity First     | ✅/❌ |          |
-| Fail Fast            | ✅/❌ |          |
-| Iterative Refinement | ✅/❌ |          |
-| Feedback Loop        | ✅/❌ |          |
+| Principle            | Result | Comment |
+| -------------------- | ------ | ------- |
+| SSOT                 | ✅/❌  |         |
+| SRP                  | ✅/❌  |         |
+| Simplicity First     | ✅/❌  |         |
+| Fail Fast            | ✅/❌  |         |
+| Iterative Refinement | ✅/❌  |         |
+| Feedback Loop        | ✅/❌  |         |
 
-### 品質原則
+### Quality Principles
 
-| 原則            | 結果  | コメント |
-| --------------- | ----- | -------- |
-| Transparency    | ✅/❌ |          |
-| Gate/Checkpoint | ✅/❌ |          |
-| DRY             | ✅/❌ |          |
-| ISP             | ✅/❌ |          |
-| Idempotency     | ✅/❌ |          |
+| Principle       | Result | Comment |
+| --------------- | ------ | ------- |
+| Transparency    | ✅/❌  |         |
+| Gate/Checkpoint | ✅/❌  |         |
+| DRY             | ✅/❌  |         |
+| ISP             | ✅/❌  |         |
+| Idempotency     | ✅/❌  |         |
 
-### アンチパターン
+### Anti-Patterns
 
-| パターン         | 検出  | 対策 |
-| ---------------- | ----- | ---- |
-| God Agent        | ✅/❌ |      |
-| Context Overload | ✅/❌ |      |
-| Silent Failure   | ✅/❌ |      |
-| Infinite Loop    | ✅/❌ |      |
-| Big Bang         | ✅/❌ |      |
+| Pattern          | Detected | Solution |
+| ---------------- | -------- | -------- |
+| God Agent        | ✅/❌    |          |
+| Context Overload | ✅/❌    |          |
+| Silent Failure   | ✅/❌    |          |
+| Infinite Loop    | ✅/❌    |          |
+| Big Bang         | ✅/❌    |          |
 
-## 改善提案
+## Improvement Proposals
 
 1.
 2.
 3.
 
-## 総合評価
+## Overall Evaluation
 
-- [ ] 承認
-- [ ] 条件付き承認（軽微な修正後）
-- [ ] 要修正
+- [ ] Approved
+- [ ] Conditionally Approved (after minor fixes)
+- [ ] Requires Revision
 ```
 
 ---
 
-## 次のステップ
+## Next Steps
 
-レビュー完了後：
+After review completion:
 
-1. **全て ✅** → 実装へ進む
-2. **軽微な ❌** → 修正後に再確認
-3. **重大な ❌** → 設計を見直し、再レビュー
+1. **All ✅** → Proceed to implementation
+2. **Minor ❌** → Re-check after fixes
+3. **Major ❌** → Revise design, re-review
