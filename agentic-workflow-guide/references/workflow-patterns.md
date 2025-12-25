@@ -1,25 +1,25 @@
 # Workflow Patterns
 
-エージェントワークフローの 5 つの基本パターン。
+Five fundamental patterns for agent workflows.
 
-## パターン選択フローチャート
+## Pattern Selection Flowchart
 
 ```
-タスクの性質は？
+What's the nature of the task?
 │
-├─ 順次処理が必要（ステップに明確な順序）
+├─ Sequential processing needed (clear step ordering)
 │   └─→ Prompt Chaining
 │
-├─ 独立タスクが複数（互いに影響しない）
+├─ Multiple independent tasks (no mutual impact)
 │   └─→ Parallelization
 │
-├─ タスク数が動的（事前に決まらない）
+├─ Dynamic number of tasks (not predetermined)
 │   └─→ Orchestrator-Workers
 │
-├─ 品質基準を満たすまで繰り返す
+├─ Repeat until quality criteria met
 │   └─→ Evaluator-Optimizer
 │
-└─ 入力によって処理が大きく変わる
+└─ Processing varies significantly by input
     └─→ Routing
 ```
 
@@ -27,7 +27,7 @@
 
 ## 1. Prompt Chaining
 
-**順次処理、各ステップで検証**
+**Sequential processing with validation at each step**
 
 ```mermaid
 graph LR
@@ -39,37 +39,37 @@ graph LR
     F --> G[Output]
 ```
 
-### 特徴
+### Characteristics
 
-| 観点       | 説明                                           |
-| ---------- | ---------------------------------------------- |
-| **構造**   | 直列処理、前のステップの出力が次の入力         |
-| **Gate**   | 各ステップ後に検証ゲートを設置可能             |
-| **適用例** | ドキュメント翻訳、コード生成 → レビュー → 修正 |
+| Aspect        | Description                                              |
+| ------------- | -------------------------------------------------------- |
+| **Structure** | Serial processing, output of each step is input for next |
+| **Gate**      | Can set validation gates after each step                 |
+| **Use Cases** | Document translation, code generation → review → fix     |
 
-### いつ使うか
+### When to Use
 
-- タスクが明確なサブタスクに分解できる
-- 各ステップの出力が次のステップに必要
-- 中間結果の検証が重要
+- Task can be decomposed into clear subtasks
+- Each step's output is needed for the next step
+- Intermediate result validation is important
 
-### 実装例
+### Implementation Example
 
 ```
-Step 1: 要件を分析
-    ↓ (Gate: 要件が明確か？)
-Step 2: 設計を作成
-    ↓ (Gate: 設計が妥当か？)
-Step 3: 実装
-    ↓ (Gate: テスト通過？)
-Step 4: ドキュメント作成
+Step 1: Analyze requirements
+    ↓ (Gate: Are requirements clear?)
+Step 2: Create design
+    ↓ (Gate: Is design valid?)
+Step 3: Implement
+    ↓ (Gate: Tests passing?)
+Step 4: Create documentation
 ```
 
 ---
 
 ## 2. Routing
 
-**入力を分類 → 専門処理へ振り分け**
+**Classify input → Route to specialized handlers**
 
 ```mermaid
 graph TD
@@ -82,34 +82,34 @@ graph TD
     E --> F
 ```
 
-### 特徴
+### Characteristics
 
-| 観点       | 説明                               |
-| ---------- | ---------------------------------- |
-| **構造**   | 分類器 + 専門ハンドラー            |
-| **利点**   | 各ハンドラーを最適化できる         |
-| **適用例** | カスタマーサポート、問い合わせ分類 |
+| Aspect        | Description                              |
+| ------------- | ---------------------------------------- |
+| **Structure** | Classifier + specialized handlers        |
+| **Benefits**  | Each handler can be optimized            |
+| **Use Cases** | Customer support, inquiry classification |
 
-### いつ使うか
+### When to Use
 
-- 入力に明確なカテゴリがある
-- カテゴリごとに異なる処理が最適
-- 分類精度が十分に高い
+- Input has clear categories
+- Different processing is optimal per category
+- Classification accuracy is sufficiently high
 
-### 実装例
+### Implementation Example
 
 ```
-Router: 問い合わせタイプを判定
-├─ 技術的質問 → 技術サポートAgent
-├─ 料金関連 → 請求サポートAgent
-└─ 一般的質問 → FAQAgent
+Router: Determine inquiry type
+├─ Technical question → Technical Support Agent
+├─ Billing related → Billing Support Agent
+└─ General question → FAQ Agent
 ```
 
 ---
 
 ## 3. Parallelization
 
-**独立タスクを同時実行**
+**Execute independent tasks simultaneously**
 
 ```mermaid
 graph TD
@@ -122,36 +122,36 @@ graph TD
     E --> F[Output]
 ```
 
-### 特徴
+### Characteristics
 
-| 観点               | 説明                                 |
-| ------------------ | ------------------------------------ |
-| **構造**           | 分割 → 並列実行 → 集約               |
-| **利点**           | 処理時間短縮、独立性による堅牢性     |
-| **バリエーション** | Sectioning（分割）、Voting（多数決） |
+| Aspect         | Description                                           |
+| -------------- | ----------------------------------------------------- |
+| **Structure**  | Split → parallel execution → aggregate                |
+| **Benefits**   | Reduced processing time, robustness from independence |
+| **Variations** | Sectioning (division), Voting (majority decision)     |
 
-### いつ使うか
+### When to Use
 
-- タスクが独立している（共有状態なし）
-- 並列実行で時間短縮できる
-- 複数の視点/結果が欲しい
+- Tasks are independent (no shared state)
+- Parallel execution can reduce time
+- Multiple perspectives/results are desired
 
-### 実装例
+### Implementation Example
 
 ```
-Input: ドキュメント
-├─ Agent 1: 文法チェック
-├─ Agent 2: 内容正確性チェック
-└─ Agent 3: スタイルチェック
+Input: Document
+├─ Agent 1: Grammar check
+├─ Agent 2: Content accuracy check
+└─ Agent 3: Style check
     ↓
-Aggregator: 全結果を統合
+Aggregator: Integrate all results
 ```
 
 ---
 
 ## 4. Orchestrator-Workers
 
-**動的にタスク分割 → ワーカーへ**
+**Dynamically decompose tasks → Dispatch to workers**
 
 ```mermaid
 graph TD
@@ -166,42 +166,42 @@ graph TD
     G --> H[Output]
 ```
 
-### 特徴
+### Characteristics
 
-| 観点       | 説明                                               |
-| ---------- | -------------------------------------------------- |
-| **構造**   | オーケストレーター + 動的ワーカー + シンセサイザー |
-| **利点**   | タスク数が事前に決まらなくても OK                  |
-| **適用例** | コード変更（複数ファイル）、リサーチ               |
+| Aspect        | Description                                     |
+| ------------- | ----------------------------------------------- |
+| **Structure** | Orchestrator + dynamic workers + synthesizer    |
+| **Benefits**  | Works even when task count is not predetermined |
+| **Use Cases** | Code changes (multiple files), research         |
 
-### いつ使うか
+### When to Use
 
-- サブタスクの数が入力依存
-- 各サブタスクが独立して実行可能
-- 結果の統合が必要
+- Number of subtasks depends on input
+- Each subtask can be executed independently
+- Result synthesis is required
 
-### 実装例
+### Implementation Example
 
 ```
 Orchestrator:
-  - ファイル変更リストを生成
-  - 各ファイルにWorkerを割り当て
+  - Generate file change list
+  - Assign workers to each file
 
 Workers:
-  - Worker 1 → file1.py を修正
-  - Worker 2 → file2.py を修正
-  - Worker 3 → test.py を修正
+  - Worker 1 → Modify file1.py
+  - Worker 2 → Modify file2.py
+  - Worker 3 → Modify test.py
 
 Synthesizer:
-  - 全変更をマージ
-  - コンフリクト解決
+  - Merge all changes
+  - Resolve conflicts
 ```
 
 ---
 
 ## 5. Evaluator-Optimizer
 
-**生成 → 評価 → 改善ループ**
+**Generate → Evaluate → Improve loop**
 
 ```mermaid
 graph TD
@@ -213,51 +213,51 @@ graph TD
     D -->|Good| F[Final Output]
 ```
 
-### 特徴
+### Characteristics
 
-| 観点       | 説明                                   |
-| ---------- | -------------------------------------- |
-| **構造**   | 生成器 + 評価器 + フィードバックループ |
-| **利点**   | 品質基準を満たすまで改善               |
-| **適用例** | 翻訳、コードレビュー、文章校正         |
+| Aspect        | Description                                 |
+| ------------- | ------------------------------------------- |
+| **Structure** | Generator + evaluator + feedback loop       |
+| **Benefits**  | Improves until quality criteria are met     |
+| **Use Cases** | Translation, code review, text proofreading |
 
-### いつ使うか
+### When to Use
 
-- 明確な品質基準がある
-- 反復的な改善で品質が上がる
-- 人間のフィードバックを模倣したい
+- Clear quality criteria exist
+- Iterative improvement increases quality
+- Want to mimic human feedback
 
-### 実装例
+### Implementation Example
 
 ```
-Generator: 翻訳を生成
+Generator: Generate translation
     ↓
 Evaluator:
-  - ニュアンスは正確か？
-  - 文法は正しいか？
-  - 原文の意図を反映しているか？
+  - Is the nuance accurate?
+  - Is the grammar correct?
+  - Does it reflect the original intent?
     ↓
-  ├─ OK → 完了
-  └─ NG → フィードバック付きで再生成
+  ├─ OK → Complete
+  └─ NG → Regenerate with feedback
 ```
 
 ---
 
-## パターンの組み合わせ
+## Combining Patterns
 
-実際のワークフローでは、複数のパターンを組み合わせることが多い。
+In real workflows, multiple patterns are often combined.
 
-### 例: コード生成ワークフロー
+### Example: Code Generation Workflow
 
 ```mermaid
 graph TD
-    A[要件] --> B{Routing}
-    B -->|新規機能| C[設計Agent]
-    B -->|バグ修正| D[分析Agent]
+    A[Requirements] --> B{Routing}
+    B -->|New Feature| C[Design Agent]
+    B -->|Bug Fix| D[Analysis Agent]
     C --> E[Orchestrator]
     D --> E
-    E --> F[実装Worker 1]
-    E --> G[実装Worker 2]
+    E --> F[Implementation Worker 1]
+    E --> G[Implementation Worker 2]
     F --> H[Evaluator]
     G --> H
     H -->|NG| I[Feedback]
@@ -266,11 +266,11 @@ graph TD
     H -->|OK| J[Complete]
 ```
 
-**使用パターン:**
+**Patterns Used:**
 
-1. **Routing** - 要件タイプで処理を分岐
-2. **Orchestrator-Workers** - ファイルごとに実装
-3. **Evaluator-Optimizer** - レビュー → 修正ループ
+1. **Routing** - Branch processing by requirement type
+2. **Orchestrator-Workers** - Implement per file
+3. **Evaluator-Optimizer** - Review → fix loop
 
 ---
 

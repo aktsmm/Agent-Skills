@@ -1,205 +1,205 @@
 # Design Principles
 
-エージェントワークフロー設計のための原則集。
+A collection of principles for designing agent workflows.
 
-## Tier 1: コア原則（必須）
+## Tier 1: Core Principles (Essential)
 
 ### 1. SSOT (Single Source of Truth)
 
-**情報は一箇所で管理する**
+**Manage information in one place**
 
-| 観点                     | 説明                                     |
-| ------------------------ | ---------------------------------------- |
-| **定義**                 | 同じ情報を複数箇所で定義しない           |
-| **ワークフローでの適用** | コンテキスト、設定、状態は一元管理       |
-| **違反例**               | 各エージェントが同じ設定を別々に持つ     |
-| **対策**                 | 共有コンテキストまたは設定ファイルを使用 |
+| Aspect                   | Description                                          |
+| ------------------------ | ---------------------------------------------------- |
+| **Definition**           | Don't define the same information in multiple places |
+| **Workflow Application** | Centralize context, configuration, and state         |
+| **Violation Example**    | Each agent maintains the same settings separately    |
+| **Solution**             | Use shared context or configuration files            |
 
 ### 2. SRP (Single Responsibility Principle)
 
-**1 エージェント = 1 責務**
+**1 Agent = 1 Responsibility**
 
-| 観点                     | 説明                                                 |
-| ------------------------ | ---------------------------------------------------- |
-| **定義**                 | 各エージェントは 1 つの責務に集中                    |
-| **ワークフローでの適用** | タスクを明確に分離して各エージェントに割り当て       |
-| **違反例**               | 1 つのエージェントが「検索 + 分析 + 報告」を全て担当 |
-| **対策**                 | 役割ごとにエージェントを分割                         |
+| Aspect                   | Description                                       |
+| ------------------------ | ------------------------------------------------- |
+| **Definition**           | Each agent focuses on a single responsibility     |
+| **Workflow Application** | Clearly separate tasks and assign to each agent   |
+| **Violation Example**    | One agent handles "search + analysis + reporting" |
+| **Solution**             | Split agents by role                              |
 
 ### 3. Simplicity First
 
-**最もシンプルな解から始める**
+**Start with the simplest solution**
 
-| 観点                     | 説明                                               |
-| ------------------------ | -------------------------------------------------- |
-| **定義**                 | 必要十分な複雑さに留める                           |
-| **ワークフローでの適用** | まず単一エージェントで試す。複雑化は必要に応じて   |
-| **違反例**               | 最初から 10 エージェントの複雑なワークフローを設計 |
-| **対策**                 | 最小構成から段階的に拡張                           |
+| Aspect                   | Description                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| **Definition**           | Keep complexity to what's necessary and sufficient             |
+| **Workflow Application** | Try with a single agent first. Add complexity only when needed |
+| **Violation Example**    | Designing a 10-agent workflow from the start                   |
+| **Solution**             | Start minimal, extend gradually                                |
 
-**Anthropic の推奨:**
+**Anthropic's Recommendation:**
 
 > "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short."
 
 ### 4. Fail Fast
 
-**早期検知・早期修正**
+**Detect and fix errors early**
 
-| 観点                     | 説明                                   |
-| ------------------------ | -------------------------------------- |
-| **定義**                 | エラーは早期に検知し、即座に対処       |
-| **ワークフローでの適用** | 各ステップで検証し、問題があれば即停止 |
-| **違反例**               | エラーを無視して最後まで処理を続行     |
-| **対策**                 | Gate/Checkpoint を設置                 |
+| Aspect                   | Description                                       |
+| ------------------------ | ------------------------------------------------- |
+| **Definition**           | Detect errors early and handle immediately        |
+| **Workflow Application** | Validate at each step, stop immediately if issues |
+| **Violation Example**    | Ignoring errors and continuing to the end         |
+| **Solution**             | Set up Gates/Checkpoints                          |
 
 ### 5. Iterative Refinement
 
-**小さく作って繰り返し改善**
+**Build small, improve repeatedly**
 
-| 観点                     | 説明                                   |
-| ------------------------ | -------------------------------------- |
-| **定義**                 | 大きな変更より小さな改善を繰り返す     |
-| **ワークフローでの適用** | MVP → 動作確認 → フィードバック → 改善 |
-| **違反例**               | 全機能を一度に実装して最後にテスト     |
-| **対策**                 | 1 タスクずつ実装・検証                 |
+| Aspect                   | Description                                           |
+| ------------------------ | ----------------------------------------------------- |
+| **Definition**           | Prefer small improvements over large changes          |
+| **Workflow Application** | MVP → verify → feedback → improve                     |
+| **Violation Example**    | Implementing all features at once, testing at the end |
+| **Solution**             | Implement and verify one task at a time               |
 
-**関連パターン:** Evaluator-Optimizer
+**Related Pattern:** Evaluator-Optimizer
 
 ### 6. Feedback Loop
 
-**各ステップで成果確認 → 調整**
+**Verify results at each step → adjust**
 
-| 観点                     | 説明                                         |
-| ------------------------ | -------------------------------------------- |
-| **定義**                 | 実行結果からフィードバックを得て次に活かす   |
-| **ワークフローでの適用** | エージェント出力を評価し、必要に応じて再実行 |
-| **違反例**               | 一方通行で結果を確認しない                   |
-| **対策**                 | 評価ステップを組み込む                       |
+| Aspect                   | Description                                        |
+| ------------------------ | -------------------------------------------------- |
+| **Definition**           | Get feedback from execution results, apply to next |
+| **Workflow Application** | Evaluate agent output, re-execute if needed        |
+| **Violation Example**    | One-way flow without result verification           |
+| **Solution**             | Incorporate evaluation steps                       |
 
-**Anthropic の推奨:**
+**Anthropic's Recommendation:**
 
 > "During execution, it's crucial for the agents to gain 'ground truth' from the environment at each step to assess its progress."
 
 ---
 
-## Tier 2: 品質原則（推奨）
+## Tier 2: Quality Principles (Recommended)
 
 ### 7. Transparency
 
-**計画・進捗を明示的に見せる**
+**Show plans and progress explicitly**
 
-| 観点                     | 説明                                   |
-| ------------------------ | -------------------------------------- |
-| **定義**                 | 何をしているかを可視化する             |
-| **ワークフローでの適用** | 各ステップの開始/終了、進捗を明示      |
-| **違反例**               | ブラックボックスで何が起きているか不明 |
-| **対策**                 | ログ、進捗表示、TodoWrite 使用         |
+| Aspect                   | Description                                        |
+| ------------------------ | -------------------------------------------------- |
+| **Definition**           | Make what's happening visible                      |
+| **Workflow Application** | Show start/end of each step, display progress      |
+| **Violation Example**    | Black box with no visibility into what's happening |
+| **Solution**             | Use logs, progress display, TodoWrite              |
 
-**Anthropic の推奨:**
+**Anthropic's Recommendation:**
 
 > "Prioritize transparency by explicitly showing the agent's planning steps."
 
 ### 8. Gate/Checkpoint
 
-**各ステップで検証ゲート**
+**Validation gates at each step**
 
-| 観点                     | 説明                             |
-| ------------------------ | -------------------------------- |
-| **定義**                 | 次のステップに進む前に検証を行う |
-| **ワークフローでの適用** | 品質基準を満たさなければ進まない |
-| **違反例**               | 検証なしで全ステップを通過       |
-| **対策**                 | 条件分岐で品質チェック           |
+| Aspect                   | Description                                   |
+| ------------------------ | --------------------------------------------- |
+| **Definition**           | Validate before proceeding to the next step   |
+| **Workflow Application** | Don't proceed unless quality criteria are met |
+| **Violation Example**    | Passing through all steps without validation  |
+| **Solution**             | Quality checks with conditional branching     |
 
 ### 9. DRY (Don't Repeat Yourself)
 
-**重複排除、再利用**
+**Eliminate duplication, promote reuse**
 
-| 観点                     | 説明                                       |
+| Aspect                   | Description                                |
 | ------------------------ | ------------------------------------------ |
-| **定義**                 | 同じロジックを繰り返さない                 |
-| **ワークフローでの適用** | 共通処理はテンプレート化、プロンプト再利用 |
-| **違反例**               | 各エージェントに同じプロンプトをコピペ     |
-| **対策**                 | 共通プロンプトテンプレートを作成           |
+| **Definition**           | Don't repeat the same logic                |
+| **Workflow Application** | Template common processes, reuse prompts   |
+| **Violation Example**    | Copy-pasting the same prompt to each agent |
+| **Solution**             | Create common prompt templates             |
 
 ### 10. ISP (Interface Segregation Principle)
 
-**必要最小限のコンテキスト**
+**Minimal context only**
 
-| 観点                     | 説明                                 |
-| ------------------------ | ------------------------------------ |
-| **定義**                 | 各エージェントに必要な情報だけを渡す |
-| **ワークフローでの適用** | 過剰なコンテキストはノイズになる     |
-| **違反例**               | 全エージェントに全情報を渡す         |
-| **対策**                 | タスクに必要な情報のみ選別して渡す   |
+| Aspect                   | Description                                    |
+| ------------------------ | ---------------------------------------------- |
+| **Definition**           | Pass only necessary information to each agent  |
+| **Workflow Application** | Excessive context becomes noise                |
+| **Violation Example**    | Passing all information to all agents          |
+| **Solution**             | Select and pass only task-relevant information |
 
-### 11. Idempotency (冪等性)
+### 11. Idempotency
 
-**リトライしても安全**
+**Safe to retry**
 
-| 観点                     | 説明                                       |
-| ------------------------ | ------------------------------------------ |
-| **定義**                 | 同じ操作を複数回実行しても結果が変わらない |
-| **ワークフローでの適用** | 失敗時にリトライできる設計                 |
-| **違反例**               | リトライするとデータが重複                 |
-| **対策**                 | 状態チェック、ユニーク ID 使用             |
+| Aspect                   | Description                                               |
+| ------------------------ | --------------------------------------------------------- |
+| **Definition**           | Same operation produces same result regardless of retries |
+| **Workflow Application** | Design to allow retries on failure                        |
+| **Violation Example**    | Retrying causes data duplication                          |
+| **Solution**             | State checking, use unique IDs                            |
 
 ---
 
-## Tier 3: スケール原則（発展）
+## Tier 3: Scale Principles (Advanced)
 
 ### 12. Human-in-the-Loop
 
-**重要ポイントで人間確認**
+**Human confirmation at critical points**
 
-| 観点                     | 説明                                 |
-| ------------------------ | ------------------------------------ |
-| **定義**                 | 自動化と人間判断のバランス           |
-| **ワークフローでの適用** | 重要な決定、リスクの高い操作前に確認 |
-| **適用例**               | 本番デプロイ前、大量削除前           |
+| Aspect                   | Description                                          |
+| ------------------------ | ---------------------------------------------------- |
+| **Definition**           | Balance automation with human judgment               |
+| **Workflow Application** | Confirm before important decisions, risky operations |
+| **Application Example**  | Before production deploy, before mass deletion       |
 
 ### 13. KISS (Keep It Simple, Stupid)
 
-**シンプルに保つ**
+**Keep it simple**
 
-| 観点                     | 説明                                     |
-| ------------------------ | ---------------------------------------- |
-| **定義**                 | 不必要な複雑さを避ける                   |
-| **ワークフローでの適用** | 必要十分なエージェント数、シンプルな連携 |
+| Aspect                   | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| **Definition**           | Avoid unnecessary complexity                     |
+| **Workflow Application** | Sufficient number of agents, simple coordination |
 
 ### 14. Loose Coupling
 
-**エージェント間の疎結合**
+**Loose coupling between agents**
 
-| 観点                     | 説明                             |
-| ------------------------ | -------------------------------- |
-| **定義**                 | エージェント間の依存を最小化     |
-| **ワークフローでの適用** | 各エージェントは独立して動作可能 |
-| **メリット**             | 変更の影響範囲を限定、テスト容易 |
+| Aspect                   | Description                             |
+| ------------------------ | --------------------------------------- |
+| **Definition**           | Minimize dependencies between agents    |
+| **Workflow Application** | Each agent can operate independently    |
+| **Benefits**             | Limit impact of changes, easier testing |
 
 ### 15. Graceful Degradation
 
-**部分障害でも動作継続**
+**Continue operation despite partial failures**
 
-| 観点                     | 説明                                       |
-| ------------------------ | ------------------------------------------ |
-| **定義**                 | 一部が失敗しても全体は機能を維持           |
-| **ワークフローでの適用** | フォールバック処理、スキップ可能なステップ |
+| Aspect                   | Description                                    |
+| ------------------------ | ---------------------------------------------- |
+| **Definition**           | Maintain overall function even when parts fail |
+| **Workflow Application** | Fallback processing, skippable steps           |
 
 ---
 
 ## ACI Design (Agent-Computer Interface)
 
-**Anthropic の推奨:**
+**Anthropic's Recommendation:**
 
 > "Think about how much effort goes into human-computer interfaces (HCI), and plan to invest just as much effort in creating good agent-computer interfaces (ACI)."
 
-### ツール設計のポイント
+### Tool Design Guidelines
 
-1. **明確な説明** - ツールの目的と使い方を明確に
-2. **エッジケース** - 境界条件を文書化
-3. **入力フォーマット** - 期待する入力形式を明示
-4. **エラーハンドリング** - 失敗時の動作を定義
-5. **テスト** - 実際に使ってみてイテレート
+1. **Clear Description** - Clarify tool purpose and usage
+2. **Edge Cases** - Document boundary conditions
+3. **Input Format** - Specify expected input format
+4. **Error Handling** - Define behavior on failure
+5. **Testing** - Actually use it and iterate
 
 ---
 

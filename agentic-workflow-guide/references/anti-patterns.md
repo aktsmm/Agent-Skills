@@ -1,142 +1,142 @@
 # Anti-Patterns
 
-エージェントワークフローで避けるべきアンチパターン集。
+A collection of anti-patterns to avoid in agent workflows.
 
-## 概要
+## Overview
 
-| アンチパターン       | 問題                   | 対策                   |
-| -------------------- | ---------------------- | ---------------------- |
-| God Agent            | 1 エージェントに全責務 | SRP で分割             |
-| Context Overload     | 不要な情報を大量に渡す | ISP で最小化           |
-| Silent Failure       | エラーを無視して続行   | Fail Fast で即停止     |
-| Infinite Loop        | 終了条件なしのループ   | 最大イテレーション設定 |
-| Big Bang             | 一度に大きく作る       | Iterative で小さく回す |
-| Premature Complexity | 最初から複雑な設計     | Simplicity First       |
-| Black Box            | 内部状態が見えない     | Transparency           |
-| Tight Coupling       | エージェント間の密結合 | Loose Coupling         |
+| Anti-Pattern         | Problem                            | Solution                        |
+| -------------------- | ---------------------------------- | ------------------------------- |
+| God Agent            | All responsibilities in 1 agent    | Split with SRP                  |
+| Context Overload     | Passing excessive unnecessary info | Minimize with ISP               |
+| Silent Failure       | Ignoring errors and continuing     | Stop immediately with Fail Fast |
+| Infinite Loop        | Loops without termination          | Set maximum iterations          |
+| Big Bang             | Building everything at once        | Build small with Iterative      |
+| Premature Complexity | Complex design from the start      | Simplicity First                |
+| Black Box            | Internal state invisible           | Transparency                    |
+| Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
 
 ---
 
-## 詳細
+## Details
 
 ### 1. God Agent
 
-**1 エージェントに全責務を詰め込む**
+**Packing all responsibilities into one agent**
 
-#### 症状
-
-```
-❌ 悪い例:
-Agent: "検索して、分析して、レポート作成して、メール送信して..."
-```
-
-- 1 つのエージェントが複数の異なるタスクを担当
-- プロンプトが肥大化
-- デバッグが困難
-- 部分的な変更が全体に影響
-
-#### 対策
+#### Symptoms
 
 ```
-✅ 良い例:
-Agent 1 (Searcher): "関連情報を検索"
-Agent 2 (Analyzer): "情報を分析"
-Agent 3 (Reporter): "レポート作成"
-Agent 4 (Sender): "メール送信"
+❌ Bad Example:
+Agent: "Search, analyze, create report, send email..."
 ```
 
-**適用原則:** SRP (Single Responsibility Principle)
+- One agent handles multiple different tasks
+- Prompt becomes bloated
+- Debugging is difficult
+- Partial changes affect the whole system
+
+#### Solution
+
+```
+✅ Good Example:
+Agent 1 (Searcher): "Search for relevant information"
+Agent 2 (Analyzer): "Analyze information"
+Agent 3 (Reporter): "Create report"
+Agent 4 (Sender): "Send email"
+```
+
+**Applicable Principle:** SRP (Single Responsibility Principle)
 
 ---
 
 ### 2. Context Overload
 
-**不要な情報を大量に渡す**
+**Passing excessive unnecessary information**
 
-#### 症状
-
-```
-❌ 悪い例:
-Agent に渡すコンテキスト:
-- 全ファイルの内容
-- 過去の会話履歴全て
-- 関係ない設定情報
-```
-
-- コンテキストウィンドウの無駄遣い
-- ノイズが多く本質が埋もれる
-- コスト増加
-- 処理時間増加
-
-#### 対策
+#### Symptoms
 
 ```
-✅ 良い例:
-Agent に渡すコンテキスト:
-- このタスクに必要なファイルのみ
-- 直近の関連する会話のみ
-- 必要な設定項目のみ
+❌ Bad Example:
+Context passed to Agent:
+- All file contents
+- Entire conversation history
+- Unrelated configuration info
 ```
 
-**適用原則:** ISP (Interface Segregation Principle)
+- Wasting context window
+- Noise buries the essence
+- Increased cost
+- Increased processing time
+
+#### Solution
+
+```
+✅ Good Example:
+Context passed to Agent:
+- Only files needed for this task
+- Only recent relevant conversation
+- Only necessary configuration items
+```
+
+**Applicable Principle:** ISP (Interface Segregation Principle)
 
 ---
 
 ### 3. Silent Failure
 
-**エラーを無視して続行**
+**Ignoring errors and continuing**
 
-#### 症状
+#### Symptoms
 
 ```
-❌ 悪い例:
+❌ Bad Example:
 try:
     result = agent.execute()
 except:
-    pass  # エラー無視
+    pass  # Ignore error
 ```
 
-- エラーが発生しても処理が続く
-- 問題が後工程まで伝播
-- デバッグが困難
-- 不正な結果が生成される
+- Processing continues even when errors occur
+- Problems propagate to later stages
+- Debugging is difficult
+- Invalid results are generated
 
-#### 対策
+#### Solution
 
 ```
-✅ 良い例:
+✅ Good Example:
 try:
     result = agent.execute()
 except AgentError as e:
     log.error(f"Agent failed: {e}")
-    raise  # 即座に停止
+    raise  # Stop immediately
 ```
 
-**適用原則:** Fail Fast
+**Applicable Principle:** Fail Fast
 
 ---
 
 ### 4. Infinite Loop
 
-**終了条件なしのループ**
+**Loops without termination conditions**
 
-#### 症状
+#### Symptoms
 
 ```
-❌ 悪い例:
+❌ Bad Example:
 while not evaluator.is_satisfied():
     result = generator.generate()
-    # 終了条件なし
+    # No termination condition
 ```
 
-- 永遠に終わらない可能性
-- リソース枯渇
-- コスト爆発
+- May never end
+- Resource exhaustion
+- Cost explosion
 
-#### 対策
+#### Solution
 
 ```
-✅ 良い例:
+✅ Good Example:
 MAX_ITERATIONS = 5
 for i in range(MAX_ITERATIONS):
     result = generator.generate()
@@ -146,75 +146,75 @@ else:
     log.warning("Max iterations reached")
 ```
 
-**適用原則:** 明示的な終了条件
+**Applicable Principle:** Explicit termination conditions
 
 ---
 
 ### 5. Big Bang
 
-**一度に大きく作る**
+**Building everything at once**
 
-#### 症状
-
-```
-❌ 悪い例:
-1. 全機能の設計を完了
-2. 全エージェントを一度に実装
-3. 最後にまとめてテスト
-→ 問題発見が遅れ、修正コスト大
-```
-
-- 全てを一度に実装
-- テストが後回し
-- 問題の発見が遅い
-- 修正範囲が広い
-
-#### 対策
+#### Symptoms
 
 ```
-✅ 良い例:
-1. 最小機能を設計
-2. 1エージェントを実装
-3. テスト・検証
-4. 次のエージェントを追加
-5. 繰り返し
+❌ Bad Example:
+1. Complete design for all features
+2. Implement all agents at once
+3. Test everything at the end
+→ Late problem discovery, high fix costs
 ```
 
-**適用原則:** Iterative Refinement
+- Implementing everything at once
+- Testing is deferred
+- Late problem discovery
+- Wide scope of fixes
+
+#### Solution
+
+```
+✅ Good Example:
+1. Design minimum functionality
+2. Implement 1 agent
+3. Test and verify
+4. Add next agent
+5. Repeat
+```
+
+**Applicable Principle:** Iterative Refinement
 
 ---
 
 ### 6. Premature Complexity
 
-**最初から複雑な設計**
+**Complex design from the start**
 
-#### 症状
-
-```
-❌ 悪い例:
-最初から:
-- 10エージェントの複雑なワークフロー
-- 複雑な条件分岐
-- 高度なエラーハンドリング
-→ 実際には必要なかった
-```
-
-- YAGNI (You Aren't Gonna Need It) 違反
-- 保守コスト増加
-- 理解困難
-
-#### 対策
+#### Symptoms
 
 ```
-✅ 良い例:
-1. まず単一エージェントで試す
-2. 問題が発生したら分割を検討
-3. 必要に応じて複雑化
+❌ Bad Example:
+From the start:
+- 10-agent complex workflow
+- Complex conditional branching
+- Advanced error handling
+→ Turned out not to be needed
 ```
 
-**適用原則:** Simplicity First, YAGNI
+- YAGNI (You Aren't Gonna Need It) violation
+- Increased maintenance cost
+- Hard to understand
 
-**Anthropic の推奨:**
+#### Solution
+
+```
+✅ Good Example:
+1. First try with a single agent
+2. Consider splitting if problems occur
+3. Add complexity as needed
+```
+
+**Applicable Principle:** Simplicity First, YAGNI
+
+**Anthropic's Recommendation:**
 
 > "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short."
 
@@ -222,80 +222,80 @@ else:
 
 ### 7. Black Box
 
-**内部状態が見えない**
+**Internal state invisible**
 
-#### 症状
-
-```
-❌ 悪い例:
-Agent: (何も出力せず処理中...)
-User: "何をしているの？"
-```
-
-- 進捗が不明
-- 問題発生時に原因特定困難
-- ユーザーが不安
-
-#### 対策
+#### Symptoms
 
 ```
-✅ 良い例:
-Agent: "Step 1/3: データを取得中..."
-Agent: "Step 2/3: 分析中..."
-Agent: "Step 3/3: レポート生成中..."
+❌ Bad Example:
+Agent: (Processing without any output...)
+User: "What are you doing?"
 ```
 
-**適用原則:** Transparency
+- Progress unknown
+- Difficult to identify causes when problems occur
+- User feels anxious
+
+#### Solution
+
+```
+✅ Good Example:
+Agent: "Step 1/3: Fetching data..."
+Agent: "Step 2/3: Analyzing..."
+Agent: "Step 3/3: Generating report..."
+```
+
+**Applicable Principle:** Transparency
 
 ---
 
 ### 8. Tight Coupling
 
-**エージェント間の密結合**
+**Tight coupling between agents**
 
-#### 症状
-
-```
-❌ 悪い例:
-Agent A の出力形式を変更
-→ Agent B, C, D も全て修正が必要
-```
-
-- 変更の影響範囲が広い
-- テストが困難
-- 再利用が困難
-
-#### 対策
+#### Symptoms
 
 ```
-✅ 良い例:
-- 標準化されたインターフェース
-- 各エージェントは独立してテスト可能
-- 変更が局所化される
+❌ Bad Example:
+Change Agent A's output format
+→ Agents B, C, D all require changes
 ```
 
-**適用原則:** Loose Coupling
+- Wide impact of changes
+- Testing is difficult
+- Hard to reuse
+
+#### Solution
+
+```
+✅ Good Example:
+- Standardized interfaces
+- Each agent can be tested independently
+- Changes are localized
+```
+
+**Applicable Principle:** Loose Coupling
 
 ---
 
-## チェックリスト
+## Checklist
 
-ワークフロー設計時にこのリストで確認：
+Verify with this list when designing workflows:
 
 ```markdown
-- [ ] God Agent: 1 つのエージェントに責務を詰め込みすぎていないか？
-- [ ] Context Overload: コンテキストを過剰に渡していないか？
-- [ ] Silent Failure: エラーを無視して続行していないか？
-- [ ] Infinite Loop: 終了条件なしのループはないか？
-- [ ] Big Bang: 一度に大きく作ろうとしていないか？
-- [ ] Premature Complexity: 必要以上に複雑にしていないか？
-- [ ] Black Box: 内部状態が見えなくなっていないか？
-- [ ] Tight Coupling: エージェント間が密結合になっていないか？
+- [ ] God Agent: Is too much responsibility packed into one agent?
+- [ ] Context Overload: Is excessive context being passed?
+- [ ] Silent Failure: Are errors being ignored and continuing?
+- [ ] Infinite Loop: Are there loops without termination conditions?
+- [ ] Big Bang: Trying to build everything at once?
+- [ ] Premature Complexity: Making it more complex than necessary?
+- [ ] Black Box: Is internal state invisible?
+- [ ] Tight Coupling: Are agents tightly coupled?
 ```
 
 ---
 
-## 関連ドキュメント
+## Related Documents
 
-- [design-principles.md](design-principles.md) - 設計原則の詳細
-- [review-checklist.md](review-checklist.md) - レビューチェックリスト
+- [design-principles.md](design-principles.md) - Design principles details
+- [review-checklist.md](review-checklist.md) - Review checklist

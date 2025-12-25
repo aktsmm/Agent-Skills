@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scaffold_workflow.py - エージェントワークフローのディレクトリ構成を生成
+scaffold_workflow.py - Generate directory structure for agent workflows
 
 Usage:
     python scaffold_workflow.py <workflow-name> [--pattern <pattern>] [--path <output-dir>]
@@ -12,102 +12,561 @@ Examples:
 """
 
 import argparse
-import os
 from pathlib import Path
 
-# 共通テンプレート（全パターンで使用）
-COMMON_TEMPLATES = {
-    "Agent.md": '''# {workflow_name} - Agent Workflow
+# Pattern-specific AGENTS.md templates
+AGENTS_MD_TEMPLATES = {
+    "basic": '''# {workflow_name} - Agent Workflow
 
-## Overview
+## Entry Point
 
-This workflow implements the **{pattern}** pattern for {purpose}.
+**Start with the Orchestrator agent.** It coordinates all workflow tasks.
+
+→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
+
+## Generic Rules
+
+### Behavior
+
+1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
+2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
+
+### Communication
+
+- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Match User Language**: Respond in the user's language.
+
+### Safety
+
+- **No `git push`**: Do not push without explicit user instruction.
+- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
+- **Minimal Permissions**: Request only what's needed.
 
 ## Agents
 
-| Agent | Role | Done Criteria |
-|-------|------|---------------|
-| | | |
+| Agent | Role | Entry Point |
+|-------|------|-------------|
+| [orchestrator](.github/agents/orchestrator.agent.md) | Task decomposition, delegation, progress management | ✅ **Yes** |
+| [worker](.github/agents/worker.agent.md) | Execute assigned subtasks | |
 
-## Workflow Flow
+## Workflow Pattern
+
+**basic** - Basic orchestrator-worker workflow
+
+## Flow
 
 ```mermaid
 graph TD
-    A[Input] --> B[Agent 1]
-    B --> C[Output]
+    User[👤 User Request] --> Orch[🎯 Orchestrator]
+    Orch --> |analyze & delegate| W1[⚙️ Worker]
+    W1 --> |result| Orch
+    Orch --> |report| User
 ```
 
-## I/O Contract
+## How It Works
 
-- **Input**: [入力形式の説明]
-- **Output**: [出力形式の説明]
-- **IR Format**: （該当する場合）中間表現の仕様
+1. **User** sends a request
+2. **Orchestrator** analyzes and creates a plan
+3. **Orchestrator** delegates subtasks to **Worker**
+4. **Worker** executes and returns results
+5. **Orchestrator** aggregates and reports to **User**
 
 ## Design Principles
 
-This workflow follows:
 - **SSOT**: Single source of truth for all data
 - **SRP**: Each agent has one responsibility
 - **Fail Fast**: Errors are caught early
 - **Iterative**: Small, verifiable steps
 - **Idempotency**: Same input → same output
 
-## Quick Start
+## References
 
-1. Configure agents in `agents/`
-2. Set up prompts in `prompts/`
-3. Run with your orchestration framework
+- [Design Document](docs/design.md)
+- [Copilot Instructions](.github/copilot-instructions.md)
+- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
+''',
+
+    "prompt-chaining": '''# {workflow_name} - Agent Workflow
+
+## Entry Point
+
+**Start with the Orchestrator agent.** It coordinates the sequential step execution.
+
+→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
+
+## Generic Rules
+
+### Behavior
+
+1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
+2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
+
+### Communication
+
+- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Match User Language**: Respond in the user's language.
+
+### Safety
+
+- **No `git push`**: Do not push without explicit user instruction.
+- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
+- **Minimal Permissions**: Request only what's needed.
+
+## Agents
+
+| Agent | Role | Entry Point |
+|-------|------|-------------|
+| [orchestrator](.github/agents/orchestrator.agent.md) | Coordinate sequential execution | ✅ **Yes** |
+| [step1](.github/agents/step1.agent.md) | Handle first step | |
+| [step2](.github/agents/step2.agent.md) | Handle second step | |
+| [step3](.github/agents/step3.agent.md) | Handle final step | |
+
+## Workflow Pattern
+
+**prompt-chaining** - Sequential processing with gates between steps
+
+## Flow
+
+```mermaid
+graph LR
+    User[👤 User] --> Orch[🎯 Orchestrator]
+    Orch --> S1[📝 Step 1]
+    S1 --> G1{{🚦 Gate 1}}
+    G1 -->|pass| S2[📝 Step 2]
+    G1 -->|fail| Orch
+    S2 --> G2{{🚦 Gate 2}}
+    G2 -->|pass| S3[📝 Step 3]
+    G2 -->|fail| Orch
+    S3 --> Orch
+    Orch --> User
+```
+
+## How It Works
+
+1. **Orchestrator** receives request and initiates Step 1
+2. **Step 1** processes and outputs intermediate result
+3. **Gate 1** validates output (pass → continue, fail → retry/abort)
+4. **Step 2** takes Step 1's output as input
+5. **Gate 2** validates again
+6. **Step 3** produces final output
+7. **Orchestrator** reports to user
+
+## Gate Validation
+
+Each gate checks:
+- Output format correctness
+- Required fields present
+- Quality thresholds met
+
+See `gates/gate_template.md` for validation criteria.
+
+## Design Principles
+
+- **SSOT**: Single source of truth for all data
+- **SRP**: Each agent has one responsibility
+- **Fail Fast**: Errors are caught early at gates
+- **Iterative**: Small, verifiable steps
+- **Idempotency**: Same input → same output
+
+## References
+
+- [Design Document](docs/design.md)
+- [Gate Template](gates/gate_template.md)
+- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
+''',
+
+    "parallelization": '''# {workflow_name} - Agent Workflow
+
+## Entry Point
+
+**Start with the Orchestrator agent.** It coordinates parallel task execution.
+
+→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
+
+## Generic Rules
+
+### Behavior
+
+1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
+2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
+
+### Communication
+
+- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Match User Language**: Respond in the user's language.
+
+### Safety
+
+- **No `git push`**: Do not push without explicit user instruction.
+- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
+- **Minimal Permissions**: Request only what's needed.
+
+## Agents
+
+| Agent | Role | Entry Point |
+|-------|------|-------------|
+| [orchestrator](.github/agents/orchestrator.agent.md) | Dispatch tasks & aggregate results | ✅ **Yes** |
+| [worker1](.github/agents/worker1.agent.md) | Handle parallel task 1 | |
+| [worker2](.github/agents/worker2.agent.md) | Handle parallel task 2 | |
+| [worker3](.github/agents/worker3.agent.md) | Handle parallel task 3 | |
+
+## Workflow Pattern
+
+**parallelization** - Execute independent tasks simultaneously
+
+## Flow
+
+```mermaid
+graph TD
+    User[👤 User] --> Orch[🎯 Orchestrator]
+    Orch --> |spawn| W1[⚙️ Worker 1]
+    Orch --> |spawn| W2[⚙️ Worker 2]
+    Orch --> |spawn| W3[⚙️ Worker 3]
+    W1 --> |result| Agg[📊 Aggregator]
+    W2 --> |result| Agg
+    W3 --> |result| Agg
+    Agg --> Orch
+    Orch --> User
+```
+
+## How It Works
+
+1. **Orchestrator** analyzes request and identifies independent subtasks
+2. **Orchestrator** spawns multiple **Workers** in parallel
+3. Each **Worker** executes its subtask independently
+4. Results are **aggregated** (merge, vote, or combine)
+5. **Orchestrator** reports final result to user
+
+## Parallelization Strategy
+
+| Strategy | Use Case |
+|----------|----------|
+| **Sectioning** | Split large task into chunks (e.g., process files in parallel) |
+| **Voting** | Multiple workers solve same task, majority wins |
+| **Specialization** | Different workers handle different aspects |
+
+## Design Principles
+
+- **SSOT**: Single source of truth for all data
+- **SRP**: Each agent has one responsibility
+- **Fail Fast**: Errors are caught early
+- **Iterative**: Small, verifiable steps
+- **Idempotency**: Same input → same output
 
 ## References
 
 - [Design Document](docs/design.md)
 - [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
 ''',
-    
-    ".github/copilot-instructions.md": '''# Repository Copilot Instructions for {workflow_name}
 
-このワークフローでは、Copilot を自律的なエージェントワークフローの一部として扱います。
+    "orchestrator-workers": '''# {workflow_name} - Agent Workflow
 
-## エージェント行動指針 (Agent Behavior)
+## Entry Point
 
-1. **計画重視 (Plan First)**:
-   - 複雑なタスクに着手する前に、必ずステップバイステップの計画を提示
-   - ユーザーの承認を得てから実行に移る
+**Start with the Orchestrator agent.** It dynamically decomposes tasks and assigns to workers.
 
-2. **コンテキスト認識 (Context Awareness)**:
-   - 作業前に関連ファイルを読み込み、プロジェクトの文脈を理解
-   - 推測でコードを書かず、既存の実装パターンを確認
+→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
 
-3. **自律的な検証 (Self-Correction)**:
-   - コードを変更した後は、可能な限り検証を実行
-   - エラー発生時は分析し、修正案を提示・実行
+## Generic Rules
 
-## ワークフローパターン
+### Behavior
 
-**{pattern}** - {pattern_description}
+1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
+2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
 
-## コーディング規約
+### Communication
 
-- **DRY & SOLID**: 重複を避け、単一責任の原則に従う
-- **SSOT**: 情報は一箇所で管理し、他はそこを参照
-- **Fail Fast**: エラーは早期に検出・報告
+- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Match User Language**: Respond in the user's language.
 
-## コミュニケーションスタイル
+### Safety
 
-- **結論ファースト**: 結論を先に述べ、その後に理由・詳細
-- **日本語で回答**: ユーザーが日本語なら日本語で応答
+- **No `git push`**: Do not push without explicit user instruction.
+- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
+- **Minimal Permissions**: Request only what's needed.
 
-## ファイル構成
+## Agents
 
-- エージェント定義: `agents/*.agent.md`
-- プロンプト: `prompts/*.prompt.md`
-- 設定: `config/*.yaml`
-- インストラクション: `.github/instructions/`
+| Agent | Role | Entry Point |
+|-------|------|-------------|
+| [orchestrator](.github/agents/orchestrator.agent.md) | Dynamic task decomposition & coordination | ✅ **Yes** |
+| [worker](.github/agents/worker.agent.md) | Execute assigned subtasks | |
 
-## 参照
+## Workflow Pattern
 
-- [Agent.md](../Agent.md) - ワークフロー概要
-- [docs/design.md](../docs/design.md) - 設計ドキュメント
+**orchestrator-workers** - Dynamic task decomposition with flexible worker assignment
+
+## Flow
+
+```mermaid
+graph TD
+    User[👤 User] --> Orch[🎯 Orchestrator]
+    Orch --> |analyze| Plan[📋 Task Plan]
+    Plan --> |subtask 1| W1[⚙️ Worker]
+    Plan --> |subtask 2| W2[⚙️ Worker]
+    Plan --> |subtask N| WN[⚙️ Worker]
+    W1 --> |result| Orch
+    W2 --> |result| Orch
+    WN --> |result| Orch
+    Orch --> |synthesize| Result[📊 Final Result]
+    Result --> User
+```
+
+## How It Works
+
+1. **Orchestrator** receives complex request
+2. **Orchestrator** analyzes and creates dynamic task plan
+3. **Orchestrator** assigns subtasks to **Workers** (sequential or parallel)
+4. **Workers** execute and return results
+5. **Orchestrator** synthesizes all results
+6. **Orchestrator** reports to user (may iterate if needed)
+
+## Dynamic Decomposition
+
+Unlike fixed workflows, the orchestrator:
+- Determines number of subtasks at runtime
+- Adjusts strategy based on intermediate results
+- Can spawn additional workers as needed
+- Handles dependencies between subtasks
+
+## Design Principles
+
+- **SSOT**: Single source of truth for all data
+- **SRP**: Each agent has one responsibility
+- **Fail Fast**: Errors are caught early
+- **Iterative**: Small, verifiable steps
+- **Idempotency**: Same input → same output
+
+## References
+
+- [Design Document](docs/design.md)
+- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
+''',
+
+    "evaluator-optimizer": '''# {workflow_name} - Agent Workflow
+
+## Entry Point
+
+**Start with the Orchestrator agent.** It coordinates the generate-evaluate-improve loop.
+
+→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
+
+## Generic Rules
+
+### Behavior
+
+1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
+2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
+
+### Communication
+
+- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Match User Language**: Respond in the user's language.
+
+### Safety
+
+- **No `git push`**: Do not push without explicit user instruction.
+- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
+- **Minimal Permissions**: Request only what's needed.
+
+## Agents
+
+| Agent | Role | Entry Point |
+|-------|------|-------------|
+| [orchestrator](.github/agents/orchestrator.agent.md) | Coordinate generation-evaluation loop | ✅ **Yes** |
+| [generator](.github/agents/generator.agent.md) | Generate content/code | |
+| [evaluator](.github/agents/evaluator.agent.md) | Evaluate and provide feedback | |
+
+## Workflow Pattern
+
+**evaluator-optimizer** - Iterative improvement through feedback loops
+
+## Flow
+
+```mermaid
+graph TD
+    User[👤 User] --> Orch[🎯 Orchestrator]
+    Orch --> Gen[✨ Generator]
+    Gen --> |output| Eval[🔍 Evaluator]
+    Eval --> |score & feedback| Orch
+    Orch --> |pass?| Decision{{✅ Good enough?}}
+    Decision --> |no| Gen
+    Decision --> |yes| Result[📊 Final Output]
+    Result --> User
+```
+
+## How It Works
+
+1. **Orchestrator** receives request and sends to **Generator**
+2. **Generator** produces initial output
+3. **Evaluator** scores output against criteria
+4. If score < threshold:
+   - **Evaluator** provides specific feedback
+   - **Generator** improves based on feedback
+   - Loop continues (max N iterations)
+5. If score ≥ threshold or max iterations reached:
+   - **Orchestrator** returns best result to user
+
+## Loop Configuration
+
+See `config/loop_config.yaml`:
+
+```yaml
+max_iterations: 5
+threshold: 0.8
+on_max_reached: return_best  # or: fail
+```
+
+## Evaluation Criteria
+
+The evaluator checks (customize in evaluator.agent.md):
+- [ ] Criterion 1: [Description]
+- [ ] Criterion 2: [Description]
+- [ ] Criterion 3: [Description]
+
+## Design Principles
+
+- **SSOT**: Single source of truth for all data
+- **SRP**: Each agent has one responsibility
+- **Fail Fast**: Errors are caught early
+- **Iterative**: Small, verifiable steps
+- **Idempotency**: Same input → same output
+
+## References
+
+- [Design Document](docs/design.md)
+- [Loop Configuration](config/loop_config.yaml)
+- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
+''',
+
+    "routing": '''# {workflow_name} - Agent Workflow
+
+## Entry Point
+
+**Start with the Orchestrator (Router) agent.** It classifies input and routes to appropriate handlers.
+
+→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
+
+## Generic Rules
+
+### Behavior
+
+1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
+2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
+
+### Communication
+
+- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Match User Language**: Respond in the user's language.
+
+### Safety
+
+- **No `git push`**: Do not push without explicit user instruction.
+- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
+- **Minimal Permissions**: Request only what's needed.
+
+## Agents
+
+| Agent | Role | Entry Point |
+|-------|------|-------------|
+| [orchestrator](.github/agents/orchestrator.agent.md) | Classify input and route to handlers | ✅ **Yes** |
+| [handler-a](.github/agents/handler-a.agent.md) | Handle Type A requests | |
+| [handler-b](.github/agents/handler-b.agent.md) | Handle Type B requests | |
+| [handler-c](.github/agents/handler-c.agent.md) | Handle Type C requests | |
+
+## Workflow Pattern
+
+**routing** - Classify input and route to specialized handlers
+
+## Flow
+
+```mermaid
+graph TD
+    User[👤 User] --> Router[🎯 Orchestrator/Router]
+    Router --> |classify| Decision{{📋 Request Type?}}
+    Decision --> |Type A| HA[🅰️ Handler A]
+    Decision --> |Type B| HB[🅱️ Handler B]
+    Decision --> |Type C| HC[🅲 Handler C]
+    HA --> Router
+    HB --> Router
+    HC --> Router
+    Router --> User
+```
+
+## How It Works
+
+1. **Orchestrator (Router)** receives request
+2. **Router** classifies the request type using rules/LLM
+3. **Router** dispatches to appropriate **Handler**
+4. **Handler** processes and returns result
+5. **Router** may post-process and returns to user
+
+## Routing Rules
+
+| Request Pattern | Route To | Example |
+|-----------------|----------|---------|
+| Type A keywords | Handler A | "create", "new", "add" |
+| Type B keywords | Handler B | "update", "modify", "change" |
+| Type C keywords | Handler C | "delete", "remove", "clean" |
+| Ambiguous | Ask user for clarification | - |
+
+Customize routing logic in `orchestrator.agent.md`.
+
+## Design Principles
+
+- **SSOT**: Single source of truth for all data
+- **SRP**: Each agent has one responsibility
+- **Fail Fast**: Errors are caught early
+- **Iterative**: Small, verifiable steps
+- **Idempotency**: Same input → same output
+
+## References
+
+- [Design Document](docs/design.md)
+- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
+'''
+}
+
+# Common templates (used for all patterns)
+COMMON_TEMPLATES = {
+    ".github/copilot-instructions.md": '''# Copilot Instructions for {workflow_name}
+
+This workflow uses agentic pattern. See the following files for details.
+
+## Entry Point
+
+- [AGENTS.md](../AGENTS.md) - **Start here**. Orchestrator entry point and generic rules.
+
+## Agent Definitions
+
+- [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md) - Workflow orchestrator
+- [.github/agents/worker.agent.md](.github/agents/worker.agent.md) - Worker agent template
+
+## Instructions
+
+- [.github/instructions/workflow.instructions.md](.github/instructions/workflow.instructions.md) - Workflow rules
+- [.github/instructions/agents.instructions.md](.github/instructions/agents.instructions.md) - Agent editing rules
+- [.github/instructions/prompts.instructions.md](.github/instructions/prompts.instructions.md) - Prompt editing rules
+
+## Prompts
+
+- [.github/prompts/](.github/prompts/) - Reusable prompt templates
+
+## References
+
+- [docs/design.md](../docs/design.md) - Design document
 ''',
     
     ".github/instructions/workflow.instructions.md": '''---
@@ -116,33 +575,34 @@ applyTo: "**"
 
 # Workflow Instructions
 
-このワークフロー全体に適用されるルール。
+Rules applied to the entire workflow.
 
-## 基本原則
+## Basic Principles
 
-- 各エージェントは単一責務を持つ
-- エラーは早期に検出し、明確なメッセージを出力
-- 中間状態は必ず確認可能にする
+- Each agent has a single responsibility
+- Errors are detected early with clear messages
+- Intermediate state is always verifiable
 
-## 命名規則
+## Naming Conventions
 
-- エージェント: `{{role}}_agent.md`
-- プロンプト: `{{purpose}}_prompt.md`
-- 設定: `{{scope}}_config.yaml`
+- Agents: `{{role}}_agent.md`
+- Prompts: `{{purpose}}_prompt.md`
+- Config: `{{scope}}_config.yaml`
 
-## ファイル構成
+## File Structure
 
 ```
 {workflow_name}/
-├── Agent.md                 # ワークフロー概要
+├── AGENTS.md                # Entry point (orchestrator-first)
 ├── .github/
 │   ├── copilot-instructions.md
-│   └── instructions/
-│       └── workflow.instructions.md
-├── agents/                  # エージェント定義
-├── prompts/                 # プロンプトテンプレート
-├── docs/                    # 設計ドキュメント
-└── config/                  # 設定ファイル
+│   ├── instructions/
+│   ├── agents/              # Agent definitions
+│   │   ├── orchestrator.agent.md  # Entry point
+│   │   └── worker.agent.md
+│   └── prompts/             # Prompt templates
+├── docs/                    # Design documents
+└── config/                  # Configuration files
 ```
 ''',
     
@@ -152,35 +612,35 @@ applyTo: "agents/**"
 
 # Agent Instructions
 
-`agents/` ディレクトリのファイル編集時に適用されるルール。
+Rules applied when editing files in the `agents/` directory.
 
-## エージェント定義の構成
+## Agent Definition Structure
 
 ```markdown
 # Agent: {{name}}
 
 ## Role
-エージェントの役割を1文で記述
+Describe the agent's role in one sentence
 
 ## Responsibilities
-- 責務1
-- 責務2
+- Responsibility 1
+- Responsibility 2
 
 ## Input
-- input1: 説明
+- input1: Description
 
 ## Output
-- output1: 説明
+- output1: Description
 
 ## Constraints
-- 制約事項
+- Constraint details
 ```
 
-## ベストプラクティス
+## Best Practices
 
-1. **1エージェント1責務** - 複数の責務は分割
-2. **明確な入出力** - 曖昧な定義を避ける
-3. **制約を明記** - エッジケースを考慮
+1. **1 Agent = 1 Responsibility** - Split if there are multiple responsibilities
+2. **Clear I/O** - Avoid ambiguous definitions
+3. **Explicit Constraints** - Consider edge cases
 ''',
     
     ".github/instructions/prompts.instructions.md": '''---
@@ -189,153 +649,153 @@ applyTo: "prompts/**"
 
 # Prompt Instructions
 
-`prompts/` ディレクトリのファイル編集時に適用されるルール。
+Rules applied when editing files in the `prompts/` directory.
 
-## プロンプト構成
+## Prompt Structure
 
 ```markdown
 # {{Purpose}} Prompt
 
 ## Context
-背景情報
+Background information
 
 ## Task
-タスクの説明
+Task description
 
 ## Guidelines
-1. ガイドライン1
-2. ガイドライン2
+1. Guideline 1
+2. Guideline 2
 
 ## Output Format
-期待する出力形式
+Expected output format
 ```
 
-## ベストプラクティス
+## Best Practices
 
-1. **明確な指示** - 曖昧な表現を避ける
-2. **具体例を含める** - 期待する出力の例を示す
-3. **制約を明記** - やってはいけないことを書く
-4. **変数は `{{placeholder}}` 形式** - 動的に置換可能に
+1. **Clear Instructions** - Avoid ambiguous expressions
+2. **Include Examples** - Show expected output examples
+3. **Explicit Constraints** - Write what should NOT be done
+4. **Use `{{placeholder}}` format for variables** - Enable dynamic substitution
 ''',
     
-    "prompts/system_prompt.md": '''# System Prompt
+    ".github/prompts/system.prompt.md": '''# System Prompt
 
 You are a specialized agent in the {workflow_name} workflow.
 
 ## Your Role
 
-[エージェントの役割を1文で記述]
+[Describe the agent's role in one sentence]
 
 ## Guidelines
 
-1. **Plan First**: 複雑なタスクは計画を提示してから実行
-2. **Single Responsibility**: 自分の責務に集中し、他は委譲
-3. **Validate First**: 入力を検証してから処理開始
-4. **Fail Fast**: エラーは早期に検知・報告
-5. **Transparency**: 進捗を明示的に報告
+1. **Plan First**: Present a plan before executing complex tasks
+2. **Single Responsibility**: Focus on your responsibility, delegate the rest
+3. **Validate First**: Validate input before processing
+4. **Fail Fast**: Detect and report errors early
+5. **Transparency**: Report progress explicitly
 
 ## Constraints
 
-- 推測でデータを補完しない（不明点は確認）
-- 検証に失敗したら処理を停止
-- 破壊的操作の前に確認を求める
-- `git push` は原則禁止
+- Do not fill in data based on assumptions (confirm unclear points)
+- Stop processing if validation fails
+- Request confirmation before destructive operations
+- `git push` is prohibited by default
 
 ## Output Format
 
-- 結論ファースト（結論 → 理由 → 詳細）
-- 構造化された出力を心がける
+- Conclusion first (conclusion → reasons → details)
+- Strive for structured output
 ''',
     
-    "prompts/create-agent.prompt.md": '''# Prompt: Create New Agent
+    ".github/prompts/create-agent.prompt.md": '''# Prompt: Create New Agent
 
-新しいエージェント定義 (`.agent.md`) を作成するためのプロンプトです。
+Prompt for creating a new agent definition (`.agent.md`).
 
-## 前提条件
+## Prerequisites
 
-- 参照: `agents/sample.agent.md` (テンプレート)
-- 参照: `.github/instructions/agents.instructions.md`
+- Reference: `agents/sample.agent.md` (template)
+- Reference: `.github/instructions/agents.instructions.md`
 
-## 指示
+## Instructions
 
-1. ユーザーの要望から **Role** (役割) と **Goals** (ゴール) を定義
-2. **Done Criteria** を検証可能な形で記述
-3. **Permissions** は最小権限の原則に従う
-4. **I/O Contract** を明確に定義
-5. **Workflow** は具体的なステップに分解
+1. Define **Role** and **Goals** from user requirements
+2. Write **Done Criteria** in verifiable form
+3. Follow the principle of least privilege for **Permissions**
+4. Clearly define **I/O Contract**
+5. Break down **Workflow** into specific steps
 
-## 出力フォーマット
+## Output Format
 
 ```markdown
 # [Agent Name]
 
 ## Role
-[役割を1文で]
+[Role in one sentence]
 
 ## Goals
-- [ゴール1]
-- [ゴール2]
+- [Goal 1]
+- [Goal 2]
 
 ## Done Criteria
-- [検証可能な完了条件1]
-- [検証可能な完了条件2]
+- [Verifiable completion condition 1]
+- [Verifiable completion condition 2]
 
 ## Permissions
-- **Allowed**: [許可される操作]
-- **Denied**: `git push`, ユーザー許可なき削除
+- **Allowed**: [Permitted operations]
+- **Denied**: `git push`, deletion without user permission
 
 ## I/O Contract
-- **Input**: [入力形式]
-- **Output**: [出力形式]
+- **Input**: [Input format]
+- **Output**: [Output format]
 
 ## Workflow
-1. **Plan**: 要求を分析し、手順を提示
-2. **Act**: 承認を得て実行
-3. **Verify**: 結果を検証
+1. **Plan**: Analyze request and present steps
+2. **Act**: Execute after approval
+3. **Verify**: Verify results
 
 ## Error Handling
-- エラー発生時は分析して修正を試みる
-- 3回連続失敗で人間に報告
+- When errors occur, analyze and attempt to fix
+- Report to human after 3 consecutive failures
 
 ## Idempotency
-- 既存状態を確認してから操作
-- 重複処理を避ける
+- Check existing state before operations
+- Avoid duplicate processing
 ```
 ''',
     
-    "prompts/design-workflow.prompt.md": '''# Prompt: Design Agent Workflow
+    ".github/prompts/design-workflow.prompt.md": '''# Prompt: Design Agent Workflow
 
-エージェントワークフローを設計するためのプロンプトです。
+Prompt for designing an agent workflow.
 
-## 前提条件
+## Prerequisites
 
-- 参照: `docs/design.md`
-- 原則: SSOT, SRP, Simplicity First, Fail Fast
+- Reference: `docs/design.md`
+- Principles: SSOT, SRP, Simplicity First, Fail Fast
 
-## 指示
+## Instructions
 
-ユーザーの要望に基づいて、以下を設計してください。
+Design the following based on user requirements:
 
-### Step 1: 複雑さレベルの判断
+### Step 1: Determine Complexity Level
 
-| レベル | エージェント数 | 適用ケース |
-|--------|--------------|-----------|
-| Simple | 1 | 単一タスク、シンプルな処理 |
-| Medium | 2-3 | オーケストレーター + ワーカー |
-| Complex | 4+ | 専門エージェント複数 |
+| Level | Agent Count | Use Case |
+|-------|-------------|----------|
+| Simple | 1 | Single task, simple processing |
+| Medium | 2-3 | Orchestrator + workers |
+| Complex | 4+ | Multiple specialized agents |
 
-**原則: Start Simple** - まず最小構成で試す
+**Principle: Start Simple** - Try the minimum configuration first
 
-### Step 2: 設計書作成
+### Step 2: Create Design Document
 
-1. **ワークフローの目的**: 何を解決するか
-2. **エージェント構成**: 役割と責務
-3. **I/O Contract**: 入出力の定義
-4. **インタラクションフロー**: データの流れ
-5. **検証ポイント**: Gate/Checkpoint の配置
-6. **エラー処理**: 失敗時の対応
+1. **Workflow Purpose**: What problem does it solve?
+2. **Agent Composition**: Roles and responsibilities
+3. **I/O Contract**: Input/output definitions
+4. **Interaction Flow**: Data flow
+5. **Verification Points**: Gate/Checkpoint placement
+6. **Error Handling**: Response to failures
 
-## 出力フォーマット
+## Output Format
 
 ```markdown
 # [Workflow Name] Design
@@ -359,98 +819,98 @@ graph TD
 ```
 
 ## Checkpoints
-1. [ステップ間の検証ポイント]
+1. [Verification points between steps]
 
 ## Error Handling
-- [エラー時の対応]
+- [Response on error]
 ```
 ''',
     
-    "prompts/plan-workflow.prompt.md": '''# Prompt: Plan Agent Workflow
+    ".github/prompts/plan-workflow.prompt.md": '''# Prompt: Plan Agent Workflow
 
-複数のエージェントを組み合わせる計画を立てるプロンプトです。
+Prompt for planning a combination of multiple agents.
 
-## 前提条件
+## Prerequisites
 
-- 参照: `Agent.md` (利用可能なエージェント一覧)
+- Reference: `Agent.md` (list of available agents)
 
-## 指示
+## Instructions
 
-ユーザーのタスクを達成するために、以下のステップで計画を立ててください。
+Follow these steps to create a plan for achieving the user's task:
 
-1. **タスク分解**: 独立したサブタスクに分解
-2. **エージェント選定**: 各サブタスクに最適なエージェントを選ぶ
-3. **フロー定義**: データの受け渡しと順序を定義
-4. **検証ポイント**: 各ステップ後の検証方法
-5. **実行計画**: 具体的な実行手順
+1. **Task Decomposition**: Break down into independent subtasks
+2. **Agent Selection**: Choose the optimal agent for each subtask
+3. **Flow Definition**: Define data handoff and sequence
+4. **Verification Points**: Verification method after each step
+5. **Execution Plan**: Specific execution steps
 
-## 出力例
+## Output Example
 
-### Step 1: 要件定義
+### Step 1: Requirements Definition
 - **Agent**: orchestrator
-- **Goal**: ユーザーの要望を整理
+- **Goal**: Organize user's requirements
 - **Output**: `docs/requirements.md`
-- **Validation**: ユーザー確認
+- **Validation**: User confirmation
 
-### Step 2: 実装
+### Step 2: Implementation
 - **Agent**: worker
-- **Input**: Step 1 の requirements.md
-- **Goal**: 実装を行う
-- **Output**: 実装ファイル
-- **Validation**: テスト実行
+- **Input**: requirements.md from Step 1
+- **Goal**: Perform implementation
+- **Output**: Implementation files
+- **Validation**: Run tests
 ''',
     
-    "prompts/review-agent.prompt.md": '''# Prompt: Review Agent Definition
+    ".github/prompts/review-agent.prompt.md": '''# Prompt: Review Agent Definition
 
-エージェント定義をレビューするためのプロンプトです。
+Prompt for reviewing agent definitions.
 
-## 設計原則チェックリスト
+## Design Principles Checklist
 
-### Tier 1: コア原則（必須）
-- [ ] **SRP**: 1エージェント1責務になっているか？
-- [ ] **SSOT**: 情報が一元管理されているか？
-- [ ] **Fail Fast**: エラー時の早期検知ができるか？
+### Tier 1: Core Principles (Required)
+- [ ] **SRP**: Is it 1 agent = 1 responsibility?
+- [ ] **SSOT**: Is information centrally managed?
+- [ ] **Fail Fast**: Can errors be detected early?
 
-### Tier 2: 品質原則（推奨）
-- [ ] **I/O Contract**: 入出力が明確に定義されているか？
-- [ ] **Done Criteria**: 完了条件が検証可能か？
-- [ ] **Idempotency**: リトライ可能な設計か？
-- [ ] **Error Handling**: エラー処理が明記されているか？
+### Tier 2: Quality Principles (Recommended)
+- [ ] **I/O Contract**: Are inputs/outputs clearly defined?
+- [ ] **Done Criteria**: Are completion conditions verifiable?
+- [ ] **Idempotency**: Is the design retry-safe?
+- [ ] **Error Handling**: Is error handling documented?
 
-### 構造チェック
-- [ ] Role が1文で明確か？
-- [ ] Goals が具体的か？
-- [ ] Permissions が最小権限か？
-- [ ] Workflow がステップに分解されているか？
+### Structure Check
+- [ ] Is Role clear in one sentence?
+- [ ] Are Goals specific?
+- [ ] Are Permissions minimal?
+- [ ] Is Workflow broken into steps?
 
-## 出力フォーマット
+## Output Format
 
 ```markdown
 ## Review Result
 
 ### ✅ Good Points
-- [良い点]
+- [Good points]
 
 ### ⚠️ Improvements Needed
-- [改善点]
+- [Improvement points]
 
 ### Recommendation
-[総合評価と推奨アクション]
+[Overall evaluation and recommended actions]
 ```
 ''',
     
-    "prompts/error_handling_prompt.md": '''# Error Handling Prompt
+    ".github/prompts/error-handling.prompt.md": '''# Error Handling Prompt
 
-エラー発生時のプロトコルです。
+Protocol for handling errors.
 
 ## Error Classification
 
 | Type | Description | Recovery |
 |------|-------------|----------|
-| ValidationError | 入力データ不正 | 入力を修正して再試行 |
-| ProcessingError | 処理中の失敗 | 原因分析して再試行 |
-| TimeoutError | タイムアウト | リトライまたはスキップ |
-| DependencyError | 外部サービス障害 | フォールバック |
+| ValidationError | Invalid input data | Fix input and retry |
+| ProcessingError | Failure during processing | Analyze cause and retry |
+| TimeoutError | Timeout | Retry or skip |
+| DependencyError | External service failure | Fallback |
 
 ## Response Format
 
@@ -467,133 +927,491 @@ error:
 
 ## Escalation Rules
 
-1. **リトライ**: 同じエラーは最大3回まで
-2. **フォールバック**: 可能なら代替手段を試す
-3. **ハンドオフ**: 3回失敗で人間に報告
-4. **ログ**: 全コンテキストを記録
+1. **Retry**: Same error up to 3 times max
+2. **Fallback**: Try alternative method if possible
+3. **Handoff**: Report to human after 3 failures
+4. **Log**: Record all context
 
 ## Fail Fast Principle
 
-- エラーは早期に検知
-- 問題があれば即座に報告
-- 曖昧な状態で続行しない
+- Detect errors early
+- Report immediately when problems occur
+- Do not continue in an ambiguous state
+''',
+    
+    ".github/prompts/review-retrospective-learnings.prompt.md": '''# Prompt: Agent Design Retro
+
+Extract reusable design insights from events (incident response, errors, fix PRs)
+and reflect them in design assets for prevention and quality improvement.
+
+## Your Role
+You are an "AI Agent Design Improvement Architect".
+
+## Premises
+- Do not make changes based on assumptions. Always read target files first.
+- Prioritize additions over new content. Use reference links for duplicates.
+- For destructive changes, always confirm first.
+
+## Input
+- Response history (timeline, logs, error messages, fixes)
+- Scope of reflection (Agents.md / *.agent.md / instructions)
+
+## Steps
+
+### Step 0: Context Collection
+1. Read target files (Agents.md, agents/*.agent.md, instructions/*.md)
+2. Summarize existing rules in 5 lines or less
+
+### Step 1: Extract and Classify Learnings
+- Design principle level (separation of concerns, idempotency)
+- Workflow level (call order, preconditions, error handling)
+- Agent-specific rules (input assumptions, prohibitions)
+
+Format: Learning (1 line) + Evidence + Impact
+
+### Step 2: Generalization Judgment
+For each learning, determine:
+- Individual response / Generalize / Strengthen existing rules
+- Check for duplicates/conflicts
+
+### Step 3: Determine Reflection Target
+- Common principles → Agents.md
+- Agent-specific → .github/agents/*.agent.md
+- Overall constraints → .github/instructions/*.md
+
+### Step 4: Present Update Content
+Show "exactly how to rewrite" in code blocks:
+- add / replace / restructure
+- Change granularity (add heading, bullet points, etc.)
+
+### Step 5: Final Check
+- Design philosophy is consistent
+- Reusability and maintainability improve
+- Same trouble is less likely to recur
+''',
+    
+    ".github/prompts/create-agentWF.prompt.md": '''# Create Agent Workflow Prompt
+
+Hearing prompt for designing agent workflows through user dialogue.
+
+## Mode: Start Hearing
+
+You are an agent workflow design facilitator.
+
+## Step 1: Confirm Purpose
+
+```
+What kind of agent workflow do you want to create?
+
+Please tell me:
+1. **What do you want to achieve?** (report generation, automation, analysis...)
+2. **For whom?** (personal, team, customer demo...)
+3. **Trigger?** (manual, schedule, event...)
+```
+
+## Step 2: Define Input/Output
+
+```
+**Input:**
+- What will you receive? (file, API, user input...)
+- Format? (JSON, text, CLI arguments...)
+
+**Output:**
+- What to generate? (report, diagram, file...)
+- Format? (Markdown, CSV, PDF...)
+- Destination? (file, Issue, Slack...)
+```
+
+## Step 3: Confirm Tools/APIs
+
+```
+- **External API**: Azure CLI, GitHub CLI, REST API...
+- **Authentication**: Via environment variables?
+- **Existing tools**: Scripts in the project?
+```
+
+## Step 4: Consider Workflow Structure
+
+```
+1. **Complexity**: Single agent or multiple?
+2. **Steps**: How many stages?
+3. **Review**: Human confirmation points?
+4. **On error**: Retry? Report to human?
+
+Examples:
+- Simple → 1 agent
+- Medium → Orchestrator + 1-2 workers
+- Large → Orchestrator + multiple workers
+```
+
+## Step 5: Design Principles Confirmation
+
+```
+This workflow follows:
+- Two-stage architecture: Input → IR → Output
+- Idempotency: Same input → same result
+- Separation of concerns
+- Fail-safe with error handling
+- Observability with logs
+```
+
+## Step 6: Generate Deliverables
+
+```
+Deliverables:
+1. Agent definition (.github/agents/{{name}}.agent.md)
+2. IR schema (if needed)
+3. Report template (if needed)
+```
+
+## Hearing Result IR Template
+
+```yaml
+workflow:
+  name: "{{{{workflow_name}}}}"
+  purpose: "{{{{purpose}}}}"
+  trigger: "{{{{trigger}}}}"
+io:
+  input: {{ source: "", format: "" }}
+  output: {{ type: "", format: "", destination: "" }}
+architecture:
+  complexity: "simple|medium|complex"
+  agents: []
+  human_checkpoints: []
+  error_handling: ""
+```
 '''
 }
 
-# ワークフローパターンごとのテンプレート
+# Extended instruction templates (optional, generated with --include-instructions flag)
+EXTENDED_INSTRUCTIONS = {
+    ".github/instructions/agent-design.instructions.md": '''---
+applyTo: "**"
+---
+
+# Agent Workflow Design Instructions
+
+## Part 1: Agent Design Principles
+
+### 1. Single Responsibility Principle (SRP)
+- **1 Agent, 1 Goal**: Give each agent one clearly defined role.
+- **Separation of Roles**: Separate by phase: "planning", "implementation", "review", "testing".
+
+### 2. Stateless & Idempotency
+- Design agents to judge based on file system state, not conversation history.
+- Design workflows to converge to correct state when re-run.
+
+### 3. Orchestration
+- For complex tasks, use "manager agent" delegating to "worker agents".
+- Clearly define expected deliverables for handoffs.
+
+### 4. Fail-safe & Human-in-the-loop
+- Before irreversible operations, ask human confirmation.
+- Design prompts to analyze errors and attempt fixes.
+
+### 5. Observability
+- Record decisions as Issue comments or documents.
+- For long tasks, have regular status reports.
+
+## Part 2: Workflow Architecture
+
+### 6. Two-stage Architecture
+Input → IR (Intermediate Representation) → Output
+
+### 7. IR Specification
+- Define allowed structure (JSON/YAML/structured Markdown)
+- Strict validation; do not auto-complete
+
+### 8. Separation of Concerns
+| Responsibility | Description |
+|---------------|-------------|
+| Generate | Generate IR |
+| Validate | Verify IR |
+| Transform | Convert IR to output |
+| Render | Output to final format |
+
+### 9. Determinism
+Same IR → Same output. No creativity in transformation.
+''',
+    
+    ".github/instructions/communication.instructions.md": '''---
+applyTo: "**"
+---
+
+# Communication Instructions
+
+## 1. Response Style
+- **Conclusion First**: State conclusion, then reasons and details.
+- **Conciseness**: Avoid verbose explanations.
+- **Logical Structure**: Use bullet points, tables, headings.
+
+## 2. Language Settings
+- Match user's language for dialogue
+- Follow existing comment style in code
+
+## 3. Citation of References
+- Include relative paths for file references
+- Include URLs for external resources
+
+## 4. Confirmation and Approval
+Always seek user confirmation before:
+- File deletion or large-scale changes
+- External service connections
+- Design policy decisions
+
+## 5. Error Reporting Format
+1. What happened (overview)
+2. Why (cause analysis)
+3. What to do (recommended remediation)
+''',
+    
+    ".github/instructions/git.instructions.md": '''---
+applyTo: "**"
+---
+
+# Git Commit Instructions
+
+Use **Conventional Commits** format.
+
+## Format
+```
+<type>(<scope>): <subject>
+```
+
+## Types
+- **feat**: New feature
+- **fix**: Bug fix
+- **docs**: Documentation only
+- **style**: Formatting (no code change)
+- **refactor**: Code change (no feature/bug)
+- **test**: Adding/correcting tests
+- **chore**: Build/tool changes
+
+## Rules
+- Use imperative form ("add" not "added")
+- No period at end
+- Lowercase first letter
+
+## Important
+- **Push Prohibited**: No `git push` without explicit instruction
+- Split commits for multiple logical changes
+''',
+    
+    ".github/instructions/terminal.instructions.md": '''---
+applyTo: "**"
+---
+
+# Terminal Instructions
+
+## 1. Confirm Current Directory
+Always verify location before commands:
+```powershell
+Get-Location
+Set-Location "path/to/project"
+```
+
+## 2. Command Syntax (PowerShell)
+- Use `;` to chain commands (not `&&`)
+- Use pipeline `|` for data operations
+
+## 3. Destructive Operations
+- Verify paths before delete/move
+- Avoid wildcards; use specific names
+
+## 4. Long-running Processes
+- Use background execution for servers
+- Inform user about non-terminating commands
+''',
+    
+    ".github/instructions/security.instructions.md": '''---
+applyTo: "**"
+---
+
+# Security Instructions
+
+## 1. Confidential Information
+**Prohibited:**
+- Hardcoding API keys, passwords, tokens
+- Committing `.env` or secret files
+
+**Recommended:**
+- Use environment variables
+- Use secret management (Key Vault, GitHub Secrets)
+- Configure `.gitignore`
+
+## 2. External Libraries
+- Check license compatibility
+- Check for vulnerabilities (npm audit, pip-audit)
+
+## 3. API Calls
+- Principle of least privilege
+- Implement rate limiting and backoff
+
+## 4. Git Operations
+- No `git push` without instruction
+- No `--force` push
+- Use PR-based workflow
+
+## 5. Input Validation
+- Sanitize for injection attacks
+- Prevent directory traversal
+''',
+    
+    ".github/instructions/microsoft-docs.instructions.md": '''---
+applyTo: "**"
+---
+
+# Microsoft Documentation Instructions
+
+## Basic Policy
+Reference latest official documentation for Microsoft/Azure answers.
+
+## Required Procedure
+1. Use MCP tools to get latest info
+2. Always include reference URLs
+3. Note API versions
+
+## MCP Tool Workflow
+```
+1. microsoft_docs_search → Find docs
+2. microsoft_code_sample_search → Get code samples
+3. microsoft_docs_fetch → Get full content
+```
+
+## Answer Format
+```markdown
+## Answer
+[Content]
+
+### References
+- [Doc Title](URL) - Microsoft Learn
+- API Version: 2024-01-01
+```
+
+## Priority
+1. Official docs via MCP tools (highest)
+2. Official GitHub repos
+3. Official blogs/announcements
+'''
+}
+
+# Templates for each workflow pattern
 PATTERNS = {
     "basic": {
-        "description": "基本的なワークフロー構成",
+        "description": "Basic workflow structure",
         "structure": {
-            "agents": {
-                "__description__": "エージェント定義",
-                "sample.agent.md": '''# Sample Agent
-
-## Role
-
-あなたは [役割名] です。[対象] に対して [アクション] を行います。
-
-## Goals
-
-- [ゴール1]
-- [ゴール2]
-
-## Done Criteria
-
-- [完了条件1: 検証可能な形で記述]
-- [完了条件2]
-
-## Permissions
-
-- **Allowed**: ファイルの読み込み、提案の作成
-- **Denied**: `git push`、ユーザー許可なきファイル削除
-
-## I/O Contract
-
-- **Input**: [入力形式の説明]
-- **Output**: [出力形式の説明]
-- **IR Format**: （該当する場合）構造化データの仕様
-
-## References
-
-- [Workflow Instructions](../.github/instructions/workflow.instructions.md)
-
-## Workflow
-
-1. **Plan**: ユーザーの要求を分析し、手順を提示
-2. **Act**: 承認を得たら実行
-3. **Verify**: 結果を確認
-
-## Error Handling
-
-- エラー発生時はエラーメッセージを分析し、修正を試みる
-- 3回連続で失敗した場合は人間に報告
-- 破壊的操作の前には必ず確認を求める
-
-## Idempotency
-
-- 既存ファイルの存在を確認してから操作
-- 重複処理を避けるため、状態を必ずチェック
-''',
+            ".github/agents": {
+                "__description__": "Agent definitions",
                 "orchestrator.agent.md": '''# Orchestrator Agent
 
 ## Role
 
-あなたはオーケストレーター（司令塔）です。ユーザーの要求を分析し、適切なサブエージェントに作業を委譲して、全体の進行を管理します。
+You are the orchestrator (commander). You analyze user requests, delegate work to appropriate sub-agents, and manage overall progress.
+
+**This is the entry point for this workflow.**
 
 ## Goals
 
-- ユーザーの要求を理解し、タスクを分解する
-- 各サブエージェントに適切な作業を割り当てる
-- 進捗を監視し、結果をユーザーに報告する
+- Understand user requests and decompose tasks
+- Assign appropriate work to each sub-agent
+- Monitor progress and report results to users
 
 ## Done Criteria
 
-- すべてのサブタスクが `completed` または `skipped` ステータスになっている
-- 最終報告がユーザーに提示されている
+- All subtasks have `completed` or `skipped` status
+- Final report has been presented to the user
 
 ## Permissions
 
-- **Allowed**: タスク分解、サブエージェントへの委譲、進捗報告
-- **Denied**: 直接のコード編集、ファイル削除、`git push`
+- **Allowed**: Task decomposition, delegation to sub-agents, progress reporting
+- **Denied**: Direct code editing, file deletion, `git push`
 
-## Non-Goals (やらないこと)
+## Non-Goals (What not to do)
 
-- コードを直接書かない（実装は専用エージェントに委譲）
-- レビューを自分でしない（レビューは専用エージェントに委譲）
-- ユーザーの意図を勝手に補完しない（不明点は確認）
+- Do not write code directly (delegate implementation to specialized agents)
+- Do not review yourself (delegate reviews to specialized agents)
+- Do not assume user intent (confirm unclear points)
 
 ## I/O Contract
 
-- **Input**: ユーザーからの自然言語リクエスト
+- **Input**: Natural language request from user
 - **Output**:
-  - タスク分解結果
-  - 最終報告（成果物一覧 + ステータス）
+  - Task decomposition results
+  - Final report (deliverables list + status)
 
 ## Workflow
 
-1. **Analyze**: ユーザーの要求を分析し、必要なタスクを洗い出す
-2. **Plan**: タスクを分解し、どのサブエージェントに委譲するか計画を提示
-3. **Delegate**: ユーザーの承認後、サブエージェントを呼び出す
-4. **Monitor**: 各サブエージェントの結果を確認し、問題があれば対処
-5. **Report**: 全体の結果をユーザーに報告
+1. **Analyze**: Analyze user request and identify required tasks
+2. **Plan**: Decompose tasks and present plan for which sub-agent to delegate to
+3. **Delegate**: After user approval, invoke sub-agents
+4. **Monitor**: Check results from each sub-agent and handle any issues
+5. **Report**: Report overall results to user
 
 ## Error Handling
 
-- サブエージェントが3回連続で失敗した場合は、人間に報告してハンドオフ
-- 失敗したタスクはログに記録し、再試行可能な状態を維持
+- If a sub-agent fails 3 times consecutively, report to human and handoff
+- Log failed tasks and maintain retry-capable state
 
 ## Idempotency
 
-- タスクの状態は常にファイルから読み取る（会話履歴に依存しない）
-- 既に完了したタスクは再実行しない
+- Always read task state from files (do not depend on conversation history)
+- Do not re-execute already completed tasks
+''',
+                "worker.agent.md": '''# Worker Agent
+
+## Role
+
+You are a worker agent. You execute specific subtasks assigned by the orchestrator.
+
+## Goals
+
+- Execute assigned subtask accurately
+- Report results back to orchestrator
+
+## Done Criteria
+
+- [Completion condition 1: Describe in verifiable form]
+- [Completion condition 2]
+
+## Permissions
+
+- **Allowed**: File reading, file editing, proposal creation
+- **Denied**: `git push`, file deletion without user permission
+
+## I/O Contract
+
+- **Input**: Subtask description from orchestrator
+- **Output**: Task result and status
+
+## References
+
+- [Workflow Instructions](../instructions/workflow.instructions.md)
+
+## Workflow
+
+1. **Receive**: Receive subtask from orchestrator
+2. **Plan**: Analyze subtask and present steps
+3. **Act**: Execute after approval
+4. **Verify**: Confirm results
+5. **Report**: Report results to orchestrator
+
+## Error Handling
+
+- When errors occur, analyze error messages and attempt to fix
+- Report to orchestrator after 3 consecutive failures
+- Always request confirmation before destructive operations
+
+## Idempotency
+
+- Check for existing files before operations
+- Always check state to avoid duplicate processing
 '''
             },
-            "prompts": {
-                "__description__": "プロンプトテンプレート"
+            ".github/prompts": {
+                "__description__": "Prompt templates"
             },
             "docs": {
-                "__description__": "設計ドキュメント",
+                "__description__": "Design documents",
                 "design.md": '''# Workflow Design Document
 
 ## Overview
@@ -615,11 +1433,11 @@ graph TD
 ```
 
 ## Design Principles Check
-- [ ] SSOT: 情報は一元管理されているか？
-- [ ] SRP: 各エージェントは1責務か？
-- [ ] Fail Fast: エラー時に即停止か？
-- [ ] Iterative: 小さく分割されているか？
-- [ ] Feedback Loop: 成果確認できるか？
+- [ ] SSOT: Is information centrally managed?
+- [ ] SRP: Is each agent single responsibility?
+- [ ] Fail Fast: Stop immediately on error?
+- [ ] Iterative: Is it divided into small steps?
+- [ ] Feedback Loop: Can results be verified?
 ''',
                 "review_notes.md": '''# Review Notes
 
@@ -640,7 +1458,7 @@ See: agentic-workflow-guide/references/review-checklist.md
 '''
             },
             "config": {
-                "__description__": "設定ファイル",
+                "__description__": "Configuration files",
                 "workflow_config.yaml": '''# Workflow Configuration
 
 name: "{workflow_name}"
@@ -666,151 +1484,162 @@ error_handling:
         }
     },
     "prompt-chaining": {
-        "description": "順次処理パターン",
+        "description": "Sequential processing pattern",
         "structure": {
-            "agents": {
-                "__description__": "順次実行されるエージェント",
-                "step1_agent.md": "# Step 1 Agent\n\n## Role\n最初のステップを担当\n",
-                "step2_agent.md": "# Step 2 Agent\n\n## Role\n2番目のステップを担当\n",
-                "step3_agent.md": "# Step 3 Agent\n\n## Role\n最終ステップを担当\n"
+            ".github/agents": {
+                "__description__": "Sequentially executed agents",
+                "orchestrator.agent.md": "# Orchestrator Agent\n\n## Role\nCoordinate sequential step execution\n\n**Entry point for this workflow.**\n",
+                "step1.agent.md": "# Step 1 Agent\n\n## Role\nHandle the first step\n",
+                "step2.agent.md": "# Step 2 Agent\n\n## Role\nHandle the second step\n",
+                "step3.agent.md": "# Step 3 Agent\n\n## Role\nHandle the final step\n"
             },
-            "prompts": {
-                "__description__": "各ステップのプロンプト"
+            ".github/prompts": {
+                "__description__": "Prompts for each step"
             },
             "gates": {
-                "__description__": "ステップ間の検証ゲート",
+                "__description__": "Validation gates between steps",
                 "gate_template.md": '''# Gate: Step N → Step N+1
 
 ## Validation Criteria
-- [ ] 条件1
-- [ ] 条件2
+- [ ] Condition 1
+- [ ] Condition 2
 
 ## On Pass
-次のステップへ進む
+Proceed to next step
 
 ## On Fail
-エラー処理またはリトライ
+Error handling or retry
 '''
             },
             "docs": {
-                "__description__": "設計ドキュメント",
-                "design.md": "# Prompt Chaining Workflow\n\n## Pattern: Prompt Chaining\n順次処理、各ステップで検証\n"
+                "__description__": "Design documents",
+                "design.md": "# Prompt Chaining Workflow\n\n## Pattern: Prompt Chaining\nSequential processing with validation at each step\n"
             },
             "config": {
-                "__description__": "設定ファイル"
+                "__description__": "Configuration files"
             }
         }
     },
     "parallelization": {
-        "description": "並列処理パターン",
+        "description": "Parallel processing pattern",
         "structure": {
-            "agents": {
-                "__description__": "並列実行されるエージェント",
-                "worker1_agent.md": "# Worker 1 Agent\n\n## Role\n並列タスク1を担当\n",
-                "worker2_agent.md": "# Worker 2 Agent\n\n## Role\n並列タスク2を担当\n",
-                "worker3_agent.md": "# Worker 3 Agent\n\n## Role\n並列タスク3を担当\n",
-                "aggregator_agent.md": "# Aggregator Agent\n\n## Role\n全ワーカーの結果を集約\n"
+            ".github/agents": {
+                "__description__": "Parallel executed agents",
+                "orchestrator.agent.md": "# Orchestrator Agent\n\n## Role\nCoordinate parallel task execution and aggregate results\n\n**Entry point for this workflow.**\n",
+                "worker1.agent.md": "# Worker 1 Agent\n\n## Role\nHandle parallel task 1\n",
+                "worker2.agent.md": "# Worker 2 Agent\n\n## Role\nHandle parallel task 2\n",
+                "worker3.agent.md": "# Worker 3 Agent\n\n## Role\nHandle parallel task 3\n"
             },
-            "prompts": {
-                "__description__": "ワーカー用プロンプト"
+            ".github/prompts": {
+                "__description__": "Prompts for workers"
             },
             "docs": {
-                "__description__": "設計ドキュメント",
-                "design.md": "# Parallelization Workflow\n\n## Pattern: Parallelization\n独立タスクを同時実行\n"
+                "__description__": "Design documents",
+                "design.md": "# Parallelization Workflow\n\n## Pattern: Parallelization\nExecute independent tasks simultaneously\n"
             },
             "config": {
-                "__description__": "設定ファイル"
+                "__description__": "Configuration files"
             }
         }
     },
     "orchestrator-workers": {
-        "description": "オーケストレーター + ワーカーパターン",
+        "description": "Orchestrator + workers pattern",
         "structure": {
-            "agents": {
-                "__description__": "オーケストレーターとワーカー",
-                "orchestrator_agent.md": '''# Orchestrator Agent
+            ".github/agents": {
+                "__description__": "Orchestrator and workers",
+                "orchestrator.agent.md": '''# Orchestrator Agent
 
 ## Role
-タスクを動的に分割し、ワーカーに割り当て
+Dynamically decompose tasks and assign to workers
+
+**Entry point for this workflow.**
 
 ## Responsibilities
-1. 入力を分析
-2. サブタスクを生成
-3. ワーカーを起動
-4. 結果を統合
+1. Analyze input
+2. Generate subtasks
+3. Launch workers
+4. Integrate results
 ''',
-                "worker_agent.md": '''# Worker Agent Template
+                "worker.agent.md": '''# Worker Agent Template
 
 ## Role
-割り当てられたサブタスクを実行
+Execute assigned subtask
 
 ## Input
-- task: サブタスクの内容
-- context: 必要なコンテキスト
+- task: Subtask content
+- context: Required context
 
 ## Output
-- result: タスク結果
-- status: 成功/失敗
-''',
-                "synthesizer_agent.md": '''# Synthesizer Agent
-
-## Role
-全ワーカーの結果を統合して最終出力を生成
+- result: Task result
+- status: Success/Failure
 '''
             },
-            "prompts": {
-                "__description__": "各エージェントのプロンプト"
+            ".github/prompts": {
+                "__description__": "Prompts for each agent"
             },
             "docs": {
-                "__description__": "設計ドキュメント",
-                "design.md": "# Orchestrator-Workers Workflow\n\n## Pattern: Orchestrator-Workers\n動的にタスク分割→ワーカーへ\n"
+                "__description__": "Design documents",
+                "design.md": "# Orchestrator-Workers Workflow\n\n## Pattern: Orchestrator-Workers\nDynamically decompose tasks and dispatch to workers\n"
             },
             "config": {
-                "__description__": "設定ファイル"
+                "__description__": "Configuration files"
             }
         }
     },
     "evaluator-optimizer": {
-        "description": "評価・改善ループパターン",
+        "description": "Evaluation-improvement loop pattern",
         "structure": {
-            "agents": {
-                "__description__": "生成器と評価器",
-                "generator_agent.md": '''# Generator Agent
+            ".github/agents": {
+                "__description__": "Orchestrator, generator and evaluator",
+                "orchestrator.agent.md": '''# Orchestrator Agent
 
 ## Role
-コンテンツを生成
+Coordinate the generate-evaluate-improve loop
+
+**Entry point for this workflow.**
+
+## Responsibilities
+1. Send generation requests to generator
+2. Send outputs to evaluator
+3. Route feedback back to generator
+4. Decide when to stop iteration
+''',
+                "generator.agent.md": '''# Generator Agent
+
+## Role
+Generate content
 
 ## Input
-- request: 生成リクエスト
-- feedback: 前回のフィードバック（あれば）
+- request: Generation request
+- feedback: Previous feedback (if any)
 
 ## Output
-- content: 生成されたコンテンツ
+- content: Generated content
 ''',
-                "evaluator_agent.md": '''# Evaluator Agent
+                "evaluator.agent.md": '''# Evaluator Agent
 
 ## Role
-生成されたコンテンツを評価
+Evaluate generated content
 
 ## Criteria
-- [ ] 基準1
-- [ ] 基準2
-- [ ] 基準3
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
 
 ## Output
 - passed: true/false
-- feedback: 改善点（失敗時）
+- feedback: Improvement points (on failure)
 '''
             },
-            "prompts": {
-                "__description__": "生成・評価プロンプト"
+            ".github/prompts": {
+                "__description__": "Generation and evaluation prompts"
             },
             "docs": {
-                "__description__": "設計ドキュメント",
+                "__description__": "Design documents",
                 "design.md": '''# Evaluator-Optimizer Workflow
 
 ## Pattern: Evaluator-Optimizer
-生成→評価→改善ループ
+Generate → Evaluate → Improve loop
 
 ## Flow
 ```mermaid
@@ -829,7 +1658,7 @@ graph TD
 '''
             },
             "config": {
-                "__description__": "設定ファイル",
+                "__description__": "Configuration files",
                 "loop_config.yaml": '''# Evaluator-Optimizer Loop Configuration
 
 max_iterations: 5
@@ -848,33 +1677,35 @@ on_max_reached: return_best  # or: fail
         }
     },
     "routing": {
-        "description": "ルーティングパターン",
+        "description": "Routing pattern",
         "structure": {
-            "agents": {
-                "__description__": "ルーターと専門ハンドラー",
-                "router_agent.md": '''# Router Agent
+            ".github/agents": {
+                "__description__": "Router and specialized handlers",
+                "orchestrator.agent.md": '''# Orchestrator (Router) Agent
 
 ## Role
-入力を分類し、適切なハンドラーに振り分け
+Classify input and route to appropriate handler
+
+**Entry point for this workflow.**
 
 ## Categories
-- type_a: Handler A へ
-- type_b: Handler B へ
-- type_c: Handler C へ
+- type_a: Route to Handler A
+- type_b: Route to Handler B
+- type_c: Route to Handler C
 ''',
-                "handler_a_agent.md": "# Handler A Agent\n\n## Role\nType A の処理を担当\n",
-                "handler_b_agent.md": "# Handler B Agent\n\n## Role\nType B の処理を担当\n",
-                "handler_c_agent.md": "# Handler C Agent\n\n## Role\nType C の処理を担当\n"
+                "handler-a.agent.md": "# Handler A Agent\n\n## Role\nHandle Type A processing\n",
+                "handler-b.agent.md": "# Handler B Agent\n\n## Role\nHandle Type B processing\n",
+                "handler-c.agent.md": "# Handler C Agent\n\n## Role\nHandle Type C processing\n"
             },
-            "prompts": {
-                "__description__": "ルーティング・ハンドラープロンプト"
+            ".github/prompts": {
+                "__description__": "Routing and handler prompts"
             },
             "docs": {
-                "__description__": "設計ドキュメント",
-                "design.md": "# Routing Workflow\n\n## Pattern: Routing\n入力を分類→専門処理へ振り分け\n"
+                "__description__": "Design documents",
+                "design.md": "# Routing Workflow\n\n## Pattern: Routing\nClassify input and route to specialized processing\n"
             },
             "config": {
-                "__description__": "設定ファイル"
+                "__description__": "Configuration files"
             }
         }
     }
@@ -882,7 +1713,7 @@ on_max_reached: return_best  # or: fail
 
 
 def create_structure(base_path: Path, structure: dict, workflow_name: str):
-    """ディレクトリ構造を再帰的に作成"""
+    """Recursively create directory structure"""
     for name, content in structure.items():
         if name == "__description__":
             continue
@@ -890,15 +1721,15 @@ def create_structure(base_path: Path, structure: dict, workflow_name: str):
         path = base_path / name
         
         if isinstance(content, dict):
-            # ディレクトリを作成
+            # Create directory
             path.mkdir(parents=True, exist_ok=True)
-            # .gitkeep を作成（空ディレクトリ対策）
+            # Create .gitkeep for empty directory
             if not any(k for k in content.keys() if k != "__description__"):
                 (path / ".gitkeep").touch()
             else:
                 create_structure(path, content, workflow_name)
         else:
-            # ファイルを作成
+            # Create file
             file_content = content.format(
                 workflow_name=workflow_name,
                 name=workflow_name,
@@ -910,8 +1741,15 @@ def create_structure(base_path: Path, structure: dict, workflow_name: str):
             path.write_text(file_content, encoding="utf-8")
 
 
-def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = "."):
-    """ワークフローのディレクトリ構成を生成"""
+def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".", include_instructions: bool = False):
+    """Generate workflow directory structure
+    
+    Args:
+        name: Workflow name
+        pattern: Workflow pattern (basic, prompt-chaining, etc.)
+        output_path: Output directory
+        include_instructions: If True, generate extended instruction templates
+    """
     
     if pattern not in PATTERNS:
         print(f"❌ Unknown pattern: {pattern}")
@@ -930,17 +1768,22 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".")
     print(f"   Location: {base_path.absolute()}")
     print()
     
-    # ディレクトリ構造を作成
+    # Create directory structure
     base_path.mkdir(parents=True, exist_ok=True)
     create_structure(base_path, pattern_info["structure"], name)
     
-    # .github ディレクトリと instructions を作成
+    # Create .github directory and instructions
     github_dir = base_path / ".github"
     github_dir.mkdir(parents=True, exist_ok=True)
     instructions_dir = github_dir / "instructions"
     instructions_dir.mkdir(parents=True, exist_ok=True)
     
-    # 共通テンプレートを生成
+    # Generate AGENTS.md with pattern-specific template
+    agents_md_template = AGENTS_MD_TEMPLATES.get(pattern, AGENTS_MD_TEMPLATES["basic"])
+    agents_md_content = agents_md_template.format(workflow_name=name)
+    (base_path / "AGENTS.md").write_text(agents_md_content, encoding="utf-8")
+    
+    # Generate common templates (excluding AGENTS.md which is pattern-specific)
     for filename, template in COMMON_TEMPLATES.items():
         file_path = base_path / filename
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -960,7 +1803,15 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".")
         )
         file_path.write_text(content, encoding="utf-8")
     
-    # README.md を生成
+    # Generate extended instructions if requested
+    if include_instructions:
+        print("📋 Generating extended instructions...")
+        for filename, template in EXTENDED_INSTRUCTIONS.items():
+            file_path = base_path / filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(template, encoding="utf-8")
+    
+    # Generate README.md
     readme_content = f'''# {name}
 
 ## Overview
@@ -969,53 +1820,52 @@ Generated with `agentic-workflow-guide` skill.
 ## Pattern
 **{pattern}** - {pattern_info['description']}
 
+## Entry Point
+
+**Start with [AGENTS.md](AGENTS.md)** - It defines the orchestrator entry point and generic rules.
+
 ## Directory Structure
 ```
 {name}/
-├── Agent.md                    # ワークフロー概要
+├── AGENTS.md                   # Entry point (orchestrator-first)
 ├── .github/
-│   ├── copilot-instructions.md # Copilot 用インストラクション
-│   └── instructions/           # 個別インストラクション
-│       ├── workflow.instructions.md
-│       ├── agents.instructions.md
-│       └── prompts.instructions.md
-'''
-    
-    for dir_name, dir_content in pattern_info["structure"].items():
-        if dir_name != "__description__":
-            desc = dir_content.get("__description__", "")
-            readme_content += f"├── {dir_name}/                    # {desc}\n"
-    
-    readme_content += '''```
+│   ├── copilot-instructions.md # Links to agent files
+│   ├── instructions/           # Individual instructions
+│   ├── agents/                 # Agent definitions
+│   │   ├── orchestrator.agent.md  # Entry point
+│   │   └── worker.agent.md
+│   └── prompts/                # Prompt templates
+├── docs/                       # Design documents
+└── config/                     # Configuration files
+```
 
 ## Quick Start
 
-1. **Agent.md** を編集してワークフロー概要を記述
-2. **agents/** でエージェント定義を作成
-3. **prompts/** でプロンプトテンプレートをカスタマイズ
-4. **docs/design.md** で設計を文書化
-5. **config/** で設定を調整
+1. Read **AGENTS.md** to understand the workflow entry point
+2. Customize orchestrator in **.github/agents/orchestrator.agent.md**
+3. Add workers in **.github/agents/**
+4. Set up prompts in **.github/prompts/**
+5. Document design in **docs/design.md**
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `Agent.md` | ワークフロー全体の概要・エージェント一覧 |
-| `.github/copilot-instructions.md` | GitHub Copilot 用の開発ガイドライン |
-| `.github/instructions/*.instructions.md` | ファイルパターン別のルール |
-| `prompts/system_prompt.md` | エージェント用システムプロンプト |
-| `prompts/task_prompt.md` | タスク用プロンプトテンプレート |
-| `prompts/error_handling_prompt.md` | エラー処理用プロンプト |
+| `AGENTS.md` | Entry point with generic rules |
+| `.github/copilot-instructions.md` | Links to agent files |
+| `.github/agents/*.agent.md` | Agent definitions |
+| `.github/prompts/*.prompt.md` | Prompt templates |
+| `.github/instructions/*.instructions.md` | File pattern-specific rules |
 
 ## Design Principles
 
 This workflow should follow:
 
-- **SSOT** - Single Source of Truth（情報の一元管理）
-- **SRP** - Single Responsibility Principle（単一責務）
-- **Fail Fast** - エラーは早期検出
-- **Iterative Refinement** - 小さく反復
-- **Feedback Loop** - 成果確認
+- **SSOT** - Single Source of Truth
+- **SRP** - Single Responsibility Principle
+- **Fail Fast** - Early error detection
+- **Iterative Refinement** - Small iterations
+- **Feedback Loop** - Verify results
 
 See: `agentic-workflow-guide` for full checklist.
 
@@ -1028,30 +1878,31 @@ See: `agentic-workflow-guide` for full checklist.
     (base_path / "README.md").write_text(readme_content, encoding="utf-8")
     
     print("✅ Created structure:")
-    print(f"   📄 Agent.md")
+    print(f"   📄 AGENTS.md")
     print(f"   📄 README.md")
     print(f"   📁 .github/")
     print(f"      📄 copilot-instructions.md")
     print(f"      📁 instructions/")
-    print(f"         📄 workflow.instructions.md")
-    print(f"         📄 agents.instructions.md")
-    print(f"         📄 prompts.instructions.md")
+    print(f"      📁 agents/")
+    print(f"         📄 orchestrator.agent.md")
+    print(f"      📁 prompts/")
     for dir_name in pattern_info["structure"].keys():
-        if dir_name != "__description__":
-            print(f"   📁 {dir_name}/")
+        if dir_name != "__description__" and not dir_name.startswith(".github"):
             print(f"   📁 {dir_name}/")
     
     print(f"\n✅ Workflow '{name}' scaffolded successfully!")
     print("\nGenerated files:")
-    print("  📄 Agent.md - ワークフロー概要")
-    print("  📄 .github/copilot-instructions.md - Copilot 用インストラクション")
-    print("  📄 .github/instructions/*.instructions.md - 個別ルール")
-    print("  📄 prompts/*.md - プロンプトテンプレート")
+    print("  📄 AGENTS.md - Entry point with orchestrator")
+    print("  📄 .github/copilot-instructions.md - Links to agents")
+    print("  📄 .github/agents/*.agent.md - Agent definitions")
+    print("  📄 .github/prompts/*.prompt.md - Prompt templates")
+    print("  📄 .github/instructions/*.instructions.md - Individual rules")
     print("\nNext steps:")
-    print("1. Edit Agent.md to describe your workflow")
-    print("2. Customize agents/ for your use case")
-    print("3. Update prompts/ with your prompts")
-    print("4. Review with agentic-workflow-guide checklist")
+    print("1. Read AGENTS.md for entry point")
+    print("2. Customize .github/agents/orchestrator.agent.md")
+    print("3. Add workers in .github/agents/")
+    print("4. Update .github/prompts/ with your prompts")
+    print("5. Review with agentic-workflow-guide checklist")
     
     return True
 
@@ -1060,7 +1911,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Generate agent workflow directory structure"
     )
-    parser.add_argument("name", help="Workflow name")
+    parser.add_argument("name", nargs="?", help="Workflow name")
     parser.add_argument(
         "--pattern", "-p",
         choices=list(PATTERNS.keys()),
@@ -1077,6 +1928,11 @@ def main():
         action="store_true",
         help="List available patterns"
     )
+    parser.add_argument(
+        "--include-instructions", "-i",
+        action="store_true",
+        help="Include extended instruction templates (agent-design, git, security, etc.)"
+    )
     
     args = parser.parse_args()
     
@@ -1086,9 +1942,20 @@ def main():
             print(f"  {name}")
             print(f"    {info['description']}")
             print()
+        print("Extended instructions (use --include-instructions):")
+        print("  - agent-design.instructions.md")
+        print("  - communication.instructions.md")
+        print("  - git.instructions.md")
+        print("  - terminal.instructions.md")
+        print("  - security.instructions.md")
+        print("  - microsoft-docs.instructions.md")
         return
     
-    scaffold_workflow(args.name, args.pattern, args.path)
+    if not args.name:
+        parser.print_help()
+        return
+    
+    scaffold_workflow(args.name, args.pattern, args.path, args.include_instructions)
 
 
 if __name__ == "__main__":
