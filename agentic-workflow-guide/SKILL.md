@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "エージェントワークフローの設計・レビュー・改善ガイド。SSOT, SRP, Fail Fast, Iterative Refinement 等の設計原則に基づき、ワークフローを構築・検証。Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer パターンをサポート。Use when: (1) エージェントワークフローを新規設計, (2) 既存ワークフローのレビュー・改善, (3) マルチエージェント構成の検討, (4) ワークフローのアンチパターン検出"
+description: "エージェントワークフローの設計・レビュー・改善ガイド。設計原則（SSOT, SRP, Fail Fast, Iterative Refinement）に基づき構築・検証。Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer パターンをサポート。Use when: (1) ワークフローを新規設計・ヒアリング, (2) 既存ワークフローのレビュー・改善, (3) マルチエージェント構成の検討, (4) アンチパターン検出, (5) テンプレート/雛形/ディレクトリ構成の生成 (scaffold), (6) エージェント定義・プロンプト・copilot-instructions の作成"
 ---
 
 # Agentic Workflow Guide
