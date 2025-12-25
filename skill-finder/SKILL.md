@@ -1,6 +1,6 @@
 ---
 name: skill-finder
-description: 'Full-featured Agent Skills management: Search 35+ skills, install locally, star favorites, update from sources. Supports tag search (#azure #bicep), category filtering, and similar skill recommendations.'
+description: "Full-featured Agent Skills management: Search 35+ skills, install locally, star favorites, update from sources. Supports tag search (#azure #bicep), category filtering, and similar skill recommendations."
 license: MIT
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -109,50 +109,98 @@ This will:
 
 ## Popular Repositories
 
-### Official
+**Note:** These are representative examples. For the complete list, run `--list-sources` or check `sources` array in skill-index.json.
 
-| Repository                                                          | Description                           |
-| ------------------------------------------------------------------- | ------------------------------------- |
-| [anthropics/skills](https://github.com/anthropics/skills)           | Official Claude Skills by Anthropic   |
-| [github/awesome-copilot](https://github.com/github/awesome-copilot) | Official Copilot resources by GitHub  |
-| [obra/superpowers](https://github.com/obra/superpowers)             | High-quality skills, agents, commands |
+### Official (type: `official`)
 
-### Awesome Lists
+- [anthropics/skills](https://github.com/anthropics/skills) - Official Claude Skills by Anthropic
+- [github/awesome-copilot](https://github.com/github/awesome-copilot) - Official Copilot resources by GitHub
 
-| Repository                                                                              | Description           |
-| --------------------------------------------------------------------------------------- | --------------------- |
-| [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | Curated Claude Skills |
-| [travisvn/awesome-claude-skills](https://github.com/travisvn/awesome-claude-skills)     | Claude Code focused   |
+### Curated Lists (type: `awesome-list`)
+
+- [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) - Curated Claude Skills
+
+### Community (type: `community`)
+
+- [obra/superpowers](https://github.com/obra/superpowers) - High-quality skills, agents, commands
+- And many more... (run `--list-sources` for full list)
 
 ## Categories
 
-| ID          | Description            |
-| ----------- | ---------------------- |
-| development | Software development   |
-| testing     | Testing & QA           |
-| document    | Document processing    |
-| azure       | Azure services         |
-| web         | Web development        |
-| git         | Git & version control  |
-| agents      | AI agents              |
-| mcp         | Model Context Protocol |
+**Dynamically extracted from skill-index.json.** Run `--list-categories` for current list.
+
+Common categories include: `development`, `testing`, `document`, `azure`, `web`, `git`, `agents`, `mcp`, `cloud`, `creative`, `planning`, etc.
 
 ## Files
 
-| File                             | Description              |
-| -------------------------------- | ------------------------ |
-| `scripts/Search-Skills.ps1`      | PowerShell script        |
-| `scripts/search_skills.py`       | Python script            |
-| `references/skill-index.json`    | Skill index (35+ skills) |
-| `references/starred-skills.json` | Your starred skills      |
+| File                             | Description               |
+| -------------------------------- | ------------------------- |
+| `scripts/Search-Skills.ps1`      | PowerShell script         |
+| `scripts/search_skills.py`       | Python script             |
+| `references/skill-index.json`    | Skill index (220+ skills) |
+| `references/starred-skills.json` | Your starred skills       |
 
 ## Requirements
 
-- PowerShell 7+ or Python 3.8+
-- GitHub CLI (`gh`) for search/install
-- curl for file downloads
+### Required
 
----
+| Tool           | Version | Purpose                           | Install                                   |
+| -------------- | ------- | --------------------------------- | ----------------------------------------- |
+| **GitHub CLI** | 2.0+    | Search/install skills from GitHub | [cli.github.com](https://cli.github.com/) |
+| **curl**       | Any     | Download files                    | Pre-installed on most systems             |
+
+### Optional (choose one)
+
+| Runtime    | Version | Script                      |
+| ---------- | ------- | --------------------------- |
+| PowerShell | 7+      | `scripts/Search-Skills.ps1` |
+| Python     | 3.8+    | `scripts/search_skills.py`  |
+
+### Setup
+
+```bash
+# 1. Install GitHub CLI
+# Windows (winget)
+winget install GitHub.cli
+
+# macOS (Homebrew)
+brew install gh
+
+# Linux (apt)
+sudo apt install gh
+
+# 2. Authenticate with GitHub
+gh auth login
+
+# 3. Verify installation
+gh --version
+curl --version
+```
+
+### Verify Dependencies
+
+```bash
+# Check all dependencies at once
+python scripts/search_skills.py --check
+pwsh scripts/Search-Skills.ps1 -Check
+```
+
+**Expected output:**
+
+```
+✅ gh: installed (version 2.x.x)
+✅ curl: installed
+✅ All dependencies satisfied
+```
+
+### Troubleshooting
+
+| Issue                   | Solution                                    |
+| ----------------------- | ------------------------------------------- |
+| `gh: command not found` | Install GitHub CLI and add to PATH          |
+| `gh auth login` fails   | Run `gh auth login` and follow prompts      |
+| Rate limit exceeded     | Wait or use authenticated requests          |
+| curl SSL errors         | Update curl or check network/proxy settings |
 
 ## Agent Instructions
 
@@ -169,7 +217,9 @@ This will:
 
 When user asks for recommendations (e.g., "おすすめは？", "何かいいスキルある？"), suggest skills based on persona:
 
-| Persona          | Categories                      | Recommended Skills                                                 |
+**Note:** These are reference examples. Always verify skill availability in skill-index.json before recommending.
+
+| Persona          | Categories                      | Example Skills (verify in index)                                   |
 | ---------------- | ------------------------------- | ------------------------------------------------------------------ |
 | オフィスワーカー | document, office, communication | docx, xlsx, pptx, pdf, internal-comms, brainstorming               |
 | 開発者           | development, testing, git       | test-driven-development, systematic-debugging, using-git-worktrees |
@@ -266,34 +316,66 @@ Before sending a search result response, verify:
 🔎 {N} リポジトリ、{M} スキルから検索しました（最終更新: {date}）
 ```
 
-Example:
+**Values are dynamic:**
 
-```
-🔎 7 リポジトリ、195 スキルから検索しました（最終更新: 2025-12-25）
-```
+- `{N}` = count of sources in skill-index.json
+- `{M}` = count of skills in skill-index.json
+- `{date}` = `lastUpdated` field from skill-index.json
 
 ### Output Format
 
-**Skill Table (include Source with URL):**
+**Trust Level Indicators (MANDATORY):**
 
-```markdown
-| Skill | Description | Source                                     | Link                                                       |
-| ----- | ----------- | ------------------------------------------ | ---------------------------------------------------------- |
-| name  | Description | [source-id](https://github.com/owner/repo) | [View](https://github.com/{owner}/{repo}/tree/main/{path}) |
+Always include trust level badge based on source `type` in skill-index.json:
+
+| Type           | Badge           | Description                              |
+| -------------- | --------------- | ---------------------------------------- |
+| `official`     | 🏢 **Official** | Anthropic / GitHub 公式リポジトリ        |
+| `awesome-list` | 📋 **Curated**  | キュレーションリスト（品質レビュー済み） |
+| `community`    | 👥 Community    | コミュニティ製（自己責任で使用）         |
+
+**⚠️ Warning for Community Skills:**
+
+When showing community skills, add this note:
+
+```
+⚠️ コミュニティ製スキルは自己責任でご使用ください。
+   公式スキル（🏢）を優先することを推奨します。
 ```
 
-**Source Breakdown Table (MANDATORY):**
+**Skill Table (include Source with Trust Level):**
 
 ```markdown
-### 📊 Source Breakdown
-
-| Source              | Skills Found | Repository                                                  |
-| ------------------- | ------------ | ----------------------------------------------------------- |
-| anthropics-skills   | N            | [View](https://github.com/anthropics/skills)                |
-| obra-superpowers    | N            | [View](https://github.com/obra/superpowers)                 |
-| composio-awesome    | N            | [View](https://github.com/ComposioHQ/awesome-claude-skills) |
-| aktsmm-agent-skills | N            | [View](https://github.com/aktsmm/Agent-Skills)              |
+| Skill       | Description  | Source                       | Trust        |
+| ----------- | ------------ | ---------------------------- | ------------ |
+| docx        | Word 処理    | [anthropics-skills](url)     | 🏢 Official  |
+| pdf         | PDF 処理     | [anthropics-skills](url)     | 🏢 Official  |
+| azure-usage | Azure ツール | [claude-codex-settings](url) | 👥 Community |
 ```
+
+**Source Breakdown Table (MANDATORY - show ALL sources dynamically):**
+
+**CRITICAL: Read `sources` array from skill-index.json and display ALL sources.**
+
+Do NOT use a hardcoded example. Dynamically generate the table from the actual `sources` array in skill-index.json.
+
+```markdown
+### 📊 Source Breakdown ({N} sources)
+
+| Source      | Type         | Skills Found | Repository           |
+| ----------- | ------------ | ------------ | -------------------- |
+| {source.id} | {type badge} | {count}      | [View]({source.url}) |
+
+...repeat for ALL sources in skill-index.json...
+```
+
+**Generation rules:**
+
+1. Read `sources` array from skill-index.json
+2. For each source, count matching skills in search results
+3. Display ALL sources, including those with 0 matches
+4. Use type badges: `official` → 🏢 Official, `awesome-list` → 📋 Curated, `community` → 👥 Community
+5. Include total count in header: "📊 Source Breakdown (14 sources)"
 
 **URL Construction:**
 

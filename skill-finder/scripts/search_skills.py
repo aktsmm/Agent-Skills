@@ -243,74 +243,106 @@ def add_source(repo_url: str) -> None:
 
 
 def update_source_skills(index: Dict, source_id: str, repo_full: str) -> None:
-    """Fetch and update skills from a source repository."""
+    """Fetch and update skills from a source repository using GitHub Code Search API."""
     print("\n🔍 Searching for skills...")
-    # Check these subdirectories first
-    skills_paths = ["skills", ".github/skills", ".claude/skills", "scientific-skills"]
     found_skills = []
-    found_in_subdir = False
     
-    for path in skills_paths:
-        try:
-            result = subprocess.run(
-                ["gh", "api", f"repos/{repo_full}/contents/{path}"],
-                capture_output=True, text=True, timeout=10
-            )
-            if result.returncode == 0 and "message" not in result.stdout[:50]:
-                items = json.loads(result.stdout)
-                if isinstance(items, list):
-                    print(f"  📂 Found {len(items)} items in {path}")
-                    for item in items:
-                        name = item.get("name", "")
-                        if name and item.get("type") == "dir":
-                            found_skills.append({"name": name, "path": f"{path}/{name}"})
-                            print(f"    - {name}")
-                    found_in_subdir = True
-                    break
-        except subprocess.TimeoutExpired:
-            print(f"  ⚠️ Timeout checking {path}")
-        except FileNotFoundError:
-            print("  ❌ GitHub CLI (gh) not found.")
-            break
-        except Exception:
-            pass  # Silently ignore other errors, continue search
-    # If no skills/ directory found, check root for SKILL.md in subdirectories
-    if not found_in_subdir:
-        try:
-            result = subprocess.run(
-                ["gh", "api", f"repos/{repo_full}/contents"],
-                capture_output=True, text=True, timeout=10
-            )
-            if result.returncode == 0:
-                items = json.loads(result.stdout)
-                if isinstance(items, list):
-                    # Get all directories at root level
-                    dirs = [item for item in items if item.get("type") == "dir"]
-                    skill_dirs = []
-                    for d in dirs:
-                        name = d.get("name", "")
-                        # Skip common non-skill directories
-                        if name.startswith(".") or name in ["docs", "examples", "tests", "node_modules", "dist", "build"]:
-                            continue
-                        # Check if directory contains SKILL.md
-                        check_result = subprocess.run(
-                            ["gh", "api", f"repos/{repo_full}/contents/{name}/SKILL.md"],
-                            capture_output=True, text=True, timeout=5
-                        )
-                        if check_result.returncode == 0 and "message" not in check_result.stdout[:50]:
-                            skill_dirs.append({"name": name, "path": name})
-                    
-                    if skill_dirs:
-                        print(f"  📂 Found {len(skill_dirs)} skills at root level")
-                        for skill in skill_dirs:
-                            found_skills.append(skill)
-                            print(f"    - {skill['name']}")
-        except subprocess.TimeoutExpired:
-            print("  ⚠️ Timeout checking root")
-        except Exception:
-            pass  # Silently ignore other errors, continue search
+    # Method 1: Use GitHub Code Search API to find all SKILL.md files
+    try:
+        result = subprocess.run(
+            ["gh", "api", "search/code", "-f", f"q=repo:{repo_full} filename:SKILL.md"],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            data = json.loads(result.stdout)
+            items = data.get("items", [])
+            if items:
+                # Extract unique parent directories from SKILL.md paths
+                seen_paths = set()
+                for item in items:
+                    path = item.get("path", "")
+                    if path.endswith("SKILL.md"):
+                        # Get parent directory (skill folder)
+                        parent = "/".join(path.split("/")[:-1])
+                        if parent and parent not in seen_paths:
+                            seen_paths.add(parent)
+                            skill_name = parent.split("/")[-1]
+                            found_skills.append({"name": skill_name, "path": parent})
+                
+                if found_skills:
+                    print(f"  📂 Found {len(found_skills)} skills via Code Search")
+                    for skill in found_skills:
+                        print(f"    - {skill['name']} ({skill['path']})")
+    except subprocess.TimeoutExpired:
+        print("  ⚠️ Code Search timeout, falling back to directory scan...")
+    except Exception as e:
+        print(f"  ⚠️ Code Search failed ({e}), falling back to directory scan...")
+    
+    # Method 2: Fallback to directory-based search if Code Search fails or returns empty
+    if not found_skills:
+        # Check common skill directories
+        skills_paths = ["skills", ".github/skills", ".claude/skills", "scientific-skills"]
+        found_in_subdir = False
+        
+        for path in skills_paths:
+            try:
+                result = subprocess.run(
+                    ["gh", "api", f"repos/{repo_full}/contents/{path}"],
+                    capture_output=True, text=True, timeout=10
+                )
+                if result.returncode == 0 and "message" not in result.stdout[:50]:
+                    items = json.loads(result.stdout)
+                    if isinstance(items, list):
+                        print(f"  📂 Found {len(items)} items in {path}")
+                        for item in items:
+                            name = item.get("name", "")
+                            if name and item.get("type") == "dir":
+                                found_skills.append({"name": name, "path": f"{path}/{name}"})
+                                print(f"    - {name}")
+                        found_in_subdir = True
+                        break
+            except subprocess.TimeoutExpired:
+                print(f"  ⚠️ Timeout checking {path}")
+            except FileNotFoundError:
+                print("  ❌ GitHub CLI (gh) not found.")
+                break
+            except Exception:
+                pass
+        
+        # If no skills/ directory found, check root for SKILL.md in subdirectories
+        if not found_in_subdir:
+            try:
+                result = subprocess.run(
+                    ["gh", "api", f"repos/{repo_full}/contents"],
+                    capture_output=True, text=True, timeout=10
+                )
+                if result.returncode == 0:
+                    items = json.loads(result.stdout)
+                    if isinstance(items, list):
+                        dirs = [item for item in items if item.get("type") == "dir"]
+                        skill_dirs = []
+                        for d in dirs:
+                            name = d.get("name", "")
+                            if name.startswith(".") or name in ["docs", "examples", "tests", "node_modules", "dist", "build"]:
+                                continue
+                            check_result = subprocess.run(
+                                ["gh", "api", f"repos/{repo_full}/contents/{name}/SKILL.md"],
+                                capture_output=True, text=True, timeout=5
+                            )
+                            if check_result.returncode == 0 and "message" not in check_result.stdout[:50]:
+                                skill_dirs.append({"name": name, "path": name})
+                        
+                        if skill_dirs:
+                            print(f"  📂 Found {len(skill_dirs)} skills at root level")
+                            for skill in skill_dirs:
+                                found_skills.append(skill)
+                                print(f"    - {skill['name']}")
+            except subprocess.TimeoutExpired:
+                print("  ⚠️ Timeout checking root")
+            except Exception:
+                pass
 
-        # Add found skills
+    # Add found skills to index
     if found_skills:
         print("\n✨ Adding skills to index...")
         added = 0
@@ -332,7 +364,7 @@ def update_source_skills(index: Dict, source_id: str, repo_full: str) -> None:
         if added > 0:
             save_index(index)
     else:
-        print("  ⚠️ No skills directory found")
+        print("  ⚠️ No skills found")
 
 
 def update_all_sources() -> None:
@@ -679,7 +711,7 @@ def discover_new_repos(query: str) -> None:
                             add_source(f"https://github.com/{repo_name}")
                 except (EOFError, KeyboardInterrupt):
                     pass  # User cancelled input, skip adding repository
-                        else:
+            else:
                 print("  No matching repositories found")
         else:
             print(f"  ⚠️ Search failed: {result.stderr}")
