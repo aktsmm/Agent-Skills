@@ -638,38 +638,117 @@ if ($Update) {
             $repoFull = $Matches[1]
             Write-Host "`n📦 $($src.id) ($repoFull)" -ForegroundColor White
             
-            # Search for skills directory
-            $skillsPaths = @("skills", ".github/skills", ".claude/skills")
-            foreach ($path in $skillsPaths) {
-                try {
-                    $rawOutput = gh api "repos/$repoFull/contents/$path" 2>$null
-                    if ($LASTEXITCODE -eq 0 -and $rawOutput -and $rawOutput -notmatch '"message"') {
-                        $items = $rawOutput | ConvertFrom-Json
-                        if ($items) {
-                            Write-Host "  📂 Found $(@($items).Count) items in $path" -ForegroundColor Green
-                            foreach ($item in $items) {
-                                if ($item.type -eq "dir") {
-                                    $existing = $index.skills | Where-Object { $_.name -eq $item.name -and $_.source -eq $src.id }
-                                    if (-not $existing) {
-                                        $newSkill = [PSCustomObject]@{
-                                            name        = $item.name
-                                            source      = $src.id
-                                            path        = "$path/$($item.name)"
-                                            categories  = @("community")
-                                            description = "$($item.name) skill"
-                                        }
-                                        $index.skills += $newSkill
-                                        Write-Host "    ✅ $($item.name)" -ForegroundColor Green
-                                    } else {
-                                        Write-Host "    ⏭️ $($item.name) (exists)" -ForegroundColor Gray
-                                    }
+            $foundSkills = @()
+            
+            # Method 1: Use GitHub Code Search API to find all SKILL.md files
+            try {
+                $rawOutput = gh api search/code -f "q=repo:$repoFull filename:SKILL.md" 2>$null
+                if ($LASTEXITCODE -eq 0 -and $rawOutput) {
+                    $data = $rawOutput | ConvertFrom-Json
+                    $items = $data.items
+                    if ($items -and $items.Count -gt 0) {
+                        $seenPaths = @{}
+                        foreach ($item in $items) {
+                            $path = $item.path
+                            if ($path -and $path.EndsWith("SKILL.md")) {
+                                # Get parent directory (skill folder)
+                                $parts = $path -split "/"
+                                $parent = ($parts[0..($parts.Count - 2)]) -join "/"
+                                if ($parent -and -not $seenPaths.ContainsKey($parent)) {
+                                    $seenPaths[$parent] = $true
+                                    $skillName = $parts[$parts.Count - 2]
+                                    $foundSkills += @{ name = $skillName; path = $parent }
                                 }
                             }
-                            break
+                        }
+                        
+                        if ($foundSkills.Count -gt 0) {
+                            Write-Host "  📂 Found $($foundSkills.Count) skills via Code Search" -ForegroundColor Green
+                            foreach ($skill in $foundSkills) {
+                                Write-Host "    - $($skill.name) ($($skill.path))" -ForegroundColor Gray
+                            }
                         }
                     }
                 }
-                catch { }
+            }
+            catch {
+                Write-Host "  ⚠️ Code Search failed, falling back to directory scan..." -ForegroundColor Yellow
+            }
+            
+            # Method 2: Fallback to directory-based search if Code Search fails or returns empty
+            if ($foundSkills.Count -eq 0) {
+                $skillsPaths = @("skills", ".github/skills", ".claude/skills", "scientific-skills")
+                $foundInSubdir = $false
+                
+                foreach ($path in $skillsPaths) {
+                    try {
+                        $rawOutput = gh api "repos/$repoFull/contents/$path" 2>$null
+                        if ($LASTEXITCODE -eq 0 -and $rawOutput -and $rawOutput -notmatch '"message"') {
+                            $items = $rawOutput | ConvertFrom-Json
+                            if ($items) {
+                                $foundInSubdir = $true
+                                Write-Host "  📂 Found $(@($items).Count) items in $path" -ForegroundColor Green
+                                foreach ($item in $items) {
+                                    if ($item.type -eq "dir") {
+                                        $foundSkills += @{ name = $item.name; path = "$path/$($item.name)" }
+                                        Write-Host "    - $($item.name)" -ForegroundColor Gray
+                                    }
+                                }
+                                break
+                            }
+                        }
+                    }
+                    catch { }
+                }
+                
+                # If no skills/ directory found, check root for SKILL.md in subdirectories
+                if (-not $foundInSubdir) {
+                    try {
+                        $rawOutput = gh api "repos/$repoFull/contents" 2>$null
+                        if ($LASTEXITCODE -eq 0 -and $rawOutput) {
+                            $items = $rawOutput | ConvertFrom-Json
+                            $skillDirs = @()
+                            $skipDirs = @(".", ".github", ".claude", "docs", "examples", "tests", "node_modules", "dist", "build", "src", "lib", "scripts")
+                            
+                            foreach ($item in $items) {
+                                if ($item.type -eq "dir" -and $item.name -and -not $item.name.StartsWith(".")) {
+                                    if ($skipDirs -notcontains $item.name) {
+                                        $skillMdCheck = gh api "repos/$repoFull/contents/$($item.name)/SKILL.md" 2>$null
+                                        if ($LASTEXITCODE -eq 0 -and $skillMdCheck -and $skillMdCheck -notmatch '"message"') {
+                                            $foundSkills += @{ name = $item.name; path = $item.name }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if ($foundSkills.Count -gt 0) {
+                                Write-Host "  📂 Found $($foundSkills.Count) skills at root level" -ForegroundColor Green
+                                foreach ($skill in $foundSkills) {
+                                    Write-Host "    - $($skill.name)" -ForegroundColor Gray
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            
+            # Add found skills to index
+            foreach ($skill in $foundSkills) {
+                $existing = $index.skills | Where-Object { $_.name -eq $skill.name -and $_.source -eq $src.id }
+                if (-not $existing) {
+                    $newSkill = [PSCustomObject]@{
+                        name        = $skill.name
+                        source      = $src.id
+                        path        = $skill.path
+                        categories  = @("community")
+                        description = "$($skill.name) skill"
+                    }
+                    $index.skills += $newSkill
+                    Write-Host "    ✅ $($skill.name)" -ForegroundColor Green
+                } else {
+                    Write-Host "    ⏭️ $($skill.name) (exists)" -ForegroundColor Gray
+                }
             }
         }
     }
