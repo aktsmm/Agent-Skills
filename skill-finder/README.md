@@ -159,14 +159,13 @@ python scripts/search_skills.py --check
 
 ## Included Sources / 収録ソース
 
-| Source                                                                                            | Type      | Description                 |
-| ------------------------------------------------------------------------------------------------- | --------- | --------------------------- |
-| [anthropics/skills](https://github.com/anthropics/skills)                                         | Official  | Official Claude skills      |
-| [obra/superpowers](https://github.com/obra/superpowers)                                           | Community | Superpowers for Claude      |
-| [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills)           | Awesome   | Curated skill list          |
-| [microsoft/windows-ai-studio-templates](https://github.com/microsoft/windows-ai-studio-templates) | Official  | Microsoft AI templates      |
-| [github/copilot-instructions](https://github.com/github/copilot-instructions)                     | Official  | GitHub Copilot instructions |
-| [aktsmm/Agent-Skills](https://github.com/aktsmm/Agent-Skills)                                     | Community | Azure/Development skills    |
+| Source                                                                                            | Type      | Description              |
+| ------------------------------------------------------------------------------------------------- | --------- | ------------------------ |
+| [anthropics/skills](https://github.com/anthropics/skills)                                         | Official  | Official Claude skills   |
+| [obra/superpowers](https://github.com/obra/superpowers)                                           | Community | Superpowers for Claude   |
+| [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills)           | Awesome   | Curated skill list       |
+| [microsoft/windows-ai-studio-templates](https://github.com/microsoft/windows-ai-studio-templates) | Official  | Microsoft AI templates   |
+| [aktsmm/Agent-Skills](https://github.com/aktsmm/Agent-Skills)                                     | Community | Azure/Development skills |
 
 ## Categories / カテゴリ
 
