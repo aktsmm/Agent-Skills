@@ -93,6 +93,20 @@
       "url": "https://github.com/danielmiessler/Personal_AI_Infrastructure",
       "type": "community",
       "description": "AI インフラ・オブザーバビリティスキル by danielmiessler"
+    },
+    {
+      "id": "awesome-claude",
+      "name": "awesome-claude",
+      "url": "https://github.com/tsaol/awesome-claude",
+      "type": "community",
+      "description": "Skills from tsaol/awesome-claude"
+    },
+    {
+      "id": "some-claude-skills",
+      "name": "some_claude_skills",
+      "url": "https://github.com/erichowens/some_claude_skills",
+      "type": "community",
+      "description": "Skills from erichowens/some_claude_skills"
     }
   ],
   "skills": [
@@ -2438,6 +2452,600 @@
         "community"
       ],
       "description": "workflow skill"
+    },
+    {
+      "name": "excel",
+      "source": "awesome-claude",
+      "path": "skills/excel",
+      "categories": [
+        "community"
+      ],
+      "description": "excel skill"
+    },
+    {
+      "name": "pdf",
+      "source": "awesome-claude",
+      "path": "skills/pdf",
+      "categories": [
+        "community"
+      ],
+      "description": "pdf skill"
+    },
+    {
+      "name": "ppt",
+      "source": "awesome-claude",
+      "path": "skills/ppt",
+      "categories": [
+        "community"
+      ],
+      "description": "ppt skill"
+    },
+    {
+      "name": "word",
+      "source": "awesome-claude",
+      "path": "skills/word",
+      "categories": [
+        "community"
+      ],
+      "description": "word skill"
+    },
+    {
+      "name": "2000s-visualization-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/2000s-visualization-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "2000s-visualization-expert skill"
+    },
+    {
+      "name": "adhd-design-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/adhd-design-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "adhd-design-expert skill"
+    },
+    {
+      "name": "agent-creator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/agent-creator",
+      "categories": [
+        "community"
+      ],
+      "description": "agent-creator skill"
+    },
+    {
+      "name": "api-architect",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/api-architect",
+      "categories": [
+        "community"
+      ],
+      "description": "api-architect skill"
+    },
+    {
+      "name": "automatic-stateful-prompt-improver",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/automatic-stateful-prompt-improver",
+      "categories": [
+        "community"
+      ],
+      "description": "automatic-stateful-prompt-improver skill"
+    },
+    {
+      "name": "bot-developer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/bot-developer",
+      "categories": [
+        "community"
+      ],
+      "description": "bot-developer skill"
+    },
+    {
+      "name": "career-biographer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/career-biographer",
+      "categories": [
+        "community"
+      ],
+      "description": "career-biographer skill"
+    },
+    {
+      "name": "claude-ecosystem-promoter",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/claude-ecosystem-promoter",
+      "categories": [
+        "community"
+      ],
+      "description": "claude-ecosystem-promoter skill"
+    },
+    {
+      "name": "clip-aware-embeddings",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/clip-aware-embeddings",
+      "categories": [
+        "community"
+      ],
+      "description": "clip-aware-embeddings skill"
+    },
+    {
+      "name": "code-necromancer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/code-necromancer",
+      "categories": [
+        "community"
+      ],
+      "description": "code-necromancer skill"
+    },
+    {
+      "name": "collage-layout-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/collage-layout-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "collage-layout-expert skill"
+    },
+    {
+      "name": "color-theory-palette-harmony-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/color-theory-palette-harmony-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "color-theory-palette-harmony-expert skill"
+    },
+    {
+      "name": "competitive-cartographer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/competitive-cartographer",
+      "categories": [
+        "community"
+      ],
+      "description": "competitive-cartographer skill"
+    },
+    {
+      "name": "cv-creator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/cv-creator",
+      "categories": [
+        "community"
+      ],
+      "description": "cv-creator skill"
+    },
+    {
+      "name": "data-pipeline-engineer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/data-pipeline-engineer",
+      "categories": [
+        "community"
+      ],
+      "description": "data-pipeline-engineer skill"
+    },
+    {
+      "name": "design-archivist",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/design-archivist",
+      "categories": [
+        "community"
+      ],
+      "description": "design-archivist skill"
+    },
+    {
+      "name": "design-system-creator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/design-system-creator",
+      "categories": [
+        "community"
+      ],
+      "description": "design-system-creator skill"
+    },
+    {
+      "name": "devops-automator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/devops-automator",
+      "categories": [
+        "community"
+      ],
+      "description": "devops-automator skill"
+    },
+    {
+      "name": "diagramming-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/diagramming-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "diagramming-expert skill"
+    },
+    {
+      "name": "drone-cv-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/drone-cv-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "drone-cv-expert skill"
+    },
+    {
+      "name": "drone-inspection-specialist",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/drone-inspection-specialist",
+      "categories": [
+        "community"
+      ],
+      "description": "drone-inspection-specialist skill"
+    },
+    {
+      "name": "event-detection-temporal-intelligence-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/event-detection-temporal-intelligence-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "event-detection-temporal-intelligence-expert skill"
+    },
+    {
+      "name": "hr-network-analyst",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/hr-network-analyst",
+      "categories": [
+        "community"
+      ],
+      "description": "hr-network-analyst skill"
+    },
+    {
+      "name": "hrv-alexithymia-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/hrv-alexithymia-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "hrv-alexithymia-expert skill"
+    },
+    {
+      "name": "indie-monetization-strategist",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/indie-monetization-strategist",
+      "categories": [
+        "community"
+      ],
+      "description": "indie-monetization-strategist skill"
+    },
+    {
+      "name": "interior-design-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/interior-design-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "interior-design-expert skill"
+    },
+    {
+      "name": "job-application-optimizer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/job-application-optimizer",
+      "categories": [
+        "community"
+      ],
+      "description": "job-application-optimizer skill"
+    },
+    {
+      "name": "jungian-psychologist",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/jungian-psychologist",
+      "categories": [
+        "community"
+      ],
+      "description": "jungian-psychologist skill"
+    },
+    {
+      "name": "knot-theory-educator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/knot-theory-educator",
+      "categories": [
+        "community"
+      ],
+      "description": "knot-theory-educator skill"
+    },
+    {
+      "name": "liaison",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/liaison",
+      "categories": [
+        "community"
+      ],
+      "description": "liaison skill"
+    },
+    {
+      "name": "mcp-creator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/mcp-creator",
+      "categories": [
+        "community"
+      ],
+      "description": "mcp-creator skill"
+    },
+    {
+      "name": "metal-shader-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/metal-shader-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "metal-shader-expert skill"
+    },
+    {
+      "name": "native-app-designer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/native-app-designer",
+      "categories": [
+        "community"
+      ],
+      "description": "native-app-designer skill"
+    },
+    {
+      "name": "orchestrator",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/orchestrator",
+      "categories": [
+        "community"
+      ],
+      "description": "orchestrator skill"
+    },
+    {
+      "name": "personal-finance-coach",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/personal-finance-coach",
+      "categories": [
+        "community"
+      ],
+      "description": "personal-finance-coach skill"
+    },
+    {
+      "name": "photo-composition-critic",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/photo-composition-critic",
+      "categories": [
+        "community"
+      ],
+      "description": "photo-composition-critic skill"
+    },
+    {
+      "name": "photo-content-recognition-curation-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/photo-content-recognition-curation-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "photo-content-recognition-curation-expert skill"
+    },
+    {
+      "name": "physics-rendering-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/physics-rendering-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "physics-rendering-expert skill"
+    },
+    {
+      "name": "project-management-guru-adhd",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/project-management-guru-adhd",
+      "categories": [
+        "community"
+      ],
+      "description": "project-management-guru-adhd skill"
+    },
+    {
+      "name": "refactoring-surgeon",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/refactoring-surgeon",
+      "categories": [
+        "community"
+      ],
+      "description": "refactoring-surgeon skill"
+    },
+    {
+      "name": "research-analyst",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/research-analyst",
+      "categories": [
+        "community"
+      ],
+      "description": "research-analyst skill"
+    },
+    {
+      "name": "security-auditor",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/security-auditor",
+      "categories": [
+        "community"
+      ],
+      "description": "security-auditor skill"
+    },
+    {
+      "name": "seo-visibility-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/seo-visibility-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "seo-visibility-expert skill"
+    },
+    {
+      "name": "site-reliability-engineer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/site-reliability-engineer",
+      "categories": [
+        "community"
+      ],
+      "description": "site-reliability-engineer skill"
+    },
+    {
+      "name": "skill-coach",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/skill-coach",
+      "categories": [
+        "community"
+      ],
+      "description": "skill-coach skill"
+    },
+    {
+      "name": "skill-documentarian",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/skill-documentarian",
+      "categories": [
+        "community"
+      ],
+      "description": "skill-documentarian skill"
+    },
+    {
+      "name": "sound-engineer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/sound-engineer",
+      "categories": [
+        "community"
+      ],
+      "description": "sound-engineer skill"
+    },
+    {
+      "name": "speech-pathology-ai",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/speech-pathology-ai",
+      "categories": [
+        "community"
+      ],
+      "description": "speech-pathology-ai skill"
+    },
+    {
+      "name": "swift-executor",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/swift-executor",
+      "categories": [
+        "community"
+      ],
+      "description": "swift-executor skill"
+    },
+    {
+      "name": "team-builder",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/team-builder",
+      "categories": [
+        "community"
+      ],
+      "description": "team-builder skill"
+    },
+    {
+      "name": "tech-entrepreneur-coach-adhd",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/tech-entrepreneur-coach-adhd",
+      "categories": [
+        "community"
+      ],
+      "description": "tech-entrepreneur-coach-adhd skill"
+    },
+    {
+      "name": "technical-writer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/technical-writer",
+      "categories": [
+        "community"
+      ],
+      "description": "technical-writer skill"
+    },
+    {
+      "name": "test-automation-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/test-automation-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "test-automation-expert skill"
+    },
+    {
+      "name": "typography-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/typography-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "typography-expert skill"
+    },
+    {
+      "name": "vaporwave-glassomorphic-ui-designer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/vaporwave-glassomorphic-ui-designer",
+      "categories": [
+        "community"
+      ],
+      "description": "vaporwave-glassomorphic-ui-designer skill"
+    },
+    {
+      "name": "vibe-matcher",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/vibe-matcher",
+      "categories": [
+        "community"
+      ],
+      "description": "vibe-matcher skill"
+    },
+    {
+      "name": "voice-audio-engineer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/voice-audio-engineer",
+      "categories": [
+        "community"
+      ],
+      "description": "voice-audio-engineer skill"
+    },
+    {
+      "name": "vr-avatar-engineer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/vr-avatar-engineer",
+      "categories": [
+        "community"
+      ],
+      "description": "vr-avatar-engineer skill"
+    },
+    {
+      "name": "web-design-expert",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/web-design-expert",
+      "categories": [
+        "community"
+      ],
+      "description": "web-design-expert skill"
+    },
+    {
+      "name": "webapp-testing",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/webapp-testing",
+      "categories": [
+        "community"
+      ],
+      "description": "webapp-testing skill"
+    },
+    {
+      "name": "windows-3-1-web-designer",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/windows-3-1-web-designer",
+      "categories": [
+        "community"
+      ],
+      "description": "windows-3-1-web-designer skill"
+    },
+    {
+      "name": "wisdom-accountability-coach",
+      "source": "some-claude-skills",
+      "path": ".claude/skills/wisdom-accountability-coach",
+      "categories": [
+        "community"
+      ],
+      "description": "wisdom-accountability-coach skill"
     }
   ],
   "categories": [
