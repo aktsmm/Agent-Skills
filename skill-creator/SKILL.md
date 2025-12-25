@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating and editing skills. Use when creating new skills, editing SKILL.md, updating references/scripts/assets, or reviewing skills in .github/skills/ directory. Ensures consistency, maintainability, and best practices.
+description: "MANDATORY for any .github/skills/ operations. Use when: (1) Creating new skills, (2) Editing SKILL.md files, (3) Adding/updating references/, scripts/, assets/, (4) Reviewing skills, (5) ANY file changes under .github/skills/ directory. This skill ensures consistency, maintainability, and best practices. ALWAYS consult this skill before modifying skill files."
 license: Complete terms in LICENSE.txt
 ---
 
