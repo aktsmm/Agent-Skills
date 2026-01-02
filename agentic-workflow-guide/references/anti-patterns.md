@@ -1,8 +1,8 @@
 # Anti-Patterns
 
-A collection of anti-patterns to avoid in agent workflows.
+> **Note:** Anti-pattern details have been consolidated into [review-checklist.md](review-checklist.md) to reduce duplication and improve maintainability.
 
-## Overview
+## Quick Reference
 
 | Anti-Pattern         | Problem                            | Solution                        |
 | -------------------- | ---------------------------------- | ------------------------------- |
@@ -17,136 +17,11 @@ A collection of anti-patterns to avoid in agent workflows.
 
 ---
 
-## Details
+→ **See [review-checklist.md](review-checklist.md)** for:
 
-### 1. God Agent
-
-**Packing all responsibilities into one agent**
-
-#### Symptoms
-
-```
-❌ Bad Example:
-Agent: "Search, analyze, create report, send email..."
-```
-
-- One agent handles multiple different tasks
-- Prompt becomes bloated
-- Debugging is difficult
-- Partial changes affect the whole system
-
-#### Solution
-
-```
-✅ Good Example:
-Agent 1 (Searcher): "Search for relevant information"
-Agent 2 (Analyzer): "Analyze information"
-Agent 3 (Reporter): "Create report"
-Agent 4 (Sender): "Send email"
-```
-
-**Applicable Principle:** SRP (Single Responsibility Principle)
-
----
-
-### 2. Context Overload
-
-**Passing excessive unnecessary information**
-
-#### Symptoms
-
-```
-❌ Bad Example:
-Context passed to Agent:
-- All file contents
-- Entire conversation history
-- Unrelated configuration info
-```
-
-- Wasting context window
-- Noise buries the essence
-- Increased cost
-- Increased processing time
-
-#### Solution
-
-```
-✅ Good Example:
-Context passed to Agent:
-- Only files needed for this task
-- Only recent relevant conversation
-- Only necessary configuration items
-```
-
-**Applicable Principle:** ISP (Interface Segregation Principle)
-
----
-
-### 3. Silent Failure
-
-**Ignoring errors and continuing**
-
-#### Symptoms
-
-```
-❌ Bad Example:
-try:
-    result = agent.execute()
-except:
-    pass  # Ignore error
-```
-
-- Processing continues even when errors occur
-- Problems propagate to later stages
-- Debugging is difficult
-- Invalid results are generated
-
-#### Solution
-
-```
-✅ Good Example:
-try:
-    result = agent.execute()
-except AgentError as e:
-    log.error(f"Agent failed: {e}")
-    raise  # Stop immediately
-```
-
-**Applicable Principle:** Fail Fast
-
----
-
-### 4. Infinite Loop
-
-**Loops without termination conditions**
-
-#### Symptoms
-
-```
-❌ Bad Example:
-while not evaluator.is_satisfied():
-    result = generator.generate()
-    # No termination condition
-```
-
-- May never end
-- Resource exhaustion
-- Cost explosion
-
-#### Solution
-
-```
-✅ Good Example:
-MAX_ITERATIONS = 5
-for i in range(MAX_ITERATIONS):
-    result = generator.generate()
-    if evaluator.is_satisfied():
-        break
-else:
-    log.warning("Max iterations reached")
-```
-
-**Applicable Principle:** Explicit termination conditions
+- Detailed anti-pattern descriptions with code examples
+- Detection checklist
+- Solutions and fixes
 
 ---
 

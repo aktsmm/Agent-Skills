@@ -193,6 +193,15 @@ A collection of principles for designing agent workflows.
 
 > "Think about how much effort goes into human-computer interfaces (HCI), and plan to invest just as much effort in creating good agent-computer interfaces (ACI)."
 
+### Core Principles
+
+| Principle                  | Description                                            |
+| -------------------------- | ------------------------------------------------------ |
+| **Minimal Overlap**        | Each tool has a distinct, non-overlapping purpose      |
+| **Self-Contained**         | Tools are robust to errors and handle edge cases       |
+| **Clear Intent**           | Tool name and description unambiguously convey purpose |
+| **Model-Friendly Formats** | Output formats are easy for LLMs to parse and use      |
+
 ### Tool Design Guidelines
 
 1. **Clear Description** - Clarify tool purpose and usage
@@ -200,11 +209,60 @@ A collection of principles for designing agent workflows.
 3. **Input Format** - Specify expected input format
 4. **Error Handling** - Define behavior on failure
 5. **Testing** - Actually use it and iterate
+6. **Example Usage** - Include usage examples in description
+7. **Poka-yoke** - Design to prevent mistakes (e.g., use absolute paths)
+
+### Format Selection
+
+Choose formats that minimize cognitive load for LLMs:
+
+| Good Format                 | Avoid                              |
+| --------------------------- | ---------------------------------- |
+| Markdown code blocks        | JSON with escaped strings          |
+| Absolute file paths         | Relative paths (context-dependent) |
+| Structured sections         | Free-form text with implicit rules |
+| Clear delimiters (XML tags) | Ambiguous separators               |
+
+### Anthropic's Tool Format Recommendations
+
+> "Give the model enough tokens to 'think' before it writes itself into a corner. Keep the format close to what the model has seen naturally occurring in text on the internet."
+
+**Do:**
+
+- Use formats the model has seen in training (Markdown, code, XML)
+- Allow space for reasoning before final output
+- Use descriptive parameter names
+
+**Don't:**
+
+- Require accurate counting (e.g., line numbers in diffs)
+- Force heavy escaping (e.g., code inside JSON strings)
+- Create ambiguous decision points between similar tools
+
+### Tool Set Design
+
+| Symptom                       | Problem                        | Solution                         |
+| ----------------------------- | ------------------------------ | -------------------------------- |
+| User unsure which tool to use | Overlapping functionality      | Consolidate or clearly delineate |
+| Frequent tool misuse          | Unclear descriptions           | Improve docs, add examples       |
+| Verbose tool outputs          | Wasted context tokens          | Return summaries, not raw data   |
+| Error-prone inputs            | Complex parameter requirements | Simplify, use defaults           |
+
+### Testing Checklist
+
+```markdown
+- [ ] Can a junior developer understand how to use this tool from its description?
+- [ ] Does running multiple test inputs produce expected outputs?
+- [ ] Are error messages actionable?
+- [ ] Is the output format consistent and parseable?
+- [ ] Does the tool handle edge cases gracefully?
+```
 
 ---
 
 ## References
 
 - [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
+- [Writing tools for AI agents - Anthropic](https://www.anthropic.com/engineering/writing-tools-for-agents)
 - [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
 - [12-Factor App](https://12factor.net/)
