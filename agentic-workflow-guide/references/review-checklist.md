@@ -1,6 +1,6 @@
 # Review Checklist
 
-Review checklist for agent workflows.
+Comprehensive review checklist for agent workflows. Includes anti-pattern detection.
 
 ## How to Use
 
@@ -21,6 +21,7 @@ Minimum items to verify:
 - [ ] Is it divided into small steps? (Iterative)
 - [ ] Can results be verified at each step? (Feedback Loop)
 - [ ] Is there any possibility of infinite loops?
+- [ ] Are related files (references, scripts) simple and minimal? (DRY)
 ```
 
 ---
@@ -131,29 +132,183 @@ Minimum items to verify:
 
 ---
 
-## Anti-Pattern Detection
+## Related File Simplicity Check
 
-If any of the following apply, review the design:
+**NEW:** Verify that referenced Markdown files, scripts, and assets are simple and maintainable.
 
 ```markdown
-- [ ] **God Agent**: Is too much responsibility packed into one agent?
-      → Split with SRP
+## Documentation (references/, .md files)
 
-- [ ] **Context Overload**: Is excessive context being passed?
-      → Minimize with ISP
+- [ ] Is information duplicated across multiple files?
+- [ ] Could any reference files be consolidated?
+- [ ] Are large files (>200 lines) well-structured with TOC?
+- [ ] Is there orphaned documentation no longer referenced?
 
-- [ ] **Silent Failure**: Are errors being ignored and continuing?
-      → Stop immediately with Fail Fast
+## Scripts (scripts/)
 
-- [ ] **Infinite Loop**: Are there loops without termination conditions?
-      → Set maximum iterations
+- [ ] Are scripts focused on a single task? (SRP for code)
+- [ ] Are there duplicate functions across scripts?
+- [ ] Is script logic simple enough to understand quickly?
+- [ ] Are scripts tested and working?
 
-- [ ] **Big Bang**: Trying to build everything at once?
-      → Build small with Iterative
+## Prompts and Templates
 
-- [ ] **Premature Optimization**: Making it more complex than necessary?
-      → Apply Simplicity First
+- [ ] Are prompts reused where possible? (DRY)
+- [ ] Is there copy-pasted prompt text that should be templated?
+- [ ] Are prompt variations clearly organized?
+
+## Overall Structure
+
+- [ ] Is the total number of files reasonable (<15 for most workflows)?
+- [ ] Is the directory structure intuitive?
+- [ ] Can a new contributor understand the layout quickly?
 ```
+
+---
+
+## Anti-Pattern Detection
+
+Detect and fix common workflow anti-patterns:
+
+### God Agent
+
+**Problem:** All responsibilities packed into one agent
+
+```
+❌ Bad:  Agent handles "search + analyze + report + email"
+✅ Good: Separate agents for each responsibility
+```
+
+**Solution:** Split with SRP
+
+---
+
+### Context Overload
+
+**Problem:** Passing excessive unnecessary information
+
+```
+❌ Bad:  Pass all files, entire history, all config
+✅ Good: Pass only task-relevant data
+```
+
+**Solution:** Minimize with ISP
+
+---
+
+### Silent Failure
+
+**Problem:** Ignoring errors and continuing
+
+```python
+# ❌ Bad
+try:
+    result = agent.execute()
+except:
+    pass  # Silent failure
+
+# ✅ Good
+try:
+    result = agent.execute()
+except AgentError as e:
+    log.error(f"Agent failed: {e}")
+    raise  # Stop immediately
+```
+
+**Solution:** Fail Fast
+
+---
+
+### Infinite Loop
+
+**Problem:** Loops without termination conditions
+
+```python
+# ❌ Bad
+while not evaluator.is_satisfied():
+    result = generator.generate()
+    # No termination condition
+
+# ✅ Good
+MAX_ITERATIONS = 5
+for i in range(MAX_ITERATIONS):
+    result = generator.generate()
+    if evaluator.is_satisfied():
+        break
+else:
+    log.warning("Max iterations reached")
+```
+
+**Solution:** Set maximum iterations
+
+---
+
+### Big Bang
+
+**Problem:** Building everything at once
+
+```
+❌ Bad:  Design all → Implement all → Test at end
+✅ Good: Design 1 → Implement 1 → Test → Repeat
+```
+
+**Solution:** Iterative Refinement
+
+---
+
+### Premature Complexity
+
+**Problem:** Complex design from the start
+
+```
+❌ Bad:  Start with 10-agent workflow
+✅ Good: Start with 1 agent, add complexity as needed
+```
+
+**Solution:** Simplicity First
+
+> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short." — Anthropic
+
+---
+
+### Black Box
+
+**Problem:** Internal state invisible
+
+```
+❌ Bad:  Agent processes silently, user sees nothing
+✅ Good: "Step 1/3: Fetching data..." → "Step 2/3: Analyzing..."
+```
+
+**Solution:** Transparency
+
+---
+
+### Tight Coupling
+
+**Problem:** Changes to one agent cascade to many others
+
+```
+❌ Bad:  Change Agent A's output → B, C, D all break
+✅ Good: Standardized interfaces, independent testing
+```
+
+**Solution:** Loose Coupling
+
+---
+
+## Anti-Pattern Quick Reference
+
+| Anti-Pattern         | Symptom                            | Solution                        |
+| -------------------- | ---------------------------------- | ------------------------------- |
+| God Agent            | All responsibilities in 1 agent    | Split with SRP                  |
+| Context Overload     | Passing excessive unnecessary info | Minimize with ISP               |
+| Silent Failure       | Ignoring errors and continuing     | Stop immediately with Fail Fast |
+| Infinite Loop        | Loops without termination          | Set maximum iterations          |
+| Big Bang             | Building everything at once        | Build small with Iterative      |
+| Premature Complexity | Complex design from the start      | Simplicity First                |
+| Black Box            | Internal state invisible           | Transparency                    |
+| Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
 
 ---
 
@@ -191,15 +346,27 @@ If any of the following apply, review the design:
 | ISP             | ✅/❌  |         |
 | Idempotency     | ✅/❌  |         |
 
+### Related File Simplicity
+
+| Check                 | Result | Comment |
+| --------------------- | ------ | ------- |
+| No duplication        | ✅/❌  |         |
+| Files consolidated    | ✅/❌  |         |
+| Scripts focused       | ✅/❌  |         |
+| Reasonable file count | ✅/❌  |         |
+
 ### Anti-Patterns
 
-| Pattern          | Detected | Solution |
-| ---------------- | -------- | -------- |
-| God Agent        | ✅/❌    |          |
-| Context Overload | ✅/❌    |          |
-| Silent Failure   | ✅/❌    |          |
-| Infinite Loop    | ✅/❌    |          |
-| Big Bang         | ✅/❌    |          |
+| Pattern              | Detected | Solution Applied |
+| -------------------- | -------- | ---------------- |
+| God Agent            | ✅/❌    |                  |
+| Context Overload     | ✅/❌    |                  |
+| Silent Failure       | ✅/❌    |                  |
+| Infinite Loop        | ✅/❌    |                  |
+| Big Bang             | ✅/❌    |                  |
+| Premature Complexity | ✅/❌    |                  |
+| Black Box            | ✅/❌    |                  |
+| Tight Coupling       | ✅/❌    |                  |
 
 ## Improvement Proposals
 
@@ -223,3 +390,11 @@ After review completion:
 1. **All ✅** → Proceed to implementation
 2. **Minor ❌** → Re-check after fixes
 3. **Major ❌** → Revise design, re-review
+
+---
+
+## Related Documents
+
+- [design-principles.md](design-principles.md) - Design principles details
+- [workflow-patterns.md](workflow-patterns.md) - Workflow pattern details
+- [context-engineering.md](context-engineering.md) - Context management for long tasks

@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "Design, review, and improve agent workflows based on proven design principles (SSOT, SRP, Fail Fast, Iterative Refinement). Supports Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer patterns. Use when: (1) Designing new agent workflows, (2) Reviewing/improving existing workflows, (3) Planning multi-agent architectures, (4) Detecting anti-patterns, (5) Scaffolding workflow templates/directory structures, (6) Creating agent definitions, prompts, or copilot-instructions"
+description: "Design, review, and improve agent workflows based on proven design principles (SSOT, SRP, Fail Fast, Iterative Refinement). Supports Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer patterns. Includes Context Engineering for long-running agents (Compaction, Note-taking, Sub-agents). Use when working with .github/ directory: copilot-instructions.md, prompts/, instructions/, agents/, or any agent configuration files. Triggers: (1) Designing new agent workflows, (2) Reviewing/improving existing workflows, (3) Planning multi-agent architectures, (4) Detecting anti-patterns, (5) Scaffolding workflow templates, (6) Creating/editing .github/copilot-instructions.md, (7) Working with .github/prompts or .prompt.md files, (8) Creating .github/instructions/*.instructions.md, (9) Managing context for long-horizon tasks"
 ---
 
 # Agentic Workflow Guide
@@ -14,31 +14,21 @@ A comprehensive guide for designing, reviewing, and improving agent workflows ba
 - **Pattern Selection** - Choose the right workflow pattern for your task
 - **Quality Improvement** - Iteratively refine workflows step by step
 - **Scaffolding** - Generate workflow directory structures and templates
+- **Long-Horizon Tasks** - Manage context for multi-hour agent sessions
 
 ## Core Principles
 
 → See **[references/design-principles.md](references/design-principles.md)** for details
 
-### Tier 1: Essential Principles
+| Tier                  | Principles                                                                  | Focus                      |
+| --------------------- | --------------------------------------------------------------------------- | -------------------------- |
+| **Tier 1: Essential** | SSOT, SRP, Simplicity First, Fail Fast, Iterative Refinement, Feedback Loop | Must-have for any workflow |
+| **Tier 2: Quality**   | Transparency, Gate/Checkpoint, DRY, ISP, Idempotency                        | Recommended for production |
+| **Tier 3: Scale**     | Human-in-the-Loop, KISS, Loose Coupling, Graceful Degradation               | Advanced patterns          |
 
-| Principle                | Description                      | Check Point                                      |
-| ------------------------ | -------------------------------- | ------------------------------------------------ |
-| **SSOT**                 | Single source of truth           | Is the same info defined in multiple places?     |
-| **SRP**                  | 1 agent = 1 responsibility       | Does one agent handle multiple responsibilities? |
-| **Simplicity First**     | Start with the simplest solution | Is the design overly complex?                    |
-| **Fail Fast**            | Detect and fix errors early      | Can errors be detected and stopped immediately?  |
-| **Iterative Refinement** | Build small, improve repeatedly  | Is it broken into small steps?                   |
-| **Feedback Loop**        | Verify results at each step      | Can results be verified at each step?            |
+**Anthropic's Key Insight:**
 
-### Tier 2: Quality Principles
-
-| Principle           | Description                        | Check Point                           |
-| ------------------- | ---------------------------------- | ------------------------------------- |
-| **Transparency**    | Show plans and progress explicitly | Is progress visible?                  |
-| **Gate/Checkpoint** | Validate at each step              | Is validation done before proceeding? |
-| **DRY**             | Don't repeat yourself              | Are common processes reused?          |
-| **ISP**             | Minimal context only               | Is unnecessary info being passed?     |
-| **Idempotency**     | Safe to retry                      | Is it safe to retry operations?       |
+> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short."
 
 ## Workflow Patterns
 
@@ -119,50 +109,34 @@ Build small → verify → get feedback → improve
 
 ## Review Checklist
 
-→ See **[references/review-checklist.md](references/review-checklist.md)** for details
+→ See **[references/review-checklist.md](references/review-checklist.md)** for complete checklist (includes anti-patterns)
 
-### Quick Check
+### Quick Check (5 items)
 
 ```markdown
-## Workflow Review Checklist
-
-### Core Principles
-
-- [ ] **SSOT**: Is the same info defined in multiple places?
-- [ ] **SRP**: Is each agent focused on a single responsibility?
-- [ ] **Simplicity**: Is this the simplest possible solution?
-- [ ] **Fail Fast**: Can errors be detected and stopped immediately?
-- [ ] **Iterative**: Is it broken into small steps?
-- [ ] **Feedback Loop**: Can results be verified at each step?
-
-### Quality Principles
-
-- [ ] **Transparency**: Are plans and progress visible?
-- [ ] **Gate/Checkpoint**: Is validation done at each step?
-- [ ] **DRY**: Are common processes reused?
-- [ ] **ISP**: Is only necessary info being passed?
-- [ ] **Idempotency**: Is it safe to retry?
-
-### Anti-Pattern Detection
-
-- [ ] Is too much responsibility packed into one agent?
-- [ ] Is excessive context being passed?
-- [ ] Is error handling missing?
-- [ ] Is there potential for infinite loops?
-- [ ] Are there points where human-in-the-loop is needed?
+- [ ] Is each agent focused on a single responsibility? (SRP)
+- [ ] Can errors be detected and stopped immediately? (Fail Fast)
+- [ ] Is it divided into small steps? (Iterative)
+- [ ] Can results be verified at each step? (Feedback Loop)
+- [ ] Are related files (references, scripts) simple and minimal? (DRY)
 ```
 
-## Anti-Patterns
+## Context Engineering
 
-→ See **[references/anti-patterns.md](references/anti-patterns.md)** for details
+→ See **[references/context-engineering.md](references/context-engineering.md)** for details
 
-| Anti-Pattern         | Problem                         | Solution                        |
-| -------------------- | ------------------------------- | ------------------------------- |
-| **God Agent**        | All responsibilities in 1 agent | Split with SRP                  |
-| **Context Overload** | Passing excessive info          | Minimize with ISP               |
-| **Silent Failure**   | Ignoring errors and continuing  | Stop immediately with Fail Fast |
-| **Infinite Loop**    | No termination condition        | Set max iterations              |
-| **Big Bang**         | Building everything at once     | Build small with Iterative      |
+For long-running agents, manage context as a finite resource:
+
+| Technique                   | When to Use                            |
+| --------------------------- | -------------------------------------- |
+| **Compaction**              | Context window 70%+ full               |
+| **Structured Note-taking**  | Multi-hour tasks with milestones       |
+| **Sub-agent Architectures** | Complex research, parallel exploration |
+| **Just-in-Time Retrieval**  | Large codebases, dynamic data          |
+
+**Key Insight:**
+
+> "Context must be treated as a finite resource with diminishing marginal returns." — Anthropic
 
 ## Scaffold Workflow
 
@@ -220,17 +194,19 @@ my-workflow/
 
 ## Resources
 
-| File                                                    | Content                       |
-| ------------------------------------------------------- | ----------------------------- |
-| [design-principles.md](references/design-principles.md) | Detailed design principles    |
-| [workflow-patterns.md](references/workflow-patterns.md) | Workflow pattern details      |
-| [review-checklist.md](references/review-checklist.md)   | Review checklist              |
-| [anti-patterns.md](references/anti-patterns.md)         | Anti-pattern collection       |
-| [scaffold_workflow.py](scripts/scaffold_workflow.py)    | Directory structure generator |
+| File                                                        | Content                            |
+| ----------------------------------------------------------- | ---------------------------------- |
+| [design-principles.md](references/design-principles.md)     | Design principles (Tier 1-3) + ACI |
+| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns with examples  |
+| [review-checklist.md](references/review-checklist.md)       | Full checklist + anti-patterns     |
+| [context-engineering.md](references/context-engineering.md) | Context management for long tasks  |
+| [scaffold_workflow.py](scripts/scaffold_workflow.py)        | Directory structure generator      |
 
 ## References
 
 - [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
-- [Workflows and Agents - LangChain](https://docs.langchain.com/oss/python/langgraph/workflows-agents)
+- [Effective Context Engineering - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Writing Tools for Agents - Anthropic](https://www.anthropic.com/engineering/writing-tools-for-agents)
+- [Prompt Engineering Tutorial - Anthropic](https://github.com/anthropics/prompt-eng-interactive-tutorial)
 - [subagent-driven-development - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/subagent-driven-development)
 - [dispatching-parallel-agents - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/dispatching-parallel-agents)
