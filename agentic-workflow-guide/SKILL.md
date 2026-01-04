@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "Design, review, and improve agent workflows based on proven design principles (SSOT, SRP, Fail Fast, Iterative Refinement). Supports Prompt Chaining, Parallelization, Orchestrator-Workers, Evaluator-Optimizer patterns. Includes Context Engineering for long-running agents (Compaction, Note-taking, Sub-agents). Use when working with .github/ directory: copilot-instructions.md, prompts/, instructions/, agents/, or any agent configuration files. Triggers: (1) Designing new agent workflows, (2) Reviewing/improving existing workflows, (3) Planning multi-agent architectures, (4) Detecting anti-patterns, (5) Scaffolding workflow templates, (6) Creating/editing .github/copilot-instructions.md, (7) Working with .github/prompts or .prompt.md files, (8) Creating .github/instructions/*.instructions.md, (9) Managing context for long-horizon tasks"
+description: "Design, review, and improve agent workflows & agent using SSOT, SRP, Fail Fast principles. Supports Prompt Chaining, Parallelization, Orchestrator-Workers patterns."
 ---
 
 # Agentic Workflow Guide
