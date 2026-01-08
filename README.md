@@ -46,9 +46,12 @@ skill-name/
 
 ## License / ライセンス
 
-MIT License - see [LICENSE](LICENSE) for details.
+Each skill has its own license. See [LICENSE](LICENSE) for details.
 
-MIT ライセンス - 詳細は [LICENSE](LICENSE) を参照してください。
+各スキルは個別のライセンスを持ちます。詳細は [LICENSE](LICENSE) を参照してください。
+
+- **Self-created skills / 自作スキル**: CC BY-NC 4.0
+- **External skills / 外部由来**: Original license retained (MIT, Apache 2.0, etc.)
 
 ## Author / 作者
 
