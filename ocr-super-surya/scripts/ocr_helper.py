@@ -85,7 +85,6 @@ def _run_with_oom_retry(func, *args, max_retries: int = 3, **kwargs):
 
 def ocr_image(
     image_path: str,
-    languages: Optional[list[str]] = None,
     output_format: str = "text",
     verbose: bool = False,
     auto_retry: bool = True
@@ -95,10 +94,12 @@ def ocr_image(
     
     Args:
         image_path: Path to the image file
-        languages: Optional list of language codes (e.g., ["ja", "en"])
         output_format: "text" for plain text, "json" for detailed results
         verbose: Enable detailed logging
         auto_retry: Automatically retry with smaller batch size on OOM
+    
+    Note:
+        Language is auto-detected by Surya. No manual specification needed.
     
     Returns:
         Extracted text (str) or detailed results (dict)
@@ -161,7 +162,6 @@ def ocr_image(
 
 def ocr_pdf(
     pdf_path: str,
-    languages: Optional[list[str]] = None,
     dpi: int = 300,
     verbose: bool = False,
     auto_retry: bool = True
@@ -171,10 +171,12 @@ def ocr_pdf(
     
     Args:
         pdf_path: Path to the PDF file
-        languages: Optional list of language codes
         dpi: Resolution for PDF to image conversion
         verbose: Enable detailed logging
         auto_retry: Automatically retry with smaller batch size on OOM
+    
+    Note:
+        Language is auto-detected by Surya. No manual specification needed.
     
     Returns:
         List of extracted text per page
@@ -231,7 +233,6 @@ def ocr_pdf(
 
 def ocr_batch(
     image_paths: list[str],
-    languages: Optional[list[str]] = None,
     verbose: bool = False,
     auto_retry: bool = True
 ) -> dict[str, str]:
@@ -240,9 +241,11 @@ def ocr_batch(
     
     Args:
         image_paths: List of image file paths
-        languages: Optional list of language codes
         verbose: Enable detailed logging
         auto_retry: Automatically retry with smaller batch size on OOM
+    
+    Note:
+        Language is auto-detected by Surya. No manual specification needed.
     
     Returns:
         Dictionary mapping file paths to extracted text
