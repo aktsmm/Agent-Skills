@@ -8,7 +8,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ### OCR Super Surya
 
-![OCR Demo](assets/ocr-demo.gif)
+![OCR Demo](assets/image.png)
 
 ## Skills
 
