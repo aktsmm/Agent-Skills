@@ -4,6 +4,12 @@ A collection of Agent Skills for GitHub Copilot and Claude.
 
 GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
+## Demo
+
+### OCR Super Surya
+
+![OCR Demo](assets/ocr-demo.gif)
+
 ## Skills
 
 | Skill                                           | Description / 説明                                                                                  |
