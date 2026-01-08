@@ -297,7 +297,6 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="OCR using Surya")
     parser.add_argument("input", help="Image or PDF file path")
-    parser.add_argument("-l", "--languages", nargs="+", help="Language codes (e.g., ja en)")
     parser.add_argument("-o", "--output", help="Output file path (optional)")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
@@ -325,7 +324,6 @@ if __name__ == "__main__":
         print(f"📄 Processing PDF: {input_path}")
         results = ocr_pdf(
             str(input_path), 
-            languages=args.languages,
             verbose=args.verbose,
             auto_retry=auto_retry
         )
@@ -335,7 +333,6 @@ if __name__ == "__main__":
         output_format = "json" if args.json else "text"
         text = ocr_image(
             str(input_path), 
-            languages=args.languages, 
             output_format=output_format,
             verbose=args.verbose,
             auto_retry=auto_retry
