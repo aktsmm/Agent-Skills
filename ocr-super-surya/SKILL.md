@@ -8,6 +8,10 @@ license: CC BY-NC 4.0
 
 GPU-optimized OCR skill using [Surya](https://github.com/datalab-to/surya) - a modern, high-accuracy OCR engine.
 
+## Demo
+
+![OCR Demo](assets/demo.gif)
+
 ## When to Use
 
 - Extracting text from screenshots, photos, or scanned images
