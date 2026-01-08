@@ -133,12 +133,12 @@ text = ocr_image("large_image.png", auto_retry=False)
 
 ## Use Cases
 
-| Use Case | Command / Function |
-|----------|--------------------|
-| Screenshot OCR | `python scripts/ocr_helper.py screenshot.png` |
-| PDF Processing | `ocr_pdf("document.pdf")` → returns list of page texts |
-| Batch Processing | `ocr_batch(["img1.png", "img2.png"])` → returns dict |
-| Japanese/CJK | Auto-detected, no config needed |
+| Use Case         | Command / Function                                     |
+| ---------------- | ------------------------------------------------------ |
+| Screenshot OCR   | `python scripts/ocr_helper.py screenshot.png`          |
+| PDF Processing   | `ocr_pdf("document.pdf")` → returns list of page texts |
+| Batch Processing | `ocr_batch(["img1.png", "img2.png"])` → returns dict   |
+| Japanese/CJK     | Auto-detected, no config needed                        |
 
 ## Scripts
 
