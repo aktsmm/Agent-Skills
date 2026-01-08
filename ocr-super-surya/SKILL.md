@@ -133,53 +133,12 @@ text = ocr_image("large_image.png", auto_retry=False)
 
 ## Use Cases
 
-### Screenshot OCR
-
-```python
-# Option 1: Use the helper script directly
-# python scripts/ocr_helper.py screenshot.png
-
-# Option 2: Import the module (adjust path as needed)
-import sys
-sys.path.append("path/to/ocr-surya")
-from scripts.ocr_helper import ocr_image
-
-text = ocr_image("screenshot.png")
-print(text)
-```
-
-### PDF Processing
-
-```python
-from scripts.ocr_helper import ocr_pdf
-
-# Extract text from all pages
-results = ocr_pdf("document.pdf")
-for page_num, text in enumerate(results):
-    print(f"--- Page {page_num + 1} ---")
-    print(text)
-```
-
-### Japanese OCR
-
-```python
-from scripts.ocr_helper import ocr_image
-
-# Surya auto-detects language, but you can specify
-text = ocr_image("japanese_doc.png", languages=["ja"])
-```
-
-### Batch Processing
-
-```python
-from scripts.ocr_helper import ocr_batch
-
-# Process multiple images efficiently
-results = ocr_batch(["img1.png", "img2.png", "img3.png"])
-for path, text in results.items():
-    print(f"--- {path} ---")
-    print(text)
-```
+| Use Case | Command / Function |
+|----------|--------------------|
+| Screenshot OCR | `python scripts/ocr_helper.py screenshot.png` |
+| PDF Processing | `ocr_pdf("document.pdf")` → returns list of page texts |
+| Batch Processing | `ocr_batch(["img1.png", "img2.png"])` → returns dict |
+| Japanese/CJK | Auto-detected, no config needed |
 
 ## Scripts
 
@@ -197,15 +156,6 @@ for path, text in results.items():
 | `ocr_pdf()`     | PDF OCR (all pages)                                  |
 | `ocr_batch()`   | Batch OCR for multiple images                        |
 | `set_verbose()` | Enable/disable logging programmatically              |
-
-## Comparison with Other Tools
-
-| Tool      | GPU | Accuracy | Speed  | Best For                 |
-| --------- | --- | -------- | ------ | ------------------------ |
-| **Surya** | ✅  | Highest  | Fast   | General use, screenshots |
-| PaddleOCR | ✅  | High     | Fast   | Complex layouts, tables  |
-| EasyOCR   | ✅  | Good     | Medium | Simple documents         |
-| Tesseract | ❌  | Medium   | Slow   | Legacy systems           |
 
 ## Troubleshooting
 
