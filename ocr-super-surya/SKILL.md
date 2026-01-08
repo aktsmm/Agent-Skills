@@ -1,0 +1,251 @@
+---
+name: ocr-super-surya
+description: "GPU-optimized OCR using Surya. Use when: (1) Extracting text from images/screenshots, (2) Processing PDFs with embedded images, (3) Multi-language document OCR, (4) Layout analysis and table detection. Supports 90+ languages with 2x accuracy over Tesseract."
+license: CC BY-NC 4.0
+---
+
+# OCR Super Surya
+
+GPU-optimized OCR skill using [Surya](https://github.com/datalab-to/surya) - a modern, high-accuracy OCR engine.
+
+## When to Use
+
+- Extracting text from screenshots, photos, or scanned images
+- Processing PDFs with embedded images
+- Multi-language document OCR (90+ languages including Japanese)
+- Layout analysis and table detection
+- When GPU acceleration is available and desired
+
+## Key Features
+
+| Feature         | Description                                        |
+| --------------- | -------------------------------------------------- |
+| **Accuracy**    | 2x better than Tesseract (0.97 vs 0.88 similarity) |
+| **GPU Support** | PyTorch-based, CUDA optimized                      |
+| **Languages**   | 90+ languages including CJK                        |
+| **Layout**      | Document layout analysis, table recognition        |
+| **LaTeX**       | Inline math equation recognition                   |
+
+## Quick Start
+
+### Installation
+
+```bash
+# Core OCR
+pip install surya-ocr
+
+# For PDF processing (optional)
+pip install pdf2image
+# Windows: Install Poppler from https://github.com/oschwartz10612/poppler-windows/releases
+# macOS: brew install poppler
+# Linux: sudo apt install poppler-utils
+```
+
+### Basic Usage
+
+```python
+from PIL import Image
+from surya.recognition import RecognitionPredictor
+from surya.detection import DetectionPredictor
+from surya.foundation import FoundationPredictor
+
+# Load image
+image = Image.open("document.png")
+
+# Initialize predictors (auto-detects GPU)
+foundation_predictor = FoundationPredictor()
+recognition_predictor = RecognitionPredictor(foundation_predictor)
+detection_predictor = DetectionPredictor()
+
+# Run OCR
+predictions = recognition_predictor([image], det_predictor=detection_predictor)
+
+# Get text
+for page in predictions:
+    for line in page.text_lines:
+        print(line.text)
+```
+
+### CLI Usage
+
+```bash
+# OCR single image
+surya_ocr image.png
+
+# OCR with output to JSON
+surya_ocr image.png --output_dir ./results
+
+# Launch GUI (requires streamlit)
+pip install streamlit
+surya_gui
+```
+
+### Helper Script CLI
+
+```bash
+# Basic usage
+python scripts/ocr_helper.py image.png
+
+# With verbose logging
+python scripts/ocr_helper.py image.png -v
+
+# Specify languages and output file
+python scripts/ocr_helper.py document.pdf -l ja en -o result.txt
+
+# Disable OOM auto-retry
+python scripts/ocr_helper.py large_image.png --no-retry
+```
+
+## GPU Configuration
+
+Surya auto-detects GPU. Adjust VRAM usage with environment variables:
+
+| Variable                 | Default | Description                                |
+| ------------------------ | ------- | ------------------------------------------ |
+| `RECOGNITION_BATCH_SIZE` | 512     | Reduce for lower VRAM (e.g., 256 for 12GB) |
+| `DETECTOR_BATCH_SIZE`    | 36      | Reduce if OOM errors occur                 |
+
+```bash
+# Linux/macOS
+export RECOGNITION_BATCH_SIZE=256
+export DETECTOR_BATCH_SIZE=16
+surya_ocr image.png
+```
+
+```powershell
+# Windows PowerShell
+$env:RECOGNITION_BATCH_SIZE = 256
+$env:DETECTOR_BATCH_SIZE = 16
+surya_ocr image.png
+```
+
+### OOM Auto-Retry
+
+The helper script automatically retries with reduced batch size on GPU OOM:
+
+```python
+# Auto-retry enabled by default
+text = ocr_image("large_image.png")  # Retries up to 3x
+
+# Disable if you want manual control
+text = ocr_image("large_image.png", auto_retry=False)
+```
+
+## Use Cases
+
+### Screenshot OCR
+
+```python
+# Option 1: Use the helper script directly
+# python scripts/ocr_helper.py screenshot.png
+
+# Option 2: Import the module (adjust path as needed)
+import sys
+sys.path.append("path/to/ocr-surya")
+from scripts.ocr_helper import ocr_image
+
+text = ocr_image("screenshot.png")
+print(text)
+```
+
+### PDF Processing
+
+```python
+from scripts.ocr_helper import ocr_pdf
+
+# Extract text from all pages
+results = ocr_pdf("document.pdf")
+for page_num, text in enumerate(results):
+    print(f"--- Page {page_num + 1} ---")
+    print(text)
+```
+
+### Japanese OCR
+
+```python
+from scripts.ocr_helper import ocr_image
+
+# Surya auto-detects language, but you can specify
+text = ocr_image("japanese_doc.png", languages=["ja"])
+```
+
+### Batch Processing
+
+```python
+from scripts.ocr_helper import ocr_batch
+
+# Process multiple images efficiently
+results = ocr_batch(["img1.png", "img2.png", "img3.png"])
+for path, text in results.items():
+    print(f"--- {path} ---")
+    print(text)
+```
+
+## Scripts
+
+| Script                  | Description                                                          |
+| ----------------------- | -------------------------------------------------------------------- |
+| `scripts/ocr_helper.py` | Helper functions with OOM auto-retry, verbose logging, batch support |
+
+### Helper Script Features
+
+| Feature         | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| `verbose`       | Enable detailed logging (`-v` in CLI)                |
+| `auto_retry`    | Automatically reduce batch size on OOM (default: on) |
+| `ocr_image()`   | Single image OCR                                     |
+| `ocr_pdf()`     | PDF OCR (all pages)                                  |
+| `ocr_batch()`   | Batch OCR for multiple images                        |
+| `set_verbose()` | Enable/disable logging programmatically              |
+
+## Comparison with Other Tools
+
+| Tool      | GPU | Accuracy | Speed  | Best For                 |
+| --------- | --- | -------- | ------ | ------------------------ |
+| **Surya** | ✅  | Highest  | Fast   | General use, screenshots |
+| PaddleOCR | ✅  | High     | Fast   | Complex layouts, tables  |
+| EasyOCR   | ✅  | Good     | Medium | Simple documents         |
+| Tesseract | ❌  | Medium   | Slow   | Legacy systems           |
+
+## Troubleshooting
+
+### CUDA Out of Memory
+
+Reduce batch sizes:
+
+```bash
+export RECOGNITION_BATCH_SIZE=128
+export DETECTOR_BATCH_SIZE=8
+```
+
+### CPU Fallback
+
+If no GPU available, Surya automatically falls back to CPU (slower but works).
+
+### PDF Processing on Windows
+
+If `pdf2image` fails, install Poppler:
+
+1. Download from https://github.com/oschwartz10612/poppler-windows/releases
+2. Extract to `C:\Program Files\poppler`
+3. Add `C:\Program Files\poppler\Library\bin` to PATH
+
+### Model Download
+
+First run downloads models (~2GB). Ensure internet connection.
+
+## References
+
+- [Surya GitHub](https://github.com/datalab-to/surya) - Official repository
+- [Surya Documentation](https://github.com/datalab-to/surya#readme) - Usage guide
+- [Benchmark Results](https://github.com/datalab-to/surya#benchmarks) - Accuracy comparisons
+
+## License Notice
+
+**This skill**: CC BY-NC 4.0 (wrapper scripts only)
+
+**Surya (underlying OCR engine)**:
+
+- Code: GPL-3.0
+- Models: Free for research, personal use, and startups under $2M funding/revenue
+- Commercial use beyond $2M: See [Surya Pricing](https://www.datalab.to/pricing)
