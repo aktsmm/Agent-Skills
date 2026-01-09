@@ -12,11 +12,12 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ## Skills
 
-| Skill                                             | Description / 説明                                                                                  |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| [agentic-workflow-guide](agentic-workflow-guide/) | Guide for designing agentic workflows / エージェントワークフロー設計ガイド                          |
-| [azure-env-builder](azure-env-builder/)           | Azure environment builder with Bicep templates / Azure 環境構築支援（Bicep テンプレート生成・検証） |
-| [ocr-super-surya](ocr-super-surya/)               | GPU-optimized OCR using Surya / GPU 最適化 OCR（90+言語対応、Tesseract の 2 倍精度）                |
+| Skill                                             | Description / 説明                                                                                              |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [agentic-workflow-guide](agentic-workflow-guide/) | Guide for designing agentic workflows / エージェントワークフロー設計ガイド                                      |
+| [azure-env-builder](azure-env-builder/)           | ⚠️ **Alpha** - Azure environment builder with Bicep templates / Azure 環境構築支援（Bicep テンプレート生成・検証） |
+| [browser-max-automation](browser-max-automation/) | Browser automation via Playwright MCP / Playwright MCP によるブラウザ自動操作                                  |
+| [ocr-super-surya](ocr-super-surya/)               | GPU-optimized OCR using Surya / GPU 最適化 OCR（90+言語対応、Tesseract の 2 倍精度）                            |
 | [skill-creator](skill-creator/)                   | Create new Agent Skills / 新しい Agent Skill を作成                                                 |
 | [skill-finder](skill-finder/)                     | Search, install, and manage Agent Skills / Agent Skills の検索・インストール・管理                  |
 
