@@ -177,6 +177,7 @@ def ocr_pdf(
     
     Note:
         Language is auto-detected by Surya. No manual specification needed.
+        Uses pypdfium2 (bundled with surya) - no Poppler required.
     
     Returns:
         List of extracted text per page
@@ -185,21 +186,32 @@ def ocr_pdf(
         set_verbose(True)
     
     try:
-        import pdf2image
+        import pypdfium2 as pdfium
     except ImportError:
         raise ImportError(
-            "pdf2image is required for PDF processing. "
-            "Install with: pip install pdf2image"
+            "pypdfium2 is required for PDF processing. "
+            "It should be included with surya-ocr. "
+            "Install with: pip install pypdfium2"
         )
     
+    from PIL import Image
     from surya.recognition import RecognitionPredictor
     from surya.detection import DetectionPredictor
     from surya.foundation import FoundationPredictor
     
     logger.debug(f"📄 Converting PDF to images (dpi={dpi}): {pdf_path}")
     
-    # Convert PDF to images
-    images = pdf2image.convert_from_path(pdf_path, dpi=dpi)
+    # Convert PDF to images using pypdfium2
+    pdf = pdfium.PdfDocument(pdf_path)
+    images = []
+    scale = dpi / 72  # PDF default is 72 DPI
+    
+    for page_idx in range(len(pdf)):
+        page = pdf[page_idx]
+        bitmap = page.render(scale=scale)
+        pil_image = bitmap.to_pil()
+        images.append(pil_image)
+    
     logger.debug(f"📚 Found {len(images)} pages")
     
     # Initialize predictors

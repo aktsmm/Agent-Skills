@@ -30,16 +30,44 @@ GPU-optimized OCR skill using [Surya](https://github.com/datalab-to/surya) - a m
 
 ### Installation
 
-```bash
-# Core OCR
-pip install surya-ocr
+#### Step 1: GPU Check
 
-# For PDF processing (optional)
-pip install pdf2image
-# Windows: Install Poppler from https://github.com/oschwartz10612/poppler-windows/releases
-# macOS: brew install poppler
-# Linux: sudo apt install poppler-utils
+Before installing, check if GPU is available:
+
+```python
+import torch
+print(f"CUDA available: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"GPU: {torch.cuda.get_device_name(0)}")
+    print(f"VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 ```
+
+**⚠️ If CUDA = False but you have an NVIDIA GPU:**
+
+You have CPU-only PyTorch installed. Reinstall with CUDA support:
+
+```bash
+# Uninstall CPU version
+pip uninstall torch torchvision torchaudio -y
+
+# Install CUDA version (check your CUDA version with: nvidia-smi)
+# CUDA 12.1 (recommended)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# CUDA 11.8 (older GPUs)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+**No GPU?** Surya works on CPU too (slower, but functional).
+
+#### Step 2: Install Surya
+
+```bash
+# Core OCR (includes pypdfium2 for PDF support)
+pip install surya-ocr
+```
+
+**Note:** Surya includes `pypdfium2` for PDF processing. No external dependencies (Poppler) required.
 
 ### Basic Usage
 
@@ -159,6 +187,31 @@ text = ocr_image("large_image.png", auto_retry=False)
 
 ## Troubleshooting
 
+### GPU Not Detected (CUDA = False)
+
+**Symptom:** `CUDA available: False` even with NVIDIA GPU
+
+**Cause:** CPU-only PyTorch installed instead of CUDA version
+
+**Fix:**
+
+```bash
+# 1. Check your CUDA version
+nvidia-smi  # Look for "CUDA Version: X.X"
+
+# 2. Reinstall PyTorch with CUDA
+pip uninstall torch torchvision torchaudio -y
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+**Verify:**
+
+```python
+import torch
+print(torch.cuda.is_available())  # Should be True
+print(torch.cuda.get_device_name(0))  # Should show your GPU name
+```
+
 ### CUDA Out of Memory
 
 Reduce batch sizes:
@@ -171,14 +224,6 @@ export DETECTOR_BATCH_SIZE=8
 ### CPU Fallback
 
 If no GPU available, Surya automatically falls back to CPU (slower but works).
-
-### PDF Processing on Windows
-
-If `pdf2image` fails, install Poppler:
-
-1. Download from https://github.com/oschwartz10612/poppler-windows/releases
-2. Extract to `C:\Program Files\poppler`
-3. Add `C:\Program Files\poppler\Library\bin` to PATH
 
 ### Model Download
 
