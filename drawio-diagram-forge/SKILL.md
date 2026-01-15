@@ -119,20 +119,48 @@ This triggers the full manifest → review → generation → review cycle.
 
 ## Cloud Icon Usage
 
-When generating cloud architecture diagrams:
+When generating cloud architecture diagrams, follow this **icon selection logic**:
 
-1. **Detect cloud provider** from input keywords (Azure, AWS, GCP, etc.)
-2. **Use appropriate icon format**:
-   - **Azure**: `image=img/lib/azure2/**/*.svg` (⚠️ NOT `mxgraph.azure.*`)
-   - **AWS**: `shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.*`
-3. **Refer to** [cloud-icons.md](references/cloud-icons.md) for SVG paths and style examples
+### Step 1: Detect Cloud Provider
 
-### Icon Detection Keywords
+Scan input for provider-specific keywords:
 
-| Provider | Keywords (detect any of these)                                                                                                                             |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Azure    | `Azure`, `Microsoft Cloud`, `VM`, `App Service`, `Function App`, `Logic App`, `VNET`, `Virtual Network`, `Azure AD`, `AAD`, `Entra ID`, `Key Vault`, `AKS` |
-| AWS      | `AWS`, `Amazon Web Services`, `EC2`, `Lambda`, `ECS`, `EKS`, `S3`, `RDS`, `DynamoDB`, `VPC`, `CloudFront`, `Route 53`, `API Gateway`                       |
+| Provider | Keywords                                                                          |
+| -------- | --------------------------------------------------------------------------------- |
+| Azure    | `Azure`, `Microsoft Cloud`, `App Service`, `Azure AD`, `VNET`, `AKS`, `Key Vault` |
+| AWS      | `AWS`, `Amazon`, `EC2`, `Lambda`, `S3`, `RDS`, `VPC`, `EKS`, `DynamoDB`           |
+| GCP      | `GCP`, `Google Cloud`, `Cloud Run`, `BigQuery`, `GKE`, `Cloud Functions`          |
+| Alibaba  | `Alibaba Cloud`, `Aliyun`, `ECS` (Alibaba context), `OSS`, `MaxCompute`           |
+| IBM      | `IBM Cloud`, `IBM Watson`, `IBM OpenShift`                                        |
+| Cisco    | `Cisco`, `Meraki`, `ACI`, `Nexus`, `ISE`                                          |
+
+### Step 2: Search for Matching Icon
+
+For each cloud service mentioned:
+
+1. **Search** the appropriate icon library for a matching icon
+2. **If found**: Use the provider-specific format (see below)
+3. **If not found**: Use a generic shape with the service name as label
+
+### Step 3: Apply Provider-Specific Format
+
+| Provider    | Icon Format                                                   | Library Path                                                                       |
+| ----------- | ------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **Azure**   | `image=img/lib/azure2/{category}/{Icon}.svg`                  | [azure2](https://github.com/jgraph/drawio/tree/dev/src/main/webapp/img/lib/azure2) |
+| **AWS**     | `shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.{icon}` | mxgraph.aws4.\*                                                                    |
+| **GCP**     | `shape=mxgraph.gcp2.{icon}`                                   | mxgraph.gcp2.\*                                                                    |
+| **Alibaba** | `shape=mxgraph.alibabacloud.{icon}`                           | mxgraph.alibabacloud.\*                                                            |
+| **IBM**     | `image=img/lib/ibm/{category}/{icon}.svg`                     | [ibm](https://github.com/jgraph/drawio/tree/dev/src/main/webapp/img/lib/ibm)       |
+| **Cisco**   | `shape=mxgraph.cisco19.{icon}`                                | mxgraph.cisco19.\*                                                                 |
+
+### Step 4: Fallback for Unknown Services
+
+If no matching icon exists:
+
+```xml
+<!-- Generic rectangle with service name -->
+<mxCell value="Custom Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" />
+```
 
 ### ⚠️ Critical: Azure Format
 
@@ -143,6 +171,8 @@ When generating cloud architecture diagrams:
 <!-- ✅ CORRECT - Works everywhere -->
 <mxCell style="aspect=fixed;image=img/lib/azure2/networking/Front_Doors.svg;..." />
 ```
+
+**Refer to** [cloud-icons.md](references/cloud-icons.md) for detailed SVG paths and style examples.
 
 ## Resources
 
