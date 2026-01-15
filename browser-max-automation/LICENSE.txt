@@ -1,10 +1,10 @@
-# Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+# Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
 
 ## English
 
 Copyright (c) 2025 yamapan (aktsmm)
 
-This work is licensed under the Creative Commons Attribution-NonCommercial 4.0
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
 International License.
 
 You are free to:
@@ -21,13 +21,16 @@ Under the following terms:
 - **NonCommercial** — You may not use the material for commercial purposes.
   *(Please contact the author if you wish to use this material for commercial purposes.)*
 
+- **ShareAlike** — If you remix, transform, or build upon the material, you must
+  distribute your contributions under the same license as the original.
+
 No additional restrictions — You may not apply legal terms or technological
 measures that legally restrict others from doing anything the license permits.
 
 **AI/ML Training Restriction** — Use of this content for AI/ML training, data
 mining, or other analytical purposes is prohibited without explicit permission.
 
-Full license text: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 ---
 
@@ -35,7 +38,7 @@ Full license text: https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
 Copyright (c) 2025 yamapan (aktsmm)
 
-この作品はクリエイティブ・コモンズ 表示-非営利 4.0 国際ライセンスの下に提供されています。
+この作品はクリエイティブ・コモンズ 表示-非営利-継承 4.0 国際ライセンスの下に提供されています。
 
 あなたは以下の条件に従う限り、自由に：
 
@@ -52,13 +55,16 @@ Copyright (c) 2025 yamapan (aktsmm)
 - **非営利** — あなたは営利目的でこの資料を利用してはなりません。
   （※商用利用をご希望の場合は、別途ご連絡ください。）
 
+- **継承** — もしあなたがこの資料をリミックス、変形、または加工した場合、
+  あなたはあなたの貢献部分を元の作品と同じライセンスの下で配布しなければなりません。
+
 追加的な制約は課せません — あなたは、このライセンスが他の者に許諾することを法的に
 制限するような法的条項や技術的手段を適用してはなりません。
 
 **AI/MLトレーニング制限** — 本コンテンツをAI/MLモデルのトレーニング、データマイニング、
 その他の解析目的での使用は明示的な許可なく禁止されています。
 
-ライセンス全文: https://creativecommons.org/licenses/by-nc/4.0/legalcode.ja
+ライセンス全文: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.ja
 
 ---
 
