@@ -117,6 +117,33 @@ For complex diagrams, explicitly invoke the orchestrator:
 
 This triggers the full manifest → review → generation → review cycle.
 
+## Cloud Icon Usage
+
+When generating cloud architecture diagrams:
+
+1. **Detect cloud provider** from input keywords (Azure, AWS, GCP, etc.)
+2. **Use appropriate icon format**:
+   - **Azure**: `image=img/lib/azure2/**/*.svg` (⚠️ NOT `mxgraph.azure.*`)
+   - **AWS**: `shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.*`
+3. **Refer to** [cloud-icons.md](references/cloud-icons.md) for SVG paths and style examples
+
+### Icon Detection Keywords
+
+| Provider | Keywords (detect any of these)                                                                                                                             |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Azure    | `Azure`, `Microsoft Cloud`, `VM`, `App Service`, `Function App`, `Logic App`, `VNET`, `Virtual Network`, `Azure AD`, `AAD`, `Entra ID`, `Key Vault`, `AKS` |
+| AWS      | `AWS`, `Amazon Web Services`, `EC2`, `Lambda`, `ECS`, `EKS`, `S3`, `RDS`, `DynamoDB`, `VPC`, `CloudFront`, `Route 53`, `API Gateway`                       |
+
+### ⚠️ Critical: Azure Format
+
+```xml
+<!-- ❌ WRONG - Will show blue square in VS Code -->
+<mxCell style="shape=mxgraph.azure.front_door;..." />
+
+<!-- ✅ CORRECT - Works everywhere -->
+<mxCell style="aspect=fixed;image=img/lib/azure2/networking/Front_Doors.svg;..." />
+```
+
 ## Resources
 
 ### References
