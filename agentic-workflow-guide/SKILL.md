@@ -295,6 +295,8 @@ tools: ["run_in_terminal", "read_file", "runSubagent"]
 tools: ["execute", "read", "agent"]
 ```
 
+**Troubleshooting**: If tools are not recognized, verify against [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+
 **MCP Server Tools**: Use `<server-name>/*` format to include all tools from an MCP server.
 
 **Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`).
