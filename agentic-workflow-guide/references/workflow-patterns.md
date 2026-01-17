@@ -199,29 +199,30 @@ Synthesizer:
 
 ### VS Code Copilot: runSubagent Implementation
 
-⚠️ **Critical:** Workers are spawned via `#tool:runSubagent`. The orchestrator MUST explicitly call this tool.
+⚠️ **Critical:** Workers are spawned via `#tool:agent` (Primary Alias: `agent`, compatible: `runSubagent`). The orchestrator MUST explicitly call this tool.
 
 **Agent Definition:**
 
 ```yaml
 ---
 name: Code Review Orchestrator
-tools: ["runSubagent", "grep_search", "read_file"]
+# Use Primary Aliases in tools: property
+tools: ["agent", "search", "read"]
 ---
 
 # Code Review Orchestrator
 
 ## Workflow
 
-1. Identify files to review (grep_search)
-2. For EACH file, MUST call #tool:runSubagent:
+1. Identify files to review (search)
+2. For EACH file, MUST call #tool:agent:
    - Prompt: "Review {filepath}. Return: {bugs: [], style: [], security: []}"
 3. Aggregate all sub-agent results
 4. Generate final report
 
 ## MANDATORY RULES
 
-- You MUST use runSubagent for each file
+- You MUST use #tool:agent for each file
 - Do NOT read file contents directly
 - Each sub-agent prompt must specify output format
 ```
@@ -229,7 +230,7 @@ tools: ["runSubagent", "grep_search", "read_file"]
 **Why This Works:**
 
 - "MUST" language prevents orchestrator from skipping delegation
-- Explicit tool reference (`#tool:runSubagent`) triggers tool usage
+- Explicit tool reference (`#tool:agent`) triggers tool usage
 - Output format in prompt ensures consistent synthesis
 
 ### Common Mistake
@@ -243,7 +244,7 @@ You can use sub-agents to review files if needed.
 ✅ **Mandatory instructions:**
 
 ```markdown
-You MUST use #tool:runSubagent for EACH file. Do NOT review directly.
+You MUST use #tool:agent for EACH file. Do NOT review directly.
 ```
 
 ---

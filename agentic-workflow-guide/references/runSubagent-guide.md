@@ -2,6 +2,9 @@
 
 Practical guide for using `runSubagent` tool in VS Code Copilot.
 
+> **Note**: The official Primary Alias is `agent`. Use `agent` in the `tools:` property.
+> `runSubagent` works as a compatible alias in prompts and tool references.
+
 ## What is runSubagent?
 
 `runSubagent` launches an independent agent with a **clean context window** to handle complex, multi-step tasks autonomously.
@@ -62,7 +65,8 @@ Use when you want to:
 ```yaml
 ---
 name: Orchestrator
-tools: ["runSubagent", "fetch", "read_file"]
+# Use Primary Aliases in tools: property
+tools: ["agent", "web", "read"]
 ---
 ```
 
