@@ -54,6 +54,7 @@ Minimum items to verify:
 - [ ] ❌ Expecting handoff to named agents (subagentType doesn't work)
 - [ ] ❌ Orchestrator reading files directly instead of delegating
 - [ ] ❌ Using `runSubagent` in tools: property (use `agent` instead)
+- [ ] ❌ Nested sub-agent calls (sub-agents cannot call runSubagent)
 
 ## Correct Pattern Example
 
