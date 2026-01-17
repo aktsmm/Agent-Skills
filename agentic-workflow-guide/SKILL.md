@@ -169,16 +169,17 @@ For long-running agents, manage context as a finite resource:
 ```yaml
 ---
 name: Review Orchestrator
-tools: ["runSubagent", "read_file"]
+# Use Primary Aliases
+tools: ["agent", "read"]
 ---
 
 ## MANDATORY: Sub-agent Delegation
 
-You MUST use #tool:runSubagent for each file review.
+You MUST use #tool:agent for each file review.
 Do NOT read file contents directly in main context.
 
 For EACH file:
-1. Call runSubagent with prompt:
+1. Call agent with prompt:
    "Read {filepath}. Return: {issues: [], suggestions: []}"
 2. Wait for summary response
 3. Aggregate into final report
@@ -209,7 +210,7 @@ Each runSubagent call needs a **complete, self-contained prompt**:
 ### Quick Checklist
 
 ```markdown
-- [ ] Agent definition includes `tools: ["runSubagent"]`
+- [ ] Agent definition includes `tools: ["agent"]` (Primary Alias)
 - [ ] Instructions use MUST/MANDATORY (not "can" or "may")
 - [ ] Sub-agent prompt template is defined with output format
 - [ ] Orchestrator explicitly told NOT to do sub-agent work itself
@@ -255,21 +256,48 @@ handoffs:
 
 ## Available Tools
 
-Built-in tools for custom agents:
+Built-in tools for custom agents. Use **Primary Alias** in the `tools:` property.
 
-| Tool                 | Description                 |
-| -------------------- | --------------------------- |
-| `read` / `read_file` | Read file contents          |
-| `edit`               | Edit/create files           |
-| `search`             | Search codebase             |
-| `fetch`              | Fetch web content           |
-| `githubRepo`         | Search GitHub repositories  |
-| `usages`             | Find code usages/references |
-| `runSubagent`        | Spawn isolated sub-agent    |
+| Primary Alias | Compatible Aliases                                | Description                 |
+| ------------- | ------------------------------------------------- | --------------------------- |
+| `execute`     | `shell`, `Bash`, `powershell`, `run_in_terminal`  | Shell command execution     |
+| `read`        | `Read`, `NotebookRead`, `read_file`               | Read file contents          |
+| `edit`        | `Edit`, `MultiEdit`, `Write`, `NotebookEdit`      | Edit/create files           |
+| `search`      | `Grep`, `Glob`, `grep_search`, `file_search`      | Search files/text           |
+| `agent`       | `custom-agent`, `Task`, `runSubagent`             | Spawn sub-agent             |
+| `web`         | `WebSearch`, `WebFetch`, `fetch`, `fetch_webpage` | Fetch web content           |
+| `todo`        | `TodoWrite`                                       | Task list management        |
+| `githubRepo`  | -                                                 | Search GitHub repositories  |
+| `usages`      | -                                                 | Find code usages/references |
 
-**MCP Server Tools**: `<server-name>/*` format to include all tools from an MCP server.
+### Tool Definition Examples
 
-**Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:runSubagent`).
+```yaml
+# Orchestrator with sub-agent delegation
+tools: ["agent", "execute", "read", "search"]
+
+# Code reviewer
+tools: ["read", "search", "web", "execute"]
+
+# Translator/Editor
+tools: ["read", "edit", "agent"]
+```
+
+### Common Mistakes
+
+⚠️ **Wrong**: Using non-primary aliases in `tools:` property
+
+```yaml
+# ❌ Bad - may not be recognized
+tools: ["run_in_terminal", "read_file", "runSubagent"]
+
+# ✅ Good - use Primary Alias
+tools: ["execute", "read", "agent"]
+```
+
+**MCP Server Tools**: Use `<server-name>/*` format to include all tools from an MCP server.
+
+**Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`).
 
 ## Scaffold Workflow
 
