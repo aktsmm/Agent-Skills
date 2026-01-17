@@ -29,12 +29,14 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 Install the **Agent Skill Ninja** extension for easy skill management:
 
+**Agent Skill Ninja** 拡張機能でスキル管理が簡単に：
+
 **[📦 Agent Skill Ninja - VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=yamapan.agent-skill-ninja)**
 
-- 🔍 Browse and search skills
-- 📥 One-click install to your project
-- 🔄 Auto-update installed skills
-- 📋 View skill details and documentation
+- 🔍 Browse and search skills / スキルの検索・閲覧
+- 📥 One-click install to your project / ワンクリックでプロジェクトにインストール
+- 🔄 Auto-update installed skills / インストール済みスキルの自動更新
+- 📋 View skill details and documentation / スキル詳細とドキュメントの表示
 
 ### Manual Installation / 手動インストール
 
