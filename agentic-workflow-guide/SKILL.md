@@ -1,6 +1,9 @@
 ---
 name: agentic-workflow-guide
-description: "Design, review, and improve agent workflows & agent using SSOT, SRP, Fail Fast principles. Supports Prompt Chaining, Parallelization, Orchestrator-Workers patterns."
+description: "Design, review, and improve agent workflows using SSOT, SRP, Fail Fast principles. Supports Prompt Chaining, Parallelization, Orchestrator-Workers, runSubagent patterns. Use when reviewing sub-agent delegation or fixing orchestrators that don't spawn workers."
+license: Complete terms in LICENSE.txt
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Agentic Workflow Guide
@@ -15,6 +18,7 @@ A comprehensive guide for designing, reviewing, and improving agent workflows ba
 - **Quality Improvement** - Iteratively refine workflows step by step
 - **Scaffolding** - Generate workflow directory structures and templates
 - **Long-Horizon Tasks** - Manage context for multi-hour agent sessions
+- **runSubagent Implementation** - Ensure orchestrators properly delegate to sub-agents
 
 ## Core Principles
 
@@ -138,6 +142,123 @@ For long-running agents, manage context as a finite resource:
 
 > (Quote removed; see linked references.)
 
+## runSubagent Implementation
+
+→ See **[references/runSubagent-guide.md](references/runSubagent-guide.md)** for complete guide
+
+### Common Problem: Orchestrator Doesn't Spawn Sub-agents
+
+**Symptoms:** Agent says "I'll delegate to sub-agents" but does work directly.
+
+**Root Cause:** Instructions are too vague or permissive.
+
+**Solution:** Use imperative, mandatory language:
+
+```yaml
+---
+name: Review Orchestrator
+tools: ["runSubagent", "read_file"]
+---
+
+## MANDATORY: Sub-agent Delegation
+
+You MUST use #tool:runSubagent for each file review.
+Do NOT read file contents directly in main context.
+
+For EACH file:
+1. Call runSubagent with prompt:
+   "Read {filepath}. Return: {issues: [], suggestions: []}"
+2. Wait for summary response
+3. Aggregate into final report
+```
+
+### Sub-agent Prompt Template
+
+Each runSubagent call needs a **complete, self-contained prompt**:
+
+```markdown
+# Task
+
+[Clear, specific objective]
+
+# Input
+
+[What data/files to process]
+
+# Output Format
+
+[Exact structure expected - JSON/Markdown/etc.]
+
+# Constraints
+
+[Scope limits, max length, focus areas]
+```
+
+### Quick Checklist
+
+```markdown
+- [ ] Agent definition includes `tools: ["runSubagent"]`
+- [ ] Instructions use MUST/MANDATORY (not "can" or "may")
+- [ ] Sub-agent prompt template is defined with output format
+- [ ] Orchestrator explicitly told NOT to do sub-agent work itself
+```
+
+## Handoffs (Agent Transitions)
+
+Handoffs enable guided sequential workflows between agents with suggested next steps.
+
+### When to Use
+
+- **Plan → Implementation**: Generate plan, then hand off to implementation agent
+- **Implementation → Review**: Complete coding, then switch to code review agent
+- **Write Failing Tests → Pass Tests**: Generate failing tests first, then implement code
+
+### Configuration
+
+```yaml
+---
+name: Planner
+description: Generate an implementation plan
+tools: ["search", "fetch", "read_file"]
+handoffs:
+  - label: Start Implementation
+    agent: implementation
+    prompt: Implement the plan outlined above.
+    send: false
+---
+```
+
+| Property | Description                         |
+| -------- | ----------------------------------- |
+| `label`  | Button text shown to user           |
+| `agent`  | Target agent identifier             |
+| `prompt` | Pre-filled prompt for next agent    |
+| `send`   | Auto-submit prompt (default: false) |
+
+### Benefits
+
+- **Human control**: User reviews each phase before proceeding
+- **Context preservation**: Relevant context passed via prompt
+- **Workflow orchestration**: Multi-step tasks with clear boundaries
+
+## Available Tools
+
+Built-in tools for custom agents:
+
+| Tool                 | Description                 |
+| -------------------- | --------------------------- |
+| `read` / `read_file` | Read file contents          |
+| `edit`               | Edit/create files           |
+| `search`             | Search codebase             |
+| `fetch`              | Fetch web content           |
+| `githubRepo`         | Search GitHub repositories  |
+| `usages`             | Find code usages/references |
+| `runSubagent`        | Spawn isolated sub-agent    |
+
+**MCP Server Tools**: `<server-name>/*` format to include all tools from an MCP server.
+
+**Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:runSubagent`).
+
 ## Scaffold Workflow
 
 Automatically generate workflow directory structures.
@@ -173,40 +294,52 @@ python scripts/scaffold_workflow.py --list-patterns
 
 ```
 my-workflow/
-├── Agent.md                    # Workflow overview & agent list
-├── README.md                   # Usage guide
+├── README.md                       # Usage guide
 ├── .github/
-│   ├── copilot-instructions.md # GitHub Copilot instructions
-│   └── instructions/           # File-pattern-specific rules
-│       ├── workflow.instructions.md
-│       ├── agents.instructions.md
-│       └── prompts.instructions.md
-├── agents/                     # Agent definitions
-├── prompts/                    # Prompt templates
-│   ├── system_prompt.md
-│   ├── task_prompt.md
-│   └── error_handling_prompt.md
-├── docs/                       # Design documentation
-│   ├── design.md
-│   └── review_notes.md
-└── config/                     # Configuration files
+│   ├── copilot-instructions.md    # GitHub Copilot instructions
+│   ├── agents/                     # Custom agent definitions (NEW standard)
+│   │   ├── orchestrator.agent.md  # Main orchestrator agent
+│   │   ├── planner.agent.md       # Planning specialist
+│   │   ├── implementer.agent.md   # Implementation agent
+│   │   └── reviewer.agent.md      # Code review agent
+│   └── instructions/               # File-pattern-specific rules
+│       └── workflow.instructions.md
+├── prompts/                        # Prompt templates (optional)
+│   └── system_prompt.md
+└── docs/                           # Design documentation
+    └── design.md
 ```
+
+**Note**: Custom agents use `.agent.md` extension in `.github/agents/` directory (VS Code 1.106+).
 
 ## Resources
 
-| File                                                        | Content                            |
-| ----------------------------------------------------------- | ---------------------------------- |
-| [design-principles.md](references/design-principles.md)     | Design principles (Tier 1-3) + ACI |
-| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns with examples  |
-| [review-checklist.md](references/review-checklist.md)       | Full checklist + anti-patterns     |
-| [context-engineering.md](references/context-engineering.md) | Context management for long tasks  |
-| [scaffold_workflow.py](scripts/scaffold_workflow.py)        | Directory structure generator      |
+| File                                                        | Content                             |
+| ----------------------------------------------------------- | ----------------------------------- |
+| [design-principles.md](references/design-principles.md)     | Design principles (Tier 1-3) + ACI  |
+| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns with examples   |
+| [review-checklist.md](references/review-checklist.md)       | Full checklist + anti-patterns      |
+| [context-engineering.md](references/context-engineering.md) | Context management for long tasks   |
+| [runSubagent-guide.md](references/runSubagent-guide.md)     | runSubagent usage & common pitfalls |
+| [scaffold_workflow.py](scripts/scaffold_workflow.py)        | Directory structure generator       |
 
 ## References
+
+### Official Documentation
+
+- [Chat in IDE - GitHub Docs](https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide) - Chat modes, subagents, plan mode
+- [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents) - Agent file structure, handoffs
+- [Create Custom Agents - GitHub Docs](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents) - Agent configuration
+- [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration) - YAML properties reference
+
+### Design Principles
 
 - [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
 - [Effective Context Engineering - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Writing Tools for Agents - Anthropic](https://www.anthropic.com/engineering/writing-tools-for-agents)
-- [Prompt Engineering Tutorial - Anthropic](https://github.com/anthropics/prompt-eng-interactive-tutorial)
+
+### Community Resources
+
+- [runSubagent 検証記事 - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
 - [subagent-driven-development - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/subagent-driven-development)
-- [dispatching-parallel-agents - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/dispatching-parallel-agents)
+- [awesome-copilot agents - GitHub](https://github.com/github/awesome-copilot/tree/main/agents)
