@@ -26,6 +26,43 @@ Minimum items to verify:
 
 ---
 
+## runSubagent Check (Orchestrator-Workers)
+
+⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
+
+```markdown
+## Agent Definition
+
+- [ ] Does `tools:` include "runSubagent"?
+- [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
+- [ ] Is explicit tool reference present (#tool:runSubagent)?
+- [ ] Is orchestrator explicitly told NOT to do worker tasks itself?
+
+## Sub-agent Prompts
+
+- [ ] Does each runSubagent call have a complete prompt?
+- [ ] Is output format specified (JSON/Markdown/etc.)?
+- [ ] Are constraints and scope defined?
+- [ ] Is expected return size reasonable (1-2k tokens)?
+
+## Common Anti-patterns
+
+- [ ] ❌ "You can use sub-agents if needed" (too vague)
+- [ ] ❌ "Process in parallel" (not supported as of 2025/12)
+- [ ] ❌ Expecting handoff to named agents (subagentType doesn't work)
+- [ ] ❌ Orchestrator reading files directly instead of delegating
+
+## Correct Pattern Example
+
+✅ Good:
+
+- "You MUST use #tool:runSubagent for EACH file"
+- "Do NOT read file contents directly in main context"
+- "Each sub-agent prompt must include output format"
+```
+
+---
+
 ## Detailed Check
 
 ### Core Principles Check

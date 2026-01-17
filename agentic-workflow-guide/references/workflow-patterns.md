@@ -197,6 +197,55 @@ Synthesizer:
   - Resolve conflicts
 ```
 
+### VS Code Copilot: runSubagent Implementation
+
+⚠️ **Critical:** Workers are spawned via `#tool:runSubagent`. The orchestrator MUST explicitly call this tool.
+
+**Agent Definition:**
+
+```yaml
+---
+name: Code Review Orchestrator
+tools: ["runSubagent", "grep_search", "read_file"]
+---
+
+# Code Review Orchestrator
+
+## Workflow
+
+1. Identify files to review (grep_search)
+2. For EACH file, MUST call #tool:runSubagent:
+   - Prompt: "Review {filepath}. Return: {bugs: [], style: [], security: []}"
+3. Aggregate all sub-agent results
+4. Generate final report
+
+## MANDATORY RULES
+
+- You MUST use runSubagent for each file
+- Do NOT read file contents directly
+- Each sub-agent prompt must specify output format
+```
+
+**Why This Works:**
+
+- "MUST" language prevents orchestrator from skipping delegation
+- Explicit tool reference (`#tool:runSubagent`) triggers tool usage
+- Output format in prompt ensures consistent synthesis
+
+### Common Mistake
+
+❌ **Vague instructions:**
+
+```markdown
+You can use sub-agents to review files if needed.
+```
+
+✅ **Mandatory instructions:**
+
+```markdown
+You MUST use #tool:runSubagent for EACH file. Do NOT review directly.
+```
+
 ---
 
 ## 5. Evaluator-Optimizer
