@@ -30,17 +30,19 @@ Minimum items to verify:
 
 ⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
 
+> **Note**: Primary Alias is `agent`. Use `agent` in `tools:` property, `#tool:agent` or `#tool:runSubagent` in prompts.
+
 ```markdown
 ## Agent Definition
 
-- [ ] Does `tools:` include "runSubagent"?
+- [ ] Does `tools:` include "agent" (Primary Alias)?
 - [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
-- [ ] Is explicit tool reference present (#tool:runSubagent)?
+- [ ] Is explicit tool reference present (#tool:agent)?
 - [ ] Is orchestrator explicitly told NOT to do worker tasks itself?
 
 ## Sub-agent Prompts
 
-- [ ] Does each runSubagent call have a complete prompt?
+- [ ] Does each agent call have a complete prompt?
 - [ ] Is output format specified (JSON/Markdown/etc.)?
 - [ ] Are constraints and scope defined?
 - [ ] Is expected return size reasonable (1-2k tokens)?
@@ -51,12 +53,13 @@ Minimum items to verify:
 - [ ] ❌ "Process in parallel" (not supported as of 2025/12)
 - [ ] ❌ Expecting handoff to named agents (subagentType doesn't work)
 - [ ] ❌ Orchestrator reading files directly instead of delegating
+- [ ] ❌ Using `runSubagent` in tools: property (use `agent` instead)
 
 ## Correct Pattern Example
 
 ✅ Good:
 
-- "You MUST use #tool:runSubagent for EACH file"
+- "You MUST use #tool:agent for EACH file"
 - "Do NOT read file contents directly in main context"
 - "Each sub-agent prompt must include output format"
 ```
