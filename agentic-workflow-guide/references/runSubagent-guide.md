@@ -18,6 +18,7 @@ Practical guide for using `runSubagent` tool in VS Code Copilot.
 | **Stateless** | One-shot execution - no follow-up conversation possible          |
 | **Return**    | Only final summary returns to main agent                         |
 | **Parallel**  | ❌ NOT supported (2025/12) - executes sequentially               |
+| **Nesting**   | ❌ NOT supported - sub-agents cannot call runSubagent            |
 
 ### Primary Purpose
 
@@ -284,7 +285,25 @@ For EACH file → runSubagent with specific prompt.
 For each MODULE (not each file), use one sub-agent
 ```
 
-### Pitfall 3: Vague Sub-agent Prompts
+### Pitfall 3: Nested Sub-agent Calls (Not Supported)
+
+❌ **Problem:** Sub-agent tries to call another sub-agent
+
+**Reality:** Sub-agents cannot call `runSubagent` themselves. Nesting is not supported.
+
+**Solution:** Keep hierarchy flat:
+
+```
+✅ Correct:
+Orchestrator → Worker A
+            → Worker B
+            → Worker C
+
+❌ Wrong:
+Orchestrator → Worker A → Sub-Worker (NOT ALLOWED)
+```
+
+### Pitfall 4: Vague Sub-agent Prompts
 
 ❌ **Problem:** "Analyze this file" → Sub-agent doesn't know what to return
 
