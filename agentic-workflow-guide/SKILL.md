@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "Design, review, and improve agent workflows using SSOT, SRP, Fail Fast principles. Supports Prompt Chaining, Parallelization, Orchestrator-Workers, runSubagent patterns. Use when reviewing sub-agent delegation or fixing orchestrators that don't spawn workers."
+description: "Create, review, and update agents and workflows. Covers 5 workflow patterns, runSubagent delegation, Handoffs, Context Engineering. Use for any .agent.md file work or multi-agent system design."
 license: Complete terms in LICENSE.txt
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -12,13 +12,25 @@ A comprehensive guide for designing, reviewing, and improving agent workflows ba
 
 ## When to Use
 
-- **New Workflow Design** - Define agent roles, responsibilities, and execution order
-- **Workflow Review** - Detect issues by checking against design principles
-- **Pattern Selection** - Choose the right workflow pattern for your task
-- **Quality Improvement** - Iteratively refine workflows step by step
-- **Scaffolding** - Generate workflow directory structures and templates
-- **Long-Horizon Tasks** - Manage context for multi-hour agent sessions
-- **runSubagent Implementation** - Ensure orchestrators properly delegate to sub-agents
+Use this skill when creating, reviewing, or updating agents and workflows:
+
+### Create
+
+- **New agent design** - Define responsibilities, tools, and prompts for `.agent.md` files
+- **Workflow architecture** - Choose from 5 patterns (Prompt Chaining, Routing, Parallelization, Orchestrator-Workers, Evaluator-Optimizer)
+- **Scaffolding** - Generate `.github/agents/*.agent.md` structure with `scaffold_workflow.py`
+
+### Review
+
+- **Orchestrator not delegating** - Agent says "I'll use sub-agents" but does work directly
+- **Design principle check** - Validate against SSOT, SRP, Fail Fast, Feedback Loop
+- **Context overflow diagnosis** - Long-running agents hitting limits
+
+### Update
+
+- **Adding Handoffs** - Implement Plan → Implement → Review phase transitions
+- **Improving delegation** - Fix vague instructions with MUST/MANDATORY language
+- **Tool configuration** - Configure `tools:` property and `#tool:` references
 
 ## Core Principles
 
