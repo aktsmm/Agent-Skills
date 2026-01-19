@@ -70,13 +70,6 @@ Each skill has its own license in `LICENSE.txt`. Please refer to the license fil
 - **Self-created skills / 自作スキル**: CC BY-NC-SA 4.0
 - **External skills / 外部由来**: Original license retained (MIT, Apache 2.0, etc.)
 
-
-## Changelog / 更新履歴
-
-| Date       | Skill               | Changes                                                                 |
-| ---------- | ------------------- | ----------------------------------------------------------------------- |
-| 2026-01-19 | drawio-diagram-forge | 🔥 Azure icons 35→80+ (OpenAI, Databricks, IoT Hub, etc.), AWS→Azure migration patterns, ID duplicate check |
-| 2026-01-15 | drawio-diagram-forge | Initial release                                                         |
 ## Author / 作者
 
 yamapan ([@aktsmm](https://github.com/aktsmm))
