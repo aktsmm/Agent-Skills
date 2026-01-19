@@ -47,6 +47,17 @@ def validate_drawio(filepath: str) -> dict:
     cells = root.findall(".//mxCell")
     cell_ids = {c.get("id") for c in cells}
     
+    # Check for duplicate IDs
+    from collections import Counter
+    all_ids = [c.get("id") for c in cells if c.get("id")]
+    id_counts = Counter(all_ids)
+    duplicates = [id_ for id_, count in id_counts.items() if count > 1]
+    if duplicates:
+        result["valid"] = False
+        result["errors"].append(
+            f"Duplicate cell IDs found: {duplicates}"
+        )
+    
     vertices = [c for c in cells if c.get("vertex") == "1"]
     edges = [c for c in cells if c.get("edge") == "1"]
     
@@ -98,6 +109,16 @@ def validate_drawio(filepath: str) -> dict:
             result["warnings"].append(
                 f"mxCell '{cell_id}' missing mxGeometry"
             )
+    
+    # Check for deprecated Azure icon format (mxgraph.azure.*)
+    import re
+    file_content = Path(filepath).read_text(encoding="utf-8")
+    azure_old_pattern = re.findall(r'mxgraph\.azure[^2]', file_content)
+    if azure_old_pattern:
+        result["warnings"].append(
+            f"Deprecated Azure format detected: 'mxgraph.azure.*' "
+            f"Use 'img/lib/azure2/**/*.svg' instead for VS Code compatibility"
+        )
     
     return result
 
