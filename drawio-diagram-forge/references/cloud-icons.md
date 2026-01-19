@@ -43,94 +43,101 @@ Azure/AWS アイコンを使うには、**事前にシェイプライブラリ�
 
 ### Common Azure Icons
 
-| Service              | SVG Path                                                               | Category              |
-| -------------------- | ---------------------------------------------------------------------- | --------------------- |
-| **Compute**          |                                                                        |                       |
-| Virtual Machine      | `img/lib/azure2/compute/Virtual_Machine.svg`                           | compute               |
-| VM Scale Sets        | `img/lib/azure2/compute/VM_Scale_Sets.svg`                             | compute               |
-| App Service          | `img/lib/azure2/compute/App_Services.svg`                              | compute               |
-| Function Apps        | `img/lib/azure2/compute/Function_Apps.svg`                             | compute               |
-| AKS                  | `img/lib/azure2/compute/Azure_Kubernetes_Service.svg`                  | compute               |
-| Container Instances  | `img/lib/azure2/compute/Container_Instances.svg`                       | compute               |
-| Disks                | `img/lib/azure2/compute/Disks.svg`                                     | compute               |
-| Batch Accounts       | `img/lib/azure2/compute/Batch_Accounts.svg`                            | compute               |
-| **Containers**       |                                                                        |                       |
-| Container Registry   | `img/lib/azure2/containers/Container_Registries.svg`                   | containers            |
-| Red Hat OpenShift    | `img/lib/azure2/containers/Azure_Red_Hat_OpenShift.svg`                | containers            |
-| Service Fabric       | `img/lib/azure2/containers/Service_Fabric_Clusters.svg`                | containers            |
-| **Storage**          |                                                                        |                       |
-| Storage Account      | `img/lib/azure2/storage/Storage_Accounts.svg`                          | storage               |
-| **Databases**        |                                                                        |                       |
-| SQL Database         | `img/lib/azure2/databases/SQL_Database.svg`                            | databases             |
-| SQL Managed Instance | `img/lib/azure2/databases/SQL_Managed_Instance.svg`                    | databases             |
-| Cosmos DB            | `img/lib/azure2/databases/Azure_Cosmos_DB.svg`                         | databases             |
-| Redis Cache          | `img/lib/azure2/databases/Cache_Redis.svg`                             | databases             |
-| MySQL                | `img/lib/azure2/databases/Azure_Database_MySQL_Server.svg`             | databases             |
-| PostgreSQL           | `img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg`        | databases             |
-| Data Factory         | `img/lib/azure2/databases/Data_Factory.svg`                            | databases             |
-| Synapse Analytics    | `img/lib/azure2/databases/Azure_Synapse_Analytics.svg`                 | databases             |
-| Data Explorer        | `img/lib/azure2/databases/Azure_Data_Explorer_Clusters.svg`            | databases             |
-| **Networking**       |                                                                        |                       |
-| Virtual Network      | `img/lib/azure2/networking/Virtual_Networks.svg`                       | networking            |
-| Subnet               | `img/lib/azure2/networking/Subnet.svg`                                 | networking            |
-| Load Balancer        | `img/lib/azure2/networking/Load_Balancers.svg`                         | networking            |
-| Application Gateway  | `img/lib/azure2/networking/Application_Gateways.svg`                   | networking            |
-| Front Door           | `img/lib/azure2/networking/Front_Doors.svg`                            | networking            |
-| ExpressRoute         | `img/lib/azure2/networking/ExpressRoute_Circuits.svg`                  | networking            |
-| VPN Gateway          | `img/lib/azure2/networking/Virtual_Network_Gateways.svg`               | networking            |
-| Firewall             | `img/lib/azure2/networking/Firewalls.svg`                              | networking            |
-| Bastion              | `img/lib/azure2/networking/Bastions.svg`                               | networking            |
-| Private Endpoint     | `img/lib/azure2/networking/Private_Endpoint.svg`                       | networking            |
-| Private Link         | `img/lib/azure2/networking/Private_Link.svg`                           | networking            |
-| NSG                  | `img/lib/azure2/networking/Network_Security_Groups.svg`                | networking            |
-| DNS Zone             | `img/lib/azure2/networking/DNS_Zones.svg`                              | networking            |
-| Virtual WAN          | `img/lib/azure2/networking/Virtual_WANs.svg`                           | networking            |
-| Virtual WAN Hub      | `img/lib/azure2/networking/Virtual_WAN_Hub.svg`                        | networking            |
-| Traffic Manager      | `img/lib/azure2/networking/Traffic_Manager_Profiles.svg`               | networking            |
-| NAT Gateway          | `img/lib/azure2/networking/NAT.svg`                                    | networking            |
-| **Security**         |                                                                        |                       |
-| Key Vault            | `img/lib/azure2/security/Key_Vaults.svg`                               | security              |
-| Defender             | `img/lib/azure2/security/Azure_Defender.svg`                           | security              |
-| Sentinel             | `img/lib/azure2/security/Azure_Sentinel.svg`                           | security              |
-| Security Center      | `img/lib/azure2/security/Security_Center.svg`                          | security              |
-| **Identity**         |                                                                        |                       |
-| Azure AD / Entra ID  | `img/lib/azure2/identity/Azure_Active_Directory.svg`                   | identity              |
-| **Integration**      |                                                                        |                       |
-| API Management       | `img/lib/azure2/integration/API_Management_Services.svg`               | integration           |
-| Logic Apps           | `img/lib/azure2/integration/Logic_Apps.svg`                            | integration           |
-| Service Bus          | `img/lib/azure2/integration/Service_Bus.svg`                           | integration           |
-| **Analytics**        |                                                                        |                       |
-| Event Hubs           | `img/lib/azure2/analytics/Event_Hubs.svg`                              | analytics             |
-| Databricks           | `img/lib/azure2/analytics/Azure_Databricks.svg`                        | analytics             |
-| Stream Analytics     | `img/lib/azure2/analytics/Stream_Analytics_Jobs.svg`                   | analytics             |
-| HDInsight            | `img/lib/azure2/analytics/HD_Insight_Clusters.svg`                     | analytics             |
-| Power BI Embedded    | `img/lib/azure2/analytics/Power_BI_Embedded.svg`                       | analytics             |
-| **AI / ML**          |                                                                        |                       |
-| Azure OpenAI         | `img/lib/azure2/ai_machine_learning/Azure_OpenAI.svg`                  | ai_machine_learning   |
-| Cognitive Services   | `img/lib/azure2/ai_machine_learning/Cognitive_Services.svg`            | ai_machine_learning   |
-| Machine Learning     | `img/lib/azure2/ai_machine_learning/Machine_Learning.svg`              | ai_machine_learning   |
-| Bot Services         | `img/lib/azure2/ai_machine_learning/Bot_Services.svg`                  | ai_machine_learning   |
-| AI Studio            | `img/lib/azure2/ai_machine_learning/AI_Studio.svg`                     | ai_machine_learning   |
-| Speech Services      | `img/lib/azure2/ai_machine_learning/Speech_Services.svg`               | ai_machine_learning   |
-| Computer Vision      | `img/lib/azure2/ai_machine_learning/Computer_Vision.svg`               | ai_machine_learning   |
-| Form Recognizer      | `img/lib/azure2/ai_machine_learning/Form_Recognizers.svg`              | ai_machine_learning   |
-| **IoT**              |                                                                        |                       |
-| IoT Hub              | `img/lib/azure2/iot/IoT_Hub.svg`                                       | iot                   |
-| IoT Central          | `img/lib/azure2/iot/IoT_Central_Applications.svg`                      | iot                   |
-| IoT Edge             | `img/lib/azure2/iot/IoT_Edge.svg`                                      | iot                   |
-| Digital Twins        | `img/lib/azure2/iot/Digital_Twins.svg`                                 | iot                   |
-| **DevOps**           |                                                                        |                       |
-| Azure DevOps         | `img/lib/azure2/devops/Azure_DevOps.svg`                               | devops                |
-| DevTest Labs         | `img/lib/azure2/devops/DevTest_Labs.svg`                               | devops                |
-| **Management**       |                                                                        |                       |
-| Monitor              | `img/lib/azure2/management_governance/Monitor.svg`                     | management_governance |
-| Log Analytics        | `img/lib/azure2/management_governance/Log_Analytics_Workspaces.svg`    | management_governance |
-| Backup (Recovery)    | `img/lib/azure2/management_governance/Recovery_Services_Vaults.svg`    | management_governance |
-| Application Insights | `img/lib/azure2/management_governance/Application_Insights.svg`        | management_governance |
-| Policy               | `img/lib/azure2/management_governance/Policy.svg`                      | management_governance |
-| Automation           | `img/lib/azure2/management_governance/Automation_Accounts.svg`         | management_governance |
-| Azure Arc            | `img/lib/azure2/management_governance/Azure_Arc.svg`                   | management_governance |
-| Cost Management      | `img/lib/azure2/management_governance/Cost_Management_and_Billing.svg` | management_governance |
+| Service                | SVG Path                                                               | Category              |
+| ---------------------- | ---------------------------------------------------------------------- | --------------------- |
+| **Compute**            |                                                                        |                       |
+| Virtual Machine        | `img/lib/azure2/compute/Virtual_Machine.svg`                           | compute               |
+| VM Scale Sets          | `img/lib/azure2/compute/VM_Scale_Sets.svg`                             | compute               |
+| App Service            | `img/lib/azure2/compute/App_Services.svg`                              | compute               |
+| Function Apps          | `img/lib/azure2/compute/Function_Apps.svg`                             | compute               |
+| AKS                    | `img/lib/azure2/compute/Azure_Kubernetes_Service.svg`                  | compute               |
+| Container Instances    | `img/lib/azure2/compute/Container_Instances.svg`                       | compute               |
+| Disks                  | `img/lib/azure2/compute/Disks.svg`                                     | compute               |
+| Batch Accounts         | `img/lib/azure2/compute/Batch_Accounts.svg`                            | compute               |
+| **Containers**         |                                                                        |                       |
+| Container Registry     | `img/lib/azure2/containers/Container_Registries.svg`                   | containers            |
+| Red Hat OpenShift      | `img/lib/azure2/containers/Azure_Red_Hat_OpenShift.svg`                | containers            |
+| Service Fabric         | `img/lib/azure2/containers/Service_Fabric_Clusters.svg`                | containers            |
+| **Storage**            |                                                                        |                       |
+| Storage Account        | `img/lib/azure2/storage/Storage_Accounts.svg`                          | storage               |
+| **Databases**          |                                                                        |                       |
+| SQL Database           | `img/lib/azure2/databases/SQL_Database.svg`                            | databases             |
+| SQL Managed Instance   | `img/lib/azure2/databases/SQL_Managed_Instance.svg`                    | databases             |
+| Cosmos DB              | `img/lib/azure2/databases/Azure_Cosmos_DB.svg`                         | databases             |
+| Redis Cache            | `img/lib/azure2/databases/Cache_Redis.svg`                             | databases             |
+| MySQL                  | `img/lib/azure2/databases/Azure_Database_MySQL_Server.svg`             | databases             |
+| PostgreSQL             | `img/lib/azure2/databases/Azure_Database_PostgreSQL_Server.svg`        | databases             |
+| Data Factory           | `img/lib/azure2/databases/Data_Factory.svg`                            | databases             |
+| Synapse Analytics      | `img/lib/azure2/databases/Azure_Synapse_Analytics.svg`                 | databases             |
+| Data Explorer          | `img/lib/azure2/databases/Azure_Data_Explorer_Clusters.svg`            | databases             |
+| **Networking**         |                                                                        |                       |
+| Virtual Network        | `img/lib/azure2/networking/Virtual_Networks.svg`                       | networking            |
+| Subnet                 | `img/lib/azure2/networking/Subnet.svg`                                 | networking            |
+| Load Balancer          | `img/lib/azure2/networking/Load_Balancers.svg`                         | networking            |
+| Application Gateway    | `img/lib/azure2/networking/Application_Gateways.svg`                   | networking            |
+| Front Door             | `img/lib/azure2/networking/Front_Doors.svg`                            | networking            |
+| ExpressRoute           | `img/lib/azure2/networking/ExpressRoute_Circuits.svg`                  | networking            |
+| VPN Gateway            | `img/lib/azure2/networking/Virtual_Network_Gateways.svg`               | networking            |
+| Firewall               | `img/lib/azure2/networking/Firewalls.svg`                              | networking            |
+| Bastion                | `img/lib/azure2/networking/Bastions.svg`                               | networking            |
+| Private Endpoint       | `img/lib/azure2/networking/Private_Endpoint.svg`                       | networking            |
+| Private Link           | `img/lib/azure2/networking/Private_Link.svg`                           | networking            |
+| NSG                    | `img/lib/azure2/networking/Network_Security_Groups.svg`                | networking            |
+| DNS Zone               | `img/lib/azure2/networking/DNS_Zones.svg`                              | networking            |
+| Virtual WAN            | `img/lib/azure2/networking/Virtual_WANs.svg`                           | networking            |
+| Virtual WAN Hub        | `img/lib/azure2/networking/Virtual_WAN_Hub.svg`                        | networking            |
+| Traffic Manager        | `img/lib/azure2/networking/Traffic_Manager_Profiles.svg`               | networking            |
+| NAT Gateway            | `img/lib/azure2/networking/NAT.svg`                                    | networking            |
+| **Networking (other)** |                                                                        |                       |
+| VNet Peering           | `img/lib/azure2/other/Peerings.svg`                                    | other ⚠️              |
+| Peering Service        | `img/lib/azure2/other/Peering_Service.svg`                             | other ⚠️              |
+| Local Network Gateway  | `img/lib/azure2/other/Local_Network_Gateways.svg`                      | other ⚠️              |
+| Private Endpoints      | `img/lib/azure2/other/Private_Endpoints.svg`                           | other ⚠️ (複数形)     |
+| ExpressRoute Direct    | `img/lib/azure2/other/ExpressRoute_Direct.svg`                         | other ⚠️              |
+| Azure Network Manager  | `img/lib/azure2/other/Azure_Network_Manager.svg`                       | other ⚠️              |
+| **Security**           |                                                                        |                       |
+| Key Vault              | `img/lib/azure2/security/Key_Vaults.svg`                               | security              |
+| Defender               | `img/lib/azure2/security/Azure_Defender.svg`                           | security              |
+| Sentinel               | `img/lib/azure2/security/Azure_Sentinel.svg`                           | security              |
+| Security Center        | `img/lib/azure2/security/Security_Center.svg`                          | security              |
+| **Identity**           |                                                                        |                       |
+| Azure AD / Entra ID    | `img/lib/azure2/identity/Azure_Active_Directory.svg`                   | identity              |
+| **Integration**        |                                                                        |                       |
+| API Management         | `img/lib/azure2/integration/API_Management_Services.svg`               | integration           |
+| Logic Apps             | `img/lib/azure2/integration/Logic_Apps.svg`                            | integration           |
+| Service Bus            | `img/lib/azure2/integration/Service_Bus.svg`                           | integration           |
+| **Analytics**          |                                                                        |                       |
+| Event Hubs             | `img/lib/azure2/analytics/Event_Hubs.svg`                              | analytics             |
+| Databricks             | `img/lib/azure2/analytics/Azure_Databricks.svg`                        | analytics             |
+| Stream Analytics       | `img/lib/azure2/analytics/Stream_Analytics_Jobs.svg`                   | analytics             |
+| HDInsight              | `img/lib/azure2/analytics/HD_Insight_Clusters.svg`                     | analytics             |
+| Power BI Embedded      | `img/lib/azure2/analytics/Power_BI_Embedded.svg`                       | analytics             |
+| **AI / ML**            |                                                                        |                       |
+| Azure OpenAI           | `img/lib/azure2/ai_machine_learning/Azure_OpenAI.svg`                  | ai_machine_learning   |
+| Cognitive Services     | `img/lib/azure2/ai_machine_learning/Cognitive_Services.svg`            | ai_machine_learning   |
+| Machine Learning       | `img/lib/azure2/ai_machine_learning/Machine_Learning.svg`              | ai_machine_learning   |
+| Bot Services           | `img/lib/azure2/ai_machine_learning/Bot_Services.svg`                  | ai_machine_learning   |
+| AI Studio              | `img/lib/azure2/ai_machine_learning/AI_Studio.svg`                     | ai_machine_learning   |
+| Speech Services        | `img/lib/azure2/ai_machine_learning/Speech_Services.svg`               | ai_machine_learning   |
+| Computer Vision        | `img/lib/azure2/ai_machine_learning/Computer_Vision.svg`               | ai_machine_learning   |
+| Form Recognizer        | `img/lib/azure2/ai_machine_learning/Form_Recognizers.svg`              | ai_machine_learning   |
+| **IoT**                |                                                                        |                       |
+| IoT Hub                | `img/lib/azure2/iot/IoT_Hub.svg`                                       | iot                   |
+| IoT Central            | `img/lib/azure2/iot/IoT_Central_Applications.svg`                      | iot                   |
+| IoT Edge               | `img/lib/azure2/iot/IoT_Edge.svg`                                      | iot                   |
+| Digital Twins          | `img/lib/azure2/iot/Digital_Twins.svg`                                 | iot                   |
+| **DevOps**             |                                                                        |                       |
+| Azure DevOps           | `img/lib/azure2/devops/Azure_DevOps.svg`                               | devops                |
+| DevTest Labs           | `img/lib/azure2/devops/DevTest_Labs.svg`                               | devops                |
+| **Management**         |                                                                        |                       |
+| Monitor                | `img/lib/azure2/management_governance/Monitor.svg`                     | management_governance |
+| Log Analytics          | `img/lib/azure2/management_governance/Log_Analytics_Workspaces.svg`    | management_governance |
+| Backup (Recovery)      | `img/lib/azure2/management_governance/Recovery_Services_Vaults.svg`    | management_governance |
+| Application Insights   | `img/lib/azure2/management_governance/Application_Insights.svg`        | management_governance |
+| Policy                 | `img/lib/azure2/management_governance/Policy.svg`                      | management_governance |
+| Automation             | `img/lib/azure2/management_governance/Automation_Accounts.svg`         | management_governance |
+| Azure Arc              | `img/lib/azure2/management_governance/Azure_Arc.svg`                   | management_governance |
+| Cost Management        | `img/lib/azure2/management_governance/Cost_Management_and_Billing.svg` | management_governance |
 
 ### Azure Icon Style (✅ Correct)
 
@@ -170,6 +177,60 @@ img/lib/azure2/
 | Azure Monitor | `Azure_Monitor.svg`       | `Monitor.svg`                       |
 | App Gateway   | `Application_Gateway.svg` | `Application_Gateways.svg` (複数形) |
 | Backup        | `Backup.svg`              | `Recovery_Services_Vaults.svg`      |
+
+### 🚫 Non-Existent Icons & Alternatives
+
+以下のアイコンは draw.io の azure2 ライブラリに**存在しない**、または**パスが異なる**。代替案を使用すること。
+
+| サービス                    | ❌ よくある間違い                              | ✅ 正しいパス / 代替案                                                         |
+| --------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------ |
+| **Cloud Shell**             | `general/Cloud_Shell.svg`                      | `other/Azure_Cloud_Shell.svg`                                                  |
+| **Container Apps**          | `compute/Container_Apps.svg`                   | `other/Worker_Container_App.svg` または `other/Container_App_Environments.svg` |
+| **Communication Services**  | `integration/Communication_Services.svg`       | `other/Azure_Communication_Services.svg`                                       |
+| **Private DNS Zones**       | `networking/Private_DNS_Zones.svg`             | `networking/DNS_Zones.svg`                                                     |
+| **GitHub / GitHub Actions** | `other/GitHub.svg` `devops/GitHub_Actions.svg` | 濃灰の角丸ボックス + テキスト（ライブラリに存在しない）                        |
+| **Internet**                | `networking/Internet.svg`                      | `shape=cloud` (汎用雲形状)                                                     |
+| **App Configuration**       | `integration/App_Configuration.svg`            | テキストのみ or `management_governance/Automation_Accounts.svg`                |
+| **Static Web Apps**         | `web/Static_Web_Apps.svg`                      | `app_services/Static_Apps.svg` (要確認)                                        |
+
+### 🔍 `other/` カテゴリに注目
+
+多くの新しい Azure サービスは `other/` カテゴリに配置されている。見つからない場合は `other/` を確認：
+
+- `other/Azure_Cloud_Shell.svg`
+- `other/Azure_Communication_Services.svg`
+- `other/Container_App_Environments.svg`
+- `other/Worker_Container_App.svg`
+- `other/Grafana.svg`
+- `other/Azure_Load_Testing.svg`
+- `other/MS_Dev_Box.svg`
+- `other/Private_Endpoints.svg`
+- `other/Local_Network_Gateways.svg`
+- `other/ExpressRoute_Direct.svg`
+
+#### 代替スタイル例
+
+**角丸ボックス + テキスト（GitHub 向け）**:
+
+```xml
+<mxCell value="Cloud Shell"
+        style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0078D4;strokeColor=#005A9E;fontColor=#FFFFFF;fontSize=12;fontStyle=1;"
+        vertex="1" parent="1">
+  <mxGeometry x="100" y="100" width="100" height="40" as="geometry"/>
+</mxCell>
+```
+
+**雲形状（Internet 向け）**:
+
+```xml
+<mxCell value="Internet"
+        style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#666666;"
+        vertex="1" parent="1">
+  <mxGeometry x="100" y="100" width="120" height="80" as="geometry"/>
+</mxCell>
+```
+
+> **💡 Tip**: 新しい Azure サービスはアイコンがライブラリに追加されるまで時間がかかる。テキストボックスで対応し、将来のアップデートで置換可能にする。
 
 ## AWS Icons (AWS4 形式)
 
