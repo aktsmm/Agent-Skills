@@ -30,16 +30,18 @@ handoffs: [...] # Optional: Agent transitions
 
 Each agent should include these sections:
 
-| Section            | Required    | Description                                           |
-| ------------------ | ----------- | ----------------------------------------------------- |
-| **Role**           | ✅          | Single sentence defining responsibility               |
-| **Goals**          | ✅          | List of objectives to achieve                         |
-| **Done Criteria**  | ✅          | Verifiable completion conditions (**one place only**) |
-| **Permissions**    | ✅          | What's allowed and forbidden                          |
-| **I/O Contract**   | ✅          | Input/output definitions                              |
-| **Workflow**       | Recommended | Step-by-step procedure                                |
-| **Error Handling** | Recommended | Error patterns and responses                          |
-| **Idempotency**    | Recommended | How to guarantee safe retries                         |
+| Section                | Required    | Description                                           |
+| ---------------------- | ----------- | ----------------------------------------------------- |
+| **Role**               | ✅          | Single sentence defining responsibility               |
+| **Goals**              | ✅          | List of objectives to achieve                         |
+| **Done Criteria**      | ✅          | Verifiable completion conditions (**one place only**) |
+| **Permissions**        | ✅          | What's allowed and forbidden                          |
+| **I/O Contract**       | ✅          | Input/output definitions                              |
+| **Non-Goals**          | Recommended | What this agent explicitly does NOT do                |
+| **Workflow**           | Recommended | Step-by-step procedure                                |
+| **Progress Reporting** | Recommended | How to report progress (e.g., `manage_todo_list`)     |
+| **Error Handling**     | Recommended | Error patterns and responses                          |
+| **Idempotency**        | Recommended | How to guarantee safe retries                         |
 
 ### ⚠️ Critical: Done Criteria Placement
 
@@ -47,7 +49,7 @@ Each agent should include these sections:
 
 ## Full Template
 
-```markdown
+````markdown
 ---
 name: example-agent
 description: Brief description of what this agent does
@@ -86,6 +88,16 @@ Task is complete when ALL of the following are true:
 - ❌ Action that should never be done
 - ❌ Another prohibited action
 
+## Non-Goals
+
+Explicitly define what this agent does NOT do:
+
+- ❌ Do not write code directly (delegate to implementation agent)
+- ❌ Do not review own output (delegate to review agent)
+- ❌ Do not assume user intent (ask for clarification)
+
+> **Why Non-Goals?** Prevents orchestrators from doing work they should delegate.
+
 ## I/O Contract
 
 ### Input
@@ -115,12 +127,30 @@ Task is complete when ALL of the following are true:
 | Invalid input format | Validate early, return clear error |
 | External API failure | Retry with backoff, then escalate  |
 
+## Progress Reporting
+
+For long-running tasks, maintain visibility:
+
+- Use `manage_todo_list` tool to track task status
+- Update status at each sub-task completion
+- Provide intermediate reports for tasks > 5 minutes
+
+```markdown
+**Progress:**
+
+- [x] Task 1: Analyze requirements
+- [x] Task 2: Generate IR
+- [ ] Task 3: Validate output
+```
+````
+
 ## Idempotency
 
 - Check current state before making changes
 - Use unique identifiers to prevent duplicates
 - Design operations to be safely retried
-```
+
+````
 
 ## Design Principles for Agents
 
@@ -149,7 +179,7 @@ name: orchestrator
 description: Coordinates workflow and delegates to specialist agents
 tools: ["agent", "read", "search", "todo"]
 ---
-```
+````
 
 Key characteristics:
 
