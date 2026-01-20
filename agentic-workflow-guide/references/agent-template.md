@@ -219,6 +219,91 @@ Key characteristics:
 - Makes targeted changes
 - Reports results back to orchestrator
 
+## Available Tools
+
+Built-in tools for custom agents. Use **Primary Alias** in the `tools:` property.
+
+| Primary Alias | Compatible Aliases                                | Description                 |
+| ------------- | ------------------------------------------------- | --------------------------- |
+| `execute`     | `shell`, `Bash`, `powershell`, `run_in_terminal`  | Shell command execution     |
+| `read`        | `Read`, `NotebookRead`, `read_file`               | Read file contents          |
+| `edit`        | `Edit`, `MultiEdit`, `Write`, `NotebookEdit`      | Edit/create files           |
+| `search`      | `Grep`, `Glob`, `grep_search`, `file_search`      | Search files/text           |
+| `agent`       | `custom-agent`, `Task`, `runSubagent`             | Spawn sub-agent             |
+| `web`         | `WebSearch`, `WebFetch`, `fetch`, `fetch_webpage` | Fetch web content           |
+| `todo`        | `TodoWrite`                                       | Task list management        |
+| `githubRepo`  | -                                                 | Search GitHub repositories  |
+| `usages`      | -                                                 | Find code usages/references |
+
+### Tool Definition Examples
+
+```yaml
+# Orchestrator with sub-agent delegation
+tools: ["agent", "execute", "read", "search"]
+
+# Code reviewer
+tools: ["read", "search", "web", "execute"]
+
+# Translator/Editor
+tools: ["read", "edit", "agent"]
+```
+
+### Common Mistakes
+
+⚠️ **Wrong**: Using non-primary aliases in `tools:` property
+
+```yaml
+# ❌ Bad - may not be recognized
+tools: ["run_in_terminal", "read_file", "runSubagent"]
+
+# ✅ Good - use Primary Alias
+tools: ["execute", "read", "agent"]
+```
+
+**Troubleshooting**: If tools are not recognized, verify against [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+
+**MCP Server Tools**: Use `<server-name>/*` format to include all tools from an MCP server.
+
+**Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`).
+
+## Handoffs (Agent Transitions)
+
+Handoffs enable guided sequential workflows between agents with suggested next steps.
+
+### When to Use
+
+- **Plan → Implementation**: Generate plan, then hand off to implementation agent
+- **Implementation → Review**: Complete coding, then switch to code review agent
+- **Write Failing Tests → Pass Tests**: Generate failing tests first, then implement code
+
+### Configuration
+
+```yaml
+---
+name: Planner
+description: Generate an implementation plan
+tools: ["search", "fetch", "read_file"]
+handoffs:
+  - label: Start Implementation
+    agent: implementation
+    prompt: Implement the plan outlined above.
+    send: false
+---
+```
+
+| Property | Description                         |
+| -------- | ----------------------------------- |
+| `label`  | Button text shown to user           |
+| `agent`  | Target agent identifier             |
+| `prompt` | Pre-filled prompt for next agent    |
+| `send`   | Auto-submit prompt (default: false) |
+
+### Benefits
+
+- **Human control**: User reviews each phase before proceeding
+- **Context preservation**: Relevant context passed via prompt
+- **Workflow orchestration**: Multi-step tasks with clear boundaries
+
 ## References
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
