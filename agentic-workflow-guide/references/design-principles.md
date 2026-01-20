@@ -145,6 +145,46 @@ A collection of principles for designing agent workflows.
 
 ---
 
+## Intermediate Representation (IR) Architecture
+
+For complex workflows, use a two-stage architecture with an intermediate representation.
+
+### Two-Stage Pattern
+
+```
+Input → IR (Intermediate Representation) → Output
+```
+
+| Stage         | Description                                    |
+| ------------- | ---------------------------------------------- |
+| **Generate**  | Parse input and create structured IR           |
+| **Validate**  | Verify IR structure (strict, no auto-complete) |
+| **Transform** | Convert IR to output format                    |
+| **Render**    | Final formatting and delivery                  |
+
+### IR Format Example
+
+```yaml
+tasks:
+  - id: "task-001"
+    agent: "impl"
+    status: "pending|in-progress|completed|failed|skipped"
+    input:
+      description: "Task description"
+      files: ["src/xxx.ts"]
+    output:
+      files: ["src/xxx.ts"]
+      validation: "lint-pass|test-pass|manual"
+```
+
+### Determinism Principle
+
+**Same IR → Same Output.** No creativity in transformation phase.
+
+This ensures reproducibility and debuggability.
+
+---
+
 ## Tier 3: Scale Principles (Advanced)
 
 ### 12. Human-in-the-Loop
