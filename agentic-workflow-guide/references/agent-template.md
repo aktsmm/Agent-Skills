@@ -8,21 +8,21 @@ Required fields for agent definition files:
 
 ```yaml
 ---
-name: <agent-name>        # Required: Identifier for @mention
+name: <agent-name> # Required: Identifier for @mention
 description: <description> # Required: One-line role description
-model: <model-name>        # Optional: LLM model to use
-tools: [...]               # Optional: Tool whitelist
-handoffs: [...]            # Optional: Agent transitions
+model: <model-name> # Optional: LLM model to use
+tools: [...] # Optional: Tool whitelist
+handoffs: [...] # Optional: Agent transitions
 ---
 ```
 
 ### Tools Field Behavior
 
-| Specification  | Behavior                                      |
-| -------------- | --------------------------------------------- |
-| **Omitted**    | All tools available (recommended for most)    |
-| `tools: []`    | No tools available                            |
-| Tool names     | Only listed tools available (whitelist)       |
+| Specification | Behavior                                   |
+| ------------- | ------------------------------------------ |
+| **Omitted**   | All tools available (recommended for most) |
+| `tools: []`   | No tools available                         |
+| Tool names    | Only listed tools available (whitelist)    |
 
 > **Note**: MCP server tools become available at runtime automatically. Unknown tool names cause errors.
 
@@ -30,16 +30,16 @@ handoffs: [...]            # Optional: Agent transitions
 
 Each agent should include these sections:
 
-| Section            | Required | Description                                    |
-| ------------------ | -------- | ---------------------------------------------- |
-| **Role**           | ✅       | Single sentence defining responsibility        |
-| **Goals**          | ✅       | List of objectives to achieve                  |
-| **Done Criteria**  | ✅       | Verifiable completion conditions (**one place only**) |
-| **Permissions**    | ✅       | What's allowed and forbidden                   |
-| **I/O Contract**   | ✅       | Input/output definitions                       |
-| **Workflow**       | Recommended | Step-by-step procedure                      |
-| **Error Handling** | Recommended | Error patterns and responses                |
-| **Idempotency**    | Recommended | How to guarantee safe retries               |
+| Section            | Required    | Description                                           |
+| ------------------ | ----------- | ----------------------------------------------------- |
+| **Role**           | ✅          | Single sentence defining responsibility               |
+| **Goals**          | ✅          | List of objectives to achieve                         |
+| **Done Criteria**  | ✅          | Verifiable completion conditions (**one place only**) |
+| **Permissions**    | ✅          | What's allowed and forbidden                          |
+| **I/O Contract**   | ✅          | Input/output definitions                              |
+| **Workflow**       | Recommended | Step-by-step procedure                                |
+| **Error Handling** | Recommended | Error patterns and responses                          |
+| **Idempotency**    | Recommended | How to guarantee safe retries                         |
 
 ### ⚠️ Critical: Done Criteria Placement
 
@@ -109,8 +109,8 @@ Task is complete when ALL of the following are true:
 
 ## Error Handling
 
-| Error Pattern        | Response                          |
-| -------------------- | --------------------------------- |
+| Error Pattern        | Response                           |
+| -------------------- | ---------------------------------- |
 | File not found       | Report error, suggest alternatives |
 | Invalid input format | Validate early, return clear error |
 | External API failure | Retry with backoff, then escalate  |
@@ -152,6 +152,7 @@ tools: ["agent", "read", "search", "todo"]
 ```
 
 Key characteristics:
+
 - Uses `#tool:agent` for delegation
 - Maintains high-level view
 - Does NOT perform detailed work itself
@@ -167,6 +168,7 @@ tools: ["read", "search", "web"]
 ```
 
 Key characteristics:
+
 - Focused expertise
 - Clear input/output contract
 - Deterministic behavior where possible
@@ -182,6 +184,7 @@ tools: ["read", "edit", "execute", "search"]
 ```
 
 Key characteristics:
+
 - Receives clear specifications
 - Makes targeted changes
 - Reports results back to orchestrator
