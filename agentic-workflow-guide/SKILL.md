@@ -39,7 +39,7 @@ Use this skill when creating, reviewing, or updating agents and workflows:
 | Tier                  | Principles                                                                  | Focus                      |
 | --------------------- | --------------------------------------------------------------------------- | -------------------------- |
 | **Tier 1: Essential** | SSOT, SRP, Simplicity First, Fail Fast, Iterative Refinement, Feedback Loop | Must-have for any workflow |
-| **Tier 2: Quality**   | Transparency, Gate/Checkpoint, DRY, ISP, Idempotency                        | Recommended for production |
+| **Tier 2: Quality**   | Transparency, Gate/Checkpoint, DRY, ISP, Idempotency, Observability         | Recommended for production |
 | **Tier 3: Scale**     | Human-in-the-Loop, KISS, Loose Coupling, Graceful Degradation               | Advanced patterns          |
 
 **Anthropic's Key Insight:**
@@ -218,88 +218,31 @@ Each runSubagent call needs a **complete, self-contained prompt**:
 
 ## Handoffs (Agent Transitions)
 
-Handoffs enable guided sequential workflows between agents with suggested next steps.
+→ See **[references/agent-template.md](references/agent-template.md#handoffs-agent-transitions)** for details
 
-### When to Use
-
-- **Plan → Implementation**: Generate plan, then hand off to implementation agent
-- **Implementation → Review**: Complete coding, then switch to code review agent
-- **Write Failing Tests → Pass Tests**: Generate failing tests first, then implement code
-
-### Configuration
+Enable guided sequential workflows: Plan → Implement → Review.
 
 ```yaml
----
-name: Planner
-description: Generate an implementation plan
-tools: ["search", "fetch", "read_file"]
 handoffs:
   - label: Start Implementation
     agent: implementation
     prompt: Implement the plan outlined above.
-    send: false
----
 ```
-
-| Property | Description                         |
-| -------- | ----------------------------------- |
-| `label`  | Button text shown to user           |
-| `agent`  | Target agent identifier             |
-| `prompt` | Pre-filled prompt for next agent    |
-| `send`   | Auto-submit prompt (default: false) |
-
-### Benefits
-
-- **Human control**: User reviews each phase before proceeding
-- **Context preservation**: Relevant context passed via prompt
-- **Workflow orchestration**: Multi-step tasks with clear boundaries
 
 ## Available Tools
 
-Built-in tools for custom agents. Use **Primary Alias** in the `tools:` property.
+→ See **[references/agent-template.md](references/agent-template.md#available-tools)** for full reference
 
-| Primary Alias | Compatible Aliases                                | Description                 |
-| ------------- | ------------------------------------------------- | --------------------------- |
-| `execute`     | `shell`, `Bash`, `powershell`, `run_in_terminal`  | Shell command execution     |
-| `read`        | `Read`, `NotebookRead`, `read_file`               | Read file contents          |
-| `edit`        | `Edit`, `MultiEdit`, `Write`, `NotebookEdit`      | Edit/create files           |
-| `search`      | `Grep`, `Glob`, `grep_search`, `file_search`      | Search files/text           |
-| `agent`       | `custom-agent`, `Task`, `runSubagent`             | Spawn sub-agent             |
-| `web`         | `WebSearch`, `WebFetch`, `fetch`, `fetch_webpage` | Fetch web content           |
-| `todo`        | `TodoWrite`                                       | Task list management        |
-| `githubRepo`  | -                                                 | Search GitHub repositories  |
-| `usages`      | -                                                 | Find code usages/references |
+Use **Primary Alias** in `tools:` property:
 
-### Tool Definition Examples
-
-```yaml
-# Orchestrator with sub-agent delegation
-tools: ["agent", "execute", "read", "search"]
-
-# Code reviewer
-tools: ["read", "search", "web", "execute"]
-
-# Translator/Editor
-tools: ["read", "edit", "agent"]
-```
-
-### Common Mistakes
-
-⚠️ **Wrong**: Using non-primary aliases in `tools:` property
-
-```yaml
-# ❌ Bad - may not be recognized
-tools: ["run_in_terminal", "read_file", "runSubagent"]
-
-# ✅ Good - use Primary Alias
-tools: ["execute", "read", "agent"]
-```
-
-**Troubleshooting**: If tools are not recognized, verify against [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
-
-**MCP Server Tools**: Use `<server-name>/*` format to include all tools from an MCP server.
-
-**Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`).
+| Primary Alias | Description             |
+| ------------- | ----------------------- |
+| `execute`     | Shell command execution |
+| `read`        | Read file contents      |
+| `edit`        | Edit/create files       |
+| `search`      | Search files/text       |
+| `agent`       | Spawn sub-agent         |
+| `web`         | Fetch web content       |
 
 ## Scaffold Workflow
 
@@ -356,15 +299,16 @@ my-workflow/
 
 ## Resources
 
-| File                                                        | Content                               |
-| ----------------------------------------------------------- | ------------------------------------- |
-| [design-principles.md](references/design-principles.md)     | Design principles (Tier 1-3) + ACI    |
-| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns + IR Architecture |
-| [agent-template.md](references/agent-template.md)           | .agent.md structure & template        |
-| [review-checklist.md](references/review-checklist.md)       | Full checklist + anti-patterns        |
-| [context-engineering.md](references/context-engineering.md) | Context management for long tasks     |
-| [runSubagent-guide.md](references/runSubagent-guide.md)     | runSubagent usage & common pitfalls   |
-| [scaffold_workflow.py](scripts/scaffold_workflow.py)        | Directory structure generator         |
+| File                                                        | Content                                |
+| ----------------------------------------------------------- | -------------------------------------- |
+| [design-principles.md](references/design-principles.md)     | Design principles (Tier 1-3) + ACI     |
+| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns + IR Architecture  |
+| [agent-template.md](references/agent-template.md)           | .agent.md structure & template         |
+| [review-checklist.md](references/review-checklist.md)       | Full checklist + anti-patterns         |
+| [context-engineering.md](references/context-engineering.md) | Context management for long tasks      |
+| [runSubagent-guide.md](references/runSubagent-guide.md)     | runSubagent usage & common pitfalls    |
+| [examples/](references/examples/)                           | Concrete agent examples (orchestrator) |
+| [scaffold_workflow.py](scripts/scaffold_workflow.py)        | Directory structure generator          |
 
 ## References
 
