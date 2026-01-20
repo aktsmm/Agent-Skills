@@ -359,7 +359,8 @@ my-workflow/
 | File                                                        | Content                             |
 | ----------------------------------------------------------- | ----------------------------------- |
 | [design-principles.md](references/design-principles.md)     | Design principles (Tier 1-3) + ACI  |
-| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns with examples   |
+| [workflow-patterns.md](references/workflow-patterns.md)     | 5 workflow patterns + IR Architecture |
+| [agent-template.md](references/agent-template.md)           | .agent.md structure & template      |
 | [review-checklist.md](references/review-checklist.md)       | Full checklist + anti-patterns      |
 | [context-engineering.md](references/context-engineering.md) | Context management for long tasks   |
 | [runSubagent-guide.md](references/runSubagent-guide.md)     | runSubagent usage & common pitfalls |

@@ -2,6 +2,19 @@
 
 Comprehensive review checklist for agent workflows. Includes anti-pattern detection.
 
+## Anti-Pattern Quick Reference
+
+| Anti-Pattern         | Problem                            | Solution                        |
+| -------------------- | ---------------------------------- | ------------------------------- |
+| God Agent            | All responsibilities in 1 agent    | Split with SRP                  |
+| Context Overload     | Passing excessive unnecessary info | Minimize with ISP               |
+| Silent Failure       | Ignoring errors and continuing     | Stop immediately with Fail Fast |
+| Infinite Loop        | Loops without termination          | Set maximum iterations          |
+| Big Bang             | Building everything at once        | Build small with Iterative      |
+| Premature Complexity | Complex design from the start      | Simplicity First                |
+| Black Box            | Internal state invisible           | Transparency                    |
+| Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
+
 ## How to Use
 
 1. Review this checklist after completing workflow design
