@@ -1,0 +1,42 @@
+# Book Writing Workspace
+# Ignore patterns for git
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Node.js (if using Re:VIEW with npm)
+node_modules/
+.npm-cache/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Build outputs
+03_re-view_output/output_pdf/*.pdf
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Sensitive files
+*.env
+.env.local
+secrets/
