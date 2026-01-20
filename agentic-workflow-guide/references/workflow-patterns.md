@@ -347,20 +347,20 @@ graph LR
 
 ### Core Principles
 
-| Principle | Description |
-| --------- | ----------- |
-| **Separation of Concerns** | Split responsibility: Generate, Validate, Transform, Render |
-| **Strict Validation** | Validate IR structure strictly; do not auto-complete missing data |
-| **Determinism** | Same IR → Same output. No creativity in transformation phase |
+| Principle                  | Description                                                       |
+| -------------------------- | ----------------------------------------------------------------- |
+| **Separation of Concerns** | Split responsibility: Generate, Validate, Transform, Render       |
+| **Strict Validation**      | Validate IR structure strictly; do not auto-complete missing data |
+| **Determinism**            | Same IR → Same output. No creativity in transformation phase      |
 
 ### Separation of Concerns
 
-| Responsibility | Agent Role | Creativity Level |
-| -------------- | ---------- | ---------------- |
-| **Generate**   | Create IR from input | High (interpretation) |
-| **Validate**   | Verify IR completeness and correctness | None (rule-based) |
-| **Transform**  | Convert IR to output format | None (mechanical) |
-| **Render**     | Format final output | Low (formatting only) |
+| Responsibility | Agent Role                             | Creativity Level      |
+| -------------- | -------------------------------------- | --------------------- |
+| **Generate**   | Create IR from input                   | High (interpretation) |
+| **Validate**   | Verify IR completeness and correctness | None (rule-based)     |
+| **Transform**  | Convert IR to output format            | None (mechanical)     |
+| **Render**     | Format final output                    | Low (formatting only) |
 
 ### IR Specification Guidelines
 
@@ -430,12 +430,12 @@ Step 4: Render
 
 ### Benefits
 
-| Benefit | Description |
-| ------- | ----------- |
-| **Reproducibility** | Same IR always produces same output |
-| **Debuggability** | Can inspect IR to understand failures |
-| **Testability** | Can unit test each stage independently |
-| **Reusability** | Same IR can render to multiple formats |
+| Benefit             | Description                            |
+| ------------------- | -------------------------------------- |
+| **Reproducibility** | Same IR always produces same output    |
+| **Debuggability**   | Can inspect IR to understand failures  |
+| **Testability**     | Can unit test each stage independently |
+| **Reusability**     | Same IR can render to multiple formats |
 
 ---
 
