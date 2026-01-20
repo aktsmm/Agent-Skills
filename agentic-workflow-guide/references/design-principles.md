@@ -143,6 +143,27 @@ A collection of principles for designing agent workflows.
 | **Violation Example**    | Retrying causes data duplication                          |
 | **Solution**             | State checking, use unique IDs                            |
 
+### 12. Observability
+
+**Record decisions and make progress visible**
+
+| Aspect                   | Description                                              |
+| ------------------------ | -------------------------------------------------------- |
+| **Definition**           | Make agent decisions and progress traceable              |
+| **Workflow Application** | Log key decisions as Issue comments, files, or documents |
+| **Violation Example**    | No visibility into why agent made a decision             |
+| **Solution**             | Decision logs, regular status reports for long tasks     |
+
+**Decision Log Example:**
+
+```markdown
+| Time  | Decision                      | Rationale                  |
+| ----- | ----------------------------- | -------------------------- |
+| 10:00 | Delegate to @impl for task-01 | Code change required       |
+| 10:05 | Skip task-02                  | File already up-to-date    |
+| 10:10 | Escalate to human             | Requires production access |
+```
+
 ---
 
 ## Intermediate Representation (IR) Architecture
