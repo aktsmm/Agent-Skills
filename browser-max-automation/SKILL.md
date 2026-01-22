@@ -10,6 +10,12 @@ metadata:
 
 Browser automation via Playwright MCP.
 
+## When to use
+
+- Automating browser-based workflows or QA checks
+- Verifying UI states, DOM changes, or visual regressions
+- Filling forms, clicking elements, or capturing screenshots
+
 ## Prerequisites
 
 Configure `.vscode/mcp.json`:
