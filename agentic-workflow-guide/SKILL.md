@@ -61,6 +61,17 @@ What's the nature of the task?
 └─ Processing varies by input ────→ Routing
 ```
 
+### Workflow vs Agent (Stop Conditions)
+
+- **Workflow**: Fixed path with explicit stages and checkpoints. Prefer when steps are known.
+- **Agent**: Dynamic decisions and tool use. Prefer when inputs or paths vary.
+
+**Stop Conditions (MANDATORY):**
+
+- Define success criteria (output format, quality bar, tests).
+- Define failure criteria (max retries, missing data, validation fail).
+- Ensure each loop has an exit condition.
+
 ### Pattern Overview
 
 | Pattern                  | Use Case                           | Iterative Level |
@@ -123,6 +134,46 @@ Validate design against principles (use review checklist)
 
 Build small → verify → get feedback → improve
 
+## Prompt Composition Template
+
+Use a minimal, high-signal prompt structure. Keep only what the task needs.
+
+```markdown
+# Objective
+
+- Do: [what to do]
+- Don't: [what to avoid]
+
+# Input
+
+- Data: [files, text, or references]
+- Assumptions: [constraints or environment]
+
+# Output Format
+
+- Format: [bullet list / JSON / table]
+- Length: [max items / max tokens]
+
+# Examples (1–3 representative)
+
+- Example 1: [input → output]
+  - Note: Explain why this is a good example
+
+# Validation Criteria
+
+- Test: [test name or procedure]
+- Expected: [exact pass condition]
+- Fail: [what to do on failure]
+
+# Escape Hatch
+
+- If missing or uncertain, return: "Not found" (or specified fallback)
+
+# Additional Context
+
+- Only the minimum needed context
+```
+
 ## Review Checklist
 
 → See **[references/review-checklist.md](references/review-checklist.md)** for complete checklist (includes anti-patterns)
@@ -135,6 +186,25 @@ Build small → verify → get feedback → improve
 - [ ] Is it divided into small steps? (Iterative)
 - [ ] Can results be verified at each step? (Feedback Loop)
 - [ ] Are related files (references, scripts) simple and minimal? (DRY)
+```
+
+## Validation & Evals
+
+Define how quality is verified and how regressions are detected.
+
+**Minimum Set:**
+
+- Tests or evaluation steps are explicit.
+- Expected results are measurable.
+- Regression checks are repeatable after model updates.
+
+**Example (template):**
+
+```markdown
+- Test: [name]
+  - Step: [command or procedure]
+  - Expected: [clear pass condition]
+  - On Failure: [retry / diagnose / report diff]
 ```
 
 ## Context Engineering
@@ -330,3 +400,13 @@ my-workflow/
 - [runSubagent 検証記事 - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
 - [subagent-driven-development - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/subagent-driven-development)
 - [awesome-copilot agents - GitHub](https://github.com/github/awesome-copilot/tree/main/agents)
+
+### External References (Prompt Engineering)
+
+- https://platform.openai.com/docs/guides/prompt-engineering
+- https://learn.microsoft.com/azure/ai-services/openai/concepts/prompt-engineering
+- https://code.claude.com/docs/en/best-practices
+- https://cloud.google.com/blog/products/application-development/five-best-practices-for-prompt-engineering
+- https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html
+- https://www.promptingguide.ai/
+- https://www.ibm.com/think/prompt-engineering

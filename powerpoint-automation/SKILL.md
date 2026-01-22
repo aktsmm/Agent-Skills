@@ -2,6 +2,8 @@
 name: powerpoint-automation
 description: Create professional PowerPoint presentations from various sources including web articles, blog posts, and existing PPTX files. Ideal for tech presentations, reports, and documentation.
 license: Complete terms in LICENSE.txt
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # PowerPoint Automation
