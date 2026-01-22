@@ -2,13 +2,15 @@
 name: book-writing-workspace
 description: Set up a complete book writing workspace with AI agents, instructions, prompts, and scripts. Use when users want to create a new book/technical writing project with Markdown + Re:VIEW + PDF output workflow. Triggers on "book writing workspace", "technical book project", "執筆ワークスペース", or similar project setup requests.
 license: Complete terms in LICENSE.txt
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Book Writing Workspace
 
 Set up a professional book writing workspace with AI-assisted workflow support.
 
-## When to Use
+## When to use
 
 - Creating a new book or technical writing project
 - Setting up Markdown → Re:VIEW → PDF workflow
@@ -44,6 +46,7 @@ Please provide the following information:
 Run the setup script with gathered information:
 
 ```powershell
+# Setup workspace with the collected project configuration
 python scripts/setup_workspace.py `
     --name "project-name" `
     --title "Book Title" `
@@ -168,8 +171,20 @@ Example: `01-1-a-00_Introduction_to_Topic.md`
 
 After workspace creation:
 
-1. **Initialize Git**: `git init && git add . && git commit -m "Initial commit"`
-2. **Open in VS Code**: `code {project-path}`
+1. **Initialize Git** (commented example):
+
+   ```bash
+   # Initialize repository and create the first commit
+   git init && git add . && git commit -m "Initial commit"
+   ```
+
+2. **Open in VS Code** (commented example):
+
+   ```bash
+   # Open the project in VS Code
+   code {project-path}
+   ```
+
 3. **Test prompts**: Try `/gc_Commit` to verify setup
 4. **Start writing**: Create key points in `01_contents_keyPoints/`
 
