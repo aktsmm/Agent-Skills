@@ -223,29 +223,34 @@ Key characteristics:
 
 Built-in tools for custom agents. Use **Primary Alias** in the `tools:` property.
 
-| Primary Alias | Compatible Aliases                                | Description                 |
-| ------------- | ------------------------------------------------- | --------------------------- |
-| `execute`     | `shell`, `Bash`, `powershell`, `run_in_terminal`  | Shell command execution     |
-| `read`        | `Read`, `NotebookRead`, `read_file`               | Read file contents          |
-| `edit`        | `Edit`, `MultiEdit`, `Write`, `NotebookEdit`      | Edit/create files           |
-| `search`      | `Grep`, `Glob`, `grep_search`, `file_search`      | Search files/text           |
-| `agent`       | `custom-agent`, `Task`, `runSubagent`             | Spawn sub-agent             |
-| `web`         | `WebSearch`, `WebFetch`, `fetch`, `fetch_webpage` | Fetch web content           |
-| `todo`        | `TodoWrite`                                       | Task list management        |
-| `githubRepo`  | -                                                 | Search GitHub repositories  |
-| `usages`      | -                                                 | Find code usages/references |
+| Primary Alias       | Compatible Aliases                                | Description                           |
+| ------------------- | ------------------------------------------------- | ------------------------------------- |
+| `execute`           | `shell`, `Bash`, `powershell`, `run_in_terminal`  | Shell command execution               |
+| `read`              | `Read`, `NotebookRead`, `read_file`               | Read file contents                    |
+| `edit`              | `Edit`, `MultiEdit`, `Write`, `NotebookEdit`      | Edit/create files                     |
+| `search`            | `Grep`, `Glob`, `grep_search`, `file_search`      | Search files/text                     |
+| `agent/runSubagent` | `agent`, `custom-agent`, `Task`, `runSubagent`    | Spawn sub-agent (specify `agentName`) |
+| `web`               | `WebSearch`, `WebFetch`, `fetch`, `fetch_webpage` | Fetch web content                     |
+| `todo`              | `TodoWrite`                                       | Task list management                  |
+| `githubRepo`        | -                                                 | Search GitHub repositories            |
+| `usages`            | -                                                 | Find code usages/references           |
 
 ### Tool Definition Examples
 
 ```yaml
 # Orchestrator with sub-agent delegation
-tools: ["agent", "execute", "read", "search"]
+tools: ["agent/runSubagent", "execute", "read", "search"]
 
 # Code reviewer
 tools: ["read", "search", "web", "execute"]
 
 # Translator/Editor
 tools: ["read", "edit", "agent"]
+
+# Sub-agent call template (Zenn format)
+#tool:agent/runSubagent を使用して、Worker エージェントを呼び出してください。
+- prompt: ${task to delegate}
+- agentName: Worker
 ```
 
 ### Common Mistakes
@@ -253,11 +258,11 @@ tools: ["read", "edit", "agent"]
 ⚠️ **Wrong**: Using non-primary aliases in `tools:` property
 
 ```yaml
-# ❌ Bad - may not be recognized
+# ❌ Bad - mixes non-primary aliases and omits agentName usage
 tools: ["run_in_terminal", "read_file", "runSubagent"]
 
-# ✅ Good - use Primary Alias
-tools: ["execute", "read", "agent"]
+# ✅ Good - use Primary Alias and runSubagent spec
+tools: ["execute", "read", "agent/runSubagent"]
 ```
 
 **Troubleshooting**: If tools are not recognized, verify against [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration).

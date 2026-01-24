@@ -43,14 +43,15 @@ Minimum items to verify:
 
 ⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
 
-> **Note**: Primary Alias is `agent`. Use `agent` in `tools:` property, `#tool:agent` or `#tool:runSubagent` in prompts.
+> **Note**: Declare `agent/runSubagent` in `tools:` and use `#tool:agent/runSubagent` with explicit `agentName` in prompts.
 
 ```markdown
 ## Agent Definition
 
-- [ ] Does `tools:` include "agent" (Primary Alias)?
+- [ ] Does `tools:` include "agent/runSubagent"?
 - [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
-- [ ] Is explicit tool reference present (#tool:agent)?
+- [ ] Is explicit tool reference present (#tool:agent/runSubagent)?
+- [ ] Is `agentName` required for each call?
 - [ ] Is orchestrator explicitly told NOT to do worker tasks itself?
 
 ## Sub-agent Prompts
@@ -59,6 +60,7 @@ Minimum items to verify:
 - [ ] Is output format specified (JSON/Markdown/etc.)?
 - [ ] Are constraints and scope defined?
 - [ ] Is expected return size reasonable (1-2k tokens)?
+- [ ] Is `agentName` set for every call?
 
 ## Common Anti-patterns
 
@@ -66,14 +68,14 @@ Minimum items to verify:
 - [ ] ❌ "Process in parallel" (not supported as of 2025/12)
 - [ ] ❌ Expecting handoff to named agents (subagentType doesn't work)
 - [ ] ❌ Orchestrator reading files directly instead of delegating
-- [ ] ❌ Using `runSubagent` in tools: property (use `agent` instead)
+- [ ] ❌ Missing `agent/runSubagent` in tools: property or missing `agentName`
 - [ ] ❌ Nested sub-agent calls (sub-agents cannot call runSubagent)
 
 ## Correct Pattern Example
 
 ✅ Good:
 
-- "You MUST use #tool:agent for EACH file"
+- "You MUST use #tool:agent/runSubagent for EACH file"
 - "Do NOT read file contents directly in main context"
 - "Each sub-agent prompt must include output format"
 ```

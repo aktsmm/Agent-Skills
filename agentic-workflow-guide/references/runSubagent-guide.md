@@ -2,8 +2,7 @@
 
 Practical guide for using `runSubagent` tool in VS Code Copilot.
 
-> **Note**: The official Primary Alias is `agent`. Use `agent` in the `tools:` property.
-> `runSubagent` works as a compatible alias in prompts and tool references.
+> **Note**: Declare `agent/runSubagent` in the `tools:` property (spec-compliant). `agent` remains a compatible alias in prompts and tool references.
 
 ## What is runSubagent?
 
@@ -66,8 +65,8 @@ Use when you want to:
 ```yaml
 ---
 name: Orchestrator
-# Use Primary Aliases in tools: property
-tools: ["agent", "web", "read"]
+# Declare agent/runSubagent in tools for sub-agent delegation
+tools: ["agent/runSubagent", "web", "read"]
 ---
 ```
 
@@ -107,10 +106,29 @@ When calling `runSubagent`, your **prompt** parameter must include:
 
 | Element             | Example                                       |
 | ------------------- | --------------------------------------------- |
+| **agentName**       | `Researcher`                                  |
 | **Clear task**      | "Fetch and summarize the content of this URL" |
 | **Expected output** | "Return a 100-word summary with key points"   |
 | **Constraints**     | "Focus only on pricing information"           |
 | **Return format**   | "Output as bullet points with source quotes"  |
+
+### Zenn-compliant minimal template
+
+```markdown
+# MyOrchestrator.agent.md
+
+---
+
+name: MyOrchestrator
+tools: ['agent/runSubagent']
+
+---
+
+#tool:agent/runSubagent を使用して、Researcher エージェントを呼び出してください。
+
+- prompt: ${調査したい内容}
+- agentName: Researcher
+```
 
 ### Good Prompt Examples
 
