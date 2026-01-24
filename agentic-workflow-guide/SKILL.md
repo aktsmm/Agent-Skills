@@ -99,7 +99,32 @@ What's the nature of the task?
 
 ### Step 2: Pattern Selection
 
-Choose the optimal pattern based on requirements:
+**⚠️ MANDATORY: Ask user to confirm pattern before proceeding.**
+
+Based on requirements, recommend a pattern and get user approval:
+
+```markdown
+## Pattern Recommendation
+
+Based on your requirements, I recommend:
+
+**🎯 Recommended: {Pattern Name}**
+
+- Reason: {why this pattern fits}
+
+**Other Options:**
+| Pattern | Fit | Notes |
+| -------------------- | --- | ------------------------ |
+| Prompt Chaining | ⭐⭐ | Good if sequential |
+| Routing | ⭐ | If input types vary |
+| Parallelization | ⭐⭐ | If tasks are independent |
+| Orchestrator-Workers | ⭐⭐⭐| Dynamic task count |
+| Evaluator-Optimizer | ⭐ | If quality loop needed |
+
+**Proceed with {Pattern Name}? (Yes / Other pattern / More info)**
+```
+
+**Pattern Selection Criteria:**
 
 | Condition                         | Recommended Pattern  |
 | --------------------------------- | -------------------- |
@@ -108,6 +133,8 @@ Choose the optimal pattern based on requirements:
 | Number of tasks is dynamic        | Orchestrator-Workers |
 | Repeat until quality criteria met | Evaluator-Optimizer  |
 | Processing varies by input type   | Routing              |
+
+→ See **[references/workflow-patterns.md](references/workflow-patterns.md)** for detailed pattern descriptions
 
 ### Step 3: Create Design Diagram
 
