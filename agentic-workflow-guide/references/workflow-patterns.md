@@ -247,6 +247,69 @@ You can use sub-agents to review files if needed.
 You MUST use #tool:agent for EACH file. Do NOT review directly.
 ```
 
+### General Assistant (Fallback Worker)
+
+Handle tasks that don't match specialized workers (casual chat, ad-hoc questions, minor help):
+
+```mermaid
+graph TD
+    A[Input] --> B[Orchestrator]
+    B --> C{Task Type?}
+    C -->|Code Review| D[Review Worker]
+    C -->|Documentation| E[Docs Worker]
+    C -->|Testing| F[Test Worker]
+    C -->|Other/Chat| G[General Assistant]
+    D --> H[Synthesizer]
+    E --> H
+    F --> H
+    G --> I[Direct Response]
+    H --> J[Output]
+    I --> J
+```
+
+**When to Use:**
+
+- Casual conversation or greetings
+- Simple clarification questions
+- Tasks outside defined worker scope
+- Quick one-off requests
+
+**Benefits:**
+
+| Benefit               | Description                                         |
+| --------------------- | --------------------------------------------------- |
+| **Safety Net**        | Handles edge cases without "I can't help" responses |
+| **UX Improvement**    | Users get answers even for undefined task types     |
+| **Reduced Overhead**  | No complex routing for simple requests              |
+| **Graceful Fallback** | Prevents workflow from failing on unexpected input  |
+
+**Implementation Example:**
+
+```yaml
+---
+name: Project Orchestrator
+tools: ["agent", "search", "read"]
+---
+
+# Project Orchestrator
+
+## Routing Rules
+
+1. Code changes → Code Worker
+2. Documentation → Docs Worker
+3. Testing → Test Worker
+4. **Everything else → General Assistant**
+
+## General Assistant Prompt
+
+For unclassified tasks, call #tool:agent with:
+- Prompt: "Handle this user request conversationally: {request}"
+- No strict output format required
+- Prioritize helpfulness over structure
+```
+
+**⚠️ Important:** General Assistant should NOT bypass the orchestrator for tasks that genuinely require specialized workers. Use as fallback, not shortcut.
+
 ---
 
 ## 5. Evaluator-Optimizer
