@@ -124,12 +124,12 @@ graph TD
 
 **When to Route to Default:**
 
-| Condition                     | Action                              |
-| ----------------------------- | ----------------------------------- |
-| Low classification confidence | Route to Default Handler            |
-| Unknown category              | Route to Default Handler            |
-| Ambiguous input               | Ask clarifying question             |
-| Out of scope                  | Politely decline or escalate        |
+| Condition                     | Action                       |
+| ----------------------------- | ---------------------------- |
+| Low classification confidence | Route to Default Handler     |
+| Unknown category              | Route to Default Handler     |
+| Ambiguous input               | Ask clarifying question      |
+| Out of scope                  | Politely decline or escalate |
 
 **Implementation Example:**
 
