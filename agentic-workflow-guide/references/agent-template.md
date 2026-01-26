@@ -30,27 +30,41 @@ description: <description> # Required: Brief description of the prompt
 
 | Field   | Status        | Applies To             | Use Instead                                         |
 | ------- | ------------- | ---------------------- | --------------------------------------------------- |
-| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `name:` for agents, omit for prompts            |
+| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below)                      |
 
-**Common Mistake:**
+**`mode:` Migration Guide:**
 
 ```yaml
-# ❌ Wrong (deprecated) - both .agent.md and .prompt.md
+# ❌ Wrong (deprecated)
 ---
 mode: agent
 ---
 
-# ✅ Correct for .agent.md
+# ✅ Correct: Specify agent name
 ---
-name: my-agent
-description: Does something useful
+description: Daily report generator
+agent: report-generator
 ---
 
-# ✅ Correct for .prompt.md
+# ✅ Correct: Boolean value
 ---
-description: Does something useful
+description: Daily report generator
+agent: true
+---
+
+# ✅ Correct: Omit (default behavior)
+---
+description: Daily report generator
 ---
 ```
+
+**`agent:` Field Options:**
+
+| Value               | Behavior                              |
+| ------------------- | ------------------------------------- |
+| `agent: <name>`     | Use specific agent (e.g., `report-generator`) |
+| `agent: true`       | Enable agent mode                     |
+| *(omit field)*      | Default behavior                      |
 ---
 
 # ✅ Correct
