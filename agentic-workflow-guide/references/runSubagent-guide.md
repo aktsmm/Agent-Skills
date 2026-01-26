@@ -1,8 +1,11 @@
 # runSubagent Guide
 
-Practical guide for using `runSubagent` tool in VS Code Copilot.
+Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 
-> **Note**: Declare `agent/runSubagent` in the `tools:` property (spec-compliant). `agent` remains a compatible alias in prompts and tool references.
+> **Platform Note**:
+>
+> - **VS Code Copilot**: Use `runSubagent` in `tools:` and `#tool:runSubagent` in prompts
+> - **Claude Code**: Use `Task` in `tools:`
 
 ## What is runSubagent?
 
@@ -63,10 +66,15 @@ Use when you want to:
 **Option 2: Agent YAML (Recommended)**
 
 ```yaml
+# VS Code Copilot
 ---
 name: Orchestrator
-# Declare agent/runSubagent in tools for sub-agent delegation
-tools: ["agent/runSubagent", "web", "read"]
+tools: ["runSubagent", "fetch", "readFile"]
+---
+# Claude Code
+---
+name: Orchestrator
+tools: ["Task", "WebSearch", "Read"]
 ---
 ```
 

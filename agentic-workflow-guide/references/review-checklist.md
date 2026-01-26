@@ -43,15 +43,17 @@ Minimum items to verify:
 
 ⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
 
-> **Note**: Declare `agent/runSubagent` in `tools:` and use `#tool:agent/runSubagent` with explicit `agentName` in prompts.
+> **Platform Note**:
+>
+> - **VS Code Copilot**: Use `runSubagent` in `tools:` and `#tool:runSubagent` in prompts
+> - **Claude Code**: Use `Task` in `tools:`
 
 ```markdown
 ## Agent Definition
 
-- [ ] Does `tools:` include "agent/runSubagent"?
+- [ ] Does `tools:` include subagent tool? (`runSubagent` for VS Code, `Task` for Claude Code)
 - [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
-- [ ] Is explicit tool reference present (#tool:agent/runSubagent)?
-- [ ] Is `agentName` required for each call?
+- [ ] Is explicit tool reference present? (`#tool:runSubagent` for VS Code)
 - [ ] Is orchestrator explicitly told NOT to do worker tasks itself?
 
 ## Sub-agent Prompts
@@ -60,22 +62,20 @@ Minimum items to verify:
 - [ ] Is output format specified (JSON/Markdown/etc.)?
 - [ ] Are constraints and scope defined?
 - [ ] Is expected return size reasonable (1-2k tokens)?
-- [ ] Is `agentName` set for every call?
 
 ## Common Anti-patterns
 
 - [ ] ❌ "You can use sub-agents if needed" (too vague)
 - [ ] ❌ "Process in parallel" (not supported as of 2025/12)
-- [ ] ❌ Expecting handoff to named agents (subagentType doesn't work)
 - [ ] ❌ Orchestrator reading files directly instead of delegating
-- [ ] ❌ Missing `agent/runSubagent` in tools: property or missing `agentName`
+- [ ] ❌ Missing subagent tool in tools: property
 - [ ] ❌ Nested sub-agent calls (sub-agents cannot call runSubagent)
 
 ## Correct Pattern Example
 
-✅ Good:
+✅ Good (VS Code):
 
-- "You MUST use #tool:agent/runSubagent for EACH file"
+- "You MUST use #tool:runSubagent for EACH file"
 - "Do NOT read file contents directly in main context"
 - "Each sub-agent prompt must include output format"
 ```
