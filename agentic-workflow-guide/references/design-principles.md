@@ -401,6 +401,134 @@ Choose formats that minimize cognitive load for LLMs:
 
 ---
 
+## File Organization Principles
+
+### Instructions Organization
+
+**Group related instructions by domain/genre**
+
+| Aspect                   | Description                                               |
+| ------------------------ | --------------------------------------------------------- |
+| **Definition**           | Organize instruction files into logical folder categories |
+| **Workflow Application** | Categorize `.github/instructions/` by domain              |
+| **Violation Example**    | All files flat in one directory                           |
+| **Solution**             | Create genre-based folders (azure/, git/, skills/, etc.)  |
+
+**Why This Matters:**
+
+- Easier navigation for both humans and agents
+- Related instructions stay together
+- Reduces cognitive load when searching
+- Enables folder-level `.gitignore` or permissions
+
+**Recommended Structure:**
+
+```
+.github/instructions/
+├── azure/
+│   ├── bicep-style.instructions.md
+│   ├── naming-conventions.instructions.md
+│   └── resource-tagging.instructions.md
+├── git/
+│   ├── commit-message.instructions.md
+│   ├── branch-naming.instructions.md
+│   └── pr-contribution.instructions.md
+├── code/
+│   ├── python-style.instructions.md
+│   ├── typescript-style.instructions.md
+│   └── testing-guidelines.instructions.md
+├── skills/
+│   └── skill-creator.instructions.md
+└── global.instructions.md  # Cross-cutting rules
+```
+
+**Benefits:**
+
+| Benefit              | Description                                         |
+| -------------------- | --------------------------------------------------- |
+| **Discoverability**  | Find related files quickly                          |
+| **Scoped Loading**   | Load only relevant folder for specific tasks        |
+| **Team Ownership**   | Assign folder ownership to domain experts           |
+| **Reduced Conflict** | Parallel edits in different folders avoid conflicts |
+
+### Naming Conventions
+
+**Use consistent, descriptive file names**
+
+| Aspect                   | Description                                      |
+| ------------------------ | ------------------------------------------------ |
+| **Definition**           | Follow predictable naming patterns               |
+| **Workflow Application** | File names convey purpose without opening        |
+| **Violation Example**    | `notes.md`, `stuff.md`, `doc1.md`                |
+| **Solution**             | Use descriptive kebab-case with file type suffix |
+
+#### File Naming Rules
+
+| Rule                    | Good Example                            | Bad Example         |
+| ----------------------- | --------------------------------------- | ------------------- |
+| **Kebab-case**          | `commit-message.instructions.md`        | `commitMessage.md`  |
+| **Include type suffix** | `azure-deploy.instructions.md`          | `azure-deploy.md`   |
+| **Be descriptive**      | `pr-contribution-guide.instructions.md` | `pr.md`             |
+| **Avoid generic names** | `bicep-naming-conventions.md`           | `conventions.md`    |
+| **Use lowercase**       | `github-actions.md`                     | `GitHub-Actions.md` |
+
+#### Suffix Conventions
+
+| Suffix             | Usage                           | Example                       |
+| ------------------ | ------------------------------- | ----------------------------- |
+| `.instructions.md` | Agent/Copilot instruction files | `code-review.instructions.md` |
+| `.prompt.md`       | Reusable prompt templates       | `summarize-pr.prompt.md`      |
+| `.agent.md`        | Agent definition files          | `code-reviewer.agent.md`      |
+| `.md`              | General documentation           | `architecture-overview.md`    |
+
+#### Folder Naming Rules
+
+| Rule                   | Good Example                          | Bad Example       |
+| ---------------------- | ------------------------------------- | ----------------- |
+| **Singular or plural** | `skills/` or `skill/` (be consistent) | Mixed usage       |
+| **Lowercase**          | `azure/`                              | `Azure/`          |
+| **No spaces**          | `code-style/`                         | `code style/`     |
+| **Domain-based**       | `infrastructure/`                     | `misc/`, `other/` |
+
+#### Agent/Prompt File Naming
+
+For `.agent.md` and `.prompt.md` files, use action-oriented names:
+
+```
+✅ Good:
+- code-reviewer.agent.md
+- pr-summarizer.agent.md
+- test-generator.prompt.md
+- refactor-suggestions.prompt.md
+
+❌ Bad:
+- agent1.agent.md
+- my-agent.agent.md
+- prompt.prompt.md
+- test.prompt.md
+```
+
+#### Versioning in Names (When Needed)
+
+If maintaining multiple versions:
+
+```
+feature-flags-v1.instructions.md
+feature-flags-v2.instructions.md
+```
+
+Or use folders:
+
+```
+feature-flags/
+├── v1/
+│   └── implementation.instructions.md
+└── v2/
+    └── implementation.instructions.md
+```
+
+---
+
 ## References
 
 - [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
