@@ -1,10 +1,12 @@
-# Agent Template
+# Agent & Prompt Template
 
-Standard structure and specification for `.agent.md` files.
+Standard structure and specification for `.agent.md` and `.prompt.md` files.
+
+> **Note**: Both file types use similar YAML front matter. The `mode:` field is deprecated for both.
 
 ## YAML Front Matter
 
-Required fields for agent definition files:
+### For `.agent.md` files
 
 ```yaml
 ---
@@ -13,6 +15,48 @@ description: <description> # Required: One-line role description
 model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
+---
+```
+
+### For `.prompt.md` files
+
+```yaml
+---
+description: <description> # Required: Brief description of the prompt
+---
+```
+
+### ⚠️ Deprecated Fields
+
+| Field   | Status        | Applies To             | Use Instead                                         |
+| ------- | ------------- | ---------------------- | --------------------------------------------------- |
+| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `name:` for agents, omit for prompts            |
+
+**Common Mistake:**
+
+```yaml
+# ❌ Wrong (deprecated) - both .agent.md and .prompt.md
+---
+mode: agent
+---
+
+# ✅ Correct for .agent.md
+---
+name: my-agent
+description: Does something useful
+---
+
+# ✅ Correct for .prompt.md
+---
+description: Does something useful
+---
+```
+---
+
+# ✅ Correct
+---
+name: my-agent
+description: Does something useful
 ---
 ```
 
