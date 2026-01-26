@@ -263,23 +263,37 @@ For long-running agents, manage context as a finite resource:
 
 **Solution:** Use imperative, mandatory language:
 
+**VS Code Copilot:**
+
 ```yaml
 ---
 name: Review Orchestrator
-# Use Primary Aliases
-tools: ["agent", "read"]
+tools: ["runSubagent", "readFile"]
 ---
 
 ## MANDATORY: Sub-agent Delegation
 
-You MUST use #tool:agent for each file review.
+You MUST use #tool:runSubagent for each file review.
 Do NOT read file contents directly in main context.
 
 For EACH file:
-1. Call agent with prompt:
+1. Call runSubagent with prompt:
    "Read {filepath}. Return: {issues: [], suggestions: []}"
 2. Wait for summary response
 3. Aggregate into final report
+```
+
+**Claude Code:**
+
+```yaml
+---
+name: Review Orchestrator
+tools: ["Task", "Read"]
+---
+## MANDATORY: Sub-agent Delegation
+
+You MUST use Task for each file review.
+Do NOT read file contents directly in main context.
 ```
 
 ### Sub-agent Prompt Template
@@ -307,7 +321,7 @@ Each runSubagent call needs a **complete, self-contained prompt**:
 ### Quick Checklist
 
 ```markdown
-- [ ] Agent definition includes `tools: ["agent"]` (Primary Alias)
+- [ ] Agent definition includes subagent tool (`runSubagent` for VS Code, `Task` for Claude Code)
 - [ ] Instructions use MUST/MANDATORY (not "can" or "may")
 - [ ] Sub-agent prompt template is defined with output format
 - [ ] Orchestrator explicitly told NOT to do sub-agent work itself
@@ -330,16 +344,19 @@ handoffs:
 
 → See **[references/agent-template.md](references/agent-template.md#available-tools)** for full reference
 
-Use **Primary Alias** in `tools:` property:
+Tool names differ between VS Code Copilot and Claude Code:
 
-| Primary Alias | Description             |
-| ------------- | ----------------------- |
-| `execute`     | Shell command execution |
-| `read`        | Read file contents      |
-| `edit`        | Edit/create files       |
-| `search`      | Search files/text       |
-| `agent`       | Spawn sub-agent         |
-| `web`         | Fetch web content       |
+| Purpose         | VS Code Copilot              | Claude Code      | Description           |
+| --------------- | ---------------------------- | ---------------- | --------------------- |
+| Shell execution | `#runInTerminal`             | `Bash`           | Run terminal commands |
+| Read file       | `#readFile`                  | `Read`           | Read file contents    |
+| Edit file       | `#editFiles`                 | `Write`/`Edit`   | Edit/create files     |
+| Search          | `#textSearch`, `#fileSearch` | `Search`, `Grep` | Search files/text     |
+| Subagent        | `#runSubagent`               | `Task`           | Spawn sub-agent       |
+| Web fetch       | `#fetch`                     | (MCP)            | Fetch web content     |
+| Todo list       | `#todos`                     | `TodoWrite`      | Task list management  |
+
+**Note**: In `.agent.md` files, use the platform-appropriate tool names in the `tools:` property.
 
 ## Scaffold Workflow
 

@@ -2,14 +2,15 @@
 name: orchestrator
 description: Coordinates workflow by delegating to specialist sub-agents
 model: claude-sonnet-4-20250514
-tools: ["agent/runSubagent", "read", "search", "todo"]
+# VS Code Copilot tools (use Task, Read, Search, TodoWrite for Claude Code)
+tools: ["runSubagent", "readFile", "textSearch", "todos"]
 ---
 
 # Orchestrator Agent
 
 ## Role
 
-You are the orchestrator (commander). Analyze user requests, delegate work to appropriate sub-agents, and manage overall progress. Use `#tool:agent/runSubagent` with an explicit `agentName` for each delegation.
+You are the orchestrator (commander). Analyze user requests, delegate work to appropriate sub-agents, and manage overall progress. Use `#tool:runSubagent` (VS Code) or `Task` (Claude Code) for each delegation.
 
 ## Goals
 
