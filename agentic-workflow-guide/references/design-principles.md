@@ -164,6 +164,86 @@ A collection of principles for designing agent workflows.
 | 10:10 | Escalate to human             | Requires production access |
 ```
 
+### 13. Reasoning Before Conclusions
+
+**Show your thinking, then provide the answer**
+
+| Aspect                   | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| **Definition**           | Generate reasoning steps before jumping to conclusions |
+| **Workflow Application** | Use chain-of-thought prompting, allow "scratch space"  |
+| **Violation Example**    | Agent provides answer without explaining logic         |
+| **Solution**             | Structure prompts to encourage step-by-step reasoning  |
+
+**Why This Matters:**
+
+LLMs perform better when they can "think out loud" before committing to an answer. This principle improves accuracy and makes agent decisions auditable.
+
+**Prompt Design:**
+
+✅ **Encourage reasoning:**
+
+```markdown
+Before selecting a workflow pattern:
+
+1. Analyze the task characteristics
+2. List applicable patterns with pros/cons
+3. Recommend the best fit based on your analysis
+```
+
+❌ **Discourage reasoning:**
+
+```markdown
+Select the best workflow pattern for this task.
+```
+
+**Implementation Techniques:**
+
+| Technique                  | Description                               |
+| -------------------------- | ----------------------------------------- |
+| **Chain-of-Thought (CoT)** | Prompt: "Let's think step by step..."     |
+| **Scratch Space**          | Allow working area for calculations/notes |
+| **Explicit Steps**         | Require "Analysis → Options → Decision"   |
+| **Self-Verification**      | Ask agent to check its own reasoning      |
+
+**Example Output:**
+
+```markdown
+## Analysis
+
+- Task requires processing 10 files
+- Files are independent
+- No interdependencies detected
+
+## Options Considered
+
+1. Prompt Chaining: ❌ Sequential would be slow
+2. Parallelization: ✅ Files are independent
+3. Orchestrator-Workers: ⚠️ Overkill for fixed task count
+
+## Decision
+
+Use Parallelization pattern (Pattern 3)
+
+## Implementation Plan
+
+[Detailed steps...]
+```
+
+**Benefits:**
+
+| Benefit             | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| **Higher Accuracy** | Reduces hallucination and logical errors        |
+| **Debuggability**   | Trace reasoning when output is wrong            |
+| **Transparency**    | Users understand why agent chose action         |
+| **Self-Correction** | Agent catches its own mistakes during reasoning |
+
+**References:**
+
+- [Chain-of-Thought Prompting - Google Research](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
+- [vscode-ai-toolkit Prompt Generation Best Practices](https://github.com/microsoft/vscode-ai-toolkit)
+
 ---
 
 ## Intermediate Representation (IR) Architecture
@@ -208,7 +288,7 @@ This ensures reproducibility and debuggability.
 
 ## Tier 3: Scale Principles (Advanced)
 
-### 12. Human-in-the-Loop
+### 14. Human-in-the-Loop
 
 **Human confirmation at critical points**
 
@@ -218,7 +298,7 @@ This ensures reproducibility and debuggability.
 | **Workflow Application** | Confirm before important decisions, risky operations |
 | **Application Example**  | Before production deploy, before mass deletion       |
 
-### 13. KISS (Keep It Simple, Stupid)
+### 15. KISS (Keep It Simple, Stupid)
 
 **Keep it simple**
 
@@ -227,7 +307,7 @@ This ensures reproducibility and debuggability.
 | **Definition**           | Avoid unnecessary complexity                     |
 | **Workflow Application** | Sufficient number of agents, simple coordination |
 
-### 14. Loose Coupling
+### 16. Loose Coupling
 
 **Loose coupling between agents**
 
@@ -237,7 +317,7 @@ This ensures reproducibility and debuggability.
 | **Workflow Application** | Each agent can operate independently    |
 | **Benefits**             | Limit impact of changes, easier testing |
 
-### 15. Graceful Degradation
+### 17. Graceful Degradation
 
 **Continue operation despite partial failures**
 
