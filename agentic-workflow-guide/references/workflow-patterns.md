@@ -552,40 +552,42 @@ When you encounter a task that doesn't match existing workers:
 1. **STOP** - Do not create new workers automatically
 2. **PROPOSE** - Ask user:
    "New task type detected: {description}
-    - Option A: Create new '{type} Worker' sub-agent
-    - Option B: Handle with General Assistant
-    Which do you prefer?"
+   - Option A: Create new '{type} Worker' sub-agent
+   - Option B: Handle with General Assistant
+     Which do you prefer?"
 3. **WAIT** - Get explicit confirmation before proceeding
 4. **EXECUTE** - Follow user's choice
 ```
 
 **Decision Flow:**
 
-| Task Type | Existing Worker? | Action |
-|-----------|------------------|--------|
-| Code review | ✅ Yes | Use Code Review Worker |
-| Documentation | ✅ Yes | Use Docs Worker |
-| Database migration | ❌ No | **Ask user** → Create or use General |
-| Security audit | ❌ No | **Ask user** → Create or use General |
+| Task Type          | Existing Worker? | Action                               |
+| ------------------ | ---------------- | ------------------------------------ |
+| Code review        | ✅ Yes           | Use Code Review Worker               |
+| Documentation      | ✅ Yes           | Use Docs Worker                      |
+| Database migration | ❌ No            | **Ask user** → Create or use General |
+| Security audit     | ❌ No            | **Ask user** → Create or use General |
 
 **Benefits:**
 
-| Benefit | Description |
-|---------|-------------|
-| **User Control** | User decides workflow expansion |
-| **Cost Transparency** | Explicit acknowledgment of resource usage |
-| **Learning Opportunity** | User can guide new worker's specialization |
-| **Avoid Over-Engineering** | One-off tasks stay with General Assistant |
+| Benefit                    | Description                                |
+| -------------------------- | ------------------------------------------ |
+| **User Control**           | User decides workflow expansion            |
+| **Cost Transparency**      | Explicit acknowledgment of resource usage  |
+| **Learning Opportunity**   | User can guide new worker's specialization |
+| **Avoid Over-Engineering** | One-off tasks stay with General Assistant  |
 
 **Anti-Pattern: Silent Worker Creation**
 
 ❌ **Bad:**
+
 ```
 Orchestrator: [Silently creates DatabaseWorker, SecurityWorker, PerformanceWorker...]
 User: "Why did this take so long and cost so much?"
 ```
 
 ✅ **Good:**
+
 ```
 Orchestrator: "I see a database-related task. I don't have a specialized worker for this.
               Should I create a Database Worker, or handle it with General Assistant?"
