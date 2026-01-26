@@ -479,6 +479,120 @@ For unclassified tasks, call #tool:agent with:
 
 **⚠️ Important:** General Assistant should NOT bypass the orchestrator for tasks that genuinely require specialized workers. Use as fallback, not shortcut.
 
+### Dynamic Worker Creation (New Task Detection)
+
+When the orchestrator encounters a task type that doesn't match existing workers, it should **ask for user confirmation** before creating a new sub-agent.
+
+```mermaid
+graph TD
+    A[New Task Detected] --> B{Existing Worker?}
+    B -->|Yes| C[Use Existing Worker]
+    B -->|No| D[Propose New Worker]
+    D --> E{User Approves?}
+    E -->|Yes| F[Create New Sub-Agent]
+    E -->|No| G[Use General Assistant]
+    F --> H[Execute Task]
+    G --> H
+    C --> H
+```
+
+**Why Ask for Confirmation:**
+
+| Reason                | Description                                             |
+| --------------------- | ------------------------------------------------------- |
+| **Cost Control**      | New sub-agents consume additional tokens/resources      |
+| **Scope Management**  | User may prefer to handle new task types differently    |
+| **Quality Assurance** | User can provide guidance for the new worker's behavior |
+| **Visibility**        | User knows when workflow is expanding                   |
+
+**Implementation Pattern:**
+
+```yaml
+---
+name: Adaptive Orchestrator
+tools: ["agent", "search", "read"]
+---
+
+# Adaptive Orchestrator
+
+## Workflow
+
+1. Analyze incoming task
+2. Check if existing worker matches task type
+3. **If NO match:**
+   - Propose: "I detected a new task type: {type}. Create a specialized sub-agent for this?"
+   - Wait for user confirmation
+   - If YES: Create and execute with new sub-agent
+   - If NO: Route to General Assistant
+
+## New Worker Proposal Format
+
+When proposing a new worker, include:
+- Task type detected
+- Proposed worker name
+- Expected responsibilities
+- Alternative: General Assistant handling
+
+**Example:**
+"I detected a task type I haven't handled before:
+- **Type:** Database migration
+- **Proposed Worker:** Migration Worker
+- **Responsibilities:** Schema changes, data migration, rollback scripts
+
+Should I create a specialized sub-agent for this, or handle it with General Assistant?"
+```
+
+**Orchestrator Prompt Template:**
+
+```markdown
+## Dynamic Worker Rules
+
+When you encounter a task that doesn't match existing workers:
+
+1. **STOP** - Do not create new workers automatically
+2. **PROPOSE** - Ask user:
+   "New task type detected: {description}
+    - Option A: Create new '{type} Worker' sub-agent
+    - Option B: Handle with General Assistant
+    Which do you prefer?"
+3. **WAIT** - Get explicit confirmation before proceeding
+4. **EXECUTE** - Follow user's choice
+```
+
+**Decision Flow:**
+
+| Task Type | Existing Worker? | Action |
+|-----------|------------------|--------|
+| Code review | ✅ Yes | Use Code Review Worker |
+| Documentation | ✅ Yes | Use Docs Worker |
+| Database migration | ❌ No | **Ask user** → Create or use General |
+| Security audit | ❌ No | **Ask user** → Create or use General |
+
+**Benefits:**
+
+| Benefit | Description |
+|---------|-------------|
+| **User Control** | User decides workflow expansion |
+| **Cost Transparency** | Explicit acknowledgment of resource usage |
+| **Learning Opportunity** | User can guide new worker's specialization |
+| **Avoid Over-Engineering** | One-off tasks stay with General Assistant |
+
+**Anti-Pattern: Silent Worker Creation**
+
+❌ **Bad:**
+```
+Orchestrator: [Silently creates DatabaseWorker, SecurityWorker, PerformanceWorker...]
+User: "Why did this take so long and cost so much?"
+```
+
+✅ **Good:**
+```
+Orchestrator: "I see a database-related task. I don't have a specialized worker for this.
+              Should I create a Database Worker, or handle it with General Assistant?"
+User: "Just use General Assistant for now."
+Orchestrator: "Got it. Routing to General Assistant..."
+```
+
 ---
 
 ## 5. Evaluator-Optimizer
