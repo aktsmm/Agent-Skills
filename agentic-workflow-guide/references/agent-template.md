@@ -28,9 +28,9 @@ description: <description> # Required: Brief description of the prompt
 
 ### ⚠️ Deprecated Fields
 
-| Field   | Status        | Applies To             | Use Instead                                         |
-| ------- | ------------- | ---------------------- | --------------------------------------------------- |
-| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below)                      |
+| Field   | Status        | Applies To                | Use Instead                    |
+| ------- | ------------- | ------------------------- | ------------------------------ |
+| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below) |
 
 **`mode:` Migration Guide:**
 
@@ -39,19 +39,16 @@ description: <description> # Required: Brief description of the prompt
 ---
 mode: agent
 ---
-
 # ✅ Correct: Specify agent name
 ---
 description: Daily report generator
 agent: report-generator
 ---
-
 # ✅ Correct: Boolean value
 ---
 description: Daily report generator
 agent: true
 ---
-
 # ✅ Correct: Omit (default behavior)
 ---
 description: Daily report generator
@@ -60,19 +57,58 @@ description: Daily report generator
 
 **`agent:` Field Options:**
 
-| Value               | Behavior                              |
-| ------------------- | ------------------------------------- |
-| `agent: <name>`     | Use specific agent (e.g., `report-generator`) |
-| `agent: true`       | Enable agent mode                     |
-| *(omit field)*      | Default behavior                      |
+| Value           | Behavior                                      |
+| --------------- | --------------------------------------------- |
+| `agent: <name>` | Use specific agent (e.g., `report-generator`) |
+| `agent: true`   | Enable agent mode                             |
+| _(omit field)_  | Default behavior                              |
+
+### Complete `.prompt.md` Example
+
+```yaml
+---
+description: デイリーレポート自動生成（業務ログから1日分のレポートを作成）
+agent: report-generator
+tools:
+  [
+    "read/readFile",
+    "edit/editFiles",
+    "search/fileSearch",
+    "search/textSearch",
+    "workiq/*",
+  ]
+---
+```
+
+**Tools Pattern Reference:**
+
+| Pattern         | Description               | Example                |
+| --------------- | ------------------------- | ---------------------- |
+| `category/tool` | Specific tool             | `read/readFile`        |
+| `category/*`    | All tools in category     | `workiq/*`             |
+| MCP tools       | External MCP server tools | `workiq/*`, `github/*` |
+
+**Common Tool Categories:**
+
+| Category | Tools                                     |
+| -------- | ----------------------------------------- |
+| `read`   | `readFile`                                |
+| `edit`   | `editFiles`                               |
+| `search` | `fileSearch`, `textSearch`                |
+| `workiq` | M365 integration (email, calendar, files) |
+
 ---
 
 # ✅ Correct
+
 ---
+
 name: my-agent
 description: Does something useful
+
 ---
-```
+
+`````
 
 ### Tools Field Behavior
 
@@ -200,8 +236,9 @@ For long-running tasks, maintain visibility:
 - [x] Task 1: Analyze requirements
 - [x] Task 2: Generate IR
 - [ ] Task 3: Validate output
+`````
+
 ```
-````
 
 ## Idempotency
 
@@ -209,7 +246,7 @@ For long-running tasks, maintain visibility:
 - Use unique identifiers to prevent duplicates
 - Design operations to be safely retried
 
-````
+```
 
 ## Design Principles for Agents
 
@@ -300,46 +337,46 @@ Built-in tools for custom agents. Tool names differ by platform:
 
 ### VS Code Copilot Tools (Official)
 
-| Tool Name | Description | Tool Set |
-| --------- | ----------- | -------- |
+| Tool Name        | Description                              | Tool Set       |
+| ---------------- | ---------------------------------------- | -------------- |
 | `#runInTerminal` | Run shell command in integrated terminal | `#runCommands` |
-| `#readFile` | Read file contents | - |
-| `#editFiles` | Edit/create files | `#edit` |
-| `#createFile` | Create new file | `#edit` |
-| `#textSearch` | Search text in files | `#search` |
-| `#fileSearch` | Search files by glob pattern | `#search` |
-| `#runSubagent` | Spawn sub-agent with isolated context | - |
-| `#fetch` | Fetch web page content | - |
-| `#todos` | Task list management | - |
-| `#codebase` | Search codebase for context | - |
-| `#changes` | List source control changes | - |
-| `#problems` | Get workspace issues | - |
-| `#usages` | Find references/implementations | - |
-| `#githubRepo` | Search GitHub repository | - |
+| `#readFile`      | Read file contents                       | -              |
+| `#editFiles`     | Edit/create files                        | `#edit`        |
+| `#createFile`    | Create new file                          | `#edit`        |
+| `#textSearch`    | Search text in files                     | `#search`      |
+| `#fileSearch`    | Search files by glob pattern             | `#search`      |
+| `#runSubagent`   | Spawn sub-agent with isolated context    | -              |
+| `#fetch`         | Fetch web page content                   | -              |
+| `#todos`         | Task list management                     | -              |
+| `#codebase`      | Search codebase for context              | -              |
+| `#changes`       | List source control changes              | -              |
+| `#problems`      | Get workspace issues                     | -              |
+| `#usages`        | Find references/implementations          | -              |
+| `#githubRepo`    | Search GitHub repository                 | -              |
 
 ### Claude Code Tools (Anthropic)
 
-| Tool Name | Description |
-| --------- | ----------- |
-| `Bash` | Shell command execution |
-| `Read` | Read file contents |
-| `Write` / `Edit` | Create/edit files |
-| `Search` / `Grep` | Search files/text |
-| `Task` | Spawn sub-agent |
-| `TodoWrite` | Task list management |
-| `WebSearch` | Web search (via MCP) |
+| Tool Name         | Description             |
+| ----------------- | ----------------------- |
+| `Bash`            | Shell command execution |
+| `Read`            | Read file contents      |
+| `Write` / `Edit`  | Create/edit files       |
+| `Search` / `Grep` | Search files/text       |
+| `Task`            | Spawn sub-agent         |
+| `TodoWrite`       | Task list management    |
+| `WebSearch`       | Web search (via MCP)    |
 
 ### Cross-Platform Mapping
 
-| Purpose | VS Code Copilot | Claude Code |
-| ------- | --------------- | ----------- |
-| Shell execution | `runInTerminal` | `Bash` |
-| Read file | `readFile` | `Read` |
-| Edit file | `editFiles` | `Write`/`Edit` |
-| Search | `textSearch`, `fileSearch` | `Search`, `Grep` |
-| Subagent | `runSubagent` | `Task` |
-| Web fetch | `fetch` | (MCP) |
-| Todo list | `todos` | `TodoWrite` |
+| Purpose         | VS Code Copilot            | Claude Code      |
+| --------------- | -------------------------- | ---------------- |
+| Shell execution | `runInTerminal`            | `Bash`           |
+| Read file       | `readFile`                 | `Read`           |
+| Edit file       | `editFiles`                | `Write`/`Edit`   |
+| Search          | `textSearch`, `fileSearch` | `Search`, `Grep` |
+| Subagent        | `runSubagent`              | `Task`           |
+| Web fetch       | `fetch`                    | (MCP)            |
+| Todo list       | `todos`                    | `TodoWrite`      |
 
 ### Tool Definition Examples
 
@@ -373,6 +410,7 @@ tools: ["Task", "Read", "Search", "TodoWrite"]
 Use `<server-name>/*` format to include all tools from an MCP server.
 
 **Troubleshooting**: If tools are not recognized:
+
 - VS Code: Check [VS Code Chat Tools Reference](https://code.visualstudio.com/docs/copilot/reference/copilot-vscode-features#_chat-tools)
 - Claude Code: Check [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 
@@ -419,4 +457,7 @@ handoffs:
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-````
+
+```
+
+```
