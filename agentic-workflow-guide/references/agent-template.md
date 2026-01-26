@@ -53,7 +53,8 @@ Each agent should include these sections:
 ---
 name: example-agent
 description: Brief description of what this agent does
-tools: ["read", "edit", "search"]
+# VS Code Copilot tools (adjust for Claude Code: Read, Edit, Search)
+tools: ["readFile", "editFiles", "textSearch"]
 ---
 
 # Example Agent
@@ -173,27 +174,41 @@ For long-running tasks, maintain visibility:
 
 ### Orchestrator Agent
 
+**VS Code Copilot:**
+
 ```yaml
 ---
 name: orchestrator
 description: Coordinates workflow and delegates to specialist agents
-tools: ["agent", "read", "search", "todo"]
+tools: ["runSubagent", "readFile", "textSearch", "todos"]
 ---
-````
+```
+
+**Claude Code:**
+
+```yaml
+---
+name: orchestrator
+description: Coordinates workflow and delegates to specialist agents
+tools: ["Task", "Read", "Search", "TodoWrite"]
+---
+```
 
 Key characteristics:
 
-- Uses `#tool:agent` for delegation
+- Uses subagent tool for delegation (`#runSubagent` / `Task`)
 - Maintains high-level view
 - Does NOT perform detailed work itself
 
 ### Specialist Agent
 
+**VS Code Copilot:**
+
 ```yaml
 ---
 name: code-reviewer
 description: Reviews code for quality, security, and best practices
-tools: ["read", "search", "web"]
+tools: ["readFile", "textSearch", "fetch"]
 ---
 ```
 
@@ -205,11 +220,13 @@ Key characteristics:
 
 ### Implementation Agent
 
+**VS Code Copilot:**
+
 ```yaml
 ---
 name: implementer
 description: Implements code changes based on specifications
-tools: ["read", "edit", "execute", "search"]
+tools: ["readFile", "editFiles", "runInTerminal", "textSearch"]
 ---
 ```
 
@@ -221,55 +238,85 @@ Key characteristics:
 
 ## Available Tools
 
-Built-in tools for custom agents. Use **Primary Alias** in the `tools:` property.
+Built-in tools for custom agents. Tool names differ by platform:
 
-| Primary Alias       | Compatible Aliases                                | Description                           |
-| ------------------- | ------------------------------------------------- | ------------------------------------- |
-| `execute`           | `shell`, `Bash`, `powershell`, `run_in_terminal`  | Shell command execution               |
-| `read`              | `Read`, `NotebookRead`, `read_file`               | Read file contents                    |
-| `edit`              | `Edit`, `MultiEdit`, `Write`, `NotebookEdit`      | Edit/create files                     |
-| `search`            | `Grep`, `Glob`, `grep_search`, `file_search`      | Search files/text                     |
-| `agent/runSubagent` | `agent`, `custom-agent`, `Task`, `runSubagent`    | Spawn sub-agent (specify `agentName`) |
-| `web`               | `WebSearch`, `WebFetch`, `fetch`, `fetch_webpage` | Fetch web content                     |
-| `todo`              | `TodoWrite`                                       | Task list management                  |
-| `githubRepo`        | -                                                 | Search GitHub repositories            |
-| `usages`            | -                                                 | Find code usages/references           |
+### VS Code Copilot Tools (Official)
+
+| Tool Name | Description | Tool Set |
+| --------- | ----------- | -------- |
+| `#runInTerminal` | Run shell command in integrated terminal | `#runCommands` |
+| `#readFile` | Read file contents | - |
+| `#editFiles` | Edit/create files | `#edit` |
+| `#createFile` | Create new file | `#edit` |
+| `#textSearch` | Search text in files | `#search` |
+| `#fileSearch` | Search files by glob pattern | `#search` |
+| `#runSubagent` | Spawn sub-agent with isolated context | - |
+| `#fetch` | Fetch web page content | - |
+| `#todos` | Task list management | - |
+| `#codebase` | Search codebase for context | - |
+| `#changes` | List source control changes | - |
+| `#problems` | Get workspace issues | - |
+| `#usages` | Find references/implementations | - |
+| `#githubRepo` | Search GitHub repository | - |
+
+### Claude Code Tools (Anthropic)
+
+| Tool Name | Description |
+| --------- | ----------- |
+| `Bash` | Shell command execution |
+| `Read` | Read file contents |
+| `Write` / `Edit` | Create/edit files |
+| `Search` / `Grep` | Search files/text |
+| `Task` | Spawn sub-agent |
+| `TodoWrite` | Task list management |
+| `WebSearch` | Web search (via MCP) |
+
+### Cross-Platform Mapping
+
+| Purpose | VS Code Copilot | Claude Code |
+| ------- | --------------- | ----------- |
+| Shell execution | `runInTerminal` | `Bash` |
+| Read file | `readFile` | `Read` |
+| Edit file | `editFiles` | `Write`/`Edit` |
+| Search | `textSearch`, `fileSearch` | `Search`, `Grep` |
+| Subagent | `runSubagent` | `Task` |
+| Web fetch | `fetch` | (MCP) |
+| Todo list | `todos` | `TodoWrite` |
 
 ### Tool Definition Examples
 
-```yaml
-# Orchestrator with sub-agent delegation
-tools: ["agent/runSubagent", "execute", "read", "search"]
-
-# Code reviewer
-tools: ["read", "search", "web", "execute"]
-
-# Translator/Editor
-tools: ["read", "edit", "agent"]
-
-# Sub-agent call template (Zenn format)
-#tool:agent/runSubagent を使用して、Worker エージェントを呼び出してください。
-- prompt: ${task to delegate}
-- agentName: Worker
-```
-
-### Common Mistakes
-
-⚠️ **Wrong**: Using non-primary aliases in `tools:` property
+**VS Code Copilot:**
 
 ```yaml
-# ❌ Bad - mixes non-primary aliases and omits agentName usage
-tools: ["run_in_terminal", "read_file", "runSubagent"]
-
-# ✅ Good - use Primary Alias and runSubagent spec
-tools: ["execute", "read", "agent/runSubagent"]
+---
+name: orchestrator
+description: Coordinates workflow and delegates to specialist agents
+tools: ["runSubagent", "readFile", "textSearch", "todos"]
+---
 ```
 
-**Troubleshooting**: If tools are not recognized, verify against [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration).
+**Claude Code:**
 
-**MCP Server Tools**: Use `<server-name>/*` format to include all tools from an MCP server.
+```yaml
+---
+name: orchestrator
+description: Coordinates workflow and delegates to specialist agents
+tools: ["Task", "Read", "Search", "TodoWrite"]
+---
+```
 
-**Tool Reference Syntax**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`).
+### Tool Reference Syntax
+
+- **VS Code Copilot**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:runSubagent`)
+- **Claude Code**: Reference tools directly by name
+
+### MCP Server Tools
+
+Use `<server-name>/*` format to include all tools from an MCP server.
+
+**Troubleshooting**: If tools are not recognized:
+- VS Code: Check [VS Code Chat Tools Reference](https://code.visualstudio.com/docs/copilot/reference/copilot-vscode-features#_chat-tools)
+- Claude Code: Check [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 
 ## Handoffs (Agent Transitions)
 
@@ -287,7 +334,8 @@ Handoffs enable guided sequential workflows between agents with suggested next s
 ---
 name: Planner
 description: Generate an implementation plan
-tools: ["search", "fetch", "read_file"]
+# VS Code Copilot tools
+tools: ["textSearch", "fetch", "readFile"]
 handoffs:
   - label: Start Implementation
     agent: implementation
@@ -313,3 +361,4 @@ handoffs:
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
+````
