@@ -1741,7 +1741,7 @@ def create_structure(base_path: Path, structure: dict, workflow_name: str):
             path.write_text(file_content, encoding="utf-8")
 
 
-def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".", include_instructions: bool = False):
+def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".", include_instructions: bool = False, full_workspace: bool = False):
     """Generate workflow directory structure
     
     Args:
@@ -1749,6 +1749,7 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
         pattern: Workflow pattern (basic, prompt-chaining, etc.)
         output_path: Output directory
         include_instructions: If True, generate extended instruction templates
+        full_workspace: If True, copy full workspace templates from assets/workspace-templates
     """
     
     if pattern not in PATTERNS:
@@ -1810,6 +1811,38 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
             file_path = base_path / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(template, encoding="utf-8")
+    
+    # Copy full workspace templates if requested
+    if full_workspace:
+        print("📦 Copying full workspace templates...")
+        import shutil
+        # Find the assets/workspace-templates directory relative to this script
+        script_dir = Path(__file__).parent
+        templates_dir = script_dir.parent / "assets" / "workspace-templates"
+        
+        if not templates_dir.exists():
+            print(f"⚠️ Workspace templates not found: {templates_dir}")
+            print("   Run with --include-instructions instead for basic templates.")
+        else:
+            github_dir = base_path / ".github"
+            github_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Copy copilot-instructions.md
+            src_copilot = templates_dir / "copilot-instructions.md"
+            if src_copilot.exists():
+                shutil.copy2(src_copilot, github_dir / "copilot-instructions.md")
+                print("   📄 copilot-instructions.md")
+            
+            # Copy agents/, instructions/, prompts/ directories
+            for folder in ["agents", "instructions", "prompts"]:
+                src_folder = templates_dir / folder
+                dst_folder = github_dir / folder
+                if src_folder.exists():
+                    if dst_folder.exists():
+                        shutil.rmtree(dst_folder)
+                    shutil.copytree(src_folder, dst_folder)
+                    file_count = len(list(dst_folder.rglob("*")))
+                    print(f"   📁 {folder}/ ({file_count} files)")
     
     # Generate README.md
     readme_content = f'''# {name}
@@ -1933,6 +1966,11 @@ def main():
         action="store_true",
         help="Include extended instruction templates (agent-design, git, security, etc.)"
     )
+    parser.add_argument(
+        "--full-workspace", "-f",
+        action="store_true",
+        help="Copy full workspace templates (agents, instructions, prompts) from bundled assets"
+    )
     
     args = parser.parse_args()
     
@@ -1955,7 +1993,7 @@ def main():
         parser.print_help()
         return
     
-    scaffold_workflow(args.name, args.pattern, args.path, args.include_instructions)
+    scaffold_workflow(args.name, args.pattern, args.path, args.include_instructions, args.full_workspace)
 
 
 if __name__ == "__main__":
