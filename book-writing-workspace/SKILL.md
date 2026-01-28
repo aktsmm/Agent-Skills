@@ -23,7 +23,7 @@ Set up a professional book writing workspace with AI-assisted workflow support.
 Ask the user for project configuration:
 
 ```
-📚 Book Writing Workspace Setup
+Book Writing Workspace Setup
 
 Please provide the following information:
 

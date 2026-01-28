@@ -136,7 +136,7 @@ await element.click({ force: true });
 Use snapshot + click instead:
 
 ```
-✅ browser_snapshot → get ref → browser_click(ref)
+browser_snapshot → get ref → browser_click(ref)
 ```
 
 ## Reference
