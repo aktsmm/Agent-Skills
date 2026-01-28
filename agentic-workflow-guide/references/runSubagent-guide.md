@@ -36,6 +36,8 @@ Use when you want to:
 
 ## When to Use
 
+→ See also **[splitting-criteria.md](splitting-criteria.md)** for the complete escalation ladder and quantitative thresholds.
+
 ### ✅ Effective Scenarios
 
 | Scenario                    | Example                                                |
@@ -45,13 +47,36 @@ Use when you want to:
 | **File-by-file operations** | Fix ESLint errors in each file independently           |
 | **Phase-based workflows**   | Plan → Implement → Review (each phase = sub-agent)     |
 
-### ❌ Avoid When
+### ❌ When NOT to Use Sub-agents
 
-| Scenario                  | Reason                                               |
-| ------------------------- | ---------------------------------------------------- |
-| Need follow-up questions  | Sub-agents are stateless, no "tell me more"          |
-| Task is too lightweight   | Startup overhead > benefit                           |
-| Need context accumulation | Previous step's details are lost in sub-agent return |
+Sub-agents have overhead. Avoid in these scenarios:
+
+| Scenario                        | Reason                          | Alternative               |
+| ------------------------------- | ------------------------------- | ------------------------- |
+| **Single file, < 5 min task**   | Overhead > benefit              | Direct processing         |
+| **Simple Q&A**                  | Overkill for single-call task   | L0 prompt                 |
+| **Need follow-up questions**    | Sub-agents are stateless        | Keep in main context      |
+| **Context accumulation needed** | Previous details lost in return | Single agent + compaction |
+| **Lightweight task**            | Startup overhead dominates      | Direct processing         |
+
+### Complexity Scaling (Anthropic Multi-Agent Research)
+
+| Query Complexity        | Sub-agent Count | Tool Calls per Agent       | Example                 |
+| ----------------------- | --------------- | -------------------------- | ----------------------- |
+| **Simple** (fact check) | 1               | 3-10                       | "What is X?"            |
+| **Comparison**          | 2-4             | 10-15 each                 | "Compare A vs B vs C"   |
+| **Complex research**    | 10+             | Clear responsibility split | "Analyze market trends" |
+
+### Splitting Decision Matrix
+
+| Condition                     | Use Sub-agent? | Reason                  |
+| ----------------------------- | -------------- | ----------------------- |
+| Single file, < 5 min          | ❌             | Overhead > benefit      |
+| Multiple files, > 30 min      | ✅             | Context isolation value |
+| Research + Implement + Review | ✅             | Phase separation        |
+| Simple Q&A                    | ❌             | Single call sufficient  |
+| Log analysis (1000+ lines)    | ✅             | Return only conclusions |
+| Dynamic subtask discovery     | ✅             | Orchestrator-Workers    |
 
 ---
 

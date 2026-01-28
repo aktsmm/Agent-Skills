@@ -4,15 +4,95 @@ scaffold_workflow.py - Generate directory structure for agent workflows
 
 Usage:
     python scaffold_workflow.py <workflow-name> [--pattern <pattern>] [--path <output-dir>]
+    python scaffold_workflow.py --lint <path>
 
 Examples:
     python scaffold_workflow.py my-workflow
     python scaffold_workflow.py code-review --pattern evaluator-optimizer
     python scaffold_workflow.py data-pipeline --pattern orchestrator-workers --path ./projects
+    python scaffold_workflow.py --lint .github/prompts/
 """
 
 import argparse
+import re
 from pathlib import Path
+
+# Complexity thresholds (can be overridden in copilot-instructions.md)
+THRESHOLDS = {
+    "line_count": 50,
+    "step_count": 7,
+    "step_count_warning": 5,
+}
+
+
+def lint_files(path: str) -> None:
+    """Lint prompt/agent files for complexity thresholds."""
+    target = Path(path)
+    
+    if target.is_file():
+        files = [target]
+    elif target.is_dir():
+        files = list(target.glob("**/*.prompt.md")) + list(target.glob("**/*.agent.md")) + list(target.glob("**/*.instructions.md"))
+    else:
+        print(f"❌ Path not found: {path}")
+        return
+    
+    if not files:
+        print(f"⚠️ No .prompt.md, .agent.md, or .instructions.md files found in: {path}")
+        return
+    
+    print(f"🔍 Linting {len(files)} file(s)...\n")
+    
+    issues_found = False
+    
+    for file in files:
+        content = file.read_text(encoding="utf-8")
+        lines = content.split("\n")
+        line_count = len(lines)
+        
+        # Count steps (numbered lists like "1.", "2.", etc.)
+        step_pattern = re.compile(r"^\s*\d+\.\s+")
+        steps = [line for line in lines if step_pattern.match(line)]
+        step_count = len(steps)
+        
+        # Check for multiple responsibilities (SRP violation indicators)
+        responsibility_keywords = ["## Phase", "## Step", "## Stage", "# Part"]
+        phases = sum(1 for line in lines if any(kw in line for kw in responsibility_keywords))
+        
+        # Analyze issues
+        file_issues = []
+        
+        if line_count > THRESHOLDS["line_count"]:
+            file_issues.append(f"  🔴 Line count: {line_count} (threshold: {THRESHOLDS['line_count']})")
+        
+        if step_count > THRESHOLDS["step_count"]:
+            file_issues.append(f"  🔴 Step count: {step_count} (threshold: {THRESHOLDS['step_count']})")
+        elif step_count > THRESHOLDS["step_count_warning"]:
+            file_issues.append(f"  🟡 Step count: {step_count} (warning threshold: {THRESHOLDS['step_count_warning']})")
+        
+        if phases > 3:
+            file_issues.append(f"  🟡 Multiple phases detected: {phases} (consider splitting)")
+        
+        if file_issues:
+            issues_found = True
+            print(f"📄 {file.relative_to(Path.cwd()) if file.is_relative_to(Path.cwd()) else file}")
+            for issue in file_issues:
+                print(issue)
+            print()
+    
+    if not issues_found:
+        print("✅ All files within complexity thresholds.")
+    else:
+        print("─" * 50)
+        print("💡 Recommendations:")
+        print("  - 🔴 issues: Consider splitting (see splitting-criteria.md)")
+        print("  - 🟡 warnings: Review for potential improvements")
+        print()
+        print("Escalation options:")
+        print("  - L0 → L1: Add .instructions.md file")
+        print("  - L1 → L2: Create .agent.md with tools")
+        print("  - L2 → L3: Use runSubagent for sub-tasks")
+
 
 # Pattern-specific AGENTS.md templates
 AGENTS_MD_TEMPLATES = {
@@ -1971,8 +2051,19 @@ def main():
         action="store_true",
         help="Copy full workspace templates (agents, instructions, prompts) from bundled assets"
     )
+    parser.add_argument(
+        "--lint",
+        type=str,
+        metavar="PATH",
+        help="Lint prompt/agent files for complexity thresholds (line count, step count)"
+    )
     
     args = parser.parse_args()
+    
+    # Handle --lint option
+    if args.lint:
+        lint_files(args.lint)
+        return
     
     if args.list_patterns:
         print("Available patterns:\n")
