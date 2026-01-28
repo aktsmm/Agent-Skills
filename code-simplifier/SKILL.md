@@ -47,9 +47,9 @@ Simplify code structure by:
 
 **Critical Rules:**
 
-- ❌ **Avoid nested ternary operators** - prefer switch statements or if/else chains
-- ❌ **Avoid overly compact one-liners** - explicit code is often better
-- ✅ **Choose clarity over brevity**
+- **Avoid nested ternary operators** - prefer switch statements or if/else chains
+- **Avoid overly compact one-liners** - explicit code is often better
+- **Choose clarity over brevity**
 
 ### 4. Maintain Balance
 
