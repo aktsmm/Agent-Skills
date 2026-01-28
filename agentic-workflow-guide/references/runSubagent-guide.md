@@ -153,11 +153,11 @@ When calling `runSubagent`, your **prompt** parameter must include:
 ---
 
 name: MyOrchestrator
-tools: ['agent/runSubagent']
+tools: ['runSubagent']
 
 ---
 
-#tool:agent/runSubagent を使用して、Researcher エージェントを呼び出してください。
+#tool:runSubagent を使用して、Researcher エージェントを呼び出してください。
 
 - prompt: ${調査したい内容}
 - agentName: Researcher

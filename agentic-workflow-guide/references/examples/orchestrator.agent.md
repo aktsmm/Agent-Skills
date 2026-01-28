@@ -91,7 +91,7 @@ tasks:
 ### runSubagent Call Example (Zenn format)
 
 ```markdown
-#tool:agent/runSubagent を使用して、Worker エージェントを呼び出してください。
+#tool:runSubagent を使用して、Worker エージェントを呼び出してください。
 
 - prompt: Add error handling to src/handler.ts. Return results in JSON format when complete.
 - agentName: Worker
