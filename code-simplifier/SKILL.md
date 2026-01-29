@@ -1,6 +1,7 @@
 ---
 name: code-simplifier
 description: Guide for simplifying and refining code after coding sessions. Use when cleaning up complex code, reviewing PRs for readability, or applying consistent refactoring patterns.
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
@@ -11,10 +12,10 @@ A guide for simplifying and refining code while preserving functionality.
 
 ## When to Use
 
+- **Refactor**, **simplify code**, **clean up**, **code review**
 - After completing a coding task or writing a logical chunk of code
 - Cleaning up complex PRs before review
 - Refactoring code for better readability and maintainability
-- Applying consistent coding standards across a codebase
 
 ## Core Principles
 

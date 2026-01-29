@@ -1,7 +1,7 @@
 ---
 name: powerpoint-automation
-description: Create professional PowerPoint presentations from various sources including web articles, blog posts, and existing PPTX files. Ideal for tech presentations, reports, and documentation.
-license: Complete terms in LICENSE.txt
+description: Create professional PowerPoint presentations from various sources including web articles, blog posts, and existing PPTX files. Use when creating PPTX, converting articles to slides, or translating presentations.
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
@@ -12,10 +12,10 @@ AI-powered PPTX generation using Orchestrator-Workers pattern.
 
 ## When to Use
 
+- **PowerPoint**, **PPTX**, **create presentation**, **slides**
 - Convert web articles/blog posts to presentations
 - Translate English PPTX to Japanese
 - Create presentations using custom templates
-- Generate technical presentations with code blocks
 
 ## Quick Start
 
