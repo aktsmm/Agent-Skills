@@ -2,6 +2,17 @@
 
 A collection of principles for designing agent workflows.
 
+## Table of Contents
+
+- [Tier 1: Core Principles](#tier-1-core-principles-essential) - SSOT, SRP, Simplicity First, Fail Fast, Iterative, Feedback Loop
+- [Tier 2: Quality Principles](#tier-2-quality-principles-recommended) - Transparency, Gate/Checkpoint, DRY, ISP, Idempotency, Observability, Reasoning
+- [IR Architecture](#intermediate-representation-ir-architecture) - Two-stage pattern (reference)
+- [Tier 3: Scale Principles](#tier-3-scale-principles-advanced) - Human-in-the-Loop, KISS, Loose Coupling, Graceful Degradation
+- [ACI Design](#aci-design-agent-computer-interface) - Tool design guidelines
+- [File Organization](#file-organization-principles) - Instructions organization, naming conventions
+
+---
+
 ## Tier 1: Core Principles (Essential)
 
 ### 1. SSOT (Single Source of Truth)
@@ -248,41 +259,10 @@ Use Parallelization pattern (Pattern 3)
 
 ## Intermediate Representation (IR) Architecture
 
+→ **[workflow-patterns/ir-architecture.md](workflow-patterns/ir-architecture.md)** (SSOT)
+
 For complex workflows, use a two-stage architecture with an intermediate representation.
-
-### Two-Stage Pattern
-
-```
-Input → IR (Intermediate Representation) → Output
-```
-
-| Stage         | Description                                    |
-| ------------- | ---------------------------------------------- |
-| **Generate**  | Parse input and create structured IR           |
-| **Validate**  | Verify IR structure (strict, no auto-complete) |
-| **Transform** | Convert IR to output format                    |
-| **Render**    | Final formatting and delivery                  |
-
-### IR Format Example
-
-```yaml
-tasks:
-  - id: "task-001"
-    agent: "impl"
-    status: "pending|in-progress|completed|failed|skipped"
-    input:
-      description: "Task description"
-      files: ["src/xxx.ts"]
-    output:
-      files: ["src/xxx.ts"]
-      validation: "lint-pass|test-pass|manual"
-```
-
-### Determinism Principle
-
-**Same IR → Same Output.** No creativity in transformation phase.
-
-This ensures reproducibility and debuggability.
+Core principle: **Same IR → Same Output.** No creativity in transformation phase.
 
 ---
 

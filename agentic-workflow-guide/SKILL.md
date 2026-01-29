@@ -28,11 +28,11 @@ Design, review, and improve agent workflows based on proven principles.
 | **Quality**   | Transparency, Gate/Checkpoint, DRY, Observability       |
 | **Scale**     | Human-in-the-Loop, Loose Coupling, Graceful Degradation |
 
-> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short." — Anthropic
+> See [design-principles.md > Simplicity First](references/design-principles.md#3-simplicity-first) for Anthropic's key recommendation.
 
 ## Workflow Patterns
 
-→ **[references/workflow-patterns.md](references/workflow-patterns.md)**
+→ **[references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)**
 
 | Pattern                  | When to Use                       |
 | ------------------------ | --------------------------------- |
@@ -82,6 +82,7 @@ Design, review, and improve agent workflows based on proven principles.
 | runSubagent        | [references/runSubagent-guide.md](references/runSubagent-guide.md)     |
 | Agent Template     | [references/agent-template.md](references/agent-template.md)           |
 | Context Management | [references/context-engineering.md](references/context-engineering.md) |
+| **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
 | Scaffold Tool      | [references/scaffold-usage.md](references/scaffold-usage.md)           |
 
 ## runSubagent Quick Fix

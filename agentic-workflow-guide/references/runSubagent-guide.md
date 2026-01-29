@@ -2,6 +2,18 @@
 
 Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 
+## Table of Contents
+
+- [What is runSubagent?](#what-is-runsubagent) - Key characteristics and purpose
+- [When to Use](#when-to-use) - Effective scenarios and anti-patterns
+- [How to Invoke](#how-to-invoke) - Enabling and invocation methods
+- [Prompt Engineering](#prompt-engineering-for-runsubagent) - Sub-agent prompt requirements
+- [Orchestrator-Workers Pattern](#orchestrator-workers-pattern-with-runsubagent) - Architecture examples
+- [Common Pitfalls](#common-pitfalls) - Avoiding delegation failures
+- [Token Efficiency](#token-efficiency) - Trade-offs and recommendations
+- [Handoffs vs runSubagent](#handoffs-vs-runsubagent) - Comparison
+- [Checklist](#checklist) - Implementation checklist
+
 > **Platform Note**:
 >
 > - **VS Code Copilot**: Use `runSubagent` in `tools:` and `#tool:runSubagent` in prompts
@@ -13,14 +25,14 @@ Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 
 ### Key Characteristics
 
-| Aspect        | Description                                                      |
-| ------------- | ---------------------------------------------------------------- |
-| **Context**   | Each sub-agent has its own context window (isolated from main)   |
-| **Execution** | Synchronous - main agent waits for result (NOT async/background) |
-| **Stateless** | One-shot execution - no follow-up conversation possible          |
-| **Return**    | Only final summary returns to main agent                         |
-| **Parallel**  | ❌ NOT supported (2025/12) - executes sequentially               |
-| **Nesting**   | ❌ NOT supported - sub-agents cannot call runSubagent            |
+| Aspect        | Description                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| **Context**   | Each sub-agent has its own context window (isolated from main)    |
+| **Execution** | Synchronous - main agent waits for result (NOT async/background)  |
+| **Stateless** | One-shot execution - no follow-up conversation possible           |
+| **Return**    | Only final summary returns to main agent                          |
+| **Parallel**  | ✅ Supported (2026/01+) - multiple sub-agents can run in parallel |
+| **Nesting**   | ❌ NOT supported - sub-agents cannot call runSubagent             |
 
 ### Primary Purpose
 
@@ -49,34 +61,9 @@ Use when you want to:
 
 ### ❌ When NOT to Use Sub-agents
 
-Sub-agents have overhead. Avoid in these scenarios:
+→ **[splitting-criteria.md#part-4-when-not-to-split](splitting-criteria.md#part-4-when-not-to-split)** for detailed decision matrix and complexity scaling guidelines.
 
-| Scenario                        | Reason                          | Alternative               |
-| ------------------------------- | ------------------------------- | ------------------------- |
-| **Single file, < 5 min task**   | Overhead > benefit              | Direct processing         |
-| **Simple Q&A**                  | Overkill for single-call task   | L0 prompt                 |
-| **Need follow-up questions**    | Sub-agents are stateless        | Keep in main context      |
-| **Context accumulation needed** | Previous details lost in return | Single agent + compaction |
-| **Lightweight task**            | Startup overhead dominates      | Direct processing         |
-
-### Complexity Scaling (Anthropic Multi-Agent Research)
-
-| Query Complexity        | Sub-agent Count | Tool Calls per Agent       | Example                 |
-| ----------------------- | --------------- | -------------------------- | ----------------------- |
-| **Simple** (fact check) | 1               | 3-10                       | "What is X?"            |
-| **Comparison**          | 2-4             | 10-15 each                 | "Compare A vs B vs C"   |
-| **Complex research**    | 10+             | Clear responsibility split | "Analyze market trends" |
-
-### Splitting Decision Matrix
-
-| Condition                     | Use Sub-agent? | Reason                  |
-| ----------------------------- | -------------- | ----------------------- |
-| Single file, < 5 min          | ❌             | Overhead > benefit      |
-| Multiple files, > 30 min      | ✅             | Context isolation value |
-| Research + Implement + Review | ✅             | Phase separation        |
-| Simple Q&A                    | ❌             | Single call sufficient  |
-| Log analysis (1000+ lines)    | ✅             | Return only conclusions |
-| Dynamic subtask discovery     | ✅             | Orchestrator-Workers    |
+**Quick reference:** Avoid sub-agents for single file/< 5 min tasks, simple Q&A, or when follow-up conversation is needed.
 
 ---
 
@@ -320,20 +307,28 @@ Do NOT review code in main context.
 For EACH file → runSubagent with specific prompt.
 ```
 
-### Pitfall 2: Expecting Parallel Execution
+### Pitfall 2: Parallel Execution Overhead
 
-❌ **Problem:** Prompt says "process in parallel" but runSubagent is sequential
+⚠️ **Note:** As of 2026/01, runSubagent supports parallel execution, but with overhead.
 
-**Reality:** As of 2025/12, runSubagent does NOT support parallel execution.
+**Trade-off:** Parallel sub-agents add VS Code processing overhead. In one test:
 
-**Solution:** Accept sequential execution or reduce sub-agent count:
+| Metric         | Sequential | Parallel (8 sub-agents) |
+| -------------- | ---------- | ----------------------- |
+| Total tokens   | 33,000     | ~80,000                 |
+| Execution time | 5 sec      | 33 sec                  |
+| Main context   | 33,000     | 10,000                  |
+
+**Recommendation:** Use parallel sub-agents when:
+
+- Context isolation is the primary goal
+- Tasks are truly independent
+- Main session needs to stay clean for follow-up work
 
 ```markdown
-# Note: Sub-agents execute sequentially
+# For parallel execution, group related files into batches
 
-# Optimize by grouping related files
-
-For each MODULE (not each file), use one sub-agent
+# to reduce overhead while maintaining context isolation
 ```
 
 ### Pitfall 3: Nested Sub-agent Calls (Not Supported)
@@ -375,6 +370,34 @@ Return as:
 **Reality:** runSubagent creates fresh agents, cannot handoff to existing agent definitions.
 
 **Solution:** Define sub-agent behavior in the prompt parameter, not in separate files.
+
+### Pitfall 5: Custom Agent as Sub-agent (Experimental)
+
+⚠️ **Experimental Feature:** As of 2026/01, you can invoke custom agents as sub-agents with additional configuration.
+
+**Enable in VS Code:**
+
+```json
+// settings.json
+{
+  "chat.customAgentInSubagent.enabled": true
+}
+```
+
+**Usage:**
+
+```markdown
+#tool:runSubagent を使用して、以下の処理をサブエージェントで実行してください。
+
+- prompt: {サブエージェントへの入力}
+- agentName: my-custom-agent
+```
+
+**Limitations:**
+
+- Custom agent must have `infer: true` (default)
+- Sub-agent cannot access main session context
+- Parallel execution available (2026/01+) but with overhead
 
 ---
 
@@ -458,4 +481,5 @@ Return as:
 - [Chat in IDE - GitHub Docs](https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide#using-subagents)
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [GitHub Copilot runSubagent - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
-- [Context Engineering for Agents - LangChain Blog](https://blog.langchain.com/context-engineering-for-agents/)
+- [Context Engineering for Agents - LangChain Blog](https://blog.langchain.com/context-engineering-for-agents/)- [Handoffs Guide](handoffs-guide.md) - Alternative for human-in-the-loop workflows
+- [Splitting Criteria](splitting-criteria.md) - When to use sub-agents

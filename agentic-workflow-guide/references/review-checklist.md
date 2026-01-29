@@ -43,10 +43,7 @@ Minimum items to verify:
 
 ⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
 
-> **Platform Note**:
->
-> - **VS Code Copilot**: Use `runSubagent` in `tools:` and `#tool:runSubagent` in prompts
-> - **Claude Code**: Use `Task` in `tools:`
+> **Platform Note**: See [runSubagent-guide.md](runSubagent-guide.md#what-is-runsubagent) for VS Code / Claude Code tool names.
 
 ```markdown
 ## Agent Definition
@@ -323,7 +320,7 @@ else:
 
 **Solution:** Simplicity First
 
-> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short." — Anthropic
+> See [design-principles.md > Simplicity First](design-principles.md#3-simplicity-first) for Anthropic's recommendation.
 
 ---
 
@@ -350,21 +347,6 @@ else:
 ```
 
 **Solution:** Loose Coupling
-
----
-
-## Anti-Pattern Quick Reference
-
-| Anti-Pattern         | Symptom                            | Solution                        |
-| -------------------- | ---------------------------------- | ------------------------------- |
-| God Agent            | All responsibilities in 1 agent    | Split with SRP                  |
-| Context Overload     | Passing excessive unnecessary info | Minimize with ISP               |
-| Silent Failure       | Ignoring errors and continuing     | Stop immediately with Fail Fast |
-| Infinite Loop        | Loops without termination          | Set maximum iterations          |
-| Big Bang             | Building everything at once        | Build small with Iterative      |
-| Premature Complexity | Complex design from the start      | Simplicity First                |
-| Black Box            | Internal state invisible           | Transparency                    |
-| Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
 
 ---
 
@@ -452,5 +434,5 @@ After review completion:
 ## Related Documents
 
 - [design-principles.md](design-principles.md) - Design principles details
-- [workflow-patterns.md](workflow-patterns.md) - Workflow pattern details
+- [workflow-patterns/overview.md](workflow-patterns/overview.md) - Workflow pattern details
 - [context-engineering.md](context-engineering.md) - Context management for long tasks
