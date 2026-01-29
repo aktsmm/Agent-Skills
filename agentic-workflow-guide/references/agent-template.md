@@ -2,6 +2,16 @@
 
 Standard structure and specification for `.agent.md` and `.prompt.md` files.
 
+## Table of Contents
+
+- [YAML Front Matter](#yaml-front-matter) - Agent/prompt metadata configuration
+- [Agent Body Structure](#agent-body-structure) - Required and recommended sections
+- [Full Template](#full-template) - Complete agent example
+- [Design Principles](#design-principles-for-agents) - Stateless, SRP, Observability
+- [Examples by Role](#examples-by-role) - Orchestrator, Specialist, Implementation
+- [Available Tools](#available-tools) - VS Code Copilot / Claude Code tool mapping
+- [Handoffs](#handoffs-agent-transitions) - Agent transitions configuration
+
 > **Note**: Both file types use similar YAML front matter. The `mode:` field is deprecated for both.
 
 ## YAML Front Matter
@@ -12,11 +22,28 @@ Standard structure and specification for `.agent.md` and `.prompt.md` files.
 ---
 name: <agent-name> # Required: Identifier for @mention
 description: <description> # Required: One-line role description
-model: <model-name> # Optional: LLM model to use
+model: <model-name> # Optional: LLM model to use (e.g., "Claude Sonnet 4")
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
+target: <vscode|github-copilot> # Optional: Target environment
+infer: <true|false> # Optional: Allow as subagent (default: true)
+argument-hint: <hint-text> # Optional: Input field placeholder
 ---
 ```
+
+### YAML Properties Reference (VS Code 1.106+)
+
+| Property        | Required | Type     | Description                                                         |
+| --------------- | -------- | -------- | ------------------------------------------------------------------- |
+| `name`          | ✅       | string   | Agent identifier for @mention                                       |
+| `description`   | ✅       | string   | Brief description (shown as placeholder in chat)                    |
+| `tools`         | ❌       | string[] | Tool whitelist (omit for all tools)                                 |
+| `model`         | ❌       | string   | AI model to use (e.g., `Claude Sonnet 4`, `GPT-4o`)                 |
+| `handoffs`      | ❌       | object[] | Agent transition buttons (→ [handoffs-guide.md](handoffs-guide.md)) |
+| `target`        | ❌       | string   | `vscode` or `github-copilot` (default: both)                        |
+| `infer`         | ❌       | boolean  | Allow as subagent target (default: `true`)                          |
+| `argument-hint` | ❌       | string   | Hint text in chat input field                                       |
+| `mcp-servers`   | ❌       | object[] | MCP server config (org/enterprise agents only)                      |
 
 ### For `.prompt.md` files
 
@@ -269,25 +296,14 @@ For long-running tasks, maintain visibility:
 
 ### Orchestrator Agent
 
-**VS Code Copilot:**
+→ **Full Example**: See [examples/orchestrator.agent.md](examples/orchestrator.agent.md) for complete definition.
 
-```yaml
----
-name: orchestrator
-description: Coordinates workflow and delegates to specialist agents
-tools: ["runSubagent", "readFile", "textSearch", "todos"]
----
-```
+**Quick Reference (YAML front matter only):**
 
-**Claude Code:**
-
-```yaml
----
-name: orchestrator
-description: Coordinates workflow and delegates to specialist agents
-tools: ["Task", "Read", "Search", "TodoWrite"]
----
-```
+| Platform        | tools                                                |
+| --------------- | ---------------------------------------------------- |
+| VS Code Copilot | `["runSubagent", "readFile", "textSearch", "todos"]` |
+| Claude Code     | `["Task", "Read", "Search", "TodoWrite"]`            |
 
 Key characteristics:
 
@@ -457,6 +473,8 @@ handoffs:
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
+- [Handoffs Guide](handoffs-guide.md) - Detailed handoffs configuration
+- [runSubagent Guide](runSubagent-guide.md) - Sub-agent delegation
 
 ```
 

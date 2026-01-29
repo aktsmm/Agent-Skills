@@ -2,6 +2,17 @@
 
 A framework for measuring agent workflow effectiveness based on vscode-ai-toolkit best practices.
 
+## Table of Contents
+
+- [Overview](#overview) - Why evaluation matters
+- [Three Core Metrics](#three-core-metrics) - Intent Resolution, Tool Call Accuracy, Task Adherence
+- [Evaluation Methodology](#evaluation-methodology) - How to evaluate
+- [Evaluation Best Practices](#evaluation-best-practices) - Guidelines for effective evaluation
+- [Common Evaluation Pitfalls](#common-evaluation-pitfalls) - Anti-patterns to avoid
+- [Evaluation Checklist](#evaluation-checklist) - Quick check template
+
+---
+
 ## Overview
 
 Effective agent evaluation goes beyond simple success/fail metrics. It requires assessing the quality of reasoning, tool usage, and task adherence across diverse scenarios.
