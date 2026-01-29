@@ -21,6 +21,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [drawio-diagram-forge](drawio-diagram-forge/)     | Create draw.io diagrams from text / テキストから draw.io 図を生成                                                  |
 | [ocr-super-surya](ocr-super-surya/)               | GPU-optimized OCR using Surya / GPU 最適化 OCR（90+言語対応、Tesseract の 2 倍精度）                               |
 | [powerpoint-automation](powerpoint-automation/)   | 🆕 Create PPTX from web articles or existing files / Web記事や既存ファイルからPowerPoint自動生成                   |
+| [skill-creator-plus](skill-creator-plus/)         | Guide for creating effective skills (derived from Anthropic) / スキル作成ガイド（Anthropic派生）   |
 | [skill-finder](skill-finder/)                     | Search, install, and manage Agent Skills / Agent Skills の検索・インストール・管理                                 |
 
 ## Usage / 使い方
