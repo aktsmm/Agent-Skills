@@ -1,7 +1,7 @@
 ---
 name: customer-workspace
 description: Customer workspace initialization skill (Japanese UI). Provides inbox (information accumulation), meeting minutes management, and auto-classification rules. Use for "setup customer workspace" or "add inbox feature" requests.
-license: Complete terms in LICENSE.txt
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
@@ -10,11 +10,12 @@ metadata:
 
 顧客固有のワークスペースを初期化し、情報蓄積・議事録管理の仕組みを提供。
 
-## When to use
+## When to Use
 
-- 顧客ごとのワークスペース初期化が必要なとき
-- インボックス機能や議事録管理を追加したいとき
-- 顧客情報の整理・自動分類ルールを導入したいとき
+- **Customer workspace**, **inbox**, **meeting notes**, **顧客ワークスペース**
+- Setting up per-customer workspaces
+- Adding inbox or meeting minutes management
+- Implementing auto-classification rules for customer information
 
 ## 機能
 

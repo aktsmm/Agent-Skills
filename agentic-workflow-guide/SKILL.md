@@ -1,7 +1,7 @@
 ---
 name: agentic-workflow-guide
-description: "Create, review, and update Prompt and agents and workflows. Covers 5 workflow patterns, runSubagent delegation, Handoffs, Context Engineering. Use for any .agent.md file work or multi-agent system design."
-license: Complete terms in LICENSE.txt
+description: "Create, review, and update Prompt and agents and workflows. Covers 5 workflow patterns, runSubagent delegation, Handoffs, Context Engineering. Use for any .agent.md file work or multi-agent system design. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計'."
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---

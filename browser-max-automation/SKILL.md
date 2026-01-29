@@ -1,7 +1,7 @@
 ---
 name: browser-max-automation
 description: Browser automation using Playwright MCP for web testing, UI verification, and form automation. Use when navigating websites, clicking elements, filling forms, taking screenshots, or testing web applications. Supports iframe operations and complex JavaScript execution.
-license: Complete terms in LICENSE.txt
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
@@ -10,8 +10,9 @@ metadata:
 
 Browser automation via Playwright MCP.
 
-## When to use
+## When to Use
 
+- **Browser automation**, **Playwright**, **web testing**, **screenshot**
 - Automating browser-based workflows or QA checks
 - Verifying UI states, DOM changes, or visual regressions
 - Filling forms, clicking elements, or capturing screenshots

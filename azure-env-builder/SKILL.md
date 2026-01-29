@@ -1,19 +1,21 @@
 ---
 name: azure-env-builder
-description: "[Alpha] エンタープライズ Azure 環境構築スキル。AVM 活用、VM アプリ初期化、App Service/AKS/Container Apps へのアプリデプロイ、サービス間設定連携、CI/CD 生成をサポート。Hub-Spoke, AKS, AI Foundry 等の複合アーキテクチャに対応。Bicep MCP と Microsoft Learn Docs MCP で最新スキーマを取得。"
+description: "[Alpha] Enterprise Azure environment builder. Deploy apps to App Service/AKS/Container Apps, generate Bicep with AVM modules, configure service connections and CI/CD. Use when building Azure infrastructure, deploying applications, or designing Hub-Spoke/AKS/AI Foundry architectures."
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
 
 # Azure Environment Builder
 
-エンタープライズ向け Azure 環境を効率的に構築するスキル。
+Enterprise Azure environment builder skill.
 
 ## When to Use
 
-- エンタープライズ向け Azure 環境の新規構築や再構成
-- AVM モジュールを活用した Bicep 設計・実装
-- Hub-Spoke/AKS/AI Foundry など複合アーキテクチャの設計
+- **Azure**, **Bicep**, **infrastructure**, **deploy app**
+- Building enterprise Azure environments
+- Deploying apps to App Service, AKS, or Container Apps
+- Designing Hub-Spoke, AKS, or AI Foundry architectures
 
 ## 機能一覧
 
