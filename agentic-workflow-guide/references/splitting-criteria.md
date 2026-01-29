@@ -2,8 +2,17 @@
 
 Guide for deciding when to escalate complexity (Prompt → Agent → Multi-Agent) and when to split into sub-agents.
 
-):**
-> (Quote removed; see linked references.)
+'s recommendation.
+
+### Evidence Levels
+
+| Icon | Meaning                             |
+| ---- | ----------------------------------- |
+| ✅   | Official source (Anthropic, OpenAI) |
+| ⚠️   | Indirect evidence / best practice   |
+| 📊   | Community-verified (empirical)      |
+
+> **Note on Thresholds:** Specific numeric thresholds (50 lines, 70%, etc.) are practical guidelines derived from community experience. Adjust based on your project needs. See Part 5 for customization.
 
 ---
 
@@ -13,12 +22,14 @@ When a simple approach isn't working, escalate to the next level.
 
 ### Levels
 
-| Level  | Configuration         | When to Use                                | Escalation Triggers (Observable Signals)                                   |
-| ------ | --------------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
-| **L0** | Single Prompt         | Simple Q&A, single response completes task | Same request retried 3+ times, output format unstable                      |
-| **L1** | Prompt + Instructions | Repeated use, consistency needed           | Steps > 5, complex branching, **repeated "missed" or "overlooked" errors** |
-| **L2** | Single Agent          | Dynamic decisions, tool use required       | Multiple responsibilities, context > 70%, phase transitions needed         |
-| **L3** | Multi-Agent           | Complex workflows, parallel processing     | Independent subtasks, context isolation required                           |
+| Level  | Configuration         | When to Use                                | Escalation Triggers (Observable Signals)                                   | Evidence |
+| ------ | --------------------- | ------------------------------------------ | -------------------------------------------------------------------------- | -------- |
+| **L0** | Single Prompt         | Simple Q&A, single response completes task | Same request retried 3+ times, output format unstable                      | ⚠️       |
+| **L1** | Prompt + Instructions | Repeated use, consistency needed           | Steps > 5, complex branching, **repeated "missed" or "overlooked" errors** | ⚠️       |
+| **L2** | Single Agent          | Dynamic decisions, tool use required       | Multiple responsibilities, context > 70%, phase transitions needed         | ✅ [^1]  |
+| **L3** | Multi-Agent           | Complex workflows, parallel processing     | Independent subtasks, context isolation required                           | ✅ [^2]  |
+
+> **Context Rot:** Research shows LLM performance degrades as context length increases, even on simple tasks. This supports the "context > 70%" threshold as a safety margin. [^3]
 
 ### Observable Escalation Signals
 
@@ -77,16 +88,16 @@ Once at L2/L3, use these criteria to decide sub-agent boundaries.
 
 ### Quantitative Triggers
 
-| Metric                  | Threshold              | Action                                  |
-| ----------------------- | ---------------------- | --------------------------------------- |
-| **Prompt line count**   | > 50 lines             | Consider splitting                      |
-| **Step count**          | > 5-7 sequential steps | Consider phase splitting                |
-| **Context usage**       | > 70%                  | Mandatory: use sub-agents or compaction |
-| **Session duration**    | > 30 min               | Selective sub-agent use                 |
-| **Session duration**    | > 2 hours              | Sub-agents mandatory                    |
-| **Files to process**    | > 3-5 files            | File-per-subagent pattern               |
-| **Tool calls expected** | > 15-20 calls          | Consider task splitting                 |
-| **Subtask count**       | Dynamic/unknown        | Orchestrator-Workers pattern            |
+| Metric                  | Threshold              | Action                                  | Evidence |
+| ----------------------- | ---------------------- | --------------------------------------- | -------- |
+| **Prompt line count**   | > 50 lines             | Consider splitting                      | ⚠️       |
+| **Step count**          | > 5-7 sequential steps | Consider phase splitting                | ⚠️       |
+| **Context usage**       | > 70%                  | Mandatory: use sub-agents or compaction | ⚠️ [^3]  |
+| **Session duration**    | > 30 min               | Selective sub-agent use                 | ⚠️       |
+| **Session duration**    | > 2 hours              | Sub-agents mandatory                    | ⚠️       |
+| **Files to process**    | > 3-5 files            | File-per-subagent pattern               | 📊 [^4]  |
+| **Tool calls expected** | > 15-20 calls          | Consider task splitting                 | ✅ [^2]  |
+| **Subtask count**       | Dynamic/unknown        | Orchestrator-Workers pattern            | ✅ [^1]  |
 
 ### Qualitative Triggers
 
@@ -100,7 +111,9 @@ Once at L2/L3, use these criteria to decide sub-agent boundaries.
 | **Dynamic task count**     | Subtask count depends on input                       | Orchestrator-Workers                    |
 | **Input branching**        | Processing varies by input type                      | Routing                                 |
 
-### Complexity Scaling (Anthropic Multi-Agent Research)
+### Complexity Scaling ✅
+
+ Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) [^2]
 
 | Query Complexity  | Sub-agent Count | Tool Calls per Agent       |
 | ----------------- | --------------- | -------------------------- |
@@ -144,7 +157,9 @@ Run this check when creating or reviewing prompts/agents:
 
 ## Part 4: When NOT to Split
 
-Sub-agents have overhead. Avoid when:
+Sub-agents have overhead. Avoid when: ✅ [^1] 📊 [^4]
+
+> **Empirical Data:** Sub-agent overhead can be significant. In one test, sub-agents reduced main session tokens by 70% but increased total tokens by 2.4x and execution time by 6.6x. [^4]
 
 | Scenario                    | Reason                                    | Alternative                  |
 | --------------------------- | ----------------------------------------- | ---------------------------- |
@@ -188,9 +203,20 @@ Default thresholds can be overridden in `.github/copilot-instructions.md`:
 
 ## References
 
-- [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
-- [How We Built Our Multi-Agent Research System - Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)
-- [Context Engineering for AI Agents - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+### Official Sources
+
+[^1]: [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents) — 5 workflow patterns, when to use agents
+
+[^2]: [How We Built Our Multi-Agent Research System - Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system) — Complexity scaling, sub-agent counts
+
+[^3]: [Context Rot - Chroma Research](https://research.trychroma.com/context-rot) — LLM performance degrades with context length
+
+### Community / Empirical
+
+[^4]: [GitHub Copilot Chat サブエージェント検証 - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167) — Overhead measurements
+
+### Internal References
+
 - [runSubagent-guide.md](runSubagent-guide.md) — Detailed sub-agent implementation
-- [workflow-patterns.md](workflow-patterns.md) — 5 workflow patterns
+- [workflow-patterns/overview.md](workflow-patterns/overview.md) — 5 workflow patterns
 - [context-engineering.md](context-engineering.md) — Context management techniques

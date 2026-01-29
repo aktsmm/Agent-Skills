@@ -6,21 +6,14 @@
 
 以下のプロンプトがテンプレートに含まれています。
 
-| ファイル                                   | 説明                                         |
-| ------------------------------------------ | -------------------------------------------- |
-| `create-workflow.prompt.md`                | エージェント/ワークフロー作成（統合版）      |
-| `review-agents-and-instructions.prompt.md` | エージェント定義・instructions のレビュー    |
-| `plan-workflow.prompt.md`                  | 複数エージェントを使ったタスク実行計画       |
-| `design-workflow.prompt.md`                | 新しいエージェントワークフロー設計           |
-| `debug-error.prompt.md`                    | エラーメッセージ分析によるデバッグ支援       |
-| `write-tests.prompt.md`                    | テストコード生成                             |
-| `gc_Commit.prompt.md`                      | Git コミット（Push なし）                    |
-| `gcp_Commit_Push.prompt.md`                | Git コミット＆プッシュ                       |
-| `gpull.prompt.md`                          | Git プル                                     |
-| `review-retrospective-learnings.prompt.md` | 学びを抽象化して設計資産へ反映（ふりかえり） |
-| `review-session-export-md.prompt.md`       | セッション内容を Markdown 形式でエクスポート |
-| `wrap-up-work.prompt.md`                   | 作業の締め・要約                             |
-| `sample.prompt.md`                         | カスタムプロンプト作成用テンプレート         |
+| ファイル                    | 説明                                    |
+| --------------------------- | --------------------------------------- |
+| `create-workflow.prompt.md` | エージェント/ワークフロー作成（統合版） |
+| `plan-workflow.prompt.md`   | 複数エージェントを使ったタスク実行計画  |
+| `design-workflow.prompt.md` | 新しいエージェントワークフロー設計      |
+| `sample.prompt.md`          | カスタムプロンプト作成用テンプレート    |
+
+> **Note**: Git操作・デバッグ・レビュー系の汎用プロンプトは VS Code のグローバル設定に配置することを推奨します。
 
 ## カスタマイズ
 
