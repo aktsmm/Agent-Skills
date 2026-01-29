@@ -1,7 +1,7 @@
 ---
 name: skill-finder
-description: "Full-featured Agent Skills management: Search 35+ skills, install locally, star favorites, update from sources. Supports tag search (#azure #bicep), category filtering, and similar skill recommendations."
-license: MIT
+description: "Full-featured Agent Skills management: Search 35+ skills, install locally, star favorites, update from sources. Use when looking for skills, installing new skills, or managing your skill collection."
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
@@ -12,10 +12,10 @@ Full-featured Agent Skills management tool.
 
 ## When to Use
 
+- **Find skill**, **search skill**, **install skill**, **スキル検索**
 - Looking for skills for a specific task or domain
 - Finding and installing skills locally
 - Managing favorites with star feature
-- Keeping skill index up-to-date
 
 ## Features
 

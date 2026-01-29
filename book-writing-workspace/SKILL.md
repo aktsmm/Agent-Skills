@@ -1,7 +1,7 @@
 ---
 name: book-writing-workspace
 description: Set up a complete book writing workspace with AI agents, instructions, prompts, and scripts. Use when users want to create a new book/technical writing project with Markdown + Re:VIEW + PDF output workflow. Triggers on "book writing workspace", "technical book project", "執筆ワークスペース", or similar project setup requests.
-license: Complete terms in LICENSE.txt
+license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
@@ -12,6 +12,7 @@ Set up a professional book writing workspace with AI-assisted workflow support.
 
 ## When to use
 
+- **Book writing**, **technical writing**, **執筆プロジェクト**
 - Creating a new book or technical writing project
 - Setting up Markdown → Re:VIEW → PDF workflow
 - Establishing multi-chapter document structure with AI agent support
