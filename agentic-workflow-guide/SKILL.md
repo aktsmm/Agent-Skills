@@ -84,6 +84,7 @@ Design, review, and improve agent workflows based on proven principles.
 | Context Management | [references/context-engineering.md](references/context-engineering.md) |
 | **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
 | Scaffold Tool      | [references/scaffold-usage.md](references/scaffold-usage.md)           |
+| **Deep Agent**     | [references/deep-agent-patterns.md](references/deep-agent-patterns.md) |
 
 ## runSubagent Quick Fix
 
