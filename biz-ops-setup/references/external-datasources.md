@@ -11,18 +11,18 @@ Automatic retrieval from workIQ (M365) and reference to folders outside the work
 
 List of data sources available via workIQ MCP server.
 
-| Data Source              | Priority | Purpose                                      |
-| ------------------------ | -------- | -------------------------------------------- |
-| 📅 Meetings & Calendar   | ⭐⭐⭐   | Attended meetings, time, duration            |
-| ✉️ Sent Emails           | ⭐⭐⭐   | Emails sent by you                           |
-| 📥 Received Emails (To)  | ⭐⭐     | Emails received addressed to you             |
-| 💬 Teams Mentions        | ⭐⭐⭐   | Mentions directed to you, reply status       |
-| � Teams Posts            | ⭐⭐     | Messages posted by you                       |
-| �📄 Edited Files         | ⭐⭐     | Word/Excel/PDF edit history                  |
-| 📊 PowerPoint Updates    | ⭐⭐     | PPTX edit history (explicitly retrieved)     |
-| 📝 OneNote               | ⭐       | Note updates, sections                       |
-| 💬 Teams Meeting Notes   | ⭐⭐     | AI meeting minutes, decisions                |
-| 📋 Planner/To Do         | ⭐       | Task completion                              |
+| Data Source             | Priority | Purpose                                  |
+| ----------------------- | -------- | ---------------------------------------- |
+| 📅 Meetings & Calendar  | ⭐⭐⭐   | Attended meetings, time, duration        |
+| ✉️ Sent Emails          | ⭐⭐⭐   | Emails sent by you                       |
+| 📥 Received Emails (To) | ⭐⭐     | Emails received addressed to you         |
+| 💬 Teams Mentions       | ⭐⭐⭐   | Mentions directed to you, reply status   |
+| � Teams Posts           | ⭐⭐     | Messages posted by you                   |
+| �📄 Edited Files        | ⭐⭐     | Word/Excel/PDF edit history              |
+| 📊 PowerPoint Updates   | ⭐⭐     | PPTX edit history (explicitly retrieved) |
+| 📝 OneNote              | ⭐       | Note updates, sections                   |
+| 💬 Teams Meeting Notes  | ⭐⭐     | AI meeting minutes, decisions            |
+| 📋 Planner/To Do        | ⭐       | Task completion                          |
 
 ### workIQ Query Examples
 
@@ -57,33 +57,43 @@ Please specify external folders to reference during report generation.
 
 ### 2. Record in Configuration File
 
-Record in `_datasources/external-paths.md`:
+**Use template:** `assets/external-paths.template.md`
+
+```powershell
+# Copy template to workspace
+Copy-Item assets/external-paths.template.md _datasources/external-paths.md
+```
+
+**Fill in paths from interview:**
 
 ```markdown
 # External Data Sources
 
-## Technical QA
-
-- **Path**: {user-specified path}
-- **Purpose**: PR count, QA responses by project
-- **Check method**: Git log / File modification date
-
-## Blog
-
-- **Path**: {user-specified path}
-- **Purpose**: Published blog article count
-- **Check method**: New files / Modification date
-
-## Customer Project Folders
-
-- **Path**: {user-specified path}
-- **Purpose**: Customer materials and deliverable updates
-- **Check method**: Folder modification date
+| Data Source        | Path                                       | Purpose                | Check Method      |
+| ------------------ | ------------------------------------------ | ---------------------- | ----------------- |
+| Tech QA Repository | C:\Users\{user}\repos\{repo-name}          | PR count, QA responses | Git log           |
+| Blog Folder        | D:\{blog-folder}                           | Published articles     | File modification |
+| Customer Projects  | C:\Users\{user}\OneDrive\{customer-folder} | Deliverables           | Folder update     |
 ```
 
-### 3. Reference in report-generator
+### 3. Deploy report-generator with Integration
 
-Already added to data source section in `report-generator.agent.md`.
+**Use template:** `assets/report-generator.agent.template.md`
+
+```powershell
+# Copy template to workspace
+Copy-Item assets/report-generator.agent.template.md .github/agents/report-generator.agent.md
+```
+
+**Integration features:**
+
+- Automatic read of `_datasources/external-paths.md` during report generation
+- Execute check commands for each configured source
+- Include results in "External Updates" section
+
+### 4. Update copilot-instructions
+
+Add external data source references to the data source table (uncomment template section).
 
 ## Check Query Examples
 
