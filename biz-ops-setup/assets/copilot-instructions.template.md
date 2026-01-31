@@ -1,20 +1,23 @@
-# Biz-Ops Copilot Instructions Template
+# Copilot Instructions
+
+This file provides workspace-specific instructions for GitHub Copilot.
+Place this file at `.github/copilot-instructions.md` in your workspace.
+
+---
+
+## Biz-Ops Workspace Overview
 
 Microsoft workIQ をベースとした業務管理ワークスペースの共通ルール。
 
----
-
-## ワークスペース概要
-
-| 項目         | 内容                                               |
-| ------------ | -------------------------------------------------- |
-| **目的**     | 業務棚卸、レポート生成、タスク管理、上司PR         |
-| **ベース**   | Microsoft workIQ                                   |
-| **主要機能** | デイリー/週次/月次レポート、タスク管理、データ収集 |
+| Item         | Description                                                    |
+| ------------ | -------------------------------------------------------------- |
+| **Purpose**  | Work inventory, report generation, task management             |
+| **Base**     | Microsoft workIQ (optional)                                    |
+| **Features** | Daily/Weekly/Monthly reports, task management, data collection |
 
 ---
 
-## 🔔 自動レポートチェック（MANDATORY）
+## 🔔 Auto Report Check (MANDATORY)
 
 **すべてのリクエスト処理前に、以下のチェックを実行すること:**
 
@@ -92,6 +95,25 @@ graph TD
 
 ---
 
+## 社内行事振り分け
+
+### 社内行事検出パターン
+
+| パターン                     | 分類     | 保存先                    |
+| ---------------------------- | -------- | ------------------------- |
+| Tech Connect, テックコネクト | イベント | `_internal/tech-connect/` |
+| All Hands, 全社, 全体会議    | 会議     | `_internal/_meetings/`    |
+| 1on1, 1:1, ワンオンワン      | チーム   | `_internal/team/`         |
+| チームMTG, Team Meeting      | チーム   | `_internal/team/`         |
+| 勉強会（社内）, LT           | 学習     | `_internal/_meetings/`    |
+| FY26, 年度, 四半期, QBR      | 会議     | `_internal/_meetings/`    |
+| 昇進, 評価, Connect          | キャリア | `_internal/team/`         |
+| 異動, 組織変更               | 組織     | `_internal/_inbox/`       |
+| 休暇, PTO, 有給              | 休暇     | `_internal/_inbox/`       |
+| 経費, 精算                   | 経費     | `_internal/_inbox/`       |
+
+---
+
 ## レポート生成
 
 ### 種類と頻度
@@ -112,14 +134,24 @@ graph TD
 
 レポート生成時に以下を参照（更新チェック付き）:
 
-| ソース       | パス                  | 内容                               |
-| ------------ | --------------------- | ---------------------------------- |
-| workIQ       | (API)                 | 会議・メール・ファイル・メンション |
-| 顧客フォルダ | `Customers/*/_inbox/` | 顧客別活動                         |
-| 社内フォルダ | `_internal/`          | 社内イベント                       |
-| タスク       | `Tasks/`              | 完了・進行中タスク                 |
+| ソース           | パス                             | 内容                               |
+| ---------------- | -------------------------------- | ---------------------------------- |
+| workIQ           | (API)                            | 会議・メール・ファイル・メンション |
+| 顧客フォルダ     | `Customers/*/_inbox/`            | 顧客別活動                         |
+| 社内フォルダ     | `_internal/`                     | 社内イベント                       |
+| タスク           | `Tasks/`                         | 完了・進行中タスク                 |
+| **外部フォルダ** | `_datasources/external-paths.md` | **外部リポジトリ・OneDrive等**     |
 
-<!-- 外部データソースをセットアップ時に追加 -->
+<!-- セットアップ時に外部データソースを追加例 -->
+<!--
+### 外部データソース例
+
+| ソース | パス | 確認方法 |
+| ------ | ---- | -------- |
+| Tech QA Repository | C:\Users\{user}\repos\{repo-name} | Git log |
+| Blog | D:\{blog-folder} | File modification |
+| Customer Projects | C:\Users\{user}\OneDrive\{customer-folder} | Folder update |
+-->
 
 ---
 
@@ -148,7 +180,42 @@ graph TD
 
 ## デフォルトタグ
 
-`#network` `#cost` `#contract` `#proposal` `#ai` `#container` `#meeting` `#support` `#organization` `#deadline` `#internal` `#dev` `#docs` `#research` `#admin` `#customer` `#report` `#ross` `#delivery` `#vbd` `#training` `#demo`
+`#network` `#cost` `#contract` `#proposal` `#ai` `#container` `#meeting` `#support` `#organization` `#deadline` `#internal` `#dev` `#docs` `#research` `#admin` `#customer` `#report` `#case` `#delivery` `#engagement` `#training` `#demo`
+
+該当なし → 内容から新規タグを動的生成
+
+---
+
+## 案件管理システム連携（オプション）
+
+外部の案件管理システム（CRM、チケットシステム等）と連携する場合、タスクに以下の情報を記録する：
+
+### 推奨フィールド
+
+- **Case URL**: 案件管理システムの詳細ページURL
+  - 形式例: `https://crm.example.com/cases/12345`
+- **Case ID**: 案件識別子
+- **Request ID**: リクエストID（該当する場合）
+- **Project Name/ID**: プロジェクト名とID
+- **Location**: 作業場所・デリバリー先
+
+### 記録例
+
+```markdown
+- **案件情報**:
+  - Case URL: https://crm.example.com/cases/12345
+  - Case ID: 12345
+  - Request ID: REQ-2026-001
+  - Project Name/ID: Example Corp - Project Alpha
+  - Location: Tokyo, Japan
+```
+
+<!--
+組織固有のシステム連携が必要な場合:
+1. 上記テンプレートをカスタマイズ
+2. フィールド名を実際のシステムに合わせて変更
+3. URLフォーマットを調整
+-->
 
 ---
 
