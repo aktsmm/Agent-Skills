@@ -109,20 +109,32 @@ tools:
 
 **Tools Pattern Reference:**
 
-| Pattern         | Description               | Example                |
-| --------------- | ------------------------- | ---------------------- |
-| `category/tool` | Specific tool             | `read/readFile`        |
-| `category/*`    | All tools in category     | `workiq/*`             |
-| MCP tools       | External MCP server tools | `workiq/*`, `github/*` |
+| Pattern           | Description                | Example                                   |
+| ----------------- | -------------------------- | ----------------------------------------- |
+| `category`        | Category alias (all tools) | `read`, `edit`, `search`, `execute`       |
+| `category/tool`   | Specific tool              | `read/readFile`, `execute/runInTerminal`  |
+| `mcp-server/*`    | All MCP server tools       | `bicep/*`, `github/*`                     |
+| `mcp-server/tool` | Specific MCP tool          | `github/search_code`                      |
+| Mixed             | Combine any patterns       | `['execute', 'read/readFile', 'bicep/*']` |
 
-**Common Tool Categories:**
+**Tool Aliases (VS Code Copilot):**
 
-| Category | Tools                                     |
-| -------- | ----------------------------------------- |
-| `read`   | `readFile`                                |
-| `edit`   | `editFiles`                               |
-| `search` | `fileSearch`, `textSearch`                |
-| `workiq` | M365 integration (email, calendar, files) |
+| Alias     | Included Tools                         | Description        |
+| --------- | -------------------------------------- | ------------------ |
+| `execute` | shell, Bash, powershell, runInTerminal | シェル実行         |
+| `read`    | readFile, NotebookRead                 | ファイル読み取り   |
+| `edit`    | editFiles, MultiEdit, Write            | ファイル編集       |
+| `search`  | fileSearch, textSearch, Grep, Glob     | 検索               |
+| `agent`   | runSubagent, custom-agent, Task        | サブエージェント   |
+| `web`     | WebSearch, WebFetch, fetch             | Web 取得           |
+| `todo`    | manage_todo_list, TodoWrite            | タスクリスト       |
+| `vscode`  | VS Code specific tools                 | VS Code 固有ツール |
+
+> **💡 Tips:**
+>
+> - エイリアス形式 (`"read"`) とフルパス形式 (`"read/readFile"`) は混在可能
+> - 認識されないツール名は**無視される**（エラーにならない）
+> - MCP サーバーは `server-name/*` でワイルドカード指定可能
 
 ---
 
@@ -142,10 +154,11 @@ description: Does something useful
 | Specification | Behavior                                   |
 | ------------- | ------------------------------------------ |
 | **Omitted**   | All tools available (recommended for most) |
+| `tools: ["*"]`| All tools available (explicit)             |
 | `tools: []`   | No tools available                         |
 | Tool names    | Only listed tools available (whitelist)    |
 
-> **Note**: MCP server tools become available at runtime automatically. Unknown tool names cause errors.
+> **Note**: MCP server tools become available at runtime automatically. Unknown tool names are **ignored** (not errors).
 
 ## Agent Body Structure
 
@@ -392,7 +405,7 @@ Built-in tools for custom agents. Tool names differ by platform:
 | Search          | `search/textSearch`, `search/fileSearch` | `Search`, `Grep` |
 | Subagent        | `agent`                                  | `Task`           |
 | Web fetch       | `fetch`                                  | (MCP)            |
-| Todo list       | `todos`                                  | `TodoWrite`      |
+| Todo list       | `todo`                                   | `TodoWrite`      |
 
 ### Tool Definition Examples
 
@@ -402,7 +415,7 @@ Built-in tools for custom agents. Tool names differ by platform:
 ---
 name: orchestrator
 description: Coordinates workflow and delegates to specialist agents
-tools: ["agent", "read/readFile", "search/textSearch", "todos"]
+tools: ["agent", "read", "search", "todo"]
 ---
 ```
 
@@ -447,7 +460,7 @@ Handoffs enable guided sequential workflows between agents with suggested next s
 name: Planner
 description: Generate an implementation plan
 # VS Code Copilot tools
-tools: ["textSearch", "fetch", "readFile"]
+tools: ["search", "web", "read"]
 handoffs:
   - label: Start Implementation
     agent: implementation
