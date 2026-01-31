@@ -162,11 +162,21 @@ Copy from `assets/` to workspace root or `.github/`:
 
 Copy from `assets/_datasources/` to `_datasources/`:
 
-| Template                  | Destination      | Purpose                |
-| ------------------------- | ---------------- | ---------------------- |
-| `workiq-spec.template.md` | `workiq-spec.md` | workIQ query reference |
+| Template                           | Destination            | Purpose                         |
+| ---------------------------------- | ---------------------- | ------------------------------- |
+| `workiq-spec.template.md`          | `workiq-spec.md`       | workIQ query reference          |
+| `external-folders.template.md`     | `external-folders.md`  | External folder sync config     |
+| `README.template.md`               | `README.md`            | Data sources overview           |
 
-### 3.5 Post-Deploy Customization
+### 3.5 Scripts
+
+Copy from `assets/scripts/` to `_datasources/scripts/`:
+
+| Script                        | Purpose                          |
+| ----------------------------- | -------------------------------- |
+| `Check-ExternalFolders.ps1`   | External folder update checker   |
+
+### 3.6 Post-Deploy Customization
 
 After copying, customize these sections in copied files:
 
@@ -227,6 +237,7 @@ Create `Customers/{id}/` for each interviewed customer.
 - \_internal/
 - \_inbox/
 - \_datasources/
+- \_datasources/scripts/
 - \_workiq/
 
 ### Deployed Agents (6)
@@ -250,8 +261,10 @@ Create `Customers/{id}/` for each interviewed customer.
 - AGENTS.md (agent registry)
 - DASHBOARD.md (status dashboard)
 - copilot-instructions.md (with customer mappings)
-- \_datasources/external-paths.md (if configured)
+- \_datasources/external-folders.md (external folder sync)
+- \_datasources/README.md (data sources overview)
 - \_datasources/workiq-spec.md
+- \_datasources/scripts/Check-ExternalFolders.ps1
 - \_workiq/{country}-holidays.md
 
 ### Workflow Verification
@@ -259,11 +272,13 @@ Create `Customers/{id}/` for each interviewed customer.
 Test these commands to verify setup:
 
 1. "Create daily report" → report-generator activates
-   - ⚠️ Run `Get-Date` first to confirm current date
+   - ⚠️ Runs Phase 0 date/weekday check first
+   - ⚠️ Skips weekend and holidays automatically
 2. Paste Teams chat → data-collector routes to customer folder
 3. "Add task: {content}" → task-manager creates task
 4. "Update tasks" → workIQ integration (if available)
 5. "Create weekly report" → Confirm week start/end dates before generating
+6. "Check external folders" → Check-ExternalFolders.ps1 executes
 ```
 
 ## Key References

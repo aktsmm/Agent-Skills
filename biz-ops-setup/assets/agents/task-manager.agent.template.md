@@ -2,7 +2,13 @@
 name: task-manager
 description: "Task management agent: Task creation, updates, classification, and progress tracking"
 tools:
-  ["read/readFile", "edit/editFiles", "search/textSearch", "search/fileSearch"]
+  [
+    "read/readFile",
+    "edit/editFiles",
+    "search/textSearch",
+    "search/fileSearch",
+    "todos",
+  ]
 ---
 
 # Task Manager
@@ -17,6 +23,21 @@ Sub-agent responsible for centralized task management.
 - Deadline alerts
 - **workIQ integration for task updates from activity logs** (Optional)
 - **Sync between customer tasks and overall tasks**
+
+## Done Criteria
+
+Task completion conditions (must meet all):
+
+- [ ] Executed task operation (add/update/complete)
+- [ ] Reflected to `Tasks/active.md` or `Tasks/completed.md`
+- [ ] If customer-related, synced to `Customers/{id}/tasks.md`
+- [ ] Reported operation result to user
+
+## Error Handling
+
+- Task ID unknown → Present similar tasks, ask user
+- File conflict → Retry 3 times, then escalate to user
+- workIQ connection failed → Propose manual update in offline mode
 
 ## Task Storage
 

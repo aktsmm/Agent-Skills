@@ -140,7 +140,23 @@ graph TD
 | 顧客フォルダ     | `Customers/*/_inbox/`            | 顧客別活動                         |
 | 社内フォルダ     | `_internal/`                     | 社内イベント                       |
 | タスク           | `Tasks/`                         | 完了・進行中タスク                 |
-| **外部フォルダ** | `_datasources/external-paths.md` | **外部リポジトリ・OneDrive等**     |
+| **外部フォルダ** | `_datasources/external-folders.md` | **外部リポジトリ・OneDrive等**   |
+
+### 外部フォルダ自動チェック（MANDATORY）
+
+レポート生成前に以下を実行:
+
+1. **外部フォルダをチェック**: `_datasources/external-folders.md` 参照
+2. **更新ファイル検出**: `_inbox/{YYYY-MM}.md` の最終更新日時を確認
+3. **差分取得**: 新規セクションを `Customers/{id}/_inbox/` に追記
+4. **タスク抽出**: `📌 TODO` パターンを `Tasks/active.md` に追加
+
+**チェック方法例**:
+- 対象フォルダ内の `_inbox` ファイルを列挙
+- 最終更新日時が過去7日以内のものを抽出
+- 更新があれば差分を取得
+
+**スクリプト**: `_datasources/scripts/Check-ExternalFolders.ps1`
 
 <!-- セットアップ時に外部データソースを追加例 -->
 <!--

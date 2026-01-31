@@ -17,14 +17,27 @@ Sub-agent responsible for information collection from various data sources.
 - Metadata assignment
 - Inbox accumulation
 
+## Done Criteria
+
+Task completion conditions (must meet all):
+
+- [ ] Determined input data source type
+- [ ] Detected and classified customer or internal event
+- [ ] Saved in normalized format to file
+- [ ] If task detected, reflected to Tasks/ as well
+
+## Error Handling
+
+- Customer detection failed → Save to `_inbox/`, ask user for routing
+- File write failure → Retry 3 times, then escalate to user
+- Format recognition failed → Save raw data to `_inbox/`, request manual check
+
 ## Customer Auto-Routing (MANDATORY)
 
-### Customer Name Mapping
-
-<!-- Add customer mappings during setup interview -->
-
-| Detection Pattern | Customer ID | Folder |
-| ----------------- | ----------- | ------ |
+> **SSOT**: Customer mapping definitions are in `.github/copilot-instructions.md`
+>
+> - Customer name mapping → `Customer Auto-Routing` section
+> - Contact-customer mapping → `Routing Rules` section
 
 ### Routing Flow
 
@@ -44,34 +57,18 @@ graph TD
 
 ### Customer Detection Rules
 
-1. **From sender name**: Infer customer from account manager or MS contact names
+1. **From sender name**: Infer customer from account manager or internal contact names (refer to copilot-instructions.md)
 2. **From content**: Keywords with customer or project names
 3. **Explicit specification**: "Regarding X" or "From X" patterns
 
-### Contact-Customer Mapping
-
-<!-- Add mappings during setup interview -->
-
-| Contact Name | Customer |
-| ------------ | -------- |
-
 ## Internal Event Routing
 
-### Internal Event Detection Patterns
-
-| Pattern                 | Classification | Destination            |
-| ----------------------- | -------------- | ---------------------- |
-| Tech Connect, All Hands | Event          | `_internal/_meetings/` |
-| 1on1, Team Meeting      | Team           | `_internal/team/`      |
-| Study Session, Workshop | Learning       | `_internal/_meetings/` |
-| Quarterly Review, QBR   | Meeting        | `_internal/_meetings/` |
-| Promotion, Evaluation   | Career         | `_internal/team/`      |
-| Expense, PTO, Leave     | Admin          | `_internal/_inbox/`    |
+> **SSOT**: Internal event patterns are in `.github/copilot-instructions.md` `Internal Event Routing` section
 
 ### Detection Priority
 
 1. **Explicit customer name** → Customer folder
-2. **Internal event keyword** → \_internal/
+2. **Internal event keyword** → `_internal/`
 3. **Contact name can infer customer** → Customer folder
 4. **Unknown** → Common `_inbox/`
 
