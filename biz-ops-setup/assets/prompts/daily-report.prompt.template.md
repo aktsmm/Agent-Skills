@@ -111,19 +111,27 @@ Query: "List of emails I sent on {target date}. Include subject, time, recipient
 - Verify each data item's datetime is within target date range (00:00-23:59)
 - Exclude out-of-range data and log
 
-**⚠️ Important**: Only sent emails (replies + new). Do NOT include received emails.
+**⚠️ Important**: Only sent emails (replies + new) count as actual work activity.
 
-#### 📥 Received Emails (To me)
+#### ~~📥 Received Emails (To me)~~
 
-```
-Query: "List of emails addressed to me on {target date}. Include subject, sender, time"
-```
+**EXCLUDED**: Received emails are excluded from daily reports (too much noise from auto-notifications).
+
+- Exception: If specific received email led to action, include that action instead
 
 #### 📄 Edited Files
 
 ```
-Query: "Word, PowerPoint, Excel files I edited on {target date}"
+Query: "Word, Excel files I edited on {target date}"
 ```
+
+#### 📊 PowerPoint Updates
+
+```
+Query: "PowerPoint files I edited on {target date}. Include file name, save location"
+```
+
+**Note**: PowerPoint is tracked separately as it often represents significant deliverable work.
 
 #### 💬 Teams Mentions
 

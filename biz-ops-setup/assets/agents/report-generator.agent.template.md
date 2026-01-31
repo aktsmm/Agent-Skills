@@ -47,6 +47,7 @@ Execute before generating any report:
 ### Step 0-1: Target Date Validation
 
 **Day of Week Check**:
+
 - Determine the day of week for target date `{YYYY-MM-DD}`
 - If Saturday or Sunday:
   - Notify: "🎌 Weekend - Skipping report generation"
@@ -62,6 +63,7 @@ Execute before generating any report:
 ### Step 0-3: Data Source Date Range
 
 **Date Range**:
+
 - Target date: `{YYYY-MM-DD}` 00:00:00 - 23:59:59
 - workIQ query: Explicitly specify start/end time
 - Exclude data outside the range
@@ -76,16 +78,20 @@ Execute before generating any report:
 
 Automatically retrieved via workIQ MCP server:
 
-| Data Source             | Priority | Query Example                                                               |
-| ----------------------- | -------- | --------------------------------------------------------------------------- |
-| 📅 Meetings & Calendar  | ⭐⭐⭐   | "List of meetings on {target date}. Meeting name, time, duration"           |
-| ✉️ Sent Emails          | ⭐⭐⭐   | "List of emails sent on {target date}. Subject, recipient"                  |
-| 📥 Received Emails (To) | ⭐⭐     | "List of emails received addressed to me on {target date}. Subject, sender" |
-| 💬 Teams Mentions       | ⭐⭐⭐   | "Chats with mentions to me on {target date}. Content, reply status"         |
-| �📄 Edited Files        | ⭐⭐     | "List of Word/Excel/PDF files edited on {target date}"                      |
-| 📊 PowerPoint Updates   | ⭐⭐     | "List of PowerPoint files edited on {target date}"                          |
-| 📝 OneNote              | ⭐       | "OneNote updated on {target date}. Note name, section"                      |
-| 💬 Teams Meeting Notes  | ⭐⭐     | "Teams meeting notes from {target date}"                                    |
+| Data Source              | Priority | Query Example                                                       |
+| ------------------------ | -------- | ------------------------------------------------------------------- |
+| 📅 Meetings & Calendar   | ⭐⭐⭐   | "List of meetings on {target date}. Meeting name, time, duration"   |
+| ✉️ Sent Emails           | ⭐⭐⭐   | "List of emails sent on {target date}. Subject, recipient"          |
+| ~~📥 Received Emails~~   | ❌       | **EXCLUDED** - Too much noise from auto-notifications               |
+| 💬 Teams Mentions        | ⭐⭐⭐   | "Chats with mentions to me on {target date}. Content, reply status" |
+| 💬 Teams Posts (My msgs) | ⭐⭐     | "Messages I posted in Teams on {target date}. Chat name, content"   |
+| 📄 Edited Files          | ⭐⭐     | "List of Word/Excel files edited on {target date}"                  |
+| 📊 PowerPoint Updates    | ⭐⭐     | "List of PowerPoint files edited on {target date}. File name, path" |
+| 📝 OneNote               | ⭐       | "OneNote updated on {target date}. Note name, section"              |
+| 💬 Teams Meeting Notes   | ⭐⭐     | "Decisions and action items from {important meeting name}"          |
+
+> **Note**: Received emails excluded by default due to high noise (auto-notifications, support tickets).
+> Only track sent emails as they represent actual work output.
 
 ### 2. External Data Sources
 
@@ -123,6 +129,39 @@ For each configured external data source:
 | `Customers/*/_inbox/` | Customer-specific activities |
 | `_internal/`          | Internal events              |
 | `Tasks/active.md`     | Completed tasks              |
+
+### 4. workIQ Query Examples by Report Type
+
+**Daily Report Queries**:
+
+```
+Query 1: "Meetings on {target date}. Meeting name, time, duration"
+Query 2: "Emails I sent on {target date}. Subject, recipient"
+Query 3: "Word/Excel files I edited on {target date}"
+Query 4: "PowerPoint files I edited on {target date}"
+Query 5: "Chats with mentions to me on {target date}. Content, reply status"
+Query 6: "Messages I posted in Teams on {target date}"
+Query 7: "OneNote updated on {target date}. Note name, section"
+```
+
+**Weekly Report Queries**:
+
+```
+Query 1: "Meetings in {target week}"
+Query 2: "Email count and main recipients in {target week}"
+Query 3: "Key meeting decisions in {target week}"
+Query 4: "Teams mentions to me in {target week}. Prioritize unresolved"
+Query 5: "PowerPoint files edited in {target week}"
+```
+
+**Monthly Report Queries**:
+
+```
+Query 1: "Meeting count and total hours in {target month}"
+Query 2: "Sent email count in {target month}"
+Query 3: "Files edited in {target month}"
+Query 4: "Teams mention count in {target month}"
+```
 
 ---
 
@@ -268,11 +307,11 @@ Else:
 
 When generating reports, follow the corresponding prompt file:
 
-| Report Type | Prompt File                              | Output                                            |
-| ----------- | ---------------------------------------- | ------------------------------------------------- |
-| Daily       | `.github/prompts/daily-report.prompt.md` | `ActivityReport/{YYYY-MM}/daily/{YYYY-MM-DD}.md`  |
-| Weekly      | `.github/prompts/weekly-report.prompt.md`| `ActivityReport/{YYYY-MM}/weekly/{YYYY}-W{WW}.md` |
-| Monthly     | `.github/prompts/monthly-report.prompt.md`| `ActivityReport/{YYYY-MM}/{YYYY-MM}.md`          |
+| Report Type | Prompt File                                | Output                                            |
+| ----------- | ------------------------------------------ | ------------------------------------------------- |
+| Daily       | `.github/prompts/daily-report.prompt.md`   | `ActivityReport/{YYYY-MM}/daily/{YYYY-MM-DD}.md`  |
+| Weekly      | `.github/prompts/weekly-report.prompt.md`  | `ActivityReport/{YYYY-MM}/weekly/{YYYY}-W{WW}.md` |
+| Monthly     | `.github/prompts/monthly-report.prompt.md` | `ActivityReport/{YYYY-MM}/{YYYY-MM}.md`           |
 
 ---
 
