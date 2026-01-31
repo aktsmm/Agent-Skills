@@ -97,3 +97,39 @@ By recording all activities, work inventory and analysis can accurately reflect 
 - **Holidays in the table** affect report _generation_ (skip creating reports on holidays)
 - **Data retrieval** from workIQ always includes all days and times
 - **Weekly/monthly reports** summarize data from all days, but only count business days for metrics
+
+### Time Range for Reports
+
+- **Daily report**: Full 24 hours (00:00-23:59) of the target date
+- **Weekly report**: 7 days × 24 hours each
+- **Monthly report**: All business days × 24 hours each
+
+No filtering by business hours - all activities throughout the day are included.
+
+### Weekend/Holiday Activity Handling
+
+Activities performed on weekends or holidays are **rolled into the next business day's report**:
+
+**Example scenarios:**
+
+| Activity Date | Activity Type           | Included in Report |
+| ------------- | ----------------------- | ------------------ |
+| Saturday      | Emergency hotfix        | Monday's report    |
+| Sunday        | Blog post writing       | Monday's report    |
+| Holiday       | Customer email response | Next business day  |
+| Friday 23:00  | Late-night deployment   | Friday's report    |
+
+**Rationale:**
+
+- Avoid skipping weekend/holiday contributions
+- Maintain visibility of all work efforts
+- Provide complete context for the next business day
+- Ensure weekend deployments and on-call work are recognized
+
+**Implementation:**
+When generating a business day report, include activities from:
+
+1. The target business day itself (00:00-23:59)
+2. Any preceding non-business days since the last report
+
+Example: Monday's report includes Friday night + Saturday + Sunday + Monday activities.
