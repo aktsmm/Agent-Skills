@@ -100,12 +100,12 @@ You MUST use runSubagent for each file. Do NOT read files directly.
 
 → **[references/agent-template.md](references/agent-template.md#available-tools)**
 
-| Purpose  | VS Code Copilot | Claude Code |
-| -------- | --------------- | ----------- |
-| Shell    | `runInTerminal` | `Bash`      |
-| Read     | `readFile`      | `Read`      |
-| Edit     | `editFiles`     | `Write`     |
-| Subagent | `runSubagent`   | `Task`      |
+| Purpose  | VS Code Copilot  | Claude Code |
+| -------- | ---------------- | ----------- |
+| Shell    | `runInTerminal`  | `Bash`      |
+| Read     | `read/readFile`  | `Read`      |
+| Edit     | `edit/editFiles` | `Write`     |
+| Subagent | `agent`          | `Task`      |
 
 ## External References
 
