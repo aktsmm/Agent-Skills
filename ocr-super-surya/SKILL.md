@@ -90,13 +90,18 @@ surya_ocr image.png
 | ----------------------- | ----------------------------------------- |
 | `scripts/ocr_helper.py` | Helper with OOM auto-retry, batch support |
 
-## Troubleshooting
+## Done Criteria
 
-| Issue               | Solution                    |
-| ------------------- | --------------------------- |
-| CUDA=False with GPU | Reinstall PyTorch with CUDA |
-| OOM Error           | Reduce batch sizes          |
-| CPU Fallback        | Auto-detected (slower)      |
+- [ ] CUDA available (if GPU present)
+- [ ] Text extracted from target image
+- [ ] Output saved to specified file
+
+## Key References
+
+| Topic        | Reference                                                  |
+| ------------ | ---------------------------------------------------------- |
+| GPU Config   | [references/gpu-config.md](references/gpu-config.md)       |
+| API Examples | [references/api-examples.md](references/api-examples.md)   |
 
 ## License
 

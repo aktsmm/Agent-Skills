@@ -112,3 +112,9 @@ python scripts/search_skills.py --add-source https://github.com/owner/repo
 | `official`     | Official  | Anthropic / GitHub 公式    |
 | `awesome-list` | Curated   | キュレーションリスト       |
 | `community`    | Community | コミュニティ製（自己責任） |
+
+## Done Criteria
+
+- [ ] Search query returns results
+- [ ] Skill installed to local directory (if requested)
+- [ ] Index updated successfully (if requested)

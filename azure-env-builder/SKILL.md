@@ -17,28 +17,28 @@ Enterprise Azure environment builder skill.
 - Deploying apps to App Service, AKS, or Container Apps
 - Designing Hub-Spoke, AKS, or AI Foundry architectures
 
-## 機能一覧
+## Features
 
-| カテゴリ       | 機能                               |
+| Category       | Capabilities                       |
 | -------------- | ---------------------------------- |
 | Architecture   | Hub-Spoke, Web+DB, AKS, AI Foundry |
 | AVM Modules    | 200+ Azure Verified Modules        |
-| VM Init        | Squid, Nginx, Docker, IIS 初期化   |
-| Config Linking | SQL/Storage/Redis 接続、MI RBAC    |
+| VM Init        | Squid, Nginx, Docker, IIS setup    |
+| Config Linking | SQL/Storage/Redis, Managed ID RBAC |
 | CI/CD          | GitHub Actions / Azure Pipelines   |
 
-## ワークフロー
+## Workflow
 
-1. **ヒアリング** - 基本情報 + アーキテクチャパターン選択
-2. **MCP ツール実行** - 最新 AVM/スキーマ取得
-3. **環境フォルダ生成** - `scripts/scaffold_environment.ps1`
-4. **Bicep 実装** - AVM モジュール + VM 初期化
-5. **CI/CD 生成** - パイプラインテンプレート
-6. **検証 → デプロイ** - what-if → 実行
+1. **Interview** - Gather requirements + select architecture pattern
+2. **MCP Tools** - Fetch latest AVM/schema info
+3. **Scaffold** - Generate environment folder via `scripts/scaffold_environment.ps1`
+4. **Implement** - Write Bicep with AVM modules + VM init
+5. **CI/CD** - Generate pipeline templates
+6. **Deploy** - what-if → execute
 
-## 必須: MCP ツール
+## Required: MCP Tools
 
-**Bicep コード生成前に必ず実行:**
+**Run before generating Bicep code:**
 
 ```
 mcp_bicep_experim_get_bicep_best_practices
@@ -47,49 +47,58 @@ mcp_bicep_experim_get_az_resource_type_schema(azResourceType, apiVersion)
 microsoft_docs_search(query: "Private Endpoint Bicep")
 ```
 
-## ヒアリング項目
+## Interview Checklist
 
 → **[references/hearing-checklist.md](references/hearing-checklist.md)**
 
-| 項目               | 確認内容                    |
-| ------------------ | --------------------------- |
-| サブスクリプション | ID または `az account show` |
-| 環境名             | dev / staging / prod        |
-| リージョン         | japaneast / japanwest       |
-| デプロイ方式       | Azure CLI / Bicep           |
+| Item         | Details                     |
+| ------------ | --------------------------- |
+| Subscription | ID or `az account show`     |
+| Environment  | dev / staging / prod        |
+| Region       | japaneast / japanwest       |
+| Deploy Type  | Azure CLI / Bicep           |
 
-## アーキテクチャパターン
+## Architecture Patterns
 
 → **[references/architecture-patterns.md](references/architecture-patterns.md)**
 
-| パターン   | 用途                     |
-| ---------- | ------------------------ |
-| Hub-Spoke  | 大規模エンタープライズ   |
-| Web + DB   | 一般的な Web アプリ      |
-| AKS        | コンテナマイクロサービス |
-| AI Foundry | AI/ML ワークロード       |
-| Proxy VM   | 閉域ネットワーク送信制御 |
+| Pattern    | Use Case                       |
+| ---------- | ------------------------------ |
+| Hub-Spoke  | Large enterprise               |
+| Web + DB   | Standard web applications      |
+| AKS        | Container microservices        |
+| AI Foundry | AI/ML workloads                |
+| Proxy VM   | Private network egress control |
 
-## コマンド
+## Commands
 
 ```powershell
-# 環境フォルダ生成
+# Scaffold environment folder
 pwsh scripts/scaffold_environment.ps1 -Environment <env> -Location <region>
 
-# 検証
+# Validate
 az deployment group what-if --resource-group <rg> --template-file main.bicep
 
-# デプロイ
+# Deploy
 az deployment group create --resource-group <rg> --template-file main.bicep
 ```
 
-## 参照ファイル
+## Key References
 
-| ファイル                                                              | 用途                   |
+| File                                                                  | Purpose                |
 | --------------------------------------------------------------------- | ---------------------- |
-| [architecture-patterns.md](references/architecture-patterns.md)       | アーキテクチャパターン |
-| [avm-modules.md](references/avm-modules.md)                           | AVM モジュールカタログ |
-| [vm-app-scripts.md](references/vm-app-scripts.md)                     | VM 初期化スクリプト    |
-| [app-deploy-patterns.md](references/app-deploy-patterns.md)           | アプリデプロイパターン |
-| [service-config-templates.md](references/service-config-templates.md) | サービス間設定連携     |
-| [cicd-templates/](references/cicd-templates/)                         | CI/CD テンプレート     |
+| [architecture-patterns.md](references/architecture-patterns.md)       | Architecture patterns  |
+| [avm-modules.md](references/avm-modules.md)                           | AVM module catalog     |
+| [vm-app-scripts.md](references/vm-app-scripts.md)                     | VM init scripts        |
+| [app-deploy-patterns.md](references/app-deploy-patterns.md)           | App deploy patterns    |
+| [service-config-templates.md](references/service-config-templates.md) | Service config linking |
+| [cicd-templates/](references/cicd-templates/)                         | CI/CD templates        |
+
+## Done Criteria
+
+- [ ] Interview checklist completed
+- [ ] MCP tools fetched latest info
+- [ ] Bicep files generated
+- [ ] `az deployment group what-if` succeeded
+- [ ] Bicep ファイルが生成された
+- [ ] `az deployment group what-if` が成功した
