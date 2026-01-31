@@ -32,6 +32,27 @@ Task completion conditions (must meet all):
 - [ ] Reflected to `Tasks/active.md` or `Tasks/completed.md`
 - [ ] If customer-related, synced to `Customers/{id}/tasks.md`
 - [ ] Reported operation result to user
+- [ ] **Synced `DASHBOARD.md` "Today's Focus" and "This Week" sections**
+
+## Dashboard Sync Rules (MANDATORY)
+
+Always sync `DASHBOARD.md` when updating tasks.
+
+### Sync Targets
+
+| DASHBOARD Section | Sync Source                                              |
+| ----------------- | -------------------------------------------------------- |
+| Today's Focus     | Top 3 high-priority tasks from `Tasks/active.md`       |
+| This Week         | Tasks due this week from `Tasks/active.md`             |
+| Recent Completed  | Latest 3 from `Tasks/completed.md`                     |
+
+### Sync Timing
+
+- On task add
+- On task status update
+- On task completion
+- On "Update dashboard" command
+
 
 ## Error Handling
 
@@ -231,3 +252,4 @@ Deadline alert generation conditions:
 | `Overdue tasks`         | Show overdue tasks     |
 | `Update tasks`          | Auto-update via workIQ |
 | `{customer} tasks`      | Show customer tasks    |
+| `Update dashboard`      | Sync DASHBOARD.md      |
