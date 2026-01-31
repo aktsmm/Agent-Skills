@@ -140,6 +140,18 @@ Use snapshot + click instead:
 browser_snapshot → get ref → browser_click(ref)
 ```
 
+## Done Criteria
+
+- [ ] MCP server configured in `.vscode/mcp.json`
+- [ ] Browser navigation successful
+- [ ] Target action (click/type/screenshot) completed
+
+## Key References
+
+| Topic               | Reference                                                                  |
+| ------------------- | -------------------------------------------------------------------------- |
+| Advanced Operations | [references/advanced-operations.md](references/advanced-operations.md)     |
+
 ## Reference
 
 | Type       | Use Case        | Selection |
