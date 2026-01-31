@@ -37,13 +37,49 @@ Also list "talking points usable in performance reviews (achievements, actions, 
 - Working Hours Condition: 8+ hours total
   - If insufficient, supplement with reasonably estimated tasks
 
-### Holiday Skip Rule
+### Weekend/Holiday Skip Rule
+
+#### Weekend Skip
+
+If target date is Saturday or Sunday:
+
+- Skip report generation
+- Notify: "🎌 Skipped due to weekend"
+- Weekly report will include this date; individual daily not needed
+
+#### Holiday Skip
 
 If target date is a holiday (check `_workiq/{country}-holidays.md`):
 
 - Skip report generation
 - Notify: "🎌 Skipped due to {holiday name}"
 - Holiday dates are also skipped in previous day checks
+
+### PTO (Paid Time Off) Adjustment Rule
+
+If target date has PTO:
+
+#### Detection
+
+- Calendar has "PTO", "Vacation", "Leave", "年休", "有給" events
+- **Acceptance Status**: Tentative also counts as PTO
+- Detect full-day / morning / afternoon
+
+#### Working Hours Calculation
+
+Count PTO hours as working hours. **Total should be 8 hours**.
+
+| PTO Type  | PTO Hours | Actual Work | Total |
+| --------- | --------- | ----------- | ----- |
+| Full day  | 8h        | 0h          | 8h ✓  |
+| Morning   | 4h        | 4h          | 8h ✓  |
+| Afternoon | 4h        | 4h          | 8h ✓  |
+| Hourly    | Xh        | 8h-Xh       | 8h ✓  |
+
+#### Report Notation
+
+- Show PTO hours in task summary (e.g., `🏖️ PTO (Morning): 4.0h`)
+- In working hours summary: "PTO + Actual = 8h"
 
 ---
 
@@ -59,11 +95,23 @@ If workIQ MCP server is available, use `mcp_workiq_ask_work_iq` tool:
 Query: "List of meetings on {target date}. Include meeting name, time, duration"
 ```
 
+**Date Validation**:
+
+- Verify each data item's datetime is within target date range (00:00-23:59)
+- Exclude out-of-range data and log
+
 #### ✉️ Sent Emails
 
 ```
 Query: "List of emails I sent on {target date}. Include subject, time, recipient"
 ```
+
+**Date Validation**:
+
+- Verify each data item's datetime is within target date range (00:00-23:59)
+- Exclude out-of-range data and log
+
+**⚠️ Important**: Only sent emails (replies + new). Do NOT include received emails.
 
 #### 📥 Received Emails (To me)
 
@@ -120,6 +168,37 @@ Check `_datasources/external-paths.md` for configured external folders:
 - If workIQ unavailable, supplement with workspace data
 - Supplement with reasonable estimates if needed (mark as `[Estimated]`)
 
+### 4.5 Excluded Meetings (Do NOT include in report)
+
+Configure meetings to exclude even if they appear in calendar:
+
+| Meeting Name Pattern | Reason                        |
+| -------------------- | ----------------------------- |
+| (Configure per org)  | Non-attendance expected       |
+| Late night globals   | Outside regular working hours |
+
+**Judgment Rule**:
+
+- Exclude from Task Summary and Meeting Summary
+- Do NOT count in working hours
+- However, if there are clear outputs (questions, action items), include
+
+### 4.6 Excluded Tasks (Do NOT include in report)
+
+Configure tasks to exclude:
+
+| Task Pattern                    | Reason                      |
+| ------------------------------- | --------------------------- |
+| Auto-notification emails        | No actual work performed    |
+| Support ticket notifications    | Status change notifications |
+| Received-only emails (no reply) | Not actual activity         |
+
+**Judgment Rule**:
+
+- Do NOT count auto-notifications in working hours
+- **However**, actual responses (investigation, replies, escalation) DO count
+- Normal email handling (reply, forward, coordination) counts
+
 ---
 
 ## 5) Completion Rules
@@ -131,6 +210,28 @@ Check `_datasources/external-paths.md` for configured external folders:
    - Document review
    - Preparation/follow-up (meeting notes, task entry, etc.)
 3. Always mark estimated tasks with `[Estimated]` (don't mix with facts)
+
+### ⚠️ Estimation Prohibited Tasks (MANDATORY)
+
+Do NOT add the following tasks without workIQ data evidence:
+
+| Prohibited Category            | Reason                                                            |
+| ------------------------------ | ----------------------------------------------------------------- |
+| **Customer-specific tasks**    | Customer name tasks (e.g., Contoso delivery) require verification |
+| **Delivery completion**        | Deliverable submissions need evidence (email/file)                |
+| **Customer document creation** | Specific file edit history required                               |
+
+**Judgment Rule**:
+
+- Tasks containing customer name → Verify meeting/email/file edit in workIQ
+- If unverifiable → Do NOT include in report
+- If unclear → Supplement with generic tasks (email handling, etc.)
+
+### Participant Name Notation
+
+- Use names as retrieved from workIQ
+- If kanji unavailable, **use romaji** (e.g., John, Smith)
+- Do NOT force character conversion
 
 ---
 
