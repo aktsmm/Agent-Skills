@@ -110,6 +110,40 @@ For EACH task:
 3. Wait for sub-agent response
 4. Aggregate results into final response
 
+### runSubagent Examples
+
+**Report Generation:**
+
+```javascript
+runSubagent({
+  agentName: "report-generator",
+  prompt:
+    "Generate daily report for {YYYY-MM-DD}. Retrieve activity log from workIQ and perform IMPACT review.",
+  description: "Daily report generation",
+});
+```
+
+**Task Management:**
+
+```javascript
+runSubagent({
+  agentName: "task-manager",
+  prompt:
+    "Add task: Demo preparation for {Customer}. Due: {date}, Priority: High.",
+  description: "Add new task",
+});
+```
+
+**Data Collection:**
+
+```javascript
+runSubagent({
+  agentName: "data-collector",
+  prompt: "Process the following Teams chat: {pasted_content}",
+  description: "Process Teams chat",
+});
+```
+
 ## New Task Detection
 
 When input doesn't match existing categories:
