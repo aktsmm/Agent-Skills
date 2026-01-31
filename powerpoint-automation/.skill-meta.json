@@ -4,7 +4,12 @@
   "source": "aktsmm-Ag-ppt-create",
   "description": "Create professional PowerPoint presentations from web articles, blog posts, existing PPTX files. Ideal for tech presentations, reports, and documentation.",
   "description_ja": "Web記事、ブログ、既存PPTXからプロフェッショナルなPowerPointプレゼンテーションを作成。技術プレゼン、報告書、ドキュメント作成に最適。",
-  "whenToUse": "Use this skill when the user wants to: convert web articles/blog posts to PPTX, translate English PPTX to Japanese, create presentations using templates, generate technical presentations with code blocks and diagrams, or automate presentation creation with quality assurance.",
-  "categories": ["automation", "presentation", "powerpoint", "ai-pipeline"],
+  "whenToUse": "PowerPoint, PPTX, create presentation, slides; Convert web articles/blog posts to presentations; Translate English PPTX to Japanese; Create presentations using custom templates",
+  "categories": [
+    "automation",
+    "presentation",
+    "powerpoint",
+    "ai-pipeline"
+  ],
   "installedAt": "2026-01-18T04:46:00.000Z"
 }

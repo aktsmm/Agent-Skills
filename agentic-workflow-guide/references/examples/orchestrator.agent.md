@@ -1,9 +1,7 @@
 ---
 name: orchestrator
 description: Coordinates workflow by delegating to specialist sub-agents
-model: claude-sonnet-4-20250514
-# VS Code Copilot tools (use Task, Read, Search, TodoWrite for Claude Code)
-tools: ["runSubagent", "readFile", "textSearch", "todos"]
+tools: ["agent/runSubagent", "read/readFile", "search/textSearch", "todo"]
 ---
 
 # Orchestrator Agent

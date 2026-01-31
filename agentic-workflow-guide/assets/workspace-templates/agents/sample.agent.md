@@ -1,7 +1,6 @@
 ---
 name: sample
 description: エージェント定義のテンプレート
-model: claude-sonnet-4-20250514
 ---
 
 # Sample Agent
