@@ -2,8 +2,7 @@
 ---
 name: orchestrator
 description: サブエージェントを統括する司令塔
-model: claude-sonnet-4-20250514
-tools: ["agent", "read/readFile", "search/textSearch", "todos"]
+tools: ["agent", "read", "search", "todo"]
 ---
 
 # Orchestrator Agent (テンプレート)
