@@ -7,11 +7,11 @@ Daily reports are not generated on holidays.
 
 ## Supported Countries
 
-| Country | File                 | Notes           |
-| ------- | -------------------- | --------------- |
-| Japan   | `japan-holidays.md`  | Default         |
-| USA     | `us-holidays.md`     | Federal holidays|
-| Custom  | `custom-holidays.md` | Manual setup    |
+| Country | File                 | Notes            |
+| ------- | -------------------- | ---------------- |
+| Japan   | `japan-holidays.md`  | Default          |
+| USA     | `us-holidays.md`     | Federal holidays |
+| Custom  | `custom-holidays.md` | Manual setup     |
 
 ## Japan Holidays (2026)
 
@@ -73,3 +73,27 @@ Daily reports are not generated on holidays.
 2. If included → Skip
 3. For weekly/monthly reports, exclude holidays from working days
 ```
+
+## Data Collection vs Report Generation
+
+| Operation             | Target Period       | Weekend/Holiday Handling |
+| --------------------- | ------------------- | ------------------------ |
+| **Data Collection**   | All days, all hours | All included             |
+| **Report Generation** | Business days only  | Holidays skipped         |
+
+### Data Collection Policy
+
+All activities, including those outside business hours, are recorded for the following reasons:
+
+- **Flexible remote work** - Activities may occur at non-traditional hours
+- **Time zone coordination** - International collaboration across time zones
+- **Emergency response** - On-call duties and urgent issues
+- **Self-development** - Technical blogging, OSS contributions, learning activities
+
+By recording all activities, work inventory and analysis can accurately reflect the true scope of work, including weekend deployments, after-hours support, and personal development efforts.
+
+### Important Distinction
+
+- **Holidays in the table** affect report _generation_ (skip creating reports on holidays)
+- **Data retrieval** from workIQ always includes all days and times
+- **Weekly/monthly reports** summarize data from all days, but only count business days for metrics
