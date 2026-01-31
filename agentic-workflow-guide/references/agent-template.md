@@ -175,7 +175,7 @@ Each agent should include these sections:
 name: example-agent
 description: Brief description of what this agent does
 # VS Code Copilot tools (adjust for Claude Code: Read, Edit, Search)
-tools: ["readFile", "editFiles", "textSearch"]
+tools: ["read/readFile", "edit/editFiles", "search/textSearch"]
 ---
 
 # Example Agent
@@ -300,10 +300,10 @@ For long-running tasks, maintain visibility:
 
 **Quick Reference (YAML front matter only):**
 
-| Platform        | tools                                                |
-| --------------- | ---------------------------------------------------- |
-| VS Code Copilot | `["runSubagent", "readFile", "textSearch", "todos"]` |
-| Claude Code     | `["Task", "Read", "Search", "TodoWrite"]`            |
+| Platform        | tools                                                      |
+| --------------- | ---------------------------------------------------------- |
+| VS Code Copilot | `["agent", "read/readFile", "search/textSearch", "todos"]` |
+| Claude Code     | `["Task", "Read", "Search", "TodoWrite"]`                  |
 
 Key characteristics:
 
@@ -319,7 +319,7 @@ Key characteristics:
 ---
 name: code-reviewer
 description: Reviews code for quality, security, and best practices
-tools: ["readFile", "textSearch", "fetch"]
+tools: ["read/readFile", "search/textSearch", "fetch"]
 ---
 ```
 
@@ -337,7 +337,7 @@ Key characteristics:
 ---
 name: implementer
 description: Implements code changes based on specifications
-tools: ["readFile", "editFiles", "runInTerminal", "textSearch"]
+tools: ["read/readFile", "edit/editFiles", "runInTerminal", "search/textSearch"]
 ---
 ```
 
@@ -353,22 +353,22 @@ Built-in tools for custom agents. Tool names differ by platform:
 
 ### VS Code Copilot Tools (Official)
 
-| Tool Name        | Description                              | Tool Set       |
-| ---------------- | ---------------------------------------- | -------------- |
-| `#runInTerminal` | Run shell command in integrated terminal | `#runCommands` |
-| `#readFile`      | Read file contents                       | -              |
-| `#editFiles`     | Edit/create files                        | `#edit`        |
-| `#createFile`    | Create new file                          | `#edit`        |
-| `#textSearch`    | Search text in files                     | `#search`      |
-| `#fileSearch`    | Search files by glob pattern             | `#search`      |
-| `#runSubagent`   | Spawn sub-agent with isolated context    | -              |
-| `#fetch`         | Fetch web page content                   | -              |
-| `#todos`         | Task list management                     | -              |
-| `#codebase`      | Search codebase for context              | -              |
-| `#changes`       | List source control changes              | -              |
-| `#problems`      | Get workspace issues                     | -              |
-| `#usages`        | Find references/implementations          | -              |
-| `#githubRepo`    | Search GitHub repository                 | -              |
+| Tool Name            | Description                              | Tool Set   |
+| -------------------- | ---------------------------------------- | ---------- |
+| `#runInTerminal`     | Run shell command in integrated terminal | `#execute` |
+| `#read/readFile`     | Read file contents                       | `#read`    |
+| `#edit/editFiles`    | Edit/create files                        | `#edit`    |
+| `#edit/createFile`   | Create new file                          | `#edit`    |
+| `#search/textSearch` | Search text in files                     | `#search`  |
+| `#search/fileSearch` | Search files by glob pattern             | `#search`  |
+| `#agent`             | Spawn sub-agent with isolated context    | -          |
+| `#fetch`             | Fetch web page content                   | `#web`     |
+| `#todos`             | Task list management                     | `#todo`    |
+| `#codebase`          | Search codebase for context              | -          |
+| `#changes`           | List source control changes              | -          |
+| `#problems`          | Get workspace issues                     | -          |
+| `#usages`            | Find references/implementations          | -          |
+| `#githubRepo`        | Search GitHub repository                 | -          |
 
 ### Claude Code Tools (Anthropic)
 
@@ -384,15 +384,15 @@ Built-in tools for custom agents. Tool names differ by platform:
 
 ### Cross-Platform Mapping
 
-| Purpose         | VS Code Copilot            | Claude Code      |
-| --------------- | -------------------------- | ---------------- |
-| Shell execution | `runInTerminal`            | `Bash`           |
-| Read file       | `readFile`                 | `Read`           |
-| Edit file       | `editFiles`                | `Write`/`Edit`   |
-| Search          | `textSearch`, `fileSearch` | `Search`, `Grep` |
-| Subagent        | `runSubagent`              | `Task`           |
-| Web fetch       | `fetch`                    | (MCP)            |
-| Todo list       | `todos`                    | `TodoWrite`      |
+| Purpose         | VS Code Copilot                          | Claude Code      |
+| --------------- | ---------------------------------------- | ---------------- |
+| Shell execution | `runInTerminal`                          | `Bash`           |
+| Read file       | `read/readFile`                          | `Read`           |
+| Edit file       | `edit/editFiles`                         | `Write`/`Edit`   |
+| Search          | `search/textSearch`, `search/fileSearch` | `Search`, `Grep` |
+| Subagent        | `agent`                                  | `Task`           |
+| Web fetch       | `fetch`                                  | (MCP)            |
+| Todo list       | `todos`                                  | `TodoWrite`      |
 
 ### Tool Definition Examples
 
@@ -402,7 +402,7 @@ Built-in tools for custom agents. Tool names differ by platform:
 ---
 name: orchestrator
 description: Coordinates workflow and delegates to specialist agents
-tools: ["runSubagent", "readFile", "textSearch", "todos"]
+tools: ["agent", "read/readFile", "search/textSearch", "todos"]
 ---
 ```
 
