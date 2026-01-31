@@ -54,6 +54,17 @@ Example:
 - Fabrikam Ltd / fabrikam / Jane Smith
 ```
 
+### 1.1.1 Date Confirmation Rule (MANDATORY)
+
+> ⚠️ **CRITICAL**: Always confirm current date/time before generating reports.
+
+```
+Before generating any report, confirm:
+1. Today's date? → Run `Get-Date` in terminal
+2. Report period? → Daily: today / Weekly: this week / Monthly: this month
+3. Holidays? → Check _workiq/{country}-holidays.md
+```
+
 ### 1.2 External Data Sources (Optional)
 
 ```
@@ -248,9 +259,11 @@ Create `Customers/{id}/` for each interviewed customer.
 Test these commands to verify setup:
 
 1. "Create daily report" → report-generator activates
+   - ⚠️ Run `Get-Date` first to confirm current date
 2. Paste Teams chat → data-collector routes to customer folder
 3. "Add task: {content}" → task-manager creates task
 4. "Update tasks" → workIQ integration (if available)
+5. "Create weekly report" → Confirm week start/end dates before generating
 ```
 
 ## Key References
