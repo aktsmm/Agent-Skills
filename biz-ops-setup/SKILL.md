@@ -54,11 +54,11 @@ Collect the following information:
 
 ## Deployed Components
 
-| Type    | Count | Examples                                       |
-| ------- | ----- | ---------------------------------------------- |
-| Agents  | 6     | orchestrator, report-generator, task-manager   |
-| Prompts | 4     | daily-report, weekly-report, monthly-report    |
-| Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/  |
+| Type    | Count | Examples                                      |
+| ------- | ----- | --------------------------------------------- |
+| Agents  | 6     | orchestrator, report-generator, task-manager  |
+| Prompts | 4     | daily-report, weekly-report, monthly-report   |
+| Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/ |
 
 ## Done Criteria
 

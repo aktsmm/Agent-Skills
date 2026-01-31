@@ -34,12 +34,12 @@ python scripts/setup_workspace.py `
 
 ## Agents Overview
 
-| Agent               | Role                          | Permissions           |
-| ------------------- | ----------------------------- | --------------------- |
-| `@writing`          | Write and edit manuscripts    | Edit `02_contents/`   |
-| `@writing-reviewer` | Review manuscripts (P1/P2/P3) | Read only             |
+| Agent               | Role                          | Permissions               |
+| ------------------- | ----------------------------- | ------------------------- |
+| `@writing`          | Write and edit manuscripts    | Edit `02_contents/`       |
+| `@writing-reviewer` | Review manuscripts (P1/P2/P3) | Read only                 |
 | `@converter`        | Convert Markdown to Re:VIEW   | Edit `03_re-view_output/` |
-| `@orchestrator`     | Coordinate workflow           | Delegate to agents    |
+| `@orchestrator`     | Coordinate workflow           | Delegate to agents        |
 
 ## Dependencies
 
@@ -58,8 +58,8 @@ python scripts/setup_workspace.py `
 
 ## Key References
 
-| Topic            | Reference                                                          |
-| ---------------- | ------------------------------------------------------------------ |
-| Folder Structure | [references/folder-structure.md](references/folder-structure.md)   |
-| Agents           | [references/AGENTS.md](references/AGENTS.md)                       |
+| Topic            | Reference                                                                |
+| ---------------- | ------------------------------------------------------------------------ |
+| Folder Structure | [references/folder-structure.md](references/folder-structure.md)         |
+| Agents           | [references/AGENTS.md](references/AGENTS.md)                             |
 | Instructions     | [references/copilot-instructions.md](references/copilot-instructions.md) |

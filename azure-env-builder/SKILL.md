@@ -51,12 +51,12 @@ microsoft_docs_search(query: "Private Endpoint Bicep")
 
 → **[references/hearing-checklist.md](references/hearing-checklist.md)**
 
-| Item         | Details                     |
-| ------------ | --------------------------- |
-| Subscription | ID or `az account show`     |
-| Environment  | dev / staging / prod        |
-| Region       | japaneast / japanwest       |
-| Deploy Type  | Azure CLI / Bicep           |
+| Item         | Details                 |
+| ------------ | ----------------------- |
+| Subscription | ID or `az account show` |
+| Environment  | dev / staging / prod    |
+| Region       | japaneast / japanwest   |
+| Deploy Type  | Azure CLI / Bicep       |
 
 ## Architecture Patterns
 

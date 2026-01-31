@@ -65,11 +65,11 @@ npx @vscode/vsce package   # Creates .vsix
 
 ## Key References
 
-| Topic           | Reference                                                    |
-| --------------- | ------------------------------------------------------------ |
-| Code Samples    | [references/code-samples.md](references/code-samples.md)     |
-| TreeView        | [references/treeview.md](references/treeview.md)             |
-| Webview         | [references/webview.md](references/webview.md)               |
-| Testing         | [references/testing.md](references/testing.md)               |
-| Publishing      | [references/publishing.md](references/publishing.md)         |
+| Topic           | Reference                                                      |
+| --------------- | -------------------------------------------------------------- |
+| Code Samples    | [references/code-samples.md](references/code-samples.md)       |
+| TreeView        | [references/treeview.md](references/treeview.md)               |
+| Webview         | [references/webview.md](references/webview.md)                 |
+| Testing         | [references/testing.md](references/testing.md)                 |
+| Publishing      | [references/publishing.md](references/publishing.md)           |
 | Troubleshooting | [references/troubleshooting.md](references/troubleshooting.md) |

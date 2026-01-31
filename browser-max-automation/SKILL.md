@@ -148,9 +148,9 @@ browser_snapshot → get ref → browser_click(ref)
 
 ## Key References
 
-| Topic               | Reference                                                                  |
-| ------------------- | -------------------------------------------------------------------------- |
-| Advanced Operations | [references/advanced-operations.md](references/advanced-operations.md)     |
+| Topic               | Reference                                                              |
+| ------------------- | ---------------------------------------------------------------------- |
+| Advanced Operations | [references/advanced-operations.md](references/advanced-operations.md) |
 
 ## Reference
 
