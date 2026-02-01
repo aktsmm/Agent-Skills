@@ -51,12 +51,12 @@ microsoft_docs_search(query: "Private Endpoint Bicep")
 
 → **[references/hearing-checklist.md](references/hearing-checklist.md)**
 
-| Item         | Details                 |
-| ------------ | ----------------------- |
-| Subscription | ID or `az account show` |
-| Environment  | dev / staging / prod    |
-| Region       | japaneast / japanwest   |
-| Deploy Type  | Azure CLI / Bicep       |
+| Item         | Details                     |
+| ------------ | --------------------------- |
+| Subscription | ID or `az account show`     |
+| Environment  | dev / staging / prod        |
+| Region       | japaneast / japanwest       |
+| Deploy Type  | Azure CLI / Bicep           |
 
 ## Architecture Patterns
 
@@ -100,5 +100,3 @@ az deployment group create --resource-group <rg> --template-file main.bicep
 - [ ] MCP tools fetched latest info
 - [ ] Bicep files generated
 - [ ] `az deployment group what-if` succeeded
-- [ ] Bicep ファイルが生成された
-- [ ] `az deployment group what-if` が成功した

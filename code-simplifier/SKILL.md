@@ -111,3 +111,10 @@ Before submitting refactored code:
 3. Apply code-simplifier → Improve clarity
 4. Run tests again → Confirm no regressions
 5. Submit PR → Ready for review
+
+## Done Criteria
+
+- [ ] All tests pass after refactoring
+- [ ] No functionality changed
+- [ ] Code follows project standards
+- [ ] No nested ternaries or overly complex one-liners

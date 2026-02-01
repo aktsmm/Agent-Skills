@@ -140,3 +140,10 @@ You MUST use runSubagent for each file. Do NOT read files directly.
 - https://code.claude.com/docs/en/best-practices
 - https://www.promptingguide.ai/
 - https://www.ibm.com/think/prompt-engineering
+
+## Done Criteria
+
+- [ ] Workflow pattern selected and confirmed with user
+- [ ] `.agent.md` file created with clear Role/Workflow/Done Criteria
+- [ ] Design principles checklist passed
+- [ ] Agent registered in AGENTS.md (if applicable)

@@ -146,12 +146,6 @@ browser_snapshot → get ref → browser_click(ref)
 - [ ] Browser navigation successful
 - [ ] Target action (click/type/screenshot) completed
 
-## Key References
-
-| Topic               | Reference                                                              |
-| ------------------- | ---------------------------------------------------------------------- |
-| Advanced Operations | [references/advanced-operations.md](references/advanced-operations.md) |
-
 ## Reference
 
 | Type       | Use Case        | Selection |
