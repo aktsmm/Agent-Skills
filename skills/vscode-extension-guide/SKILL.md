@@ -63,13 +63,14 @@ npx @vscode/vsce package   # Creates .vsix
 | Command not found     | Match command ID in package.json/code  |
 | Shortcut not working  | Remove `when` clause, check conflicts  |
 
-## Key References
 
-| Topic           | Reference                                                    |
-| --------------- | ------------------------------------------------------------ |
-| Code Samples    | [references/code-samples.md](references/code-samples.md)     |
-| TreeView        | [references/treeview.md](references/treeview.md)             |
-| Webview         | [references/webview.md](references/webview.md)               |
-| Testing         | [references/testing.md](references/testing.md)               |
-| Publishing      | [references/publishing.md](references/publishing.md)         |
-| Troubleshooting | [references/troubleshooting.md](references/troubleshooting.md) |
+| Topic               | Reference                                                            |
+| ------------------- | -------------------------------------------------------------------- |
+| AI Customization    | [references/ai-customization.md](references/ai-customization.md)     |
+| Code Review Prompts | [references/code-review-prompts.md](references/code-review-prompts.md) |
+| Code Samples        | [references/code-samples.md](references/code-samples.md)             |
+| TreeView            | [references/treeview.md](references/treeview.md)                     |
+| Webview             | [references/webview.md](references/webview.md)                       |
+| Testing             | [references/testing.md](references/testing.md)                       |
+| Publishing          | [references/publishing.md](references/publishing.md)                 |
+| Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)       |
