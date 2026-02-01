@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Ag-ppt-create/classification.schema.json",
+  "version": "1.0.0",
+  "title": "Input Classification Schema",
+  "description": "Output schema for classify_input.py - defines input classification passed to Orchestrator",
+  "type": "object",
+  "required": ["input_type", "base_name", "recommended_method"],
+  "properties": {
+    "input_type": {
+      "type": "string",
+      "enum": [
+        "pptx_en",
+        "pptx_ja",
+        "pptx_mixed",
+        "url",
+        "markdown",
+        "json",
+        "text",
+        "image",
+        "unknown"
+      ],
+      "description": "Detected input type"
+    },
+    "source": {
+      "type": "string",
+      "description": "URL source (for url input_type)"
+    },
+    "source_file": {
+      "type": "string",
+      "description": "File path (for file input types)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["qiita", "zenn", "github", "microsoft", "web"],
+      "description": "Platform name for URL sources"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["en", "ja", "mixed", "unknown"],
+      "description": "Detected language for PPTX files"
+    },
+    "language_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence score for language detection"
+    },
+    "slide_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of slides in PPTX"
+    },
+    "recommended_method": {
+      "type": "string",
+      "enum": ["reconstruct", "analyze_only", "create_new", "manual"],
+      "description": "Recommended processing method"
+    },
+    "output_format": {
+      "type": "string",
+      "enum": ["template", "python-pptx", "pptxgenjs", "unknown"],
+      "description": "Recommended output generation format"
+    },
+    "reasoning": {
+      "type": "string",
+      "description": "Explanation for method recommendation"
+    },
+    "workflow": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ordered list of scripts/steps to execute"
+    },
+    "base_name": {
+      "type": "string",
+      "pattern": "^[0-9]{8}_[a-z0-9_]+_[a-z]+$",
+      "description": "Generated base name following {YYYYMMDD}_{keyword}_{purpose} convention"
+    },
+    "user_confirmation_required": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether user confirmation is required before processing"
+    },
+    "confirmation_prompt": {
+      "type": "string",
+      "description": "Message to display to user for confirmation"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Overall confidence score for classification"
+    },
+    "error": {
+      "type": "string",
+      "description": "Error message if classification failed"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "input_type": { "const": "url" } }
+      },
+      "then": {
+        "required": ["source", "platform"]
+      }
+    },
+    {
+      "if": {
+        "properties": { "input_type": { "pattern": "^pptx_" } }
+      },
+      "then": {
+        "required": ["source_file", "language", "slide_count"]
+      }
+    }
+  ],
+  "examples": [
+    {
+      "input_type": "pptx_en",
+      "source_file": "input/BRK252_presentation.pptx",
+      "language": "en",
+      "language_confidence": 0.85,
+      "slide_count": 45,
+      "recommended_method": "reconstruct",
+      "output_format": "template",
+      "reasoning": "English PPTX detected - use reconstruct method to preserve slide master",
+      "workflow": [
+        "analyze_template.py",
+        "extract_images.py",
+        "reconstruct_analyzer.py",
+        "translate_content.py",
+        "create_from_template.py"
+      ],
+      "base_name": "20251214_brk252_report",
+      "user_confirmation_required": true,
+      "confidence": 0.85
+    },
+    {
+      "input_type": "url",
+      "source": "https://qiita.com/example/items/abc123",
+      "platform": "qiita",
+      "recommended_method": "create_new",
+      "output_format": "template",
+      "reasoning": "Web content from qiita - create new PPTX from content",
+      "workflow": [
+        "fetch_article (curl/API)",
+        "extract_images (download)",
+        "create content.json",
+        "create_from_template.py"
+      ],
+      "base_name": "20251214_example_blog",
+      "user_confirmation_required": true,
+      "confidence": 0.8
+    }
+  ]
+}
