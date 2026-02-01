@@ -43,3 +43,41 @@ Evaluator:
   ├─ OK → Complete
   └─ NG → Regenerate with feedback
 ```
+
+## Real-World Example: Error-Fixer Agent
+
+A practical implementation combining Evaluator-Optimizer with Human-in-the-Loop:
+
+```mermaid
+flowchart TD
+    A[User Issue] --> B{Clarify?}
+    B -->|Yes| C[Ask Questions]
+    C --> A
+    B -->|No| D[Create Plan]
+    D --> E{User Approval?}
+    E -->|No| D
+    E -->|Yes| F[Fix: runSubagent developer]
+    F --> G[Verify: runSubagent reviewer]
+    G --> H{All PASS?}
+    H -->|Yes| I[Done]
+    H -->|No| J{Retry < 3?}
+    J -->|Yes| K[Reflection: Why failed?]
+    K --> F
+    J -->|No| L[Escalate to User]
+```
+
+### Key Design Patterns
+
+| Pattern | Implementation |
+|---------|---------------|
+| **Reflection Loop** | Analyze why previous fix failed before retrying |
+| **Error Context** | Pass full stack trace + related files + past attempts |
+| **No Repeat Fixes** | Track attempt history, try different approaches |
+| **Escalation** | After 3 failures, report to user with recommendations |
+
+### Stop Conditions (MANDATORY)
+
+- ✅ All verification items PASS
+- ⛔ Max 3 retries reached → Escalate
+- ⛔ Same error 2x in a row → Change approach
+
