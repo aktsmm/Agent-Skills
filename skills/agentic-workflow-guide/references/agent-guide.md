@@ -1,4 +1,4 @@
-# runSubagent Guide
+# Agent (Sub-agent) Guide
 
 Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 

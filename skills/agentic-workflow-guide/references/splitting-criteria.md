@@ -217,6 +217,6 @@ Default thresholds can be overridden in `.github/copilot-instructions.md`:
 
 ### Internal References
 
-- [runSubagent-guide.md](runSubagent-guide.md) — Detailed sub-agent implementation
+- [agent-guide.md](agent-guide.md) — Detailed sub-agent implementation
 - [workflow-patterns/overview.md](workflow-patterns/overview.md) — 5 workflow patterns
 - [context-engineering.md](context-engineering.md) — Context management techniques
