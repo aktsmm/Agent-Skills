@@ -528,3 +528,40 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 - [GitHub Copilot runSubagent - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
 - [Context Engineering for Agents - LangChain Blog](https://blog.langchain.com/context-engineering-for-agents/)- [Handoffs Guide](handoffs-guide.md) - Alternative for human-in-the-loop workflows
 - [Splitting Criteria](splitting-criteria.md) - When to use sub-agents
+
+
+---
+
+## ⚠️ tools 形式の注意点（2026/02 Updated）
+
+VS Code Copilot のカスタムエージェントで正しくサブエージェントを呼び出すには、以下の形式を守る必要があります。
+
+### 正しいツールエイリアス
+
+| エイリアス | 説明 | 間違い例 |
+|------------|------|----------|
+| agent | サブエージェント呼び出し | runSubagent |
+| read | ファイル読み取り | read/readFile |
+| edit | ファイル編集 | edit/editFiles |
+| search | 検索 | search/textSearch |
+| execute | コマンド実行 | execute/runInTerminal |
+| todo | タスク管理 | todos |
+
+> **参考:** [GitHub Docs - Custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration#tools)
+
+### JSON配列形式を推奨
+
+YAML配列形式は動作しない場合があります。JSON配列形式を使用してください。
+
+正しい形式:
+tools: ["agent", "read", "edit", "search", "execute", "todo"]
+
+間違い形式:
+tools:
+  - agent
+  - read
+
+### シンプルなプロンプト構造
+
+複雑な450行のプロンプトより、シンプルな70行のプロンプトの方が効果的です。
+
