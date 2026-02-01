@@ -171,7 +171,8 @@ Each agent should include these sections:
 | **Done Criteria**      | ✅          | Verifiable completion conditions (**one place only**) |
 | **Permissions**        | ✅          | What's allowed and forbidden                          |
 | **I/O Contract**       | ✅          | Input/output definitions                              |
-| **Non-Goals**          | Recommended | What this agent explicitly does NOT do                |
+| **When to Use**    | Recommended | Trigger conditions for agent selection               |
+  | **Non-Goals**          | Recommended | What this agent explicitly does NOT do                |
 | **Workflow**           | Recommended | Step-by-step procedure                                |
 | **Progress Reporting** | Recommended | How to report progress (e.g., `manage_todo_list`)     |
 | **Error Handling**     | Recommended | Error patterns and responses                          |
@@ -223,6 +224,16 @@ Task is complete when ALL of the following are true:
 - ❌ Action that should never be done
 - ❌ Another prohibited action
 
+## When to Use
+
+Define trigger conditions for when this agent should be selected:
+
+- User reports specific keywords (e.g., "fix", "broken", "doesn't work")
+- Specific task type is requested
+- Context matches agent's expertise
+
+> **Why When to Use?** Improves agent selection accuracy in multi-agent systems.
+
 ## Non-Goals
 
 Explicitly define what this agent does NOT do:
@@ -249,6 +260,17 @@ Explicitly define what this agent does NOT do:
 
 ## Workflow
 
+
+  ### Phase Skip Conditions (Optional)
+
+  Define conditions to skip phases when context is already clear:
+
+  > **Skip Conditions**: Proceed directly to next phase if ALL of the following are met:
+  > - User provided specific operation and problem description
+  > - Expected behavior is clear or explicitly stated  
+  > - Error messages or screenshots are provided
+
+  ### Steps
 1. **Step 1**: [Action description]
    - Details or sub-steps
 2. **Step 2**: [Action description]
@@ -487,8 +509,36 @@ handoffs:
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 - [Handoffs Guide](handoffs-guide.md) - Detailed handoffs configuration
-- [runSubagent Guide](runSubagent-guide.md) - Sub-agent delegation
+- [runSubagent Guide](agent-guide.md) - Sub-agent delegation
 
 ```
 
 ```
+
+### ⚠️ Tool Name Format Changes (VS Code 2026+)
+
+Some tool names require full path format. Use the following:
+
+| Tool | Correct Format | Notes |
+|------|---------------|-------|
+| runInTerminal | `execute/runInTerminal` | Alias `execute` does NOT work |
+| problems | `read/problems` | Renamed from `problems` |
+| runSubagent | `agent` | Alias works |
+| todo | `todo` | Alias works |
+
+**Example (correct):**
+```yaml
+tools:
+  - read/readFile
+  - edit/editFiles
+  - search/textSearch
+  - search/fileSearch
+  - execute/runInTerminal  # Full path required
+  - agent                  # Alias OK
+  - todo                   # Alias OK
+  - read/problems          # Full path required
+```
+
+
+
+

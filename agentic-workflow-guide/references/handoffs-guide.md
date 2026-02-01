@@ -364,5 +364,5 @@ prompt: |
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_handoffs)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-- [runSubagent Guide](runSubagent-guide.md) - Alternative for context isolation
+- [runSubagent Guide](agent-guide.md) - Alternative for context isolation
 - [Workflow Patterns Overview](workflow-patterns/overview.md) - Pattern selection guide

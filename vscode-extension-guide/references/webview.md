@@ -188,3 +188,96 @@ vscode.window.registerWebviewViewProvider(
   }
 }
 ```
+
+## Fallback Patterns
+
+### Promise-based Callback Fallback
+
+When using Promise-based callbacks (e.g., `resolveCreate`), always provide a fallback mechanism:
+
+```typescript
+// ❌ Bad: Single callback dependency
+case "createTask": {
+  if (!resolveCreate) {
+    return; // Silent failure if callback not set
+  }
+  resolveCreate(data);
+  break;
+}
+
+// ✅ Good: Fallback to alternative handler
+case "createTask": {
+  const result = buildResult(data);
+  if (resolveCreate) {
+    resolveCreate(result);
+    resolveCreate = undefined;
+  } else if (onAction) {
+    // Fallback to action handler
+    onAction({ action: "create", data: result });
+  }
+  break;
+}
+```
+
+### VS Code Internal API Fallback
+
+When using internal/unstable APIs (`vscode.lm`, `vscode.chat`), always implement fallback:
+
+```typescript
+// ✅ Good: API availability check + fallback
+static async getAvailableModels(): Promise<Model[]> {
+  const models: Model[] = [{ id: "", name: "Default" }];
+
+  try {
+    if (typeof vscode.lm !== "undefined" && "selectChatModels" in vscode.lm) {
+      const available = await (vscode.lm as any).selectChatModels({});
+      
+      // Null check for API result
+      if (available && Array.isArray(available)) {
+        for (const model of available) {
+          models.push({
+            id: model.id || model.family,
+            name: model.name || model.family || model.id,
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.log("API not available, using fallback", error);
+  }
+
+  // Return fallback if API returned nothing useful
+  if (models.length <= 1) {
+    return getFallbackModels();
+  }
+
+  return models;
+}
+```
+
+### Path Consistency
+
+When handling both local and global paths, use consistent format:
+
+```typescript
+// ❌ Bad: Mixed path formats
+templates.push({
+  source: "local",
+  path: relativePath,  // Relative
+});
+templates.push({
+  source: "global",
+  path: file.fsPath,   // Absolute - inconsistent!
+});
+
+// ✅ Good: Consistent relative paths
+templates.push({
+  source: "local",
+  path: path.relative(workspaceRoot, file.fsPath).replace(/\\/g, "/"),
+});
+templates.push({
+  source: "global",
+  path: path.relative(globalRoot, file.fsPath).replace(/\\/g, "/"),
+});
+```
+
