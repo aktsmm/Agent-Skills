@@ -509,7 +509,7 @@ handoffs:
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 - [Handoffs Guide](handoffs-guide.md) - Detailed handoffs configuration
-- [runSubagent Guide](runSubagent-guide.md) - Sub-agent delegation
+- [runSubagent Guide](agent-guide.md) - Sub-agent delegation
 
 ```
 
