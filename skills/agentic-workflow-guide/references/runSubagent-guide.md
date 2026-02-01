@@ -14,9 +14,9 @@ Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 - [Handoffs vs runSubagent](#handoffs-vs-runsubagent) - Comparison
 - [Checklist](#checklist) - Implementation checklist
 
-> **Platform Note**:
+> **Platform Note (2026/02 Updated)**:
 >
-> - **VS Code Copilot**: Use `runSubagent` in `tools:` and `#tool:runSubagent` in prompts
+> - **VS Code Copilot**: `runSubagent` is now part of the `agent` toolset. Use `agent` in `tools:` and `#tool:agent` in prompts (`runSubagent` still works as alias)
 > - **Claude Code**: Use `Task` in `tools:`
 
 ## What is runSubagent?
@@ -400,6 +400,51 @@ Return as:
 - Parallel execution available (2026/01+) but with overhead
 
 ---
+
+
+---
+
+## Inline Sub-agent Pattern (Recommended)
+
+Instead of referencing external `.agent.md` files, embed the sub-agent's role definition directly in the prompt.
+
+### Why Inline?
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| External reference (`agentName: developer`) | Reusable, DRY | May not work reliably, dependency |
+| **Inline definition** | Self-contained, reliable | Slightly longer prompts |
+
+### Example: Inline Developer Sub-agent
+
+`markdown
+#tool:agent を使用してサブエージェントを起動してください。
+
+**prompt**: 以下の内容を渡す
+
+# Developer Agent
+
+## Role
+あなたは開発者です。バグ修正、コードの改善を行います。
+
+## Goals
+- TypeScript のベストプラクティスに従う
+- エラーなくコンパイルされることを確認
+
+## Done Criteria
+- `npm run compile` がエラーなしで完了
+
+---
+
+## タスク
+{具体的な修正内容}
+`
+
+### Benefits
+
+1. **Reliability**: No dependency on external files
+2. **Portability**: Single file works anywhere
+3. **Clarity**: Sub-agent behavior is explicit in the orchestrator
 
 ## Token Efficiency
 
