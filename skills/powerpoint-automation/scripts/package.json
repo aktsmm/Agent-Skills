@@ -1,0 +1,14 @@
+{
+  "name": "pptx-tools",
+  "version": "0.1.0",
+  "description": "Utilities for PPTX generation",
+  "main": "scripts/convert_html.js",
+  "scripts": {
+    "convert-html": "node scripts/convert_html.js"
+  },
+  "dependencies": {
+    "playwright": "^1.41.2",
+    "pptxgenjs": "^3.12.0",
+    "sharp": "^0.33.2"
+  }
+}
