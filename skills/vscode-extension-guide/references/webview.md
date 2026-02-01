@@ -73,6 +73,29 @@ function getNonce(): string {
 }
 ```
 
+### Embed initial data safely (no document.write)
+
+```html
+<script id="initial-data" type="application/json">${serializeForWebview(initialData)}</script>
+<script nonce="${nonce}">
+  (function() {
+    var vscode = acquireVsCodeApi();
+    var initialData = {};
+    try {
+      var el = document.getElementById('initial-data');
+      if (el && el.textContent) initialData = JSON.parse(el.textContent) || {};
+    } catch (e) {
+      initialData = {};
+    }
+    // ... use initialData ...
+  })();
+</script>
+```
+
+- Avoid Base64 + `document.write`; inject JSON as text and parse.
+- Escape `<`, U+2028/2029 before embedding to keep the script tag valid.
+- Keep the CSP nonce on the executable script only.
+
 ## Message Passing
 
 ### Extension → Webview
@@ -525,3 +548,39 @@ async function getModels(): Promise<Model[]> {
   return getFallbackModels();
 }
 ```
+
+### 8. data-action + 委譲でアクションを束ねる
+
+```javascript
+// ✅ Good: render attributes, delegate once
+function renderTasks(tasks) {
+  return tasks.map(function(task) {
+    var id = escapeAttr(task.id || '');
+    return '<button data-action="run" data-id="' + id + '">Run</button>';
+  }).join('');
+}
+
+document.addEventListener('click', function(e) {
+  var target = e.target;
+  var host = target && typeof target.closest === 'function'
+    ? target.closest('[data-action]')
+    : null;
+  if (!host) return;
+  var action = host.getAttribute('data-action');
+  var id = host.getAttribute('data-id');
+  if (!action || !id) return;
+  if (action === 'run') window.runTask(id);
+  if (action === 'edit') window.editTask(id);
+  // ... other actions ...
+});
+```
+
+- ❌ Avoid `onclick="..."` 直書き（クォート崩れ・minify時のSyntaxErrorの温床）。
+- ❌ Avoid TypeScript キャスト文字列（`as HTMLElement` がそのままHTMLに出てSyntaxError）。
+- ✅ 属性は必ず escape し、委譲で処理する。
+
+### 9. ビルド後 HTML の健全性チェック
+
+- ビルド時に `debug-webview.html` を出力し、実ファイルをブラウザ/VS Codeで開いて SyntaxError を確認する。
+- Webview Developer Tools の Console を確認し、CSP/quote崩れ/`document.write` などのエラーを検知する。
+- タブ切り替え・プルダウンなど主要動作を1回ずつ手動で触り、ログにエラーが出ないか見る。
