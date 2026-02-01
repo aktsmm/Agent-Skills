@@ -523,6 +523,8 @@ Some tool names require full path format. Use the following:
 |------|---------------|-------|
 | runInTerminal | `execute/runInTerminal` | Alias `execute` does NOT work |
 | problems | `read/problems` | Renamed from `problems` |
+| codebase | `search/codebase` | Renamed from `codebase` |
+| terminalLastCommand | `read/terminalLastCommand` | Renamed from `terminalLastCommand` |
 | runSubagent | `agent` | Alias works |
 | todo | `todo` | Alias works |
 
