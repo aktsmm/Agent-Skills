@@ -43,7 +43,7 @@ Minimum items to verify:
 
 ⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
 
-> **Platform Note**: See [runSubagent-guide.md](runSubagent-guide.md#what-is-runsubagent) for VS Code / Claude Code tool names.
+> **Platform Note**: See [agent-guide.md](agent-guide.md#what-is-runsubagent) for VS Code / Claude Code tool names.
 
 ```markdown
 ## Agent Definition
