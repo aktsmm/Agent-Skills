@@ -1,6 +1,9 @@
 ---
 name: biz-ops-setup
 description: "Business operations workspace setup with workIQ integration. Creates report generation, task management, and customer management system. Use when: setting up new workspace, initializing biz-ops environment, creating business management system."
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Biz-Ops Workspace Setup
@@ -54,11 +57,11 @@ Collect the following information:
 
 ## Deployed Components
 
-| Type    | Count | Examples                                      |
-| ------- | ----- | --------------------------------------------- |
-| Agents  | 6     | orchestrator, report-generator, task-manager  |
-| Prompts | 4     | daily-report, weekly-report, monthly-report   |
-| Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/ |
+| Type    | Count | Examples                                       |
+| ------- | ----- | ---------------------------------------------- |
+| Agents  | 6     | orchestrator, report-generator, task-manager   |
+| Prompts | 4     | daily-report, weekly-report, monthly-report    |
+| Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/  |
 
 ## Done Criteria
 
