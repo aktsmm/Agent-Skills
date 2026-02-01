@@ -79,7 +79,7 @@ Design, review, and improve agent workflows based on proven principles.
 | Topic              | Reference                                                              |
 | ------------------ | ---------------------------------------------------------------------- |
 | Prompt Template    | [references/prompt-template.md](references/prompt-template.md)         |
-| runSubagent        | [references/runSubagent-guide.md](references/runSubagent-guide.md)     |
+| runSubagent        | [references/agent-guide.md](references/agent-guide.md)     |
 | Agent Template     | [references/agent-template.md](references/agent-template.md)           |
 | Context Management | [references/context-engineering.md](references/context-engineering.md) |
 | **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
@@ -90,7 +90,7 @@ Design, review, and improve agent workflows based on proven principles.
 
 **Problem:** Orchestrator says "I'll delegate" but does work directly.
 
-**Solution:** Use MUST/MANDATORY language. See [runSubagent-guide.md](references/runSubagent-guide.md).
+**Solution:** Use MUST/MANDATORY language. See [agent-guide.md](references/agent-guide.md).
 
 ```yaml
 ## MANDATORY: Sub-agent Delegation
