@@ -19,12 +19,12 @@ Initialize customer-specific workspaces with information accumulation and meetin
 
 ## Features
 
-| Feature              | Description                               |
-| -------------------- | ----------------------------------------- |
-| **Inbox**            | Paste chat/email for auto-classification  |
-| **Meeting Notes**    | Convert Teams AI notes to template format |
-| **Auto-Routing**     | Route input based on pattern detection    |
-| **Customer Profile** | Centralized customer information          |
+| Feature              | Description                                |
+| -------------------- | ------------------------------------------ |
+| **Inbox**            | Paste chat/email for auto-classification   |
+| **Meeting Notes**    | Convert Teams AI notes to template format  |
+| **Auto-Routing**     | Route input based on pattern detection     |
+| **Customer Profile** | Centralized customer information           |
 
 ---
 

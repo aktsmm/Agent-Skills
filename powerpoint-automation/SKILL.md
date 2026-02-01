@@ -102,3 +102,10 @@ All agents communicate via this intermediate format:
 | [USE_CASES.md](references/USE_CASES.md) | Workflow examples    |
 | [agents/](references/agents/)           | Agent definitions    |
 | [schemas/](references/schemas/)         | JSON schemas         |
+
+## Done Criteria
+
+- [ ] `content.json` generated and validated
+- [ ] PPTX file created successfully
+- [ ] No text overflow detected
+- [ ] User confirmed output quality

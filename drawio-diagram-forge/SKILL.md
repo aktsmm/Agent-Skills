@@ -114,3 +114,10 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | Blank in draw.io  | Check `content` attribute |
 | Edges not visible | Verify node IDs           |
 | Icons missing     | Enable Azure/AWS shapes   |
+
+## Done Criteria
+
+- [ ] `.drawio` or `.drawio.svg` file generated
+- [ ] Diagram opens correctly in VS Code Draw.io extension
+- [ ] All nodes and edges visible
+- [ ] Quality gate score ≥ 85
