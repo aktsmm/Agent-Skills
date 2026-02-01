@@ -146,3 +146,38 @@ code --install-extension ./extension-1.0.0.vsix
 # Check what's in your VSIX
 npx @vscode/vsce ls
 ```
+
+## Webview 真っ白 / SyntaxError
+
+| 症状 | 原因 | 解決策 |
+|------|------|--------|
+| 画面真っ白 | JavaScript SyntaxError | Webview DevTools Console でエラー確認 |
+| `Invalid regular expression: /^*/` | 正規表現のバックスラッシュが消えた | テンプレート内で二重エスケープ (`\\d`, `\\s`) |
+| `Unexpected token` | minify時にクォートが崩れた | `data-action` + イベント委譲パターンに変更 |
+| ボタンが反応しない | innerHTML後の onclick が効かない | `document.addEventListener` で委譲 |
+
+### デバッグ手順
+
+1. **Developer: Open Webview Developer Tools** を実行
+2. Console タブでエラーを確認
+3. ビルド出力 `out/extension.js` で該当行を検索
+4. ソースの正規表現/クォートを修正し再ビルド
+
+## 命名の不一致
+
+| 症状 | 原因 | 解決策 |
+|------|------|--------|
+| 設定が効かない | 設定キーがコードと不一致 | package.json と getConfiguration() を統一 |
+| コマンドが見つからない | コマンドIDがpackage.jsonと不一致 | 全箇所で同じIDを使用 |
+
+### 命名一貫性チェック
+
+```bash
+# package.json のコマンド/設定キーを抽出
+grep -E '"myExt\.' package.json
+
+# ソースコードの使用箇所を検索
+grep -r "myExt\." src/
+```
+
+公開前に統一することを強く推奨（公開後は既存ユーザーの設定が壊れる）。
