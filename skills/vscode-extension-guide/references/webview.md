@@ -400,3 +400,128 @@ function startWebviewReadyHandshake() {
 3. **Check CSP errors in Webview DevTools**
    - Open Webview Developer Tools
    - Look for CSP violation errors in Console
+
+## Webview JavaScript Anti-Patterns
+
+Webview内のJavaScriptは通常のブラウザ環境と異なる動作をする場合があります。以下のパターンを避けてください。
+
+### 1. アロー関数 vs 従来関数
+
+Webview環境では従来のfunction構文がより安全です：
+
+```javascript
+// ❌ Bad: Arrow function
+btn.addEventListener('click', (e) => {
+  handleClick(e);
+});
+
+// ✅ Good: Traditional function
+btn.addEventListener('click', function(e) {
+  handleClick(e);
+});
+```
+
+### 2. nullチェック必須
+
+`getElementById` は null を返す可能性があります。常にnullチェックを行ってください：
+
+```javascript
+// ❌ Bad: No null check
+document.getElementById('my-input').value = 'xxx';
+
+// ✅ Good: With null check
+var element = document.getElementById('my-input');
+if (element) element.value = 'xxx';
+```
+
+### 3. イベント委譲パターン推奨
+
+NodeListへの直接イベント登録は失敗する可能性があります。イベント委譲を使用してください：
+
+```javascript
+// ❌ Bad: Direct event registration on NodeList
+document.querySelectorAll('.btn').forEach(function(btn) {
+  btn.addEventListener('click', handleClick);
+});
+
+// ✅ Good: Event delegation
+document.addEventListener('click', function(e) {
+  var target = e.target;
+  if (target && target.classList && target.classList.contains('btn')) {
+    e.preventDefault();
+    handleClick(target);
+  }
+});
+```
+
+### 4. var を使用
+
+互換性のため、`const` / `let` より `var` を推奨：
+
+```javascript
+// ❌ Bad: const/let
+const items = [];
+let count = 0;
+
+// ✅ Good: var
+var items = [];
+var count = 0;
+```
+
+### 5. デフォルト引数の回避
+
+ES6のデフォルト引数構文は避けてください：
+
+```javascript
+// ❌ Bad: Default parameters
+function updateOptions(source, selectedPath = '') {
+  // ...
+}
+
+// ✅ Good: Manual default
+function updateOptions(source, selectedPath) {
+  selectedPath = selectedPath || '';
+  // ...
+}
+```
+
+### 6. 初期データの埋め込み
+
+"Loading..."をハードコードせず、初期データがある場合は直接埋め込んでください：
+
+```typescript
+// ❌ Bad: Hardcoded loading state
+return `<select id="agent-select">
+  <option value="">Loading...</option>
+</select>`;
+
+// ✅ Good: Embed initial data if available
+const options = agents.length > 0
+  ? agents.map(a => `<option value="${a.id}">${a.name}</option>`).join('')
+  : '<option value="">Loading...</option>';
+return `<select id="agent-select">${options}</select>`;
+```
+
+### 7. 非同期処理のフォールバック
+
+API呼び出しには常にtry/catchとフォールバックデータを用意してください：
+
+```typescript
+// ❌ Bad: No fallback
+async function getModels(): Promise<Model[]> {
+  return await vscode.lm.selectChatModels({});
+}
+
+// ✅ Good: With fallback
+async function getModels(): Promise<Model[]> {
+  try {
+    const models = await vscode.lm.selectChatModels({});
+    if (models && models.length > 0) {
+      return models;
+    }
+  } catch {
+    // API may not be available
+  }
+  return getFallbackModels();
+}
+```
