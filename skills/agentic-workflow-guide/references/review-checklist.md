@@ -14,6 +14,11 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 | Premature Complexity | Complex design from the start      | Simplicity First                |
 | Black Box            | Internal state invisible           | Transparency                    |
 | Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
+| Hallucination        | Fabricating unverified info      | No Hallucination principle       |
+| Hallucination        | Fabricating unverified info      | No Hallucination principle       |
+
+| Hallucination        | Fabricating unverified info      | No Hallucination principle       |
+
 
 ## How to Use
 
@@ -75,6 +80,66 @@ Minimum items to verify:
 - "You MUST use #tool:runSubagent for EACH file"
 - "Do NOT read file contents directly in main context"
 - "Each sub-agent prompt must include output format"
+```
+
+
+---
+
+## Hallucination Check
+
+⚠️ **Critical for information accuracy.** Detect and prevent fabricated outputs.
+
+```markdown
+## Source Verification
+
+- [ ] Does every claim have a verifiable source?
+- [ ] Are all URLs real and accessible?
+- [ ] Are dates, numbers, and statistics from official sources?
+- [ ] Is the agent using "probably", "likely", or "possibly" as facts?
+
+## Detection Patterns
+
+- [ ] ❌ Citing non-existent documentation
+- [ ] ❌ Describing features not in official docs
+- [ ] ❌ Generating fake URLs or file paths
+- [ ] ❌ Filling knowledge gaps with assumptions
+
+## Correct Behavior
+
+- [ ] ✅ Returns status=not_found when information unavailable
+- [ ] ✅ States "not explicitly documented" for uncertain info
+- [ ] ✅ ESCALATEs to user when verification impossible
+- [ ] ✅ Only outputs information backed by sources
+```
+
+
+---
+
+## Hallucination Check
+
+Critical for information accuracy. Detect and prevent fabricated outputs.
+
+```markdown
+## Source Verification
+
+- [ ] Does every claim have a verifiable source?
+- [ ] Are all URLs real and accessible?
+- [ ] Are dates, numbers, and statistics from official sources?
+- [ ] Is the agent using "probably", "likely", or "possibly" as facts?
+
+## Detection Patterns
+
+- [ ] No citing non-existent documentation
+- [ ] No describing features not in official docs
+- [ ] No generating fake URLs or file paths
+- [ ] No filling knowledge gaps with assumptions
+
+## Correct Behavior
+
+- [ ] Returns status=not_found when information unavailable
+- [ ] States "not explicitly documented" for uncertain info
+- [ ] ESCALATEs to user when verification impossible
+- [ ] Only outputs information backed by sources
 ```
 
 ---
@@ -436,3 +501,8 @@ After review completion:
 - [design-principles.md](design-principles.md) - Design principles details
 - [workflow-patterns/overview.md](workflow-patterns/overview.md) - Workflow pattern details
 - [context-engineering.md](context-engineering.md) - Context management for long tasks
+
+
+
+
+
