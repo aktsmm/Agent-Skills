@@ -267,7 +267,7 @@ Explicitly define what this agent does NOT do:
 
   > **Skip Conditions**: Proceed directly to next phase if ALL of the following are met:
   > - User provided specific operation and problem description
-  > - Expected behavior is clear or explicitly stated  
+  > - Expected behavior is clear or explicitly stated
   > - Error messages or screenshots are provided
 
   ### Steps
@@ -519,26 +519,25 @@ handoffs:
 
 Some tool names require full path format. Use the following:
 
-| Tool | Correct Format | Notes |
-|------|---------------|-------|
-| runInTerminal | `execute/runInTerminal` | Alias `execute` does NOT work |
-| problems | `read/problems` | Renamed from `problems` |
-| runSubagent | `agent` | Alias works |
-| todo | `todo` | Alias works |
+| Tool                | Correct Format             | Notes                              |
+| ------------------- | -------------------------- | ---------------------------------- |
+| runInTerminal       | `execute/runInTerminal`    | Alias `execute` does NOT work      |
+| problems            | `read/problems`            | Renamed from `problems`            |
+| codebase            | `search/codebase`          | Renamed from `codebase`            |
+| terminalLastCommand | `read/terminalLastCommand` | Renamed from `terminalLastCommand` |
+| runSubagent         | `agent`                    | Alias works                        |
+| todo                | `todo`                     | Alias works                        |
 
 **Example (correct):**
+
 ```yaml
 tools:
   - read/readFile
   - edit/editFiles
   - search/textSearch
   - search/fileSearch
-  - execute/runInTerminal  # Full path required
-  - agent                  # Alias OK
-  - todo                   # Alias OK
-  - read/problems          # Full path required
+  - execute/runInTerminal # Full path required
+  - agent # Alias OK
+  - todo # Alias OK
+  - read/problems # Full path required
 ```
-
-
-
-

@@ -63,13 +63,67 @@ npx @vscode/vsce package   # Creates .vsix
 | Command not found     | Match command ID in package.json/code  |
 | Shortcut not working  | Remove `when` clause, check conflicts  |
 
-## Key References
 
-| Topic           | Reference                                                    |
-| --------------- | ------------------------------------------------------------ |
-| Code Samples    | [references/code-samples.md](references/code-samples.md)     |
-| TreeView        | [references/treeview.md](references/treeview.md)             |
-| Webview         | [references/webview.md](references/webview.md)               |
-| Testing         | [references/testing.md](references/testing.md)               |
-| Publishing      | [references/publishing.md](references/publishing.md)         |
-| Troubleshooting | [references/troubleshooting.md](references/troubleshooting.md) |
+| Topic               | Reference                                                            |
+| ------------------- | -------------------------------------------------------------------- |
+| AI Customization    | [references/ai-customization.md](references/ai-customization.md)     |
+| Code Review Prompts | [references/code-review-prompts.md](references/code-review-prompts.md) |
+| Code Samples        | [references/code-samples.md](references/code-samples.md)             |
+| TreeView            | [references/treeview.md](references/treeview.md)                     |
+| Webview             | [references/webview.md](references/webview.md)                       |
+| Testing             | [references/testing.md](references/testing.md)                       |
+| Publishing          | [references/publishing.md](references/publishing.md)                 |
+| Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)       |
+
+## Best Practices
+
+### 命名の一貫性
+
+公開前にパッケージ名・設定キー・コマンド名を統一：
+
+| 項目 | 例 |
+|------|-----|
+| パッケージ名 | `copilot-scheduler` |
+| 設定キー | `copilotScheduler.enabled` |
+| コマンドID | `copilotScheduler.createTask` |
+| ビューID | `copilotSchedulerTasks` |
+
+### 通知の一元管理
+
+```typescript
+type NotificationMode = "sound" | "silentToast" | "silentStatus";
+
+function getNotificationMode(): NotificationMode {
+  const config = vscode.workspace.getConfiguration("myExtension");
+  return config.get<NotificationMode>("notificationMode", "sound");
+}
+
+function notifyInfo(message: string, timeoutMs = 4000): void {
+  const mode = getNotificationMode();
+  switch (mode) {
+    case "silentStatus":
+      vscode.window.setStatusBarMessage(message, timeoutMs);
+      break;
+    case "silentToast":
+      void vscode.window.withProgress(
+        { location: vscode.ProgressLocation.Notification, title: message },
+        async () => {},
+      );
+      break;
+    default:
+      void vscode.window.showInformationMessage(message);
+  }
+}
+
+function notifyError(message: string, timeoutMs = 6000): void {
+  const mode = getNotificationMode();
+  if (mode === "silentStatus") {
+    vscode.window.setStatusBarMessage(`⚠ ${message}`, timeoutMs);
+    console.error(message);
+    return;
+  }
+  void vscode.window.showErrorMessage(message);
+}
+```
+
+設定で `notificationMode` を選べるようにすることで、ユーザーが通知音を制御可能。

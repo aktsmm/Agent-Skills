@@ -72,10 +72,23 @@ All agents communicate via this intermediate format:
 
 ## Templates
 
-| Template                    | Purpose                 | Layouts    |
-| --------------------------- | ----------------------- | ---------- |
-| `assets/base_template.pptx` | Full-featured (English) | 11 layouts |
-| `assets/template.pptx`      | Legacy (Japanese names) | 4 layouts  |
+| Template              | Purpose                  | Layouts   |
+| --------------------- | ------------------------ | --------- |
+| `assets/template.pptx` | デフォルト (Japanese, 16:9) | 4 layouts |
+
+### template レイアウト詳細
+
+| Index | Name               | Category | 用途             |
+| ----- | ------------------ | -------- | ---------------- |
+| 0     | タイトル スライド   | title    | プレゼン冒頭     |
+| 1     | タイトルとコンテンツ | content  | 標準コンテンツ   |
+| 2     | 1_タイトルとコンテンツ | content | 標準コンテンツ（別版） |
+| 3     | セクション見出し    | section  | セクション区切り |
+
+**使用例:**
+```bash
+python scripts/create_from_template.py assets/template.pptx content.json output.pptx --config assets/template_layouts.json
+```
 
 ## Agents
 
@@ -102,6 +115,41 @@ All agents communicate via this intermediate format:
 | [USE_CASES.md](references/USE_CASES.md) | Workflow examples    |
 | [agents/](references/agents/)           | Agent definitions    |
 | [schemas/](references/schemas/)         | JSON schemas         |
+
+## Technical Content Addition (Azure/MS Topics)
+
+When adding Azure/Microsoft technical content to slides, follow the same verification workflow as QA:
+
+### Workflow
+
+```
+[Content Request] → [Researcher] → [Reviewer] → [PPTX Update]
+                         ↓              ↓
+                   Docs MCP 検索    内容検証
+```
+
+### Required Steps
+
+1. **Research Phase**: Use `microsoft_docs_search` / `microsoft_docs_fetch` to gather official information
+2. **Review Phase**: Verify the accuracy of content before adding to slides
+3. **Build Phase**: Update content.json and regenerate PPTX
+
+### Forbidden
+
+- ❌ Adding technical content without MCP verification
+- ❌ Skipping review for "simple additions"
+- ❌ Generating PPTX while PowerPoint has the file open
+
+### File Lock Prevention
+
+Before generating PPTX, check if the file is locked:
+
+```powershell
+# Check if file is locked
+$path = "path/to/file.pptx"
+try { [IO.File]::OpenWrite($path).Close(); "File is writable" }
+catch { "File is LOCKED - close PowerPoint first" }
+```
 
 ## Done Criteria
 

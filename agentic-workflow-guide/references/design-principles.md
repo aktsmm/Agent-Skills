@@ -154,6 +154,32 @@ A collection of principles for designing agent workflows.
 | **Violation Example**    | Retrying causes data duplication                          |
 | **Solution**             | State checking, use unique IDs                            |
 
+### 13. No Hallucination (Anti-Fabrication)
+
+**Don't guess, don't lie, don't fabricate**
+
+| Aspect                   | Description                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| **Definition**           | Never output information that cannot be verified by sources    |
+| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
+| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
+| **Solution**             | Return `status=not_found` instead of guessing                  |
+
+**Detection Patterns:**
+- Citing non-existent URLs or sources
+- Describing features not in official documentation
+- Using phrases like "probably" or "likely" as facts
+- Filling knowledge gaps with fabricated information
+
+**Correct Responses When Uncertain:**
+
+| Situation                      | ✅ Correct Response                                    | ❌ Prohibited                        |
+| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
+| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
+| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
+| Search returns no results      | Return `status=not_found` and ESCALATE                 | Generate from memory               |
+
+
 ### 12. Observability
 
 **Record decisions and make progress visible**
@@ -263,6 +289,84 @@ Use Parallelization pattern (Pattern 3)
 
 For complex workflows, use a two-stage architecture with an intermediate representation.
 Core principle: **Same IR → Same Output.** No creativity in transformation phase.
+
+
+### 14. No Hallucination (Anti-Fabrication)
+
+**Don't guess, don't lie, don't fabricate**
+
+| Aspect                   | Description                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| **Definition**           | Never output information that cannot be verified by sources    |
+| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
+| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
+| **Solution**             | Return status=not_found instead of guessing                    |
+
+**Detection Patterns:**
+- Citing non-existent URLs or sources
+- Describing features not in official documentation
+- Using phrases like "probably" or "likely" as facts
+- Filling knowledge gaps with fabricated information
+
+**Correct Responses When Uncertain:**
+
+| Situation                      | Correct Response                                       | Prohibited                          |
+| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
+| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
+| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
+| Search returns no results      | Return status=not_found and ESCALATE                   | Generate from memory               |
+
+
+### 14. No Hallucination (Anti-Fabrication)
+
+**Don't guess, don't lie, don't fabricate**
+
+| Aspect                   | Description                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| **Definition**           | Never output information that cannot be verified by sources    |
+| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
+| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
+| **Solution**             | Return status=not_found instead of guessing                    |
+
+**Detection Patterns:**
+- Citing non-existent URLs or sources
+- Describing features not in official documentation
+- Using phrases like "probably" or "likely" as facts
+- Filling knowledge gaps with fabricated information
+
+**Correct Responses When Uncertain:**
+
+| Situation                      | Correct Response                                       | Prohibited                          |
+| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
+| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
+| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
+| Search returns no results      | Return status=not_found and ESCALATE                   | Generate from memory               |
+
+
+### 14. No Hallucination (Anti-Fabrication)
+
+**Don't guess, don't lie, don't fabricate**
+
+| Aspect                   | Description                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| **Definition**           | Never output information that cannot be verified by sources    |
+| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
+| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
+| **Solution**             | Return status=not_found instead of guessing                    |
+
+**Detection Patterns:**
+- Citing non-existent URLs or sources
+- Describing features not in official documentation
+- Using phrases like "probably" or "likely" as facts
+- Filling knowledge gaps with fabricated information
+
+**Correct Responses When Uncertain:**
+
+| Situation                      | Correct Response                                       | Prohibited                          |
+| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
+| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
+| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
+| Search returns no results      | Return status=not_found and ESCALATE                   | Generate from memory               |
 
 ---
 
@@ -515,3 +619,7 @@ feature-flags/
 - [Writing tools for AI agents - Anthropic](https://www.anthropic.com/engineering/writing-tools-for-agents)
 - [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
 - [12-Factor App](https://12factor.net/)
+
+
+
+

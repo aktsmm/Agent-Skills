@@ -366,3 +366,88 @@ prompt: |
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 - [runSubagent Guide](agent-guide.md) - Alternative for context isolation
 - [Workflow Patterns Overview](workflow-patterns/overview.md) - Pattern selection guide
+
+---
+
+## Context-Based Handoff (Non-runSubagent)
+
+Not all agent-to-agent communication uses `runSubagent`. Some patterns use **chat context** for data passing.
+
+### When to Use Context-Based Handoff
+
+| Scenario | Method | Reason |
+|----------|--------|--------|
+| Router → Orchestrator | Chat context | Router makes decisions, doesn't spawn workers |
+| Same-level coordination | Chat context | Agents share conversation, not parent-child |
+| Decision passing | JSON in context | Structured data without sub-agent overhead |
+
+### Implementation Pattern
+
+```markdown
+## Router Agent (Decision Maker)
+
+- Makes routing decision
+- Outputs RouterDecision JSON to chat context
+- Does NOT use runSubagent
+
+## Orchestrator Agent (Executor)
+
+- Receives RouterDecision from chat context (NOT as runSubagent input)
+- Uses runSubagent for actual worker delegation
+- Logs decision to .logs/ for traceability
+```
+
+### RouterDecision JSON Example
+
+```json
+{
+  "flow": "full_ir",
+  "normalized_question": "...",
+  "manifest": { "applied": true, "name": "..." },
+  "decision_reason": "...",
+  "timestamp": "ISO8601"
+}
+```
+
+### Key Distinction
+
+| Handoff Type | Tool Used | Parent-Child? | Use Case |
+|--------------|-----------|---------------|----------|
+| runSubagent | runSubagent / Task | Yes | Worker delegation |
+| Context-based | None (chat) | No | Decision passing, coordination |
+
+
+
+---
+
+## Context-Based Handoff (Non-runSubagent)
+
+Not all agent-to-agent communication uses runSubagent. Some patterns use chat context for data passing.
+
+### When to Use Context-Based Handoff
+
+| Scenario | Method | Reason |
+|----------|--------|--------|
+| Router to Orchestrator | Chat context | Router makes decisions, doesnt spawn workers |
+| Same-level coordination | Chat context | Agents share conversation, not parent-child |
+| Decision passing | JSON in context | Structured data without sub-agent overhead |
+
+### Implementation Pattern
+
+Router Agent (Decision Maker):
+- Makes routing decision
+- Outputs RouterDecision JSON to chat context
+- Does NOT use runSubagent
+
+Orchestrator Agent (Executor):
+- Receives RouterDecision from chat context (NOT as runSubagent input)
+- Uses runSubagent for actual worker delegation
+- Logs decision to .logs/ for traceability
+
+### Key Distinction
+
+| Handoff Type | Tool Used | Parent-Child | Use Case |
+|--------------|-----------|--------------|----------|
+| runSubagent | runSubagent / Task | Yes | Worker delegation |
+| Context-based | None (chat) | No | Decision passing, coordination |
+
