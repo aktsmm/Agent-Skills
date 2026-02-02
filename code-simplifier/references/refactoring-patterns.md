@@ -305,3 +305,42 @@ return <div>Content</div>;
 | Manual loops     | `for (let i = 0; ...)` | `map`, `filter`, `reduce`    |
 | Silent errors    | Empty `catch` block    | Log or handle explicitly     |
 | Magic values     | `if (status === 3)`    | Named constants              |
+
+---
+
+## Code Review Perspectives
+
+コードレビュー時に確認すべき6つの観点（リファクタリング前後で活用）：
+
+### 🐛 バグ・論理エラー
+- ランタイムエラー、エッジケース、null/undefined 問題
+- 境界値、空配列、空文字列の処理
+
+### 🔒 セキュリティ
+- XSS、インジェクション、機密データ露出
+- 入力バリデーション、認証・認可チェック
+
+### ⚡ パフォーマンス
+- N+1 クエリ、不要な再レンダリング、メモリリーク
+- 計算量の最適化、キャッシュの活用
+
+### 📖 保守性・可読性
+- 命名、コード構造、複雑度
+- 関数の責務分離、モジュール化
+
+### 🧪 テストカバレッジ
+- 不足しているテストケース
+- エッジケースのテスト
+
+### 📚 ドキュメント
+- コメント、JSDoc、README 更新
+- API ドキュメント
+
+## Feedback Format
+
+レビュー・リファクタリング結果を以下の形式で整理：
+
+- ❌ **Critical**: 必須修正（機能に影響）
+- ⚠️ **Warning**: 推奨修正（品質に影響）
+- 💡 **Suggestion**: 改善案（あると良い）
+- ✅ **Positive**: 良い点（維持すべき）
