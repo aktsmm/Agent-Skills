@@ -1,8 +1,0 @@
-{
-  "name": "ocr-super-surya",
-  "source": "aktsmm-Agent-Skills",
-  "description": "GPU-optimized OCR using Surya.",
-  "whenToUse": "Extracting text from screenshots, photos, or scanned images",
-  "categories": [],
-  "installedAt": "2026-01-08T21:18:11.932Z"
-}
