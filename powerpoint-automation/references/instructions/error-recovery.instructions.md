@@ -89,3 +89,44 @@ python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --reset
 | ✅ PASS | 0 errors, 0 warnings  | Proceed to next phase  |
 | ⚠️ WARN | 0 errors, 1+ warnings | User confirm, continue |
 | ❌ FAIL | 1+ errors             | Send back (max 3×)     |
+
+---
+
+## Template Corruption Recovery
+
+### Symptoms
+
+- `BadZipFile: Bad magic number for central directory`
+- `zipfile.BadZipFile: File is not a zip file`
+- PPTX header is not `PK` (hex: `50-4B`)
+
+### Diagnosis
+
+```powershell
+# Check file header (should show 80-75 = PK)
+[System.IO.File]::ReadAllBytes("template.pptx")[0..3] -join '-'
+```
+
+### Causes
+
+| Cause | Description |
+|-------|-------------|
+| OneDrive sync | File incomplete during sync |
+| Git autocrlf | Binary treated as text |
+| Partial download | Network interruption |
+
+### Recovery: Use Your Own Template
+
+If bundled template is corrupted, use any PPTX as template:
+
+```powershell
+# Analyze user's PPTX → auto-generates layouts.json
+python scripts/analyze_template.py "user_presentation.pptx"
+
+# Use as template
+python scripts/create_from_template.py "user_presentation.pptx" `
+    "output_manifest/content.json" "output_ppt/result.pptx" `
+    --config "output_manifest/user_presentation_layouts.json"
+```
+
+> 📖 **Full template requirements:** See [template.instructions.md](template.instructions.md) > Template Preparation
