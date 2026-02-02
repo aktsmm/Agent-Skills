@@ -1,10 +1,9 @@
 ---
 name: skill-creator-plus
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
-license: Apache-2.0 (see LICENSE.txt)
+description: Guide for creating and reviewing effective skills. Use when creating a new skill, updating an existing skill, or reviewing SKILL.md files for quality. Triggers on "create skill", "review skill", "スキル作成".
+license: Apache-2.0
 metadata:
-  original_author: Anthropic (Apache-2.0)
-  modified_by: yamapan (https://github.com/aktsmm)
+  author: yamapan (based on Anthropic)
 ---
 
 # Skill Creator+
@@ -13,6 +12,7 @@ Guide for creating and reviewing effective skills.
 
 ## When to Use
 
+- **Create skill**, **new skill**, **review skill**, **スキル作成**
 - Creating a new skill from scratch
 - Updating or refactoring an existing skill
 - **Reviewing existing SKILL.md files** → See [references/skill-review-checklist.md](references/skill-review-checklist.md)
@@ -67,11 +67,30 @@ skill-name/
 ```yaml
 ---
 name: skill-name
-description: "What it does. Use when [trigger conditions]."
+description: "What it does. Use when [trigger conditions]. Triggers on 'keyword', 'phrase'."
 ---
 ```
 
 **Description must include:** What the skill does AND when to trigger it.
+
+> ⚠️ **Why this matters:** Skills may not be invoked if descriptions lack clear triggers. Include user phrases to improve routing accuracy.
+
+| ✅ Good                                                                                                                                                                 | ❌ Bad               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| Extract text and tables from PDF files, fill forms, merge documents. **Use when** working with PDF files or when the user mentions PDFs, forms, or document extraction. | Helps with documents |
+| Set up book writing workspace. **Triggers on** "book writing", "執筆ワークスペース", "technical writing project".                                                       | Creates workspaces   |
+
+### When to Use Section
+
+Start with **generic keywords** users are likely to say:
+
+```markdown
+## When to Use
+
+- **PDF**, **extract text**, **form filling** ← Keywords first
+- Processing documents with embedded images
+- Filling PDF forms programmatically
+```
 
 ### Body
 
@@ -99,3 +118,10 @@ description: "What it does. Use when [trigger conditions]."
 | Review Checklist | [references/skill-review-checklist.md](references/skill-review-checklist.md) |
 | Workflows        | [references/workflows.md](references/workflows.md)                           |
 | Output Patterns  | [references/output-patterns.md](references/output-patterns.md)               |
+
+## Done Criteria
+
+- [ ] SKILL.md created and under 150 lines
+- [ ] Frontmatter has name + description with trigger conditions
+- [ ] Details moved to references/ (Progressive Disclosure)
+- [ ] Review checklist passed
