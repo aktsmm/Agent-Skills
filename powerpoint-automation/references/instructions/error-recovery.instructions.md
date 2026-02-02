@@ -109,11 +109,11 @@ python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --reset
 
 ### Causes
 
-| Cause | Description |
-|-------|-------------|
-| OneDrive sync | File incomplete during sync |
-| Git autocrlf | Binary treated as text |
-| Partial download | Network interruption |
+| Cause            | Description                 |
+| ---------------- | --------------------------- |
+| OneDrive sync    | File incomplete during sync |
+| Git autocrlf     | Binary treated as text      |
+| Partial download | Network interruption        |
 
 ### Recovery: Use Your Own Template
 

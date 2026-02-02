@@ -177,29 +177,29 @@ python scripts/create_from_template.py "user_presentation.pptx" `
 
 The analyzer detects layouts by name matching:
 
-| Slide Type | English Keywords | Japanese Keywords |
-|------------|------------------|-------------------|
-| **title** | "Title Slide" | "タイトル スライド", "タイトルスライド" |
-| **content** | "Title and Content" | "タイトルとコンテンツ" |
-| **section** | "Section Header", "Divider" | "セクション見出し", "セクション" |
-| agenda | "Agenda" | "アジェンダ" |
-| closing | "Closing" | - |
-| two_column | "Two Column", "2 Column" | "2列" |
-| code | "Code", "Developer" | - |
-| photo | "Photo", "Picture", "50/50" | - |
-| blank | "Blank" | "白紙" |
+| Slide Type  | English Keywords            | Japanese Keywords                       |
+| ----------- | --------------------------- | --------------------------------------- |
+| **title**   | "Title Slide"               | "タイトル スライド", "タイトルスライド" |
+| **content** | "Title and Content"         | "タイトルとコンテンツ"                  |
+| **section** | "Section Header", "Divider" | "セクション見出し", "セクション"        |
+| agenda      | "Agenda"                    | "アジェンダ"                            |
+| closing     | "Closing"                   | -                                       |
+| two_column  | "Two Column", "2 Column"    | "2列"                                   |
+| code        | "Code", "Developer"         | -                                       |
+| photo       | "Photo", "Picture", "50/50" | -                                       |
+| blank       | "Blank"                     | "白紙"                                  |
 
 ### Placeholder Detection
 
 Layouts are also detected by placeholder types:
 
-| Placeholder | Type Constant | Used For |
-|-------------|---------------|----------|
-| Title | `TITLE`, `CENTER_TITLE` | All layouts |
-| Subtitle | `SUBTITLE` | Title slide |
-| Body | `BODY` | Content slides |
-| Content | `OBJECT`, `CONTENT` | Two-column |
-| Picture | `PICTURE` | Photo layouts |
+| Placeholder | Type Constant           | Used For       |
+| ----------- | ----------------------- | -------------- |
+| Title       | `TITLE`, `CENTER_TITLE` | All layouts    |
+| Subtitle    | `SUBTITLE`              | Title slide    |
+| Body        | `BODY`                  | Content slides |
+| Content     | `OBJECT`, `CONTENT`     | Two-column     |
+| Picture     | `PICTURE`               | Photo layouts  |
 
 ### Verification
 
@@ -208,6 +208,7 @@ python scripts/analyze_template.py "your.pptx"
 ```
 
 **Good output:**
+
 ```
 📋 Recommended Layout Mapping:
   title           → [ 0] Title Slide
@@ -216,6 +217,7 @@ python scripts/analyze_template.py "your.pptx"
 ```
 
 **Warning signs:**
+
 - `title → [0] Layout_0` (unnamed, may work but not optimal)
 - All mappings pointing to same index (fallback used)
 

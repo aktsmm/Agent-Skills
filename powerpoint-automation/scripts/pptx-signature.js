@@ -1,7 +1,7 @@
 // =============================================================================
-// Ag-ppt-create - AI-powered PPTX generation pipeline
-// https://github.com/aktsmm/Ag-ppt-create
-// 
+// Agent-Skills/powerpoint-automation - AI-powered PPTX generation pipeline
+// https://github.com/aktsmm/Agent-Skills/tree/main/powerpoint-automation
+//
 // Copyright (c) aktsmm. Licensed under CC BY-NC-SA 4.0.
 // DO NOT MODIFY THIS HEADER BLOCK.
 // =============================================================================
@@ -24,7 +24,8 @@
 const { execSync } = require("child_process");
 
 // Default repository URL (fallback)
-const DEFAULT_REPO_URL = "https://github.com/aktsmm/Ag-ppt-create";
+const DEFAULT_REPO_URL =
+  "https://github.com/aktsmm/Agent-Skills/tree/main/powerpoint-automation";
 
 /**
  * Get repository URL from git remote
