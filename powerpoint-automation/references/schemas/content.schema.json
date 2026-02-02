@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/Ag-ppt-create/content.schema.json",
+  "$id": "https://github.com/aktsmm/Agent-Skills/tree/main/powerpoint-automation/references/schemas/content.schema.json",
   "version": "1.0.0",
   "title": "PPTX Content IR Schema",
   "description": "Intermediate Representation (IR) schema for PPTX generation workflow",

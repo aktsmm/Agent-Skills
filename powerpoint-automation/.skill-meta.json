@@ -2,7 +2,7 @@
   "name": "powerpoint-automation",
   "version": "1.0.0",
   "source": "aktsmm-Ag-ppt-create",
-  "description": "Create professional PowerPoint presentations from web articles, blog posts, existing PPTX files. Ideal for tech presentations, reports, and documentation.",
+  "description": "Create professional PowerPoint presentations from various sources including web articles, blog posts, and existing PPTX files.",
   "description_ja": "Web記事、ブログ、既存PPTXからプロフェッショナルなPowerPointプレゼンテーションを作成。技術プレゼン、報告書、ドキュメント作成に最適。",
   "whenToUse": "PowerPoint, PPTX, create presentation, slides; Convert web articles/blog posts to presentations; Translate English PPTX to Japanese; Create presentations using custom templates",
   "categories": [
