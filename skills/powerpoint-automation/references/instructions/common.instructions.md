@@ -129,3 +129,23 @@ When extracting from web sources, explicitly list and retrieve all these element
 | Omitted all code    | Put working sample in Appendix  |
 | Forgot citation     | Always include URL if available |
 | Inconsistent tone   | Maintain initial tone           |
+
+---
+
+## Emoji Usage (★ Important)
+
+**Emoji is prohibited in PPTX slides.**
+
+| Location      | Emoji | Reason                          |
+| ------------- | ----- | ------------------------------- |
+| Slide title   | ❌    | Font compatibility issues       |
+| Bullet items  | ❌    | May not render correctly        |
+| Speaker notes | ⚠️ OK | Internal use, not shown to audience |
+
+### Why No Emoji?
+
+- PowerPoint fonts may not support all emoji
+- Different OS versions render emoji differently
+- Professional presentations should avoid emoji
+- Use icons from template instead
+

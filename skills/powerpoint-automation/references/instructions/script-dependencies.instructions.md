@@ -122,3 +122,63 @@ requests>=2.28.0
 | `validate_content.py`     | PASS    | FAIL  | WARN         |
 | `validate_pptx.py`        | PASS    | FAIL  | WARN         |
 | `create_from_template.py` | Success | Error | Empty slides |
+
+---
+
+## Python Environment Troubleshooting
+
+### Problem: `pip install` fails
+
+Errors like:
+- `ModuleNotFoundError: No module named 'xxx'`
+- `error: externally managed`
+- `Failed to inspect Python interpreter from virtual environment`
+
+### Solution: Use uv venv
+
+```powershell
+# 1. Remove broken .venv
+Remove-Item ".venv" -Recurse -Force -ErrorAction SilentlyContinue
+
+# 2. Create new venv with uv
+uv venv .venv
+
+# 3. Activate
+.\.venv\Scripts\Activate.ps1
+
+# 4. Install packages
+uv pip install python-pptx Pillow jsonschema requests
+```
+
+### Why uv?
+
+- `pip install --system` fails with uv-managed Python
+- `py -3.12` launcher may not be available
+- `uv venv + uv pip` is the most reliable combination
+
+### Problem: `BadZipFile` error
+
+Template files (.pptx) may be Git LFS pointers, not actual files.
+
+```powershell
+# Pull LFS files
+git lfs pull
+
+# Verify file is valid (should show PK header, not "version https://git-lfs")
+Get-Content "assets/template.pptx" -TotalCount 1
+```
+
+### Script Execution
+
+Always specify venv Python explicitly:
+
+```powershell
+& "d:\project\.venv\Scripts\python.exe" create_from_template.py template.pptx content.json output.pptx
+```
+
+### Package Installation Priority
+
+1. **VS Code tool `install_python_packages`** - Try first
+2. **uv venv + uv pip** - Most reliable
+3. **pip install** - Last resort (environment-dependent)
+
