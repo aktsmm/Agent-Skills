@@ -159,18 +159,81 @@ output_ppt/{base}.pptx
 
 ## Template Preparation
 
-### Addition Steps
+### Auto-Template from User's PPTX
+
+When bundled template is unavailable or corrupted, use any PPTX as template:
 
 ```powershell
-# 1. Place template
-cp "path/to/template.pptx" "assets/"
+# 1. Analyze user's PPTX → generates layouts.json automatically
+python scripts/analyze_template.py "user_presentation.pptx"
 
-# 2. Analyze layout
-python scripts/analyze_template.py assets/template.pptx
-
-# 3. Verify result
-cat output_manifest/template_layouts.json
+# 2. Use analyzed PPTX as template
+python scripts/create_from_template.py "user_presentation.pptx" `
+    "output_manifest/content.json" "output_ppt/result.pptx" `
+    --config "output_manifest/user_presentation_layouts.json"
 ```
+
+### Layout Detection Keywords
+
+The analyzer detects layouts by name matching:
+
+| Slide Type | English Keywords | Japanese Keywords |
+|------------|------------------|-------------------|
+| **title** | "Title Slide" | "タイトル スライド", "タイトルスライド" |
+| **content** | "Title and Content" | "タイトルとコンテンツ" |
+| **section** | "Section Header", "Divider" | "セクション見出し", "セクション" |
+| agenda | "Agenda" | "アジェンダ" |
+| closing | "Closing" | - |
+| two_column | "Two Column", "2 Column" | "2列" |
+| code | "Code", "Developer" | - |
+| photo | "Photo", "Picture", "50/50" | - |
+| blank | "Blank" | "白紙" |
+
+### Placeholder Detection
+
+Layouts are also detected by placeholder types:
+
+| Placeholder | Type Constant | Used For |
+|-------------|---------------|----------|
+| Title | `TITLE`, `CENTER_TITLE` | All layouts |
+| Subtitle | `SUBTITLE` | Title slide |
+| Body | `BODY` | Content slides |
+| Content | `OBJECT`, `CONTENT` | Two-column |
+| Picture | `PICTURE` | Photo layouts |
+
+### Verification
+
+```powershell
+python scripts/analyze_template.py "your.pptx"
+```
+
+**Good output:**
+```
+📋 Recommended Layout Mapping:
+  title           → [ 0] Title Slide
+  content         → [ 1] Title and Content
+  section         → [ 2] Section Header
+```
+
+**Warning signs:**
+- `title → [0] Layout_0` (unnamed, may work but not optimal)
+- All mappings pointing to same index (fallback used)
+
+### Creating Optimal Template (PowerPoint)
+
+If your PPTX lacks properly named layouts:
+
+1. **Open PowerPoint** → View → Slide Master
+2. **Rename existing layouts** to match keywords above:
+   - First layout → "Title Slide" or "タイトル スライド"
+   - Second layout → "Title and Content" or "タイトルとコンテンツ"
+   - Add new layout → "Section Header" or "セクション見出し"
+3. **Ensure placeholders exist**:
+   - Title slide: TITLE + SUBTITLE
+   - Content: TITLE + BODY
+   - Section: TITLE only
+4. **Close Slide Master** → Save
+5. **Re-analyze**: `python scripts/analyze_template.py "updated.pptx"`
 
 ### Recommended Requirements
 
