@@ -1,8 +1,0 @@
-{
-  "name": "agentic-workflow-guide",
-  "source": "aktsmm-Agent-Skills",
-  "description": "Create, review, and update Prompt and agents and workflows.",
-  "whenToUse": "Create: New .agent.md, workflow architecture, scaffolding; Review: Orchestrator not delegating, design principle check, context overflow",
-  "categories": [],
-  "installedAt": "2026-01-31T17:40:46.674Z"
-}
