@@ -1,0 +1,37 @@
+# License / ライセンス
+
+This repository contains multiple skills, each with its own license.
+Please refer to the `LICENSE.txt` file in each skill folder.
+
+このリポジトリには複数のスキルが含まれており、それぞれ個別のライセンスが適用されます。
+各スキルフォルダ内の `LICENSE.txt` を参照してください。
+
+## License Summary / ライセンス一覧
+
+| Skill | License |
+|-------|---------|
+| agentic-workflow-guide | CC BY-NC-SA 4.0 |
+| azure-env-builder | CC BY-NC-SA 4.0 |
+| browser-max-automation | CC BY-NC-SA 4.0 |
+| code-simplifier | CC BY-NC-SA 4.0 |
+| drawio-diagram-forge | CC BY-NC-SA 4.0 |
+| ocr-super-surya | CC BY-NC-SA 4.0 |
+| skill-creator | MIT (Anthropic) |
+| skill-finder | MIT |
+
+## Self-created Skills / 自作スキル
+
+Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+- **BY**: Credit must be given to the creator
+- **NC**: Non-commercial use only
+- **SA**: Adaptations must be shared under the same license
+
+## External Skills / 外部由来スキル
+
+Original licenses are retained (MIT, Apache 2.0, etc.)
+
+---
+
+Copyright (c) 2025-2026 yamapan (aktsmm)
+https://github.com/aktsmm
