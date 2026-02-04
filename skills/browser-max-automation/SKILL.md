@@ -17,20 +17,86 @@ Browser automation via Playwright MCP.
 - Verifying UI states, DOM changes, or visual regressions
 - Filling forms, clicking elements, or capturing screenshots
 
-## Prerequisites
+## セットアップ（初回確認）
 
-Configure `.vscode/mcp.json`:
+**このスキルを使う前に、以下を確認してください：**
+
+### 1. ブラウザの選択
+
+どのブラウザを使いますか？
+
+| 選択肢 | 説明 |
+|--------|------|
+| **Edge** | Windows標準、企業環境向け |
+| **Chrome** | 汎用、拡張機能が豊富 |
+
+### 2. 接続モードの選択
+
+| モード | 説明 | メリット | デメリット |
+|--------|------|----------|------------|
+| **新規ブラウザ** | Playwrightが新しいブラウザを起動 | 設定が簡単、安定 | 別ウィンドウが開く |
+| **既存ブラウザ (CDP)** | 今開いているブラウザを操作 | 普段のブラウザをそのまま使える | 事前にデバッグモード起動が必要 |
+
+---
+
+### 設定A: 新規ブラウザモード（推奨）
+
+`mcp.json` に以下を設定：
 
 ```json
 {
   "servers": {
     "playwright": {
       "command": "npx",
-      "args": ["@anthropic-ai/mcp-playwright@latest", "--browser", "chrome"]
+      "args": ["@playwright/mcp@latest", "--browser", "msedge"],
+      "type": "stdio"
     }
   }
 }
 ```
+
+> `--browser` の値: `msedge` (Edge) / `chrome` (Chrome) / `firefox` (Firefox)
+
+---
+
+### 設定B: 既存ブラウザモード (CDP接続)
+
+#### Step 1: ブラウザをデバッグモードで起動
+
+**すべての対象ブラウザを閉じてから**実行：
+
+```powershell
+# Edge の場合
+Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -ArgumentList "--remote-debugging-port=9222"
+
+# Chrome の場合
+Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "--remote-debugging-port=9222"
+```
+
+#### Step 2: mcp.json を設定
+
+```json
+{
+  "servers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--cdp-endpoint", "http://localhost:9222"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+#### Step 3: VS Codeをリロード
+
+`Ctrl+Shift+P` → `Developer: Reload Window`
+
+#### 💡 Tips
+
+- ショートカット作成を推奨: `msedge.exe --remote-debugging-port=9222`
+- CDPポート確認: `http://localhost:9222/json/version`
+
+---
 
 ## Quick Reference
 
@@ -142,7 +208,7 @@ browser_snapshot → get ref → browser_click(ref)
 
 ## Done Criteria
 
-- [ ] MCP server configured in `.vscode/mcp.json`
+- [ ] MCP server configured in `mcp.json`
 - [ ] Browser navigation successful
 - [ ] Target action (click/type/screenshot) completed
 
@@ -152,41 +218,3 @@ browser_snapshot → get ref → browser_click(ref)
 | ---------- | --------------- | --------- |
 | `radio`    | Single choice   | One only  |
 | `checkbox` | Multiple choice | 0 to many |
-
-## 既存ブラウザへの接続 (CDP)
-
-新しいブラウザを開かず、既に起動しているブラウザに接続できます。
-
-### 設定
-
-1. **ブラウザをデバッグモードで起動**（既存のブラウザをすべて閉じてから）:
-
-   ```powershell
-   # Edge
-   Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -ArgumentList "--remote-debugging-port=9222"
-   
-   # Chrome
-   Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentList "--remote-debugging-port=9222"
-   ```
-
-2. **mcp.json に `--cdp-endpoint` を追加**:
-
-   ```json
-   {
-     "servers": {
-       "playwright": {
-         "command": "npx",
-         "args": ["@playwright/mcp@latest", "--cdp-endpoint", "http://localhost:9222"],
-         "type": "stdio"
-       }
-     }
-   }
-   ```
-
-3. **VS Codeをリロード** (`Developer: Reload Window`)
-
-### 注意点
-
-- デバッグモード起動前に対象ブラウザをすべて終了する必要あり
-- 普段使いのブラウザで作業したい場合に有効
-- ショートカット作成を推奨: `msedge.exe --remote-debugging-port=9222`
