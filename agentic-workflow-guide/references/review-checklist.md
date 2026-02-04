@@ -14,11 +14,10 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 | Premature Complexity | Complex design from the start      | Simplicity First                |
 | Black Box            | Internal state invisible           | Transparency                    |
 | Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
-| Hallucination        | Fabricating unverified info      | No Hallucination principle       |
-| Hallucination        | Fabricating unverified info      | No Hallucination principle       |
+| Hallucination        | Fabricating unverified info        | No Hallucination principle      |
+| Hallucination        | Fabricating unverified info        | No Hallucination principle      |
 
-| Hallucination        | Fabricating unverified info      | No Hallucination principle       |
-
+| Hallucination | Fabricating unverified info | No Hallucination principle |
 
 ## How to Use
 
@@ -44,18 +43,18 @@ Minimum items to verify:
 
 ---
 
-## runSubagent Check (Orchestrator-Workers)
+## agent Check (Orchestrator-Workers)
 
 ⚠️ **Critical for sub-agent delegation issues.** If orchestrator doesn't spawn workers, check these items.
 
-> **Platform Note**: See [agent-guide.md](agent-guide.md#what-is-runsubagent) for VS Code / Claude Code tool names.
+> **Platform Note**: See [agent-guide.md](agent-guide.md#what-is-agent) for VS Code / Claude Code tool names.
 
 ```markdown
 ## Agent Definition
 
-- [ ] Does `tools:` include subagent tool? (`runSubagent` for VS Code, `Task` for Claude Code)
+- [ ] Does `tools:` include subagent tool? (`agent` for VS Code, `Task` for Claude Code)
 - [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
-- [ ] Is explicit tool reference present? (`#tool:runSubagent` for VS Code)
+- [ ] Is explicit tool reference present? (`#tool:agent` for VS Code)
 - [ ] Is orchestrator explicitly told NOT to do worker tasks itself?
 
 ## Sub-agent Prompts
@@ -71,17 +70,16 @@ Minimum items to verify:
 - [ ] ❌ "Process in parallel" (not supported as of 2025/12)
 - [ ] ❌ Orchestrator reading files directly instead of delegating
 - [ ] ❌ Missing subagent tool in tools: property
-- [ ] ❌ Nested sub-agent calls (sub-agents cannot call runSubagent)
+- [ ] ❌ Nested sub-agent calls (sub-agents cannot call agent)
 
 ## Correct Pattern Example
 
 ✅ Good (VS Code):
 
-- "You MUST use #tool:runSubagent for EACH file"
+- "You MUST use #tool:agent for EACH file"
 - "Do NOT read file contents directly in main context"
 - "Each sub-agent prompt must include output format"
 ```
-
 
 ---
 
@@ -111,7 +109,6 @@ Minimum items to verify:
 - [ ] ✅ ESCALATEs to user when verification impossible
 - [ ] ✅ Only outputs information backed by sources
 ```
-
 
 ---
 
@@ -501,8 +498,3 @@ After review completion:
 - [design-principles.md](design-principles.md) - Design principles details
 - [workflow-patterns/overview.md](workflow-patterns/overview.md) - Workflow pattern details
 - [context-engineering.md](context-engineering.md) - Context management for long tasks
-
-
-
-
-

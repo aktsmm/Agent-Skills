@@ -79,13 +79,13 @@ If a specific review target is specified, you may skip unrelated files:
 
 Check only 5 items first. If any ❌, proceed to detailed review:
 
-| #   | Check Item                                        | Detection Method                                    |
-| --- | ------------------------------------------------- | --------------------------------------------------- |
-| 1   | **SRP**: 1 agent = 1 responsibility?              | ❌ if Role cannot be stated in 1 sentence           |
-| 2   | **Fail Fast**: Error detection in first 2 steps?  | ❌ if no validation in Workflow Step 1-2            |
-| 3   | **runSubagent delegation**: Orchestrator working? | ❌ if Workflow contains direct file-read/edit tools |
-| 4   | **SSOT**: Same definition in 2+ places?           | Use `grep_search` to detect duplicates              |
-| 5   | **Done Criteria**: Verifiable completion?         | ❌ if just "complete" without specific checklist    |
+| #   | Check Item                                       | Detection Method                                    |
+| --- | ------------------------------------------------ | --------------------------------------------------- |
+| 1   | **SRP**: 1 agent = 1 responsibility?             | ❌ if Role cannot be stated in 1 sentence           |
+| 2   | **Fail Fast**: Error detection in first 2 steps? | ❌ if no validation in Workflow Step 1-2            |
+| 3   | **agent delegation**: Orchestrator working?      | ❌ if Workflow contains direct file-read/edit tools |
+| 4   | **SSOT**: Same definition in 2+ places?          | Use `grep_search` to detect duplicates              |
+| 5   | **Done Criteria**: Verifiable completion?        | ❌ if just "complete" without specific checklist    |
 
 ### Tier 1: Core Principles (Required)
 
@@ -125,28 +125,28 @@ For orchestrator agents, always verify the following:
 | **Prompt Chaining**      | Sequential subtasks with dependencies | Steps explicitly depend on previous output |
 | **Routing**              | Different handling per input type     | Classification/branching at workflow start |
 | **Parallelization**      | Independent subtasks for speed        | No data dependency between steps           |
-| **Orchestrator-Workers** | Dynamic subtask breakdown             | `runSubagent` calls in workflow            |
+| **Orchestrator-Workers** | Dynamic subtask breakdown             | `agent` calls in workflow                  |
 | **Evaluator-Optimizer**  | Iterative refinement needed           | Review → feedback → improve loop           |
 
 ### 🔴 SRP Violation Detection (Critical)
 
-| Anti-pattern                         | Detection Method                                    | Resolution                       |
-| ------------------------------------ | --------------------------------------------------- | -------------------------------- |
-| Orchestrator doing direct work       | `read_file` or `replace_string_in_file` in Workflow | Change to `runSubagent` delegate |
-| Orchestrator analyzing data          | "verify" or "check" actions in Workflow             | Delegate to Worker agent         |
-| Missing "prohibited actions" section | No prohibition table exists                         | Add explicit prohibition list    |
+| Anti-pattern                         | Detection Method                                    | Resolution                    |
+| ------------------------------------ | --------------------------------------------------- | ----------------------------- |
+| Orchestrator doing direct work       | `read_file` or `replace_string_in_file` in Workflow | Change to `agent` delegate    |
+| Orchestrator analyzing data          | "verify" or "check" actions in Workflow             | Delegate to Worker agent      |
+| Missing "prohibited actions" section | No prohibition table exists                         | Add explicit prohibition list |
 
-### runSubagent Delegation Pattern Check
+### agent Delegation Pattern Check
 
-- [ ] Does Orchestrator's Workflow include `runSubagent` call examples?
+- [ ] Does Orchestrator's Workflow include `agent` call examples?
 - [ ] Does each Worker have a "What this agent actually does" section?
 - [ ] Is Worker's I/O Contract clearly defined in JSON format?
 - [ ] Is retry policy defined (e.g., max 3 retries)?
 
-**Expected runSubagent call pattern:**
+**Expected agent call pattern:**
 
 ```javascript
-runSubagent({
+agent({
   prompt: "Analyze the file at {path} and return JSON with {fields}",
   description: "File analysis task",
 });
@@ -161,7 +161,7 @@ runSubagent({
 
 **Limitation:**
 
-- Sub-agents cannot call `runSubagent` themselves (flat hierarchy only: Orchestrator → Workers)
+- Sub-agents cannot call `agent` themselves (flat hierarchy only: Orchestrator → Workers)
 
 ## Cross-Reference Validation
 
@@ -275,7 +275,7 @@ Review is complete when:
 
 - 🔴 **SRP Violation (Orchestrator)**: `{orchestrator}.agent.md` directly uses `read_file` on data
   - L{line}: `read_file to load target file`
-    → Should delegate to Worker agent via `runSubagent`
+    → Should delegate to Worker agent via `agent`
 
 - 🟠 **SSOT Violation**: "{concept}" defined in 2 places:
   - `{file-a}.agent.md` (L{line})
