@@ -18,7 +18,7 @@ applyTo: ".github/agents/**/*.agent.md"
 |------|------|
 | **Single Responsibility** | 1 エージェント = 1 ゴール |
 | **Stateless & Idempotency** | ファイル状態で判断、再実行可能 |
-| **Orchestration** | 複雑タスクは runSubagent で委譲 |
+| **Orchestration** | 複雑タスクは agent（旧 runSubagent）で委譲 |
 | **Fail-safe** | 破壊的操作前に確認 |
 | **Observability** | 決定事項をログに残す |
 

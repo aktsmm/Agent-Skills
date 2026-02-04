@@ -119,16 +119,16 @@ tools:
 
 **Tool Aliases (VS Code Copilot):**
 
-| Alias     | Included Tools                         | Description        |
-| --------- | -------------------------------------- | ------------------ |
-| `execute` | shell, Bash, powershell, runInTerminal | シェル実行         |
-| `read`    | readFile, NotebookRead                 | ファイル読み取り   |
-| `edit`    | editFiles, MultiEdit, Write            | ファイル編集       |
-| `search`  | fileSearch, textSearch, Grep, Glob     | 検索               |
-| `agent`   | runSubagent, custom-agent, Task        | サブエージェント   |
-| `web`     | WebSearch, WebFetch, fetch             | Web 取得           |
-| `todo`    | manage_todo_list, TodoWrite            | タスクリスト       |
-| `vscode`  | VS Code specific tools                 | VS Code 固有ツール |
+| Alias     | Included Tools                                  | Description        |
+| --------- | ----------------------------------------------- | ------------------ |
+| `execute` | shell, Bash, powershell, runInTerminal          | シェル実行         |
+| `read`    | readFile, NotebookRead                          | ファイル読み取り   |
+| `edit`    | editFiles, MultiEdit, Write                     | ファイル編集       |
+| `search`  | fileSearch, textSearch, Grep, Glob              | 検索               |
+| `agent`   | agent (legacy: runSubagent), custom-agent, Task | サブエージェント   |
+| `web`     | WebSearch, WebFetch, fetch                      | Web 取得           |
+| `todo`    | manage_todo_list, TodoWrite                     | タスクリスト       |
+| `vscode`  | VS Code specific tools                          | VS Code 固有ツール |
 
 > **💡 Tips:**
 >
@@ -342,7 +342,7 @@ For long-running tasks, maintain visibility:
 
 Key characteristics:
 
-- Uses subagent tool for delegation (`#runSubagent` / `Task`)
+- Uses subagent tool for delegation (`#tool:agent` / `Task`)
 - Maintains high-level view
 - Does NOT perform detailed work itself
 
@@ -453,7 +453,7 @@ tools: ["Task", "Read", "Search", "TodoWrite"]
 
 ### Tool Reference Syntax
 
-- **VS Code Copilot**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:runSubagent`)
+- **VS Code Copilot**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`)
 - **Claude Code**: Reference tools directly by name
 
 ### MCP Server Tools
@@ -509,7 +509,7 @@ handoffs:
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
 - [Handoffs Guide](handoffs-guide.md) - Detailed handoffs configuration
-- [runSubagent Guide](agent-guide.md) - Sub-agent delegation
+- [agent Guide (旧 runSubagent)](agent-guide.md) - Sub-agent delegation
 
 ```
 
@@ -519,14 +519,14 @@ handoffs:
 
 Some tool names require full path format. Use the following:
 
-| Tool                | Correct Format             | Notes                              |
-| ------------------- | -------------------------- | ---------------------------------- |
-| runInTerminal       | `execute/runInTerminal`    | Alias `execute` does NOT work      |
-| problems            | `read/problems`            | Renamed from `problems`            |
-| codebase            | `search/codebase`          | Renamed from `codebase`            |
-| terminalLastCommand | `read/terminalLastCommand` | Renamed from `terminalLastCommand` |
-| runSubagent         | `agent`                    | Alias works                        |
-| todo                | `todo`                     | Alias works                        |
+| Tool                        | Correct Format             | Notes                              |
+| --------------------------- | -------------------------- | ---------------------------------- |
+| runInTerminal               | `execute/runInTerminal`    | Alias `execute` does NOT work      |
+| problems                    | `read/problems`            | Renamed from `problems`            |
+| codebase                    | `search/codebase`          | Renamed from `codebase`            |
+| terminalLastCommand         | `read/terminalLastCommand` | Renamed from `terminalLastCommand` |
+| agent (legacy: runSubagent) | `agent`                    | Legacy alias supported             |
+| todo                        | `todo`                     | Alias works                        |
 
 **Example (correct):**
 

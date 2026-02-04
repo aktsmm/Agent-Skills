@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "Create, review, and update Prompt and agents and workflows. Covers 5 workflow patterns, runSubagent delegation, Handoffs, Context Engineering. Use for any .agent.md file work or multi-agent system design. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計'."
+description: "Create, review, and update Prompt and agents and workflows. Covers 5 workflow patterns, agent delegation, Handoffs, Context Engineering. Use for any .agent.md file work or multi-agent system design. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計'."
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -79,7 +79,7 @@ Design, review, and improve agent workflows based on proven principles.
 | Topic              | Reference                                                              |
 | ------------------ | ---------------------------------------------------------------------- |
 | Prompt Template    | [references/prompt-template.md](references/prompt-template.md)         |
-| runSubagent        | [references/agent-guide.md](references/agent-guide.md)                 |
+| agent              | [references/agent-guide.md](references/agent-guide.md)                 |
 | Agent Template     | [references/agent-template.md](references/agent-template.md)           |
 | Context Management | [references/context-engineering.md](references/context-engineering.md) |
 | **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
@@ -87,7 +87,7 @@ Design, review, and improve agent workflows based on proven principles.
 | **Deep Agent**     | [references/deep-agent-patterns.md](references/deep-agent-patterns.md) |
 | Agent Evaluation   | [references/agent-evaluation.md](references/agent-evaluation.md)       |
 
-## runSubagent Quick Fix
+## agent Quick Fix
 
 **Problem:** Orchestrator says "I'll delegate" but does work directly.
 
@@ -95,7 +95,7 @@ Design, review, and improve agent workflows based on proven principles.
 
 ```yaml
 ## MANDATORY: Sub-agent Delegation
-You MUST use runSubagent for each file. Do NOT read files directly.
+You MUST use agent for each file. Do NOT read files directly.
 ```
 
 ## Tools Reference
@@ -131,7 +131,7 @@ You MUST use runSubagent for each file. Do NOT read files directly.
 
 ### Community Resources
 
-- [runSubagent 検証記事 - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
+- [agent (旧 runSubagent) 検証記事 - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
 - [subagent-driven-development - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/subagent-driven-development)
 - [awesome-copilot agents - GitHub](https://github.com/github/awesome-copilot/tree/main/agents)
 

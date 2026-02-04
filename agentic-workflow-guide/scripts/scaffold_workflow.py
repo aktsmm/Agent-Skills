@@ -91,7 +91,7 @@ def lint_files(path: str) -> None:
         print("Escalation options:")
         print("  - L0 → L1: Add .instructions.md file")
         print("  - L1 → L2: Create .agent.md with tools")
-        print("  - L2 → L3: Use runSubagent for sub-tasks")
+        print("  - L2 → L3: Use agent for sub-tasks")
 
 
 # Pattern-specific AGENTS.md templates

@@ -59,14 +59,14 @@ Collect the following information:
 
 | Type    | Count | Examples                                      |
 | ------- | ----- | --------------------------------------------- |
-| Agents  | 6     | orchestrator, report-generator, task-manager  |
+| Agents  | 8     | orchestrator, report-generator, task-manager, 1on1-assistant  |
 | Prompts | 4     | daily-report, weekly-report, monthly-report   |
 | Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/ |
 
 ## Done Criteria
 
 - [ ] All folders created (ActivityReport/, Customers/, Tasks/, etc.)
-- [ ] 6 agents deployed to `.github/agents/`
+- [ ] 8 agents deployed to `.github/agents/`
 - [ ] 4 prompts deployed to `.github/prompts/`
 - [ ] Customer mappings configured in `copilot-instructions.md`
 - [ ] Workflow verification passed (daily report test)

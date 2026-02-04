@@ -71,7 +71,7 @@ graph TD
 ```yaml
 ---
 name: Support Router
-tools: ["runSubagent"]
+tools: ["agent"]
 ---
 
 # Support Router

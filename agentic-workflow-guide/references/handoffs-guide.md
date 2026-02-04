@@ -8,7 +8,7 @@ Guided sequential workflows with human-in-the-loop control between agents.
 - [When to Use](#when-to-use) - Effective scenarios
 - [Configuration](#configuration) - YAML properties and examples
 - [Workflow Examples](#workflow-examples) - Common patterns
-- [Handoffs vs runSubagent](#handoffs-vs-runsubagent) - Comparison and selection
+- [Handoffs vs agent](#handoffs-vs-agent) - Comparison and selection
 - [Best Practices](#best-practices) - Tips for effective handoffs
 - [Troubleshooting](#troubleshooting) - Common issues
 
@@ -60,12 +60,12 @@ Handoffs enable **guided sequential workflows** that transition between agents w
 
 ### ❌ When NOT to Use
 
-| Scenario                   | Use Instead                       |
-| -------------------------- | --------------------------------- |
-| Automated background tasks | `runSubagent` (no human approval) |
-| Parallel processing        | Parallelization pattern           |
-| Context isolation needed   | `runSubagent` (clean context)     |
-| Simple single-step tasks   | Single agent                      |
+| Scenario                   | Use Instead                 |
+| -------------------------- | --------------------------- |
+| Automated background tasks | `agent` (no human approval) |
+| Parallel processing        | Parallelization pattern     |
+| Context isolation needed   | `agent` (clean context)     |
+| Simple single-step tasks   | Single agent                |
 
 ---
 
@@ -230,9 +230,9 @@ handoffs:
 
 ---
 
-## Handoffs vs runSubagent
+## Handoffs vs agent
 
-| Feature          | Handoffs               | runSubagent             |
+| Feature          | Handoffs               | agent                   |
 | ---------------- | ---------------------- | ----------------------- |
 | **Execution**    | User clicks button     | Automatic               |
 | **Context**      | Shared via prompt      | Isolated (clean window) |
@@ -243,15 +243,15 @@ handoffs:
 
 ### Decision Matrix
 
-| Need                               | Use Handoffs | Use runSubagent |
-| ---------------------------------- | ------------ | --------------- |
-| Human approval between phases      | ✅           |                 |
-| Automatic execution                |              | ✅              |
-| Context isolation                  |              | ✅              |
-| Sequential workflow orchestration  | ✅           |                 |
-| Log/data analysis (large data)     |              | ✅              |
-| Plan → Implement → Review workflow | ✅           |                 |
-| Research during implementation     |              | ✅              |
+| Need                               | Use Handoffs | Use agent |
+| ---------------------------------- | ------------ | --------- |
+| Human approval between phases      | ✅           |           |
+| Automatic execution                |              | ✅        |
+| Context isolation                  |              | ✅        |
+| Sequential workflow orchestration  | ✅           |           |
+| Log/data analysis (large data)     |              | ✅        |
+| Plan → Implement → Review workflow | ✅           |           |
+| Research during implementation     |              | ✅        |
 
 ---
 
@@ -364,22 +364,22 @@ prompt: |
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_handoffs)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-- [runSubagent Guide](agent-guide.md) - Alternative for context isolation
+- [agent Guide (legacy: runSubagent)](agent-guide.md) - Alternative for context isolation
 - [Workflow Patterns Overview](workflow-patterns/overview.md) - Pattern selection guide
 
 ---
 
-## Context-Based Handoff (Non-runSubagent)
+## Context-Based Handoff (No agent tool)
 
-Not all agent-to-agent communication uses `runSubagent`. Some patterns use **chat context** for data passing.
+Not all agent-to-agent communication uses `agent`. Some patterns use **chat context** for data passing.
 
 ### When to Use Context-Based Handoff
 
-| Scenario | Method | Reason |
-|----------|--------|--------|
-| Router → Orchestrator | Chat context | Router makes decisions, doesn't spawn workers |
-| Same-level coordination | Chat context | Agents share conversation, not parent-child |
-| Decision passing | JSON in context | Structured data without sub-agent overhead |
+| Scenario                | Method          | Reason                                        |
+| ----------------------- | --------------- | --------------------------------------------- |
+| Router → Orchestrator   | Chat context    | Router makes decisions, doesn't spawn workers |
+| Same-level coordination | Chat context    | Agents share conversation, not parent-child   |
+| Decision passing        | JSON in context | Structured data without sub-agent overhead    |
 
 ### Implementation Pattern
 
@@ -388,12 +388,12 @@ Not all agent-to-agent communication uses `runSubagent`. Some patterns use **cha
 
 - Makes routing decision
 - Outputs RouterDecision JSON to chat context
-- Does NOT use runSubagent
+- Does NOT use agent
 
 ## Orchestrator Agent (Executor)
 
-- Receives RouterDecision from chat context (NOT as runSubagent input)
-- Uses runSubagent for actual worker delegation
+- Receives RouterDecision from chat context (NOT as agent input)
+- Uses agent for actual worker delegation
 - Logs decision to .logs/ for traceability
 ```
 
@@ -411,43 +411,42 @@ Not all agent-to-agent communication uses `runSubagent`. Some patterns use **cha
 
 ### Key Distinction
 
-| Handoff Type | Tool Used | Parent-Child? | Use Case |
-|--------------|-----------|---------------|----------|
-| runSubagent | runSubagent / Task | Yes | Worker delegation |
-| Context-based | None (chat) | No | Decision passing, coordination |
-
-
+| Handoff Type  | Tool Used    | Parent-Child? | Use Case                       |
+| ------------- | ------------ | ------------- | ------------------------------ |
+| agent         | agent / Task | Yes           | Worker delegation              |
+| Context-based | None (chat)  | No            | Decision passing, coordination |
 
 ---
 
-## Context-Based Handoff (Non-runSubagent)
+## Context-Based Handoff (No agent tool)
 
-Not all agent-to-agent communication uses runSubagent. Some patterns use chat context for data passing.
+Not all agent-to-agent communication uses agent. Some patterns use chat context for data passing.
 
 ### When to Use Context-Based Handoff
 
-| Scenario | Method | Reason |
-|----------|--------|--------|
-| Router to Orchestrator | Chat context | Router makes decisions, doesnt spawn workers |
-| Same-level coordination | Chat context | Agents share conversation, not parent-child |
-| Decision passing | JSON in context | Structured data without sub-agent overhead |
+| Scenario                | Method          | Reason                                       |
+| ----------------------- | --------------- | -------------------------------------------- |
+| Router to Orchestrator  | Chat context    | Router makes decisions, doesnt spawn workers |
+| Same-level coordination | Chat context    | Agents share conversation, not parent-child  |
+| Decision passing        | JSON in context | Structured data without sub-agent overhead   |
 
 ### Implementation Pattern
 
 Router Agent (Decision Maker):
+
 - Makes routing decision
 - Outputs RouterDecision JSON to chat context
-- Does NOT use runSubagent
+- Does NOT use agent
 
 Orchestrator Agent (Executor):
-- Receives RouterDecision from chat context (NOT as runSubagent input)
-- Uses runSubagent for actual worker delegation
+
+- Receives RouterDecision from chat context (NOT as agent input)
+- Uses agent for actual worker delegation
 - Logs decision to .logs/ for traceability
 
 ### Key Distinction
 
-| Handoff Type | Tool Used | Parent-Child | Use Case |
-|--------------|-----------|--------------|----------|
-| runSubagent | runSubagent / Task | Yes | Worker delegation |
-| Context-based | None (chat) | No | Decision passing, coordination |
-
+| Handoff Type  | Tool Used    | Parent-Child | Use Case                       |
+| ------------- | ------------ | ------------ | ------------------------------ |
+| agent         | agent / Task | Yes          | Worker delegation              |
+| Context-based | None (chat)  | No           | Decision passing, coordination |

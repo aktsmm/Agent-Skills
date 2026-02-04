@@ -25,6 +25,8 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 | `agents/task-manager.agent.template.md`     | `.github/agents/task-manager.agent.md`     | Task CRUD, progress tracking      |
 | `agents/data-collector.agent.template.md`   | `.github/agents/data-collector.agent.md`   | Data collection, customer routing |
 | `agents/work-inventory.agent.template.md`   | `.github/agents/work-inventory.agent.md`   | Work analysis, manager PR         |
+| `agents/1on1-assistant.agent.template.md`   | `.github/agents/1on1-assistant.agent.md`   | 1on1 prep, action item extraction |
+| `agents/general-worker.agent.template.md`   | `.github/agents/general-worker.agent.md`   | Fallback for unclassified tasks   |
 
 ### Prompt Templates
 
@@ -54,6 +56,8 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 | **task-manager**     | Task creation, updates, classification, progress management    |
 | **data-collector**   | Data collection, normalization, customer/internal auto-routing |
 | **work-inventory**   | Work inventory, analysis, manager PR material creation         |
+| **1on1-assistant**   | 1on1 meeting prep, activity summary, action item extraction    |
+| **general-worker**   | Fallback handler for unclassified tasks, pattern detection     |
 
 ## IMPACT Framework (Review Criteria)
 
@@ -92,6 +96,8 @@ Data retrieved from workIQ for report generation and task updates:
 | "Task", "TODO", "Issue", "Progress"            | task-manager     |
 | Teams/Email format paste                       | data-collector   |
 | "Inventory", "Analysis", "PR", "Retrospective" | work-inventory   |
+| "1on1", "1:1", "ワンオンワン", "prep"           | 1on1-assistant   |
+| (No match / Fallback)                          | general-worker   |
 
 ## Post-Setup Customization
 

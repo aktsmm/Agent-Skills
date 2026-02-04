@@ -4,24 +4,33 @@ Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 
 ## Table of Contents
 
-- [What is runSubagent?](#what-is-runsubagent) - Key characteristics and purpose
+- [What is agent?](#what-is-agent) - Key characteristics and purpose
 - [When to Use](#when-to-use) - Effective scenarios and anti-patterns
 - [How to Invoke](#how-to-invoke) - Enabling and invocation methods
-- [Prompt Engineering](#prompt-engineering-for-runsubagent) - Sub-agent prompt requirements
-- [Orchestrator-Workers Pattern](#orchestrator-workers-pattern-with-runsubagent) - Architecture examples
+- [Prompt Engineering](#prompt-engineering-for-agent) - Sub-agent prompt requirements
+- [Orchestrator-Workers Pattern](#orchestrator-workers-pattern-with-agent) - Architecture examples
 - [Common Pitfalls](#common-pitfalls) - Avoiding delegation failures
 - [Token Efficiency](#token-efficiency) - Trade-offs and recommendations
-- [Handoffs vs runSubagent](#handoffs-vs-runsubagent) - Comparison
+- [Handoffs vs agent](#handoffs-vs-agent) - Comparison
 - [Checklist](#checklist) - Implementation checklist
 
 > **Platform Note (2026/02 Updated)**:
 >
-> - **VS Code Copilot**: `runSubagent` is now part of the `agent` toolset. Use `agent` in `tools:` and `#tool:agent` in prompts (`runSubagent` still works as alias)
+> - **VS Code Copilot**: Use `agent` in `tools:` and `#tool:agent` in prompts (`runSubagent` is a legacy alias)
 > - **Claude Code**: Use `Task` in `tools:`
 
-## What is runSubagent?
+### Legacy call patterns (avoid in new docs)
 
-`runSubagent` launches an independent agent with a **clean context window** to handle complex, multi-step tasks autonomously.
+The following legacy forms may still work but should not be used in new documentation:
+
+- `tools: ["runSubagent"]` → use `tools: ["agent"]`
+- `#tool:runSubagent` → use `#tool:agent`
+- `runSubagent({ ... })` → use `agent({ ... })`
+- `agent/runSubagent` (old tool path) → use `agent`
+
+## What is agent?
+
+The `agent` tool launches an independent agent with a **clean context window** to handle complex, multi-step tasks autonomously.
 
 ### Key Characteristics
 
@@ -32,11 +41,11 @@ Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 | **Stateless** | One-shot execution - no follow-up conversation possible           |
 | **Return**    | Only final summary returns to main agent                          |
 | **Parallel**  | ✅ Supported (2026/01+) - multiple sub-agents can run in parallel |
-| **Nesting**   | ❌ NOT supported - sub-agents cannot call runSubagent             |
+| **Nesting**   | ❌ NOT supported - sub-agents cannot call agent                   |
 
 ### Primary Purpose
 
-> "runSubagent is for **context management**, NOT for speed optimization."
+> "agent is for **context management**, NOT for speed optimization."
 
 Use when you want to:
 
@@ -69,11 +78,11 @@ Use when you want to:
 
 ## How to Invoke
 
-### Enabling runSubagent
+### Enabling agent
 
 **Option 1: Tool Picker**
 
-- Open VS Code chat → Tool picker → Enable `runSubagent`
+- Open VS Code chat → Tool picker → Enable `agent`
 
 **Option 2: Agent YAML (Recommended)**
 
@@ -81,7 +90,7 @@ Use when you want to:
 # VS Code Copilot
 ---
 name: Orchestrator
-tools: ["runSubagent", "fetch", "readFile"]
+tools: ["agent", "fetch", "readFile"]
 ---
 # Claude Code
 ---
@@ -95,7 +104,7 @@ tools: ["Task", "WebSearch", "Read"]
 #### Method 1: Direct Tool Reference (Most Reliable)
 
 ```markdown
-Use #tool:runSubagent for each URL to fetch and summarize the content.
+Use #tool:agent for each URL to fetch and summarize the content.
 ```
 
 #### Method 2: Natural Language
@@ -111,18 +120,20 @@ For each file, launch a sub-agent to analyze and return findings.
 
 1. Analyze requirements
 2. For each identified file:
-   - Call #tool:runSubagent with prompt:
-     "Read [filename], identify issues, suggest fixes"
+
+- Call #tool:agent with prompt:
+  "Read [filename], identify issues, suggest fixes"
+
 3. Synthesize all sub-agent results
 ```
 
 ---
 
-## Prompt Engineering for runSubagent
+## Prompt Engineering for agent
 
 ### Sub-agent Prompt Requirements
 
-When calling `runSubagent`, your **prompt** parameter must include:
+When calling `agent`, your **prompt** parameter must include:
 
 | Element             | Example                                       |
 | ------------------- | --------------------------------------------- |
@@ -140,11 +151,11 @@ When calling `runSubagent`, your **prompt** parameter must include:
 ---
 
 name: MyOrchestrator
-tools: ['runSubagent']
+tools: ['agent']
 
 ---
 
-#tool:runSubagent を使用して、Researcher エージェントを呼び出してください。
+#tool:agent を使用して、Researcher エージェントを呼び出してください。
 
 - prompt: ${調査したい内容}
 - agentName: Researcher
@@ -188,7 +199,7 @@ Return: JSON with {bugs: [], security: [], performance: []}
 
 ---
 
-## Orchestrator-Workers Pattern with runSubagent
+## Orchestrator-Workers Pattern with agent
 
 ### Architecture
 
@@ -196,7 +207,7 @@ Return: JSON with {bugs: [], security: [], performance: []}
 Main Agent (Orchestrator)
 ├── Decompose task into subtasks
 ├── For each subtask:
-│   └── runSubagent(subtask_prompt)
+│   └── agent(subtask_prompt)
 │       └── Returns: summary (1-2k tokens)
 └── Synthesize all summaries
 ```
@@ -209,7 +220,7 @@ Main Agent (Orchestrator)
 ---
 name: Code Review Orchestrator
 description: Reviews code changes across multiple files using sub-agents
-tools: ["runSubagent", "read_file", "grep_search"]
+tools: ["agent", "read_file", "grep_search"]
 ---
 # Code Review Orchestrator
 
@@ -218,8 +229,8 @@ tools: ["runSubagent", "read_file", "grep_search"]
 1. **Identify changed files**
 - Use grep_search or read_file to list modified files
 
-2. **Dispatch review sub-agents** ⚠️ MUST USE runSubagent
-For each file, call #tool:runSubagent with prompt:
+2. **Dispatch review sub-agents** ⚠️ MUST USE agent
+For each file, call #tool:agent with prompt:
 ```
 
 Review the file at [filepath]:
@@ -238,7 +249,7 @@ Review the file at [filepath]:
 
 ## CRITICAL: Sub-agent Dispatch
 
-You MUST use #tool:runSubagent for file reviews.
+You MUST use #tool:agent for file reviews.
 Do NOT review files directly in main context.
 Each sub-agent keeps file content isolated.
 ```
@@ -248,7 +259,7 @@ Each sub-agent keeps file content isolated.
 ```yaml
 ---
 name: Research Orchestrator
-tools: ["runSubagent", "fetch"]
+tools: ["agent", "fetch"]
 ---
 
 # Research Orchestrator
@@ -259,7 +270,7 @@ Research multiple URLs and synthesize findings.
 
 ## Execution (⚠️ MANDATORY STEPS)
 
-1. **For EACH URL, call #tool:runSubagent:**
+1. **For EACH URL, call #tool:agent:**
 ```
 
 Prompt: "Fetch {url} and summarize:
@@ -293,23 +304,23 @@ Prompt: "Fetch {url} and summarize:
 
 **Symptoms:**
 
-- No runSubagent calls in execution
+- No #tool:agent calls in execution
 - Main context fills up
 - Agent says "I'll review each file" but doesn't spawn sub-agents
 
 **Solution:** Use explicit, imperative instructions:
 
 ```markdown
-## MANDATORY: You MUST use #tool:runSubagent
+## MANDATORY: You MUST use #tool:agent
 
 Do NOT read file contents directly.
 Do NOT review code in main context.
-For EACH file → runSubagent with specific prompt.
+For EACH file → agent with specific prompt.
 ```
 
 ### Pitfall 2: Parallel Execution Overhead
 
-⚠️ **Note:** As of 2026/01, runSubagent supports parallel execution, but with overhead.
+⚠️ **Note:** As of 2026/01, agent supports parallel execution, but with overhead.
 
 **Trade-off:** Parallel sub-agents add VS Code processing overhead. In one test:
 
@@ -335,7 +346,7 @@ For EACH file → runSubagent with specific prompt.
 
 ❌ **Problem:** Sub-agent tries to call another sub-agent
 
-**Reality:** Sub-agents cannot call `runSubagent` themselves. Nesting is not supported.
+**Reality:** Sub-agents cannot call `agent` themselves. Nesting is not supported.
 
 **Solution:** Keep hierarchy flat:
 
@@ -367,7 +378,7 @@ Return as:
 
 ❌ **Problem:** Trying to use `subagentType=my-agent` doesn't work
 
-**Reality:** runSubagent creates fresh agents, cannot handoff to existing agent definitions.
+**Reality:** agent creates fresh agents, cannot handoff to existing agent definitions.
 
 **Solution:** Define sub-agent behavior in the prompt parameter, not in separate files.
 
@@ -387,7 +398,7 @@ Return as:
 **Usage:**
 
 ```markdown
-#tool:runSubagent を使用して、以下の処理をサブエージェントで実行してください。
+#tool:agent を使用して、以下の処理をサブエージェントで実行してください。
 
 - prompt: {サブエージェントへの入力}
 - agentName: my-custom-agent
@@ -401,7 +412,6 @@ Return as:
 
 ---
 
-
 ---
 
 ## Inline Sub-agent Pattern (Recommended)
@@ -410,10 +420,10 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 ### Why Inline?
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| External reference (`agentName: developer`) | Reusable, DRY | May not work reliably, dependency |
-| **Inline definition** | Self-contained, reliable | Slightly longer prompts |
+| Approach                                    | Pros                     | Cons                              |
+| ------------------------------------------- | ------------------------ | --------------------------------- |
+| External reference (`agentName: developer`) | Reusable, DRY            | May not work reliably, dependency |
+| **Inline definition**                       | Self-contained, reliable | Slightly longer prompts           |
 
 ### Example: Inline Developer Sub-agent
 
@@ -425,18 +435,22 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 # Developer Agent
 
 ## Role
+
 あなたは開発者です。バグ修正、コードの改善を行います。
 
 ## Goals
+
 - TypeScript のベストプラクティスに従う
 - エラーなくコンパイルされることを確認
 
 ## Done Criteria
+
 - `npm run compile` がエラーなしで完了
 
 ---
 
 ## タスク
+
 {具体的な修正内容}
 `
 
@@ -471,9 +485,9 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 ---
 
-## Handoffs vs runSubagent
+## Handoffs vs agent
 
-| Feature          | Handoffs                  | runSubagent             |
+| Feature          | Handoffs                  | agent                   |
 | ---------------- | ------------------------- | ----------------------- |
 | **Context**      | Shared (via prompt)       | Isolated (clean window) |
 | **User Control** | Manual approval           | Automatic execution     |
@@ -483,18 +497,18 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 **Recommendation:**
 
 - Use **Handoffs** for human-in-the-loop phase transitions
-- Use **runSubagent** for context-heavy isolated tasks
+- Use **agent (旧 runSubagent)** for context-heavy isolated tasks
 
 ---
 
 ## Checklist
 
 ```markdown
-## runSubagent Implementation Checklist
+## agent Implementation Checklist
 
 ### Agent Definition
 
-- [ ] tools includes "runSubagent"
+- [ ] tools includes "agent"
 - [ ] Explicit instructions to USE sub-agents (not just "can use")
 - [ ] Sub-agent prompt template defined
 
@@ -525,10 +539,9 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 - [Chat in IDE - GitHub Docs](https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide#using-subagents)
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
-- [GitHub Copilot runSubagent - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
+- [GitHub Copilot agent (旧 runSubagent) - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
 - [Context Engineering for Agents - LangChain Blog](https://blog.langchain.com/context-engineering-for-agents/)- [Handoffs Guide](handoffs-guide.md) - Alternative for human-in-the-loop workflows
 - [Splitting Criteria](splitting-criteria.md) - When to use sub-agents
-
 
 ---
 
@@ -538,14 +551,14 @@ VS Code Copilot のカスタムエージェントで正しくサブエージェ�
 
 ### 正しいツールエイリアス
 
-| エイリアス | 説明 | 間違い例 |
-|------------|------|----------|
-| agent | サブエージェント呼び出し | runSubagent |
-| read | ファイル読み取り | read/readFile |
-| edit | ファイル編集 | edit/editFiles |
-| search | 検索 | search/textSearch |
-| execute | コマンド実行 | execute/runInTerminal |
-| todo | タスク管理 | todos |
+| エイリアス | 説明                     | 間違い例              |
+| ---------- | ------------------------ | --------------------- |
+| agent      | サブエージェント呼び出し | runSubagent           |
+| read       | ファイル読み取り         | read/readFile         |
+| edit       | ファイル編集             | edit/editFiles        |
+| search     | 検索                     | search/textSearch     |
+| execute    | コマンド実行             | execute/runInTerminal |
+| todo       | タスク管理               | todos                 |
 
 > **参考:** [GitHub Docs - Custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration#tools)
 
@@ -558,10 +571,10 @@ tools: ["agent", "read", "edit", "search", "execute", "todo"]
 
 間違い形式:
 tools:
-  - agent
-  - read
+
+- agent
+- read
 
 ### シンプルなプロンプト構造
 
 複雑な450行のプロンプトより、シンプルな70行のプロンプトの方が効果的です。
-
