@@ -56,8 +56,8 @@ flowchart TD
     B -->|No| D[Create Plan]
     D --> E{User Approval?}
     E -->|No| D
-    E -->|Yes| F[Fix: runSubagent developer]
-    F --> G[Verify: runSubagent reviewer]
+    E -->|Yes| F[Fix: agent developer]
+    F --> G[Verify: agent reviewer]
     G --> H{All PASS?}
     H -->|Yes| I[Done]
     H -->|No| J{Retry < 3?}
@@ -68,16 +68,15 @@ flowchart TD
 
 ### Key Design Patterns
 
-| Pattern | Implementation |
-|---------|---------------|
-| **Reflection Loop** | Analyze why previous fix failed before retrying |
-| **Error Context** | Pass full stack trace + related files + past attempts |
-| **No Repeat Fixes** | Track attempt history, try different approaches |
-| **Escalation** | After 3 failures, report to user with recommendations |
+| Pattern             | Implementation                                        |
+| ------------------- | ----------------------------------------------------- |
+| **Reflection Loop** | Analyze why previous fix failed before retrying       |
+| **Error Context**   | Pass full stack trace + related files + past attempts |
+| **No Repeat Fixes** | Track attempt history, try different approaches       |
+| **Escalation**      | After 3 failures, report to user with recommendations |
 
 ### Stop Conditions (MANDATORY)
 
 - ✅ All verification items PASS
 - ⛔ Max 3 retries reached → Escalate
 - ⛔ Same error 2x in a row → Change approach
-

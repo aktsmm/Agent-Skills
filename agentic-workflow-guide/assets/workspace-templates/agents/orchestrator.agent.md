@@ -36,7 +36,7 @@ tools: ["agent", "read", "search", "todo"]
 
 ## Workflow (概要)
 
-1. **Analyze** → 2. **Plan** → 3. **Delegate** (runSubagent) → 4. **Monitor** → 5. **Report**
+1. **Analyze** → 2. **Plan** → 3. **Delegate** (agent) → 4. **Monitor** → 5. **Report**
 
 → 詳細な Workflow、I/O Contract、Error Handling は [正本](../../references/examples/orchestrator.agent.md) を参照
 

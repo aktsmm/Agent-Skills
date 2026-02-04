@@ -216,7 +216,7 @@ External References (Optional):
 ## Learnings
 
 1. **Learning**: Subagent calls should include explicit success criteria
-   - Evidence: `runSubagent` returned ambiguous result; caller couldn't determine if task succeeded
+   - Evidence: `agent` returned ambiguous result; caller couldn't determine if task succeeded
    - Action: → `.github/instructions/agents/agent-design.instructions.md`
 
 2. **Learning**: Always validate subagent output format before processing

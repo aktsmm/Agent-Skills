@@ -50,16 +50,16 @@ Synthesizer:
   - Resolve conflicts
 ```
 
-## VS Code Copilot: runSubagent Implementation
+## VS Code Copilot: agent Implementation
 
-⚠️ **Critical:** Workers are spawned via `#tool:runSubagent`. The orchestrator MUST explicitly call this tool.
+⚠️ **Critical:** Workers are spawned via `#tool:agent`. The orchestrator MUST explicitly call this tool.
 
 **Agent Definition:**
 
 ```yaml
 ---
 name: Code Review Orchestrator
-tools: ["runSubagent", "search", "read"]
+tools: ["agent", "search", "read"]
 ---
 
 # Code Review Orchestrator
@@ -67,14 +67,14 @@ tools: ["runSubagent", "search", "read"]
 ## Workflow
 
 1. Identify files to review (search)
-2. For EACH file, MUST call #tool:runSubagent:
+2. For EACH file, MUST call #tool:agent:
    - Prompt: "Review {filepath}. Return: {bugs: [], style: [], security: []}"
 3. Aggregate all sub-agent results
 4. Generate final report
 
 ## MANDATORY RULES
 
-- You MUST use #tool:runSubagent for each file
+- You MUST use #tool:agent for each file
 - Do NOT read file contents directly
 - Each sub-agent prompt must specify output format
 ```
@@ -82,7 +82,7 @@ tools: ["runSubagent", "search", "read"]
 **Why This Works:**
 
 - "MUST" language prevents orchestrator from skipping delegation
-- Explicit tool reference (`#tool:runSubagent`) triggers tool usage
+- Explicit tool reference (`#tool:agent`) triggers tool usage
 - Output format in prompt ensures consistent synthesis
 
 ### Common Mistake
@@ -96,7 +96,7 @@ You can use sub-agents to review files if needed.
 ✅ **Mandatory instructions:**
 
 ```markdown
-You MUST use #tool:runSubagent for EACH file. Do NOT review directly.
+You MUST use #tool:agent for EACH file. Do NOT review directly.
 ```
 
 ## General Assistant (Fallback Worker)
@@ -140,7 +140,7 @@ graph TD
 ```yaml
 ---
 name: Project Orchestrator
-tools: ["runSubagent", "search", "read"]
+tools: ["agent", "search", "read"]
 ---
 
 # Project Orchestrator
@@ -154,7 +154,7 @@ tools: ["runSubagent", "search", "read"]
 
 ## General Assistant Prompt
 
-For unclassified tasks, call #tool:runSubagent with:
+For unclassified tasks, call #tool:agent with:
 - Prompt: "Handle this user request conversationally: {request}"
 - No strict output format required
 - Prioritize helpfulness over structure
@@ -193,7 +193,7 @@ graph TD
 ```yaml
 ---
 name: Adaptive Orchestrator
-tools: ["runSubagent", "search", "read"]
+tools: ["agent", "search", "read"]
 ---
 
 # Adaptive Orchestrator
