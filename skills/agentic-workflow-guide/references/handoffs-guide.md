@@ -192,7 +192,7 @@ handoffs:
 ---
 name: researcher
 description: Research a topic thoroughly
-tools: ["fetch", "textSearch", "readFile"]
+tools: ["web/fetch", "textSearch", "readFile"]
 handoffs:
   - label: Write Document
     agent: writer
