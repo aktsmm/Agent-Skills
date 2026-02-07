@@ -102,12 +102,13 @@ You MUST use agent for each file. Do NOT read files directly.
 
 → **[references/agent-template.md](references/agent-template.md#available-tools)**
 
-| Purpose  | VS Code Copilot  | Claude Code |
-| -------- | ---------------- | ----------- |
-| Shell    | `runInTerminal`  | `Bash`      |
-| Read     | `read/readFile`  | `Read`      |
-| Edit     | `edit/editFiles` | `Write`     |
-| Subagent | `agent`          | `Task`      |
+| Purpose   | VS Code Copilot  | Claude Code |
+| --------- | ---------------- | ----------- |
+| Shell     | `runInTerminal`  | `Bash`      |
+| Read      | `read/readFile`  | `Read`      |
+| Edit      | `edit/editFiles` | `Write`     |
+| Subagent  | `agent`          | `Task`      |
+| Web fetch | `web/fetch`      | (MCP)       |
 
 ## External References
 

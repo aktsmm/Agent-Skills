@@ -90,7 +90,7 @@ Use when you want to:
 # VS Code Copilot
 ---
 name: Orchestrator
-tools: ["agent", "fetch", "readFile"]
+tools: ["agent", "web/fetch", "readFile"]
 ---
 # Claude Code
 ---
@@ -259,7 +259,7 @@ Each sub-agent keeps file content isolated.
 ```yaml
 ---
 name: Research Orchestrator
-tools: ["agent", "fetch"]
+tools: ["agent", "web/fetch"]
 ---
 
 # Research Orchestrator
