@@ -11,13 +11,13 @@ Standard structure and specification for `.agent.md` and `.prompt.md` files.
 `.prompt.md` と `.instructions.md` ファイルは **素の YAML フロントマター (`---`) で始めること**。
 コードフェンス（` ````prompt ` 等）で囲む必要はない。フェンスで囲むと VS Code がフロントマターを認識できず、プロンプトピッカーに `description` が表示されなくなる。
 
-| ファイル種別 | 正しい形式 | 不正な形式 |
-|---|---|---|
-| `.prompt.md` | `---` で始まる YAML フロントマター | ` ````prompt ` で囲む |
-| `.instructions.md` | `#` 見出しで始まる（フロントマター不要） | フェンスで囲む |
-| `.agent.md` | ` ````chatagent ` で囲む（**これは必要**） | 素の `---` だけ |
+| ファイル種別       | 正しい形式                                 | 不正な形式            |
+| ------------------ | ------------------------------------------ | --------------------- |
+| `.prompt.md`       | `---` で始まる YAML フロントマター         | ` ````prompt ` で囲む |
+| `.instructions.md` | `#` 見出しで始まる（フロントマター不要）   | フェンスで囲む        |
+| `.agent.md`        | `---` で始まる YAML フロントマター         | ` ````chatagent ` で囲む |
 
-```yaml
+`````yaml
 # ✅ .prompt.md — 正しい
 ---
 description: セッション内容をXポスト用に変換
@@ -30,17 +30,19 @@ description: セッション内容をXポスト用に変換
 description: セッション内容をXポスト用に変換
 ---
 # プロンプト本文...
-````
+`````
 
-# ✅ .agent.md — 正しい（フェンス必要）
-````chatagent
+# ✅ .agent.md — 正しい（フェンス不要、素の `---` だけ）
+
+```yaml
 ---
 name: my-agent
 description: Does something useful
 ---
 # エージェント本文...
-````
 ```
+
+````
 
 ## YAML Front Matter
 
@@ -54,7 +56,7 @@ model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
 ---
-```
+````
 
 ### For `.prompt.md` files
 
@@ -157,6 +159,24 @@ description: Does something useful
 | Tool names    | Only listed tools available (whitelist)    |
 
 > **Note**: MCP server tools become available at runtime automatically. Unknown tool names cause errors.
+
+### ⚠️ tools フィールドの注意事項
+
+**ツール名は `category/toolName` 形式で指定すること。** カテゴリが間違っていると VS Code がエラーを出す。
+
+| ツール | ✅ 正しい指定 | ❌ 間違い | 備考 |
+|--------|------------|---------|------|
+| シェル実行 | `execute/runInTerminal` | `run/runInTerminal` | カテゴリは `execute` |
+| ファイル読み | `read/readFile` | `readFile` | カテゴリ必須 |
+| ファイル編集 | `edit/editFiles` | `editFiles` | カテゴリ必須 |
+| テキスト検索 | `search/textSearch` | `textSearch` | カテゴリ必須 |
+| ファイル検索 | `search/fileSearch` | `fileSearch` | カテゴリ必須 |
+| Web フェッチ | `web/fetch` | `fetch` | カテゴリ必須 |
+| サブエージェント | `agent` | `runSubagent` | カテゴリなし |
+| タスク管理 | `todo` | `todos` | カテゴリなし |
+
+**`tools:` に登録できないもの（チャット変数としてのみ利用可）:**
+- `problems` / `changes` / `usages` / `codebase` / `githubRepo` → `#problems` 等でチャット内参照は可能だが、`tools:` ホワイトリストには登録不可
 
 ## Agent Body Structure
 
