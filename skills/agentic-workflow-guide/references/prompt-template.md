@@ -46,6 +46,13 @@ Use a minimal, high-signal prompt structure. Keep only what the task needs.
 - **Examples**: 1-3 representative examples are more effective than lengthy explanations
 - **Validation**: Define measurable success criteria upfront
 - **Escape Hatch**: Prevent hallucination by providing explicit fallback behavior
+- **description (REQUIRED)**: Every `.prompt.md` must have a `description` in YAML frontmatter — it appears in the VS Code prompt picker UI and helps both humans and AI identify the prompt's purpose
+
+```yaml
+---
+description: One-line summary of what this prompt does
+---
+```
 
 ## Minimal Template (Quick Use)
 
