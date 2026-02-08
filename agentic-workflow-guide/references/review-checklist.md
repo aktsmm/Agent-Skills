@@ -15,9 +15,8 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 | Black Box            | Internal state invisible           | Transparency                    |
 | Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
 | Hallucination        | Fabricating unverified info        | No Hallucination principle      |
-| Hallucination        | Fabricating unverified info        | No Hallucination principle      |
+| False Negative       | Treating "no results" as "empty"   | Re-query with explicit params   |
 
-| Hallucination | Fabricating unverified info | No Hallucination principle |
 
 ## How to Use
 
@@ -498,3 +497,63 @@ After review completion:
 - [design-principles.md](design-principles.md) - Design principles details
 - [workflow-patterns/overview.md](workflow-patterns/overview.md) - Workflow pattern details
 - [context-engineering.md](context-engineering.md) - Context management for long tasks
+
+---
+
+## SSOT & Duplication Check
+
+Check for Single Source of Truth violations and unnecessary duplication:
+
+```markdown
+## Definition Duplication
+
+- [ ] Same table/logic appears in only one file? (no duplicate tables)
+- [ ] Definitions referenced from other files have SSOT markers?
+- [ ] Cross-file references use standard format: `> **SSOT**: See [file](path)`?
+
+## View vs Master Separation
+
+- [ ] Dashboard/view files contain links only, not full data?
+- [ ] Master files are clearly designated as SSOT?
+- [ ] Archive files have clear completion criteria?
+
+## Common SSOT Anti-patterns
+
+- [ ] ❌ Same task table in both DASHBOARD.md and active.md
+- [ ] ❌ Holiday/validation rules duplicated in 3+ files
+- [ ] ❌ Configuration repeated instead of referenced
+- [ ] ❌ "Copy this section" instructions (violates DRY)
+
+## Correct SSOT Pattern
+
+✅ Good:
+
+- Master file defines full rule
+- Other files: `> **SSOT**: See [master.md](path) for details`
+- Changes only needed in one place
+```
+
+
+---
+
+## API/Tool Query Check
+
+⚠️ **Critical for external data retrieval.** Prevent false assumptions from incomplete results.
+
+| Anti-Pattern | Problem | Solution |
+| --- | --- | --- |
+| False Negative Assumption | Treating "no results" as "nothing exists" | Re-query with explicit parameters |
+| Range Query Overconfidence | Week-range query misses specific days | Query each day individually |
+| Format Assumption | Output format differs from user expectation | Confirm format before output |
+
+### Detection Patterns
+
+- [ ] ❌ "No meetings found" → "Calendar is empty"
+- [ ] ❌ Querying week-range without day-by-day verification
+- [ ] ❌ Outputting without confirming user's preferred format
+
+### Correct Patterns
+
+- [ ] ✅ If results seem incomplete → Re-query with specific date/criteria
+- [ ] ✅ For multi-day ranges → Query each day individually
+- [ ] ✅ Ask for output format preference before generating final output

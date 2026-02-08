@@ -623,3 +623,79 @@ feature-flags/
 
 
 
+
+---
+
+## SSOT Implementation Patterns
+
+### SSOT Reference Pattern
+
+When referencing shared definitions across multiple files, use this standard format:
+
+**Format:**
+```markdown
+> **SSOT**: See [file](path) section "Section Name" for details
+```
+
+**Anti-pattern (Before):**
+- Same logic duplicated in 3+ files (e.g., holiday check, validation rules)
+- Requires updating all files when logic changes
+- Inconsistencies emerge over time
+
+**Best Practice (After):**
+- Define authoritative rule in one file (e.g., `instructions.md`)
+- Other files reference SSOT with link only
+- Changes propagate automatically
+
+**Example:**
+```markdown
+### Step 0-2: Holiday Check
+
+> **SSOT**: See [copilot-instructions.md](../copilot-instructions.md) section "Holiday Rules"
+
+1. Check holiday calendar
+2. If holiday: skip and notify
+```
+
+### View vs Master Separation
+
+For task/project management workflows, separate display views from data masters:
+
+| File Type | Role | Update Frequency | Content |
+|-----------|------|------------------|---------|
+| **View (Dashboard)** | Today's top 3 actions | Daily (morning) | Links to Master |
+| **Master (active.md)** | All task details (SSOT) | On change | Full task specs |
+| **Archive (completed.md)** | Completion history | On task completion | Archived tasks |
+
+> ⚠️ **Anti-pattern**: Putting task tables in both View and Master creates dual maintenance burden.
+
+**Correct Structure:**
+```
+DASHBOARD.md (View)
+├── Today's Focus: TOP 3 actions (links only)
+├── This Week: Schedule view
+└── Recent Completions: Last 5 items
+
+Tasks/active.md (Master - SSOT)
+├── Full task details
+├── All metadata
+└── History
+```
+
+### Activity Log Collection Strategy
+
+When collecting activity logs from integrated tools (M365, Slack, etc.), use multiple query types for comprehensive coverage:
+
+| Query Type | Purpose | Detection Target |
+|------------|---------|------------------|
+| **My Posts** | What I shared in channels | Knowledge sharing, contributions |
+| **Mentions** | Messages that mentioned me | Requests, thanks, dependencies |
+| **Files** | Files I shared/edited | Deliverables, documentation |
+
+> ⚠️ **Single query anti-pattern**: Using only one query type causes detection gaps.
+
+**Example queries:**
+1. `What did I post in channels today?` → Own contributions
+2. `What messages mentioned me today?` → Inbound requests
+3. `What files did I share today?` → Artifacts created
+

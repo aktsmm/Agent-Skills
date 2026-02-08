@@ -2,17 +2,47 @@
 
 Standard structure and specification for `.agent.md` and `.prompt.md` files.
 
-## Table of Contents
-
-- [YAML Front Matter](#yaml-front-matter) - Agent/prompt metadata configuration
-- [Agent Body Structure](#agent-body-structure) - Required and recommended sections
-- [Full Template](#full-template) - Complete agent example
-- [Design Principles](#design-principles-for-agents) - Stateless, SRP, Observability
-- [Examples by Role](#examples-by-role) - Orchestrator, Specialist, Implementation
-- [Available Tools](#available-tools) - VS Code Copilot / Claude Code tool mapping
-- [Handoffs](#handoffs-agent-transitions) - Agent transitions configuration
-
 > **Note**: Both file types use similar YAML front matter. The `mode:` field is deprecated for both.
+
+## File Format Rules
+
+### ⚠️ フェンスラッパーに関する重要な注意
+
+`.prompt.md` と `.instructions.md` ファイルは **素の YAML フロントマター (`---`) で始めること**。
+コードフェンス（` ````prompt ` 等）で囲む必要はない。フェンスで囲むと VS Code がフロントマターを認識できず、プロンプトピッカーに `description` が表示されなくなる。
+
+| ファイル種別       | 正しい形式                                 | 不正な形式            |
+| ------------------ | ------------------------------------------ | --------------------- |
+| `.prompt.md`       | `---` で始まる YAML フロントマター         | ` ````prompt ` で囲む |
+| `.instructions.md` | `#` 見出しで始まる（フロントマター不要）   | フェンスで囲む        |
+| `.agent.md`        | `---` で始まる YAML フロントマター         | ` ````chatagent ` で囲む |
+
+`````yaml
+# ✅ .prompt.md — 正しい
+---
+description: セッション内容をXポスト用に変換
+---
+# プロンプト本文...
+
+# ❌ .prompt.md — 間違い（description が表示されない）
+````prompt
+---
+description: セッション内容をXポスト用に変換
+---
+# プロンプト本文...
+`````
+
+# ✅ .agent.md — 正しい（フェンス不要、素の `---` だけ）
+
+```yaml
+---
+name: my-agent
+description: Does something useful
+---
+# エージェント本文...
+```
+
+````
 
 ## YAML Front Matter
 
@@ -22,28 +52,11 @@ Standard structure and specification for `.agent.md` and `.prompt.md` files.
 ---
 name: <agent-name> # Required: Identifier for @mention
 description: <description> # Required: One-line role description
-model: <model-name> # Optional: LLM model to use (e.g., "Claude Sonnet 4")
+model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
-target: <vscode|github-copilot> # Optional: Target environment
-infer: <true|false> # Optional: Allow as subagent (default: true)
-argument-hint: <hint-text> # Optional: Input field placeholder
 ---
-```
-
-### YAML Properties Reference (VS Code 1.106+)
-
-| Property        | Required | Type     | Description                                                         |
-| --------------- | -------- | -------- | ------------------------------------------------------------------- |
-| `name`          | ✅       | string   | Agent identifier for @mention                                       |
-| `description`   | ✅       | string   | Brief description (shown as placeholder in chat)                    |
-| `tools`         | ❌       | string[] | Tool whitelist (omit for all tools)                                 |
-| `model`         | ❌       | string   | AI model to use (e.g., `Claude Sonnet 4`, `GPT-4o`)                 |
-| `handoffs`      | ❌       | object[] | Agent transition buttons (→ [handoffs-guide.md](handoffs-guide.md)) |
-| `target`        | ❌       | string   | `vscode` or `github-copilot` (default: both)                        |
-| `infer`         | ❌       | boolean  | Allow as subagent target (default: `true`)                          |
-| `argument-hint` | ❌       | string   | Hint text in chat input field                                       |
-| `mcp-servers`   | ❌       | object[] | MCP server config (org/enterprise agents only)                      |
+````
 
 ### For `.prompt.md` files
 
@@ -109,32 +122,20 @@ tools:
 
 **Tools Pattern Reference:**
 
-| Pattern           | Description                | Example                                   |
-| ----------------- | -------------------------- | ----------------------------------------- |
-| `category`        | Category alias (all tools) | `read`, `edit`, `search`, `execute`       |
-| `category/tool`   | Specific tool              | `read/readFile`, `execute/runInTerminal`  |
-| `mcp-server/*`    | All MCP server tools       | `bicep/*`, `github/*`                     |
-| `mcp-server/tool` | Specific MCP tool          | `github/search_code`                      |
-| Mixed             | Combine any patterns       | `['execute', 'read/readFile', 'bicep/*']` |
+| Pattern         | Description               | Example                |
+| --------------- | ------------------------- | ---------------------- |
+| `category/tool` | Specific tool             | `read/readFile`        |
+| `category/*`    | All tools in category     | `workiq/*`             |
+| MCP tools       | External MCP server tools | `workiq/*`, `github/*` |
 
-**Tool Aliases (VS Code Copilot):**
+**Common Tool Categories:**
 
-| Alias     | Included Tools                                  | Description        |
-| --------- | ----------------------------------------------- | ------------------ |
-| `execute` | shell, Bash, powershell, runInTerminal          | シェル実行         |
-| `read`    | readFile, NotebookRead                          | ファイル読み取り   |
-| `edit`    | editFiles, MultiEdit, Write                     | ファイル編集       |
-| `search`  | fileSearch, textSearch, Grep, Glob              | 検索               |
-| `agent`   | agent (legacy: runSubagent), custom-agent, Task | サブエージェント   |
-| `web`     | WebSearch, WebFetch, fetch                      | Web 取得           |
-| `todo`    | manage_todo_list, TodoWrite                     | タスクリスト       |
-| `vscode`  | VS Code specific tools                          | VS Code 固有ツール |
-
-> **💡 Tips:**
->
-> - エイリアス形式 (`"read"`) とフルパス形式 (`"read/readFile"`) は混在可能
-> - 認識されないツール名は**無視される**（エラーにならない）
-> - MCP サーバーは `server-name/*` でワイルドカード指定可能
+| Category | Tools                                     |
+| -------- | ----------------------------------------- |
+| `read`   | `readFile`                                |
+| `edit`   | `editFiles`                               |
+| `search` | `fileSearch`, `textSearch`                |
+| `workiq` | M365 integration (email, calendar, files) |
 
 ---
 
@@ -154,11 +155,28 @@ description: Does something useful
 | Specification | Behavior                                   |
 | ------------- | ------------------------------------------ |
 | **Omitted**   | All tools available (recommended for most) |
-| `tools: ["*"]`| All tools available (explicit)             |
 | `tools: []`   | No tools available                         |
 | Tool names    | Only listed tools available (whitelist)    |
 
-> **Note**: MCP server tools become available at runtime automatically. Unknown tool names are **ignored** (not errors).
+> **Note**: MCP server tools become available at runtime automatically. Unknown tool names cause errors.
+
+### ⚠️ tools フィールドの注意事項
+
+**ツール名は `category/toolName` 形式で指定すること。** カテゴリが間違っていると VS Code がエラーを出す。
+
+| ツール | ✅ 正しい指定 | ❌ 間違い | 備考 |
+|--------|------------|---------|------|
+| シェル実行 | `execute/runInTerminal` | `run/runInTerminal` | カテゴリは `execute` |
+| ファイル読み | `read/readFile` | `readFile` | カテゴリ必須 |
+| ファイル編集 | `edit/editFiles` | `editFiles` | カテゴリ必須 |
+| テキスト検索 | `search/textSearch` | `textSearch` | カテゴリ必須 |
+| ファイル検索 | `search/fileSearch` | `fileSearch` | カテゴリ必須 |
+| Web フェッチ | `web/fetch` | `fetch` | カテゴリ必須 |
+| サブエージェント | `agent` | `runSubagent` | カテゴリなし |
+| タスク管理 | `todo` | `todos` | カテゴリなし |
+
+**`tools:` に登録できないもの（チャット変数としてのみ利用可）:**
+- `problems` / `changes` / `usages` / `codebase` / `githubRepo` → `#problems` 等でチャット内参照は可能だが、`tools:` ホワイトリストには登録不可
 
 ## Agent Body Structure
 
@@ -171,8 +189,7 @@ Each agent should include these sections:
 | **Done Criteria**      | ✅          | Verifiable completion conditions (**one place only**) |
 | **Permissions**        | ✅          | What's allowed and forbidden                          |
 | **I/O Contract**       | ✅          | Input/output definitions                              |
-| **When to Use**    | Recommended | Trigger conditions for agent selection               |
-  | **Non-Goals**          | Recommended | What this agent explicitly does NOT do                |
+| **Non-Goals**          | Recommended | What this agent explicitly does NOT do                |
 | **Workflow**           | Recommended | Step-by-step procedure                                |
 | **Progress Reporting** | Recommended | How to report progress (e.g., `manage_todo_list`)     |
 | **Error Handling**     | Recommended | Error patterns and responses                          |
@@ -189,7 +206,7 @@ Each agent should include these sections:
 name: example-agent
 description: Brief description of what this agent does
 # VS Code Copilot tools (adjust for Claude Code: Read, Edit, Search)
-tools: ["read/readFile", "edit/editFiles", "search/textSearch"]
+tools: ["readFile", "editFiles", "textSearch"]
 ---
 
 # Example Agent
@@ -224,16 +241,6 @@ Task is complete when ALL of the following are true:
 - ❌ Action that should never be done
 - ❌ Another prohibited action
 
-## When to Use
-
-Define trigger conditions for when this agent should be selected:
-
-- User reports specific keywords (e.g., "fix", "broken", "doesn't work")
-- Specific task type is requested
-- Context matches agent's expertise
-
-> **Why When to Use?** Improves agent selection accuracy in multi-agent systems.
-
 ## Non-Goals
 
 Explicitly define what this agent does NOT do:
@@ -260,17 +267,6 @@ Explicitly define what this agent does NOT do:
 
 ## Workflow
 
-
-  ### Phase Skip Conditions (Optional)
-
-  Define conditions to skip phases when context is already clear:
-
-  > **Skip Conditions**: Proceed directly to next phase if ALL of the following are met:
-  > - User provided specific operation and problem description
-  > - Expected behavior is clear or explicitly stated
-  > - Error messages or screenshots are provided
-
-  ### Steps
 1. **Step 1**: [Action description]
    - Details or sub-steps
 2. **Step 2**: [Action description]
@@ -331,18 +327,29 @@ For long-running tasks, maintain visibility:
 
 ### Orchestrator Agent
 
-→ **Full Example**: See [examples/orchestrator.agent.md](examples/orchestrator.agent.md) for complete definition.
+**VS Code Copilot:**
 
-**Quick Reference (YAML front matter only):**
+```yaml
+---
+name: orchestrator
+description: Coordinates workflow and delegates to specialist agents
+tools: ["runSubagent", "readFile", "textSearch", "todos"]
+---
+```
 
-| Platform        | tools                                                      |
-| --------------- | ---------------------------------------------------------- |
-| VS Code Copilot | `["agent", "read/readFile", "search/textSearch", "todos"]` |
-| Claude Code     | `["Task", "Read", "Search", "TodoWrite"]`                  |
+**Claude Code:**
+
+```yaml
+---
+name: orchestrator
+description: Coordinates workflow and delegates to specialist agents
+tools: ["Task", "Read", "Search", "TodoWrite"]
+---
+```
 
 Key characteristics:
 
-- Uses subagent tool for delegation (`#tool:agent` / `Task`)
+- Uses subagent tool for delegation (`#runSubagent` / `Task`)
 - Maintains high-level view
 - Does NOT perform detailed work itself
 
@@ -354,7 +361,7 @@ Key characteristics:
 ---
 name: code-reviewer
 description: Reviews code for quality, security, and best practices
-tools: ["read/readFile", "search/textSearch", "fetch"]
+tools: ["readFile", "textSearch", "web/fetch"]
 ---
 ```
 
@@ -372,7 +379,7 @@ Key characteristics:
 ---
 name: implementer
 description: Implements code changes based on specifications
-tools: ["read/readFile", "edit/editFiles", "runInTerminal", "search/textSearch"]
+tools: ["readFile", "editFiles", "runInTerminal", "textSearch"]
 ---
 ```
 
@@ -388,22 +395,22 @@ Built-in tools for custom agents. Tool names differ by platform:
 
 ### VS Code Copilot Tools (Official)
 
-| Tool Name            | Description                              | Tool Set   |
-| -------------------- | ---------------------------------------- | ---------- |
-| `#runInTerminal`     | Run shell command in integrated terminal | `#execute` |
-| `#read/readFile`     | Read file contents                       | `#read`    |
-| `#edit/editFiles`    | Edit/create files                        | `#edit`    |
-| `#edit/createFile`   | Create new file                          | `#edit`    |
-| `#search/textSearch` | Search text in files                     | `#search`  |
-| `#search/fileSearch` | Search files by glob pattern             | `#search`  |
-| `#agent`             | Spawn sub-agent with isolated context    | -          |
-| `#fetch`             | Fetch web page content                   | `#web`     |
-| `#todos`             | Task list management                     | `#todo`    |
-| `#codebase`          | Search codebase for context              | -          |
-| `#changes`           | List source control changes              | -          |
-| `#problems`          | Get workspace issues                     | -          |
-| `#usages`            | Find references/implementations          | -          |
-| `#githubRepo`        | Search GitHub repository                 | -          |
+| Tool Name        | Description                              | Tool Set       |
+| ---------------- | ---------------------------------------- | -------------- |
+| `#runInTerminal` | Run shell command in integrated terminal | `#runCommands` |
+| `#readFile`      | Read file contents                       | -              |
+| `#editFiles`     | Edit/create files                        | `#edit`        |
+| `#createFile`    | Create new file                          | `#edit`        |
+| `#textSearch`    | Search text in files                     | `#search`      |
+| `#fileSearch`    | Search files by glob pattern             | `#search`      |
+| `#runSubagent`   | Spawn sub-agent with isolated context    | -              |
+| `#web/fetch`     | Fetch web page content                   | `#web`         |
+| `#todos`         | Task list management                     | -              |
+| `#codebase`      | Search codebase for context              | -              |
+| `#changes`       | List source control changes              | -              |
+| `#problems`      | Get workspace issues                     | -              |
+| `#usages`        | Find references/implementations          | -              |
+| `#githubRepo`    | Search GitHub repository                 | -              |
 
 ### Claude Code Tools (Anthropic)
 
@@ -419,15 +426,15 @@ Built-in tools for custom agents. Tool names differ by platform:
 
 ### Cross-Platform Mapping
 
-| Purpose         | VS Code Copilot                          | Claude Code      |
-| --------------- | ---------------------------------------- | ---------------- |
-| Shell execution | `runInTerminal`                          | `Bash`           |
-| Read file       | `read/readFile`                          | `Read`           |
-| Edit file       | `edit/editFiles`                         | `Write`/`Edit`   |
-| Search          | `search/textSearch`, `search/fileSearch` | `Search`, `Grep` |
-| Subagent        | `agent`                                  | `Task`           |
-| Web fetch       | `fetch`                                  | (MCP)            |
-| Todo list       | `todo`                                   | `TodoWrite`      |
+| Purpose         | VS Code Copilot            | Claude Code      |
+| --------------- | -------------------------- | ---------------- |
+| Shell execution | `runInTerminal`            | `Bash`           |
+| Read file       | `readFile`                 | `Read`           |
+| Edit file       | `editFiles`                | `Write`/`Edit`   |
+| Search          | `textSearch`, `fileSearch` | `Search`, `Grep` |
+| Subagent        | `runSubagent`              | `Task`           |
+| Web fetch       | `web/fetch`                | (MCP)            |
+| Todo list       | `todos`                    | `TodoWrite`      |
 
 ### Tool Definition Examples
 
@@ -437,7 +444,7 @@ Built-in tools for custom agents. Tool names differ by platform:
 ---
 name: orchestrator
 description: Coordinates workflow and delegates to specialist agents
-tools: ["agent", "read", "search", "todo"]
+tools: ["runSubagent", "readFile", "textSearch", "todos"]
 ---
 ```
 
@@ -453,7 +460,7 @@ tools: ["Task", "Read", "Search", "TodoWrite"]
 
 ### Tool Reference Syntax
 
-- **VS Code Copilot**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:agent`)
+- **VS Code Copilot**: Use `#tool:<tool-name>` in prompts (e.g., `#tool:runSubagent`)
 - **Claude Code**: Reference tools directly by name
 
 ### MCP Server Tools
@@ -482,7 +489,7 @@ Handoffs enable guided sequential workflows between agents with suggested next s
 name: Planner
 description: Generate an implementation plan
 # VS Code Copilot tools
-tools: ["search", "web", "read"]
+tools: ["textSearch", "web/fetch", "readFile"]
 handoffs:
   - label: Start Implementation
     agent: implementation
@@ -508,36 +515,7 @@ handoffs:
 
 - [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-- [Handoffs Guide](handoffs-guide.md) - Detailed handoffs configuration
-- [agent Guide (旧 runSubagent)](agent-guide.md) - Sub-agent delegation
 
 ```
 
-```
-
-### ⚠️ Tool Name Format Changes (VS Code 2026+)
-
-Some tool names require full path format. Use the following:
-
-| Tool                        | Correct Format             | Notes                              |
-| --------------------------- | -------------------------- | ---------------------------------- |
-| runInTerminal               | `execute/runInTerminal`    | Alias `execute` does NOT work      |
-| problems                    | `read/problems`            | Renamed from `problems`            |
-| codebase                    | `search/codebase`          | Renamed from `codebase`            |
-| terminalLastCommand         | `read/terminalLastCommand` | Renamed from `terminalLastCommand` |
-| agent (legacy: runSubagent) | `agent`                    | Legacy alias supported             |
-| todo                        | `todo`                     | Alias works                        |
-
-**Example (correct):**
-
-```yaml
-tools:
-  - read/readFile
-  - edit/editFiles
-  - search/textSearch
-  - search/fileSearch
-  - execute/runInTerminal # Full path required
-  - agent # Alias OK
-  - todo # Alias OK
-  - read/problems # Full path required
 ```
