@@ -57,7 +57,8 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 | **data-collector**   | Data collection, normalization, customer/internal auto-routing |
 | **work-inventory**   | Work inventory, analysis, manager PR material creation         |
 | **1on1-assistant**   | 1on1 meeting prep, activity summary, action item extraction    |
-| **general-worker**   | Fallback handler for unclassified tasks, pattern detection     |
+| **general-worker**       | Fallback handler for unclassified tasks, pattern detection     |
+| **availability-finder**  | Calendar analysis, free slot extraction, scheduling messages   |
 
 ## IMPACT Framework (Review Criteria)
 
@@ -96,8 +97,9 @@ Data retrieved from workIQ for report generation and task updates:
 | "Task", "TODO", "Issue", "Progress"            | task-manager     |
 | Teams/Email format paste                       | data-collector   |
 | "Inventory", "Analysis", "PR", "Retrospective" | work-inventory   |
-| "1on1", "1:1", "ワンオンワン", "prep"           | 1on1-assistant   |
-| (No match / Fallback)                          | general-worker   |
+| "1on1", "1:1", "ワンオンワン", "prep"           | 1on1-assistant       |
+| "空き時間", "日程調整", "候補日", "いつ空いてる"   | availability-finder  |
+| (No match / Fallback)                          | general-worker       |
 
 ## Post-Setup Customization
 
@@ -128,3 +130,6 @@ Add contact→customer mappings:
 ### 3. External Paths (report-generator)
 
 Configure external folders from interview in `_datasources/external-paths.md`.
+
+
+

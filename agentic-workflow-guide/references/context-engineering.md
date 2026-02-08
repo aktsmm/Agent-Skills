@@ -274,15 +274,53 @@ context = read_file(relevant_files[0])         # ✅ On-demand
 
 ---
 
+## 4. Instruction File Optimization
+
+**Reduce token cost of definition files that are loaded into every session.**
+
+`.instructions.md`, `.prompt.md`, `.agent.md` are loaded in full on every conversation turn. Verbose files waste tokens before the task even starts.
+
+### What to Keep vs. Remove
+
+| Keep (AI can't know this)                  | Remove (AI already knows)                 |
+| ------------------------------------------ | ----------------------------------------- |
+| User-specific facts: IDs, paths, env names | Command syntax (`az login`, `git commit`) |
+| Policies & conventions unique to the team  | Error-handling recipes                    |
+| Workflow intent & delegation rules         | Step-by-step tutorials                    |
+| Identifiers (subscription IDs, tenant IDs) | Checklists of general best practices      |
+
+### Loading Locations (VS Code Copilot)
+
+| Scope     | Path                                              |
+| --------- | ------------------------------------------------- |
+| Global    | `%APPDATA%/Code/User/prompts/*.instructions.md`   |
+| Workspace | `.github/copilot-instructions.md`                 |
+| Workspace | `.github/instructions/**/*.instructions.md`       |
+| Workspace | `.github/prompts/*.prompt.md / *.agent.md`        |
+| Workspace | `.vscode/settings.json` (`github.copilot.chat.*`) |
+
+Duplicate content across global and workspace scopes doubles token cost.
+
+### Checklist
+
+- [ ] Each file contains only user-specific / AI-unknowable information
+- [ ] No duplicate content between global and workspace scopes
+- [ ] All `.prompt.md` files have a `description` frontmatter
+- [ ] Stale IDs, paths, or settings removed
+- [ ] No conflicting instructions across files
+
+---
+
 ## Anti-Patterns
 
-| Anti-Pattern            | Problem                           | Solution                |
-| ----------------------- | --------------------------------- | ----------------------- |
-| **Context Hoarding**    | Loading everything "just in case" | Just-in-time retrieval  |
-| **No Compaction**       | Running until context exhausted   | Proactive summarization |
-| **Stateless Loops**     | Forgetting progress on reset      | Structured note-taking  |
-| **Monolithic Agent**    | One agent doing everything        | Sub-agent delegation    |
-| **Premature Retrieval** | Loading data before knowing needs | Lazy loading            |
+| Anti-Pattern             | Problem                                         | Solution                      |
+| ------------------------ | ----------------------------------------------- | ----------------------------- |
+| **Context Hoarding**     | Loading everything "just in case"               | Just-in-time retrieval        |
+| **No Compaction**        | Running until context exhausted                 | Proactive summarization       |
+| **Stateless Loops**      | Forgetting progress on reset                    | Structured note-taking        |
+| **Monolithic Agent**     | One agent doing everything                      | Sub-agent delegation          |
+| **Premature Retrieval**  | Loading data before knowing needs               | Lazy loading                  |
+| **Verbose Instructions** | Definition files bloated with general knowledge | Instruction file optimization |
 
 ---
 
