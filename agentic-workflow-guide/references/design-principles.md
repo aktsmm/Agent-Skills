@@ -154,32 +154,6 @@ A collection of principles for designing agent workflows.
 | **Violation Example**    | Retrying causes data duplication                          |
 | **Solution**             | State checking, use unique IDs                            |
 
-### 13. No Hallucination (Anti-Fabrication)
-
-**Don't guess, don't lie, don't fabricate**
-
-| Aspect                   | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| **Definition**           | Never output information that cannot be verified by sources    |
-| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
-| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
-| **Solution**             | Return `status=not_found` instead of guessing                  |
-
-**Detection Patterns:**
-- Citing non-existent URLs or sources
-- Describing features not in official documentation
-- Using phrases like "probably" or "likely" as facts
-- Filling knowledge gaps with fabricated information
-
-**Correct Responses When Uncertain:**
-
-| Situation                      | ✅ Correct Response                                    | ❌ Prohibited                        |
-| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
-| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
-| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
-| Search returns no results      | Return `status=not_found` and ESCALATE                 | Generate from memory               |
-
-
 ### 12. Observability
 
 **Record decisions and make progress visible**
@@ -289,84 +263,6 @@ Use Parallelization pattern (Pattern 3)
 
 For complex workflows, use a two-stage architecture with an intermediate representation.
 Core principle: **Same IR → Same Output.** No creativity in transformation phase.
-
-
-### 14. No Hallucination (Anti-Fabrication)
-
-**Don't guess, don't lie, don't fabricate**
-
-| Aspect                   | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| **Definition**           | Never output information that cannot be verified by sources    |
-| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
-| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
-| **Solution**             | Return status=not_found instead of guessing                    |
-
-**Detection Patterns:**
-- Citing non-existent URLs or sources
-- Describing features not in official documentation
-- Using phrases like "probably" or "likely" as facts
-- Filling knowledge gaps with fabricated information
-
-**Correct Responses When Uncertain:**
-
-| Situation                      | Correct Response                                       | Prohibited                          |
-| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
-| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
-| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
-| Search returns no results      | Return status=not_found and ESCALATE                   | Generate from memory               |
-
-
-### 14. No Hallucination (Anti-Fabrication)
-
-**Don't guess, don't lie, don't fabricate**
-
-| Aspect                   | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| **Definition**           | Never output information that cannot be verified by sources    |
-| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
-| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
-| **Solution**             | Return status=not_found instead of guessing                    |
-
-**Detection Patterns:**
-- Citing non-existent URLs or sources
-- Describing features not in official documentation
-- Using phrases like "probably" or "likely" as facts
-- Filling knowledge gaps with fabricated information
-
-**Correct Responses When Uncertain:**
-
-| Situation                      | Correct Response                                       | Prohibited                          |
-| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
-| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
-| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
-| Search returns no results      | Return status=not_found and ESCALATE                   | Generate from memory               |
-
-
-### 14. No Hallucination (Anti-Fabrication)
-
-**Don't guess, don't lie, don't fabricate**
-
-| Aspect                   | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| **Definition**           | Never output information that cannot be verified by sources    |
-| **Workflow Application** | If unsure, state "not found in official docs" and ESCALATE     |
-| **Violation Example**    | Generating fake URLs, dates, or feature descriptions           |
-| **Solution**             | Return status=not_found instead of guessing                    |
-
-**Detection Patterns:**
-- Citing non-existent URLs or sources
-- Describing features not in official documentation
-- Using phrases like "probably" or "likely" as facts
-- Filling knowledge gaps with fabricated information
-
-**Correct Responses When Uncertain:**
-
-| Situation                      | Correct Response                                       | Prohibited                          |
-| ------------------------------ | ----------------------------------------------------- | ----------------------------------- |
-| Not in official docs           | "Not explicitly documented. Recommend official inquiry" | Guess or assume                    |
-| Partial information only       | State known parts, mark unknowns explicitly            | Fabricate missing parts            |
-| Search returns no results      | Return status=not_found and ESCALATE                   | Generate from memory               |
 
 ---
 
@@ -620,10 +516,6 @@ feature-flags/
 - [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
 - [12-Factor App](https://12factor.net/)
 
-
-
-
-
 ---
 
 ## SSOT Implementation Patterns
@@ -633,21 +525,25 @@ feature-flags/
 When referencing shared definitions across multiple files, use this standard format:
 
 **Format:**
+
 ```markdown
 > **SSOT**: See [file](path) section "Section Name" for details
 ```
 
 **Anti-pattern (Before):**
+
 - Same logic duplicated in 3+ files (e.g., holiday check, validation rules)
 - Requires updating all files when logic changes
 - Inconsistencies emerge over time
 
 **Best Practice (After):**
+
 - Define authoritative rule in one file (e.g., `instructions.md`)
 - Other files reference SSOT with link only
 - Changes propagate automatically
 
 **Example:**
+
 ```markdown
 ### Step 0-2: Holiday Check
 
@@ -661,15 +557,16 @@ When referencing shared definitions across multiple files, use this standard for
 
 For task/project management workflows, separate display views from data masters:
 
-| File Type | Role | Update Frequency | Content |
-|-----------|------|------------------|---------|
-| **View (Dashboard)** | Today's top 3 actions | Daily (morning) | Links to Master |
-| **Master (active.md)** | All task details (SSOT) | On change | Full task specs |
-| **Archive (completed.md)** | Completion history | On task completion | Archived tasks |
+| File Type                  | Role                    | Update Frequency   | Content         |
+| -------------------------- | ----------------------- | ------------------ | --------------- |
+| **View (Dashboard)**       | Today's top 3 actions   | Daily (morning)    | Links to Master |
+| **Master (active.md)**     | All task details (SSOT) | On change          | Full task specs |
+| **Archive (completed.md)** | Completion history      | On task completion | Archived tasks  |
 
 > ⚠️ **Anti-pattern**: Putting task tables in both View and Master creates dual maintenance burden.
 
 **Correct Structure:**
+
 ```
 DASHBOARD.md (View)
 ├── Today's Focus: TOP 3 actions (links only)
@@ -686,16 +583,16 @@ Tasks/active.md (Master - SSOT)
 
 When collecting activity logs from integrated tools (M365, Slack, etc.), use multiple query types for comprehensive coverage:
 
-| Query Type | Purpose | Detection Target |
-|------------|---------|------------------|
-| **My Posts** | What I shared in channels | Knowledge sharing, contributions |
-| **Mentions** | Messages that mentioned me | Requests, thanks, dependencies |
-| **Files** | Files I shared/edited | Deliverables, documentation |
+| Query Type   | Purpose                    | Detection Target                 |
+| ------------ | -------------------------- | -------------------------------- |
+| **My Posts** | What I shared in channels  | Knowledge sharing, contributions |
+| **Mentions** | Messages that mentioned me | Requests, thanks, dependencies   |
+| **Files**    | Files I shared/edited      | Deliverables, documentation      |
 
 > ⚠️ **Single query anti-pattern**: Using only one query type causes detection gaps.
 
 **Example queries:**
+
 1. `What did I post in channels today?` → Own contributions
 2. `What messages mentioned me today?` → Inbound requests
 3. `What files did I share today?` → Artifacts created
-

@@ -254,46 +254,6 @@ Do NOT review files directly in main context.
 Each sub-agent keeps file content isolated.
 ```
 
-### Example: Research Aggregator
-
-```yaml
----
-name: Research Orchestrator
-tools: ["agent", "web/fetch"]
----
-
-# Research Orchestrator
-
-## Task
-
-Research multiple URLs and synthesize findings.
-
-## Execution (⚠️ MANDATORY STEPS)
-
-1. **For EACH URL, call #tool:agent:**
-```
-
-Prompt: "Fetch {url} and summarize:
-
-- Main topic (1 sentence)
-- Key facts (3 bullet points)
-- Relevance to query: {user_query}
-  Return: Markdown summary, max 200 words"
-
-```
-
-2. **After ALL sub-agents return:**
-- Synthesize into unified report
-- Highlight conflicts between sources
-- Provide recommendation
-
-## Why Sub-agents?
-
-- Each URL's full content stays in sub-agent context
-- Main agent only receives 200-word summaries
-- Enables processing 10+ URLs without context overflow
-```
-
 ---
 
 ## Common Pitfalls
@@ -374,7 +334,7 @@ Return as:
 - Recommendation: (1 sentence)
 ```
 
-### Pitfall 4: Sub-agent Handoff to Named Agents
+### Pitfall 5: Sub-agent Handoff to Named Agents
 
 ❌ **Problem:** Trying to use `subagentType=my-agent` doesn't work
 
@@ -382,7 +342,7 @@ Return as:
 
 **Solution:** Define sub-agent behavior in the prompt parameter, not in separate files.
 
-### Pitfall 5: Custom Agent as Sub-agent (Experimental)
+### Pitfall 6: Custom Agent as Sub-agent (Experimental)
 
 ⚠️ **Experimental Feature:** As of 2026/01, you can invoke custom agents as sub-agents with additional configuration.
 
@@ -409,8 +369,6 @@ Return as:
 - Custom agent must have `infer: true` (default)
 - Sub-agent cannot access main session context
 - Parallel execution available (2026/01+) but with overhead
-
----
 
 ---
 

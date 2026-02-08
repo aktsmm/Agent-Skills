@@ -415,38 +415,3 @@ Not all agent-to-agent communication uses `agent`. Some patterns use **chat cont
 | ------------- | ------------ | ------------- | ------------------------------ |
 | agent         | agent / Task | Yes           | Worker delegation              |
 | Context-based | None (chat)  | No            | Decision passing, coordination |
-
----
-
-## Context-Based Handoff (No agent tool)
-
-Not all agent-to-agent communication uses agent. Some patterns use chat context for data passing.
-
-### When to Use Context-Based Handoff
-
-| Scenario                | Method          | Reason                                       |
-| ----------------------- | --------------- | -------------------------------------------- |
-| Router to Orchestrator  | Chat context    | Router makes decisions, doesnt spawn workers |
-| Same-level coordination | Chat context    | Agents share conversation, not parent-child  |
-| Decision passing        | JSON in context | Structured data without sub-agent overhead   |
-
-### Implementation Pattern
-
-Router Agent (Decision Maker):
-
-- Makes routing decision
-- Outputs RouterDecision JSON to chat context
-- Does NOT use agent
-
-Orchestrator Agent (Executor):
-
-- Receives RouterDecision from chat context (NOT as agent input)
-- Uses agent for actual worker delegation
-- Logs decision to .logs/ for traceability
-
-### Key Distinction
-
-| Handoff Type  | Tool Used    | Parent-Child | Use Case                       |
-| ------------- | ------------ | ------------ | ------------------------------ |
-| agent         | agent / Task | Yes          | Worker delegation              |
-| Context-based | None (chat)  | No           | Decision passing, coordination |
