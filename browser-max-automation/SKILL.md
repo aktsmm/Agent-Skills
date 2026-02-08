@@ -119,64 +119,6 @@ Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" -ArgumentL
 4. browser_snapshot → verify
 ```
 
-## Commands
-
-### Navigate
-
-```
-mcp_playwright_browser_navigate
-  url: "https://example.com"
-```
-
-### Snapshot
-
-```
-mcp_playwright_browser_snapshot
-```
-
-Returns accessibility tree with `ref` values for each element.
-
-### Click
-
-```
-mcp_playwright_browser_click
-  element: "Submit button"
-  ref: "f2e123"
-```
-
-### Type
-
-```
-mcp_playwright_browser_type
-  element: "Username"
-  ref: "f2e456"
-  text: "user@example.com"
-  submit: true  # Press Enter
-```
-
-### Screenshot
-
-```
-mcp_playwright_browser_take_screenshot
-  filename: "result.png"
-```
-
-### Wait
-
-```
-mcp_playwright_browser_wait_for
-  text: "Loading complete"  # or
-  time: 3
-```
-
-### Tabs
-
-```
-mcp_playwright_browser_tabs
-  action: "list" | "new" | "close" | "select"
-  index: 0
-```
-
 ## Advanced
 
 ### iframe Operations

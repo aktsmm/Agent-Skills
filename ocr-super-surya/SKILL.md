@@ -62,12 +62,11 @@ from surya.detection import DetectionPredictor
 from surya.foundation import FoundationPredictor
 
 image = Image.open("document.png")
-foundation_predictor = FoundationPredictor()
-recognition_predictor = RecognitionPredictor(foundation_predictor)
-detection_predictor = DetectionPredictor()
+found_pred = FoundationPredictor()
+rec_pred = RecognitionPredictor(found_pred)
+det_pred = DetectionPredictor()
 
-predictions = recognition_predictor([image], det_predictor=detection_predictor)
-for page in predictions:
+for page in rec_pred([image], det_predictor=det_pred):
     for line in page.text_lines:
         print(line.text)
 ```
@@ -90,13 +89,6 @@ surya_ocr image.png
 | ----------------------- | ----------------------------------------- |
 | `scripts/ocr_helper.py` | Helper with OOM auto-retry, batch support |
 
-## Done Criteria
+## License Note
 
-- [ ] CUDA available (if GPU present)
-- [ ] Text extracted from target image
-- [ ] Output saved to specified file
-
-## License
-
-- **This skill**: CC BY-NC 4.0
-- **Surya**: GPL-3.0 (code), commercial license for >$2M revenue
+- **Surya**: GPL-3.0 (code), commercial license required for >$2M revenue
