@@ -11,11 +11,11 @@ Standard structure and specification for `.agent.md` and `.prompt.md` files.
 `.prompt.md` と `.instructions.md` ファイルは **素の YAML フロントマター (`---`) で始めること**。
 コードフェンス（` ````prompt ` 等）で囲む必要はない。フェンスで囲むと VS Code がフロントマターを認識できず、プロンプトピッカーに `description` が表示されなくなる。
 
-| ファイル種別       | 正しい形式                                 | 不正な形式            |
-| ------------------ | ------------------------------------------ | --------------------- |
-| `.prompt.md`       | `---` で始まる YAML フロントマター         | ` ````prompt ` で囲む |
-| `.instructions.md` | `#` 見出しで始まる（フロントマター不要）   | フェンスで囲む        |
-| `.agent.md`        | `---` で始まる YAML フロントマター         | ` ````chatagent ` で囲む |
+| ファイル種別       | 正しい形式                               | 不正な形式               |
+| ------------------ | ---------------------------------------- | ------------------------ |
+| `.prompt.md`       | `---` で始まる YAML フロントマター       | ` ````prompt ` で囲む    |
+| `.instructions.md` | `#` 見出しで始まる（フロントマター不要） | フェンスで囲む           |
+| `.agent.md`        | `---` で始まる YAML フロントマター       | ` ````chatagent ` で囲む |
 
 `````yaml
 # ✅ .prompt.md — 正しい
@@ -306,24 +306,9 @@ For long-running tasks, maintain visibility:
 
 ```
 
-## Design Principles for Agents
-
-### 1. Stateless Design
-
-- Judge based on file system state, not conversation history
-- Design workflows to converge to correct state when re-run
-
-### 2. Single Responsibility
-
-- One agent, one goal
-- Separate by phase: planning, implementation, review, testing
-
-### 3. Observability
-
-- Record decisions as Issue comments or documents
-- For long tasks, include regular status reports
-
 ## Examples by Role
+
+→ See [design-principles.md](design-principles.md) for detailed design principles.
 
 ### Orchestrator Agent
 
@@ -349,45 +334,9 @@ tools: ["Task", "Read", "Search", "TodoWrite"]
 
 Key characteristics:
 
-- Uses subagent tool for delegation (`#runSubagent` / `Task`)
+- Uses subagent tool for delegation (`#tool:agent` / `Task`)
 - Maintains high-level view
 - Does NOT perform detailed work itself
-
-### Specialist Agent
-
-**VS Code Copilot:**
-
-```yaml
----
-name: code-reviewer
-description: Reviews code for quality, security, and best practices
-tools: ["readFile", "textSearch", "web/fetch"]
----
-```
-
-Key characteristics:
-
-- Focused expertise
-- Clear input/output contract
-- Deterministic behavior where possible
-
-### Implementation Agent
-
-**VS Code Copilot:**
-
-```yaml
----
-name: implementer
-description: Implements code changes based on specifications
-tools: ["readFile", "editFiles", "runInTerminal", "textSearch"]
----
-```
-
-Key characteristics:
-
-- Receives clear specifications
-- Makes targeted changes
-- Reports results back to orchestrator
 
 ## Available Tools
 

@@ -17,7 +17,6 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 | Hallucination        | Fabricating unverified info        | No Hallucination principle      |
 | False Negative       | Treating "no results" as "empty"   | Re-query with explicit params   |
 
-
 ## How to Use
 
 1. Review this checklist after completing workflow design
@@ -107,35 +106,6 @@ Minimum items to verify:
 - [ ] ✅ States "not explicitly documented" for uncertain info
 - [ ] ✅ ESCALATEs to user when verification impossible
 - [ ] ✅ Only outputs information backed by sources
-```
-
----
-
-## Hallucination Check
-
-Critical for information accuracy. Detect and prevent fabricated outputs.
-
-```markdown
-## Source Verification
-
-- [ ] Does every claim have a verifiable source?
-- [ ] Are all URLs real and accessible?
-- [ ] Are dates, numbers, and statistics from official sources?
-- [ ] Is the agent using "probably", "likely", or "possibly" as facts?
-
-## Detection Patterns
-
-- [ ] No citing non-existent documentation
-- [ ] No describing features not in official docs
-- [ ] No generating fake URLs or file paths
-- [ ] No filling knowledge gaps with assumptions
-
-## Correct Behavior
-
-- [ ] Returns status=not_found when information unavailable
-- [ ] States "not explicitly documented" for uncertain info
-- [ ] ESCALATEs to user when verification impossible
-- [ ] Only outputs information backed by sources
 ```
 
 ---
@@ -482,16 +452,6 @@ else:
 
 ---
 
-## Next Steps
-
-After review completion:
-
-1. **All ✅** → Proceed to implementation
-2. **Minor ❌** → Re-check after fixes
-3. **Major ❌** → Revise design, re-review
-
----
-
 ## Related Documents
 
 - [design-principles.md](design-principles.md) - Design principles details
@@ -533,18 +493,17 @@ Check for Single Source of Truth violations and unnecessary duplication:
 - Changes only needed in one place
 ```
 
-
 ---
 
 ## API/Tool Query Check
 
 ⚠️ **Critical for external data retrieval.** Prevent false assumptions from incomplete results.
 
-| Anti-Pattern | Problem | Solution |
-| --- | --- | --- |
-| False Negative Assumption | Treating "no results" as "nothing exists" | Re-query with explicit parameters |
-| Range Query Overconfidence | Week-range query misses specific days | Query each day individually |
-| Format Assumption | Output format differs from user expectation | Confirm format before output |
+| Anti-Pattern               | Problem                                     | Solution                          |
+| -------------------------- | ------------------------------------------- | --------------------------------- |
+| False Negative Assumption  | Treating "no results" as "nothing exists"   | Re-query with explicit parameters |
+| Range Query Overconfidence | Week-range query misses specific days       | Query each day individually       |
+| Format Assumption          | Output format differs from user expectation | Confirm format before output      |
 
 ### Detection Patterns
 

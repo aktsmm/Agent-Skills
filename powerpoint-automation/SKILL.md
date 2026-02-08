@@ -130,45 +130,6 @@ python scripts/analyze_template.py assets/template.pptx
 ]}
 ```
 
-### テンプレート管理のベストプラクティス
-
-#### 複数デザイン（スライドマスター）の整理
-
-テンプレートPPTXに複数のスライドマスターが含まれている場合、出力が不安定になることがあります。
-
-**確認方法:**
-
-```bash
-python scripts/create_from_template.py assets/template.pptx --list-layouts
-```
-
-**対処法:**
-
-1. PowerPointでテンプレートを開く
-2. [表示] → [スライドマスター] を選択
-3. 不要なスライドマスターを削除
-4. 保存後、template_layouts.json を再生成
-
-```bash
-python scripts/analyze_template.py assets/template.pptx
-```
-
-#### content.json の階層構造
-
-箇条書きに階層構造（インデント）を持たせる場合は items ではなく bullets 形式を使用：
-
-```json
-// ❌ フラットな表示になる
-{"type": "content", "items": ["項目1", "  詳細1", "項目2"]}
-
-// ✅ 階層構造が効く
-{"type": "content", "bullets": [
-  {"text": "項目1", "level": 0},
-  {"text": "詳細1", "level": 1},
-  {"text": "項目2", "level": 0}
-]}
-```
-
 ## Agents
 
 → **[references/agents/](references/agents/)** for definitions
