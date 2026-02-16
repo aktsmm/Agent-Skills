@@ -342,9 +342,18 @@ Return as:
 
 **Solution:** Define sub-agent behavior in the prompt parameter, not in separate files.
 
-### Pitfall 6: Custom Agent as Sub-agent
+### Pitfall 6: Custom Agent as Sub-agent (Experimental)
 
-Custom agents can be invoked as sub-agents using the `agentName` parameter.
+⚠️ **Experimental Feature:** As of 2026/01, you can invoke custom agents as sub-agents with additional configuration.
+
+**Enable in VS Code:**
+
+```json
+// settings.json
+{
+  "chat.customAgentInSubagent.enabled": true
+}
+```
 
 **Usage:**
 
@@ -355,111 +364,12 @@ Custom agents can be invoked as sub-agents using the `agentName` parameter.
 - agentName: my-custom-agent
 ```
 
-**Requirements:**
+**Limitations:**
 
-- Agent file must be in `.github/agents/` **直下** (サブフォルダは認識されない → Pitfall 7)
-- Agent must NOT have `disable-model-invocation: true` (unless parent's `agents` list overrides it)
+- Custom agent must NOT have `disable-model-invocation: true` (default: `false`)
+  - ℹ️ `infer:` は deprecated。`user-invokable` / `disable-model-invocation` を使用すること
 - Sub-agent cannot access main session context
 - Parallel execution available (2026/01+) but with overhead
-
-### Pitfall 7: Agent Files in Subdirectories (Not Detected)
-
-❌ **Problem:** `.github/agents/executors/coding.executor.md` が認識されない
-
-**Reality:** VS Code は `.github/agents/` 直下の `.md` ファイルのみスキャンする。サブディレクトリは再帰スキャンされない（2026-02-15 時点）。
-
-```
-✅ 認識される
-.github/agents/
-├── orchestrator.agent.md
-├── coding.executor.md
-└── quality.reviewer.md
-
-❌ 認識されない
-.github/agents/
-├── executors/
-│   └── coding.executor.md    ← 無視
-└── reviewers/
-│   └── quality.reviewer.md   ← 無視
-```
-
-**Solution:**
-- 全ファイルを `.github/agents/` 直下に配置する
-- または `chat.agentFilesLocations` 設定で追加パスを指定する
-
-> **根拠:** VS Code 公式ドキュメント: `"VS Code detects any .md files in the .github/agents folder"`
-> 再帰スキャンの記述なし。実証テストでも非対応を確認。
-
----
-
-## Agent Access Control (2026/02 Updated)
-
-### Frontmatter Properties
-
-| Property | Default | Effect |
-| --- | --- | --- |
-| `user-invokable` | `true` | `false` → ピッカーに非表示（サブエージェント専用） |
-| `disable-model-invocation` | `false` | `true` → 他エージェントからサブエージェントとして呼ばれない |
-| `agents` (親側) | `*` (全許可) | 特定エージェント名のリスト → 許可したサブエージェントのみ呼べる |
-
-> **重要:** 親の `agents` リストに明示すると `disable-model-invocation: true` をオーバーライドできる。
-
-### Access Control Patterns
-
-```yaml
-# ユーザーが直接呼ぶ + サブエージェントとしても呼ばれる（デフォルト）
-user-invokable: true    # (省略可)
-
-# サブエージェント専用（ピッカー非表示）
-user-invokable: false
-
-# ユーザー専用（他エージェントから呼ばれない）
-disable-model-invocation: true
-
-# 特定の親からのみ呼ばれるサブエージェント
-user-invokable: false
-disable-model-invocation: true
-# → 親側の agents: ['this-agent'] で明示して呼ぶ
-```
-
-### Deprecated Properties
-
-| Old | New | Migration |
-| --- | --- | --- |
-| `infer: true` | `user-invokable: true` (default) | 行を削除するか置換 |
-| `infer: false` | `user-invokable: false` | 置換 |
-| `target: vscode` | — | 削除（不要） |
-
-### Orchestrator + Workers Example
-
-```yaml
-# orchestrator.agent.md
----
-name: orchestrator
-user-invokable: true
-disable-model-invocation: true
-tools: ["agent", "codebase", "terminal"]
-agents:
-  - coding-executor
-  - quality-reviewer
-  - auditor
----
-```
-
-```yaml
-# coding.executor.md
----
-name: coding-executor
-user-invokable: false
-tools: ["codebase", "terminal"]
----
-```
-
-**Key Points:**
-- orchestrator に `agent` ツールを含めないとサブエージェント呼び出しが機能しない
-- `agents` リストで呼び出せるサブエージェントを制限する
-- `agents: []` で全サブエージェント利用を禁止
-- `agents: '*'` で全許可（デフォルト）
 
 ---
 
