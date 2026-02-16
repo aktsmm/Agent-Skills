@@ -70,10 +70,10 @@ description: <description> # Required: Brief description of the prompt
 
 ### ⚠️ Deprecated Fields
 
-| Field    | Status        | Applies To                | Use Instead                                                        |
-| -------- | ------------- | ------------------------- | ------------------------------------------------------------------ |
-| `mode:`  | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below)                                     |
-| `infer:` | ❌ Deprecated | `.agent.md`               | Use `user-invokable:` and `disable-model-invocation:` (see below)  |
+| Field    | Status        | Applies To                | Use Instead                                                       |
+| -------- | ------------- | ------------------------- | ----------------------------------------------------------------- |
+| `mode:`  | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below)                                    |
+| `infer:` | ❌ Deprecated | `.agent.md`               | Use `user-invokable:` and `disable-model-invocation:` (see below) |
 
 **`infer:` Migration Guide:**
 
@@ -99,10 +99,10 @@ disable-model-invocation: true
 ---
 ```
 
-| フィールド                    | デフォルト | 説明                                          |
-| ----------------------------- | ------------ | --------------------------------------------- |
-| `user-invokable`              | `true`       | プルダウンに表示するか                        |
-| `disable-model-invocation`    | `false`      | サブエージェントとしての呼び出しを禁止するか |
+| フィールド                 | デフォルト | 説明                                         |
+| -------------------------- | ---------- | -------------------------------------------- |
+| `user-invokable`           | `true`     | プルダウンに表示するか                       |
+| `disable-model-invocation` | `false`    | サブエージェントとしての呼び出しを禁止するか |
 
 **`mode:` Migration Guide:**
 
