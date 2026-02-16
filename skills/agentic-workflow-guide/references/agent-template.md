@@ -45,8 +45,38 @@ description: <description> # Required: One-line role description
 model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
+user-invokable: true # Optional: Show in dropdown (default: true)
 ---
-````
+```
+
+### Visibility Control (`user-invokable`)
+
+Orchestrator パターンで Worker エージェントをドロップダウン（`@` メンション ピッカー）から非表示にするには `user-invokable: false` を設定する。
+
+| 値 | 効果 |
+|---|---|
+| `true` _(default)_ | ドロップダウンに表示される |
+| `false` | ドロップダウンから非表示。`runSubagent` / `agent` ツールでの呼び出しは可能 |
+
+**典型的な使い方: Orchestrator-Workers パターン**
+
+```yaml
+# orchestrator.agent.md — ユーザーが直接呼び出す
+---
+name: Orchestrator
+description: ワークフロー全体の調整役
+tools: [agent, todo]
+---
+
+# worker.agent.md — Orchestrator からのみ呼び出される
+---
+name: Worker
+description: 特定タスクを実行
+user-invokable: false
+---
+```
+
+> **Note**: VS Code 1.106+ で利用可能。
 
 ### For `.prompt.md` files
 
