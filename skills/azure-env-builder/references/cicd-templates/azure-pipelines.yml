@@ -1,0 +1,354 @@
+# Azure Pipelines - Bicep デプロイパイプライン
+#
+# このパイプラインは Bicep テンプレートを Azure にデプロイします。
+# 使用方法: プロジェクトの azure-pipelines.yml としてコピー
+#
+# 前提条件:
+# 1. Azure Service Connection (例: 'azure-service-connection')
+# 2. Variable Group 'azure-deploy-vars' with:
+#    - RESOURCE_GROUP
+#    - AZURE_SUBSCRIPTION_ID
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - "env/**/bicep/**"
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - "env/**/bicep/**"
+
+# パイプラインパラメータ
+parameters:
+  - name: environment
+    displayName: "Target Environment"
+    type: string
+    default: "dev"
+    values:
+      - dev
+      - staging
+      - prod
+
+  - name: deployMode
+    displayName: "Deploy Mode"
+    type: string
+    default: "validate"
+    values:
+      - validate
+      - what-if
+      - deploy
+
+variables:
+  # Variable Group から読み込み
+  - group: azure-deploy-vars
+
+  # パイプライン変数
+  - name: bicepPath
+    value: "env/${{ parameters.environment }}/bicep"
+  - name: templateFile
+    value: "main.bicep"
+  - name: parametersFile
+    value: "parameters/${{ parameters.environment }}.json"
+  - name: serviceConnection
+    value: "azure-service-connection"
+
+stages:
+  # ========================================
+  # Stage 1: 検証
+  # ========================================
+  - stage: Validate
+    displayName: "Validate Bicep"
+    jobs:
+      - job: ValidateBicep
+        displayName: "Lint and Validate"
+        pool:
+          vmImage: "ubuntu-latest"
+
+        steps:
+          # チェックアウト
+          - checkout: self
+            displayName: "Checkout repository"
+
+          # Azure CLI タスク - Bicep バージョン確認
+          - task: AzureCLI@2
+            displayName: "Check Bicep version"
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                az bicep version
+                az bicep upgrade
+
+          # Bicep Lint
+          - task: AzureCLI@2
+            displayName: "Lint Bicep template"
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                echo "##[section]Linting Bicep template..."
+                az bicep build \
+                  --file $(bicepPath)/$(templateFile) \
+                  --stdout > /dev/null
+                echo "##[section]Lint passed!"
+
+          # ARM テンプレート検証
+          - task: AzureCLI@2
+            displayName: "Validate ARM template"
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                echo "##[section]Validating deployment..."
+                az deployment group validate \
+                  --resource-group $(RESOURCE_GROUP) \
+                  --template-file $(bicepPath)/$(templateFile) \
+                  --parameters @$(bicepPath)/$(parametersFile)
+                echo "##[section]Validation passed!"
+
+  # ========================================
+  # Stage 2: What-If プレビュー
+  # ========================================
+  - stage: WhatIf
+    displayName: "What-If Preview"
+    dependsOn: Validate
+    condition: |
+      and(
+        succeeded(),
+        or(
+          eq(variables['Build.Reason'], 'PullRequest'),
+          eq('${{ parameters.deployMode }}', 'what-if')
+        )
+      )
+
+    jobs:
+      - job: WhatIfAnalysis
+        displayName: "Run What-If"
+        pool:
+          vmImage: "ubuntu-latest"
+
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: "Run What-If Analysis"
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: "bash"
+              scriptLocation: "inlineScript"
+              inlineScript: |
+                echo "##[section]Running What-If analysis..."
+                echo "Environment: ${{ parameters.environment }}"
+                echo "Resource Group: $(RESOURCE_GROUP)"
+                echo ""
+
+                az deployment group what-if \
+                  --resource-group $(RESOURCE_GROUP) \
+                  --template-file $(bicepPath)/$(templateFile) \
+                  --parameters @$(bicepPath)/$(parametersFile) \
+                  --out table
+
+  # ========================================
+  # Stage 3: デプロイ (Dev)
+  # ========================================
+  - stage: DeployDev
+    displayName: "Deploy to Dev"
+    dependsOn: Validate
+    condition: |
+      and(
+        succeeded(),
+        eq('${{ parameters.environment }}', 'dev'),
+        eq('${{ parameters.deployMode }}', 'deploy'),
+        ne(variables['Build.Reason'], 'PullRequest')
+      )
+
+    jobs:
+      - deployment: DeployToDev
+        displayName: "Deploy to Dev Environment"
+        pool:
+          vmImage: "ubuntu-latest"
+        environment: "dev"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: "Deploy Bicep template"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      DEPLOYMENT_NAME="deploy-$(Build.BuildNumber)"
+
+                      echo "##[section]Deploying to Dev..."
+                      echo "Deployment Name: $DEPLOYMENT_NAME"
+
+                      az deployment group create \
+                        --name $DEPLOYMENT_NAME \
+                        --resource-group $(RESOURCE_GROUP) \
+                        --template-file $(bicepPath)/$(templateFile) \
+                        --parameters @$(bicepPath)/$(parametersFile) \
+                        --output table
+
+                      echo "##[section]Deployment completed!"
+
+  # ========================================
+  # Stage 4: デプロイ (Staging)
+  # ========================================
+  - stage: DeployStaging
+    displayName: "Deploy to Staging"
+    dependsOn: Validate
+    condition: |
+      and(
+        succeeded(),
+        eq('${{ parameters.environment }}', 'staging'),
+        eq('${{ parameters.deployMode }}', 'deploy'),
+        ne(variables['Build.Reason'], 'PullRequest')
+      )
+
+    jobs:
+      - deployment: DeployToStaging
+        displayName: "Deploy to Staging Environment"
+        pool:
+          vmImage: "ubuntu-latest"
+        environment: "staging"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: "Deploy Bicep template"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      DEPLOYMENT_NAME="deploy-$(Build.BuildNumber)"
+
+                      az deployment group create \
+                        --name $DEPLOYMENT_NAME \
+                        --resource-group $(RESOURCE_GROUP) \
+                        --template-file $(bicepPath)/$(templateFile) \
+                        --parameters @$(bicepPath)/$(parametersFile) \
+                        --output table
+
+  # ========================================
+  # Stage 5: デプロイ (Production)
+  # ========================================
+  - stage: DeployProd
+    displayName: "Deploy to Production"
+    dependsOn: Validate
+    condition: |
+      and(
+        succeeded(),
+        eq('${{ parameters.environment }}', 'prod'),
+        eq('${{ parameters.deployMode }}', 'deploy'),
+        ne(variables['Build.Reason'], 'PullRequest')
+      )
+
+    jobs:
+      - deployment: DeployToProd
+        displayName: "Deploy to Production Environment"
+        pool:
+          vmImage: "ubuntu-latest"
+        # 本番環境は承認が必要
+        environment: "production"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                # バックアップ作成 (オプション)
+                - task: AzureCLI@2
+                  displayName: "Export current state"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      echo "##[section]Exporting current resource state..."
+                      az deployment group list \
+                        --resource-group $(RESOURCE_GROUP) \
+                        --query "[?properties.provisioningState=='Succeeded'].{name:name,timestamp:properties.timestamp}" \
+                        --output table
+
+                - task: AzureCLI@2
+                  displayName: "Deploy Bicep template"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      DEPLOYMENT_NAME="deploy-$(Build.BuildNumber)"
+
+                      echo "##[section]Deploying to Production..."
+                      echo "⚠️ This is a production deployment!"
+
+                      az deployment group create \
+                        --name $DEPLOYMENT_NAME \
+                        --resource-group $(RESOURCE_GROUP) \
+                        --template-file $(bicepPath)/$(templateFile) \
+                        --parameters @$(bicepPath)/$(parametersFile) \
+                        --output table
+
+                      echo "##[section]Production deployment completed!"
+
+                # 結果出力
+                - task: AzureCLI@2
+                  displayName: "Output deployment result"
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: "bash"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      echo "===================================="
+                      echo "✅ Production Deployment Successful"
+                      echo "===================================="
+                      echo "Resource Group: $(RESOURCE_GROUP)"
+                      echo "Subscription: $(AZURE_SUBSCRIPTION_ID)"
+                      echo ""
+                      echo "Portal: https://portal.azure.com/#@/resource/subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/$(RESOURCE_GROUP)/overview"
+
+# ============================================================
+# セットアップ手順
+# ============================================================
+#
+# 1. Azure Service Connection 作成
+#    Project Settings > Service connections > New > Azure Resource Manager
+#    名前: azure-service-connection
+#
+# 2. Variable Group 作成
+#    Pipelines > Library > + Variable group
+#    名前: azure-deploy-vars
+#    変数:
+#      - RESOURCE_GROUP: リソースグループ名
+#      - AZURE_SUBSCRIPTION_ID: サブスクリプション ID
+#
+# 3. Environment 作成と承認設定
+#    Pipelines > Environments
+#    - dev (承認なし)
+#    - staging (任意)
+#    - production (承認必須)
+#
+# 4. パイプライン作成
+#    Pipelines > New pipeline > Azure Repos Git
+#    このファイルを選択
