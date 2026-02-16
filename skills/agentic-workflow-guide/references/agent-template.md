@@ -6,25 +6,33 @@ Standard structure and specification for `.agent.md` and `.prompt.md` files.
 
 ## File Format Rules
 
-すべてのファイルは **素の YAML フロントマター (`---`) で始める**。コードフェンスで囲まない。
+### ⚠️ フェンスラッパーに関する重要な注意
 
-| ファイル種別       | 1行目      | 備考                    |
-| ------------------ | ---------- | ----------------------- |
-| `.prompt.md`       | `---`      | YAML フロントマター必須 |
-| `.agent.md`        | `---`      | YAML フロントマター必須 |
-| `.instructions.md` | `#` 見出し | フロントマター不要      |
+`.prompt.md` と `.instructions.md` ファイルは **素の YAML フロントマター (`---`) で始めること**。
+コードフェンス（` ````prompt ` 等）で囲む必要はない。フェンスで囲むと VS Code がフロントマターを認識できず、プロンプトピッカーに `description` が表示されなくなる。
 
-### .prompt.md テンプレート
+| ファイル種別       | 正しい形式                               | 不正な形式               |
+| ------------------ | ---------------------------------------- | ------------------------ |
+| `.prompt.md`       | `---` で始まる YAML フロントマター       | ` ````prompt ` で囲む    |
+| `.instructions.md` | `#` 見出しで始まる（フロントマター不要） | フェンスで囲む           |
+| `.agent.md`        | `---` で始まる YAML フロントマター       | ` ````chatagent ` で囲む |
 
-```yaml
+`````yaml
+# ✅ .prompt.md — 正しい
 ---
 description: セッション内容をXポスト用に変換
-agent: my-agent
 ---
 # プロンプト本文...
-```
 
-### .agent.md テンプレート
+# ❌ .prompt.md — 間違い（description が表示されない）
+````prompt
+---
+description: セッション内容をXポスト用に変換
+---
+# プロンプト本文...
+`````
+
+# ✅ .agent.md — 正しい（フェンス不要、素の `---` だけ）
 
 ```yaml
 ---
@@ -33,6 +41,8 @@ description: Does something useful
 ---
 # エージェント本文...
 ```
+
+````
 
 ## YAML Front Matter
 
@@ -45,38 +55,10 @@ description: <description> # Required: One-line role description
 model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
-user-invokable: true # Optional: Show in dropdown (default: true)
+user-invokable: true # Optional: Show in agents dropdown (default: true)
+disable-model-invocation: false # Optional: Prevent subagent invocation (default: false)
 ---
-```
-
-### Visibility Control (`user-invokable`)
-
-Orchestrator パターンで Worker エージェントをドロップダウン（`@` メンション ピッカー）から非表示にするには `user-invokable: false` を設定する。
-
-| 値 | 効果 |
-|---|---|
-| `true` _(default)_ | ドロップダウンに表示される |
-| `false` | ドロップダウンから非表示。`runSubagent` / `agent` ツールでの呼び出しは可能 |
-
-**典型的な使い方: Orchestrator-Workers パターン**
-
-```yaml
-# orchestrator.agent.md — ユーザーが直接呼び出す
----
-name: Orchestrator
-description: ワークフロー全体の調整役
-tools: [agent, todo]
----
-
-# worker.agent.md — Orchestrator からのみ呼び出される
----
-name: Worker
-description: 特定タスクを実行
-user-invokable: false
----
-```
-
-> **Note**: VS Code 1.106+ で利用可能。
+````
 
 ### For `.prompt.md` files
 
@@ -88,9 +70,39 @@ description: <description> # Required: Brief description of the prompt
 
 ### ⚠️ Deprecated Fields
 
-| Field   | Status        | Applies To                | Use Instead                    |
-| ------- | ------------- | ------------------------- | ------------------------------ |
-| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below) |
+| Field    | Status        | Applies To                | Use Instead                                                        |
+| -------- | ------------- | ------------------------- | ------------------------------------------------------------------ |
+| `mode:`  | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below)                                     |
+| `infer:` | ❌ Deprecated | `.agent.md`               | Use `user-invokable:` and `disable-model-invocation:` (see below)  |
+
+**`infer:` Migration Guide:**
+
+`infer: true` (default) はプルダウン表示とサブエージェント呼び出しの両方を制御していたが、新しいフィールドでは独立制御が可能。
+
+```yaml
+# ❌ Wrong (deprecated)
+---
+infer: false
+---
+# ✅ Correct: プルダウンに非表示（サブエージェントとしては呼び出し可能）
+---
+user-invokable: false
+---
+# ✅ Correct: サブエージェント呼び出しを禁止（プルダウンには表示）
+---
+disable-model-invocation: true
+---
+# ✅ Correct: 両方禁止
+---
+user-invokable: false
+disable-model-invocation: true
+---
+```
+
+| フィールド                    | デフォルト | 説明                                          |
+| ----------------------------- | ------------ | --------------------------------------------- |
+| `user-invokable`              | `true`       | プルダウンに表示するか                        |
+| `disable-model-invocation`    | `false`      | サブエージェントとしての呼び出しを禁止するか |
 
 **`mode:` Migration Guide:**
 
