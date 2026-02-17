@@ -52,11 +52,11 @@ Aggregator: Integrate all results
 
 Before parallelizing, verify **all three conditions**:
 
-| Condition           | Check                                          | Example                            |
-| ------------------- | ---------------------------------------------- | ---------------------------------- |
-| **No file conflict** | Each agent writes to different output files    | A→file1.json, B→file2.json        |
-| **No COM conflict** | At most one agent uses COM (e.g., PowerPoint)  | Only Build agent opens .pptx       |
-| **No data dependency** | Agents don't read each other's outputs       | A doesn't need B's result          |
+| Condition              | Check                                         | Example                      |
+| ---------------------- | --------------------------------------------- | ---------------------------- |
+| **No file conflict**   | Each agent writes to different output files   | A→file1.json, B→file2.json   |
+| **No COM conflict**    | At most one agent uses COM (e.g., PowerPoint) | Only Build agent opens .pptx |
+| **No data dependency** | Agents don't read each other's outputs        | A doesn't need B's result    |
 
 ### Implementation Pattern
 
@@ -77,8 +77,8 @@ runSubagent("Notes Generator", prompt: "...", description: "Notes: speaker notes
 Use this table in the Orchestrator's Step definition to document parallelization safety:
 
 ```markdown
-| Agent           | Input               | Output              | COM | Conflict |
-| --------------- | ------------------- | ------------------- | --- | -------- |
+| Agent           | Input               | Output               | COM | Conflict |
+| --------------- | ------------------- | -------------------- | --- | -------- |
 | Review          | region_info.json    | region_reviewed.json | No  | None     |
 | Build PPTX      | classification.json | output.pptx          | Yes | None     |
 | Notes Generator | classification.json | notes.json           | No  | None     |
@@ -103,9 +103,9 @@ Parallel execution reduces wall-clock time from `sum(A, B, C)` to `max(A, B, C)`
 
 ### Anti-Patterns
 
-| ❌ Anti-Pattern | ✅ Correct Approach |
-| --- | --- |
-| Two agents writing to same file | Separate output files per agent |
-| Two agents using COM simultaneously | Only one COM agent in parallel group |
-| Agent B reads Agent A's output | Sequential execution, not parallel |
-| Parallel agents calling `run_in_terminal` simultaneously | Stagger or isolate terminal usage |
+| ❌ Anti-Pattern                                          | ✅ Correct Approach                  |
+| -------------------------------------------------------- | ------------------------------------ |
+| Two agents writing to same file                          | Separate output files per agent      |
+| Two agents using COM simultaneously                      | Only one COM agent in parallel group |
+| Agent B reads Agent A's output                           | Sequential execution, not parallel   |
+| Parallel agents calling `run_in_terminal` simultaneously | Stagger or isolate terminal usage    |
