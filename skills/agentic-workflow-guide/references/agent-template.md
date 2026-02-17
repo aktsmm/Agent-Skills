@@ -104,6 +104,10 @@ disable-model-invocation: true
 | `user-invokable`           | `true`     | プルダウンに表示するか                       |
 | `disable-model-invocation` | `false`    | サブエージェントとしての呼び出しを禁止するか |
 
+> ⚠️ **サブディレクトリの罠（2026年2月時点）**: `.github/agents/` は**直下のファイルだけをスキャン**。
+> サブフォルダに入れると `runSubagent` でも呼び出せなくなる。フラットに置くこと。
+> 非表示にしたい場合はサブフォルダではなく `user-invokable: false` を使うこと。
+
 **`mode:` Migration Guide:**
 
 ```yaml

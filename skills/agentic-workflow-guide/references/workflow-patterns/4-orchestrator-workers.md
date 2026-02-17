@@ -189,6 +189,7 @@ After (parallel):
 ```
 
 **Splitting criteria:**
+
 - The two responsibilities use different tools (MCP vs COM)
 - The two responsibilities have no shared state
 - One responsibility is the bottleneck
