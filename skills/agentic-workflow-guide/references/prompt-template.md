@@ -58,11 +58,11 @@ description: One-line summary of what this prompt does
 
 VS Code validates frontmatter strictly. Only use supported fields — unsupported fields cause validation errors.
 
-| File type | Supported fields | Notes |
-|-----------|-----------------|-------|
-| `.prompt.md` | `agent`, `argument-hint`, `description`, `model`, `name`, `tools` | `author`, `copyright`, `license` etc. are **NOT** supported |
-| `.instructions.md` | `applyTo` | All other fields are **NOT** supported |
-| `.skill.md` | `name`, `description`, `license`, `metadata` | Supports nested `metadata:` block |
+| File type          | Supported fields                                                  | Notes                                                       |
+| ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
+| `.prompt.md`       | `agent`, `argument-hint`, `description`, `model`, `name`, `tools` | `author`, `copyright`, `license` etc. are **NOT** supported |
+| `.instructions.md` | `applyTo`                                                         | All other fields are **NOT** supported                      |
+| `.skill.md`        | `name`, `description`, `license`, `metadata`                      | Supports nested `metadata:` block                           |
 
 **Workaround for custom metadata** (author, copyright, repository, license):  
 Use HTML comments — they are ignored by the validator but preserved in the file.
