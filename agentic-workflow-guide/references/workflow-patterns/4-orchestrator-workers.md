@@ -162,6 +162,54 @@ For unclassified tasks, call #tool:agent with:
 
 **⚠️ Important:** General Assistant should NOT bypass the orchestrator for tasks that genuinely require specialized workers. Use as fallback, not shortcut.
 
+## Parallel Workers Pattern (Orchestrator + Parallelization)
+
+When workers are independent, the Orchestrator can dispatch them **simultaneously** using `runSubagent` parallel invocation, combining Pattern 3 (Parallelization) with Pattern 4.
+
+### Design Steps
+
+1. **Identify independent workers** — no shared output files, no data dependencies
+2. **Document safety** — use the dependency table from [3-parallelization.md](3-parallelization.md)
+3. **Gate after parallel step** — verify all workers completed before next step
+4. **Retry selectively** — if one worker fails, retry only that worker
+
+### Splitting for Parallelization
+
+When a single agent has both **AI reasoning** and **mechanical execution**, consider splitting:
+
+```
+Before (sequential):
+  Enrich Agent = AI notes generation + PowerPoint writing
+  → Total time: T(AI) + T(write)
+
+After (parallel):
+  Notes Generator Agent = AI notes generation  ← parallel with others
+  Enrich Agent = PowerPoint writing only        ← runs after parallel step
+  → Total time: max(T(AI), T(other_agents)) + T(write)
+```
+
+**Splitting criteria:**
+
+- The two responsibilities use different tools (MCP vs COM)
+- The two responsibilities have no shared state
+- One responsibility is the bottleneck
+
+### Workflow Example
+
+```mermaid
+graph TD
+    Orch[Orchestrator] --> Prep[Step 1: Prepare]
+    Prep --> G1{Gate 1}
+    G1 -->|pass| RV[Worker: Review]
+    G1 -->|pass| BP[Worker: Build]
+    G1 -->|pass| NG[Worker: Notes]
+    RV --> G2{Gate 2}
+    BP --> G2
+    NG --> G2
+    G2 -->|pass| EN[Step 3: Enrich]
+    EN --> FN[Step 4: Finalize]
+```
+
 ## Dynamic Worker Creation (New Task Detection)
 
 When the orchestrator encounters a task type that doesn't match existing workers, it should **ask for user confirmation** before creating a new sub-agent.
