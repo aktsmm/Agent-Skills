@@ -73,7 +73,7 @@ tools: ["search", "web/fetch", "agent", "edit/editFiles", "todo"]
 
 - Topic: <research target>
 - Perspective: <focus area>
-- Output file: <report path>
+- Output file: <report path> (use `-part-N.md` suffix for parallel execution)
 
 **Search Strategy**:
 
@@ -83,8 +83,49 @@ tools: ["search", "web/fetch", "agent", "edit/editFiles", "todo"]
 4. Cross-reference: Compare across vendors/specs
 5. Alternative paths: Try official sites if paywalled
 
-**Output**: NULL (writes directly to file)
+**Output**: NULL (writes directly to its own dedicated file)
+**Parallel Safety**: Each sub-agent writes only to its assigned `-part-N.md` file
 ```
+
+## Parallel Execution
+
+### Overview
+
+Research sub-agents can be launched in parallel by placing multiple `runSubagent` (or `#tool:agent`) calls in the same tool-call block. This significantly reduces total execution time when perspectives are independent.
+
+> **Note**: `run_in_terminal` and `semantic_search` cannot be called in parallel. `runSubagent`, `read_file`, `grep_search`, `file_search` can.
+
+### File Collision Avoidance
+
+Each sub-agent must write to a **dedicated file** to prevent write conflicts:
+
+```
+research/YYYY-MM-DD-<slug>-part-1.md  ← Perspective A
+research/YYYY-MM-DD-<slug>-part-2.md  ← Perspective B
+research/YYYY-MM-DD-<slug>-part-3.md  ← Perspective C
+```
+
+After all sub-agents complete, the orchestrator **merges** the parts:
+
+1. Deduplicate overlapping content
+2. Renumber citation footnotes
+3. Add cross-perspective connections
+4. Output final `research/YYYY-MM-DD-<slug>.md`
+5. Delete `-part-N.md` files
+
+### When to Parallelize vs Serialize
+
+| Condition                            | Strategy                |
+| ------------------------------------ | ----------------------- |
+| Perspectives are independent         | **Parallel**            |
+| Later perspective depends on earlier | Sequential              |
+| Shared external API with rate limits | Sequential or staggered |
+| Perspectives build on each other     | Sequential              |
+
+### Cautions
+
+- **API Rate Limits**: Parallel sub-agents hitting the same API (e.g., Brave Search `1 req/s`) may trigger 429 errors. Each sub-agent should handle retries independently.
+- **Context Isolation**: Parallel sub-agents cannot see each other's results. Cross-referencing happens only in the merge step.
 
 ### Evaluator Sub-agent
 

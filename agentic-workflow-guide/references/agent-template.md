@@ -55,6 +55,8 @@ description: <description> # Required: One-line role description
 model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
 handoffs: [...] # Optional: Agent transitions
+user-invokable: true # Optional: Show in agents dropdown (default: true)
+disable-model-invocation: false # Optional: Prevent subagent invocation (default: false)
 ---
 ````
 
@@ -68,9 +70,43 @@ description: <description> # Required: Brief description of the prompt
 
 ### ⚠️ Deprecated Fields
 
-| Field   | Status        | Applies To                | Use Instead                    |
-| ------- | ------------- | ------------------------- | ------------------------------ |
-| `mode:` | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below) |
+| Field    | Status        | Applies To                | Use Instead                                                       |
+| -------- | ------------- | ------------------------- | ----------------------------------------------------------------- |
+| `mode:`  | ❌ Deprecated | `.agent.md`, `.prompt.md` | Use `agent:` field (see below)                                    |
+| `infer:` | ❌ Deprecated | `.agent.md`               | Use `user-invokable:` and `disable-model-invocation:` (see below) |
+
+**`infer:` Migration Guide:**
+
+`infer: true` (default) はプルダウン表示とサブエージェント呼び出しの両方を制御していたが、新しいフィールドでは独立制御が可能。
+
+```yaml
+# ❌ Wrong (deprecated)
+---
+infer: false
+---
+# ✅ Correct: プルダウンに非表示（サブエージェントとしては呼び出し可能）
+---
+user-invokable: false
+---
+# ✅ Correct: サブエージェント呼び出しを禁止（プルダウンには表示）
+---
+disable-model-invocation: true
+---
+# ✅ Correct: 両方禁止
+---
+user-invokable: false
+disable-model-invocation: true
+---
+```
+
+| フィールド                 | デフォルト | 説明                                         |
+| -------------------------- | ---------- | -------------------------------------------- |
+| `user-invokable`           | `true`     | プルダウンに表示するか                       |
+| `disable-model-invocation` | `false`    | サブエージェントとしての呼び出しを禁止するか |
+
+> ⚠️ **サブディレクトリの罠（2026年2月時点）**: `.github/agents/` は**直下のファイルだけをスキャン**。
+> サブフォルダに入れると `runSubagent` でも呼び出せなくなる。フラットに置くこと。
+> 非表示にしたい場合はサブフォルダではなく `user-invokable: false` を使うこと。
 
 **`mode:` Migration Guide:**
 

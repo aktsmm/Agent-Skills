@@ -12,11 +12,12 @@ Design, review, and improve agent workflows based on proven principles.
 
 ## When to Use
 
-| Action     | Triggers                                                              |
-| ---------- | --------------------------------------------------------------------- |
-| **Create** | New `.agent.md`, workflow architecture, scaffolding                   |
-| **Review** | Orchestrator not delegating, design principle check, context overflow |
-| **Update** | Adding Handoffs, improving delegation, tool configuration             |
+| Action     | Triggers                                                                     |
+| ---------- | ---------------------------------------------------------------------------- |
+| **Create** | New `.agent.md`, workflow architecture, scaffolding                          |
+| **Review** | Orchestrator not delegating, design principle check, context overflow        |
+| **Update** | Adding Handoffs, improving delegation, tool configuration                    |
+| **Debug**  | Agent not found, subagent not working, picker visibility, access control     |
 
 ## Core Principles
 

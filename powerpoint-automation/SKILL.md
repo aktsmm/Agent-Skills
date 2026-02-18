@@ -116,13 +116,9 @@ python scripts/analyze_template.py assets/template.pptx
 
 #### content.json の階層構造
 
-箇条書きに階層構造（インデント）を持たせる場合は `items` ではなく `bullets` 形式を使用：
+箇条書きに階層構造（インデント）を持たせる場合は `items` ではなく `bullets` 形式を使用（`items` はフラット表示になる）：
 
 ```json
-// ❌ フラットな表示になる
-{"type": "content", "items": ["項目1", "  詳細1", "項目2"]}
-
-// ✅ 階層構造が効く
 {"type": "content", "bullets": [
   {"text": "項目1", "level": 0},
   {"text": "詳細1", "level": 1},
@@ -216,13 +212,9 @@ catch { "File is LOCKED - close PowerPoint first" }
 
 ### Save with Different Name (File Lock Workaround)
 
-PowerPoint locks open files. Always save with a different name:
+PowerPoint locks open files.同名保存は `PermissionError` になるため、必ず別名で保存：
 
 ```python
-# ❌ Fails if file is open
-prs.save('file.pptx')  # PermissionError
-
-# ✅ Save with different name
 prs.save('file_withURL.pptx')
 ```
 

@@ -1,0 +1,8 @@
+{
+  "name": "vscode-custom-agents",
+  "source": "aktsmm-Agent-Skills",
+  "description": "VS Code カスタムエージェントの配置・設計・アクセス制御のベストプラクティス",
+  "whenToUse": "Create: New .agent.md, multi-agent setup, orchestrator config; Debug: Agent not found, subagent not working, picker visibility; Review: frontmatter validation, access control check",
+  "categories": ["vscode", "copilot", "agents"],
+  "installedAt": "2026-02-15T04:56:12.000Z"
+}
