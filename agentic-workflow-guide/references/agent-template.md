@@ -60,6 +60,35 @@ disable-model-invocation: false # Optional: Prevent subagent invocation (default
 ---
 ````
 
+### ⚠️ 非標準フィールド禁止（バリデーションエラーの原因）
+
+`author`, `repository`, `license`, `copyright` 等のメタデータを YAML frontmatter に書くと **バリデーションエラー** になる。
+これらは YAML の外、`---` 終端の直後に **HTMLコメント** として記述すること。
+
+```yaml
+# ✅ 正しい — メタデータはHTMLコメント
+---
+name: my-agent
+description: Does something useful
+---
+
+<!-- author: aktsmm
+     repository: https://github.com/aktsmm/ghc_template
+     license: CC BY-NC-SA 4.0
+     copyright: Copyright (c) 2025 aktsmm -->
+
+# エージェント本文...
+```
+
+```yaml
+# ❌ 間違い — YAMLに非標準フィールドを追加
+---
+author: aktsmm        ← バリデーションエラー
+repository: https://...
+name: my-agent
+---
+```
+
 ### For `.prompt.md` files
 
 ```yaml
