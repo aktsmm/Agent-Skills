@@ -149,3 +149,58 @@ When extracting from web sources, explicitly list and retrieve all these element
 - Professional presentations should avoid emoji
 - Use icons from template instead
 
+---
+
+## python-pptx Placeholder Manipulation Rules
+
+### xfrm 4-Attribute Rule
+
+When modifying a placeholder's position or size, **always set all 4 attributes** (`left`, `top`, `width`, `height`). Setting only some attributes causes python-pptx to create a new `xfrm` element, resetting unset attributes to **0** (width=0 → text wraps per character → appears vertical).
+
+```python
+# ❌ NG: Partial update — width resets to 0
+body_ph.top = new_top
+body_ph.height = new_height
+
+# ✅ OK: Retrieve inherited values from layout, set all 4
+layout = slide.slide_layout
+for lph in layout.placeholders:
+    if lph.placeholder_format.idx == target_idx:
+        layout_left = lph.left
+        layout_width = lph.width
+        break
+body_ph.left = layout_left
+body_ph.width = layout_width
+body_ph.top = new_top
+body_ph.height = new_height
+```
+
+### Text Direction After Resize
+
+After resizing a placeholder, explicitly set `vert="horz"` on `bodyPr` to prevent vertical text:
+
+```python
+txBody = body_ph._element.find(qn("p:txBody"))
+if txBody is not None:
+    bodyPr = txBody.find(qn("a:bodyPr"))
+    if bodyPr is not None:
+        bodyPr.set("vert", "horz")
+```
+
+### Table + Placeholder Overlap
+
+When adding a table to a slide with an existing body placeholder (idx=1), move the placeholder below the table rather than deleting it (keeps it available for ad-hoc notes):
+
+1. Calculate table bottom: `table_bottom = (table.top + table.height) / 914400`
+2. Set placeholder top to `table_bottom + 0.1in`
+3. Apply the 4-attribute rule above
+
+### Section Rebuild After Dynamic Slide Addition
+
+When dynamically adding slides from a template, the template's original section definitions remain stale. **Delete all sections and rebuild** before saving:
+
+```python
+# Remove old sectionLst from extLst
+# Create new sectionLst with sections matching actual slide order
+# Each section maps to a range of slide IDs
+```
