@@ -175,6 +175,18 @@ with zipfile.ZipFile('output.pptx') as z:
         # If Jpan contains 游ゴシック → fix required
 ```
 
+    ---
+
+    ## PowerPoint UI Sections (★★ Critical)
+
+    **Note**: PowerPointの「セクション」（左ペインで折りたためる区切り）は、`type: "section"` スライドとは別物。
+
+    - 直接XML編集は壊れやすい（例: lxml再シリアライズで `xmlns=""` 混入→PowerPointが無視）
+    - `ppt/presentation.xml` の `<p:extLst>` 内 `p14:sectionLst` が実体
+    - **URIが複数あり得る**ため、ファイル内でPowerPointが作っているURIに合わせる（観測例: `{521415D9-36F7-43E2-AB2F-B90AF26B5E84}`）
+    - 既存の `p14:sectionLst` を全削除→1つだけ注入、で整合性を保つ
+    - 反映確認は「PowerPointで開いて左ペインにセクション名が出るか」
+
 ---
 
 ## Font Size Minimum (★ Important)
