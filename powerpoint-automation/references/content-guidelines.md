@@ -241,12 +241,12 @@ python fix_script.py
 
 **Rule**: Do not rephrase technical documentation in a way that changes the meaning. When the original source uses cautious language ("will be available", "anticipated"), preserve that nuance.
 
-| Original Expression                        | ❌ NG Interpretation | ✅ OK Interpretation                     |
-| ------------------------------------------ | -------------------- | ---------------------------------------- |
-| "will be available March'2026"             | 3月に自動対応        | 3月に自動化機能がリリース予定            |
-| "anticipated timelines"                    | 確定スケジュール     | 予定（変更の可能性あり）                 |
-| "customer-controlled migration"            | 自動移行             | お客様操作による移行                     |
-| "no action required"                       | 完全放置でOK         | お客様操作は不要（スクリプト更新は必要） |
+| Original Expression             | ❌ NG Interpretation | ✅ OK Interpretation                     |
+| ------------------------------- | -------------------- | ---------------------------------------- |
+| "will be available March'2026"  | 3月に自動対応        | 3月に自動化機能がリリース予定            |
+| "anticipated timelines"         | 確定スケジュール     | 予定（変更の可能性あり）                 |
+| "customer-controlled migration" | 自動移行             | お客様操作による移行                     |
+| "no action required"            | 完全放置でOK         | お客様操作は不要（スクリプト更新は必要） |
 
 ### When in Doubt
 

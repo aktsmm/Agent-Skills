@@ -214,3 +214,61 @@ Images on title slides (`type: "title"` / `type: "closing"`) are **auto-limited 
 | `two_column` | Two Content                      | Comparison            |
 | `closing`    | Closing / Thank You              | Ending-specific       |
 | `agenda`     | Title and Content                | Same as content OK    |
+
+### Avoid "Demo" / Sample Layouts (★ Important)
+
+**Problem**: Template PPTX files often contain "Demo slide" or sample layouts with dark backgrounds and placeholder text (e.g. "Demo title", "Speaker name"). When slides use these layouts, the placeholder text bleeds through as ghost text even when empty.
+
+**Detection**:
+
+```python
+from pptx import Presentation
+prs = Presentation('output.pptx')
+bad_layouts = ['Demo slide', 'Demo', 'Sample']
+for i, slide in enumerate(prs.slides, 1):
+    if any(b.lower() in slide.slide_layout.name.lower() for b in bad_layouts):
+        print(f"⚠️ Slide {i}: uses '{slide.slide_layout.name}' layout - change required")
+```
+
+**Fix — Change slide layout** (python-pptx has no `slide.slide_layout` setter):
+
+```python
+# slide.slide_layout = new_layout  ← ❌ AttributeError: no setter
+# Must modify the relationship target directly:
+target_layout = [l for l in prs.slide_layouts if l.name == 'タイトルとコンテンツ'][0]
+for slide in prs.slides:
+    if 'Demo' in slide.slide_layout.name:
+        for rel in slide.part.rels.values():
+            if "slideLayout" in rel.reltype:
+                rel._target = target_layout.part
+                break
+```
+
+### Empty Placeholder Cleanup (★ Important)
+
+**Problem**: Even after changing layouts, empty placeholders inherited from the original layout remain in the slide XML and display ghost text from the layout definition.
+
+**Fix — Remove empty placeholders**:
+
+```python
+for slide in prs.slides:
+    to_remove = []
+    for shape in slide.shapes:
+        if shape.is_placeholder:
+            txt = ''.join(r.text for p in shape.text_frame.paragraphs for r in p.runs).strip()
+            if not txt:
+                to_remove.append(shape)
+    for shape in to_remove:
+        shape._element.getparent().remove(shape._element)
+```
+
+> ⚠️ Always run this AFTER layout change, as placeholder inheritance depends on the layout.
+
+**Full post-generation checklist**:
+
+1. Check for "Demo" / sample layouts → change to standard layout
+2. Remove empty placeholders
+3. Validate font sizes (≥ 12pt)
+4. Check textbox overlaps
+5. Verify text overflow (paragraph count, char count)
+
