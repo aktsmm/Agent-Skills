@@ -113,6 +113,70 @@ When generating new PPTX from existing PPTX, **include source slide number in sp
 
 ---
 
+## Theme Font Resolution (★★ Critical)
+
+**Problem**: Japanese text renders in 游ゴシック despite setting `<a:ea>` to BIZ UDPゴシック.
+
+**Root cause**: PowerPoint resolves Japanese fonts via `<a:font script="Jpan">` in theme XML, which takes priority over `<a:ea>`.
+
+### Font Resolution Chain (priority order)
+
+```
+1. run <a:rPr> → explicit font on the run
+2. paragraph <a:pPr>/<a:defRPr> → paragraph default
+3. slideMaster titleStyle/bodyStyle → master-level default
+4. theme majorFont/minorFont:
+   a. <a:font script="Jpan"> ← ★ THIS decides Japanese font
+   b. <a:ea>                  ← fallback for non-script-specific EA
+   c. <a:latin>               ← Latin characters
+```
+
+> ⚠️ `+mn-ea` / `+mn-lt` tokens in master styles resolve to theme fonts.
+> If theme has 游ゴシック, all `+mn-ea` references become 游ゴシック.
+
+### Fix: Modify theme XML directly
+
+python-pptx cannot modify theme fonts. Use ZIP-level manipulation:
+
+```python
+import zipfile, shutil, re, os
+
+def fix_theme_fonts(pptx_path, font_ja='BIZ UDPゴシック', font_latin='BIZ UDPGothic'):
+    tmp = pptx_path + '.tmp'
+    shutil.copy2(pptx_path, tmp)
+    with zipfile.ZipFile(tmp, 'r') as zin:
+        with zipfile.ZipFile(pptx_path, 'w', zipfile.ZIP_DEFLATED) as zout:
+            for item in zin.infolist():
+                data = zin.read(item.filename)
+                if item.filename.startswith('ppt/theme/') and item.filename.endswith('.xml'):
+                    content = data.decode('utf-8')
+                    # Fix script="Jpan" (the REAL Japanese font source)
+                    content = re.sub(
+                        r'(<a:font script="Jpan" typeface=")[^"]+(")' ,
+                        f'\\g<1>{font_ja}\\2', content)
+                    # Fix ea
+                    content = re.sub(
+                        r'(<a:ea typeface=")[^"]*(")' ,
+                        f'\\g<1>{font_ja}\\2', content)
+                    data = content.encode('utf-8')
+                zout.writestr(item, data)
+    os.remove(tmp)
+```
+
+### Detection
+
+```python
+import zipfile, re
+with zipfile.ZipFile('output.pptx') as z:
+    for tf in [f for f in z.namelist() if 'theme' in f]:
+        content = z.read(tf).decode('utf-8')
+        jpan = re.findall(r'<a:font script="Jpan" typeface="([^"]+)"', content)
+        print(f"{tf}: Jpan={set(jpan)}")
+        # If Jpan contains 游ゴシック → fix required
+```
+
+---
+
 ## Font Size Minimum (★ Important)
 
 **Rule**: All text in slides must be **12pt or larger**.
@@ -266,9 +330,11 @@ for slide in prs.slides:
 
 **Full post-generation checklist**:
 
-1. Check for "Demo" / sample layouts → change to standard layout
-2. Remove empty placeholders
-3. Validate font sizes (≥ 12pt)
-4. Check textbox overlaps
-5. Verify text overflow (paragraph count, char count)
+1. **Fix theme fonts** → Ensure `script="Jpan"` uses correct font (not 游ゴシック)
+2. Check for "Demo" / sample layouts → change to standard layout
+3. Remove empty placeholders
+4. Normalize TB shape fonts to match PH defaults (size + typeface)
+5. Validate font sizes (≥ 12pt)
+6. Check textbox overlaps
+7. Verify text overflow (paragraph count, char count)
 

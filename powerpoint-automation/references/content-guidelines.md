@@ -193,6 +193,38 @@ gh api "repos/MicrosoftDocs/azure-docs/commits?path=articles/{service}/{file}.md
 
 > ⚠️ If slide numbers don't appear, enable them in the template via "Insert → Header and Footer".
 
+## Base File Management (★★ Critical)
+
+**Rule**: Always load the **latest user-modified file** as the base for script modifications. Never revert to an earlier version.
+
+**Problem**: If the agent keeps using an old base file (e.g. `v3.pptx`) while the user manually edits later versions (e.g. `v11.pptx`), all manual edits are lost when the agent overwrites the output.
+
+**Correct workflow**:
+
+```
+1. User provides initial PPTX → agent saves as working copy
+2. Agent modifies → saves as vN.pptx → user reviews
+3. User manually edits vN.pptx in PowerPoint → saves
+4. Agent loads vN.pptx (NOT the original) → applies next fix → saves as vN+1.pptx
+```
+
+**Anti-pattern**:
+
+```
+❌ Always loading v3.pptx as base (ignores all manual edits after v3)
+❌ Overwriting the working copy without checking if user modified a later version
+```
+
+**Implementation**: Before each script run, ask or detect which file is the latest:
+
+```python
+import glob, os
+files = sorted(glob.glob('*_v*.pptx'), key=os.path.getmtime, reverse=True)
+latest = files[0]  # Use this as base
+```
+
+---
+
 ## Run-Level Text Editing (★ Important)
 
 **Problem**: `shape.text_frame` or `paragraph.text` stores text split across multiple "runs" (formatting segments). A simple `replace()` on paragraph text may fail because the target string is split across runs.
