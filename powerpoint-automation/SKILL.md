@@ -377,6 +377,69 @@ new_ext = (f'<p:ext uri="{SECTION_URI}">'
 - Always remove existing section XML before inserting new ones (avoid duplicates)
 - Section changes only show in PowerPoint's slide sorter view after re-opening the file
 
+### Slide Layout Change (Safe Pattern)
+
+python-pptx does NOT safely support direct layout swapping. Use the **add-move-hide-cleanup** pattern:
+
+1. `add_slide(target_layout)` — new slide at the end
+2. Set title text on the new slide's placeholder (`placeholder_format.idx == 0`)
+3. Move new slide to old slide's position via `sldIdLst` XML manipulation (reverse order)
+4. Hide & clear old slide (`show='0'`, remove shapes)
+5. Save, re-open, delete hidden slides in a **separate pass**
+
+```python
+# Step 3: Move new slide (last) before old slide
+sldIdLst = prs.part._element.find(qn('p:sldIdLst'))
+slides_list = list(sldIdLst)
+new_el = slides_list[-1]
+old_el = list(sldIdLst)[target_idx]
+sldIdLst.remove(new_el)
+sldIdLst.insert(list(sldIdLst).index(old_el), new_el)
+
+# Step 4: Hide old slide (now at target_idx + 1)
+old_slide._element.set('show', '0')
+for shape in list(old_slide.shapes):
+    shape._element.getparent().remove(shape._element)
+```
+
+### Forbidden Patterns (★ Critical)
+
+| Pattern | Problem | Result |
+|---------|---------|--------|
+| `rel._target = new_layout.part` | Layout reference corrupted | PowerPoint repair dialog |
+| `prs.part.drop_rel(rId)` for slide deletion | Orphan XML in ZIP | `Duplicate name` warning → corruption |
+| `show='0'` while indices shift | Wrong slides hidden | Content silently disappears |
+
+### Safe Hidden Slide Cleanup
+
+Delete hidden slides in a **separate script/pass** after saving, in **reverse index order**:
+
+```python
+# Cleanup pass (separate from insertion)
+prs = Presentation(saved_file)
+sldIdLst = prs.part._element.find(qn('p:sldIdLst'))
+
+for i, slide in enumerate(prs.slides):
+    if slide._element.get('show') == '0':
+        # Verify truly empty before deleting
+        has_content = any(
+            para.text.strip()
+            for shape in slide.shapes if shape.has_text_frame
+            for para in shape.text_frame.paragraphs
+        )
+        if has_content:
+            del slide._element.attrib['show']  # Restore, not delete
+
+# Delete empty hidden slides (reverse order)
+for idx in reversed(empty_hidden_indices):
+    el = list(sldIdLst)[idx]
+    rId = el.get(qn('r:id'))
+    sldIdLst.remove(el)
+    prs.part.drop_rel(rId)
+
+prs.save(output_new_name)  # Always save to NEW filename
+```
+
 ## Post-Processing (URL Linkification)
 
 > ⚠️ `create_from_template.py` does not process `footer_url`. Post-processing required.
