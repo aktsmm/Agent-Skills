@@ -223,6 +223,11 @@ files = sorted(glob.glob('*_v*.pptx'), key=os.path.getmtime, reverse=True)
 latest = files[0]  # Use this as base
 ```
 
+**PowerPoint Sections**: 「セクション」（左ペインの区切り）はPowerPoint独自メタデータ。
+
+- XML直編集は無視されることがあるため、基本はPowerPoint上で追加/編集して確認
+- 自動化する場合も「ファイル内でPowerPointが使っているURI」に合わせる（環境差あり）
+
 ---
 
 ## Run-Level Text Editing (★ Important)
