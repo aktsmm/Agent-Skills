@@ -198,6 +198,185 @@ try { [IO.File]::OpenWrite($path).Close(); "File is writable" }
 catch { "File is LOCKED - close PowerPoint first" }
 ```
 
+## Shape-based Architecture Diagrams
+
+When creating network/architecture diagrams, use **PowerPoint shapes** instead of ASCII art text boxes. ASCII art is unreadable in presentation mode.
+
+### Design Pattern
+
+```python
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.dml.color import RGBColor
+from pptx.util import Cm, Pt
+
+# Color scheme
+AZURE_BLUE = RGBColor(0, 120, 212)
+LIGHT_BLUE = RGBColor(232, 243, 255)
+ONPREM_GREEN = RGBColor(16, 124, 65)
+LIGHT_GREEN = RGBColor(232, 248, 237)
+
+# Outer frame (Azure VNet)
+box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, w, h)
+box.fill.solid()
+box.fill.fore_color.rgb = LIGHT_BLUE
+box.line.color.rgb = AZURE_BLUE
+
+# Dashed connector (tunnel)
+conn = slide.shapes.add_connector(1, x1, y1, x2, y2)  # 1 = straight
+conn.line.color.rgb = AZURE_BLUE
+conn.line.dash_style = 2  # dash
+```
+
+### Layout Tips
+
+- Use `Cm()` for positioning (not `Inches()`) — easier to reason about on metric-based slides
+- Leave **at least 1.5cm** vertical gap between Azure and on-premises zones for tunnel lines
+- Place labels **inside** boxes (not overlapping edges) to avoid visual clutter
+- Use **color coding** to distinguish zones: blue = Azure, green = on-premises, orange = cross-connect
+- For dual diagrams (side-by-side), split slide into left/right halves with **12cm** left margin for the right diagram
+
+### Anti-patterns
+
+```
+❌ ASCII art in textboxes (unreadable in presentation mode)
+❌ Overlapping shapes due to insufficient spacing
+❌ Placing labels outside their parent containers
+❌ Using absolute EMU values without helper functions
+```
+
+## Hyperlink Batch Processing
+
+Batch-add hyperlinks and page titles to all URLs in a presentation:
+
+### Workflow
+
+```python
+import re
+url_pattern = re.compile(r'(https?://[^\s\)）]+)')
+
+# 1. Build URL→Title map (use MCP docs_search or fetch_webpage)
+URL_TITLES = {
+    'https://learn.microsoft.com/.../whats-new': 'Azure VPN Gateway の新機能',
+    ...
+}
+
+# 2. Iterate all runs and add hyperlinks
+for slide in prs.slides:
+    for shape in slide.shapes:
+        if not shape.has_text_frame:
+            continue
+        for para in shape.text_frame.paragraphs:
+            for run in para.runs:
+                urls = url_pattern.findall(run.text)
+                for url in urls:
+                    if not (run.hyperlink and run.hyperlink.address):
+                        run.hyperlink.address = url.rstrip('/')
+                    # Prepend title if missing
+                    title = URL_TITLES.get(url.rstrip('/'))
+                    if title and title not in run.text:
+                        run.text = f'{title}\n{url}'
+```
+
+### Verification
+
+```python
+hlink_count = sum(
+    1 for slide in prs.slides
+    for shape in slide.shapes if shape.has_text_frame
+    for para in shape.text_frame.paragraphs
+    for run in para.runs
+    if run.hyperlink and run.hyperlink.address
+)
+print(f'Hyperlinks: {hlink_count}')
+```
+
+## Font Theme Token Resolution (ZIP-level)
+
+python-pptx sometimes leaves theme tokens (`+mn-ea`, `+mj-lt`) unresolved, causing font fallback. Fix via ZIP-level string replacement:
+
+```python
+import zipfile, re, shutil
+
+FONT_JA = 'BIZ UDPゴシック'
+FONT_LATIN = 'BIZ UDPGothic'
+
+tmp = out + '.tmp'
+shutil.copy2(out, tmp)
+with zipfile.ZipFile(tmp, 'r') as zin:
+    with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if item.filename.endswith('.xml'):
+                content = data.decode('utf-8')
+                content = content.replace('+mn-ea', FONT_JA)
+                content = content.replace('+mj-ea', FONT_JA)
+                content = content.replace('+mn-lt', FONT_LATIN)
+                content = content.replace('+mj-lt', FONT_LATIN)
+                content = re.sub(
+                    r'(<a:ea typeface=")[^"]*(")',
+                    f'\\g<1>{FONT_JA}\\2', content
+                )
+                data = content.encode('utf-8')
+            zout.writestr(item, data)
+os.remove(tmp)
+```
+
+> ⚠️ Always do this **after** `prs.save()`, not before.
+
+## Section Management via XML
+
+PowerPoint sections are stored as an extension in `ppt/presentation.xml`. python-pptx has no native section API.
+
+### Adding/Updating Sections
+
+```python
+import re, uuid, zipfile
+
+SECTION_URI = '{521415D9-36F7-43E2-AB2F-B90AF26B5E84}'
+P14_NS = 'http://schemas.microsoft.com/office/powerpoint/2010/main'
+
+# Read presentation.xml from ZIP
+with zipfile.ZipFile(pptx_path) as z:
+    pres_xml = z.read('ppt/presentation.xml').decode('utf-8')
+
+# Ensure p14 namespace is declared
+if f'xmlns:p14="{P14_NS}"' not in pres_xml:
+    pres_xml = pres_xml.replace('<p:presentation',
+        f'<p:presentation xmlns:p14="{P14_NS}"', 1)
+
+# Extract slide IDs
+slide_ids = re.findall(r'<p:sldId id="(\d+)"', pres_xml)
+
+# Define sections: (name, start_slide_0based)
+sections = [("表紙", 0), ("本編", 2), ("Appendix", 15)]
+
+# Build section XML
+section_parts = []
+for idx, (name, start) in enumerate(sections):
+    end = sections[idx+1][1] if idx+1 < len(sections) else len(slide_ids)
+    refs = ''.join(f'<p14:sldId id="{slide_ids[i]}"/>'
+                   for i in range(start, min(end, len(slide_ids))))
+    sec_id = '{' + str(uuid.uuid4()).upper() + '}'
+    section_parts.append(
+        f'<p14:section name="{name}" id="{sec_id}">'
+        f'<p14:sldIdLst>{refs}</p14:sldIdLst></p14:section>'
+    )
+
+# Insert into extLst
+new_ext = (f'<p:ext uri="{SECTION_URI}">'
+           f'<p14:sectionLst xmlns:p14="{P14_NS}">'
+           + ''.join(section_parts)
+           + '</p14:sectionLst></p:ext>')
+
+# Write back to ZIP
+```
+
+### Important Notes
+
+- The URI `{521415D9-36F7-43E2-AB2F-B90AF26B5E84}` is specific to the presenter's PowerPoint version; some versions use different URIs
+- Always remove existing section XML before inserting new ones (avoid duplicates)
+- Section changes only show in PowerPoint's slide sorter view after re-opening the file
+
 ## Post-Processing (URL Linkification)
 
 > ⚠️ `create_from_template.py` does not process `footer_url`. Post-processing required.

@@ -151,6 +151,58 @@ Basic IP 移行について - https://learn.microsoft.com/ja-jp/azure/vpn-gatewa
 ❌ URL without hyperlink setting
 ```
 
+### Batch Hyperlink + Title Assignment
+
+When a presentation has many URLs without hyperlinks, process all at once:
+
+1. **Extract all URLs** from the PPTX using regex
+2. **Fetch page titles** for each URL (use `fetch_webpage` or `microsoft_docs_search`)
+3. **Build a URL→Title map** and iterate all runs to add hyperlinks + prepend titles
+
+```python
+# Step 1: Collect unique URLs
+url_pattern = re.compile(r'(https?://[^\s\)）]+)')
+all_urls = set()
+for slide in prs.slides:
+    for shape in slide.shapes:
+        if shape.has_text_frame:
+            for para in shape.text_frame.paragraphs:
+                for run in para.runs:
+                    all_urls.update(url_pattern.findall(run.text))
+
+# Step 2: Build title map (from MCP search results or manual)
+URL_TITLES = {}  # populated from docs search
+
+# Step 3: Apply hyperlinks + titles
+for slide in prs.slides:
+    for shape in slide.shapes:
+        if not shape.has_text_frame:
+            continue
+        for para in shape.text_frame.paragraphs:
+            for run in para.runs:
+                urls = url_pattern.findall(run.text)
+                for url in urls:
+                    url_clean = url.rstrip('/')
+                    if not (run.hyperlink and run.hyperlink.address):
+                        run.hyperlink.address = url_clean
+                    title = URL_TITLES.get(url_clean)
+                    if title and title not in run.text:
+                        run.text = f'{title}\n{url_clean}'
+```
+
+### Verify Hyperlink Count
+
+After processing, always verify:
+
+```python
+count = sum(1 for s in prs.slides for sh in s.shapes
+            if sh.has_text_frame
+            for p in sh.text_frame.paragraphs
+            for r in p.runs
+            if r.hyperlink and r.hyperlink.address)
+print(f'Total hyperlinks: {count}')
+```
+
 ## GitHub Commit History (Optional)
 
 > Requires GitHub CLI (`gh`) to be installed.
