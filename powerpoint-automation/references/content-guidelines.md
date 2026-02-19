@@ -192,3 +192,64 @@ gh api "repos/MicrosoftDocs/azure-docs/commits?path=articles/{service}/{file}.md
 ```
 
 > ⚠️ If slide numbers don't appear, enable them in the template via "Insert → Header and Footer".
+
+## Run-Level Text Editing (★ Important)
+
+**Problem**: `shape.text_frame` or `paragraph.text` stores text split across multiple "runs" (formatting segments). A simple `replace()` on paragraph text may fail because the target string is split across runs.
+
+**Example**: The text "Active-Active" might be stored as:
+
+```
+Run 0: "Active-Acti"
+Run 1: "ve"
+```
+
+### Correct Approach
+
+1. **Reconstruct full text** by joining all runs: `full = ''.join(r.text for r in para.runs)`
+2. **Search in full text**, then **modify individual runs**
+3. **Clear extra runs** by setting `run.text = ""`
+
+```python
+# ❌ NG: paragraph-level replace (fails on split runs)
+for para in tf.paragraphs:
+    if old_text in para.text:
+        para.text = para.text.replace(old_text, new_text)  # Loses formatting!
+
+# ✅ OK: run-level editing (preserves formatting)
+for para in tf.paragraphs:
+    full = ''.join(r.text for r in para.runs)
+    if old_text in full:
+        para.runs[0].text = new_text
+        for r in para.runs[1:]:
+            r.text = ""
+```
+
+### Best Practice: Use Script Files
+
+Inline Python in terminal commands has escaping issues. Always write `.py` files:
+
+```python
+# ❌ NG: Inline Python with f-string escaping issues
+python -c "print(f'{\"|\".join(items)}')"
+
+# ✅ OK: Write to .py file and execute
+python fix_script.py
+```
+
+## Factual Accuracy in Technical Content (★ Important)
+
+**Rule**: Do not rephrase technical documentation in a way that changes the meaning. When the original source uses cautious language ("will be available", "anticipated"), preserve that nuance.
+
+| Original Expression                        | ❌ NG Interpretation | ✅ OK Interpretation                     |
+| ------------------------------------------ | -------------------- | ---------------------------------------- |
+| "will be available March'2026"             | 3月に自動対応        | 3月に自動化機能がリリース予定            |
+| "anticipated timelines"                    | 確定スケジュール     | 予定（変更の可能性あり）                 |
+| "customer-controlled migration"            | 自動移行             | お客様操作による移行                     |
+| "no action required"                       | 完全放置でOK         | お客様操作は不要（スクリプト更新は必要） |
+
+### When in Doubt
+
+1. **Quote the original text** (italic, gray, small font) on the slide
+2. **Add "詳細はSRにて"** for items where the exact customer action is unclear
+3. **Never assert certainty** when the source says "予定" / "anticipated"

@@ -113,6 +113,71 @@ When generating new PPTX from existing PPTX, **include source slide number in sp
 
 ---
 
+## Font Size Minimum (★ Important)
+
+**Rule**: All text in slides must be **12pt or larger**.
+
+| Element          | Min Size | Recommended |
+| ---------------- | -------- | ----------- |
+| Slide title      | 18pt     | 20-28pt     |
+| Body / bullets   | 12pt     | 13-14pt     |
+| Footer / source  | 10pt     | 10-11pt     |
+| Captions / notes | 8pt      | 8-10pt      |
+
+> ⚠️ Exception: Footer URLs / source citations may use 8-10pt, but body text must never go below 12pt.
+
+**Validation**: After generating PPTX, check for undersized text:
+
+```python
+from pptx import Presentation
+from pptx.util import Pt
+prs = Presentation('output.pptx')
+MIN_PT = 12
+for i, slide in enumerate(prs.slides, 1):
+    for shape in slide.shapes:
+        if shape.has_text_frame:
+            for para in shape.text_frame.paragraphs:
+                for run in para.runs:
+                    if run.font.size and run.font.size < Pt(MIN_PT):
+                        print(f"⚠️ Slide {i}: {run.font.size.pt}pt < {MIN_PT}pt: {run.text[:40]}")
+```
+
+---
+
+## Textbox Overlap Prevention (★ Important)
+
+**Rule**: Textboxes must not overlap. Verify that `shape.top + shape.height <= next_shape.top`.
+
+**Problem**: When adding textboxes programmatically (e.g. customer name, subtitle), they may overlap if positions are not calculated from existing shapes.
+
+**Prevention checklist**:
+
+1. Read existing shape positions (`top`, `height`) before adding new ones
+2. Calculate `bottom = top + height` for each shape
+3. Ensure new shape's `top >= previous shape's bottom + gap`
+4. Shrink oversized textbox `height` (e.g. subtitle placeholders have large default height)
+
+**Validation snippet**:
+
+```python
+from pptx import Presentation
+prs = Presentation('output.pptx')
+for i, slide in enumerate(prs.slides, 1):
+    shapes = sorted(
+        [s for s in slide.shapes if s.has_text_frame],
+        key=lambda s: s.top
+    )
+    for j in range(len(shapes) - 1):
+        bottom = shapes[j].top + shapes[j].height
+        next_top = shapes[j+1].top
+        if bottom > next_top:
+            t1 = shapes[j].text_frame.paragraphs[0].text[:30]
+            t2 = shapes[j+1].text_frame.paragraphs[0].text[:30]
+            print(f"⚠️ Slide {i}: overlap! [{t1}] bottom={bottom} > [{t2}] top={next_top}")
+```
+
+---
+
 ## Image Size Guidelines
 
 | Original Size     | Recommended width_percent | Notes            |
