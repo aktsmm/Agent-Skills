@@ -5,7 +5,7 @@
 Each skill in this repository is licensed under its own terms. Please refer to the `LICENSE` file or the `license` field in `SKILL.md` within each skill directory for specific licensing information.
 
 **Default License (for skills without explicit license):**
-CC BY-NC 4.0 (Creative Commons Attribution-NonCommercial 4.0 International)
+CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International)
 
 **Skills from external repositories:**
 Retain their original licenses (MIT, Apache 2.0, etc.)
@@ -17,7 +17,7 @@ Retain their original licenses (MIT, Apache 2.0, etc.)
 このリポジトリ内の各スキルは、それぞれ独自のライセンス条件に従います。具体的なライセンス情報については、各スキルディレクトリ内の `LICENSE` ファイル、または `SKILL.md` の `license` フィールドを参照してください。
 
 **デフォルトライセンス（明示的なライセンスがないスキル）:**
-CC BY-NC 4.0（クリエイティブ・コモンズ 表示-非営利 4.0 国際）
+CC BY-NC-SA 4.0（クリエイティブ・コモンズ 表示-非営利-継承 4.0 国際）
 
 **外部リポジトリ由来のスキル:**
 元のライセンス（MIT、Apache 2.0 など）を維持
@@ -28,7 +28,7 @@ CC BY-NC 4.0（クリエイティブ・コモンズ 表示-非営利 4.0 国際�
 
 | Origin / 出典 | License / ライセンス |
 |---------------|---------------------|
-| Self-created skills / 自作スキル | CC BY-NC 4.0 |
+| Self-created skills / 自作スキル | CC BY-NC-SA 4.0 |
 | anthropics/skills | Apache 2.0 |
 | obra/superpowers | Check each skill |
 | Other external repos / その他外部 | Original license retained |
@@ -40,4 +40,4 @@ CC BY-NC 4.0（クリエイティブ・コモンズ 表示-非営利 4.0 国際�
 For commercial use inquiries or license questions:
 商用利用のお問い合わせやライセンスに関する質問：
 
-- GitHub: [@aktsmm](https://github.com/aktsmm)
+- GitHub: [yamapan (@aktsmm)](https://github.com/aktsmm)
