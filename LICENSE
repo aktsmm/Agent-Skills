@@ -41,3 +41,42 @@ For commercial use inquiries or license questions:
 商用利用のお問い合わせやライセンスに関する質問：
 
 - GitHub: [yamapan (@aktsmm)](https://github.com/aktsmm)
+
+---
+
+## Supplementary Terms / 補足条項
+
+The following supplementary terms apply to all self-created skills in this
+repository (skills with CC BY-NC-SA 4.0 license). These terms do NOT apply to
+skills from external repositories that retain their original licenses.
+
+以下の補足条項は、本リポジトリ内の自作スキル（CC BY-NC-SA 4.0 ライセンスのスキル）
+に適用されます。元のライセンスを維持する外部由来のスキルには適用されません。
+
+### 1. Microsoft Employee Exception
+
+Employees of Microsoft Corporation are granted permission to use, modify, and
+distribute the contents of this repository for internal and commercial purposes
+within the scope of their employment at Microsoft, provided that appropriate
+attribution is given.
+
+### 2. Prohibition of AI/ML Training Use
+
+The contents of this repository shall NOT be used, in whole or in part, as
+training data, fine-tuning data, or evaluation data for any artificial
+intelligence (AI) or machine learning (ML) model, including but not limited to
+large language models (LLMs), without explicit written permission from the
+copyright holder.
+
+### 3. Prohibition of Collection/Aggregation Redistribution
+
+The contents of this repository shall NOT be included, in whole or in part, in
+any collection, aggregation, compilation, or "awesome list" repository for
+the purpose of redistribution or public re-hosting. Linking to this repository
+(via URL) is permitted and encouraged.
+
+### 4. Attribution Format
+
+When providing attribution, please use the following format:
+
+    yamapan (@aktsmm) - https://github.com/aktsmm
