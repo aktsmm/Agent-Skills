@@ -80,3 +80,4 @@ From vscode-ai-toolkit best practices:
 
 Bad: Jump straight to implementation without discussing approach
 Good: Propose plan, get feedback, adjust, then execute
+

@@ -3,7 +3,7 @@ name: skill-creator-plus
 description: Guide for creating and reviewing effective skills. Use when creating a new skill, updating an existing skill, or reviewing SKILL.md files for quality. Triggers on "create skill", "review skill", "スキル作成".
 license: Apache-2.0
 metadata:
-  author: yamapan (based on Anthropic)
+  author: yamapan 
 ---
 
 # Skill Creator+
@@ -125,3 +125,4 @@ Start with **generic keywords** users are likely to say:
 - [ ] Frontmatter has name + description with trigger conditions
 - [ ] Details moved to references/ (Progressive Disclosure)
 - [ ] Review checklist passed
+

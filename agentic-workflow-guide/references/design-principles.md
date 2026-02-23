@@ -596,3 +596,4 @@ When collecting activity logs from integrated tools (M365, Slack, etc.), use mul
 1. `What did I post in channels today?` → Own contributions
 2. `What messages mentioned me today?` → Inbound requests
 3. `What files did I share today?` → Artifacts created
+
