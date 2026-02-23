@@ -1,82 +1,118 @@
-# License Information / ライセンス情報
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 
-## English
+Copyright (c) 2026 yamapan (@aktsmm)
 
-Each skill in this repository is licensed under its own terms. Please refer to the `LICENSE` file or the `license` field in `SKILL.md` within each skill directory for specific licensing information.
+You are free to:
 
-**Default License (for skills without explicit license):**
-CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International)
+Share — copy and redistribute the material in any medium or format
+Adapt — remix, transform, and build upon the material
 
-**Skills from external repositories:**
-Retain their original licenses (MIT, Apache 2.0, etc.)
+Under the following terms:
 
----
+Attribution — You must give appropriate credit, provide a link to the
+license, and indicate if changes were made. You may do so in any reasonable
+manner, but not in any way that suggests the licensor endorses you or your
+use.
 
-## 日本語
+NonCommercial — You may not use the material for commercial purposes.
 
-このリポジトリ内の各スキルは、それぞれ独自のライセンス条件に従います。具体的なライセンス情報については、各スキルディレクトリ内の `LICENSE` ファイル、または `SKILL.md` の `license` フィールドを参照してください。
+ShareAlike — If you remix, transform, or build upon the material, you must
+distribute your contributions under the same license as the original.
 
-**デフォルトライセンス（明示的なライセンスがないスキル）:**
-CC BY-NC-SA 4.0（クリエイティブ・コモンズ 表示-非営利-継承 4.0 国際）
+No additional restrictions — You may not apply legal terms or technological
+measures that legally restrict others from doing anything the license permits.
 
-**外部リポジトリ由来のスキル:**
-元のライセンス（MIT、Apache 2.0 など）を維持
+Notices:
 
----
+You do not have to comply with the license for elements of the material in
+the public domain or where your use is permitted by an applicable exception
+or limitation.
 
-## License Summary by Origin / 出典別ライセンス一覧
+No warranties are given. The license may not give you all of the permissions
+necessary for your intended use. For example, other rights such as publicity,
+privacy, or moral rights may limit how you use the material.
 
-| Origin / 出典 | License / ライセンス |
-|---------------|---------------------|
-| Self-created skills / 自作スキル | CC BY-NC-SA 4.0 |
-| anthropics/skills | Apache 2.0 |
-| obra/superpowers | Check each skill |
-| Other external repos / その他外部 | Original license retained |
-
----
-
-## Contact / 連絡先
-
-For commercial use inquiries or license questions:
-商用利用のお問い合わせやライセンスに関する質問：
-
-- GitHub: [yamapan (@aktsmm)](https://github.com/aktsmm)
+For the full license text, see:
+https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 ---
 
-## Supplementary Terms / 補足条項
+Supplementary Terms
 
-The following supplementary terms apply to all self-created skills in this
-repository (skills with CC BY-NC-SA 4.0 license). These terms do NOT apply to
-skills from external repositories that retain their original licenses.
+The following supplementary terms apply in addition to the CC BY-NC-SA 4.0
+license above. These terms are set by the copyright holder and apply to all
+files in this repository unless otherwise noted.
 
-以下の補足条項は、本リポジトリ内の自作スキル（CC BY-NC-SA 4.0 ライセンスのスキル）
-に適用されます。元のライセンスを維持する外部由来のスキルには適用されません。
+1. Microsoft Employee Exception
 
-### 1. Microsoft Employee Exception
+   Employees of Microsoft Corporation are granted permission to use, modify,
+   and distribute the contents of this repository for internal and commercial
+   purposes within the scope of their employment at Microsoft, provided that
+   appropriate attribution is given.
 
-Employees of Microsoft Corporation are granted permission to use, modify, and
-distribute the contents of this repository for internal and commercial purposes
-within the scope of their employment at Microsoft, provided that appropriate
-attribution is given.
+2. Prohibition of AI/ML Training Use
 
-### 2. Prohibition of AI/ML Training Use
+   The contents of this repository shall NOT be used, in whole or in part, as
+   training data, fine-tuning data, or evaluation data for any artificial
+   intelligence (AI) or machine learning (ML) model, including but not limited
+   to large language models (LLMs), without explicit written permission from
+   the copyright holder.
 
-The contents of this repository shall NOT be used, in whole or in part, as
-training data, fine-tuning data, or evaluation data for any artificial
-intelligence (AI) or machine learning (ML) model, including but not limited to
-large language models (LLMs), without explicit written permission from the
-copyright holder.
+3. Prohibition of Collection/Aggregation Redistribution
 
-### 3. Prohibition of Collection/Aggregation Redistribution
+   The contents of this repository shall NOT be included, in whole or in part,
+   in any collection, aggregation, compilation, or "awesome list" repository
+   for the purpose of redistribution or public re-hosting. Linking to this
+   repository (via URL) is permitted and encouraged.
 
-The contents of this repository shall NOT be included, in whole or in part, in
-any collection, aggregation, compilation, or "awesome list" repository for
-the purpose of redistribution or public re-hosting. Linking to this repository
-(via URL) is permitted and encouraged.
+4. Attribution Format
 
-### 4. Attribution Format
+   When providing attribution, please use the following format:
 
-When providing attribution, please use the following format:
+   yamapan (@aktsmm) - https://github.com/aktsmm
 
-    yamapan (@aktsmm) - https://github.com/aktsmm
+5. Commercial Licensing
+
+   For commercial use beyond the scope of this license, please contact:
+   yamapan (@aktsmm) - https://github.com/aktsmm
+
+   Individual use for personal learning and study is welcome and encouraged.
+
+---
+
+補足条項（日本語）
+
+以下の補足条項は、上記 CC BY-NC-SA 4.0 に加えて適用されます。
+これらの補足条項は著作権者が定めるものであり、特に注記がない限り本リポジトリ内の
+全ファイルに適用されます。
+
+1. Microsoft 社員例外
+
+   Microsoft Corporation の従業員は、Microsoft における業務の範囲内において、
+   本リポジトリの内容を社内利用および商用目的で利用・改変・配布することを許可します。
+   ただし、適切なクレジット表記を行うことを条件とします。
+
+2. AI/ML 学習用途の禁止
+
+   本リポジトリの内容の全部または一部を、明示的な書面による許可なく、
+   AI / 機械学習（ML）モデル（LLM を含む）の学習データ、ファインチューニングデータ、
+   または評価データとして使用することを禁止します。
+
+3. コレクション/集約リポジトリへの再配布禁止
+
+   本リポジトリの内容の全部または一部を、再配布または公的な再ホスティングを目的として、
+   コレクション、集約、コンピレーション、または "awesome list" 等のリポジトリに含めることを禁止します。
+   ただし、本リポジトリへの URL リンクによる紹介は許可し、推奨します。
+
+4. クレジット表記（推奨形式）
+
+   クレジット表記は、以下の形式を使用してください：
+
+   yamapan (@aktsmm) - https://github.com/aktsmm
+
+5. 商用ライセンス
+
+   本ライセンスの範囲を超える商用利用を希望される場合は、以下までご連絡ください：
+   yamapan (@aktsmm) - https://github.com/aktsmm
+
+   個人の学習・研究目的での利用は歓迎します。
