@@ -652,3 +652,128 @@ static refreshLanguage(data: any[]): void {
   }
 }
 ```
+
+## Moving Inline JS to an External File (Recommended)
+
+Large inline `<script>` blocks inside TypeScript template literals are hard to edit,
+cause merge conflicts, and slow down the webview parse step. Prefer an external file.
+
+### Anti-pattern (inline)
+
+```typescript
+// BAD – hundreds of lines of JS buried in a TS template literal
+return `<html>...
+  <script nonce="${nonce}">
+    // 1000 lines of JS here
+  </script>
+</html>`;
+```
+
+### Preferred pattern (external file)
+
+```
+my-extension/
+├── media/
+│   └── webview.js     ← all webview logic lives here
+└── src/
+    └── myWebview.ts   ← only HTML skeleton + initial-data injection
+```
+
+```typescript
+// myWebview.ts – only the skeleton remains in TypeScript
+const scriptUri = webview.asWebviewUri(
+  vscode.Uri.joinPath(extensionUri, "media", "webview.js"),
+);
+
+return `<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none';
+                 style-src ${webview.cspSource} 'unsafe-inline';
+                 script-src 'nonce-${nonce}';
+                 img-src ${webview.cspSource};
+                 font-src ${webview.cspSource};">
+</head>
+<body>
+  <script nonce="${nonce}" id="initial-data"
+          type="application/json">${serializeForWebview(data)}</script>
+  <script nonce="${nonce}" src="${scriptUri}"></script>
+</body>
+</html>`;
+```
+
+```typescript
+// Tighten localResourceRoots to only what is needed
+this.panel = vscode.window.createWebviewPanel(
+  "myWebview", "My View", vscode.ViewColumn.One,
+  {
+    enableScripts: true,
+    retainContextWhenHidden: true,
+    localResourceRoots: [
+      vscode.Uri.joinPath(extensionUri, "media"),  // JS / CSS
+      vscode.Uri.joinPath(extensionUri, "images"), // icons
+      // ❌ Don't pass extensionUri directly – too broad
+    ],
+  },
+);
+```
+
+### Serialising initial data safely
+
+```typescript
+function serializeForWebview(value: unknown): string {
+  const json = JSON.stringify(value ?? null) ?? "null";
+  return json
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+```
+
+```javascript
+// media/webview.js – read the injected data
+(function () {
+  var vscode = acquireVsCodeApi();
+  var initialData = {};
+  try {
+    var el = document.getElementById("initial-data");
+    if (el) initialData = JSON.parse(el.textContent || "{}");
+  } catch (e) { /* ignore */ }
+  // … use initialData …
+})();
+```
+
+## Prompting Reload After Extension Update
+
+Because `activationEvents: ["onStartupFinished"]` fires only once per VS Code
+startup, users who update the extension **without restarting VS Code** will keep
+running stale code. Show a "Reload Now" notification when the version changes.
+
+```typescript
+// extension.ts
+const LAST_VERSION_KEY = "lastKnownVersion";
+
+export function activate(context: vscode.ExtensionContext): void {
+  const currentVersion =
+    (context.extension.packageJSON as { version?: string }).version ?? "0.0.0";
+  const lastVersion = context.globalState.get<string>(LAST_VERSION_KEY);
+
+  if (lastVersion && lastVersion !== currentVersion) {
+    void vscode.window
+      .showInformationMessage(
+        `Extension updated to v${currentVersion}. Reload to activate.`,
+        "Reload Now",
+      )
+      .then((choice) => {
+        if (choice === "Reload Now") {
+          void vscode.commands.executeCommand("workbench.action.reloadWindow");
+        }
+      });
+  }
+  void context.globalState.update(LAST_VERSION_KEY, currentVersion);
+}
+```
+
+> **Why not `vscode.env.reload()`?** It reloads immediately without user consent.
+> The pattern above lets users finish their current work first.

@@ -162,3 +162,68 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 - **Your extensions**: `https://marketplace.visualstudio.com/manage/publishers/<publisher-id>`
 - **Published extension**: `https://marketplace.visualstudio.com/items?itemName=<publisher>.<extension>`
 - **Statistics**: Available in manage portal after publish
+
+## PAT Security & Persistence
+
+### Persist VSCE_PAT safely (Windows)
+
+```powershell
+# 1. Set for the current terminal session (type directly – never paste into chat!)
+$env:VSCE_PAT = "<your-pat>"
+
+# 2. Persist to User environment variables (survives reboots)
+[Environment]::SetEnvironmentVariable("VSCE_PAT", $env:VSCE_PAT, "User")
+
+# 3. Verify without revealing the value
+if ($env:VSCE_PAT) { "present (length: $($env:VSCE_PAT.Length))" } else { "missing" }
+```
+
+> ⚠️ `SetEnvironmentVariable` does **not** update already-open terminals.
+> Open a new terminal (or restart VS Code) after persisting.
+
+### If the PAT was accidentally exposed
+
+1. **Revoke immediately** at `dev.azure.com` → User Settings → Personal access tokens → Revoke
+2. Generate a new token (same scopes)
+3. Update `VSCE_PAT` with the new value
+
+### Rules
+
+- ❌ Never paste a PAT into chat, issue comments, or commit messages
+- ❌ Never echo `$env:VSCE_PAT` – check existence/length only
+- ✅ Use `VSCE_PAT` env var; `vsce publish` picks it up automatically
+- ✅ Set expiry ≤ 1 year and rotate on a schedule
+
+## .vscodeignore – Recommended Exclusion Patterns
+
+Keep the published VSIX small and free of dev-only artefacts:
+
+```ignore
+# Source & config (already compiled to out/)
+src/**
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+**/*.ts
+!out/**
+
+# Dev tooling
+.vscode/**
+.vscode-test/**
+.github/**
+node_modules/**
+
+# Dev-only content (never ship to users)
+output_sessions/**
+research/**
+session/**
+FULL_SPECIFICATION.md
+AGENTS.md
+
+# Large or unnecessary assets
+images/demo-animated.gif
+*.vsix
+```
+
+> **Tip**: Run `npx @vscode/vsce ls` to preview exactly what will be packaged
+> before running `vsce package` or `vsce publish`.
