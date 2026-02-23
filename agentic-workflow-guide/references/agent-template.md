@@ -225,6 +225,8 @@ description: Does something useful
 
 > **Note**: MCP server tools become available at runtime automatically. Unknown tool names cause errors.
 
+> **⚠️ Orchestrator の tools 制限に注意**: 親エージェントの `tools:` はサブエージェントの **ツール上限（ceiling）** として機能する。Orchestrator の `tools:` から `edit` を外すと、サブエージェント（Writer 等）も `edit` を使えなくなる。Orchestrator は `tools:` を省略する（= 全ツール利用可）のが推奨。SRP の強制は `tools:` ではなくプロンプト内の MANDATORY 指示で行うこと。詳細は [agent-guide.md の Pitfall 7](agent-guide.md#pitfall-7-restricting-orchestrators-tools-breaks-sub-agents) を参照。
+
 ### ⚠️ tools フィールドの注意事項
 
 **ツール名は `category/toolName` 形式で指定すること。** カテゴリが間違っていると VS Code がエラーを出す。

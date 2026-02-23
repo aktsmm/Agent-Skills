@@ -371,6 +371,34 @@ Return as:
 - Sub-agent cannot access main session context
 - Parallel execution available (2026/01+) but with overhead
 
+### Pitfall 7: Restricting Orchestrator's tools Breaks Sub-agents
+
+❌ **Problem:** Orchestrator の `tools:` から `edit` を外してSRPを強制 → サブエージェント（Writer等）が `edit` を使えなくなる
+
+**Reality:** 親エージェントの `tools:` はサブエージェントの**ツール上限（ceiling）**として機能する。親で許可されていないツールは、サブエージェントでも使用不可。
+
+```
+❌ Wrong: Orchestratorで edit を制限
+---
+name: Orchestrator
+tools: ["agent", "read", "todo"]  # edit がない
+---
+→ Writer サブエージェントが edit/editFiles を使えない!
+
+✅ Correct: tools を省略（全ツール利用可）
+---
+name: Orchestrator
+description: サブエージェントに作業を委譲
+---
+→ サブエージェントは全ツールを使える
+```
+
+**Solution:**
+
+- Orchestrator は `tools:` を**省略**する（= 全ツール利用可、agent-template.md推奨）
+- SRP の強制は `tools:` ではなく、**プロンプト内の MANDATORY 指示**で行う
+- `tools:` 制限は Worker エージェント（末端）に対してのみ適用する
+
 ---
 
 ## Inline Sub-agent Pattern (Recommended)
