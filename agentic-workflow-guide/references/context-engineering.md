@@ -77,8 +77,7 @@ Compacted Context (30% full):
 | Critical implementation details | Redundant conversation turns |
 | Current goals and constraints   | Exploratory dead-ends        |
 
-#### Anthropic's Tip
-
+#### Tip
 > (Quote removed; see linked references.)
 
 ---
@@ -328,3 +327,4 @@ Duplicate content across global and workspace scopes doubles token cost.
 - [Effective context engineering for AI agents - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Building effective agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
 - [How we built our multi-agent research system - Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)
+
