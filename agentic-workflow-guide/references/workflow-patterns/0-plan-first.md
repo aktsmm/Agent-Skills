@@ -74,10 +74,9 @@ Step 4: Execute (only after approval)
 
 From vscode-ai-toolkit best practices:
 
-> (Quote removed; see linked references.)
+> "Generate a plan first and ask the user for approval. This prevents wasted effort on the wrong approach."
 
 ## Anti-Pattern: Plan-Free Execution
 
 Bad: Jump straight to implementation without discussing approach
 Good: Propose plan, get feedback, adjust, then execute
-

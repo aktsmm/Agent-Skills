@@ -24,7 +24,7 @@ Checklist for reviewing and improving SKILL.md files.
 
 **Source:** [GitHub Docs - Adding repository custom instructions](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions)
 
-> (Quote removed; see linked references.)
+> "Instructions must be no longer than 2 pages."
 
 ### Progressive Disclosure
 

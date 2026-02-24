@@ -50,7 +50,7 @@ A collection of principles for designing agent workflows.
 
 **Anthropic's Recommendation:**
 
-> (Quote removed; see linked references.)
+> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short."
 
 ### 4. Fail Fast
 
@@ -89,7 +89,7 @@ A collection of principles for designing agent workflows.
 
 **Anthropic's Recommendation:**
 
-> (Quote removed; see linked references.)
+> "During execution, it's crucial for the agents to gain 'ground truth' from the environment at each step to assess its progress."
 
 ---
 
@@ -108,7 +108,7 @@ A collection of principles for designing agent workflows.
 
 **Anthropic's Recommendation:**
 
-> (Quote removed; see linked references.)
+> "Prioritize transparency by explicitly showing the agent's planning steps."
 
 ### 8. Gate/Checkpoint
 
@@ -312,7 +312,7 @@ Core principle: **Same IR → Same Output.** No creativity in transformation pha
 
 **Anthropic's Recommendation:**
 
-> (Quote removed; see linked references.)
+> "Think about how much effort goes into human-computer interfaces (HCI), and plan to invest just as much effort in creating good agent-computer interfaces (ACI)."
 
 ### Core Principles
 
@@ -346,7 +346,7 @@ Choose formats that minimize cognitive load for LLMs:
 
 ### Anthropic's Tool Format Recommendations
 
-> (Quote removed; see linked references.)
+> "Give the model enough tokens to 'think' before it writes itself into a corner. Keep the format close to what the model has seen naturally occurring in text on the internet."
 
 **Do:**
 
@@ -596,4 +596,3 @@ When collecting activity logs from integrated tools (M365, Slack, etc.), use mul
 1. `What did I post in channels today?` → Own contributions
 2. `What messages mentioned me today?` → Inbound requests
 3. `What files did I share today?` → Artifacts created
-

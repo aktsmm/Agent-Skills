@@ -2,7 +2,7 @@
 
 Guide for deciding when to escalate complexity (Prompt → Agent → Multi-Agent) and when to split into sub-agents.
 
-'s recommendation.
+> **Key Principle:** See [design-principles.md > Simplicity First](design-principles.md#3-simplicity-first) for Anthropic's recommendation.
 
 ### Evidence Levels
 
@@ -113,7 +113,7 @@ Once at L2/L3, use these criteria to decide sub-agent boundaries.
 
 ### Complexity Scaling ✅
 
- Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) [^2]
+> **Source:** [Anthropic Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) [^2]
 
 | Query Complexity  | Sub-agent Count | Tool Calls per Agent       |
 | ----------------- | --------------- | -------------------------- |

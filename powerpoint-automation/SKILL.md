@@ -466,6 +466,131 @@ prs.save('file_withURL.pptx')
 | Final version | `_final`   |
 | Fixed version | `_fixed`   |
 
+## 16:9 Slide Centering (Known Issue)
+
+> **L9**: `Presentation()` のデフォルトプレースホルダは 4:3 (25.4cm) 基準。
+> `slide_width = Cm(33.867)` で 16:9 に変更しても **プレースホルダ位置は 4:3 のまま** → 全スライドが左寄りに表示される。
+
+### 推奨パターン: Blank + 手動配置
+
+```python
+prs = Presentation()
+prs.slide_width = Cm(33.867)  # 16:9
+prs.slide_height = Cm(19.05)
+SW = prs.slide_width
+
+# Blank layout (プレースホルダなし) を使う
+slide = prs.slides.add_slide(prs.slide_layouts[6])
+
+# SW 基準で中央配置
+margin = Cm(3)
+tb = slide.shapes.add_textbox(margin, Cm(5), SW - margin * 2, Cm(3))
+p = tb.text_frame.paragraphs[0]
+p.text = "Centered Title"
+p.alignment = PP_ALIGN.CENTER
+```
+
+### Anti-patterns
+
+```
+❌ Layout 0-5 を 16:9 スライドで使う（プレースホルダが 25.4cm 基準で左寄り）
+❌ slide_width 変更後にプレースホルダ位置を未調整のまま使う
+✅ Blank レイアウト + add_textbox() で SW 基準の対称マージン配置
+✅ テンプレート PPTX 自体が 16:9 で作成されていれば Layout 0-5 も OK
+```
+
+## Template Corruption Recovery
+
+> **L10**: `.gitattributes` の `*.pptx binary` が git add **後** に追加された場合、
+> CRLF/エンコーディング変換でバイナリが破壊される（UTF-8 replacement char `EF BF BD` が混入）。
+
+### 診断方法
+
+```python
+with open('template.pptx', 'rb') as f:
+    data = f.read()
+count = data.count(b'\xef\xbf\xbd')
+print(f'UTF-8 replacement chars: {count}')  # 0 以外なら破損
+```
+
+### 復旧方法
+
+```python
+# python-pptx で空テンプレートを再生成
+from pptx import Presentation
+prs = Presentation()
+prs.slide_width = Cm(33.867)  # 16:9
+prs.slide_height = Cm(19.05)
+prs.save('template_new.pptx')
+# → 11 layouts が自動生成される（4:3 プレースホルダ注意）
+```
+
+### 予防策
+
+- `.gitattributes` は **最初のコミット前** に設定する
+- skill-ninja 等の自動インストーラ経由の場合、`.gitignore` による除外とバイナリ管理の整合性を確認
+
+## Video Embedding (ZIP Direct Manipulation)
+
+> **L11**: python-pptx は公式に MP4 埋め込み非対応。
+> しかし PPTX は ZIP なので `lxml` + `zipfile` で直接操作すれば埋め込み可能。
+
+### 必要な操作
+
+1. **slide XML**: `p:pic` に `a:videoFile` + `p14:media` を注入
+2. **slide rels**: video/image リレーションシップを追加 (rId)
+3. **[Content_Types].xml**: `<Default Extension="mp4" ContentType="video/mp4"/>` を追加
+4. **ZIP**: `ppt/media/` に MP4 ファイルとポスター画像を格納
+
+### XML パターン
+
+```xml
+<p:pic>
+  <p:nvPicPr>
+    <p:cNvPr id="100" name="Video 1">
+      <a:hlinkClick r:id="" action="ppaction://media"/>
+    </p:cNvPr>
+    <p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>
+    <p:nvPr>
+      <a:videoFile r:link="rId10"/>
+      <p:extLst>
+        <p:ext uri="{DAA4B4D4-6D71-4841-9C94-3DE7FCFB9230}">
+          <p14:media r:embed="rId11"/>
+        </p:ext>
+      </p:extLst>
+    </p:nvPr>
+  </p:nvPicPr>
+  <p:blipFill>
+    <a:blip r:embed="rId12"/>  <!-- poster image -->
+    <a:stretch><a:fillRect/></a:stretch>
+  </p:blipFill>
+  <p:spPr>
+    <a:xfrm>
+      <a:off x="720000" y="1260000"/>
+      <a:ext cx="10752120" cy="5058000"/>
+    </a:xfrm>
+    <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
+  </p:spPr>
+</p:pic>
+```
+
+### Slide Rels (3 リレーションシップ必要)
+
+```xml
+<Relationship Id="rId10" Type=".../relationships/video"
+              Target="../media/video.mp4" TargetMode="Internal"/>
+<Relationship Id="rId11" Type=".../2007/relationships/media"
+              Target="../media/video.mp4"/>
+<Relationship Id="rId12" Type=".../relationships/image"
+              Target="../media/poster.png"/>
+```
+
+### 注意事項
+
+- PowerPoint が「修復しますか？」と聞く場合がある（軽微な XML 不整合） → 「はい」で自動修復される
+- ポスター画像は必須（表示用サムネイル）
+- ファイルサイズ注意: 動画を ZIP 圧縮すると PPTX が肥大化。Git 管理には LFS 推奨
+
 ## Done Criteria
 
 - [ ] `content.json` generated and validated

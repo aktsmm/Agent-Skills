@@ -2,7 +2,8 @@
 
 Strategies for curating and managing context in long-running AI agents.
 
-> (Quote removed; see linked references.)
+> "Context engineering is the art and science of curating what will go into the limited context window."
+> — Anthropic
 
 ## Overview
 
@@ -32,7 +33,7 @@ High tokens  ████░░░░░░░░░░░░ Low accuracy (cont
 
 ### Key Insight
 
-> (Quote removed; see linked references.)
+> "Context must be treated as a finite resource with diminishing marginal returns."
 
 **Principle:** Find the smallest set of high-signal tokens that maximize the likelihood of desired outcomes.
 
@@ -77,8 +78,9 @@ Compacted Context (30% full):
 | Critical implementation details | Redundant conversation turns |
 | Current goals and constraints   | Exploratory dead-ends        |
 
-#### Tip
-> (Quote removed; see linked references.)
+#### Anthropic's Tip
+
+> "Start by maximizing recall to ensure your compaction prompt captures every relevant piece of information, then iterate to improve precision by eliminating superfluous content."
 
 ---
 
@@ -211,7 +213,7 @@ context = read_file(relevant_files[0])         # ✅ On-demand
 
 ### Progressive Disclosure
 
-> (Quote removed; see linked references.)
+> "Agents can assemble understanding layer by layer, maintaining only what's necessary in working memory."
 
 ---
 
@@ -327,5 +329,3 @@ Duplicate content across global and workspace scopes doubles token cost.
 - [Effective context engineering for AI agents - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Building effective agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
 - [How we built our multi-agent research system - Anthropic](https://www.anthropic.com/engineering/multi-agent-research-system)
-
-

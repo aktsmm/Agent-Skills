@@ -29,7 +29,7 @@ Design, review, and improve agent workflows based on proven principles.
 | **Quality**   | Transparency, Gate/Checkpoint, DRY, Observability       |
 | **Scale**     | Human-in-the-Loop, Loose Coupling, Graceful Degradation |
 
-'s key recommendation.
+> See [design-principles.md > Simplicity First](references/design-principles.md#3-simplicity-first) for Anthropic's key recommendation.
 
 ## Workflow Patterns
 

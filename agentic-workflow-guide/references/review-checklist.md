@@ -351,7 +351,7 @@ else:
 
 **Solution:** Simplicity First
 
-> See [design-principles.md > Simplicity First](design-principles.md#3-simplicity-first) for the referenced recommendation.
+> See [design-principles.md > Simplicity First](design-principles.md#3-simplicity-first) for Anthropic's recommendation.
 
 ---
 
@@ -516,4 +516,3 @@ Check for Single Source of Truth violations and unnecessary duplication:
 - [ ] ✅ If results seem incomplete → Re-query with specific date/criteria
 - [ ] ✅ For multi-day ranges → Query each day individually
 - [ ] ✅ Ask for output format preference before generating final output
-

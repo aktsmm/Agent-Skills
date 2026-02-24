@@ -45,7 +45,7 @@ The `agent` tool launches an independent agent with a **clean context window** t
 
 ### Primary Purpose
 
-> (Quote removed; see linked references.)
+> "agent is for **context management**, NOT for speed optimization."
 
 Use when you want to:
 
@@ -565,4 +565,3 @@ tools:
 ### シンプルなプロンプト構造
 
 複雑な450行のプロンプトより、シンプルな70行のプロンプトの方が効果的です。
-
