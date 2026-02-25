@@ -755,6 +755,112 @@ prs.save('template_new.pptx')
 - ポスター画像は必須（表示用サムネイル）
 - ファイルサイズ注意: 動画を ZIP 圧縮すると PPTX が肥大化。Git 管理には LFS 推奨
 
+## XML Serialization Artifacts (★ Critical)
+
+> **L17**: python-pptx の `save()` は全 XML を再シリアライズする。
+> その際 `"` → `'`（属性クォート）、`\r\n` → `\n`（改行）に変換される。
+> これだけでレイアウト背景（画像 blipFill）の描画が壊れ、スライドが**真っ白**になることがある。
+
+### 原因
+
+- スライドマスター/レイアウトの `<p:bg>` が `<a:blipFill r:embed="rId2">` で背景画像を参照
+- python-pptx がレイアウト XML を再シリアライズ → PowerPoint が微妙な差異を嫌い背景を表示しない
+
+### 解決策: ZIP 再構築パターン（原本復元）
+
+python-pptx でスライド内容を編集した後、レイアウト/マスター/テーマ/メディアファイルは**オリジナル PPTX からバイト単位で復元**する。
+
+```python
+import zipfile
+from collections import Counter
+
+orig_files = {}
+with zipfile.ZipFile('original.pptx', 'r') as z:
+    for item in z.infolist():
+        fn = item.filename
+        if any(p in fn for p in ['slideLayout', 'slideMaster', 'theme', '/media/']):
+            orig_files[fn] = z.read(fn)
+
+with zipfile.ZipFile('edited.pptx', 'r') as zin:
+    with zipfile.ZipFile('output.pptx', 'w', zipfile.ZIP_DEFLATED) as zout:
+        seen = set()
+        for item in zin.infolist():
+            fn = item.filename
+            if fn in seen:
+                continue
+            seen.add(fn)
+            if fn in orig_files:
+                zout.writestr(item, orig_files[fn])  # byte-for-byte original
+            else:
+                zout.writestr(item, zin.read(fn))
+        for fn, data in orig_files.items():
+            if fn not in seen:
+                zout.writestr(fn, data)
+                seen.add(fn)
+```
+
+### SVG Content Type 欠落 (L18)
+
+> python-pptx は `[Content_Types].xml` から SVG エントリを落とすことがある。
+> テーマ/マスターが SVG を参照している場合、表示が壊れる。
+
+```python
+ct_data = z.read('[Content_Types].xml').decode('utf-8')
+if 'image/svg+xml' not in ct_data:
+    ct_data = ct_data.replace(
+        '</Types>',
+        '<Default Extension="svg" ContentType="image/svg+xml"/></Types>'
+    )
+```
+
+### 安全な TextBox コンテンツ置換 (L19)
+
+> `text_frame.clear()` は python-pptx 内部の段落リストとの不整合を起こすことがある。
+> 代わりに `txBody` の `<a:p>` 要素を直接操作する。
+
+```python
+from lxml import etree
+from pptx.oxml.ns import qn
+
+def set_textbox_content(shape, lines):
+    """Safe textbox rewrite via XML manipulation.
+    lines: list of (text, bold, size_pt) tuples.
+    """
+    txBody = shape._element.find(qn('p:txBody'))
+    if txBody is None:
+        txBody = shape._element.find(qn('a:txBody'))
+    
+    # Remove existing paragraphs
+    for old_p in txBody.findall(qn('a:p')):
+        txBody.remove(old_p)
+    
+    # Add new paragraphs
+    for text, bold, size in lines:
+        p = etree.SubElement(txBody, qn('a:p'))
+        r = etree.SubElement(p, qn('a:r'))
+        rPr = etree.SubElement(r, qn('a:rPr'))
+        rPr.set('lang', 'ja-JP')
+        rPr.set('sz', str(int(size * 100)))
+        if bold:
+            rPr.set('b', '1')
+        solidFill = etree.SubElement(rPr, qn('a:solidFill'))
+        srgbClr = etree.SubElement(solidFill, qn('a:srgbClr'))
+        srgbClr.set('val', '333333')
+        t = etree.SubElement(r, qn('a:t'))
+        t.text = text
+```
+
+### 推奨ワークフロー（既存 PPTX 編集時）
+
+```
+1. python-pptx でスライド内容 (sp, txBody) を編集
+2. prs.save('raw.pptx')
+3. ZIP 再構築: layout/master/theme/media を原本から復元
+4. [Content_Types].xml で SVG 等の欠落を補完
+5. ZIP dedup (LAST 優先) で重複エントリを除去
+6. output.pptx を別名で保存
+```
+
 ## Done Criteria
 
 - [ ] `content.json` generated and validated
