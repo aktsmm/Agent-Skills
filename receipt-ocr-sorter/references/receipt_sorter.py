@@ -67,6 +67,24 @@ COUNTRY_OUTPUT = {
     "xx": "xx",
 }
 
+# ── 商品明細キーワード（食品・飲料）──────────────────────────────────────────
+# レシート本文にこれらが含まれる場合、meal 系に優先分類する
+FOOD_ITEM_KEYWORDS = [
+    # 英語: 食品・飲料の一般名
+    "BURGER", "SANDWICH", "SALAD", "SOUP", "PIZZA", "PASTA", "TACO", "BURRITO",
+    "WRAP", "BOWL", "FRIES", "CHICKEN", "STEAK", "FISH", "SHRIMP", "SAUSAGE",
+    "BACON", "EGG", "TOAST", "PANCAKE", "WAFFLE", "BAGEL", "MUFFIN", "CROISSANT",
+    "DRINK", "BEVERAGE", "SODA", "JUICE", "LATTE", "MOCHA", "CAPPUCCINO", "TEA",
+    "BEER", "WINE", "COCKTAIL", "WATER", "MILK", "SMOOTHIE",
+    "DESSERT", "CAKE", "PIE", "ICE CREAM", "COOKIE", "BROWNIE", "DONUT",
+    "APPETIZER", "ENTREE", "SIDE", "COMBO", "MEAL DEAL",
+    "GRATUITY", "SERVER", "TABLE", "DINE IN", "TAKE OUT", "TO GO",
+    "CHOWDER", "CALAMARI", "OYSTER", "CLAM", "LOBSTER", "CRAB",
+    # 日本語: 食品
+    "弁当", "おにぎり", "サンドイッチ", "ハンバーガー", "カレー", "定食",
+    "ドリンク", "ビール", "コーラ", "お茶", "水",
+]
+
 # ── 店舗・用途キーワード ───────────────────────────────────────────────────────
 MERCHANT_MAP = [
     ("shinkansen",   ["新幹線", "のぞみ", "ひかり", "こだま", "EX予約", "EXご利用票", "みずほ", "さくら"]),
@@ -74,7 +92,7 @@ MERCHANT_MAP = [
     ("hotel",        ["ホテル", "HOTEL", "INN", "RESORT", "宿泊", "MARRIOTT", "HILTON",
                       "HYATT", "SHERATON", "WESTIN", "ANA INTERCONTINENTAL"]),
     ("airline",      ["ANA", "JAL", "DELTA", "UNITED", "ALASKA", "AMERICAN AIRLINES",
-                      "SOUTHWEST", "JETBLUE", "航空", "AIR "]),
+                      "SOUTHWEST", "JETBLUE", "航空", "AIRLINE", "AIRWAYS"]),
     ("starbucks",    ["スターバックス", "STARBUCKS"]),
     ("coffee",       ["COFFEE", "コーヒー", "CAFE", "カフェ", "ESPRESSO"]),
     ("restaurant",   ["レストラン", "RESTAURANT", "DINING", "DINER", "BISTRO",
@@ -221,11 +239,14 @@ def ocr_pdf(path: Path) -> str:
         import pypdfium2 as pdfium
         pdf = pdfium.PdfDocument(str(path))
         texts = []
-        for i in range(len(pdf)):
-            page = pdf[i]
-            bitmap = page.render(scale=2.0)
-            img = bitmap.to_pil()
-            texts.append(ocr_image_obj(img))
+        try:
+            for i in range(len(pdf)):
+                page = pdf[i]
+                bitmap = page.render(scale=2.0)
+                img = bitmap.to_pil()
+                texts.append(ocr_image_obj(img))
+        finally:
+            pdf.close()
         return "\n".join(texts)
     except ImportError:
         print(f"  ⚠️  pypdfium2 未インストール。PDFをスキップ: {path.name}", file=sys.stderr)
@@ -320,17 +341,57 @@ def detect_card(text: str) -> str | None:
     return None
 
 
+def _has_food_items(text_upper: str) -> bool:
+    """テキストに食品・飲料の商品明細キーワードが含まれるか判定"""
+    for kw in FOOD_ITEM_KEYWORDS:
+        if kw.upper() in text_upper:
+            return True
+    return False
+
+
 def extract_summary(text: str) -> str:
     tu = text.upper()
     tl = text.lower()
+    has_food = _has_food_items(tu)
 
-    # 優先度順にキーワードマッチ
+    # Phase 1: 優先度順にキーワードマッチ（全カテゴリ収集）
+    matched_categories = []
     for keyword, indicators in MERCHANT_MAP:
         for ind in indicators:
             if ind.upper() in tu or ind in text:
-                if keyword in {"starbucks", "coffee", "restaurant", "convenience", "supermarket"}:
-                    return f"meal-{keyword}"
-                return keyword
+                matched_categories.append(keyword)
+                break  # 同じカテゴリの次のインジケータは不要
+
+    # Phase 2: 商品明細による再分類
+    # 食品キーワードが見つかった場合、airline/transport/shopping より meal を優先
+    RECLASSIFY_IF_FOOD = {"airline", "transport", "shopping", "pharmacy"}
+    if has_food and matched_categories:
+        # meal系カテゴリがあればそれを優先
+        for cat in matched_categories:
+            if cat in {"starbucks", "coffee", "restaurant", "convenience", "supermarket"}:
+                return f"meal-{cat}"
+            if cat == "meal":
+                return "meal"
+        # meal系がないが food items がある → 誤分類の可能性が高い
+        if matched_categories[0] in RECLASSIFY_IF_FOOD:
+            # 店舗名をスラッグ化して meal- に付ける
+            for line in text.split("\n"):
+                line = line.strip()
+                if len(line) >= 3 and not re.match(r"^[\d\s/\-¥$¥.,*#()]+$", line):
+                    if not re.search(r"\b(total|subtotal|tax|tip|amount|authorization|approved|card|visa|amex|mastercard)\b", line, re.IGNORECASE):
+                        return f"meal-{slugify(line)}"
+            return "meal"
+
+    # Phase 3: 通常の分類（商品明細に食品なし）
+    if matched_categories:
+        keyword = matched_categories[0]
+        if keyword in {"starbucks", "coffee", "restaurant", "convenience", "supermarket"}:
+            return f"meal-{keyword}"
+        return keyword
+
+    # フォールバック: 食品キーワードがあるのにカテゴリ未マッチ → meal
+    if has_food:
+        return "meal"
 
     # フォールバック: 最初の意味のある行をスラッグ化
     for line in text.split("\n"):
@@ -713,8 +774,15 @@ def main():
         print(f"⏭️  スキップ   : {len(skipped)} 件")
     print("═" * 60)
 
-    # CSV ログ出力
-    log_path = Path(args.log) if args.log else BASE_DIR / f"{args.project}_dryrun.csv"
+    # CSV ログ出力（PJフォルダ内の csv/ に保存）
+    if args.log:
+        log_path = Path(args.log)
+    else:
+        csv_dir = output_dir / "csv"
+        csv_dir.mkdir(parents=True, exist_ok=True)
+        suffix = "dryrun" if args.dry_run else "result"
+        log_path = csv_dir / f"{args.project}_{suffix}.csv"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "w", newline="", encoding="utf-8-sig") as f_csv:
         writer = csv.writer(f_csv)
         writer.writerow(["元ファイル名", "新ファイル名", "保存先フォルダ", "カード", "備考"])
