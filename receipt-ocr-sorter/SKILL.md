@@ -1,0 +1,131 @@
+---
+name: receipt-ocr-sorter
+description: "OCR領収書自動仕分けツール。画像(JPEG/PNG)/PDF/ZIP/動画(MP4/MOV)の領収書をOCRで読み取り、日付・金額・国・カード・用途を抽出して標準ファイル名にリネーム＆プロジェクト単位で仕分ける。Markdownサマリーレポート付き。Use when: (1) 領収書の整理, (2) receipt sorting, (3) レシート仕分け, (4) 経費レシートをフォルダ整理, (5) OCRでリネーム。Surya OCR + GPU(CUDA)対応。"
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
+---
+
+# Receipt OCR Sorter
+
+OCR（Surya）を使った領収書の自動仕分け・リネーム・集計ツール。
+
+## When to Use
+
+- **領収書を仕分けて**, **レシートを整理して**, **receipt sorting**
+- フォルダ内の領収書画像をプロジェクト単位で自動整理したい
+- 大量のレシート写真に日付・金額・用途でファイル名を付けたい
+- 出張経費の領収書を一括でリネーム＆集計したい
+
+## Features
+
+| 機能 | 説明 |
+|------|------|
+| **OCR抽出** | 日付・金額・国・カード種別・店舗/用途を自動抽出 |
+| **自動リネーム** | `YYYY-MM-DD-国-金額[-カード]-用途.ext` 形式 |
+| **動画対応** | MP4/MOV → ffmpegでフレーム抽出 → OCR |
+| **品質補正** | 日付パターン拡張、金額誤読補正、上限チェック |
+| **サマリー** | PJフォルダにMarkdownレポート（合計・日付別・明細・日本語概要） |
+| **GPU対応** | CUDA PyTorch で高速処理 |
+
+## Architecture
+
+```
+入力フォルダ（未仕分け/iCloud写真 等）
+  │
+  ├─ JPEG/PNG/PDF/ZIP → OCR → 抽出 → リネーム → PJフォルダへ移動
+  ├─ MP4/MOV → ffmpeg → JPG → OCR → ...
+  │
+  └─ カード不明 or テキスト不可 → 未分類フォルダ
+                                     ↓
+                              再仕分け可能
+```
+
+## Naming Convention
+
+```
+YYYY-MM-DD-国コード-金額[-カード]-分類.ext
+
+例:
+  2026-02-09-jpn-14320-amex-shinkansen.jpeg
+  2026-02-11-us-272-amex-hotel.jpeg
+  2026-02-12-us-190.38-meal.jpeg        ← カードなし
+  2026-02-09-us-6.80-amex-meal-starbucks.jpeg
+```
+
+### 国コード
+
+| コード | 国 |
+|--------|-----|
+| jpn | 日本 |
+| us | アメリカ |
+| cn | 中国 |
+| gb | イギリス |
+| sg | シンガポール |
+| kr | 韓国 |
+| au | オーストラリア |
+| xx | 不明 |
+
+### 分類（summary）
+
+| 分類 | 日本語 | トリガーキーワード |
+|------|--------|-------------------|
+| shinkansen | 新幹線 | 新幹線, のぞみ, ひかり, EX予約 |
+| hotel | 宿泊 | ホテル, HOTEL, MARRIOTT, HILTON |
+| airline | 航空 | ANA, JAL, DELTA, UNITED |
+| transport | 交通 | TRANSIT, METRO, Suica, PASMO |
+| taxi | タクシー | TAXI, UBER, LYFT |
+| meal-starbucks | 食費（スタバ） | STARBUCKS |
+| meal-restaurant | 食費（レストラン） | RESTAURANT, DINING |
+| meal-convenience | 食費（コンビニ） | 7-ELEVEN, LAWSON, FAMILYMART |
+| meal-supermarket | 食費（スーパー） | COSTCO, WHOLE FOODS, SAFEWAY |
+| meal | 食費 | MEAL, LUNCH, DINNER |
+| seminar | セミナー | SEMINAR, CONFERENCE |
+| shopping | 買い物 | AMAZON, APPLE STORE |
+
+## CLI Usage
+
+```powershell
+# Dry-run（確認のみ、ファイル移動なし）
+python receipt_sorter.py --project "202602_TechConnect_Seattle" --dry-run
+
+# 本実行
+python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "未仕分け\iCloud写真"
+
+# ログ指定
+python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "未仕分け\iCloud写真" --log "result.csv"
+```
+
+### Options
+
+| オプション | 説明 | デフォルト |
+|------------|------|-----------|
+| `--project` | 出力PJフォルダ名（必須） | - |
+| `--input` | 入力フォルダ | `未仕分け/` |
+| `--dry-run` | ファイル移動せず結果のみ表示 | false |
+| `--log` | 結果CSVパス | `<project>_dryrun.csv` |
+
+## Markdown Summary Output
+
+本実行後、PJフォルダに `<PJ名>_summary.md` が自動生成される。
+
+含む内容:
+- プロジェクト合計（通貨混在・参考値）
+- 国コード別合計テーブル
+- 日付×国コード別合計テーブル
+- 全明細テーブル（日付・国・金額・カード・分類・日本語概要・ファイル名）
+
+## Setup
+
+→ **[references/setup-guide.md](references/setup-guide.md)**
+
+## Script Reference
+
+→ **[references/receipt_sorter.py](references/receipt_sorter.py)**
+
+## Known Limitations
+
+- OCRの精度はSuryaモデルに依存（手書きや歪みが大きい領収書は誤読あり）
+- 金額は最大候補を採用するが、複数明細のあるレシートでは個別明細は取れない
+- 動画は中間フレーム1枚のみ抽出（最適フレーム選択は未実装）
+- 日本語の漢字店名はスラッグ化時にASCII変換で落ちる（カタカナはローマ字化される）
