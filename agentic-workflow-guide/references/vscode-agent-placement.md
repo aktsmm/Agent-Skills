@@ -27,28 +27,28 @@
 
 ### 配置場所の選択肢
 
-| 場所 | 用途 |
-| --- | --- |
-| `.github/agents/` (ワークスペース) | チーム共有。そのワークスペースでのみ有効 |
-| ユーザープロファイル | 個人用。全ワークスペースで有効 |
-| `chat.agentFilesLocations` 設定 | 追加パスを指定。サブフォルダ指定にも使える |
+| 場所                               | 用途                                       |
+| ---------------------------------- | ------------------------------------------ |
+| `.github/agents/` (ワークスペース) | チーム共有。そのワークスペースでのみ有効   |
+| ユーザープロファイル               | 個人用。全ワークスペースで有効             |
+| `chat.agentFilesLocations` 設定    | 追加パスを指定。サブフォルダ指定にも使える |
 
 ### ファイル拡張子
 
-| 場所 | 拡張子 |
-| --- | --- |
+| 場所              | 拡張子                                         |
+| ----------------- | ---------------------------------------------- |
 | `.github/agents/` | `.agent.md` または `.md`（どちらも認識される） |
-| `.claude/agents/` | `.md`（Claude Code 互換） |
+| `.claude/agents/` | `.md`（Claude Code 互換）                      |
 
 ## アクセス制御（3段階）
 
 ### frontmatter プロパティ
 
-| プロパティ | デフォルト | 効果 |
-| --- | --- | --- |
-| `user-invokable` | `true` | `false` → ピッカーに非表示 |
-| `disable-model-invocation` | `false` | `true` → サブエージェントとして呼ばれない |
-| `agents` (親側) | `*` (全許可) | 特定エージェント名リスト → 許可リスト |
+| プロパティ                 | デフォルト   | 効果                                      |
+| -------------------------- | ------------ | ----------------------------------------- |
+| `user-invokable`           | `true`       | `false` → ピッカーに非表示                |
+| `disable-model-invocation` | `false`      | `true` → サブエージェントとして呼ばれない |
+| `agents` (親側)            | `*` (全許可) | 特定エージェント名リスト → 許可リスト     |
 
 > **重要**: `agents` リストに明示すると `disable-model-invocation: true` をオーバーライドできる。
 
@@ -72,11 +72,11 @@ disable-model-invocation: true
 
 ### ⚠️ Deprecated プロパティ
 
-| 旧 | 新 | 移行方法 |
-| --- | --- | --- |
-| `infer: true` | `user-invokable: true` (デフォルト) | 行を削除するか置換 |
-| `infer: false` | `user-invokable: false` | 置換 |
-| `target: vscode` | — | 削除（不要） |
+| 旧               | 新                                  | 移行方法           |
+| ---------------- | ----------------------------------- | ------------------ |
+| `infer: true`    | `user-invokable: true` (デフォルト) | 行を削除するか置換 |
+| `infer: false`   | `user-invokable: false`             | 置換               |
+| `target: vscode` | —                                   | 削除（不要）       |
 
 ## Orchestrator + Workers パターン
 
@@ -86,7 +86,7 @@ disable-model-invocation: true
 name: orchestrator
 user-invokable: true
 disable-model-invocation: true
-tools: ["codebase", "terminal", "agent"]  # "agent" が必須
+tools: ["codebase", "terminal", "agent"] # "agent" が必須
 agents:
   - coding-executor
   - quality-reviewer
@@ -103,6 +103,7 @@ tools: ["codebase", "terminal"]
 ```
 
 **ポイント:**
+
 - orchestrator に `agent` ツールを含めないとサブエージェント呼び出しが機能しない
 - `agents` リストで呼び出せるサブエージェントを制限する
 - `agents: []` で全サブエージェント利用を禁止
@@ -110,13 +111,13 @@ tools: ["codebase", "terminal"]
 
 ## トラブルシューティング
 
-| 症状 | 原因 | 対処 |
-| --- | --- | --- |
-| ピッカーに出ない | サブフォルダに配置 | `.github/agents/` 直下に移動 |
-| ピッカーに出ない | `user-invokable: false` | 意図的なら OK |
-| `runSubagent` で "not found" | 認識されていない | 直下に配置されているか確認 |
-| サブエージェントが呼ばれない | 親に `agent` ツールがない | `tools` に `"agent"` を追加 |
-| 意図しないエージェントが呼ばれる | `agents` リスト未指定 | 親側で `agents: [...]` を明示 |
+| 症状                             | 原因                      | 対処                          |
+| -------------------------------- | ------------------------- | ----------------------------- |
+| ピッカーに出ない                 | サブフォルダに配置        | `.github/agents/` 直下に移動  |
+| ピッカーに出ない                 | `user-invokable: false`   | 意図的なら OK                 |
+| `runSubagent` で "not found"     | 認識されていない          | 直下に配置されているか確認    |
+| サブエージェントが呼ばれない     | 親に `agent` ツールがない | `tools` に `"agent"` を追加   |
+| 意図しないエージェントが呼ばれる | `agents` リスト未指定     | 親側で `agents: [...]` を明示 |
 
 ## デバッグ方法
 

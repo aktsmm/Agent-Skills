@@ -12,23 +12,23 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ## Skills
 
-| Skill | Description / 説明 |
-| ----- | ------------------ |
+| Skill                                             | Description / 説明                                                         |
+| ------------------------------------------------- | -------------------------------------------------------------------------- |
 | [agentic-workflow-guide](agentic-workflow-guide/) | Design agentic workflows (5 patterns) / エージェントワークフロー設計ガイド |
-| [azure-env-builder](azure-env-builder/) | ⚠️ **Alpha** - Azure environment builder with Bicep / Azure 環境構築支援 |
-| [biz-ops-setup](biz-ops-setup/) | Business operations workspace setup / 業務管理ワークスペース構築 |
-| [book-writing-workspace](book-writing-workspace/) | Book writing workspace / 書籍執筆ワークスペース |
-| [browser-max-automation](browser-max-automation/) | Browser automation via Playwright MCP / ブラウザ自動操作 |
-| [chrome-extension-dev](chrome-extension-dev/) | Chrome extension development guide / Chrome 拡張機能開発ガイド |
-| [code-simplifier](code-simplifier/) | Simplify and refactor complex code / コード簡略化・リファクタリング |
-| [customer-workspace](customer-workspace/) | Customer workspace initialization / 顧客ワークスペース初期化 |
-| [drawio-diagram-forge](drawio-diagram-forge/) | Create draw.io diagrams from text / テキストから draw.io 図を生成 |
-| [ocr-super-surya](ocr-super-surya/) | GPU-optimized OCR using Surya (90+ languages) / GPU 最適化 OCR |
-| [powerpoint-automation](powerpoint-automation/) | Create PPTX from web articles / Web記事からPowerPoint自動生成 |
-| [receipt-ocr-sorter](receipt-ocr-sorter/) | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計 |
-| [skill-creator-plus](skill-creator-plus/) | Create and optimize Agent Skills / スキル作成・最適化 |
-| [skill-finder](skill-finder/) | Search, install, and manage Agent Skills / スキル検索・管理 |
-| [vscode-extension-guide](vscode-extension-guide/) | VS Code extension development guide / VS Code 拡張機能開発ガイド |
+| [azure-env-builder](azure-env-builder/)           | ⚠️ **Alpha** - Azure environment builder with Bicep / Azure 環境構築支援   |
+| [biz-ops-setup](biz-ops-setup/)                   | Business operations workspace setup / 業務管理ワークスペース構築           |
+| [book-writing-workspace](book-writing-workspace/) | Book writing workspace / 書籍執筆ワークスペース                            |
+| [browser-max-automation](browser-max-automation/) | Browser automation via Playwright MCP / ブラウザ自動操作                   |
+| [chrome-extension-dev](chrome-extension-dev/)     | Chrome extension development guide / Chrome 拡張機能開発ガイド             |
+| [code-simplifier](code-simplifier/)               | Simplify and refactor complex code / コード簡略化・リファクタリング        |
+| [customer-workspace](customer-workspace/)         | Customer workspace initialization / 顧客ワークスペース初期化               |
+| [drawio-diagram-forge](drawio-diagram-forge/)     | Create draw.io diagrams from text / テキストから draw.io 図を生成          |
+| [ocr-super-surya](ocr-super-surya/)               | GPU-optimized OCR using Surya (90+ languages) / GPU 最適化 OCR             |
+| [powerpoint-automation](powerpoint-automation/)   | Create PPTX from web articles / Web記事からPowerPoint自動生成              |
+| [receipt-ocr-sorter](receipt-ocr-sorter/)         | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計       |
+| [skill-creator-plus](skill-creator-plus/)         | Create and optimize Agent Skills / スキル作成・最適化                      |
+| [skill-finder](skill-finder/)                     | Search, install, and manage Agent Skills / スキル検索・管理                |
+| [vscode-extension-guide](vscode-extension-guide/) | VS Code extension development guide / VS Code 拡張機能開発ガイド           |
 
 ## Usage / 使い方
 

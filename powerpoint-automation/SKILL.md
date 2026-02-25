@@ -290,6 +290,51 @@ hlink_count = sum(
 print(f'Hyperlinks: {hlink_count}')
 ```
 
+### XML Direct Hyperlink Insertion (L16)
+
+> `run.hyperlink.address` が機能しない場合（既存 PPTX のレイアウト変更後など）、
+> XML 要素 `a:hlinkClick` を直接挿入する方が確実。
+
+```python
+from lxml import etree
+from pptx.oxml.ns import qn
+from pptx.dml.color import RGBColor
+import re
+
+url_pattern = re.compile(r'(https?://[^\s\)）」、。]+)')
+
+for slide in prs.slides:
+    for shape in slide.shapes:
+        if not shape.has_text_frame:
+            continue
+        for para in shape.text_frame.paragraphs:
+            for run in para.runs:
+                if run._r.find(qn('a:hlinkClick')) is not None:
+                    continue  # Already has link
+                urls = url_pattern.findall(run.text)
+                for url in urls:
+                    url_clean = url.rstrip('.,;:')
+                    # Add external relationship
+                    rel = slide.part.relate_to(
+                        url_clean,
+                        'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink',
+                        is_external=True)
+                    # Get or create rPr element
+                    rPr = run._r.find(qn('a:rPr'))
+                    if rPr is None:
+                        rPr = etree.SubElement(run._r, qn('a:rPr'))
+                        t_elem = run._r.find(qn('a:t'))
+                        if t_elem is not None:
+                            run._r.remove(rPr)
+                            run._r.insert(0, rPr)
+                    # Add hlinkClick
+                    hlinkClick = etree.SubElement(rPr, qn('a:hlinkClick'))
+                    hlinkClick.set(qn('r:id'), rel)
+                    # Visual styling
+                    run.font.underline = True
+                    run.font.color.rgb = RGBColor(0x00, 0x78, 0xD4)
+```
+
 ## Font Theme Token Resolution (ZIP-level)
 
 python-pptx sometimes leaves theme tokens (`+mn-ea`, `+mj-lt`) unresolved, causing font fallback. Fix via ZIP-level string replacement:
@@ -406,9 +451,128 @@ for shape in list(old_slide.shapes):
 
 | Pattern | Problem | Result |
 |---------|---------|--------|
-| `rel._target = new_layout.part` | Layout reference corrupted | PowerPoint repair dialog |
+| `rel._target = new_layout.part` **without ZIP dedup** | Duplicate ZIP entries corrupt layout | PowerPoint repair dialog |
 | `prs.part.drop_rel(rId)` for slide deletion | Orphan XML in ZIP | `Duplicate name` warning → corruption |
 | `show='0'` while indices shift | Wrong slides hidden | Content silently disappears |
+| Changing layout but keeping empty placeholders | Ghost text ("テキストを入力") visible | Unprofessional appearance |
+
+### Layout Change via `rel._target` (Safe Pattern with ZIP Dedup)
+
+> **L12**: `rel._target` 方式は ZIP dedup（LAST 優先）を併用すれば安全に動作する。
+> python-pptx の `save()` が重複エントリを生むが、後処理で解決可能。
+
+```python
+from collections import Counter
+import zipfile
+
+# 1. Change layout relationship
+blank_part = layout_parts['Blank']
+for rel in slide.part.rels.values():
+    if 'slideLayout' in rel.reltype:
+        rel._target = blank_part
+        break
+
+# 2. Save (will have duplicate ZIP entries)
+prs.save(raw_path)
+
+# 3. Dedup ZIP: keep LAST entry for duplicates (has updated rels)
+with zipfile.ZipFile(raw_path, 'r') as zin:
+    items = zin.infolist()
+    counts = Counter(i.filename for i in items)
+    dups = {n for n, c in counts.items() if c > 1}
+    last_idx = {}
+    for idx, item in enumerate(items):
+        if item.filename in dups:
+            last_idx[item.filename] = idx
+    seen = set()
+    with zipfile.ZipFile(final_path, 'w', zipfile.ZIP_DEFLATED) as zout:
+        for idx, item in enumerate(items):
+            if item.filename in dups:
+                if idx == last_idx[item.filename]:
+                    zout.writestr(item, zin.read(item.filename))
+            elif item.filename not in seen:
+                seen.add(item.filename)
+                zout.writestr(item, zin.read(item.filename))
+```
+
+> ⚠️ FIRST 優先だと変更前の rels XML が残り、レイアウト変更が反映されない。必ず **LAST 優先**。
+
+### Ghost Placeholder Elimination
+
+> **L13**: 既存 PPTX にスライドを追加する際、`Title and Content` や `Section Title` レイアウトを使うと
+> 空のプレースホルダー（「テキストを入力」「タイトルを入力」）がゴースト表示される。
+
+**解決策**: 新規スライドは `Blank` レイアウトを使い、タイトルは既存プレースホルダーに値を入れるか手動配置する。
+
+```python
+# Strategy: Fill placeholder with actual title, remove empty ones
+ns_p = '{http://schemas.openxmlformats.org/presentationml/2006/main}'
+
+for shape in slide.shapes:
+    ph_elem = shape._element.find(f'.//{ns_p}ph')
+    if ph_elem is None:
+        continue
+    ph_type = ph_elem.get('type', 'body')
+    if ph_type == 'title' and not shape.text_frame.text.strip():
+        # Fill with actual title text
+        shape.text_frame.text = slide_title
+        for run in shape.text_frame.paragraphs[0].runs:
+            run.font.size = Pt(28)
+            run.font.bold = True
+    elif not shape.text_frame.text.strip():
+        # Remove empty placeholder
+        shape._element.getparent().remove(shape._element)
+```
+
+### Consistent Title Positioning (Cross-slide Alignment)
+
+> **L14**: 新規追加スライドのタイトル位置を既存スライドと揃えるには、
+> 基準スライドの位置を計測して全スライドに適用する。
+
+```python
+# 1. Measure reference slide (e.g., slide 4)
+ref_slide = prs.slides[3]
+for shape in ref_slide.shapes:
+    ph = shape._element.find(f'.//{ns_p}ph')
+    if ph is not None and ph.get('type') == 'title':
+        REF_LEFT = shape.left      # 588263
+        REF_TOP = shape.top        # 457200
+        REF_WIDTH = shape.width    # 11018520
+        REF_HEIGHT = shape.height  # 553998
+        break
+
+# 2. Apply to all new slides
+for slide in new_slides:
+    title_ph.left = REF_LEFT
+    title_ph.top = REF_TOP
+    title_ph.width = REF_WIDTH
+    title_ph.height = REF_HEIGHT
+```
+
+### Preserving Original Layouts When Modifying Existing PPTX
+
+> **L15**: 既存 PPTX を再構成する際、オリジナルスライドのレイアウトを保持するには
+> タイトルテキストをキーにしたマッピングを作成する。
+
+```python
+# Build original layout map
+prs_orig = Presentation('original.pptx')
+orig_layouts = {}
+for slide in prs_orig.slides:
+    for shape in slide.shapes:
+        if shape.has_text_frame and shape.text_frame.text.strip():
+            title = shape.text_frame.text.replace('\n', ' ')[:50]
+            orig_layouts[title] = slide.slide_layout.name
+            break
+
+# Apply: ORIG slides keep original layout, NEW slides use Blank
+for slide in prs_edit.slides:
+    title = get_slide_title(slide)
+    if title in orig_layouts:
+        restore_layout(slide, orig_layouts[title])
+    else:
+        set_layout(slide, 'Blank')
+```
 
 ### Safe Hidden Slide Cleanup
 
