@@ -82,6 +82,7 @@ Design, review, and improve agent workflows based on proven principles.
 | Prompt Template    | [references/prompt-template.md](references/prompt-template.md)         |
 | agent              | [references/agent-guide.md](references/agent-guide.md)                 |
 | Agent Template     | [references/agent-template.md](references/agent-template.md)           |
+| **Agent Placement**| [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
 | Context Management | [references/context-engineering.md](references/context-engineering.md) |
 | **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
 | Scaffold Tool      | [references/scaffold-usage.md](references/scaffold-usage.md)           |

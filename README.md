@@ -28,7 +28,6 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [receipt-ocr-sorter](receipt-ocr-sorter/) | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計 |
 | [skill-creator-plus](skill-creator-plus/) | Create and optimize Agent Skills / スキル作成・最適化 |
 | [skill-finder](skill-finder/) | Search, install, and manage Agent Skills / スキル検索・管理 |
-| [vscode-custom-agents](vscode-custom-agents/) | VS Code custom agent design guide / カスタムエージェント設計ガイド |
 | [vscode-extension-guide](vscode-extension-guide/) | VS Code extension development guide / VS Code 拡張機能開発ガイド |
 
 ## Usage / 使い方

@@ -1,22 +1,6 @@
----
-name: vscode-custom-agents
-description: "VS Code カスタムエージェントの配置ルール・アクセス制御・マルチエージェント設計のベストプラクティス。Triggers on 'custom agent', 'agent not found', 'subagent', 'user-invokable', 'エージェント設計', 'ピッカー'."
-license: CC BY-NC-SA 4.0
-metadata:
-  author: yamapan (https://github.com/aktsmm)
-  verified: 2026-02-15
-  vscode-version: "1.106+"
----
+# VS Code Custom Agents — 配置・アクセス制御リファレンス
 
-# VS Code Custom Agents — 配置・設計・アクセス制御
-
-## When to Use
-
-| Action    | Triggers                                                                     |
-| --------- | ---------------------------------------------------------------------------- |
-| **Create** | 新しい `.agent.md` 作成、マルチエージェント構成セットアップ                  |
-| **Debug**  | "Agent not found" エラー、サブエージェント呼び出し失敗、ピッカーに表示されない |
-| **Review** | frontmatter の妥当性チェック、アクセス制御の設計レビュー                      |
+> Merged from former `vscode-custom-agents` skill (2026-02-26)
 
 ## 配置ルール（Critical）
 
@@ -37,9 +21,9 @@ metadata:
     └── quality.reviewer.md   ← 無視される
 ```
 
-> **根拠**: VS Code 公式ドキュメント (2026-02-15 時点)
+> **根拠**: VS Code 公式ドキュメント (2026-02 時点)
 > `"VS Code detects any .md files in the .github/agents folder of your workspace as custom agents."`
-> サブディレクトリの再帰スキャンについて明記なし。実証テストでも非対応を確認。
+> サブディレクトリの再帰スキャンは非対応（実証テスト済み）。
 
 ### 配置場所の選択肢
 
@@ -62,9 +46,9 @@ metadata:
 
 | プロパティ | デフォルト | 効果 |
 | --- | --- | --- |
-| `user-invokable` | `true` | `false` → ピッカー (ドロップダウン) に非表示 |
-| `disable-model-invocation` | `false` | `true` → 他エージェントからサブエージェントとして呼ばれない |
-| `agents` (親側) | `*` (全許可) | 特定エージェント名のリスト → そのサブエージェントのみ許可 |
+| `user-invokable` | `true` | `false` → ピッカーに非表示 |
+| `disable-model-invocation` | `false` | `true` → サブエージェントとして呼ばれない |
+| `agents` (親側) | `*` (全許可) | 特定エージェント名リスト → 許可リスト |
 
 > **重要**: `agents` リストに明示すると `disable-model-invocation: true` をオーバーライドできる。
 
@@ -94,9 +78,7 @@ disable-model-invocation: true
 | `infer: false` | `user-invokable: false` | 置換 |
 | `target: vscode` | — | 削除（不要） |
 
-## マルチエージェント設計パターン
-
-### Orchestrator + Workers パターン
+## Orchestrator + Workers パターン
 
 ```yaml
 # orchestrator.agent.md
@@ -108,7 +90,6 @@ tools: ["codebase", "terminal", "agent"]  # "agent" が必須
 agents:
   - coding-executor
   - quality-reviewer
-  - auditor
 ---
 ```
 
@@ -131,20 +112,14 @@ tools: ["codebase", "terminal"]
 
 | 症状 | 原因 | 対処 |
 | --- | --- | --- |
-| エージェントがピッカーに出ない | サブフォルダに配置 | `.github/agents/` 直下に移動 |
-| エージェントがピッカーに出ない | `user-invokable: false` | 意図的なら OK。変更するなら `true` に |
-| `runSubagent` で "not found" | ファイルが VS Code に認識されていない | 直下に配置されているか確認 |
+| ピッカーに出ない | サブフォルダに配置 | `.github/agents/` 直下に移動 |
+| ピッカーに出ない | `user-invokable: false` | 意図的なら OK |
+| `runSubagent` で "not found" | 認識されていない | 直下に配置されているか確認 |
 | サブエージェントが呼ばれない | 親に `agent` ツールがない | `tools` に `"agent"` を追加 |
 | 意図しないエージェントが呼ばれる | `agents` リスト未指定 | 親側で `agents: [...]` を明示 |
 
 ## デバッグ方法
 
-1. **Chat Diagnostics**: チャットビューで右クリック → Diagnostics で認識されているエージェント一覧を確認
-2. **`runSubagent` テスト**: サブエージェントを直接呼び出して応答にカスタム指示が反映されているか確認
+1. **Chat Diagnostics**: チャットビューで右クリック → Diagnostics で認識エージェント一覧を確認
+2. **`runSubagent` テスト**: サブエージェントを直接呼び出して応答確認
 3. **セッションコンテキスト確認**: `<agents>` タグに何が注入されているかで認識状態を判定
-
-## References
-
-- [Custom agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
-- [Subagents in VS Code](https://code.visualstudio.com/docs/copilot/agents/subagents)
-- [Customize AI in VS Code](https://code.visualstudio.com/docs/copilot/customization/overview)
