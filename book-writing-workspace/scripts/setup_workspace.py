@@ -23,7 +23,7 @@ from typing import List, Optional
 # Script location (for finding templates)
 SCRIPT_DIR = Path(__file__).parent
 SKILL_DIR = SCRIPT_DIR.parent
-REFERENCES_DIR = SKILL_DIR / "references"
+TEMPLATES_DIR = SKILL_DIR / "templates"
 ASSETS_DIR = SKILL_DIR / "assets"
 
 
@@ -101,7 +101,7 @@ def copy_template_files(base_path: Path, book_title: str) -> None:
     }
     
     for src, dst in templates.items():
-        src_path = REFERENCES_DIR / src
+        src_path = TEMPLATES_DIR / src
         dst_path = base_path / dst
         
         if src_path.exists():
@@ -124,7 +124,7 @@ def copy_scripts(base_path: Path) -> None:
     ]
     
     for script in scripts:
-        src_path = REFERENCES_DIR / "scripts" / script
+        src_path = TEMPLATES_DIR / "scripts" / script
         dst_path = base_path / "scripts" / script
         
         if src_path.exists():

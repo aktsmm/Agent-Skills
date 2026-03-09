@@ -1,6 +1,6 @@
 ---
 name: book-writing-workspace
-description: Set up a complete book writing workspace with AI agents, instructions, prompts, and scripts. Use when users want to create a new book/technical writing project with Markdown + Re:VIEW + PDF output workflow. Triggers on "book writing workspace", "technical book project", "執筆ワークスペース", or similar project setup requests.
+description: Set up a reusable book-writing workspace with AI agents, instructions, prompts, and scripts. Use when creating a new book or technical writing project, bootstrapping a manuscript repository, or preparing a Markdown + Re:VIEW + PDF workflow. Triggers on "book writing workspace", "technical book project", "執筆ワークスペース", "book manuscript repo", and "Re:VIEW workspace".
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -8,12 +8,13 @@ metadata:
 
 # Book Writing Workspace
 
-Set up a professional book writing workspace with AI-assisted workflow support.
+Create a reusable manuscript workspace with folders, agents, prompts, instructions, and setup scripts.
 
 ## When to use
 
-- **Book writing**, **technical writing**, **執筆プロジェクト**
+- **Book writing**, **technical writing**, **執筆プロジェクト**, **Re:VIEW**
 - Creating a new book or technical writing project
+- Bootstrapping a manuscript repository from templates
 - Setting up Markdown → Re:VIEW → PDF workflow
 
 ## Quick Start
@@ -30,16 +31,24 @@ python scripts/setup_workspace.py `
 
 1. **Gather info**: Project name, title, location, chapter count
 2. **Run script**: `scripts/setup_workspace.py`
-3. **Customize**: Edit `docs/page-allocation.md` and `.github/copilot-instructions.md`
+3. **Review output**: Confirm README, agents, prompts, and docs were created
+4. **Customize**: Edit `docs/page-allocation.md`, `docs/schedule.md`, and `.github/copilot-instructions.md`
+
+## Generated Workspace
+
+- Manuscript folders under `01_contents_keyPoints/`, `02_contents/`, and `04_images/`
+- AI workflow files under `.github/agents/`, `.github/instructions/`, and `.github/prompts/`
+- Project docs such as `README.md`, `docs/page-allocation.md`, and `docs/schedule.md`
+- Helper scripts such as `scripts/count_chars.py` and `scripts/convert_md_to_review.py`
 
 ## Agents Overview
 
-| Agent               | Role                          | Permissions           |
-| ------------------- | ----------------------------- | --------------------- |
-| `@writing`          | Write and edit manuscripts    | Edit `02_contents/`   |
-| `@writing-reviewer` | Review manuscripts (P1/P2/P3) | Read only             |
+| Agent               | Role                          | Permissions               |
+| ------------------- | ----------------------------- | ------------------------- |
+| `@writing`          | Write and edit manuscripts    | Edit `02_contents/`       |
+| `@writing-reviewer` | Review manuscripts (P1/P2/P3) | Read only                 |
 | `@converter`        | Convert Markdown to Re:VIEW   | Edit `03_re-view_output/` |
-| `@orchestrator`     | Coordinate workflow           | Delegate to agents    |
+| `@orchestrator`     | Coordinate workflow           | Delegate to agents        |
 
 ## Dependencies
 
@@ -54,12 +63,13 @@ python scripts/setup_workspace.py `
 - [ ] Workspace folder structure created
 - [ ] 4 agents deployed to `.github/agents/`
 - [ ] `docs/page-allocation.md` configured
+- [ ] `README.md` and `docs/schedule.md` customized
 - [ ] `/gc_Commit` prompt working
 
 ## Key References
 
-| Topic            | Reference                                                          |
-| ---------------- | ------------------------------------------------------------------ |
-| Folder Structure | [references/folder-structure.md](references/folder-structure.md)   |
-| Agents           | [references/AGENTS.md](references/AGENTS.md)                       |
-| Instructions     | [references/copilot-instructions.md](references/copilot-instructions.md) |
+| Topic            | Reference                                                                |
+| ---------------- | ------------------------------------------------------------------------ |
+| Folder Structure | [references/folder-structure.md](references/folder-structure.md)         |
+| Setup Workflow   | [references/setup-workflow.md](references/setup-workflow.md)             |
+| Customization    | [references/customization-points.md](references/customization-points.md) |
