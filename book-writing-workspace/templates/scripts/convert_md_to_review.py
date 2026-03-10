@@ -98,10 +98,10 @@ def convert_markdown(text: str, stem: str) -> str:
 
 def build_output_name(md_file: Path) -> str:
     stem = md_file.stem
-    match = re.match(r"\d+-(\d+)-.*?_(.*)", stem)
+    match = re.match(r"ch(\d+)-(\d+)_(.*)", stem)
     if match:
         chapter = int(match.group(1))
-        slug = slugify(match.group(2))
+        slug = slugify(match.group(3))
         return f"ch{chapter:02d}-{slug}.re"
     return f"{slugify(stem)}.re"
 

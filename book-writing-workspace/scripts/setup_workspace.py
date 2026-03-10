@@ -42,6 +42,7 @@ def create_directory_structure(
         ".github/instructions/git",
         ".github/prompts",
         "docs",
+        "docs/templates",
         "scripts",
         "output_sessions",
     ]
@@ -95,6 +96,8 @@ def copy_template_files(base_path: Path, book_title: str) -> None:
         "docs/naming-conventions.md": "docs/naming-conventions.md",
         "docs/page-allocation.md": "docs/page-allocation.md",
         "docs/schedule.md": "docs/schedule.md",
+        "docs/templates/template-chapter-intro.md": "docs/templates/template-chapter-intro.md",
+        "docs/templates/template-section.md": "docs/templates/template-section.md",
         "copilot-instructions.md": ".github/copilot-instructions.md",
         "AGENTS.md": "AGENTS.md",
         "README.md": "README.md",
@@ -105,6 +108,7 @@ def copy_template_files(base_path: Path, book_title: str) -> None:
         dst_path = base_path / dst
         
         if src_path.exists():
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
             # Read, customize, and write
             content = src_path.read_text(encoding="utf-8")
             content = content.replace("{{BOOK_TITLE}}", book_title)
@@ -155,7 +159,6 @@ def copy_assets(base_path: Path) -> None:
 def create_chapter_intro_files(
     base_path: Path,
     chapters: List[str],
-    prefix: str = "01"
 ) -> None:
     """Create initial chapter introduction files."""
     
@@ -163,7 +166,7 @@ def create_chapter_intro_files(
         chapter_folder = f"{i}. {chapter}"
         
         # Create intro file in keypoints
-        keypoints_file = base_path / f"01_contents_keyPoints/{chapter_folder}/{prefix}-{i}-0-00_{chapter}.md"
+        keypoints_file = base_path / f"01_contents_keyPoints/{chapter_folder}/ch{i}-00_{chapter}.md"
         keypoints_content = f"""# {chapter}
 
 ## Overview
@@ -184,7 +187,7 @@ def create_chapter_intro_files(
         keypoints_file.write_text(keypoints_content, encoding="utf-8")
         
         # Create intro file in contents
-        contents_file = base_path / f"02_contents/{chapter_folder}/{prefix}-{i}-0-00_{chapter}.md"
+        contents_file = base_path / f"02_contents/{chapter_folder}/ch{i}-00_{chapter}.md"
         contents_content = f"""# {chapter}
 
 (Write the introduction paragraph here)

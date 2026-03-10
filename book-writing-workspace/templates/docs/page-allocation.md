@@ -4,11 +4,13 @@ Target word counts for each file type and chapter.
 
 ## File Type Targets
 
-| File Type                     | Target (chars) | Range       | Notes          |
-| ----------------------------- | -------------- | ----------- | -------------- |
-| Chapter intro (`*-0-00_*.md`) | 300-500        | 200-700     | Brief overview |
-| Main section                  | 3,000-5,000    | 2,000-6,000 | Core content   |
-| Column/sidebar                | 2,000-3,000    | 1,500-3,500 | Supplementary  |
+**1 file = 1 section**
+
+| File Type                | Target (chars) | Range       | Notes                  |
+| ------------------------ | -------------- | ----------- | ---------------------- |
+| Chapter intro (`ch*-00`) | 300-500        | 200-700     | Chapter overview       |
+| Section (`ch*-01~`)      | 3,000-5,000    | 2,000-6,000 | Core section content   |
+| Column/sidebar           | 2,000-3,000    | 1,500-3,500 | Supplementary material |
 
 ## Chapter Targets
 

@@ -10,7 +10,7 @@ Rules for Markdown heading levels in manuscripts.
 
 | File Type                     | Allowed Levels      | Start With |
 | ----------------------------- | ------------------- | ---------- |
-| Chapter intro (`*-0-00_*.md`) | `#`, `##`, `###`    | `#`        |
+| Chapter intro (`ch*-00_*.md`) | `#`, `##`, `###`    | `#`        |
 | Section file                  | `##`, `###`, `####` | `##`       |
 | Column/sidebar                | `##`, `###`         | `##`       |
 

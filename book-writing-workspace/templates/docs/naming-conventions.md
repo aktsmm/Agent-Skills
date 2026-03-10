@@ -7,18 +7,40 @@ Naming rules for files and folders in the book project.
 ### Pattern
 
 ```text
-{prefix}-{chapter}-{section}-{number}_{title}.md
+ch{chapter}-{number}_{title}.md
 ```
 
 ### Components
 
-| Component   | Description                       | Example          |
-| ----------- | --------------------------------- | ---------------- |
-| `{prefix}`  | Fixed prefix (01 for manuscripts) | `01-`            |
-| `{chapter}` | Chapter number (0-9)              | `1`, `5`         |
-| `{section}` | Section letter (a-z, 0 for intro) | `a`, `0`         |
-| `{number}`  | Sequence (00-99)                  | `00`, `01`, `10` |
-| `{title}`   | Section title                     | `Introduction`   |
+| Component   | Description              | Example                |
+| ----------- | ------------------------ | ---------------------- |
+| `{chapter}` | Chapter number (0-9)     | `0`, `1`, `5`          |
+| `{number}`  | Sequence (00-99)         | `00`, `01`, `10`       |
+| `{title}`   | Section title (Japanese) | `日常業務を爆速化する` |
+
+### Examples
+
+| Filename                              | Usage         |
+| ------------------------------------- | ------------- |
+| `ch0-00_Copilotで何が変わったのか.md` | Chapter 0     |
+| `ch1-00_事例ギャラリー.md`            | Chapter 1     |
+| `ch2-01_Excelタスク自動化.md`         | Chapter 2, #1 |
+| `ch2-02_メール作成支援.md`            | Chapter 2, #2 |
+
+## File Division Strategy
+
+### Basic Principle
+
+**1 file = 1 section**
+
+### File Structure
+
+Each chapter consists of:
+
+- `ch{N}-00` = Chapter introduction (300-500 chars)
+- `ch{N}-01` = Section 1 (2,000-6,000 chars)
+- `ch{N}-02` = Section 2 (2,000-6,000 chars)
+- `ch{N}-03` = Section 3 (2,000-6,000 chars)
 
 ## Image Files
 

@@ -33,7 +33,7 @@ def clean_markdown(text: str) -> str:
 def get_file_type(filename: str) -> tuple[str, str]:
     if "Column" in filename or "コラム" in filename:
         return "Column", "2,000-3,000"
-    if re.match(r"^\d+-\d+-0-00", filename):
+    if re.match(r"^ch\d+-00_", filename):
         return "Intro", "300-500"
     return "Main", "3,000-5,000"
 

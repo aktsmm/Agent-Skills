@@ -33,12 +33,20 @@ docs/                   # Documentation
 scripts/                # Utility scripts
 ```
 
+## Templates
+
+| Template                                             | Usage                  |
+| ---------------------------------------------------- | ---------------------- |
+| [template-chapter-intro.md](templates/template-chapter-intro.md) | `ch*-00` chapter intro |
+| [template-section.md](templates/template-section.md) | `ch*-01~` section file |
+
 ## Reference Documents
 
 | File                                                                                                 | Content           |
 | ---------------------------------------------------------------------------------------------------- | ----------------- |
 | [writing.instructions.md](../.github/instructions/writing/writing.instructions.md)                   | Style rules       |
 | [writing-notation.instructions.md](../.github/instructions/writing/writing-notation.instructions.md) | Notation rules    |
+| [writing-heading.instructions.md](../.github/instructions/writing/writing-heading.instructions.md)   | Heading levels    |
 | [naming-conventions.md](naming-conventions.md)                                                       | File naming       |
 | [page-allocation.md](page-allocation.md)                                                             | Word counts       |
 | [AGENTS.md](../AGENTS.md)                                                                            | Agent definitions |

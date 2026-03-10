@@ -41,6 +41,26 @@ python scripts/setup_workspace.py `
 - Project docs such as `README.md`, `docs/page-allocation.md`, and `docs/schedule.md`
 - Helper scripts such as `scripts/count_chars.py` and `scripts/convert_md_to_review.py`
 
+## Recommended Writing Unit
+
+- Use **1 file = 1 section** as the default manuscript unit.
+- Keep chapter intro in `ch{N}-00_<title>.md` and section files in `ch{N}-01_...`, `ch{N}-02_...`.
+- For PDF/Re:VIEW output, heading levels define hierarchy, while file split mainly improves authoring and review workflow.
+
+## Migration Checklist (Path / Naming Changes)
+
+When reorganizing workspace paths or file naming rules, update these together:
+
+1. Docs: `docs/naming-conventions.md`, `docs/page-allocation.md`, `docs/writing-guide.md`
+2. Instructions: `templates/instructions/writing-*.instructions.md` (`applyTo` and examples)
+3. Scripts: `templates/scripts/count_chars.py`, `templates/scripts/convert_md_to_review.py`
+4. Agent docs: `templates/agents/*.agent.md` if paths are explicitly written
+
+Then verify with:
+
+- `python scripts/count_chars.py`
+- `python scripts/convert_md_to_review.py`
+
 ## Agents Overview
 
 | Agent               | Role                          | Permissions               |
