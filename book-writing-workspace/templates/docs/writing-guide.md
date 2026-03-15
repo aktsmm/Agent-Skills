@@ -35,10 +35,10 @@ scripts/                # Utility scripts
 
 ## Templates
 
-| Template                                             | Usage                  |
-| ---------------------------------------------------- | ---------------------- |
+| Template                                                         | Usage                  |
+| ---------------------------------------------------------------- | ---------------------- |
 | [template-chapter-intro.md](templates/template-chapter-intro.md) | `ch*-00` chapter intro |
-| [template-section.md](templates/template-section.md) | `ch*-01~` section file |
+| [template-section.md](templates/template-section.md)             | `ch*-01~` section file |
 
 ## Reference Documents
 

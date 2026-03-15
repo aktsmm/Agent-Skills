@@ -367,7 +367,7 @@ Return as:
 **Limitations:**
 
 - Custom agent must NOT have `disable-model-invocation: true` (default: `false`)
-  - ℹ️ `infer:` は deprecated。`user-invokable` / `disable-model-invocation` を使用すること
+  - ℹ️ `infer:` は deprecated。`user-invocable` / `disable-model-invocation` を使用すること
 - Sub-agent cannot access main session context
 - Parallel execution available (2026/01+) but with overhead
 

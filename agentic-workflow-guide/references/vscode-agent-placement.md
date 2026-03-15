@@ -46,7 +46,7 @@
 
 | プロパティ                 | デフォルト   | 効果                                      |
 | -------------------------- | ------------ | ----------------------------------------- |
-| `user-invokable`           | `true`       | `false` → ピッカーに非表示                |
+| `user-invocable`           | `true`       | `false` → ピッカーに非表示                |
 | `disable-model-invocation` | `false`      | `true` → サブエージェントとして呼ばれない |
 | `agents` (親側)            | `*` (全許可) | 特定エージェント名リスト → 許可リスト     |
 
@@ -56,16 +56,16 @@
 
 ```yaml
 # 1. ユーザーが直接呼ぶ + サブエージェントとしても呼ばれる（デフォルト）
-user-invokable: true    # (省略可)
+user-invocable: true    # (省略可)
 
 # 2. サブエージェント専用（ピッカー非表示）
-user-invokable: false
+user-invocable: false
 
 # 3. ユーザー専用（他エージェントから呼ばれない）
 disable-model-invocation: true
 
 # 4. 特定の親からのみ呼ばれるサブエージェント
-user-invokable: false
+user-invocable: false
 disable-model-invocation: true
 # → 親側の agents リストに明示して呼ぶ
 ```
@@ -74,8 +74,8 @@ disable-model-invocation: true
 
 | 旧               | 新                                  | 移行方法           |
 | ---------------- | ----------------------------------- | ------------------ |
-| `infer: true`    | `user-invokable: true` (デフォルト) | 行を削除するか置換 |
-| `infer: false`   | `user-invokable: false`             | 置換               |
+| `infer: true`    | `user-invocable: true` (デフォルト) | 行を削除するか置換 |
+| `infer: false`   | `user-invocable: false`             | 置換               |
 | `target: vscode` | —                                   | 削除（不要）       |
 
 ## Orchestrator + Workers パターン
@@ -84,7 +84,7 @@ disable-model-invocation: true
 # orchestrator.agent.md
 ---
 name: orchestrator
-user-invokable: true
+user-invocable: true
 disable-model-invocation: true
 tools: ["codebase", "terminal", "agent"] # "agent" が必須
 agents:
@@ -97,7 +97,7 @@ agents:
 # coding.executor.md
 ---
 name: coding-executor
-user-invokable: false
+user-invocable: false
 tools: ["codebase", "terminal"]
 ---
 ```
@@ -114,7 +114,7 @@ tools: ["codebase", "terminal"]
 | 症状                             | 原因                      | 対処                          |
 | -------------------------------- | ------------------------- | ----------------------------- |
 | ピッカーに出ない                 | サブフォルダに配置        | `.github/agents/` 直下に移動  |
-| ピッカーに出ない                 | `user-invokable: false`   | 意図的なら OK                 |
+| ピッカーに出ない                 | `user-invocable: false`   | 意図的なら OK                 |
 | `runSubagent` で "not found"     | 認識されていない          | 直下に配置されているか確認    |
 | サブエージェントが呼ばれない     | 親に `agent` ツールがない | `tools` に `"agent"` を追加   |
 | 意図しないエージェントが呼ばれる | `agents` リスト未指定     | 親側で `agents: [...]` を明示 |
