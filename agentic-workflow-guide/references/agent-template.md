@@ -54,11 +54,13 @@ name: <agent-name> # Required: Identifier for @mention
 description: <description> # Required: One-line role description
 model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
-handoffs: [...] # Optional: Agent transitions
+handoffs: [...] # Optional: Agent transitions (must be objects with label/agent/prompt/send)
 user-invocable: true # Optional: Show in agents dropdown (default: true)
 disable-model-invocation: false # Optional: Prevent subagent invocation (default: false)
 ---
 ````
+
+`handoffs` は文字列配列ではなく、`label`・`agent`・`prompt`・`send` を持つオブジェクト配列で定義する。
 
 ### ⚠️ 非標準フィールド禁止（バリデーションエラーの原因）
 
