@@ -93,3 +93,4 @@ Then verify with:
 | Folder Structure | [references/folder-structure.md](references/folder-structure.md)         |
 | Setup Workflow   | [references/setup-workflow.md](references/setup-workflow.md)             |
 | Customization    | [references/customization-points.md](references/customization-points.md) |
+| Re:VIEW PDF Tips | [references/review-pdf-tips.md](references/review-pdf-tips.md)           |
