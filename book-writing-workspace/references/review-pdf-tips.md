@@ -7,20 +7,16 @@ Practical tips for customizing PDF output with Re:VIEW 5.x and the `vvakame/revi
 Add `jafont=<preset>` to `texdocumentclass` options in `config.yml`:
 
 ```yaml
-texdocumentclass:
-  [
-    "review-jsbook",
-    "media=ebook,paper=b5,...,jafont=noto-otf",
-  ]
+texdocumentclass: ["review-jsbook", "media=ebook,paper=b5,...,jafont=noto-otf"]
 ```
 
 ### Available Presets (vvakame/review:5.9)
 
-| Preset      | Mincho (Body)            | Gothic (Headings)        | Notes                          |
-| ----------- | ------------------------ | ------------------------ | ------------------------------ |
-| (default)   | IPAex Mincho             | IPAex Gothic             | Classic, slightly dated        |
-| `haranoaji` | Harano Aji Mincho        | Harano Aji Gothic        | TeX Live default, sharp        |
-| `noto-otf`  | Noto Serif CJK JP        | Noto Sans CJK JP         | Google/Adobe, rich weights     |
+| Preset      | Mincho (Body)     | Gothic (Headings) | Notes                      |
+| ----------- | ----------------- | ----------------- | -------------------------- |
+| (default)   | IPAex Mincho      | IPAex Gothic      | Classic, slightly dated    |
+| `haranoaji` | Harano Aji Mincho | Harano Aji Gothic | TeX Live default, sharp    |
+| `noto-otf`  | Noto Serif CJK JP | Noto Sans CJK JP  | Google/Adobe, rich weights |
 
 > `noto-otf` provides ExtraLight through Black weights and is pre-installed in the Docker image.
 
@@ -44,11 +40,11 @@ Redefine `\review@tocdepth` itself in `review-style.sty`:
 
 ### Depth Values
 
-| Value | Shows in TOC               | Markdown equivalent |
-| ----- | -------------------------- | ------------------- |
-| 0     | Chapter (`#`) only         | `#`                 |
-| 1     | + Section (`##`)           | `#`, `##`           |
-| 2     | + Subsection (`###`)       | `#`, `##`, `###`    |
+| Value | Shows in TOC         | Markdown equivalent |
+| ----- | -------------------- | ------------------- |
+| 0     | Chapter (`#`) only   | `#`                 |
+| 1     | + Section (`##`)     | `#`, `##`           |
+| 2     | + Subsection (`###`) | `#`, `##`, `###`    |
 
 ### Build Script Integration
 
@@ -86,3 +82,88 @@ Custom headers and footers can be injected into `review-style.sty` using `fancyh
 - Check `sty/review-style.sty` inside the build directory to verify injected settings
 - Use `grep -rn 'tocdepth' sty/ *.tex` to trace where values are set
 - Use `pdftotext output.pdf -` to verify TOC content without opening a viewer
+
+## Font Size Tuning
+
+Changing font size requires adjusting multiple parameters together.
+Add all values to `texdocumentclass` in `config.yml`:
+
+| Setting          | 10pt (default) | 9pt (compact) |
+| ---------------- | -------------- | ------------- |
+| `fontsize`       | 10pt           | 9pt           |
+| `baselineskip`   | 15.4pt         | 13.5pt        |
+| `line_length`    | 40zw           | 43zw          |
+| `number_of_lines`| 35             | 38            |
+| Chars/page (est.)| ~585           | ~740          |
+
+Example (9pt):
+
+```yaml
+texdocumentclass:
+  ["review-jsbook",
+   "media=ebook,paper=b5,serial_pagination=true,openright,fontsize=9pt,baselineskip=13.5pt,line_length=43zw,number_of_lines=38,head_space=30mm,headsep=10mm,headheight=5mm,footskip=10mm,jafont=noto-otf"]
+```
+
+## Chapter Opening on Right Page
+
+Use `openright` instead of `openany` in `texdocumentclass` options.
+This ensures every `#` (chapter) starts on an odd (right-side) page.
+If the previous chapter ends on an odd page, a blank even page is inserted automatically.
+
+## Chapter Title Page (Full Page)
+
+Override `\@makechapterhead` in `review-custom.sty` to make the chapter title
+occupy a full page with centered layout and decorative rules:
+
+```latex
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+  \vspace*{3cm}%
+  \begin{center}%
+    {\Large\headfont \@chapapp\thechapter\@chappos}%
+    \par\vskip 12pt%
+    {\rule{0.6\textwidth}{0.5pt}}%
+    \par\vskip 16pt%
+    {\Huge\headfont #1}%
+    \par\vskip 12pt%
+    {\rule{0.6\textwidth}{0.5pt}}%
+  \end{center}%
+  \clearpage%
+}
+\makeatother
+```
+
+The `\clearpage` at the end forces the first `##` (section) to start on the next page.
+
+> **Pitfall**: Do not use `\renewcommand{\reviewchapterhead}` — this macro does not exist
+> in Re:VIEW 5.x. Use `\@makechapterhead` (standard jsbook) instead.
+> Also avoid `\\` (line break) in `\@makechapterhead`; use `\par\vskip` for spacing.
+
+## Code Block Auto-Wrapping with review-ext.rb
+
+Long code lines that exceed the page width can be automatically wrapped at build time
+using a `review-ext.rb` extension with the `unicode-display_width` gem.
+
+### Setup
+
+1. Place `review-ext.rb` in the Re:VIEW project root (same directory as `config.yml`)
+2. Install the gem at build time:
+
+```bash
+gem install unicode-display_width --no-document
+```
+
+3. Adjust `WRAP_WIDTH` constants for your font size and line length:
+
+| Font Size | line_length | Recommended WRAP_WIDTH |
+| --------- | ----------- | ---------------------- |
+| 10pt      | 40zw        | 76                     |
+| 9pt       | 43zw        | 82                     |
+
+### How It Works
+
+The extension overrides `code_line` and `code_line_num` in `LATEXBuilder`.
+When a line exceeds `WRAP_WIDTH` display columns, it is split and joined
+with a continuation marker (e.g. `↵`).
+
+See `templates/review-ext.rb` for a ready-to-use template.
