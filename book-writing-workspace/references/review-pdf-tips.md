@@ -88,20 +88,22 @@ Custom headers and footers can be injected into `review-style.sty` using `fancyh
 Changing font size requires adjusting multiple parameters together.
 Add all values to `texdocumentclass` in `config.yml`:
 
-| Setting          | 10pt (default) | 9pt (compact) |
-| ---------------- | -------------- | ------------- |
-| `fontsize`       | 10pt           | 9pt           |
-| `baselineskip`   | 15.4pt         | 13.5pt        |
-| `line_length`    | 40zw           | 43zw          |
-| `number_of_lines`| 35             | 38            |
-| Chars/page (est.)| ~585           | ~740          |
+| Setting           | 10pt (default) | 9pt (compact) |
+| ----------------- | -------------- | ------------- |
+| `fontsize`        | 10pt           | 9pt           |
+| `baselineskip`    | 15.4pt         | 13.5pt        |
+| `line_length`     | 40zw           | 43zw          |
+| `number_of_lines` | 35             | 38            |
+| Chars/page (est.) | ~585           | ~740          |
 
 Example (9pt):
 
 ```yaml
 texdocumentclass:
-  ["review-jsbook",
-   "media=ebook,paper=b5,serial_pagination=true,openright,fontsize=9pt,baselineskip=13.5pt,line_length=43zw,number_of_lines=38,head_space=30mm,headsep=10mm,headheight=5mm,footskip=10mm,jafont=noto-otf"]
+  [
+    "review-jsbook",
+    "media=ebook,paper=b5,serial_pagination=true,openright,fontsize=9pt,baselineskip=13.5pt,line_length=43zw,number_of_lines=38,head_space=30mm,headsep=10mm,headheight=5mm,footskip=10mm,jafont=noto-otf",
+  ]
 ```
 
 ## Chapter Opening on Right Page
@@ -167,3 +169,32 @@ When a line exceeds `WRAP_WIDTH` display columns, it is split and joined
 with a continuation marker (e.g. `↵`).
 
 See `templates/review-ext.rb` for a ready-to-use template.
+
+## Markdown Backslash Escapes in PDF Output
+
+### Problem
+
+Markdown allows backslash escapes such as `\_`, `\*`, `` \` ``, `\\` to prevent
+special characters from being interpreted as formatting. When converting Markdown
+to Re:VIEW (`.re`), these escapes may pass through literally, producing visible
+backslashes in the PDF output (e.g. `yuyanz\_` instead of `yuyanz_`).
+
+### Solution
+
+Add an unescape step in the Markdown-to-Re:VIEW conversion script's inline
+processing, **after** protecting code spans but **before** applying bold/italic
+transformations:
+
+```python
+# Unescape Markdown backslash escapes (e.g. \_ -> _)
+text = re.sub(r"\\([_*`\\])", r"\1", text)
+```
+
+This must run before bold/italic regex matching so that `\_` is reduced to `_`
+before the `*...*` patterns are evaluated.
+
+### Affected Elements
+
+- Headings (`## Yuya（yuyanz\_）` → shows backslash in section title)
+- Body text (e.g. `file\_name` → shows backslash in prose)
+- Any inline context processed by `replace_inline()`

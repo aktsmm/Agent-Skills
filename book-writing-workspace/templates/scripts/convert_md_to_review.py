@@ -32,6 +32,8 @@ def slugify(value: str) -> str:
 
 def replace_inline(text: str) -> str:
     text = re.sub(r"`([^`]+)`", r"@<code>{\1}", text)
+    # Unescape Markdown backslash escapes (e.g. \_ -> _)
+    text = re.sub(r"\\([_*`\\])", r"\1", text)
     text = re.sub(r"\*\*([^*]+)\*\*", r"@<b>{\1}", text)
     text = re.sub(r"\*([^*]+)\*", r"@<i>{\1}", text)
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"@<href>{\2, \1}", text)
