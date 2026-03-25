@@ -219,6 +219,46 @@ as layout metadata, not as visible caption text.
 - Use the Markdown image title only for layout metadata such as `scale=0.80`
 - If no caption is provided, let the converter fall back to the file stem or another deterministic rule
 
+## Markdown Tables Need `//tsize` for PDF Wrapping
+
+### Problem
+
+When Markdown pipe tables are converted to plain Re:VIEW `//table{}` blocks without a matching
+`//tsize`, LaTeX PDF output often falls back to fixed-width-free columns such as `|l|l|l|`.
+In that mode, long Japanese prose inside cells does not wrap correctly and can run past the page edge.
+
+This tends to surface in tables where the last column contains explanatory sentences, for example:
+
+- tool comparison tables
+- role / usage / notes matrices
+- long scenario descriptions in 3-column tables
+
+### Solution
+
+Emit a LaTeX-specific `//tsize` immediately before the generated `//table{}` block:
+
+```review
+//tsize[|latex||L{27mm}|L{36mm}|L{63mm}|]
+//table{
+項目	説明	利用シーン
+------------------------------------------------------------
+...
+//}
+```
+
+### Practical Rule
+
+- Use `L{...mm}` columns for any table column that may need wrapping
+- Reserve the widest column for prose-heavy cells, usually the last column
+- Generate widths automatically in the Markdown-to-Re:VIEW converter when possible
+- Keep the total width aligned to the actual PDF text area used by the project
+
+### Why This Matters
+
+Even if the manuscript source looks fine in Markdown, the PDF builder only wraps table cells when
+the LaTeX column spec supports wrapping. If a project relies on auto-generated Re:VIEW, table layout
+must be handled in the converter, not left to authors to patch by hand after every build.
+
 ### Recommended Pattern
 
 ```markdown
