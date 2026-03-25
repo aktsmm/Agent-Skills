@@ -198,3 +198,44 @@ before the `*...*` patterns are evaluated.
 - Headings (`## Yuya（yuyanz\_）` → shows backslash in section title)
 - Body text (e.g. `file\_name` → shows backslash in prose)
 - Any inline context processed by `replace_inline()`
+
+## Markdown Image Caption vs Layout Metadata
+
+### Problem
+
+When Markdown images are converted to Re:VIEW, the image alt text and optional title
+often get mixed together. If authors put manual figure numbering such as `Image: ...`
+or `図 01` into alt text, the final PDF can end up with duplicated numbering because
+Re:VIEW already manages figure numbering.
+
+Another common issue is using the title field as if it were a second caption.
+For example, `![Caption](images/foo.png "scale=0.80")` should treat `scale=0.80`
+as layout metadata, not as visible caption text.
+
+### Recommended Rule
+
+- Use alt text for the visible caption only
+- Do not put manual numbering such as `図 01`, `Figure 1`, or `Image:` into alt text
+- Use the Markdown image title only for layout metadata such as `scale=0.80`
+- If no caption is provided, let the converter fall back to the file stem or another deterministic rule
+
+### Recommended Pattern
+
+```markdown
+![Agent モードの選択](images/docmng_img02.png "scale=0.80")
+```
+
+This should become a Re:VIEW image block where:
+
+- caption = `Agent モードの選択`
+- metric = `scale=0.80`
+
+### Anti-Patterns
+
+```markdown
+![Image: Agent モードの選択](images/docmng_img02.png)
+![図 01. Agent モードの選択](images/docmng_img02.png)
+![Agent モードの選択](images/docmng_img02.png "図 01")
+```
+
+These patterns make later conversion and numbering brittle.
