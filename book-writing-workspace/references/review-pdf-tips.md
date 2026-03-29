@@ -345,3 +345,83 @@ This should become a Re:VIEW image block where:
 ```
 
 These patterns make later conversion and numbering brittle.
+
+## Chapter Illustration on Blank Pages
+
+When using `openright`, a blank even page is inserted before each chapter that
+starts on an odd page. This blank page can be used to display an illustration
+by overriding `\cleardoublepage` in `review-custom.sty`.
+
+### Implementation
+
+```latex
+\makeatletter
+% Track mainmatter state — illustration only in mainmatter
+\newif\ifreview@inmainmatter
+\review@inmainmatterfalse
+\g@addto@macro\reviewmainmatterhook{%
+  \review@inmainmattertrue
+}
+
+\let\review@origcleardoublepage\cleardoublepage
+\renewcommand{\cleardoublepage}{%
+  \clearpage
+  \if@twoside
+    \ifodd\c@page\else
+      \thispagestyle{empty}%
+      \ifreview@inmainmatter
+        \edef\review@nextch{\the\numexpr\value{chapter}+1\relax}%
+        \ifnum\review@nextch>0
+          \ifnum\review@nextch<8  % adjust upper bound to your chapter count
+            \null\vfill
+            \begin{center}%
+              \includegraphics[width=0.65\textwidth,height=0.65\textheight,keepaspectratio]{images/chapter-illustrations/ch\review@nextch}%
+            \end{center}%
+            \vfill
+          \fi
+        \fi
+      \fi
+      \newpage
+      \if@twocolumn\hbox{}\newpage\fi
+    \fi
+  \fi
+}
+\makeatother
+```
+
+### File Naming
+
+Place images as `images/chapter-illustrations/ch1.png`, `ch2.png`, etc.
+Do **not** zero-pad (`ch01.png`) because `\thechapter` outputs `1`, not `01`.
+
+### Build Prerequisites
+
+Run `extractbb` on all illustration PNGs **before** `review-pdfmaker`:
+
+```bash
+cd /work && for f in images/chapter-illustrations/*.png; do extractbb "$f"; done
+```
+
+This generates `.xbb` bounding box files that `dvipdfmx` needs.
+
+## Image Handling Pitfalls (dvipdfmx)
+
+### `\IfFileExists` Does Not Find Image Files
+
+In dvipdfmx environments, `\IfFileExists{images/foo.png}` always returns false
+because `.png` is not in the `kpsewhich` search path. Use `\ifnum` conditions
+on chapter numbers or `\openin` file-read tests instead.
+
+### extractbb Paranoid Mode in Docker
+
+TeX Live's default `openout_any = p` (paranoid) blocks writes to absolute paths.
+`extractbb /work/images/foo.png` fails with `openout_any = p` error.
+Always use relative paths: `cd /work && extractbb images/foo.png`.
+
+### `\cleardoublepage` Fires in Frontmatter
+
+The `\cleardoublepage` hook runs for all page transitions, including
+title page → TOC. Without a mainmatter guard, images meant for ch1 can
+appear on the blank page after the title page (where `chapter` counter = 0,
+so `nextch` = 1). Always gate illustration insertion with a `\ifreview@inmainmatter`
+flag set in `\reviewmainmatterhook`.
