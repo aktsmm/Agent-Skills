@@ -196,19 +196,19 @@ visible list caption. This looks like converter noise in the final PDF.
 
 Example:
 
-~~~markdown
+````markdown
 ```json API response example
 { "ok": true }
 ```
-~~~
+````
 
 should produce a visible caption, while:
 
-~~~markdown
+````markdown
 ```json
 { "ok": true }
 ```
-~~~
+````
 
 should not show `json` as the caption.
 
