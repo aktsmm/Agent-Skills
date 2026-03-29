@@ -120,6 +120,50 @@ def estimate_review_tsize(table_rows: list[list[str]]) -> str | None:
     return "|" + "|".join(f"L{{{width}mm}}" for width in widths) + "|"
 
 
+def ensure_blank_line_before_list(output: list[str]) -> None:
+    if not output:
+        return
+    if output[-1] == "":
+        return
+    if re.match(r"^\s+(?:\*+|\d+\.)\s+", output[-1]):
+        return
+    output.append("")
+
+
+def fence_caption_from_info(fence_info: str) -> tuple[str, str | None]:
+    code_lang = "text"
+    code_caption = None
+    if fence_info:
+        fence_parts = fence_info.split(maxsplit=1)
+        code_lang = fence_parts[0]
+        if len(fence_parts) > 1:
+            code_caption = fence_parts[1].strip()
+    return code_lang, code_caption
+
+
+def consume_list_continuation(lines: list[str], index: int) -> tuple[list[str], int]:
+    items: list[str] = []
+    current_index = index
+
+    while current_index < len(lines):
+        raw_line = lines[current_index]
+        line = raw_line.rstrip()
+        if not line.strip():
+            break
+        if re.match(r"^\s{2,}\S", raw_line) or raw_line.startswith("\t"):
+            items.append(line.strip())
+            current_index += 1
+            continue
+        break
+
+    return items, current_index
+
+
+def is_link_only_line(text: str) -> bool:
+    stripped = text.strip()
+    return bool(re.fullmatch(r"\[[^\]]+\]\([^\)]+\)", stripped))
+
+
 def convert_markdown(text: str, stem: str) -> str:
     output: list[str] = []
     in_code_block = False
@@ -135,8 +179,12 @@ def convert_markdown(text: str, stem: str) -> str:
         fence = re.match(r"^```(.*)$", line)
         if fence:
             if not in_code_block:
-                code_lang = fence.group(1).strip() or "text"
-                output.append(f"//listnum[{stem}-{code_id}][{code_lang}]{{")
+                fence_info = fence.group(1).strip()
+                code_lang, code_caption = fence_caption_from_info(fence_info)
+                if code_caption:
+                    output.append(f"//listnum[{stem}-{code_id}][{code_caption}]{{")
+                else:
+                    output.append(f"//listnum[{stem}-{code_id}][]{{")
                 code_id += 1
                 in_code_block = True
             else:
@@ -188,14 +236,26 @@ def convert_markdown(text: str, stem: str) -> str:
 
         unordered = re.match(r"^\s*[-*+]\s+(.*)$", line)
         if unordered:
+            ensure_blank_line_before_list(output)
+            continuation_lines, next_index = consume_list_continuation(lines, index + 1)
             output.append(f" * {replace_inline(unordered.group(1))}")
-            index += 1
+            for continuation_line in continuation_lines:
+                if is_link_only_line(continuation_line):
+                    output.append("   @<br>{}")
+                output.append(f"   {replace_inline(continuation_line)}")
+            index = next_index
             continue
 
         ordered = re.match(r"^\s*\d+\.\s+(.*)$", line)
         if ordered:
+            ensure_blank_line_before_list(output)
+            continuation_lines, next_index = consume_list_continuation(lines, index + 1)
             output.append(f" 1. {replace_inline(ordered.group(1))}")
-            index += 1
+            for continuation_line in continuation_lines:
+                if is_link_only_line(continuation_line):
+                    output.append("    @<br>{}")
+                output.append(f"    {replace_inline(continuation_line)}")
+            index = next_index
             continue
 
         output.append(replace_inline(line))

@@ -165,10 +165,76 @@ gem install unicode-display_width --no-document
 ### How It Works
 
 The extension overrides `code_line` and `code_line_num` in `LATEXBuilder`.
-When a line exceeds `WRAP_WIDTH` display columns, it is split and joined
-with a continuation marker (e.g. `↵`).
+When a line exceeds `WRAP_WIDTH` display columns, it should split at spaces
+or delimiters such as `/`, `-`, `_`, `.`, `:` when possible, and only fall back
+to character-level wrapping when no safe break point exists.
+
+Do not inject visible continuation markers such as `↵` into the PDF output.
+They tend to look like mojibake or converter garbage in review screenshots.
 
 See `templates/review-ext.rb` for a ready-to-use template.
+
+### Practical Rules
+
+- Prefer delimiter-aware wrapping over raw character-count splitting
+- Do not add visible wrap markers to wrapped code lines
+- Keep a last-resort hard wrap for single long tokens that exceed line width
+
+## Code Fence Captions
+
+### Problem
+
+If a Markdown code fence has a language but no explicit caption, some converters
+accidentally promote the language name itself (`text`, `json`, `markdown`) into a
+visible list caption. This looks like converter noise in the final PDF.
+
+### Recommended Rule
+
+- Treat the first fence token as the syntax/language only
+- Only emit a visible Re:VIEW list caption when the fence info contains an explicit caption
+- When the caption is omitted, still emit the required Re:VIEW block arguments, but keep the caption empty
+
+Example:
+
+~~~markdown
+```json API response example
+{ "ok": true }
+```
+~~~
+
+should produce a visible caption, while:
+
+~~~markdown
+```json
+{ "ok": true }
+```
+~~~
+
+should not show `json` as the caption.
+
+## Reference URLs Inside Bullet Lists
+
+### Problem
+
+In Markdown manuscripts, authors often write references as a bullet title followed by a URL on
+the next indented line. During Markdown -> Re:VIEW -> LaTeX conversion, that newline may collapse
+back into a space inside list items, causing long URLs to run across the page and get clipped.
+
+### Recommended Rule
+
+- Write manuscript references in two lines inside the same list item
+- Put the title on the first line
+- Put the URL itself as a link on the next indented line
+- In the converter, emit an explicit line break before link-only continuation lines
+
+Example manuscript form:
+
+```markdown
+- GitHub Docs: GitHub Copilot policies
+  [https://docs.github.com/en/copilot/concepts/policies](https://docs.github.com/en/copilot/concepts/policies)
+```
+
+This keeps the title readable and prevents long URLs from relying on implicit line wrapping alone.
 
 ## Markdown Backslash Escapes in PDF Output
 

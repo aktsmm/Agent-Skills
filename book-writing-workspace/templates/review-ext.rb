@@ -12,7 +12,7 @@ module ReVIEW
     require 'unicode/display_width'
     require 'unicode/display_width/string_ext'
 
-    CR = "\u{21B5}" # ↵ continuation marker
+    CR = ''
 
     # Normal code blocks
     WRAP_WIDTH = 82
@@ -25,24 +25,55 @@ module ReVIEW
     # Scale factor for CJK characters (adjust if needed)
     ZWSCALE = 0.875
 
+    BREAKABLE_CHARS = [
+      ' ', "\t", '/', '-', '_', '.', ',', ':', ';', ')', ']', '}',
+      '>', '、', '。', '：', '）', '】', '』', '」'
+    ].freeze
+
+    def breakable_char?(char)
+      BREAKABLE_CHARS.include?(char)
+    end
+
     def split_line(s, n)
-      a = []
-      l = ''
-      w = 0
-      s.each_char do |c|
-        cw = c.display_width(2)
-        cw *= ZWSCALE if cw == 2
-        if w + cw > n
-          a.push(l)
-          l = c
-          w = cw
+      lines = []
+      remaining = s
+
+      until remaining.empty?
+        width = 0
+        last_break_index = nil
+        break_index = nil
+        chars = remaining.each_char.to_a
+
+        chars.each_with_index do |char, idx|
+          char_width = char.display_width(2)
+          char_width *= ZWSCALE if char_width == 2
+          if width + char_width > n
+            break_index = idx
+            break
+          end
+          width += char_width
+          last_break_index = idx + 1 if breakable_char?(char)
+        end
+
+        if break_index.nil?
+          lines << remaining
+          break
+        end
+
+        split_index = last_break_index || break_index
+        head = chars[0...split_index].join
+        tail = chars[split_index..].join
+
+        if last_break_index
+          lines << head.rstrip
+          remaining = tail.lstrip
         else
-          l << c
-          w += cw
+          lines << head
+          remaining = tail
         end
       end
-      a.push(l)
-      a
+
+      lines
     end
 
     def code_line(type, line, idx, id, caption, lang)

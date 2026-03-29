@@ -25,6 +25,23 @@ These files are expected to be edited immediately after workspace creation.
 | `.github/prompts/*.prompt.md`     | Update branch or git conventions if needed               |
 | `scripts/convert_md_to_review.py` | Extend conversion rules when the manuscript format grows |
 
+## Heading Rename Safety
+
+When changing chapter titles that are also reflected in folder names, file names, or planning docs,
+do not stop at the first rename.
+
+### Recommended Rule
+
+- Rename the manuscript heading and every synchronized path together
+- Check that the old folder or file no longer exists physically
+- Grep the old chapter title after the rename to catch leftovers in docs, prompts, or instructions
+- Rebuild Re:VIEW/PDF output and confirm the old path is not still being converted
+
+### Why This Matters
+
+If the old chapter path remains on disk, build scripts may pick up both old and new files.
+That can produce duplicated chapters or stale generated output that is hard to diagnose from PDF alone.
+
 ## Sync-Back from Final Manuscripts to Author Drafts
 
 If your workflow keeps both final manuscripts and author draft folders, define a
@@ -38,6 +55,8 @@ drafts.
 - Do not blindly copy generated output back into draft folders
 - Do not update unrelated sibling draft files just because they share the same author folder
 - Keep keypoints, notes, and draft-only planning files as separate sources unless the task explicitly says to synchronize them
+- After sync-back, verify matched manuscript pairs with `git diff --no-index`, hashes, or an equivalent exact comparison
+- Treat chapter intro files such as `ch*-00_*.md` as mandatory sync-check targets because they drift easily
 
 ### Typical Example
 
