@@ -88,6 +88,7 @@
 各カテゴリ（Cost / Security / Reliability）のスライドに、**件数 TOP3 の推奨事項の説明**をスライドノートに含める。
 
 各推奨事項のノートには以下を含める:
+
 - **何が問題か**: 具体的に何が未設定/未対応なのか
 - **リスク**: 放置した場合に何が起きるか
 - **推奨アクション**: 具体的に何をすればよいか
@@ -99,6 +100,14 @@
 notes = slide.notes_slide
 notes.notes_text_frame.text = "ノートテキスト"
 ```
+
+## ファイル命名規則
+
+| ファイル | 命名規則 | 例 |
+|--------|---------|-----|
+| PowerPoint | `Azure-Brief-{YYYYMMDD}.pptx` | `Azure-Brief-20260331.pptx` |
+| Markdown | `Azure-Brief-{YYYYMMDD}.md` | `Azure-Brief-20260331.md` |
+| PPTX生成スクリプト | `_gen_monthly_report.py` | 固定名 |
 
 ## Azure Portal リンク
 
