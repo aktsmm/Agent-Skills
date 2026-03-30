@@ -42,7 +42,17 @@
 
 ## 免責事項（MANDATORY）
 
-レポート末尾に以下を含める:
+### 表紙スライド
+
+表紙に以下の注記をグレー文字で含める:
+
+```
+※値はあくまで参考とし、実際の値は Azure Portal でご確認お願いします
+```
+
+### レポート末尾
+
+レポート末尾（最終スライド / Markdown 末尾）に以下を含める:
 
 ```
 コスト削減見込額は Azure Advisor の推定値に基づく概算値です。
@@ -103,11 +113,11 @@ notes.notes_text_frame.text = "ノートテキスト"
 
 ## ファイル命名規則
 
-| ファイル | 命名規則 | 例 |
-|--------|---------|-----|
-| PowerPoint | `Azure-Brief-{YYYYMMDD}.pptx` | `Azure-Brief-20260331.pptx` |
-| Markdown | `Azure-Brief-{YYYYMMDD}.md` | `Azure-Brief-20260331.md` |
-| PPTX生成スクリプト | `_gen_monthly_report.py` | 固定名 |
+| ファイル           | 命名規則                      | 例                          |
+| ------------------ | ----------------------------- | --------------------------- |
+| PowerPoint         | `Azure-Brief-{YYYYMMDD}.pptx` | `Azure-Brief-20260331.pptx` |
+| Markdown           | `Azure-Brief-{YYYYMMDD}.md`   | `Azure-Brief-20260331.md`   |
+| PPTX生成スクリプト | `_gen_monthly_report.py`      | 固定名                      |
 
 ## Azure Portal リンク
 
