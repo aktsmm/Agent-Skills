@@ -236,6 +236,64 @@ Example manuscript form:
 
 This keeps the title readable and prevents long URLs from relying on implicit line wrapping alone.
 
+## Explicit Blank Lines Between Paragraphs
+
+### Problem
+
+In a Markdown -> Re:VIEW -> LaTeX -> PDF workflow, plain blank lines usually only mark paragraph boundaries.
+They do not reliably create a visibly larger vertical gap in the final PDF.
+Likewise, forcing line breaks with `@<br>{}` may end up as paragraph-internal `\\` and still fail to produce the intended blank line.
+
+### Recommended Rule
+
+- If you need a visibly larger gap in the PDF, do not rely on Markdown blank lines alone
+- Use a hidden manuscript marker such as `<!-- review:br -->`
+- Convert that marker in the Markdown-to-Re:VIEW script into a raw LaTeX vertical-space command
+
+Recommended conversion target:
+
+```review
+//raw[|latex|\\par\\vspace{1em}]
+```
+
+This keeps the Markdown source readable while producing an explicit blank gap in PDF output.
+
+### Why This Works
+
+- Markdown blank lines: paragraph split only
+- `@<br>{}`: may become `\\`, which is just a line break
+- `\par\vspace{1em}`: ends the paragraph and inserts actual vertical space
+
+### Example
+
+Manuscript source:
+
+```markdown
+本文の締めです。
+
+<!-- review:br -->
+<!-- review:br -->
+
+次の視点へ切り替えます。
+```
+
+Converter output:
+
+```review
+本文の締めです。
+
+//raw[|latex|\\par\\vspace{1em}]
+//raw[|latex|\\par\\vspace{1em}]
+
+次の視点へ切り替えます。
+```
+
+### Practical Notes
+
+- Keep the marker name stable across the workspace so authors can reuse it consistently
+- Tune `1em` to `1.5em` or `2em` only after checking the actual PDF result
+- Prefer this technique only when visual separation matters; for normal prose, paragraph breaks are usually enough
+
 ## Markdown Backslash Escapes in PDF Output
 
 ### Problem
