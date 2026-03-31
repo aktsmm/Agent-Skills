@@ -70,7 +70,7 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 4. **💰 コスト最適化（Cost）**（Advisor Cost 件数 + 推定削減ポテンシャル + 代表リソース名）
 5. **🔒 セキュリティ（Security）**（Advisor Security 件数 + 重要度分析）
 6. **🛡️ 信頼性・可用性（Reliability）**（Advisor Reliability 件数 + Zone冗長/Backup 改善提案）
-7. **⚙️ オペレーショナルエクセレンス**（Advisor OpEx 件数。データ未取得なら「次回取得予定」と明記）
+7. **⚙️ オペレーショナルエクセレンス**（Advisor OpEx 件数。**必ず取得すること**。「未取得」「次回予定」は禁止。結果が0件なら「0件（推奨なし）」と記載）
 8. **📊 全体サマリー**（サブスク × カテゴリ一覧 + グループ別集計）
 9. **🎯 推奨アクション（優先順）**（優先度付き・具体的・actionable）
 10. **📎 参考リンク**（Azure Portal Advisor 直リンク）
@@ -89,3 +89,17 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 
 - 顧客管理フォルダがある場合、ファイル作成前に **顧客マッピング定義** で正しいフォルダ名を確認する
 - 類似名の別顧客フォルダに誤配置しないこと（例: 富士通 ≠ 富士ソフト）
+
+### PPTX 生成のルール
+
+- **スライドノート必須**: 全コンテンツスライドに `add_notes()` で詳細な説明ノートを追加すること
+  - データソース、キーテイクアウェイ、推奨アクション、プレゼンター向けの補足情報を含む
+- **出力ファイル名**: 一時ファイル名（`.tmp.pptx`）で生成し、成功後にリネーム
+  - VS Code / PowerPoint のプレビューによる PermissionError を回避
+- **テンプレート流用**: ヘルパー関数（add_notes, add_shape_bg, tb, ap, tbl, hdr, ibox）のみ流用し、スライドデータ部分は新規記述
+  - コピー＆置換は旧顧客のデータが残存するため禁止
+
+### Advisor データ取得のルール
+
+- **全 4 カテゴリを必ず取得**: Cost, Security, HighAvailability, **OperationalExcellence**
+- 「未取得」「次回予定」は禁止。結果が 0 件なら 「0件（推奨なし）」 と記載
