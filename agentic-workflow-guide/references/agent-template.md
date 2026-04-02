@@ -60,6 +60,8 @@ disable-model-invocation: false # Optional: Prevent subagent invocation (default
 ---
 ````
 
+> **Model note:** `model:` is optional. Do not guess model names. If you have not verified the exact display name in the current environment, omit `model:` instead of using speculative values like `gpt-4o`.
+
 `handoffs` は文字列配列ではなく、`label`・`agent`・`prompt`・`send` を持つオブジェクト配列で定義する。
 
 ### ⚠️ 非標準フィールド禁止（バリデーションエラーの原因）
@@ -226,6 +228,30 @@ description: Does something useful
 | Tool names    | Only listed tools available (whitelist)    |
 
 > **Note**: MCP server tools become available at runtime automatically. Unknown tool names cause errors.
+
+### Recommended `tools:` style for `.agent.md`
+
+For custom agents, prefer the stable aliases below unless you specifically need a narrower tool path.
+
+```yaml
+tools: [read, search]
+tools: [read, search, edit]
+tools: [agent, read, search]
+```
+
+Use these aliases first:
+
+| Purpose | Preferred alias |
+| ------- | --------------- |
+| Read    | `read`          |
+| Search  | `search`        |
+| Edit    | `edit`          |
+| Shell   | `execute`       |
+| Web     | `web`           |
+| Subagent| `agent`         |
+| Todo    | `todo`          |
+
+Avoid raw runtime tool IDs in `.agent.md` frontmatter. Names such as `read_file`, `grep_search`, and `semantic_search` are chat/runtime tool identifiers, not portable custom-agent tool names, and they trigger validation errors.
 
 > **⚠️ Orchestrator の tools 制限に注意**: 親エージェントの `tools:` はサブエージェントの **ツール上限（ceiling）** として機能する。Orchestrator の `tools:` から `edit` を外すと、サブエージェント（Writer 等）も `edit` を使えなくなる。Orchestrator は `tools:` を省略する（= 全ツール利用可）のが推奨。SRP の強制は `tools:` ではなくプロンプト内の MANDATORY 指示で行うこと。詳細は [agent-guide.md の Pitfall 7](agent-guide.md#pitfall-7-restricting-orchestrators-tools-breaks-sub-agents) を参照。
 
