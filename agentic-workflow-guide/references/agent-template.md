@@ -137,9 +137,19 @@ disable-model-invocation: true
 | `user-invocable`           | `true`     | プルダウンに表示するか                       |
 | `disable-model-invocation` | `false`    | サブエージェントとしての呼び出しを禁止するか |
 
+> ⚠️ **typo注意**: `user-invokable` は誤記で無効。ピッカー非表示には必ず `user-invocable: false` を使うこと。
+
 > ⚠️ **サブディレクトリの罠（2026年2月時点）**: `.github/agents/` は**直下のファイルだけをスキャン**。
 > サブフォルダに入れると `runSubagent` でも呼び出せなくなる。フラットに置くこと。
 > 非表示にしたい場合はサブフォルダではなく `user-invocable: false` を使うこと。
+
+### Manifest Validation Checklist
+
+複数の `.agent.md` をまとめて編集したら、最低限次を確認すること。
+
+- `user-invokable` などの誤記が front matter に混入していない
+- `user-invocable: false` の agent が意図どおり subagent 専用になっている
+- front matter 編集後も本文先頭の `## Role` など必須セクションが崩れていない
 
 **`mode:` Migration Guide:**
 
