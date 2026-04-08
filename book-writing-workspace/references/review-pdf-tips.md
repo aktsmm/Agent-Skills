@@ -291,6 +291,37 @@ Example manuscript form:
 
 This keeps the title readable and prevents long URLs from relying on implicit line wrapping alone.
 
+## Footnote ID Collisions Across Combined Markdown Files
+
+### Problem
+
+Some book workflows concatenate multiple Markdown section files into one chapter-level `.re` file.
+If each source file uses local footnote labels such as `[^1]`, `[^2]`, the same labels can repeat across files.
+If the converter normalizes those labels directly into a shared namespace, later definitions may overwrite earlier ones or references may point to the wrong footnote body.
+
+Another trap is treating any `[^id]:` substring as a footnote definition.
+Inline prose such as `See note[^4]:` or list items ending with `[^1]:` still contain a reference followed by punctuation, not a footnote definition.
+
+### Recommended Rule
+
+- Namespace Markdown footnote labels per source file before converting them to final Re:VIEW footnote IDs
+- Detect footnote definitions only at the start of a line
+- Keep reference replacement active even when a colon immediately follows the closing bracket in prose or list items
+
+### Example Strategy
+
+If both `section-a.md` and `section-b.md` contain `[^1]`, rename them to source-scoped labels such as:
+
+- `section_a_1`
+- `section_b_1`
+
+Do this before any final ID sanitization for Re:VIEW output.
+
+### Verification
+
+- Inspect a representative `.re` snippet and confirm that each `@<fn>{...}` points to the intended `//footnote[...]`
+- Rebuild the final PDF after converter changes; checking only `.re` output is not enough when references can silently resolve to the wrong note body
+
 ## Explicit Blank Lines Between Paragraphs
 
 ### Problem

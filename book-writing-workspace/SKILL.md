@@ -61,6 +61,14 @@ Then verify with:
 - `python scripts/count_chars.py`
 - `python scripts/convert_md_to_review.py`
 
+## Converter Change Verification
+
+When changing the Markdown-to-Re:VIEW converter or related templates:
+
+1. Regenerate `.re` files first with `python scripts/convert_md_to_review.py`
+2. Rebuild the final PDF, not just the intermediate `.re` output
+3. Inspect both a representative `.re` snippet and the final PDF when the change affects footnotes, tables, images, captions, or line breaking
+
 ## Agents Overview
 
 | Agent               | Role                          | Permissions               |
