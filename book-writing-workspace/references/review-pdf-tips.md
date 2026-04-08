@@ -76,6 +76,36 @@ Custom headers and footers can be injected into `review-style.sty` using `fancyh
 }
 ```
 
+## URL Line Breaking
+
+### Problem
+
+Long URLs (especially reference links) overflow the page width in PDF output.
+The default `review-jsbook.cls` defines `\UrlBreaks` but does not cover all characters,
+and lacks aggressive line-break permissions.
+
+### Solution
+
+Add `xurl` (a TeX Live standard package that extends `url` with permissive break points)
+and `\emergencystretch` to the custom sty:
+
+```latex
+\usepackage{xurl}
+\emergencystretch=3em
+```
+
+### Where to Add
+
+Place these lines in `review-custom.sty` or the build script's custom sty injection point.
+Do **not** edit `sty/review-jsbook.cls` directly — the build script overwrites `sty/`
+from the gem defaults on every run.
+
+### Notes
+
+- `xurl` is included in TeX Live and does not require separate installation in the Docker image
+- `\emergencystretch=3em` gives LaTeX extra flexibility when it cannot find good break points
+- These two settings together handle virtually all URL overflow cases
+
 ## Debugging
 
 - Add `--debug` to `review-pdfmaker` to keep the build directory for inspection

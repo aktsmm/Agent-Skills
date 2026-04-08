@@ -25,6 +25,24 @@ These files are expected to be edited immediately after workspace creation.
 | `.github/prompts/*.prompt.md`     | Update branch or git conventions if needed               |
 | `scripts/convert_md_to_review.py` | Extend conversion rules when the manuscript format grows |
 
+## LaTeX Style Injection Point
+
+Build scripts that use `vvakame/review` Docker images typically copy the gem's default
+`review-jsbook` files into `sty/` at the start of each build, overwriting any local edits.
+
+### Rule
+
+- **Never edit `sty/review-jsbook.cls` or `sty/review-base.sty` directly** — changes will be lost
+- Place all LaTeX customizations in the **custom sty content** that the build script injects as `sty/review-custom.sty`
+- In PowerShell build scripts, this is typically a heredoc variable (e.g. `$customStyContent`) written to a file before the Docker run
+- In shell-based workflows, append to `sty/review-style.sty` **after** the gem copy step
+
+### Why This Matters
+
+If you add `\usepackage{xurl}` or other fixes directly to `sty/review-jsbook.cls`,
+the next build silently reverts those changes. The fix appears to work in manual testing
+but fails in CI or clean builds.
+
 ## Heading Rename Safety
 
 When changing chapter titles that are also reflected in folder names, file names, or planning docs,
