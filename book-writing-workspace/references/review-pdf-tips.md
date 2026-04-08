@@ -86,6 +86,10 @@ and lacks aggressive line-break permissions.
 
 ### Solution
 
+**Two changes are required** — LaTeX side and Ruby side:
+
+#### 1. LaTeX: Add `xurl` + `emergencystretch`
+
 Add `xurl` (a TeX Live standard package that extends `url` with permissive break points)
 and `\emergencystretch` to the custom sty:
 
@@ -93,6 +97,27 @@ and `\emergencystretch` to the custom sty:
 \usepackage{xurl}
 \emergencystretch=3em
 ```
+
+#### 2. Ruby: Override `inline_href` in `review-ext.rb`
+
+Re:VIEW converts `@<href>{url, text}` to `\href{url}{\texttt{text}}`.
+`xurl` only affects `\url{}` commands, so it does **not** break URLs inside `\href{\texttt{}}`.
+
+Override `inline_href` in `review-ext.rb` to emit `\url{}` when the display text equals the URL:
+
+```ruby
+def inline_href(str)
+  url, label = str.strip.split(/,\s*/, 2)
+  if label.nil? || label.strip == url.strip
+    "\\url{#{escape_url(url)}}"
+  else
+    "\\href{#{escape_url(url)}}{#{escape(label.strip)}}"
+  end
+end
+```
+
+> **Warning**: Adding `xurl` alone will appear to fix the build (no compile errors),
+> but the PDF will still have overflowing URLs. Both changes are required.
 
 ### Where to Add
 
@@ -104,7 +129,7 @@ from the gem defaults on every run.
 
 - `xurl` is included in TeX Live and does not require separate installation in the Docker image
 - `\emergencystretch=3em` gives LaTeX extra flexibility when it cannot find good break points
-- These two settings together handle virtually all URL overflow cases
+- `xurl` alone is **not enough** — the `inline_href` override is essential because Re:VIEW uses `\href{\texttt{}}` not `\url{}`
 
 ## Debugging
 
