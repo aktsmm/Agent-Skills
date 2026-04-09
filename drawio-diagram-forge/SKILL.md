@@ -49,6 +49,29 @@ From inputs/requirements.md, create a system diagram
 
 **Output**: `outputs/`
 
+### Recommended Delivery Pattern
+
+For documentation-facing diagrams, generate outputs as a pair:
+
+- `name.drawio` for editing in VS Code Draw.io
+- `name.drawio.svg` for README / web embedding
+
+Recommended markdown pattern:
+
+```markdown
+![Architecture Diagram](outputs/name.drawio.svg)
+
+- [outputs/name.drawio.svg](outputs/name.drawio.svg)
+- [outputs/name.drawio](outputs/name.drawio)
+```
+
+If multilingual variants are needed, keep parallel filenames instead of overwriting a single asset:
+
+- `name.drawio` / `name.drawio.svg`
+- `name-ja.drawio` / `name-ja.drawio.svg`
+
+This keeps the editable source, the embeddable image, and the language variants aligned.
+
 ## Workflow
 
 ```
@@ -114,6 +137,8 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | Blank in draw.io  | Check `content` attribute |
 | Edges not visible | Verify node IDs           |
 | Icons missing     | Enable Azure/AWS shapes   |
+| README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio` |
+| Too many crossing arrows | Simplify the main flow first, then move secondary flows to separate lanes or separate diagrams |
 
 ## Done Criteria
 
@@ -121,3 +146,4 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 - [ ] Diagram opens correctly in VS Code Draw.io extension
 - [ ] All nodes and edges visible
 - [ ] Quality gate score ≥ 85
+- [ ] If diagram is referenced from documentation, both editable source and embeddable image are provided
