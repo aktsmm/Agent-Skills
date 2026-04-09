@@ -322,6 +322,124 @@ Do this before any final ID sanitization for Re:VIEW output.
 - Inspect a representative `.re` snippet and confirm that each `@<fn>{...}` points to the intended `//footnote[...]`
 - Rebuild the final PDF after converter changes; checking only `.re` output is not enough when references can silently resolve to the wrong note body
 
+## Table Notes and Footnotes
+
+### Problem
+
+In a Markdown -> Re:VIEW -> LaTeX -> PDF workflow, a note may semantically belong to a whole table,
+but footnote markers placed inside table cells or even in the table header do not reliably become
+page-bottom footnotes in the final PDF. Depending on the converter and LaTeX table environment,
+the marker may disappear, remain inline, or fail to render as a normal bottom note.
+
+### Recommended Rule
+
+- If a note applies to the whole table, do not place the footnote marker inside a table cell
+- Do not rely on table-header footnote markers for bottom-of-page notes
+- Add one short prose sentence immediately before or after the table, and attach the footnote marker there
+- Write the footnote body so it explicitly says the note applies to the table
+
+### Example Strategy
+
+Prefer this:
+
+```markdown
+#### Representative built-in classifiers
+
+Note that, in the table below, Agreements, Resume, and Financial Statement are English-only as of May 2026[^1].
+
+| Classifier | Description |
+| ---------- | ----------- |
+| Threat     | ...         |
+| Agreements | ...         |
+
+[^1]: In the table below, Agreements, Resume, and Financial Statement are English-only as of May 2026.
+```
+
+Avoid this:
+
+```markdown
+| Classifier[^1] | Description |
+| -------------- | ----------- |
+| Agreements     | ...         |
+```
+
+### Why This Works
+
+- The note still reads as table-specific to the human reader
+- The footnote marker stays in normal prose, which Re:VIEW and LaTeX handle more reliably
+- The final PDF is less likely to lose the note or render it in an unexpected place
+
+## Odd/Even Running Headers and Side Markers
+
+### Problem
+
+When designing chapter/section markers for the top margin or the left/right side margins,
+it is easy to focus on `fancyhdr` slot configuration (`LE`, `RO`, etc.) and miss that the LaTeX
+document class is still running in `oneside` mode. In that case, odd/even-specific placements
+do not behave as expected, and layout experiments can appear to "do nothing".
+
+Another trap is trying to derive chapter, section, and subsection labels from only one mark
+stream. If multiple hierarchy levels need to be displayed at the same time, overloading a single
+mark variable tends to produce blanks or stale labels.
+
+### Recommended Rule
+
+- Use `twoside` in `texdocumentclass` whenever odd/even page layout should differ
+- Treat chapter and lower-level markers as separate responsibilities
+- Prefer `leftmark` for stable chapter-level display
+- Use `rightmark` for the currently active lower-level heading when appropriate
+- If the design needs multiple hierarchy levels at once, keep separate stored values instead of trying to infer everything from one mark
+
+### Practical Notes
+
+- `oneside` can make odd/even `fancyhdr` settings appear broken even when the style file is correct
+- Re:VIEW/jsbook-based stacks often behave more predictably when chapter-level display uses `leftmark`
+- Verify the actual PDF result, not just the style file text
+
+### Fastest Way to Isolate Header Problems
+
+If an odd/even running header still does not show the expected chapter or section title,
+first verify the slot itself before changing mark logic again.
+
+- Temporarily replace the intended header content with a fixed literal such as `CHAPTER-TEST`
+- Rebuild the PDF and check whether that literal appears in the target slot
+- If the literal appears, the page-style slot is working and the remaining bug is in mark propagation or title capture
+- If the literal does not appear, the issue is page style selection, `twoside` configuration, or viewer caching, not the mark text itself
+
+This avoids repeated changes to `\chaptermark`, `\sectionmark`, or custom state variables when the real problem is elsewhere.
+
+### Margin Labels: Prefer fancyhdr Before Page Overlay Packages
+
+For vertical chapter/section labels placed in the side margins, prefer a `fancyhdr`-based approach first.
+
+- Use `rotatebox` plus horizontal offset inside the appropriate `LE` / `RO` header slots
+- Treat page-overlay packages such as `eso-pic` as a fallback, not the first choice
+
+In Re:VIEW/jsbook-based stacks, `eso-pic` can conflict with other page-layout helpers such as `pxesopic` / `gentombow`, causing LaTeX build failures even when the layout idea itself is valid.
+
+If a margin-label experiment unexpectedly breaks the build, remove the overlay package first and return to a plain `fancyhdr` implementation before debugging other parts of the style.
+
+## PDF Viewer Cache During Layout Verification
+
+### Problem
+
+Running-header, footnote, or spacing changes are often verified by repeatedly rebuilding the same
+PDF output filename. Some PDF viewers continue to show a cached version of the file even after the
+build succeeded, which makes it look as though the latest style change had no effect.
+
+### Recommended Rule
+
+- Do not trust a same-name PDF tab alone when verifying layout changes
+- Check the updated file timestamp after each build
+- If the workflow archives previous builds into timestamped directories, compare against the newly archived copy as well
+- When a result seems unchanged, verify the generated `.re` or `.tex` snippet before assuming the style edit failed
+
+### Verification
+
+- Confirm the output PDF modification time changed
+- Open the latest archived/timestamped PDF when available
+- Compare one representative `.re` snippet to the PDF page before continuing with further style changes
+
 ## Explicit Blank Lines Between Paragraphs
 
 ### Problem

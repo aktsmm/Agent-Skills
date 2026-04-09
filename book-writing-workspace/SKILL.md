@@ -68,6 +68,9 @@ When changing the Markdown-to-Re:VIEW converter or related templates:
 1. Regenerate `.re` files first with `python scripts/convert_md_to_review.py`
 2. Rebuild the final PDF, not just the intermediate `.re` output
 3. Inspect both a representative `.re` snippet and the final PDF when the change affects footnotes, tables, images, captions, or line breaking
+4. If the change affects running headers, side markers, or odd/even page layout, verify that `texdocumentclass` uses `twoside`; `oneside` disables odd/even-specific `fancyhdr` placement
+5. If a note semantically belongs to a table, attach the footnote marker in prose immediately before or after the table rather than inside table cells or table headers
+6. When checking visual PDF changes, compare against the newly archived/timestamped PDF or the updated file timestamp; some viewers keep showing a cached file when the output name stays the same
 
 ## Agents Overview
 
