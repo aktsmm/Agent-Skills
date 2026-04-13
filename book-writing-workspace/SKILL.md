@@ -71,6 +71,7 @@ When changing the Markdown-to-Re:VIEW converter or related templates:
 4. If the change affects running headers, side markers, or odd/even page layout, verify that `texdocumentclass` uses `twoside`; `oneside` disables odd/even-specific `fancyhdr` placement
 5. If a note semantically belongs to a table, attach the footnote marker in prose immediately before or after the table rather than inside table cells or table headers
 6. When checking visual PDF changes, compare against the newly archived/timestamped PDF or the updated file timestamp; some viewers keep showing a cached file when the output name stays the same
+7. If footnotes cluster at the chapter end in the PDF, check that `//footnote` definitions in the `.re` file are placed near their references, not all appended at chapter end. Also confirm no `//footnote` sits inside a `//table{...//}` or `===[column]...===[/column]` block (causes `Counter too large` build failure)
 
 ## Agents Overview
 

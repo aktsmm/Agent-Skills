@@ -687,3 +687,42 @@ title page → TOC. Without a mainmatter guard, images meant for ch1 can
 appear on the blank page after the title page (where `chapter` counter = 0,
 so `nextch` = 1). Always gate illustration insertion with a `\ifreview@inmainmatter`
 flag set in `\reviewmainmatterhook`.
+
+## Footnote Placement in Generated .re Files
+
+### Problem
+
+When a Markdown-to-Re:VIEW converter concatenates multiple Markdown files into one chapter `.re` file,
+footnote definitions (`//footnote[id][text]`) are often appended at the end of the chapter.
+Re:VIEW's LaTeX builder outputs `\footnotetext[N]{...}` at the position where `//footnote` appears
+in the `.re` file. If all definitions are at the chapter end, every footnote in the chapter clusters
+on the last few pages of the PDF instead of appearing at the bottom of the page where it is referenced.
+
+### Additional Trap: Nested Blocks
+
+Moving `//footnote` to right after the reference line is not always sufficient.
+If the reference is inside a block such as `//table{...//}` that is itself nested inside
+a column block (`===[column]...===[/column]`), placing the footnote after the inner `//}` still
+leaves it inside the column. Re:VIEW renders columns with `tcolorbox`, and `\footnotetext` inside
+`tcolorbox` triggers a `Counter too large` LaTeX error that aborts the build entirely.
+
+### Recommended Rule
+
+1. After generating all `.re` content, redistribute `//footnote` definitions from the chapter end to immediately after their reference locations
+2. If the reference is inside any block, place the footnote after the **outermost** enclosing block (where depth returns to 0), not just the innermost `//}`
+3. Track block depth for both brace-delimited blocks (`//xxx{...//}`) and column blocks (`===[column]...===[/column]`)
+4. Footnotes with no matching reference (unused) stay at chapter end
+
+### Verification
+
+- Check that `//footnote` lines appear near their `@<fn>{}` references in the `.re` file, not all at the end
+- Confirm no `//footnote` is inside a `//table{...//}` or `===[column]...===[/column]` block
+- Build the full PDF and check that footnotes appear at the bottom of the referencing page, not clustered at chapter end
+- Watch for `Counter too large` errors — they indicate a footnote is still inside a tcolorbox-rendered block
+
+### Template Threshold for Skipping Files
+
+When the converter skips files below a character-count threshold to exclude templates,
+keep the threshold low enough that short but real content (e.g., a heading + one paragraph + an image reference)
+is not silently dropped from the PDF. A threshold around 200 characters for normal section files is
+a practical balance; 300 characters can silently skip valid content.
