@@ -58,6 +58,9 @@ description: One-line summary of what this prompt does
 
 VS Code validates frontmatter strictly. Only use supported fields — unsupported fields cause validation errors.
 
+- The opening `---` must be the very first bytes in the file. Any stray characters or BOM-like garbage before it can prevent the prompt from being discovered in the slash prompt picker.
+- `agent` is optional for `.prompt.md`. If you use it, the value must match a real registered agent name. Do not use placeholders such as `agent: agent`.
+
 | File type          | Supported fields                                                  | Notes                                                       |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `.prompt.md`       | `agent`, `argument-hint`, `description`, `model`, `name`, `tools` | `author`, `copyright`, `license` etc. are **NOT** supported |
@@ -77,6 +80,8 @@ description: "What this prompt does"
 <!-- license: CC BY-NC-SA 4.0 -->
 <!-- copyright: Copyright (c) 2025 yourname -->
 ```
+
+If a prompt does not need a specific sub-agent binding, omit `agent` entirely and keep the frontmatter minimal.
 
 ## Minimal Template (Quick Use)
 
