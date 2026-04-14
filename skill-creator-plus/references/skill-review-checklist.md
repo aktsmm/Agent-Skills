@@ -6,7 +6,8 @@ Checklist for reviewing and improving SKILL.md files.
 
 ```markdown
 - [ ] SKILL.md is under 150 lines? (GitHub guideline: "2 pages or less")
-- [ ] Frontmatter has name + description only?
+- [ ] Request really belongs in a skill?
+- [ ] Frontmatter is valid and intentional?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
 - [ ] No README.md or auxiliary docs in skill folder?
@@ -55,6 +56,13 @@ metadata: # Optional
 
 - What does this skill do?
 - When should it be triggered?
+- Which user phrases should help discovery?
+
+**Optional fields to review intentionally:**
+
+- `argument-hint`
+- `user-invocable`
+- `disable-model-invocation`
 
 ### Body Structure
 
@@ -63,6 +71,7 @@ metadata: # Optional
 | `# Title`        | ✅            | Match skill name           |
 | `## When to Use` | ✅            | Trigger conditions (brief) |
 | Core workflow    | ✅            | Main instructions          |
+| Decision point   | If applicable | Clarify why this is a skill |
 | `## References`  | If applicable | Links to references/ files |
 
 ### What NOT to Include
@@ -79,6 +88,7 @@ metadata: # Optional
 | Multiple variants/options | Split by variant             |
 | Domain-specific schemas   | Separate reference file      |
 | Detailed examples         | Move to references/examples/ |
+| Primitive-selection logic | Move to a dedicated reference |
 
 ### Naming Convention
 
@@ -118,6 +128,12 @@ description: "Processes PDF files"
 description: "Extract text, rotate pages, and fill forms in PDF files. Use when working with .pdf documents for text extraction, page manipulation, or form automation."
 ```
 
+### Issue 2b: Wrong Primitive
+
+**Symptoms:** The asset mostly explains prompts, instructions, or agents instead of a reusable skill workflow.
+
+**Fix:** Re-check whether the work belongs in a skill.
+
 ### Issue 3: Duplicate Content
 
 **Symptoms:** Same information in SKILL.md and references/
@@ -133,6 +149,17 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 - File patterns (`.pdf`, `.agent.md`)
 - Task keywords ("extract text", "rotate page")
 - Context conditions ("when working with...")
+
+### Issue 5: Silent Invocation Bugs
+
+**Symptoms:** Skill exists but does not load or appears inconsistent.
+
+**Fix:**
+
+1. Confirm `name` matches folder name
+2. Quote descriptions containing colons
+3. Remove optional frontmatter fields that were copied blindly
+4. Verify links are relative
 
 ## Review Template
 

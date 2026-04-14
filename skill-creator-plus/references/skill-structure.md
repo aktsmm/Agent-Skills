@@ -2,6 +2,17 @@
 
 Detailed guide for skill anatomy, bundled resources, and progressive disclosure patterns.
 
+## Locations
+
+Skills can live in project or user scope.
+
+| Path | Scope |
+| ---- | ----- |
+| `.github/skills/<name>/` | Project |
+| `.agents/skills/<name>/` | Project |
+| `.claude/skills/<name>/` | Project |
+| user profile skill folder | Personal |
+
 ## Anatomy of a Skill
 
 Every skill consists of a required SKILL.md file and optional bundled resources:
@@ -25,6 +36,23 @@ Every SKILL.md consists of:
 
 - **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields Claude reads to determine when the skill gets used.
 - **Body** (Markdown): Instructions and guidance. Only loaded AFTER the skill triggers.
+
+### Frontmatter Fields
+
+```yaml
+---
+name: skill-name
+description: "What it does and when to use it"
+argument-hint: "Optional slash-command hint"
+user-invocable: true
+disable-model-invocation: false
+---
+```
+
+- `name` and `description` are required
+- `name` must match the folder name
+- `description` is the discovery surface
+- Optional fields should only be added when they change invocation behavior
 
 ## Bundled Resources
 
@@ -115,3 +143,4 @@ cloud-deploy/
 
 - **Avoid deeply nested references** - Keep references one level deep from SKILL.md
 - **Structure longer files** - For files > 100 lines, include TOC at top
+- **Use relative links** - Link to `references/...`, `scripts/...`, and `assets/...` with relative paths
