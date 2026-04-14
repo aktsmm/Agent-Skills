@@ -30,6 +30,14 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 
 ## Skill Search Workflow
 
+0. **Classify the ask first**
+   - If the user wants always-on rules → suggest **instruction**
+   - If the user wants persona or tool boundaries → suggest **agent**
+   - If the user wants deterministic enforcement → suggest **hook**
+   - If the user wants a packaged reusable workflow → continue with skill search
+
+   → See [customization-routing.md](customization-routing.md)
+
 1. **Search ALL sources in local index**
    - Read `references/skill-index.json`
    - **ALWAYS search ALL sources**
@@ -62,6 +70,7 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
    | Skill found          | "Install it?"                |
    | Good repo discovered | "Add to sources?"            |
    | lastUpdated > 7 days | "⚠️ Index outdated. Update?" |
+   | Better non-skill fit | "Use prompt/instruction/agent/hook instead?" |
 
 ## 🚨 Mandatory Proposal Block
 
@@ -74,6 +83,7 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 3. 🔄 Update index? (last: {date})
 4. 🌐 Web search?
 5. ➕ Add source?
+6. 🧭 Use another primitive instead?
 ```
 
 ## Search Summary Format
@@ -141,6 +151,7 @@ python scripts/search_skills.py --install docx  ← NG!
 
 ## Checklist Before Responding
 
+- [ ] Checked whether the ask actually needs a skill
 - [ ] Started with search summary
 - [ ] Included skill table (from ALL sources)
 - [ ] Included source breakdown table

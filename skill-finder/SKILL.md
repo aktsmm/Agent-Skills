@@ -1,6 +1,6 @@
 ---
 name: skill-finder
-description: "Full-featured Agent Skills management: Search 35+ skills, install locally, star favorites, update from sources. Use when looking for skills, installing new skills, or managing your skill collection."
+description: "Search, install, and manage Agent Skills, and help decide whether the user actually needs a skill before recommending one. Use when looking for skills, installing skills, managing your skill collection, or deciding between a skill and another customization primitive."
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -16,6 +16,23 @@ Full-featured Agent Skills management tool.
 - Looking for skills for a specific task or domain
 - Finding and installing skills locally
 - Managing favorites with star feature
+- Checking whether the ask really calls for a skill before recommending one
+
+## Recommendation Gate
+
+Before searching, check whether the user really wants a **skill**.
+
+| If the ask sounds like... | Prefer... |
+| ------------------------- | --------- |
+| Single slash task | Prompt |
+| Always-on or file-scoped guidance | Instruction |
+| Persona, tool restrictions, delegation | Agent |
+| Deterministic enforcement | Hook |
+| Reusable packaged workflow | Skill |
+
+If the answer is not **Skill**, explain that first instead of forcing a skill recommendation.
+
+→ **[references/customization-routing.md](references/customization-routing.md)** for routing patterns
 
 ## Features
 
@@ -115,6 +132,7 @@ python scripts/search_skills.py --add-source https://github.com/owner/repo
 
 ## Done Criteria
 
+- [ ] Skill vs non-skill fit checked first
 - [ ] Search query returns results
 - [ ] Skill installed to local directory (if requested)
 - [ ] Index updated successfully (if requested)

@@ -20,6 +20,20 @@ Guide for deciding when to escalate complexity (Prompt → Agent → Multi-Agent
 
 When a simple approach isn't working, escalate to the next level.
 
+### Primitive Gate
+
+Before escalating into agent design, confirm that the ask is not better served by another primitive.
+
+| If the need is... | Prefer... |
+| ----------------- | --------- |
+| One slash-invoked task | Prompt |
+| Always-on guidance | Instruction |
+| Reusable packaged workflow | Skill |
+| Persona or delegation | Agent |
+| Deterministic enforcement | Hook |
+
+Only continue with the ladder below if an **Agent** is truly required.
+
 ### Levels
 
 | Level  | Configuration         | When to Use                                | Escalation Triggers (Observable Signals)                                   | Evidence |
@@ -132,13 +146,15 @@ Run this check when creating or reviewing prompts/agents:
 ```markdown
 ## Quick Split Check
 
+- [ ] Does this need an agent at all?
 - [ ] Prompt > 50 lines of instructions?
 - [ ] More than 5-7 sequential steps?
 - [ ] Multiple independent responsibilities? (SRP violation)
 - [ ] Expected context usage > 70%?
 - [ ] Quality loop ("until good enough") needed?
 
-→ **Any YES = Consider splitting** (See Part 2 for pattern selection)
+→ If the first item is **NO**, use a simpler primitive
+→ Otherwise, **Any YES = Consider splitting** (See Part 2 for pattern selection)
 → **2+ YES = Splitting recommended**
 → **3+ YES = Splitting mandatory**
 ```

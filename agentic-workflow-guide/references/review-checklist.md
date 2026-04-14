@@ -31,6 +31,7 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 Minimum items to verify:
 
 ```markdown
+- [ ] Is an agent really the right primitive for this problem?
 - [ ] Is each agent focused on a single responsibility? (SRP)
 - [ ] Can errors be detected and stopped immediately? (Fail Fast)
 - [ ] Is it divided into small steps? (Iterative)
@@ -111,6 +112,18 @@ Minimum items to verify:
 ---
 
 ## Detailed Check
+
+### Primitive Fit Check
+
+```markdown
+## Primitive Fit
+
+- [ ] Would a prompt be sufficient?
+- [ ] Would instructions express this more simply?
+- [ ] Would a skill package the workflow better than an agent?
+- [ ] Is a hook needed only for deterministic enforcement?
+- [ ] Is workspace vs user profile scope chosen intentionally?
+```
 
 ### Core Principles Check
 

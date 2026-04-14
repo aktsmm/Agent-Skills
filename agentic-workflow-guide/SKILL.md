@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "Create, review, and update Prompt and agents and workflows. Covers 5 workflow patterns, agent delegation, Handoffs, Context Engineering. Use for any .agent.md file work or multi-agent system design. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計'."
+description: "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for any .agent.md file work, workflow architecture, orchestration planning, or when agent workflows may be overkill. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計', 'orchestrator'."
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -10,6 +10,22 @@ metadata:
 
 Design, review, and improve agent workflows based on proven principles.
 
+## Primitive First
+
+Do not start with multi-agent by default.
+
+| Need | Best Fit |
+| ---- | -------- |
+| Single focused slash task | **Prompt** |
+| Always-on or file-scoped guidance | **Instruction** |
+| Reusable workflow with bundled scripts, references, or templates | **Skill** |
+| Persona, tool restrictions, delegation, or handoffs | **Agent** |
+| Deterministic enforcement or lifecycle automation | **Hook** |
+
+If the ask does not require an **Agent**, stop and create the simpler primitive.
+
+→ **[references/customization-decision.md](references/customization-decision.md)** for the selection guide
+
 ## When to Use
 
 | Action     | Triggers                                                                     |
@@ -18,6 +34,7 @@ Design, review, and improve agent workflows based on proven principles.
 | **Review** | Orchestrator not delegating, design principle check, context overflow        |
 | **Update** | Adding Handoffs, improving delegation, tool configuration                    |
 | **Debug**  | Agent not found, subagent not working, picker visibility, access control     |
+| **Decide** | Determining whether multi-agent is justified or a simpler primitive is enough |
 
 ## Core Principles
 
@@ -47,11 +64,13 @@ Design, review, and improve agent workflows based on proven principles.
 
 ## Design Workflow
 
+0. **Primitive + Scope** - Choose prompt / instruction / skill / agent / hook, and decide workspace vs profile
 1. **Requirements** - Goal, subtasks, dependencies, quality criteria
-2. **Pattern Selection** - [!] Ask user to confirm pattern before proceeding
-3. **Design Diagram** - Visualize with Mermaid
-4. **Principle Check** - Validate against review checklist
-5. **Implement & Iterate** - Build small → verify → improve
+2. **Escalation Check** - Confirm why agent or multi-agent is needed
+3. **Pattern Selection** - Ask user to confirm the chosen pattern when it changes complexity materially
+4. **Design Diagram** - Visualize with Mermaid when it clarifies roles or handoffs
+5. **Principle Check** - Validate against review checklist
+6. **Implement & Iterate** - Build small → verify → improve
 
 ## When to Escalate
 
@@ -63,6 +82,8 @@ Design, review, and improve agent workflows based on proven principles.
 | **L1** | Prompt + Instructions | Steps > 5, "missed/overlooked" errors    |
 | **L2** | Single Agent          | Multiple responsibilities, context > 70% |
 | **L3** | Multi-Agent           | Independent subtasks needed              |
+
+**Rule:** Prefer the lowest level that solves the problem cleanly.
 
 **Quick Check:** Prompt > 50 lines? Steps > 5? SRP violation? Context > 70%? → Consider splitting.
 
@@ -79,6 +100,7 @@ Design, review, and improve agent workflows based on proven principles.
 
 | Topic              | Reference                                                              |
 | ------------------ | ---------------------------------------------------------------------- |
+| Primitive Decision | [references/customization-decision.md](references/customization-decision.md) |
 | Prompt Template    | [references/prompt-template.md](references/prompt-template.md)         |
 | agent              | [references/agent-guide.md](references/agent-guide.md)                 |
 | Agent Template     | [references/agent-template.md](references/agent-template.md)           |
@@ -147,6 +169,7 @@ You MUST use agent for each file. Do NOT read files directly.
 
 ## Done Criteria
 
+- [ ] Primitive and scope selected intentionally
 - [ ] Workflow pattern selected and confirmed with user
 - [ ] `.agent.md` file created with clear Role/Workflow/Done Criteria
 - [ ] Design principles checklist passed
