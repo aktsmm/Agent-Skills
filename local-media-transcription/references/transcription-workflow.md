@@ -45,6 +45,39 @@ Get-Content "C:\path\to\out\meeting.txt" -TotalCount 80
 - 参加者名が確定してから実名へ置換する
 - 名前が曖昧なままなら実名化しない
 
+#### 推奨ツール
+
+- `WhisperX`
+	- Whisper + forced alignment + diarization を一体で扱いやすい
+	- 会議録画の「だいたいの話者分け」を最短で作りたいときに向く
+- `pyannote.audio`
+	- 話者分離専用として柔軟
+	- 既に別の文字起こし結果があり、後段で diarization だけ追加したいときに向く
+
+#### 具体コマンド例
+
+##### WhisperX 例
+
+```powershell
+# 事前に whisperx が入っている前提
+whisperx "C:\path\to\meeting.mp4" --language ja --model large-v3 --diarize --output_dir "C:\path\to\out"
+```
+
+##### pyannote.audio 例
+
+```powershell
+# まず音声抽出
+ffmpeg -i "C:\path\to\meeting.mp4" -vn -ac 1 -ar 16000 "C:\path\to\meeting.wav"
+
+# その後 diarization スクリプトや notebook で話者分離
+```
+
+#### 実務上の使い分け
+
+- まず速く全体像を出したい: `WhisperX`
+- 既存の文字起こしに話者情報を後付けしたい: `pyannote.audio`
+- 環境準備が重い場合は、話者分離なしで先に議事録化し、必要箇所だけ人手補正する
+
 ### 議事録に整理するときの観点
 - 目的
 - 議題
@@ -88,3 +121,4 @@ Get-Content "C:\path\to\out\meeting.txt" -TotalCount 80
 ### 話者誤判定
 - 話者分離結果はそのまま信用せず、会議文脈で確認する
 - 話者交代が短い会話では、ラベルが揺れる前提でレビューする
+- 顧客向け議事録では、話者名確定前のラベルをそのまま出さない
