@@ -83,7 +83,6 @@ whisper "<media-file>" --language Japanese --task transcribe --model turbo --fp1
 - 以下の成果物を追加生成する
   - 議事録
   - 顧客向け清書版議事録
-  - 議事録
   - アクションアイテム
   - PPT要点
 
