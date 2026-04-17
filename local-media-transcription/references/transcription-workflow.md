@@ -54,6 +54,33 @@ Get-Content "C:\path\to\out\meeting.txt" -TotalCount 80
 	- 話者分離専用として柔軟
 	- 既に別の文字起こし結果があり、後段で diarization だけ追加したいときに向く
 
+#### インストール手順
+
+##### WhisperX
+
+```powershell
+# 新しい仮想環境を推奨
+python -m venv .venv-whisperx
+.\.venv-whisperx\Scripts\Activate.ps1
+
+pip install --upgrade pip
+pip install whisperx
+```
+
+> 注意: GPU / CUDA / torch の組み合わせで失敗しやすい。既存環境を壊したくない場合は別 venv を使う。
+
+##### pyannote.audio
+
+```powershell
+python -m venv .venv-pyannote
+.\.venv-pyannote\Scripts\Activate.ps1
+
+pip install --upgrade pip
+pip install pyannote.audio
+```
+
+> 注意: pyannote.audio は Hugging Face モデル利用前提になることがあり、追加認証やモデル同意が必要なケースがある。
+
 #### 具体コマンド例
 
 ##### WhisperX 例
@@ -109,6 +136,10 @@ ffmpeg -i "C:\path\to\meeting.mp4" -vn -ac 1 -ar 16000 "C:\path\to\meeting.wav"
 ### whisper の help 表示で文字化け / 例外
 - Windows の CP932 で `UnicodeEncodeError` が起きることがある
 - 実行時は `PYTHONIOENCODING=utf-8` を付ける
+
+### WhisperX / pyannote の依存衝突
+- 既存の whisper 環境に直接入れると torch 系の依存がぶつかることがある
+- 可能なら diarization 専用の別 venv を切る
 
 ### 長時間録画で時間がかかる
 - duration を先に見積もる
