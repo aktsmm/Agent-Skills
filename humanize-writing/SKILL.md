@@ -17,13 +17,15 @@ AI生成っぽさを検出して、人間らしい文章に直すSkill。
 - 日本語記事（Qiita / WordPress / note）、英語記事（Medium）、技術ドキュメント・README
 - キーワード: `AIっぽさ`, `humanize`, `人間らしく`, `文体チェック`, `AI感`, `ChatGPT tells`
 
-## 関連 Instruction
+## 関連 Instruction（任意）
 
-- [.github/instructions/writing-style.md](../../instructions/writing-style.md) 4.2「AIっぽさを避ける」
+このSkillは**単体で完結**する（他ファイルへの依存なし）。
+
+ワークスペースに文体ルールを常時適用したい場合は、`.github/instructions/writing-style.md` のような instruction を併用するとよい（任意）。
 
 Skill と instructions の棲み分け:
 - **instructions**: 記事を書く全工程で常に適用されるルール（文体ポリシー）
-- **SKILL.md**: AI文監査・変換という **特定タスク** の手順書
+- **SKILL.md**: AI文監査・変換という **特定タスク** の手順書（このファイル）
 
 ## Done Criteria
 
@@ -36,7 +38,7 @@ Skill と instructions の棲み分け:
 **生成指示型**:
 - [ ] 同じ書き出しの文が3連続しない
 - [ ] 抽象語ではなく具体語で書く
-- [ ] 体験と引用が主語レベルで分かれている（既存 writing-style 3 を踏襲）
+- [ ] 体験と引用が主語レベルで分かれている（自分がやった／AIにやらせた／公式ドキュメントからの引用 を混同しない）
 
 ## Permissions
 
