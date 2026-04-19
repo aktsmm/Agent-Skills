@@ -11,11 +11,11 @@ These files are expected to be edited immediately after workspace creation.
 
 ## Writing Management
 
-| File                         | Why edit it                                                      |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `docs/page-allocation.md`    | Set chapter and file-level character targets                     |
-| `docs/schedule.md`           | Replace placeholder milestones and track progress                |
-| `docs/naming-conventions.md` | Adjust file and image naming if the team uses a different scheme |
+| File                                                   | Why edit it                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------- |
+| `docs/page-allocation.md`                              | Set chapter and file-level character targets                        |
+| `docs/schedule.md`                                     | Replace placeholder milestones and track progress                   |
+| `docs/naming-conventions.md`                           | Adjust file and image naming if the team uses a different scheme    |
 | `.github/instructions/writing/writing.instructions.md` | Tune table-first writing, figure usage, and section structure rules |
 
 ## Outline vs Manuscript Presentation Rules

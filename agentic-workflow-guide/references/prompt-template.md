@@ -121,11 +121,11 @@ If a prompt does not need a specific sub-agent binding, omit `agent` entirely an
 
 Use a prompt when the task is a single focused request with parameterized input.
 
-| Need | Best fit |
-| ---- | -------- |
-| One focused task | Prompt |
-| Multi-step workflow with bundled assets | Skill |
-| Specialist role or tool boundary | Agent |
+| Need                                    | Best fit |
+| --------------------------------------- | -------- |
+| One focused task                        | Prompt   |
+| Multi-step workflow with bundled assets | Skill    |
+| Specialist role or tool boundary        | Agent    |
 
 Quick check:
 
