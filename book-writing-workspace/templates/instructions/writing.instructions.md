@@ -27,6 +27,14 @@ Guidelines for manuscript writing style and quality.
 - Why -> What to protect -> How to design
 - End with practical application, not just theory
 
+## Source Confidence
+
+- Do not write feature behavior, limits, UI paths, metrics, or procedures from guesswork.
+- If a point is not verified, do not smooth it into final prose with plausible wording.
+- Keep unresolved items in outline or key-points notes as explicit verification tasks, not as normal explanatory sentences.
+- Final manuscript files should contain only verified statements or clearly attributed interpretation.
+- Avoid fallback phrasing such as "probably", "should be", or similar hedges when they are only hiding missing verification.
+
 ## Introduction Pattern
 
 1. Hook
@@ -69,3 +77,4 @@ See `docs/page-allocation.md` for detailed targets per file type.
 - Consecutive bullet lists without prose breaks
 - Translation-style Japanese
 - Sentences over 500 characters
+- Speculative statements presented as facts

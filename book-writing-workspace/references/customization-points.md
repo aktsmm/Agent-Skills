@@ -17,6 +17,7 @@ These files are expected to be edited immediately after workspace creation.
 | `docs/schedule.md`                                     | Replace placeholder milestones and track progress                   |
 | `docs/naming-conventions.md`                           | Adjust file and image naming if the team uses a different scheme    |
 | `.github/instructions/writing/writing.instructions.md` | Tune table-first writing, figure usage, and section structure rules |
+| `.github/instructions/writing/writing-notation.instructions.md` | Tune language, notation, and diagram label rules for the manuscript |
 
 ## Outline vs Manuscript Presentation Rules
 
@@ -34,6 +35,22 @@ If the workspace uses both outline files and final manuscript files, define earl
 
 Diagram needs are often discovered too late if they are deferred until section drafting.
 Likewise, comparison-heavy sections become harder to read when they stay as prose or bullets instead of being normalized into tables.
+
+## Verification and Diagram Language Rules
+
+Before large-scale drafting begins, decide two policy points explicitly.
+
+### Recommended Rule
+
+- Keep unverified items in outline or key-points material as explicit follow-up notes
+- Do not let unresolved facts drift into final prose as plausible-sounding explanation
+- Decide whether diagrams should default to the manuscript language, and document the limited cases where original-language labels stay visible
+- Keep operation names or official feature names in their original language only when readers are expected to recognize them that way
+
+### Why This Matters
+
+Speculative prose becomes expensive to detect once it has spread across multiple chapters.
+Likewise, diagrams often drift into all-English labeling even when the manuscript is written for another language audience, which creates avoidable reading friction.
 
 ## Automation
 

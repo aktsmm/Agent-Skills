@@ -50,6 +50,15 @@ Use Japanese only, or the acronym if already introduced.
   - Azure Active Directory
   - GitHub Copilot
 
+## Diagram Labels
+
+- Default diagram labels, box titles, and helper text to the main manuscript language.
+- Keep original-language operation names, feature names, or product names only when they are the terms readers are expected to recognize.
+- When needed, combine both forms instead of choosing one rigidly.
+  - Example: `pull (pull)` or `pull (fetch updates)` depending on the audience language and book style
+- Do not leave the entire diagram in English when the surrounding manuscript is not, unless you are reproducing an official UI or quoting a source artifact.
+- Keep explanatory text in diagrams reader-facing and plain; avoid tool-author jargon.
+
 ## Consistency Checklist
 
 - [ ] Numbers are half-width
@@ -57,3 +66,4 @@ Use Japanese only, or the acronym if already introduced.
 - [ ] Terms explained on first use
 - [ ] Product names match official
 - [ ] Acronyms introduced properly
+- [ ] Diagram labels follow the manuscript language policy
