@@ -50,11 +50,11 @@ The built-in `agent-customization` skill draws a hard line:
 
 Use this distinction when designing workflow systems:
 
-| Situation | Best fit |
-| --------- | -------- |
-| Encourage a workflow or style | Prompt / Instruction / Skill |
-| Restrict tools or specialize a role | Agent |
-| Guarantee a check runs before or after an event | Hook |
+| Situation                                       | Best fit                     |
+| ----------------------------------------------- | ---------------------------- |
+| Encourage a workflow or style                   | Prompt / Instruction / Skill |
+| Restrict tools or specialize a role             | Agent                        |
+| Guarantee a check runs before or after an event | Hook                         |
 
 If a requirement includes words like "always block", "must ask", "inject at session start", or "run automatically before tool use", evaluate Hook explicitly.
 

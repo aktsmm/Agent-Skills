@@ -21,33 +21,33 @@ Use hooks when workflow behavior must run, block, ask, or inject context at a kn
 
 ## Guidance vs Enforcement
 
-| Need | Use |
-| ---- | --- |
+| Need                         | Use                                  |
+| ---------------------------- | ------------------------------------ |
 | Encourage preferred behavior | Prompt / Instruction / Skill / Agent |
-| Guarantee lifecycle behavior | Hook |
+| Guarantee lifecycle behavior | Hook                                 |
 
 If the requirement includes "always block", "must ask", "auto-run", or "inject at session start", evaluate Hook first.
 
 ## Locations
 
-| Path | Scope |
-| ---- | ----- |
+| Path                   | Scope     |
+| ---------------------- | --------- |
 | `.github/hooks/*.json` | Workspace |
 
 Prefer workspace hooks for team policy. Keep personal automation outside the repo when it should not be shared.
 
 ## Lifecycle Events
 
-| Event | Trigger |
-| ----- | ------- |
-| `SessionStart` | First prompt of a new session |
-| `UserPromptSubmit` | User submits a prompt |
-| `PreToolUse` | Before tool invocation |
-| `PostToolUse` | After successful tool invocation |
-| `PreCompact` | Before context compaction |
-| `SubagentStart` | Subagent starts |
-| `SubagentStop` | Subagent ends |
-| `Stop` | Agent session ends |
+| Event              | Trigger                          |
+| ------------------ | -------------------------------- |
+| `SessionStart`     | First prompt of a new session    |
+| `UserPromptSubmit` | User submits a prompt            |
+| `PreToolUse`       | Before tool invocation           |
+| `PostToolUse`      | After successful tool invocation |
+| `PreCompact`       | Before context compaction        |
+| `SubagentStart`    | Subagent starts                  |
+| `SubagentStop`     | Subagent ends                    |
+| `Stop`             | Agent session ends               |
 
 ## Minimal Shape
 

@@ -47,6 +47,14 @@ python scripts/setup_workspace.py `
 - Keep chapter intro in `ch{N}-00_<title>.md` and section files in `ch{N}-01_...`, `ch{N}-02_...`.
 - For PDF/Re:VIEW output, heading levels define hierarchy, while file split mainly improves authoring and review workflow.
 
+## Diagram and Table Planning
+
+- Plan diagrams in the outline or key-points stage instead of waiting until full manuscript drafting.
+- For each planned diagram, note both **what to draw** and **what the reader should understand at a glance**.
+- Prefer diagrams for flows, hierarchy, lifecycle, role relationships, or source/target direction.
+- Prefer tables in full manuscript sections when readers need to compare 3 or more items such as roles, terms, plans, feature differences, or tool fit.
+- Use diagrams for flow and tables for comparison; do not force both into the same job.
+
 ## Migration Checklist (Path / Naming Changes)
 
 When reorganizing workspace paths or file naming rules, update these together:

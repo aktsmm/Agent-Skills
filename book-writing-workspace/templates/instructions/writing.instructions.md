@@ -47,9 +47,17 @@ Guidelines for manuscript writing style and quality.
 | Element      | Rule                                                            |
 | ------------ | --------------------------------------------------------------- |
 | Bullet lists | Max 3 consecutive in a section, end with prose                  |
-| Tables       | Max 1 per section, column headers <= 6 chars, cells <= 20 chars |
-| Figures      | For concept or flow only, numbered with captions                |
+| Tables       | Prefer for 3+ item comparisons; keep headers short and scannable |
+| Figures      | Plan from outline stage; use for concept, flow, hierarchy, or direction |
 | Images       | Format: `![Image: Title](images/fig-X-X-XX.png)`                |
+
+## Diagram and Table Rules
+
+- If a section compares terms, roles, plans, tools, or options, check whether a table is clearer than bullets or prose.
+- If a section explains flow, direction, lifecycle, source/target movement, or hierarchy, plan a figure before expanding the prose.
+- Keep diagram intent explicit in the outline: note both the visual type and the reader takeaway.
+- Use tables for comparison and figures for flow; do not overload a table with process steps that belong in a diagram.
+- When using a figure, add 1 to 2 sentences before or after it to tell the reader what to look at.
 
 ## Word Count Targets
 

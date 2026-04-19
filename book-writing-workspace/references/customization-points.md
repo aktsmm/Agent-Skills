@@ -16,6 +16,24 @@ These files are expected to be edited immediately after workspace creation.
 | `docs/page-allocation.md`    | Set chapter and file-level character targets                     |
 | `docs/schedule.md`           | Replace placeholder milestones and track progress                |
 | `docs/naming-conventions.md` | Adjust file and image naming if the team uses a different scheme |
+| `.github/instructions/writing/writing.instructions.md` | Tune table-first writing, figure usage, and section structure rules |
+
+## Outline vs Manuscript Presentation Rules
+
+If the workspace uses both outline files and final manuscript files, define early which ideas should be planned as diagrams and which should be rendered as tables in the full text.
+
+### Recommended Rule
+
+- Put diagram candidates in the outline or key-points side before drafting the full prose
+- For each diagram candidate, capture the reader goal, not just the topic name
+- Use tables in the final manuscript when comparing 3 or more terms, roles, plans, tools, or options
+- Use diagrams for flow, direction, sequence, hierarchy, or source/target relationships
+- Do not leave comparison-heavy sections as long bullet lists if a table would let the reader re-scan faster
+
+### Why This Matters
+
+Diagram needs are often discovered too late if they are deferred until section drafting.
+Likewise, comparison-heavy sections become harder to read when they stay as prose or bullets instead of being normalized into tables.
 
 ## Automation
 

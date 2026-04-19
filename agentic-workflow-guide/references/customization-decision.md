@@ -4,22 +4,22 @@ Choose the simplest customization primitive that can solve the problem.
 
 ## Decision Matrix
 
-| Need | Best Fit | Why | Avoid When |
-| ---- | -------- | --- | ---------- |
-| One focused slash task | Prompt | Fastest path, minimal ceremony | The task needs bundled scripts or reusable references |
-| Always-on or file-scoped guidance | Instruction | Loads automatically or on demand | The behavior is really a workflow |
-| Reusable workflow with bundled scripts, references, or templates | Skill | Best for repeatable task packages | The ask is only persona or tool restrictions |
-| Persona, tool restrictions, delegation, or handoffs | Agent | Gives role boundaries and orchestration | The task can be solved without role isolation |
-| Deterministic blocking, validation, or auto-execution | Hook | Enforces behavior at runtime | Guidance alone is enough |
+| Need                                                             | Best Fit    | Why                                     | Avoid When                                            |
+| ---------------------------------------------------------------- | ----------- | --------------------------------------- | ----------------------------------------------------- |
+| One focused slash task                                           | Prompt      | Fastest path, minimal ceremony          | The task needs bundled scripts or reusable references |
+| Always-on or file-scoped guidance                                | Instruction | Loads automatically or on demand        | The behavior is really a workflow                     |
+| Reusable workflow with bundled scripts, references, or templates | Skill       | Best for repeatable task packages       | The ask is only persona or tool restrictions          |
+| Persona, tool restrictions, delegation, or handoffs              | Agent       | Gives role boundaries and orchestration | The task can be solved without role isolation         |
+| Deterministic blocking, validation, or auto-execution            | Hook        | Enforces behavior at runtime            | Guidance alone is enough                              |
 
 ## Guidance vs Enforcement
 
 This distinction is easy to blur when designing workflow customizations.
 
-| Need | Use | Why |
-| ---- | --- | --- |
-| Tell the model what it should usually do | Prompt / Instruction / Skill / Agent | Guidance is flexible and conversational |
-| Guarantee that something runs, blocks, or asks at a lifecycle event | Hook | Runtime enforcement must be deterministic |
+| Need                                                                | Use                                  | Why                                       |
+| ------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------- |
+| Tell the model what it should usually do                            | Prompt / Instruction / Skill / Agent | Guidance is flexible and conversational   |
+| Guarantee that something runs, blocks, or asks at a lifecycle event | Hook                                 | Runtime enforcement must be deterministic |
 
 Examples:
 
@@ -48,10 +48,10 @@ Use complexity only when required.
 
 ## Scope Guidance
 
-| Scope | Use When |
-| ----- | -------- |
-| Workspace | Shared with the team or tied to a repo |
-| User profile | Personal preference across repos |
+| Scope        | Use When                               |
+| ------------ | -------------------------------------- |
+| Workspace    | Shared with the team or tied to a repo |
+| User profile | Personal preference across repos       |
 
 ## Overdesign Smells
 
