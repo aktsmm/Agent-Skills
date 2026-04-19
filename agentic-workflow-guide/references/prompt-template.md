@@ -67,6 +67,40 @@ VS Code validates frontmatter strictly. Only use supported fields — unsupporte
 | `.instructions.md` | `applyTo`                                                         | All other fields are **NOT** supported                      |
 | `.skill.md`        | `name`, `description`, `license`, `metadata`                      | Supports nested `metadata:` block                           |
 
+### Recommended `.prompt.md` frontmatter shapes
+
+Keep prompt frontmatter minimal unless a bound agent, model, or tool restriction is required.
+
+```yaml
+---
+description: "Summarize selected logs into a markdown incident report"
+---
+```
+
+```yaml
+---
+description: "Generate test cases for selected code"
+agent: reviewer
+argument-hint: path or selected code context
+---
+```
+
+```yaml
+---
+description: "Investigate issue history using GitHub and web search"
+agent: researcher
+tools: [search, web]
+---
+```
+
+Use `agent:` only when the prompt should consistently route through a specific agent role. Otherwise omit it.
+
+### Tool priority
+
+When both a prompt and a referenced custom agent define tools, the prompt-level tool configuration wins.
+
+Use that sparingly. If the prompt always needs a narrower tool set than the agent, it may be a sign that the agent boundary is wrong.
+
 **Workaround for custom metadata** (author, copyright, repository, license):  
 Use HTML comments — they are ignored by the validator but preserved in the file.
 
@@ -82,6 +116,22 @@ description: "What this prompt does"
 ```
 
 If a prompt does not need a specific sub-agent binding, omit `agent` entirely and keep the frontmatter minimal.
+
+## Prompt vs Skill vs Agent
+
+Use a prompt when the task is a single focused request with parameterized input.
+
+| Need | Best fit |
+| ---- | -------- |
+| One focused task | Prompt |
+| Multi-step workflow with bundled assets | Skill |
+| Specialist role or tool boundary | Agent |
+
+Quick check:
+
+- If you are writing a reusable task sentence, start with a prompt
+- If you need scripts, templates, or references, move to a skill
+- If the behavior depends on role isolation or tool restriction, use an agent
 
 ## Minimal Template (Quick Use)
 

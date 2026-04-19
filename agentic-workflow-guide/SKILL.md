@@ -64,13 +64,14 @@ If the ask does not require an **Agent**, stop and create the simpler primitive.
 
 ## Design Workflow
 
-0. **Primitive + Scope** - Choose prompt / instruction / skill / agent / hook, and decide workspace vs profile
-1. **Requirements** - Goal, subtasks, dependencies, quality criteria
-2. **Escalation Check** - Confirm why agent or multi-agent is needed
-3. **Pattern Selection** - Ask user to confirm the chosen pattern when it changes complexity materially
-4. **Design Diagram** - Visualize with Mermaid when it clarifies roles or handoffs
-5. **Principle Check** - Validate against review checklist
-6. **Implement & Iterate** - Build small → verify → improve
+0. **Extract from Conversation** - Generalize repeated behavior, tool preferences, and workflow shape before asking questions
+1. **Primitive + Scope** - Choose prompt / instruction / skill / agent / hook, and decide workspace vs profile
+2. **Clarify Only the Gaps** - Ask only for the missing ambiguity that materially changes behavior
+3. **Escalation Check** - Confirm why agent or multi-agent is needed
+4. **Pattern Selection** - Ask user to confirm the chosen pattern when it changes complexity materially
+5. **Design Diagram** - Visualize with Mermaid when it clarifies roles or handoffs
+6. **Principle Check** - Validate against review checklist
+7. **Implement & Iterate** - Draft → identify weak spots → refine → propose adjacent customizations
 
 ## When to Escalate
 
@@ -101,9 +102,11 @@ If the ask does not require an **Agent**, stop and create the simpler primitive.
 | Topic              | Reference                                                              |
 | ------------------ | ---------------------------------------------------------------------- |
 | Primitive Decision | [references/customization-decision.md](references/customization-decision.md) |
+| Built-in Patterns  | [references/builtin-customization-patterns.md](references/builtin-customization-patterns.md) |
 | Prompt Template    | [references/prompt-template.md](references/prompt-template.md)         |
 | agent              | [references/agent-guide.md](references/agent-guide.md)                 |
 | Agent Template     | [references/agent-template.md](references/agent-template.md)           |
+| Hooks              | [references/hooks-guide.md](references/hooks-guide.md)                 |
 | **Agent Placement**| [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
 | Context Management | [references/context-engineering.md](references/context-engineering.md) |
 | **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
