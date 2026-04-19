@@ -54,6 +54,7 @@ name: <agent-name> # Required: Identifier for @mention
 description: <description> # Required: One-line role description
 model: <model-name> # Optional: LLM model to use
 tools: [...] # Optional: Tool whitelist
+agents: [...] # Optional: Restrict which subagents may be invoked
 handoffs: [...] # Optional: Agent transitions (must be objects with label/agent/prompt/send)
 user-invocable: true # Optional: Show in agents dropdown (default: true)
 disable-model-invocation: false # Optional: Prevent subagent invocation (default: false)
@@ -62,7 +63,15 @@ disable-model-invocation: false # Optional: Prevent subagent invocation (default
 
 > **Model note:** `model:` is optional. Do not guess model names. If you have not verified the exact display name in the current environment, omit `model:` instead of using speculative values like `gpt-4o`.
 
+When fallback matters, `model:` can be an ordered array and the first available model is used.
+
+```yaml
+model: ['GPT-5 (copilot)', 'Claude Sonnet 4.5 (copilot)']
+```
+
 `handoffs` は文字列配列ではなく、`label`・`agent`・`prompt`・`send` を持つオブジェクト配列で定義する。
+
+`agents` は親 agent が呼び出せる subagent 名の制限。省略すると全許可、`[]` なら subagent 呼び出し禁止。
 
 ### ⚠️ 非標準フィールド禁止（バリデーションエラーの原因）
 
@@ -263,6 +272,13 @@ Use these aliases first:
 
 Avoid raw runtime tool IDs in `.agent.md` frontmatter. Names such as `read_file`, `grep_search`, and `semantic_search` are chat/runtime tool identifiers, not portable custom-agent tool names, and they trigger validation errors.
 
+Body から特定ツールを明示したい場合は `#tool:<name>` 参照を使う。
+
+```markdown
+Use #tool:agent for each independent file review.
+Use #tool:web when external documentation is required.
+```
+
 > **⚠️ Orchestrator の tools 制限に注意**: 親エージェントの `tools:` はサブエージェントの **ツール上限（ceiling）** として機能する。Orchestrator の `tools:` から `edit` を外すと、サブエージェント（Writer 等）も `edit` を使えなくなる。Orchestrator は `tools:` を省略する（= 全ツール利用可）のが推奨。SRP の強制は `tools:` ではなくプロンプト内の MANDATORY 指示で行うこと。詳細は [agent-guide.md の Pitfall 7](agent-guide.md#pitfall-7-restricting-orchestrators-tools-breaks-sub-agents) を参照。
 
 ### ⚠️ tools フィールドの注意事項
@@ -284,6 +300,40 @@ Avoid raw runtime tool IDs in `.agent.md` frontmatter. Names such as `read_file`
 - `problems` / `changes` / `usages` / `codebase` / `githubRepo` → `#problems` 等でチャット内参照は可能だが、`tools:` ホワイトリストには登録不可
 
 ## Agent Body Structure
+
+## Built-in Aligned Minimal Template
+
+If you do not need the full structured template, start from this smaller built-in aligned shape and expand only when required.
+
+```markdown
+---
+description: "Use when... trigger phrases for subagent discovery"
+tools: [read, search]
+user-invocable: false
+---
+You are a specialist at {specific task}. Your job is to {clear purpose}.
+
+## Constraints
+- DO NOT {thing this agent should never do}
+- DO NOT {another restriction}
+- ONLY {the core responsibility}
+
+## Approach
+1. {Step one}
+2. {Step two}
+3. {Step three}
+
+## Output Format
+{Exactly what this agent should return}
+```
+
+Use the minimal template when:
+
+- the agent is single-purpose
+- tool boundaries matter more than rich documentation
+- the return format is more important than a long workflow narrative
+
+Use the full template below when you need explicit I/O contracts, progress reporting, or error handling tables.
 
 Each agent should include these sections:
 
