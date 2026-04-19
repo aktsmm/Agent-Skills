@@ -66,7 +66,7 @@ disable-model-invocation: false # Optional: Prevent subagent invocation (default
 When fallback matters, `model:` can be an ordered array and the first available model is used.
 
 ```yaml
-model: ["GPT-5 (copilot)", "Claude Sonnet 4.5 (copilot)"]
+model: ['GPT-5 (copilot)', 'Claude Sonnet 4.5 (copilot)']
 ```
 
 `handoffs` は文字列配列ではなく、`label`・`agent`・`prompt`・`send` を持つオブジェクト配列で定義する。
