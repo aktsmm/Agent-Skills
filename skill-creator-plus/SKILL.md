@@ -1,6 +1,6 @@
 ---
 name: skill-creator-plus
-description: Guide for designing and reviewing high-quality Agent Skills, and for deciding when a request should be a skill instead of a prompt, instruction, agent, or hook. Use when creating a new skill, updating an existing skill, reviewing SKILL.md files, or fixing poor skill triggering. Triggers on "create skill", "review skill", "fix skill trigger", "SKILL.md", "スキル作成".
+description: Guide for designing and reviewing high-quality Agent Skills, and for deciding when a request should be a skill instead of a prompt, instruction, agent, or hook. Use when creating a new skill, updating an existing skill, reviewing SKILL.md files, or fixing poor skill triggering. Triggers on "create skill", "/create-skill", "review skill", "fix skill trigger", "SKILL.md", "スキル作成".
 license: Apache-2.0
 metadata:
   author: yamapan (based on Anthropic)
@@ -28,7 +28,7 @@ If the answer is not **Skill**, stop and create the right primitive instead.
 
 ## When to Use
 
-- **Create skill**, **new skill**, **review skill**, **fix skill trigger**, **SKILL.md**, **スキル作成**
+- **Create skill**, **/create-skill**, **new skill**, **review skill**, **fix skill trigger**, **SKILL.md**, **スキル作成**
 - Creating a new skill from scratch
 - Updating or refactoring an existing skill
 - Reviewing existing SKILL.md files
@@ -127,6 +127,7 @@ Start with **generic keywords** users are likely to say:
 - Link to references for details
 - Keep essential workflow only
 - Add decision points when misuse is common
+- Reuse a proven shape from `references/skill-structure-gallery.md` before inventing a custom layout
 - Push reference material out of SKILL.md aggressively
 
 ## Review Checklist
@@ -148,6 +149,7 @@ Start with **generic keywords** users are likely to say:
 | ---------------- | ---------------------------------------------------------------------------- |
 | Primitive Choice | [references/customization-primitives.md](references/customization-primitives.md) |
 | Skill Structure  | [references/skill-structure.md](references/skill-structure.md)               |
+| Structure Gallery | [references/skill-structure-gallery.md](references/skill-structure-gallery.md) |
 | Creation Process | [references/creation-process.md](references/creation-process.md)             |
 | Review Checklist | [references/skill-review-checklist.md](references/skill-review-checklist.md) |
 | Common Pitfalls  | [references/common-pitfalls.md](references/common-pitfalls.md)               |
