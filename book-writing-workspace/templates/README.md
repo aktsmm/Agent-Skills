@@ -45,5 +45,6 @@ python scripts/inspect_pdf.py 03_re-view_output/output_pdf/book.pdf
 ## Metadata Layer
 
 1. Put stable shared cover and colophon defaults in `config/review-metadata/common.yml`
-2. Put project-specific author, publisher, title, and subtitle values in `config/review-metadata/project.yml`
-3. Regenerate Re:VIEW config and cover assets through the helper scripts instead of editing generated files directly
+2. Put project-specific author, publisher, title, subtitle, and series badge values in `config/review-metadata/project.yml`
+3. If the repo contains a series, compare title naming patterns across books before fixing one title alone
+4. Regenerate Re:VIEW config and cover assets through the helper scripts instead of editing generated files directly

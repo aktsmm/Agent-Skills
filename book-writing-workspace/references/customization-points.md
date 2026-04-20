@@ -4,21 +4,21 @@ These files are expected to be edited immediately after workspace creation.
 
 ## Project Metadata
 
-| File                              | Why edit it                                             |
-| --------------------------------- | ------------------------------------------------------- |
-| `README.md`                       | Describe the book scope, workflow, and repository usage |
-| `.github/copilot-instructions.md` | Define readers, goals, and project-specific constraints |
-| `config/review-metadata/common.yml` | Tune stable shared defaults such as cover palette and colophon defaults |
+| File                                 | Why edit it                                                                                    |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| `README.md`                          | Describe the book scope, workflow, and repository usage                                        |
+| `.github/copilot-instructions.md`    | Define readers, goals, and project-specific constraints                                        |
+| `config/review-metadata/common.yml`  | Tune stable shared defaults such as cover palette and colophon defaults                        |
 | `config/review-metadata/project.yml` | Set project-specific metadata such as author list, publisher, title, subtitle, and cover badge |
 
 ## Writing Management
 
-| File                                                   | Why edit it                                                         |
-| ------------------------------------------------------ | ------------------------------------------------------------------- |
-| `docs/page-allocation.md`                              | Set chapter and file-level character targets                        |
-| `docs/schedule.md`                                     | Replace placeholder milestones and track progress                   |
-| `docs/naming-conventions.md`                           | Adjust file and image naming if the team uses a different scheme    |
-| `.github/instructions/writing/writing.instructions.md` | Tune table-first writing, figure usage, and section structure rules |
+| File                                                            | Why edit it                                                         |
+| --------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `docs/page-allocation.md`                                       | Set chapter and file-level character targets                        |
+| `docs/schedule.md`                                              | Replace placeholder milestones and track progress                   |
+| `docs/naming-conventions.md`                                    | Adjust file and image naming if the team uses a different scheme    |
+| `.github/instructions/writing/writing.instructions.md`          | Tune table-first writing, figure usage, and section structure rules |
 | `.github/instructions/writing/writing-notation.instructions.md` | Tune language, notation, and diagram label rules for the manuscript |
 
 ## Outline vs Manuscript Presentation Rules
@@ -73,11 +73,13 @@ If the workspace uses a shared metadata layer for Re:VIEW/PDF output, separate s
 - Put only stable shared defaults in `config/review-metadata/common.yml`
 - Keep author lists, publisher, title, subtitle, and other project-specific fields in `config/review-metadata/project.yml`
 - Do not place contributor-specific names in the common metadata file
+- Keep cover author typography settings such as suffix, font size, and position in metadata/helper defaults
+- If the repo contains a series, compare title patterns across books before finalizing one book's `booktitle` or `subtitle`
 - Regenerate `config.yml` and cover assets from the metadata layer instead of editing generated files by hand
 
 ### Why This Matters
 
-People, publisher details, and title wording vary per project. If they are stored in a common metadata file, they leak across projects and are easy to forget during setup or retrofits.
+People, publisher details, title wording, and cover readability vary per project. If they are stored in a common metadata file or fixed only in exported images, they leak across projects and are easy to forget during setup or retrofits.
 
 ## LaTeX Style Injection Point
 

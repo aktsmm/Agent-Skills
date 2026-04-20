@@ -12,3 +12,8 @@ cover:
   subtitle_color: "#355B4B"
   author_color: "#244738"
   publisher_color: "#355B4B"
+  author_suffix: 著
+  author_font_size: 54
+  author_y: 1860
+  publisher_font_size: 38
+  publisher_y: 2140

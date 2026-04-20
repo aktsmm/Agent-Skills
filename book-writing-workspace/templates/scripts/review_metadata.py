@@ -77,6 +77,11 @@ def load_review_metadata(workspace_root: Path, metadata_name: str = "project") -
     cover.setdefault("publisher_color", "#355B4B")
     cover.setdefault("badge", "")
     cover.setdefault("strapline", "")
+    cover.setdefault("author_suffix", "著")
+    cover.setdefault("author_font_size", 54)
+    cover.setdefault("author_y", 1860)
+    cover.setdefault("publisher_font_size", 38)
+    cover.setdefault("publisher_y", 2140)
     return merged
 
 
@@ -166,6 +171,15 @@ def _draw_multiline(draw, text, font, fill, x, y, max_width, line_spacing):
     return current_y
 
 
+def _format_cover_author_text(authors: list[str], suffix: str) -> str:
+    if not authors:
+        return ""
+    if len(authors) == 1:
+        return f"{authors[0]}　{suffix}" if suffix else authors[0]
+    joined = " / ".join(authors)
+    return f"{joined}　{suffix}" if suffix else joined
+
+
 def generate_cover_image(workspace_root: Path, review_root: Path, metadata: dict) -> Path | None:
     cover = metadata.get("cover", {})
     if not cover.get("enabled", False):
@@ -192,7 +206,8 @@ def generate_cover_image(workspace_root: Path, review_root: Path, metadata: dict
 
     title_font = _find_font([r"C:\Windows\Fonts\YuGothB.ttc", r"C:\Windows\Fonts\meiryob.ttc", r"C:\Windows\Fonts\msgothic.ttc"], 96)
     subtitle_font = _find_font([r"C:\Windows\Fonts\YuGothM.ttc", r"C:\Windows\Fonts\meiryo.ttc", r"C:\Windows\Fonts\msgothic.ttc"], 42)
-    author_font = _find_font([r"C:\Windows\Fonts\YuGothM.ttc", r"C:\Windows\Fonts\meiryo.ttc", r"C:\Windows\Fonts\msgothic.ttc"], 34)
+    author_font = _find_font([r"C:\Windows\Fonts\YuGothM.ttc", r"C:\Windows\Fonts\meiryo.ttc", r"C:\Windows\Fonts\msgothic.ttc"], int(cover["author_font_size"]))
+    publisher_font = _find_font([r"C:\Windows\Fonts\YuGothM.ttc", r"C:\Windows\Fonts\meiryo.ttc", r"C:\Windows\Fonts\msgothic.ttc"], int(cover["publisher_font_size"]))
     badge_font = _find_font([r"C:\Windows\Fonts\YuGothB.ttc", r"C:\Windows\Fonts\meiryob.ttc", r"C:\Windows\Fonts\msgothic.ttc"], 30)
 
     badge = cover.get("badge", "")
@@ -212,13 +227,14 @@ def generate_cover_image(workspace_root: Path, review_root: Path, metadata: dict
 
     authors = metadata.get("aut", [])
     if authors:
-        draw.text((100, 1920), " / ".join(authors), font=author_font, fill=cover["author_color"])
+        author_text = _format_cover_author_text(authors, str(cover.get("author_suffix", "")))
+        draw.text((100, int(cover["author_y"])), author_text, font=author_font, fill=cover["author_color"])
 
     publisher = metadata.get("pbl")
     if publisher:
-        publisher_bbox = draw.textbbox((0, 0), publisher, font=author_font)
+        publisher_bbox = draw.textbbox((0, 0), publisher, font=publisher_font)
         publisher_width = publisher_bbox[2] - publisher_bbox[0]
-        draw.text((width - 100 - publisher_width, 2140), publisher, font=author_font, fill=cover["publisher_color"])
+        draw.text((width - 100 - publisher_width, int(cover["publisher_y"])), publisher, font=publisher_font, fill=cover["publisher_color"])
 
     image.save(output_path, quality=92)
     return output_path

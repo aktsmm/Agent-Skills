@@ -18,6 +18,7 @@ Create and maintain a reusable manuscript workspace with folders, agents, prompt
 - Setting up Markdown → Re:VIEW → PDF workflow
 - Upgrading an existing manuscript workspace so it can generate Re:VIEW output and printable PDFs
 - Standardizing PDF house style, title pages, running headers, side markers, metadata, and review output folders across multiple books in the same repo
+- Standardizing metadata layers, cover assets, series title patterns, and cover typography across multiple books in the same repo
 
 ## Quick Start
 
@@ -52,6 +53,8 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 - Keep project-specific fields such as author list, publisher, title, subtitle, and book badge in `config/review-metadata/project.yml`
 - Do not put contributor- or project-specific author names into the common metadata file
 - Generate `config.yml` and cover assets from the metadata layer rather than hard-coding them in multiple scripts
+- If multiple books belong to one series, compare their `booktitle` and `subtitle` patterns together before fixing one title in isolation
+- Keep cover author typography such as suffix, size, and vertical position in metadata/helper defaults rather than patching exported images by hand
 
 ## Generated Workspace
 
@@ -109,6 +112,8 @@ When introducing or changing a metadata layer:
 2. Regenerate `config.yml` from metadata instead of editing it by hand
 3. Rebuild the cover image and final PDF after metadata changes
 4. Verify the title page, cover, and colophon in the final PDF, not only the YAML files
+5. If the repo contains a series, compare title naming patterns across books before finalizing one cover/title set
+6. When cover readability issues appear, change metadata/helper defaults first and re-render the cover before editing any exported asset manually
 
 ## Agents Overview
 
