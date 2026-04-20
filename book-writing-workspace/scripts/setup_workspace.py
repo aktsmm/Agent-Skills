@@ -57,9 +57,11 @@ def create_directory_structure(
     # Optional: Re:VIEW output
     if include_review:
         dirs.extend([
+            "config/review-metadata",
             "03_re-view_output/output_re",
             "03_re-view_output/output_pdf",
             "03_re-view_output/images",
+            "03_re-view_output/sty",
         ])
     
     # Optional: Materials
@@ -118,6 +120,27 @@ def copy_template_files(base_path: Path, book_title: str) -> None:
         else:
             print(f"  ⚠️ Template not found: {src}")
 
+    review_templates = {
+        "custom-titlepage.tex": "03_re-view_output/custom-titlepage.tex",
+        "review-ext.rb": "03_re-view_output/review-ext.rb",
+        "sty/review-custom.sty": "03_re-view_output/sty/review-custom.sty",
+        "sty/review-style.sty": "03_re-view_output/sty/review-style.sty",
+        "review-metadata/common.yml": "config/review-metadata/common.yml",
+        "review-metadata/project.yml": "config/review-metadata/project.yml",
+    }
+
+    for src, dst in review_templates.items():
+        src_path = TEMPLATES_DIR / src
+        dst_path = base_path / dst
+        if src_path.exists():
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+            content = src_path.read_text(encoding="utf-8")
+            content = content.replace("{{BOOK_TITLE}}", book_title)
+            dst_path.write_text(content, encoding="utf-8")
+            print(f"  ✅ Created: {dst}")
+        else:
+            print(f"  ⚠️ Template not found: {src}")
+
 
 def copy_scripts(base_path: Path) -> None:
     """Copy utility scripts."""
@@ -125,6 +148,9 @@ def copy_scripts(base_path: Path) -> None:
     scripts = [
         "count_chars.py",
         "convert_md_to_review.py",
+        "build_review_pdf.py",
+        "inspect_pdf.py",
+        "review_metadata.py",
     ]
     
     for script in scripts:

@@ -8,6 +8,8 @@ These files are expected to be edited immediately after workspace creation.
 | --------------------------------- | ------------------------------------------------------- |
 | `README.md`                       | Describe the book scope, workflow, and repository usage |
 | `.github/copilot-instructions.md` | Define readers, goals, and project-specific constraints |
+| `config/review-metadata/common.yml` | Tune stable shared defaults such as cover palette and colophon defaults |
+| `config/review-metadata/project.yml` | Set project-specific metadata such as author list, publisher, title, subtitle, and cover badge |
 
 ## Writing Management
 
@@ -59,6 +61,23 @@ Likewise, diagrams often drift into all-English labeling even when the manuscrip
 | `.github/agents/*.agent.md`       | Tune permissions or prompts for your team workflow       |
 | `.github/prompts/*.prompt.md`     | Update branch or git conventions if needed               |
 | `scripts/convert_md_to_review.py` | Extend conversion rules when the manuscript format grows |
+| `scripts/build_review_pdf.py`     | Build the final PDF and regenerate cover assets          |
+| `scripts/review_metadata.py`      | Merge metadata defaults and generate config/cover files  |
+
+## Metadata Layer
+
+If the workspace uses a shared metadata layer for Re:VIEW/PDF output, separate stable defaults from project-specific fields.
+
+### Recommended Rule
+
+- Put only stable shared defaults in `config/review-metadata/common.yml`
+- Keep author lists, publisher, title, subtitle, and other project-specific fields in `config/review-metadata/project.yml`
+- Do not place contributor-specific names in the common metadata file
+- Regenerate `config.yml` and cover assets from the metadata layer instead of editing generated files by hand
+
+### Why This Matters
+
+People, publisher details, and title wording vary per project. If they are stored in a common metadata file, they leak across projects and are easy to forget during setup or retrofits.
 
 ## LaTeX Style Injection Point
 

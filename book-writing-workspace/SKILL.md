@@ -8,7 +8,7 @@ metadata:
 
 # Book Writing Workspace
 
-Create a reusable manuscript workspace with folders, agents, prompts, instructions, and setup scripts.
+Create and maintain a reusable manuscript workspace with folders, agents, prompts, instructions, setup scripts, and a repeatable Markdown -> Re:VIEW -> PDF workflow.
 
 ## When to use
 
@@ -16,6 +16,8 @@ Create a reusable manuscript workspace with folders, agents, prompts, instructio
 - Creating a new book or technical writing project
 - Bootstrapping a manuscript repository from templates
 - Setting up Markdown → Re:VIEW → PDF workflow
+- Upgrading an existing manuscript workspace so it can generate Re:VIEW output and printable PDFs
+- Standardizing PDF house style, title pages, running headers, side markers, metadata, and review output folders across multiple books in the same repo
 
 ## Quick Start
 
@@ -27,19 +29,37 @@ python scripts/setup_workspace.py `
     --chapters 8
 ```
 
+## Existing Workspace Upgrade
+
+When the workspace already exists, do not stop at setup-oriented advice. This skill should also support:
+
+1. Creating or normalizing `03_re-view_output/`
+2. Converting existing manuscript Markdown into `.re`
+3. Building PDF with Docker + `vvakame/review`
+4. Applying shared house style defaults and a metadata layer for title page, cover image, colophon, and project-specific book metadata
+5. Verifying both the intermediate `.re` output and the final PDF
+
 ## Setup Workflow
 
 1. **Gather info**: Project name, title, location, chapter count
 2. **Run script**: `scripts/setup_workspace.py`
 3. **Review output**: Confirm README, agents, prompts, and docs were created
-4. **Customize**: Edit `docs/page-allocation.md`, `docs/schedule.md`, and `.github/copilot-instructions.md`
+4. **Customize**: Edit `docs/page-allocation.md`, `docs/schedule.md`, `.github/copilot-instructions.md`, and `config/review-metadata/project.yml`
+
+## Metadata Layer
+
+- Keep stable cover defaults and colophon defaults in `config/review-metadata/common.yml`
+- Keep project-specific fields such as author list, publisher, title, subtitle, and book badge in `config/review-metadata/project.yml`
+- Do not put contributor- or project-specific author names into the common metadata file
+- Generate `config.yml` and cover assets from the metadata layer rather than hard-coding them in multiple scripts
 
 ## Generated Workspace
 
 - Manuscript folders under `01_contents_keyPoints/`, `02_contents/`, and `04_images/`
 - AI workflow files under `.github/agents/`, `.github/instructions/`, and `.github/prompts/`
 - Project docs such as `README.md`, `docs/page-allocation.md`, and `docs/schedule.md`
-- Helper scripts such as `scripts/count_chars.py` and `scripts/convert_md_to_review.py`
+- Helper scripts such as `scripts/count_chars.py`, `scripts/convert_md_to_review.py`, `scripts/build_review_pdf.py`, `scripts/inspect_pdf.py`, and `scripts/review_metadata.py`
+- Re:VIEW metadata templates such as `config/review-metadata/common.yml` and `config/review-metadata/project.yml`
 
 ## Recommended Writing Unit
 
@@ -81,6 +101,15 @@ When changing the Markdown-to-Re:VIEW converter or related templates:
 6. When checking visual PDF changes, compare against the newly archived/timestamped PDF or the updated file timestamp; some viewers keep showing a cached file when the output name stays the same
 7. If footnotes cluster at the chapter end in the PDF, check that `//footnote` definitions in the `.re` file are placed near their references, not all appended at chapter end. Also confirm no `//footnote` sits inside a `//table{...//}` or `===[column]...===[/column]` block (causes `Counter too large` build failure)
 
+## Metadata Verification
+
+When introducing or changing a metadata layer:
+
+1. Keep people-specific fields such as `aut` in the project-specific metadata file, not in common defaults
+2. Regenerate `config.yml` from metadata instead of editing it by hand
+3. Rebuild the cover image and final PDF after metadata changes
+4. Verify the title page, cover, and colophon in the final PDF, not only the YAML files
+
 ## Agents Overview
 
 | Agent               | Role                          | Permissions               |
@@ -105,6 +134,9 @@ When changing the Markdown-to-Re:VIEW converter or related templates:
 - [ ] `docs/page-allocation.md` configured
 - [ ] `README.md` and `docs/schedule.md` customized
 - [ ] `/gc_Commit` prompt working
+- [ ] `config/review-metadata/common.yml` and `project.yml` customized appropriately
+- [ ] `03_re-view_output/` can regenerate `.re` files
+- [ ] PDF build works on a clean run
 
 ## Key References
 

@@ -11,6 +11,8 @@ from pathlib import Path
 import re
 import sys
 
+from review_metadata import load_review_metadata, write_review_support_files
+
 
 def resolve_contents_dir() -> Path | None:
     if len(sys.argv) > 1:
@@ -65,6 +67,21 @@ def strip_review_inline(text: str) -> str:
         previous = current
         current = re.sub(r"@<[^>]+>\{([^{}]*)\}", r"\1", current)
     return current.replace("{", "").replace("}", "")
+
+
+def build_heading_label(
+    stem: str,
+    title: str,
+    heading_label_counts: dict[str, int],
+) -> str:
+    cleaned_title = strip_review_inline(title)
+    slug = slugify(cleaned_title)
+    base_label = f"{stem}-{slug}"
+    occurrence = heading_label_counts.get(base_label, 0) + 1
+    heading_label_counts[base_label] = occurrence
+    if occurrence == 1:
+        return base_label
+    return f"{base_label}-{occurrence}"
 
 
 def estimate_review_tsize(table_rows: list[list[str]]) -> str | None:
@@ -169,6 +186,7 @@ def convert_markdown(text: str, stem: str) -> str:
     in_code_block = False
     code_id = 1
     code_lang = "text"
+    heading_label_counts: dict[str, int] = {}
 
     lines = text.splitlines()
     index = 0
@@ -220,7 +238,8 @@ def convert_markdown(text: str, stem: str) -> str:
         if heading:
             level = len(heading.group(1))
             title = replace_inline(heading.group(2).strip())
-            output.append(f"{'=' * level} {title}")
+            label = build_heading_label(stem, title, heading_label_counts)
+            output.append(f"{'=' * level}{{{label}}} {title}")
             index += 1
             continue
 
@@ -277,29 +296,6 @@ def build_output_name(md_file: Path) -> str:
     return f"{slugify(stem)}.re"
 
 
-def write_support_files(output_root: Path, generated_files: list[str], project_name: str) -> None:
-    catalog_path = output_root.parent / "catalog.yml"
-    config_path = output_root.parent / "config.yml"
-
-    catalog_lines = ["PREDEF:", "CHAPS:"]
-    catalog_lines.extend(f"  - {name}" for name in generated_files)
-    catalog_lines.append("POSTDEF:")
-    catalog_path.write_text("\n".join(catalog_lines) + "\n", encoding="utf-8")
-
-    if not config_path.exists():
-        config_path.write_text(
-            "\n".join(
-                [
-                    f"bookname: {slugify(project_name)}",
-                    f"booktitle: {project_name}",
-                    "language: ja",
-                ]
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-
-
 def main() -> int:
     contents_dir = resolve_contents_dir()
     if contents_dir is None:
@@ -323,7 +319,8 @@ def main() -> int:
         generated_files.append(output_name)
         print(f"Converted: {md_file.relative_to(project_root)} -> {output_path.relative_to(project_root)}")
 
-    write_support_files(output_root, generated_files, project_root.name)
+    metadata = load_review_metadata(project_root, "project")
+    write_review_support_files(output_root.parent, generated_files, metadata)
     print(f"Generated {len(generated_files)} Re:VIEW files in {output_root}")
     return 0
 

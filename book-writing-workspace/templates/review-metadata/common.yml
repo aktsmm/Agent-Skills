@@ -1,0 +1,14 @@
+colophon: true
+colophon_order:
+  - aut
+  - pbl
+cover:
+  enabled: true
+  image_name: cover.jpg
+  background_color: "#F6F4EE"
+  band_color: "#326450"
+  accent_color: "#C98B3A"
+  text_color: "#173026"
+  subtitle_color: "#355B4B"
+  author_color: "#244738"
+  publisher_color: "#355B4B"
