@@ -242,6 +242,40 @@ context = read_file(relevant_files[0])         # ✅ On-demand
 
 ---
 
+## Split / Compact / Reference Loop
+
+When workflow assets keep growing, do not default to adding another agent or another long instruction block.
+
+Use this order instead:
+
+1. **Split**
+    Separate responsibilities, phases, or heavy examples that are polluting the main context.
+2. **Compact**
+    Rewrite repeated guidance into a smaller rule or decision point.
+3. **Referenceize**
+    Move deep recipes, long tables, and infrequent detail into files loaded on demand.
+
+### Practical Rule of Thumb
+
+| Symptom | First Move |
+| --- | --- |
+| Main file keeps gaining new sections | Compact existing sections before adding |
+| Same rule appears in multiple headings | Merge into one SSOT section |
+| Long examples dominate the file | Move examples to `references/` |
+| Deep detail is only needed occasionally | Keep a summary in main context and link out |
+| Context usage rises because of static guidance | Trim always-loaded files before adding orchestration |
+
+### Apply to Customization Files
+
+For `.instructions.md`, `.prompt.md`, `.agent.md`, and `SKILL.md`:
+
+- Keep the routing surface and decision points in the main file
+- Move recipes, variants, and long examples into references
+- Prefer a curated small external-links section over a giant link dump in the main file
+- Treat append-only growth as a smell, not as normal maintenance
+
+---
+
 ## Long-Horizon Task Checklist
 
 ```markdown

@@ -42,10 +42,17 @@ If the answer is not **Skill**, stop and create the right primitive instead.
 | **Discovery First**        | The description is the routing surface. Triggers must be explicit.   |
 | **Degrees of Freedom**     | Match specificity to task fragility (high/medium/low freedom)        |
 | **Progressive Disclosure** | Split into 3 levels: Metadata → Body → References                    |
+| **Integrate Before Add**   | Update, merge, or replace existing guidance before appending more.   |
 | **Right Primitive**        | A good skill is not a fallback for prompt/agent/instruction design.  |
 | **Scope Before File**      | Decide workspace vs profile before creating anything.                |
 
 > **Default assumption:** Claude is already very smart. Challenge each piece: "Does this justify its token cost?"
+
+Before adding a new section, ask three questions:
+
+1. Can this update an existing rule instead?
+2. Can this move to `references/` instead of staying in `SKILL.md`?
+3. Is this actually reusable, or is it just a session-specific note?
 
 ## Skill Structure
 
@@ -74,6 +81,15 @@ skill-name/
 | 4    | Write SKILL.md and implement resources                  |
 | 5    | Validate frontmatter, structure, and trigger quality    |
 | 6    | Test on real prompt patterns and iterate                |
+
+### Refactor Order
+
+When improving an existing skill, use this order:
+
+1. Delete stale or low-value guidance
+2. Merge duplicate rules
+3. Move long detail to `references/`
+4. Add genuinely missing guidance last
 
 ## Frontmatter and Triggering
 
@@ -129,10 +145,13 @@ Start with **generic keywords** users are likely to say:
 - Add decision points when misuse is common
 - Reuse a proven shape from `references/skill-structure-gallery.md` before inventing a custom layout
 - Push reference material out of SKILL.md aggressively
+- Prefer replacing or compressing existing text over appending a new subsection
 
 ## Review Checklist
 
 → **[references/skill-review-checklist.md](references/skill-review-checklist.md)**
+
+For bloat review specifically, use [references/skill-bloat-review.md](references/skill-bloat-review.md).
 
 ```markdown
 - [ ] SKILL.md under 150 lines?
@@ -152,6 +171,7 @@ Start with **generic keywords** users are likely to say:
 | Structure Gallery | [references/skill-structure-gallery.md](references/skill-structure-gallery.md) |
 | Creation Process | [references/creation-process.md](references/creation-process.md)             |
 | Review Checklist | [references/skill-review-checklist.md](references/skill-review-checklist.md) |
+| Bloat Review     | [references/skill-bloat-review.md](references/skill-bloat-review.md)         |
 | Common Pitfalls  | [references/common-pitfalls.md](references/common-pitfalls.md)               |
 | Workflows        | [references/workflows.md](references/workflows.md)                           |
 | Output Patterns  | [references/output-patterns.md](references/output-patterns.md)               |
