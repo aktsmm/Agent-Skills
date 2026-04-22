@@ -13,6 +13,17 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] No README.md or auxiliary docs in skill folder?
 ```
 
+## Bloat Review Order
+
+When a skill feels crowded, review in this order:
+
+1. Delete stale or low-value content
+2. Merge duplicate rules
+3. Move detail to `references/`
+4. Add only what is still missing
+
+→ Use [skill-bloat-review.md](skill-bloat-review.md) when the main issue is append-only growth.
+
 ## Size & Structure
 
 ### Line Count Target
@@ -37,6 +48,15 @@ Checklist for reviewing and improving SKILL.md files.
 ❌ Bad: 400-line SKILL.md with all details inline
 ✅ Good: 120-line SKILL.md + references/detailed-guide.md
 ```
+
+### Keep vs Move
+
+| Keep in SKILL.md | Move to references/ |
+| ---------------- | ------------------- |
+| Trigger conditions | Large tables |
+| Core workflow | Long examples |
+| Misuse-prevention decisions | Implementation variants |
+| Minimal review gates | Link collections |
 
 ## Content Quality
 
@@ -140,6 +160,17 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 
 **Fix:** Information should live in ONE place only. Keep procedural instructions in SKILL.md, move detailed reference material to references/.
 
+### Issue 3b: Append-only Growth
+
+**Symptoms:** New sections keep getting added, but old ones are never rewritten.
+
+**Fix:**
+
+1. Check whether the new rule can update an existing section
+2. Merge overlapping warnings or checklists
+3. Move deep detail out before adding more top-level text
+4. Add a new section only if no existing structure can hold it cleanly
+
 ### Issue 4: Missing Trigger Conditions
 
 **Symptoms:** Skill doesn't activate when expected
@@ -177,12 +208,14 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 - [ ] Progressive disclosure applied
 - [ ] No auxiliary docs (README, CHANGELOG)
 - [ ] References properly linked
+- [ ] No append-only growth smell in main SKILL
 
 ### Content
 
 - [ ] Single responsibility (SRP)
 - [ ] No duplicate information
 - [ ] Examples minimal but sufficient
+- [ ] Delete / merge / move considered before add
 
 ### Action Items
 
