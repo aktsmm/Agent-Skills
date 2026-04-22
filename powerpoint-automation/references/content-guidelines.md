@@ -260,6 +260,78 @@ gh api "repos/MicrosoftDocs/azure-docs/commits?path=articles/{service}/{file}.md
 4. Agent loads vN.pptx (NOT the original) → applies next fix → saves as vN+1.pptx
 ```
 
+## COM Layout: Dynamic Sizing (sw/sh Based)
+
+Fixed pixel values for left/width often overflow on 16:9 slides (sw=720, sh=450).
+Always compute widths relative to slide dimensions.
+
+### Anti-pattern
+
+```python
+# BAD: right edge = 500 + 420 = 920 > sw(720)
+rect(slide, 500, 120, 420, 220, WHITE)
+```
+
+### Correct Pattern
+
+```python
+ml = 56       # left margin
+mr = 48       # right margin
+gap = 24
+total_w = sw - ml - mr
+card_w = (total_w - gap) / 2
+left1 = ml
+left2 = ml + card_w + gap
+```
+
+> Also applies to text width when images occupy part of the slide:
+> `text_w = sw - left_margin - image_width - gap`
+
+## Overlay Opacity for Text on Background Images
+
+When placing text over a background image with a semi-transparent overlay:
+
+| Overlay Alpha | Result |
+|---|---|
+| 0.50–0.60 | Background bleeds through, low contrast |
+| **0.70–0.80** | **Recommended for body text** |
+| 0.85+ | Background barely visible, may look flat |
+
+- Use `alpha=0.75` as a starting point
+- Sub-text (SKY/MUTED colors) needs higher alpha than white headings
+- Always verify with a contrast checker
+
+## Mascot / Illustration Placement Variety
+
+Repeating the same character position on every slide looks monotonous.
+Vary position and size per slide:
+
+| Slide Purpose | Position | Size |
+|---|---|---|
+| Cover / Title | Bottom-right | Large (200+) |
+| Content | Bottom-right or Top-right | Small (110–160) |
+| Closing | Right-center or Center-bottom | Medium (170–200) |
+| Appendix | Left side | Large (180+) |
+
+> Always verify the image doesn't overlap text boxes
+> (use the overlap detection pattern below).
+
+## Operational Text Goes in Slide Notes
+
+Instructions like 「FIXED」「REPLACE EACH EVENT」「差し替えてください」 must **not** appear on slide faces.
+Use `set_notes()` (COM) or `slide.notes_slide.notes_text_frame` (python-pptx)
+to store per-slide operational notes:
+
+```python
+# COM pattern
+slide.NotesPage.Shapes.Placeholders(2).TextFrame.TextRange.Text = (
+    "【運営ノート】\n"
+    "■ 差し替え箇所: タイトル, 日付\n"
+    "■ 固定要素: ブランド画像, 配色\n"
+    "■ 進行メモ: 開場BGMを流しながら表示"
+)
+```
+
 **Anti-pattern**:
 
 ```
@@ -342,3 +414,72 @@ python fix_script.py
 1. **Quote the original text** (italic, gray, small font) on the slide
 2. **Add "詳細はSRにて"** for items where the exact customer action is unclear
 3. **Never assert certainty** when the source says "予定" / "anticipated"
+
+## Layout & Visibility (COM Automation)
+
+COM Automation (`win32com`) でスライドを組むときのレイアウト・視認性ルール。
+
+### Dynamic Sizing — sw/sh ベースで計算する
+
+固定値 (`left=500`, `width=420` 等) はスライドサイズ次第ではみ出す。
+`sw` (SlideWidth) と `sh` (SlideHeight) から動的に計算する。
+
+```python
+# NG: 固定値 → sw=720 で right=920 にはみ出す
+rect(slide, 500, 120, 420, 220, WHITE)
+
+# OK: sw から逆算して右マージン 48pt を確保
+card_w = (sw - margin_left - margin_right - gap) / 2
+rect(slide, left, 120, card_w, 220, WHITE)
+```
+
+### Mascot / Character Placement
+
+全スライドで同じ位置に配置すると単調になる。スライドの役割に応じて位置・サイズを変える。
+
+| スライド種別 | 配置例 | サイズ目安 |
+|---|---|---|
+| 表紙 | 右下 | 200-220 |
+| 情報パネル | 左中央 or 右下 | 150-180 |
+| クロージング | 右上 or 中央下 | 180-200 |
+| カード 2 列 | 右上（小） or 右下（小） | 100-120 |
+| 宣伝 (Appendix) | 左中央（QR の隣など） | 80-100 |
+
+### Overlay Opacity for Background Images
+
+背景画像の上にテキストを載せるとき、半透明オーバーレイが薄いとテキストが溶ける。
+
+| 用途 | 推奨 alpha | 備考 |
+|---|---|---|
+| タイトル（大きい白文字） | 0.55-0.65 | 44pt+ なら多少薄くても読める |
+| 本文・案内テキスト | **0.70-0.80** | 16-18pt で視認性を確保 |
+| 小さい補足テキスト | **0.75+** | 13pt は特に注意 |
+
+### Operational Text → Slide Notes
+
+「差し替えてください」「REPLACE EACH EVENT」等の運営向け説明テキストはスライド本文に置かない。
+投影で映えるデザインだけをスライド面に残し、運営情報は `slide.NotesPage` に書く。
+
+```python
+def set_notes(slide, text):
+    slide.NotesPage.Shapes.Placeholders(2).TextFrame.TextRange.Text = text
+
+set_notes(slide, (
+    "【運営ノート】\n"
+    "■ 差し替え箇所\n"
+    "  ・タイトル → 回番号に変更\n"
+    "■ 進行メモ\n"
+    "  ・BGM を流しながら表示"
+))
+```
+
+### Automated Quality Checks (Done Criteria)
+
+生成後に以下を自動検証する:
+
+1. **はみ出し検出**: `shape.Left + shape.Width > sw` or `shape.Top + shape.Height > sh`
+2. **重なり検出**: 画像の矩形とテキストの矩形が 5% 以上重複
+3. **視認性検出**:
+   - フォントサイズ < 13pt → NG
+   - WCAG コントラスト比 < 3.0:1 → NG
+   - コントラスト比 < 4.5:1 かつ フォントサイズ < 18pt → 警告

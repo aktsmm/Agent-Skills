@@ -866,4 +866,7 @@ def set_textbox_content(shape, lines):
 - [ ] `content.json` generated and validated
 - [ ] PPTX file created successfully
 - [ ] No text overflow detected
+- [ ] No shape overflow: all shapes within `0 <= left` and `left + width <= sw` (and top/height vs sh)
+- [ ] No image↔text overlap: picture bounding boxes do not overlap text shape bounding boxes by more than 5%
+- [ ] Visibility check passed: font size >= 13pt, WCAG contrast ratio >= 3.0:1 (>= 4.5:1 for text < 18pt)
 - [ ] User confirmed output quality
