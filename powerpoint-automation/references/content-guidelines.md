@@ -291,11 +291,11 @@ left2 = ml + card_w + gap
 
 When placing text over a background image with a semi-transparent overlay:
 
-| Overlay Alpha | Result |
-|---|---|
-| 0.50–0.60 | Background bleeds through, low contrast |
-| **0.70–0.80** | **Recommended for body text** |
-| 0.85+ | Background barely visible, may look flat |
+| Overlay Alpha | Result                                   |
+| ------------- | ---------------------------------------- |
+| 0.50–0.60     | Background bleeds through, low contrast  |
+| **0.70–0.80** | **Recommended for body text**            |
+| 0.85+         | Background barely visible, may look flat |
 
 - Use `alpha=0.75` as a starting point
 - Sub-text (SKY/MUTED colors) needs higher alpha than white headings
@@ -306,12 +306,12 @@ When placing text over a background image with a semi-transparent overlay:
 Repeating the same character position on every slide looks monotonous.
 Vary position and size per slide:
 
-| Slide Purpose | Position | Size |
-|---|---|---|
-| Cover / Title | Bottom-right | Large (200+) |
-| Content | Bottom-right or Top-right | Small (110–160) |
-| Closing | Right-center or Center-bottom | Medium (170–200) |
-| Appendix | Left side | Large (180+) |
+| Slide Purpose | Position                      | Size             |
+| ------------- | ----------------------------- | ---------------- |
+| Cover / Title | Bottom-right                  | Large (200+)     |
+| Content       | Bottom-right or Top-right     | Small (110–160)  |
+| Closing       | Right-center or Center-bottom | Medium (170–200) |
+| Appendix      | Left side                     | Large (180+)     |
 
 > Always verify the image doesn't overlap text boxes
 > (use the overlap detection pattern below).
@@ -437,23 +437,23 @@ rect(slide, left, 120, card_w, 220, WHITE)
 
 全スライドで同じ位置に配置すると単調になる。スライドの役割に応じて位置・サイズを変える。
 
-| スライド種別 | 配置例 | サイズ目安 |
-|---|---|---|
-| 表紙 | 右下 | 200-220 |
-| 情報パネル | 左中央 or 右下 | 150-180 |
-| クロージング | 右上 or 中央下 | 180-200 |
-| カード 2 列 | 右上（小） or 右下（小） | 100-120 |
-| 宣伝 (Appendix) | 左中央（QR の隣など） | 80-100 |
+| スライド種別    | 配置例                   | サイズ目安 |
+| --------------- | ------------------------ | ---------- |
+| 表紙            | 右下                     | 200-220    |
+| 情報パネル      | 左中央 or 右下           | 150-180    |
+| クロージング    | 右上 or 中央下           | 180-200    |
+| カード 2 列     | 右上（小） or 右下（小） | 100-120    |
+| 宣伝 (Appendix) | 左中央（QR の隣など）    | 80-100     |
 
 ### Overlay Opacity for Background Images
 
 背景画像の上にテキストを載せるとき、半透明オーバーレイが薄いとテキストが溶ける。
 
-| 用途 | 推奨 alpha | 備考 |
-|---|---|---|
-| タイトル（大きい白文字） | 0.55-0.65 | 44pt+ なら多少薄くても読める |
-| 本文・案内テキスト | **0.70-0.80** | 16-18pt で視認性を確保 |
-| 小さい補足テキスト | **0.75+** | 13pt は特に注意 |
+| 用途                     | 推奨 alpha    | 備考                         |
+| ------------------------ | ------------- | ---------------------------- |
+| タイトル（大きい白文字） | 0.55-0.65     | 44pt+ なら多少薄くても読める |
+| 本文・案内テキスト       | **0.70-0.80** | 16-18pt で視認性を確保       |
+| 小さい補足テキスト       | **0.75+**     | 13pt は特に注意              |
 
 ### Operational Text → Slide Notes
 
