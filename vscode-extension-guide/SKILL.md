@@ -63,12 +63,13 @@ npx @vscode/vsce package   # Creates .vsix
 | Command not found     | Match command ID in package.json/code  |
 | Shortcut not working  | Remove `when` clause, check conflicts  |
 
+## Reference Map
 
 | Topic               | Reference                                                            |
 | ------------------- | -------------------------------------------------------------------- |
 | AI Customization    | [references/ai-customization.md](references/ai-customization.md)     |
 | Code Review Prompts | [references/code-review-prompts.md](references/code-review-prompts.md) |
-| Code Samples        | [references/code-samples.md](references/code-samples.md)             |
+| Code Samples        | [references/ai-customization.md](references/ai-customization.md) and [references/webview.md](references/webview.md) |
 | TreeView            | [references/treeview.md](references/treeview.md)                     |
 | Webview             | [references/webview.md](references/webview.md)                       |
 | Testing             | [references/testing.md](references/testing.md)                       |

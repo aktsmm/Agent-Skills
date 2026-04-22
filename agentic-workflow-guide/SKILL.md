@@ -10,21 +10,22 @@ metadata:
 
 Design, review, and improve agent workflows based on proven principles.
 
+この SKILL の基本姿勢は、**agent を増やすことではなく、必要最小の primitive で解くこと**。
+context が膨らんだときも、まずは split / compact / reference 化を考え、いきなり multi-agent にしない。
+
 ## Primitive First
 
 Do not start with multi-agent by default.
 
-| Need | Best Fit |
-| ---- | -------- |
-| Single focused slash task | **Prompt** |
-| Always-on or file-scoped guidance | **Instruction** |
-| Reusable workflow with bundled scripts, references, or templates | **Skill** |
-| Persona, tool restrictions, delegation, or handoffs | **Agent** |
-| Deterministic enforcement or lifecycle automation | **Hook** |
+- Single focused slash task -> **Prompt**
+- Always-on or file-scoped guidance -> **Instruction**
+- Reusable workflow with bundled assets -> **Skill**
+- Persona, tool restrictions, delegation, or handoffs -> **Agent**
+- Deterministic enforcement -> **Hook**
 
-If the ask does not require an **Agent**, stop and create the simpler primitive.
+If the ask does not require an **Agent**, stop and use the simpler primitive.
 
-→ **[references/customization-decision.md](references/customization-decision.md)** for the selection guide
+Selection details: [references/customization-decision.md](references/customization-decision.md)
 
 ## When to Use
 
@@ -38,81 +39,99 @@ If the ask does not require an **Agent**, stop and create the simpler primitive.
 
 ## Core Principles
 
-→ **[references/design-principles.md](references/design-principles.md)**
+- **Simplicity First**: より単純な primitive で解けるなら agent 化しない
+- **SSOT / SRP**: 情報源と責務の分割を守る
+- **Fail Fast**: エラーは早く止める
+- **Feedback Loop**: 各段で検証できるようにする
+- **Context Discipline**: context が膨らんだら compact / split / retrieve を検討する
 
-| Tier          | Principles                                              |
-| ------------- | ------------------------------------------------------- |
-| **Essential** | SSOT, SRP, Simplicity First, Fail Fast, Feedback Loop   |
-| **Quality**   | Transparency, Gate/Checkpoint, DRY, Observability       |
-| **Scale**     | Human-in-the-Loop, Loose Coupling, Graceful Degradation |
+Principle details: [references/design-principles.md](references/design-principles.md)
 
-> See [design-principles.md > Simplicity First](references/design-principles.md#3-simplicity-first) for Anthropic's key recommendation.
+## Pattern Selection
 
-## Workflow Patterns
+- **Prompt Chaining**: 順序のある段階処理
+- **Routing**: 入力タイプで分岐する処理
+- **Parallelization**: 独立タスクを並列で進める処理
+- **Orchestrator-Workers**: 動的に subtasks を分解する処理
+- **Evaluator-Optimizer**: 品質基準を満たすまで反復する処理
 
-→ **[references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)**
+Every loop needs explicit stop conditions.
 
-| Pattern                  | When to Use                       |
-| ------------------------ | --------------------------------- |
-| **Prompt Chaining**      | Sequential tasks with validation  |
-| **Routing**              | Processing varies by input type   |
-| **Parallelization**      | Independent tasks run together    |
-| **Orchestrator-Workers** | Dynamic task decomposition        |
-| **Evaluator-Optimizer**  | Repeat until quality criteria met |
-
-**Stop Conditions (MANDATORY):** Define success/failure criteria and exit conditions for every loop.
+Pattern details: [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)
 
 ## Design Workflow
 
-0. **Extract from Conversation** - Generalize repeated behavior, tool preferences, and workflow shape before asking questions
-1. **Primitive + Scope** - Choose prompt / instruction / skill / agent / hook, and decide workspace vs profile
-2. **Clarify Only the Gaps** - Ask only for the missing ambiguity that materially changes behavior
-3. **Escalation Check** - Confirm why agent or multi-agent is needed
-4. **Pattern Selection** - Ask user to confirm the chosen pattern when it changes complexity materially
-5. **Design Diagram** - Visualize with Mermaid when it clarifies roles or handoffs
-6. **Principle Check** - Validate against review checklist
-7. **Implement & Iterate** - Draft → identify weak spots → refine → propose adjacent customizations
+1. **Extract from conversation**
+  Repeated behavior, tool preferences, workflow shape, and obvious specialization を先に拾う。
+2. **Choose primitive + scope**
+  Prompt / instruction / skill / agent / hook と workspace / profile を決める。
+3. **Clarify only the gaps**
+  挙動を変える曖昧さだけ聞く。
+4. **Check escalation**
+  agent や multi-agent が本当に必要か確認する。
+5. **Choose pattern**
+  complexity が上がるなら pattern を明示して設計する。
+6. **Review before expanding**
+  split / compact / reference 化で済まないかを見る。
+7. **Implement and iterate**
+  最初から完成形を狙わず、弱い箇所を見つけて詰める。
 
-## When to Escalate
+## Escalation Rules
 
-→ **[references/splitting-criteria.md](references/splitting-criteria.md)**
+- **L0**: Single Prompt
+- **L1**: Prompt + Instructions
+- **L2**: Single Agent
+- **L3**: Multi-Agent
 
-| Level  | Configuration         | Escalation Triggers                      |
-| ------ | --------------------- | ---------------------------------------- |
-| **L0** | Single Prompt         | Retry 3+, unstable output                |
-| **L1** | Prompt + Instructions | Steps > 5, "missed/overlooked" errors    |
-| **L2** | Single Agent          | Multiple responsibilities, context > 70% |
-| **L3** | Multi-Agent           | Independent subtasks needed              |
+Prefer the lowest level that solves the problem cleanly.
 
-**Rule:** Prefer the lowest level that solves the problem cleanly.
+Quick signals:
 
-**Quick Check:** Prompt > 50 lines? Steps > 5? SRP violation? Context > 70%? → Consider splitting.
+- Prompt > 50 lines
+- Steps > 5
+- "missed" / "overlooked" errorsが続く
+- Multiple responsibilities in one agent
+- Context > 70%
 
-## Review Checklist
+Threshold details: [references/splitting-criteria.md](references/splitting-criteria.md)
 
-→ **[references/review-checklist.md](references/review-checklist.md)**
+## Review Gates
 
-- [ ] Single responsibility per agent? (SRP)
-- [ ] Errors detected immediately? (Fail Fast)
-- [ ] Small iterative steps? (Iterative)
-- [ ] Results verifiable at each step? (Feedback Loop)
+- [ ] Primitive choice is simpler than agent if possible
+- [ ] Single responsibility per agent is preserved
+- [ ] Errors can be detected and stopped early
+- [ ] Results are verifiable at each step
+- [ ] Context can be compacted or split before adding more orchestration
 
-## Key References
+Full checklist: [references/review-checklist.md](references/review-checklist.md)
 
-| Topic              | Reference                                                              |
-| ------------------ | ---------------------------------------------------------------------- |
-| Primitive Decision | [references/customization-decision.md](references/customization-decision.md) |
-| Built-in Patterns  | [references/builtin-customization-patterns.md](references/builtin-customization-patterns.md) |
-| Prompt Template    | [references/prompt-template.md](references/prompt-template.md)         |
-| agent              | [references/agent-guide.md](references/agent-guide.md)                 |
-| Agent Template     | [references/agent-template.md](references/agent-template.md)           |
-| Hooks              | [references/hooks-guide.md](references/hooks-guide.md)                 |
-| **Agent Placement**| [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
-| Context Management | [references/context-engineering.md](references/context-engineering.md) |
-| **Handoffs**       | [references/handoffs-guide.md](references/handoffs-guide.md)           |
-| Scaffold Tool      | [references/scaffold-usage.md](references/scaffold-usage.md)           |
-| **Deep Agent**     | [references/deep-agent-patterns.md](references/deep-agent-patterns.md) |
-| Agent Evaluation   | [references/agent-evaluation.md](references/agent-evaluation.md)       |
+## Reference Map
+
+| Topic | Reference |
+| --- | --- |
+| Primitive decision | [references/customization-decision.md](references/customization-decision.md) |
+| Design principles | [references/design-principles.md](references/design-principles.md) |
+| Workflow patterns | [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md) |
+| Splitting criteria | [references/splitting-criteria.md](references/splitting-criteria.md) |
+| Review checklist | [references/review-checklist.md](references/review-checklist.md) |
+| Context management | [references/context-engineering.md](references/context-engineering.md) |
+| Agent guide / template | [references/agent-guide.md](references/agent-guide.md), [references/agent-template.md](references/agent-template.md) |
+| Handoffs / placement | [references/handoffs-guide.md](references/handoffs-guide.md), [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
+| Hooks | [references/hooks-guide.md](references/hooks-guide.md) |
+| Evaluation | [references/agent-evaluation.md](references/agent-evaluation.md) |
+| Examples / scaffold | [references/scaffold-usage.md](references/scaffold-usage.md), [references/examples/](references/examples/) |
+| External links | [references/external-resources.md](references/external-resources.md) |
+
+## External References
+
+Keep a small curated set here for first-hop reading. The longer link list stays in [references/external-resources.md](references/external-resources.md).
+
+- GitHub Docs: [Chat in IDE](https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide)
+- VS Code Docs: [Custom Agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
+- GitHub Docs: [Create custom agents](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents)
+- Anthropic: [Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)
+- Anthropic: [Effective Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- Anthropic: [Writing Tools for Agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
 
 ## agent Quick Fix
 
@@ -127,7 +146,7 @@ You MUST use agent for each file. Do NOT read files directly.
 
 ## Tools Reference
 
-→ **[references/agent-template.md](references/agent-template.md#available-tools)**
+→ **[references/agent-template.md](references/agent-template.md)**
 
 | Purpose   | VS Code Copilot          | Claude Code |
 | --------- | ------------------------ | ----------- |
@@ -136,39 +155,6 @@ You MUST use agent for each file. Do NOT read files directly.
 | Edit      | `edit/editFiles`         | `Write`     |
 | Subagent  | `agent`                  | `Task`      |
 | Web fetch | `web/fetch`              | (MCP)       |
-
-## External References
-
-### Official Documentation
-
-- [Chat in IDE - GitHub Docs](https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide)
-- [Custom Agents - VS Code Docs](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
-- [Custom Agents - GitHub Docs](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents)
-- [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-
-### Design Principles
-
-- [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
-- [Effective Context Engineering - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- [Writing Tools for Agents - Anthropic](https://www.anthropic.com/engineering/writing-tools-for-agents)
-- [Context windows - Anthropic](https://platform.claude.com/docs/en/docs/build-with-claude/context-windows)
-
-### Instructions & Context
-
-- [Adding repository custom instructions - GitHub Docs](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions)
-
-### Community Resources
-
-- [agent (旧 runSubagent) 検証記事 - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
-- [subagent-driven-development - obra/superpowers](https://github.com/obra/superpowers/tree/main/skills/subagent-driven-development)
-- [awesome-copilot agents - GitHub](https://github.com/github/awesome-copilot/tree/main/agents)
-
-### Prompt Engineering
-
-- https://platform.openai.com/docs/guides/prompt-engineering
-- https://code.claude.com/docs/en/best-practices
-- https://www.promptingguide.ai/
-- https://www.ibm.com/think/prompt-engineering
 
 ## Done Criteria
 
