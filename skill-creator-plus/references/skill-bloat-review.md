@@ -51,13 +51,13 @@ Use this order every time:
 
 ## Keep vs Move
 
-| Keep in SKILL.md | Move to references/ |
-| --- | --- |
-| What the skill is for | Deep recipes |
-| Trigger conditions | Large tables |
-| Core workflow | Implementation variants |
-| Misuse-prevention decision points | Long examples |
-| Minimal review gates | Link collections |
+| Keep in SKILL.md                  | Move to references/     |
+| --------------------------------- | ----------------------- |
+| What the skill is for             | Deep recipes            |
+| Trigger conditions                | Large tables            |
+| Core workflow                     | Implementation variants |
+| Misuse-prevention decision points | Long examples           |
+| Minimal review gates              | Link collections        |
 
 ## Decision Questions
 

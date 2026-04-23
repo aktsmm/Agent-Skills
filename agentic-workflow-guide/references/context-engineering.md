@@ -249,20 +249,20 @@ When workflow assets keep growing, do not default to adding another agent or ano
 Use this order instead:
 
 1. **Split**
-    Separate responsibilities, phases, or heavy examples that are polluting the main context.
+   Separate responsibilities, phases, or heavy examples that are polluting the main context.
 2. **Compact**
-    Rewrite repeated guidance into a smaller rule or decision point.
+   Rewrite repeated guidance into a smaller rule or decision point.
 3. **Referenceize**
-    Move deep recipes, long tables, and infrequent detail into files loaded on demand.
+   Move deep recipes, long tables, and infrequent detail into files loaded on demand.
 
 ### Practical Rule of Thumb
 
-| Symptom | First Move |
-| --- | --- |
-| Main file keeps gaining new sections | Compact existing sections before adding |
-| Same rule appears in multiple headings | Merge into one SSOT section |
-| Long examples dominate the file | Move examples to `references/` |
-| Deep detail is only needed occasionally | Keep a summary in main context and link out |
+| Symptom                                        | First Move                                           |
+| ---------------------------------------------- | ---------------------------------------------------- |
+| Main file keeps gaining new sections           | Compact existing sections before adding              |
+| Same rule appears in multiple headings         | Merge into one SSOT section                          |
+| Long examples dominate the file                | Move examples to `references/`                       |
+| Deep detail is only needed occasionally        | Keep a summary in main context and link out          |
 | Context usage rises because of static guidance | Trim always-loaded files before adding orchestration |
 
 ### Apply to Customization Files

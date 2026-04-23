@@ -51,12 +51,12 @@ When a skill feels crowded, review in this order:
 
 ### Keep vs Move
 
-| Keep in SKILL.md | Move to references/ |
-| ---------------- | ------------------- |
-| Trigger conditions | Large tables |
-| Core workflow | Long examples |
+| Keep in SKILL.md            | Move to references/     |
+| --------------------------- | ----------------------- |
+| Trigger conditions          | Large tables            |
+| Core workflow               | Long examples           |
 | Misuse-prevention decisions | Implementation variants |
-| Minimal review gates | Link collections |
+| Minimal review gates        | Link collections        |
 
 ## Content Quality
 
@@ -86,13 +86,13 @@ metadata: # Optional
 
 ### Body Structure
 
-| Section          | Required      | Notes                      |
-| ---------------- | ------------- | -------------------------- |
-| `# Title`        | ✅            | Match skill name           |
-| `## When to Use` | ✅            | Trigger conditions (brief) |
-| Core workflow    | ✅            | Main instructions          |
+| Section          | Required      | Notes                       |
+| ---------------- | ------------- | --------------------------- |
+| `# Title`        | ✅            | Match skill name            |
+| `## When to Use` | ✅            | Trigger conditions (brief)  |
+| Core workflow    | ✅            | Main instructions           |
 | Decision point   | If applicable | Clarify why this is a skill |
-| `## References`  | If applicable | Links to references/ files |
+| `## References`  | If applicable | Links to references/ files  |
 
 ### What NOT to Include
 
@@ -102,12 +102,12 @@ metadata: # Optional
 
 ### When to Create references/
 
-| Condition                 | Action                       |
-| ------------------------- | ---------------------------- |
-| Section > 50 lines        | Move to references/          |
-| Multiple variants/options | Split by variant             |
-| Domain-specific schemas   | Separate reference file      |
-| Detailed examples         | Move to references/examples/ |
+| Condition                 | Action                        |
+| ------------------------- | ----------------------------- |
+| Section > 50 lines        | Move to references/           |
+| Multiple variants/options | Split by variant              |
+| Domain-specific schemas   | Separate reference file       |
+| Detailed examples         | Move to references/examples/  |
 | Primitive-selection logic | Move to a dedicated reference |
 
 ### Naming Convention
