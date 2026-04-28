@@ -125,18 +125,41 @@ snapshot で ref 取得
 - ダメなら別ページへ移動する
 - CDP 競合が疑わしいなら Python プロセスや MCP 接続を整理する
 
+### `browser_run_code` / `page.evaluate` の速度 vs 証跡
+
+`browser_run_code` + `page.evaluate(JS)` で直接 DOM 操作すると、`browser_snapshot` → `browser_click` の MCP 標準フローより速い。ただし snapshot が出ないため、操作の証跡が残りにくい。
+
+| 方式 | 速度 | 証跡 | 使い分け |
+| --- | --- | --- | --- |
+| MCP 標準 (snapshot → click) | 遅い（snapshot 数秒/回） | YAML + ref で明確 | 初回探索、デバッグ、重要操作 |
+| `browser_run_code` + evaluate | 速い | テキスト返却のみ | 手順確立済みの定型操作、大量入力 |
+
+判断基準: **発注確定など不可逆操作の直前・直後は `browser_take_screenshot` で証跡を残し、中間のフォーム入力は evaluate で高速化**するのが実用的なバランス。
+
 ## Safety Rules
 
 ### CDP 排他制御
 
 MCP Playwright と Python スクリプトは **同じ CDP ポートへ同時接続しない**。
+とくに Python 側も `connect_over_cdp()` を使う場合、MCP と Playwright セッションが二重になり、ページ操作が競合して「遷移先が想定外」「フォーム送信が効かない」等の不定失敗が起きる。
 
 | ルール | 内容 |
 | --- | --- |
 | 同時接続禁止 | MCP と Python を同じ CDP に同時接続しない |
-| MCP 切断優先 | Python 実行前に MCP 側を閉じる |
+| MCP 切断優先 | Python 実行前に **`browser_close` で MCP ページを解放** してから実行する |
 | プロセス確認 | 実行前にゾンビ Python を確認する |
-| 標準フロー | MCP で手順確立 → 切断 → Python 単独実行 → 完了後に検証 |
+| 標準フロー | MCP で手順確立 → `browser_close` → Python 単独実行 → 完了後に MCP 再接続して検証 |
+| raw WebSocket | `websocket-client` 等で CDP WebSocket に直接繋ぐスクリプトは MCP と共存可能（Playwright セッションを張らないため） |
+
+### CDP 断線復帰
+
+ブラウザがクラッシュ・終了した場合（`Target page, context or browser has been closed` エラー）:
+
+1. CDP ポート確認: `Invoke-WebRequest -Uri 'http://localhost:<port>/json/version' -TimeoutSec 5` — 接続拒否ならブラウザが落ちている
+2. ブラウザ再起動: 同じ `--remote-debugging-port` と `--user-data-dir` で起動する
+3. CDP 起動確認: 上の確認コマンドで `Browser:` が返ること
+4. MCP 再接続: `browser_close`（古いセッション破棄）→ `browser_navigate` で新しいページを開く
+5. 認証が必要なサイトは、MCP を `browser_close` してから Python ログインスクリプトを実行し、完了後に MCP で再接続する
 
 ### CDP context / page 選択
 
