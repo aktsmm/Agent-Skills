@@ -118,6 +118,8 @@ python-pptx は section API や安全な layout swap を持たない。必要な
 
 `create_from_template.py` は `footer_url` を処理しない。URL は post-processing で入れる。
 
+For open PowerPoint files or direct COM edits, use [instructions/com-automation.instructions.md](instructions/com-automation.instructions.md) as the detailed rule source.
+
 ### Items Requiring Post-processing
 
 - `footer_url`

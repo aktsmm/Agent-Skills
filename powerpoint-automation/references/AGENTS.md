@@ -23,6 +23,7 @@ Agent definitions for PPTX automation pipeline.
 | PLAN Phase Confirmation   | `instructions/plan-phase.instructions.md`              |
 | Naming & Bullet Rules     | `instructions/common.instructions.md`                  |
 | Quality Guidelines        | `instructions/quality-guidelines.instructions.md`      |
+| COM Automation Rules      | `instructions/com-automation.instructions.md`          |
 | Tools & Workflow          | `instructions/tools-reference.instructions.md`         |
 | IR Schema                 | `schemas/content.schema.json`                          |
 | **Error Recovery**        | **`instructions/error-recovery.instructions.md`**      |

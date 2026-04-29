@@ -2,14 +2,9 @@
   "name": "powerpoint-automation",
   "version": "1.0.0",
   "source": "aktsmm-Ag-ppt-create",
-  "description": "Create professional PowerPoint presentations from various sources including web articles, blog posts, and existing PPTX files.",
-  "description_ja": "Web記事、ブログ、既存PPTXからプロフェッショナルなPowerPointプレゼンテーションを作成。技術プレゼン、報告書、ドキュメント作成に最適。",
-  "whenToUse": "PowerPoint, PPTX, create presentation, slides; Convert web articles/blog posts to presentations; Translate English PPTX to Japanese; Create presentations using custom templates",
-  "categories": [
-    "automation",
-    "presentation",
-    "powerpoint",
-    "ai-pipeline"
-  ],
+  "description": "Create and edit professional PowerPoint presentations from web articles, blog posts, existing PPTX files, or templates.",
+  "description_ja": "Web記事、ブログ、既存PPTXからPowerPointを作成・翻訳・再構成し、開いているPPTXのCOM Automation編集やRefURL/overflowレビューにも対応する。",
+  "whenToUse": "Web 記事やブログをスライド化したいとき; 既存 PPTX を翻訳・再構成したいとき; 開いている PPTX を COM Automation で直接編集したいとき; テンプレートベースで PPTX を生成したいとき; content.json を SSOT にして、抽出・翻訳・生成・レビューを分離したいとき",
+  "categories": ["automation", "presentation", "powerpoint", "ai-pipeline"],
   "installedAt": "2026-01-18T04:46:00.000Z"
 }
