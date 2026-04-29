@@ -1,6 +1,6 @@
 ---
 name: browser-max-automation
-description: Browser automation using Playwright MCP for web testing, UI verification, and form automation. Use when navigating websites, clicking elements, filling forms, taking screenshots, or testing web applications. Supports iframe operations, complex JavaScript execution, MCP-to-CLI workflow switching (MCP for prototyping, Python CLI for bulk execution), CDP exclusive control, modal dialog workarounds, and file chooser handling.
+description: Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation. Use when navigating websites, clicking elements, filling forms, taking screenshots, testing web applications, reusing an existing browser session, or troubleshooting CDP / iframe / modal / file chooser issues.
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
@@ -15,14 +15,16 @@ Browser automation via Playwright MCP.
 - ブラウザ自動化、UI 確認、フォーム操作、スクリーンショット取得
 - MCP で手順を確立してから Python で一括実行したいとき
 - 既存ブラウザのログイン状態を CDP 経由で使いたいとき
+- Playwright MCP / `connect_over_cdp()` が不安定で、raw CDP WebSocket に切り替えたいとき
 - モーダルや file chooser など、通常クリックが壊れやすい UI を扱うとき
 
 ## Choose Mode First
 
-| モード | 向く場面 | メリット | 注意点 |
-| --- | --- | --- | --- |
-| 新規ブラウザ | まず安定して動かしたい | 設定が簡単 | 既存ログイン状態は使えない |
-| 既存ブラウザ (CDP) | 普段のブラウザ状態をそのまま使いたい | ログイン済み状態を再利用できる | デバッグモード起動が必要 |
+| モード             | 向く場面                                               | メリット                       | 注意点                     |
+| ------------------ | ------------------------------------------------------ | ------------------------------ | -------------------------- |
+| 新規ブラウザ       | まず安定して動かしたい                                 | 設定が簡単                     | 既存ログイン状態は使えない |
+| 既存ブラウザ (CDP) | 普段のブラウザ状態をそのまま使いたい                   | ログイン済み状態を再利用できる | デバッグモード起動が必要   |
+| 直接 CDP WebSocket | Playwright CDP が不安定、または MCP と競合させたくない | 低レベル操作で安定しやすい     | CDP コマンドを自前管理する |
 
 ### 新規ブラウザモード
 
@@ -68,18 +70,20 @@ if ($conn) {
 - 既存CDPが別プロファイルなら、既存ブラウザを落とす前に別ポートで目的プロファイルを起動できるか検討する
 - 自動化スクリプト側は `http://localhost:9222` 固定にせず、検出・起動したCDP URLを引数で受け取れるようにする
 
+直接 WebSocket CDP の起動フラグ、`websocket-client` 接続、SPA hash navigation、virtual scroll 操作は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
+
 ## Quick Reference
 
-| Command | Purpose |
-| --- | --- |
-| `browser_navigate` | URL を開く |
-| `browser_snapshot` | 要素 ref を取る |
-| `browser_click` | ref でクリック |
-| `browser_type` | テキスト入力 |
-| `browser_take_screenshot` | 画面確認 |
-| `browser_wait_for` | 表示待機 |
-| `browser_evaluate` | DOM 直接操作 |
-| `browser_file_upload` | file chooser 対応 |
+| Command                   | Purpose           |
+| ------------------------- | ----------------- |
+| `browser_navigate`        | URL を開く        |
+| `browser_snapshot`        | 要素 ref を取る   |
+| `browser_click`           | ref でクリック    |
+| `browser_type`            | テキスト入力      |
+| `browser_take_screenshot` | 画面確認          |
+| `browser_wait_for`        | 表示待機          |
+| `browser_evaluate`        | DOM 直接操作      |
+| `browser_file_upload`     | file chooser 対応 |
 
 ## Core Loop
 
@@ -129,10 +133,10 @@ snapshot で ref 取得
 
 `browser_run_code` + `page.evaluate(JS)` で直接 DOM 操作すると、`browser_snapshot` → `browser_click` の MCP 標準フローより速い。ただし snapshot が出ないため、操作の証跡が残りにくい。
 
-| 方式 | 速度 | 証跡 | 使い分け |
-| --- | --- | --- | --- |
-| MCP 標準 (snapshot → click) | 遅い（snapshot 数秒/回） | YAML + ref で明確 | 初回探索、デバッグ、重要操作 |
-| `browser_run_code` + evaluate | 速い | テキスト返却のみ | 手順確立済みの定型操作、大量入力 |
+| 方式                          | 速度                     | 証跡              | 使い分け                         |
+| ----------------------------- | ------------------------ | ----------------- | -------------------------------- |
+| MCP 標準 (snapshot → click)   | 遅い（snapshot 数秒/回） | YAML + ref で明確 | 初回探索、デバッグ、重要操作     |
+| `browser_run_code` + evaluate | 速い                     | テキスト返却のみ  | 手順確立済みの定型操作、大量入力 |
 
 判断基準: **発注確定など不可逆操作の直前・直後は `browser_take_screenshot` で証跡を残し、中間のフォーム入力は evaluate で高速化**するのが実用的なバランス。
 
@@ -143,13 +147,15 @@ snapshot で ref 取得
 MCP Playwright と Python スクリプトは **同じ CDP ポートへ同時接続しない**。
 とくに Python 側も `connect_over_cdp()` を使う場合、MCP と Playwright セッションが二重になり、ページ操作が競合して「遷移先が想定外」「フォーム送信が効かない」等の不定失敗が起きる。
 
-| ルール | 内容 |
-| --- | --- |
-| 同時接続禁止 | MCP と Python を同じ CDP に同時接続しない |
-| MCP 切断優先 | Python 実行前に **`browser_close` で MCP ページを解放** してから実行する |
-| プロセス確認 | 実行前にゾンビ Python を確認する |
-| 標準フロー | MCP で手順確立 → `browser_close` → Python 単独実行 → 完了後に MCP 再接続して検証 |
+| ルール        | 内容                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| 同時接続禁止  | MCP と Python を同じ CDP に同時接続しない                                                                          |
+| MCP 切断優先  | Python 実行前に **`browser_close` で MCP ページを解放** してから実行する                                           |
+| プロセス確認  | 実行前にゾンビ Python を確認する                                                                                   |
+| 標準フロー    | MCP で手順確立 → `browser_close` → Python 単独実行 → 完了後に MCP 再接続して検証                                   |
 | raw WebSocket | `websocket-client` 等で CDP WebSocket に直接繋ぐスクリプトは MCP と共存可能（Playwright セッションを張らないため） |
+
+raw WebSocket を使う場合は、CDP command id で応答をフィルタし、`Runtime.enable` / `Page.enable` など必要な domain を先に有効化する。詳細は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
 ### CDP 断線復帰
 
