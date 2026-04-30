@@ -1,6 +1,8 @@
 ---
 name: powerpoint-automation
 description: Create and edit professional PowerPoint presentations from web articles, blog posts, existing PPTX files, or templates. Use when creating PPTX, converting articles to slides, translating presentations, editing open PowerPoint files, or doing COM Automation / RefURL / overflow review work.
+argument-hint: "変換したい URL・PPTX・テンプレート、または編集内容"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

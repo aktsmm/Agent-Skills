@@ -14,13 +14,13 @@ Design and review Agent Skills that trigger reliably and stay lean.
 
 Start by deciding whether the user really needs a skill.
 
-| Need | Use |
-| ---- | --- |
-| Reusable multi-step workflow with bundled scripts, references, or templates | **Skill** |
-| Single focused slash task with parameterized input | **Prompt** |
-| Always-on or file-scoped guidance | **Instruction** |
-| Persona, tool restrictions, delegation, or handoffs | **Custom Agent** |
-| Deterministic enforcement or lifecycle automation | **Hook** |
+| Need                                                                        | Use              |
+| --------------------------------------------------------------------------- | ---------------- |
+| Reusable multi-step workflow with bundled scripts, references, or templates | **Skill**        |
+| Single focused slash task with parameterized input                          | **Prompt**       |
+| Always-on or file-scoped guidance                                           | **Instruction**  |
+| Persona, tool restrictions, delegation, or handoffs                         | **Custom Agent** |
+| Deterministic enforcement or lifecycle automation                           | **Hook**         |
 
 If the answer is not **Skill**, stop and create the right primitive instead.
 
@@ -72,15 +72,15 @@ skill-name/
 
 → **[references/creation-process.md](references/creation-process.md)** for the end-to-end workflow
 
-| Step | Action                                                  |
-| ---- | ------------------------------------------------------- |
-| 0    | Choose primitive + scope (skill vs prompt/agent/etc.)   |
-| 1    | Understand with concrete examples and trigger phrases   |
-| 2    | Plan reusable contents (scripts/references/assets)      |
-| 3    | Initialize or refactor the skill folder                 |
-| 4    | Write SKILL.md and implement resources                  |
-| 5    | Validate frontmatter, structure, and trigger quality    |
-| 6    | Test on real prompt patterns and iterate                |
+| Step | Action                                                |
+| ---- | ----------------------------------------------------- |
+| 0    | Choose primitive + scope (skill vs prompt/agent/etc.) |
+| 1    | Understand with concrete examples and trigger phrases |
+| 2    | Plan reusable contents (scripts/references/assets)    |
+| 3    | Initialize or refactor the skill folder               |
+| 4    | Write SKILL.md and implement resources                |
+| 5    | Validate frontmatter, structure, and trigger quality  |
+| 6    | Test on real prompt patterns and iterate              |
 
 ### Refactor Order
 
@@ -107,6 +107,10 @@ disable-model-invocation: false
 
 - `name` must match the folder name
 - `description` must say both **what** and **when**
+- For manually used skills, default to explicit `argument-hint` and `user-invocable: true`
+- Use `argument-hint` as short input guidance, not as a long explanation
+- Use `user-invocable: false` only for background knowledge skills you do not want in the `/` menu
+- Use `disable-model-invocation: true` only for manual-only skills
 - Optional fields should be intentional, not boilerplate
 - Resource links must stay relative and shallow
 
@@ -157,6 +161,8 @@ For bloat review specifically, use [references/skill-bloat-review.md](references
 - [ ] SKILL.md under 150 lines?
 - [ ] Request truly needs a skill?
 - [ ] Description has trigger conditions?
+- [ ] `argument-hint` is present for manually used skills?
+- [ ] `user-invocable` is set intentionally?
 - [ ] Optional frontmatter fields are intentional?
 - [ ] Details moved to references/?
 - [ ] No README.md or auxiliary docs?
@@ -164,17 +170,17 @@ For bloat review specifically, use [references/skill-bloat-review.md](references
 
 ## Key References
 
-| Topic            | Reference                                                                    |
-| ---------------- | ---------------------------------------------------------------------------- |
-| Primitive Choice | [references/customization-primitives.md](references/customization-primitives.md) |
-| Skill Structure  | [references/skill-structure.md](references/skill-structure.md)               |
-| Structure Gallery | [references/skill-structure-gallery.md](references/skill-structure-gallery.md) |
-| Creation Process | [references/creation-process.md](references/creation-process.md)             |
-| Review Checklist | [references/skill-review-checklist.md](references/skill-review-checklist.md) |
-| Bloat Review     | [references/skill-bloat-review.md](references/skill-bloat-review.md)         |
-| Common Pitfalls  | [references/common-pitfalls.md](references/common-pitfalls.md)               |
-| Workflows        | [references/workflows.md](references/workflows.md)                           |
-| Output Patterns  | [references/output-patterns.md](references/output-patterns.md)               |
+| Topic             | Reference                                                                        |
+| ----------------- | -------------------------------------------------------------------------------- |
+| Primitive Choice  | [references/customization-primitives.md](references/customization-primitives.md) |
+| Skill Structure   | [references/skill-structure.md](references/skill-structure.md)                   |
+| Structure Gallery | [references/skill-structure-gallery.md](references/skill-structure-gallery.md)   |
+| Creation Process  | [references/creation-process.md](references/creation-process.md)                 |
+| Review Checklist  | [references/skill-review-checklist.md](references/skill-review-checklist.md)     |
+| Bloat Review      | [references/skill-bloat-review.md](references/skill-bloat-review.md)             |
+| Common Pitfalls   | [references/common-pitfalls.md](references/common-pitfalls.md)                   |
+| Workflows         | [references/workflows.md](references/workflows.md)                               |
+| Output Patterns   | [references/output-patterns.md](references/output-patterns.md)                   |
 
 ## Done Criteria
 
@@ -182,6 +188,8 @@ For bloat review specifically, use [references/skill-bloat-review.md](references
 - [ ] Scope is decided before file creation
 - [ ] SKILL.md created and under 150 lines
 - [ ] Frontmatter has name + description with trigger conditions
+- [ ] Manually used skills have `argument-hint`
+- [ ] `user-invocable` is set intentionally
 - [ ] Optional fields are added only when they change behavior
 - [ ] Details moved to references/ (Progressive Disclosure)
 - [ ] Review checklist passed
