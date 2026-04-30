@@ -2,6 +2,10 @@
 name: azure-advisor-report
 description: "Generate Azure environment monthly report (Markdown + PowerPoint) from Azure Advisor and Cost Management API. Use when creating Advisor recommendations report, cost trend analysis, or security/reliability assessment for a customer subscription. Triggers on 'Advisor report', 'Azure monthly report', 'subscription report', 'Azure環境レポート', '簡易月次レポート'."
 argument-hint: "Subscription ID(s) and Tenant ID(s), optionally target month (e.g., 2026-04)"
+user-invocable: true
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Azure Advisor 簡易月次レポート生成

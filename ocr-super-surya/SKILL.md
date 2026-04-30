@@ -1,6 +1,8 @@
 ---
 name: ocr-super-surya
 description: "GPU-optimized OCR using Surya. Use when: (1) Extracting text from images/screenshots, (2) Processing PDFs with embedded images, (3) Multi-language document OCR, (4) Layout analysis and table detection. Supports 90+ languages with 2x accuracy over Tesseract."
+argument-hint: "OCR したい画像・PDF、対象言語、欲しい出力"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

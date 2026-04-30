@@ -2,6 +2,7 @@
 name: local-media-transcription
 description: "ローカル音声/動画の文字起こし skill。MP4/M4A/MP3/WAV/WEBM から ffmpeg + whisper で文字起こしし、必要に応じて話者分離、顧客向け議事録への清書、アクションアイテム、PPT要点まで整理する。Use when: 文字起こし, transcription, transcribe mp4, meeting transcript, mp4から文字起こし, 録画から議事録, 話者分離, diarization, 顧客向け議事録, whisper CLI, ffmpeg."
 argument-hint: "文字起こししたいファイルパス or 対象会議の説明"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

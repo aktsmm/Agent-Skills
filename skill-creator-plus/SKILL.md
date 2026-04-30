@@ -1,6 +1,8 @@
 ---
 name: skill-creator-plus
 description: Guide for designing and reviewing high-quality Agent Skills, and for deciding when a request should be a skill instead of a prompt, instruction, agent, or hook. Use when creating a new skill, updating an existing skill, reviewing SKILL.md files, or fixing poor skill triggering. Triggers on "create skill", "/create-skill", "review skill", "fix skill trigger", "SKILL.md", "スキル作成".
+argument-hint: "作りたい skill の目的、trigger、入れたい resources"
+user-invocable: true
 license: Apache-2.0
 metadata:
   author: yamapan (based on Anthropic)

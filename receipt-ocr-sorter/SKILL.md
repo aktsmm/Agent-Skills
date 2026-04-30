@@ -1,6 +1,8 @@
 ---
 name: receipt-ocr-sorter
 description: "OCR領収書自動仕分けツール。画像(JPEG/PNG)/PDF/ZIP/動画(MP4/MOV)の領収書をOCRで読み取り、日付・金額・国・カード・用途を抽出して標準ファイル名にリネーム＆プロジェクト単位で仕分ける。Markdownサマリーレポート付き。D365 Expenseカテゴリマッピング・レシート添付連携対応。Use when: (1) 領収書の整理, (2) receipt sorting, (3) レシート仕分け, (4) 経費レシートをフォルダ整理, (5) OCRでリネーム, (6) D365経費カテゴリマッピング。Surya OCR + GPU(CUDA)対応。"
+argument-hint: "仕分けたい領収書フォルダ、対象プロジェクト、必要な出力"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

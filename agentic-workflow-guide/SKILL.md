@@ -1,6 +1,8 @@
 ---
 name: agentic-workflow-guide
 description: "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for any .agent.md file work, workflow architecture, orchestration planning, or when agent workflows may be overkill. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計', 'orchestrator'."
+argument-hint: "作りたい .agent.md、設計したい workflow、または困っている症状"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

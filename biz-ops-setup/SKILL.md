@@ -1,6 +1,8 @@
 ---
 name: biz-ops-setup
 description: "Business operations workspace setup with workIQ integration. Creates report generation, task management, and customer management system. Use when: setting up new workspace, initializing biz-ops environment, creating business management system."
+argument-hint: "作りたい業務ワークスペース、必要機能、管理したい対象"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

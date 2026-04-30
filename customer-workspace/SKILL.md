@@ -1,6 +1,8 @@
 ---
 name: customer-workspace
 description: Customer workspace initialization skill. Provides inbox (information accumulation), meeting minutes management, and auto-classification rules. Use for "setup customer workspace" or "add inbox feature" requests.
+argument-hint: "作りたい顧客ワークスペース名、必要機能、管理対象"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

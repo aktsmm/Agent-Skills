@@ -1,6 +1,8 @@
 ---
 name: skill-finder
 description: "Search, install, and manage Agent Skills, and help decide whether the user actually needs a skill before recommending one. Use when looking for skills, installing skills, managing your skill collection, or deciding between a skill and another customization primitive."
+argument-hint: "探したい skill の用途やキーワード"
+user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

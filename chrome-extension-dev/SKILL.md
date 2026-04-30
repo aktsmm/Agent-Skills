@@ -1,6 +1,11 @@
 ---
 name: chrome-extension-dev
 description: "Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script', 'service worker'."
+argument-hint: "作りたい拡張機能、困っている API、対象ファイル"
+user-invocable: true
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Chrome Extension Dev
