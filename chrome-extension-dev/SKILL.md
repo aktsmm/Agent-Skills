@@ -68,26 +68,26 @@ project/
 
 ## 主要 Chrome API
 
-| API                  | 用途               | 権限                     |
-| -------------------- | ------------------ | ------------------------ |
-| `chrome.tabs`        | タブ操作           | `tabs` / `activeTab`     |
-| `chrome.storage`     | データ永続化       | `storage`                |
-| `chrome.runtime`     | メッセージング     | なし                     |
-| `chrome.scripting`   | スクリプト/CSS注入 | `scripting` + host権限   |
-| `chrome.cookies`     | Cookie操作         | `cookies` + host権限     |
-| `chrome.offscreen`   | DOM操作（SW内）    | `offscreen`              |
+| API                | 用途               | 権限                   |
+| ------------------ | ------------------ | ---------------------- |
+| `chrome.tabs`      | タブ操作           | `tabs` / `activeTab`   |
+| `chrome.storage`   | データ永続化       | `storage`              |
+| `chrome.runtime`   | メッセージング     | なし                   |
+| `chrome.scripting` | スクリプト/CSS注入 | `scripting` + host権限 |
+| `chrome.cookies`   | Cookie操作         | `cookies` + host権限   |
+| `chrome.offscreen` | DOM操作（SW内）    | `offscreen`            |
 
 → 詳細: [references/chrome-api.md](references/chrome-api.md)
 
 ## Manifest V3 制限事項
 
-| 制限               | 対処法                             |
-| ------------------ | ---------------------------------- |
-| 30秒タイムアウト   | `chrome.alarms` でウェイクアップ   |
-| DOMアクセス不可    | `chrome.offscreen` を使用          |
-| 永続化なし         | `chrome.storage.session` を使用    |
-| eval()禁止         | 事前にバンドル                     |
-| リモートコード禁止 | 全コードをバンドル                 |
+| 制限               | 対処法                           |
+| ------------------ | -------------------------------- |
+| 30秒タイムアウト   | `chrome.alarms` でウェイクアップ |
+| DOMアクセス不可    | `chrome.offscreen` を使用        |
+| 永続化なし         | `chrome.storage.session` を使用  |
+| eval()禁止         | 事前にバンドル                   |
+| リモートコード禁止 | 全コードをバンドル               |
 
 → 詳細: [references/manifest-v3.md](references/manifest-v3.md)
 
@@ -98,13 +98,13 @@ project/
 
 ## Key References
 
-| トピック         | リファレンス                                         |
-| ---------------- | ---------------------------------------------------- |
-| Chrome API 詳細  | [references/chrome-api.md](references/chrome-api.md) |
+| トピック         | リファレンス                                           |
+| ---------------- | ------------------------------------------------------ |
+| Chrome API 詳細  | [references/chrome-api.md](references/chrome-api.md)   |
 | Manifest V3      | [references/manifest-v3.md](references/manifest-v3.md) |
-| テスト           | [references/testing.md](references/testing.md)       |
-| 公開             | [references/publishing.md](references/publishing.md) |
-| よくあるパターン | [references/patterns.md](references/patterns.md)     |
+| テスト           | [references/testing.md](references/testing.md)         |
+| 公開             | [references/publishing.md](references/publishing.md)   |
+| よくあるパターン | [references/patterns.md](references/patterns.md)       |
 
 ## Done Criteria
 

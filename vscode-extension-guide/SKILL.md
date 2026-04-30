@@ -67,16 +67,16 @@ npx @vscode/vsce package   # Creates .vsix
 
 ## Reference Map
 
-| Topic               | Reference                                                            |
-| ------------------- | -------------------------------------------------------------------- |
-| AI Customization    | [references/ai-customization.md](references/ai-customization.md)     |
-| Code Review Prompts | [references/code-review-prompts.md](references/code-review-prompts.md) |
+| Topic               | Reference                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| AI Customization    | [references/ai-customization.md](references/ai-customization.md)                                                    |
+| Code Review Prompts | [references/code-review-prompts.md](references/code-review-prompts.md)                                              |
 | Code Samples        | [references/ai-customization.md](references/ai-customization.md) and [references/webview.md](references/webview.md) |
-| TreeView            | [references/treeview.md](references/treeview.md)                     |
-| Webview             | [references/webview.md](references/webview.md)                       |
-| Testing             | [references/testing.md](references/testing.md)                       |
-| Publishing          | [references/publishing.md](references/publishing.md)                 |
-| Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)       |
+| TreeView            | [references/treeview.md](references/treeview.md)                                                                    |
+| Webview             | [references/webview.md](references/webview.md)                                                                      |
+| Testing             | [references/testing.md](references/testing.md)                                                                      |
+| Publishing          | [references/publishing.md](references/publishing.md)                                                                |
+| Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)                                                      |
 
 ## Best Practices
 
@@ -84,12 +84,12 @@ npx @vscode/vsce package   # Creates .vsix
 
 公開前にパッケージ名・設定キー・コマンド名を統一：
 
-| 項目 | 例 |
-|------|-----|
-| パッケージ名 | `copilot-scheduler` |
-| 設定キー | `copilotScheduler.enabled` |
-| コマンドID | `copilotScheduler.createTask` |
-| ビューID | `copilotSchedulerTasks` |
+| 項目         | 例                            |
+| ------------ | ----------------------------- |
+| パッケージ名 | `copilot-scheduler`           |
+| 設定キー     | `copilotScheduler.enabled`    |
+| コマンドID   | `copilotScheduler.createTask` |
+| ビューID     | `copilotSchedulerTasks`       |
 
 ### 通知の一元管理
 

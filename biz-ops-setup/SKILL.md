@@ -59,11 +59,11 @@ Collect the following information:
 
 ## Deployed Components
 
-| Type    | Count | Examples                                      |
-| ------- | ----- | --------------------------------------------- |
-| Agents  | 9     | orchestrator, report-generator, task-manager, availability-finder  |
-| Prompts | 4     | daily-report, weekly-report, monthly-report   |
-| Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/ |
+| Type    | Count | Examples                                                          |
+| ------- | ----- | ----------------------------------------------------------------- |
+| Agents  | 9     | orchestrator, report-generator, task-manager, availability-finder |
+| Prompts | 4     | daily-report, weekly-report, monthly-report                       |
+| Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/                     |
 
 ## Done Criteria
 
@@ -81,8 +81,3 @@ Collect the following information:
 | Folder Structure | [references/folder-structure.md](references/folder-structure.md) |
 | Agent List       | [references/agent-list.md](references/agent-list.md)             |
 | Holidays         | [references/holidays.md](references/holidays.md)                 |
-
-
-
-
-

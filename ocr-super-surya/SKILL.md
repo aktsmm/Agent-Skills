@@ -98,6 +98,7 @@ for page in rec_pred([image], det_predictor=det_pred):
 ```
 
 > **API変更履歴 (v0.17.x)**:
+>
 > - `RecognitionPredictor(foundation_predictor)` - `FoundationPredictor` が必須引数に変更
 > - `__call__()` から `langs` 引数が削除（自動検出に変更）
 
@@ -121,13 +122,13 @@ surya_ocr image.png
 
 ## Troubleshooting
 
-| エラー | 原因 | 対処 |
-| ------ | ---- | ---- |
-| `RecognitionPredictor.__init__() missing 1 required positional argument: 'foundation_predictor'` | v0.13+ でAPIが変更 | `found_pred = FoundationPredictor()` を作成して引数に渡す |
-| `TypeError: __call__() got an unexpected keyword argument 'langs'` | v0.17.x で `langs` 引数廃止 | `langs` 引数を削除する |
-| `AttributeError: 'SuryaDecoderConfig' object has no attribute 'pad_token_id'` | `transformers 5.x` との非互換 | `pip install "transformers<5.0"` でダウングレード |
-| `failed to hardlink file ... OneDrive` (uv, os error 396) | OneDrive のハードリンク制限 | `--link-mode=copy` を付けてインストール＋`UV_CACHE_DIR` をOneDrive外に設定 |
-| `UnicodeEncodeError: 'cp932' codec can't encode character` | Windows のCP932デフォルトエンコード | `sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')` を先頭に追加 |
+| エラー                                                                                           | 原因                                | 対処                                                                              |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------- | --------------------------------------------------------------------------------- |
+| `RecognitionPredictor.__init__() missing 1 required positional argument: 'foundation_predictor'` | v0.13+ でAPIが変更                  | `found_pred = FoundationPredictor()` を作成して引数に渡す                         |
+| `TypeError: __call__() got an unexpected keyword argument 'langs'`                               | v0.17.x で `langs` 引数廃止         | `langs` 引数を削除する                                                            |
+| `AttributeError: 'SuryaDecoderConfig' object has no attribute 'pad_token_id'`                    | `transformers 5.x` との非互換       | `pip install "transformers<5.0"` でダウングレード                                 |
+| `failed to hardlink file ... OneDrive` (uv, os error 396)                                        | OneDrive のハードリンク制限         | `--link-mode=copy` を付けてインストール＋`UV_CACHE_DIR` をOneDrive外に設定        |
+| `UnicodeEncodeError: 'cp932' codec can't encode character`                                       | Windows のCP932デフォルトエンコード | `sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')` を先頭に追加 |
 
 ## License Note
 

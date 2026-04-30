@@ -134,13 +134,13 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 
 ## Troubleshooting
 
-| Issue             | Solution                  |
-| ----------------- | ------------------------- |
-| Blank in draw.io  | Check `content` attribute |
-| Edges not visible | Verify node IDs           |
-| Icons missing     | Enable Azure/AWS shapes   |
-| README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio` |
-| Too many crossing arrows | Simplify the main flow first, then move secondary flows to separate lanes or separate diagrams |
+| Issue                             | Solution                                                                                       |
+| --------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Blank in draw.io                  | Check `content` attribute                                                                      |
+| Edges not visible                 | Verify node IDs                                                                                |
+| Icons missing                     | Enable Azure/AWS shapes                                                                        |
+| README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio`                   |
+| Too many crossing arrows          | Simplify the main flow first, then move secondary flows to separate lanes or separate diagrams |
 
 ## Done Criteria
 

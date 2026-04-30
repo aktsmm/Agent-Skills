@@ -29,6 +29,7 @@ AI生成っぽさを検出して、人間らしい文章に直すSkill。
 ワークスペースに文体ルールを常時適用したい場合は、`.github/instructions/writing-style.md` のような instruction を併用するとよい（任意）。
 
 Skill と instructions の棲み分け:
+
 - **instructions**: 記事を書く全工程で常に適用されるルール（文体ポリシー）
 - **SKILL.md**: AI文監査・変換という **特定タスク** の手順書（このファイル）
 
@@ -42,6 +43,7 @@ Skill と instructions の棲み分け:
 ## Done Criteria
 
 **レビュー型**:
+
 - [ ] 検出された問題箇所を行番号／引用付きで列挙
 - [ ] 各問題に「カテゴリ」「置換案」を付ける
 - [ ] 同じ箇所に重なったシグナルを別件で水増しせず、必要なら `stacking pattern` としてまとめる
@@ -51,6 +53,7 @@ Skill と instructions の棲み分け:
 - [ ] 一般論の説明ではなく、書き手の判断が読めるかを確認する
 
 **生成指示型**:
+
 - [ ] 同じ書き出しの文が3連続しない
 - [ ] 抽象語ではなく具体語で書く
 - [ ] 体験と引用が主語レベルで分かれている（自分がやった／AIにやらせた／公式ドキュメントからの引用 を混同しない）
@@ -71,53 +74,53 @@ Skill と instructions の棲み分け:
 
 ### 日本語シグナル（高優先）
 
-| カテゴリ | パターン | 置換方針 |
-|---|---|---|
-| 定型接続詞 | `つまり、` `要は` `言い換えると` `すなわち` | 削除、または具体語へ |
-| 空虚な断定・抽象語 | `かなり` `十分` `しっかり` `活用` `効率化` `土台` `価値` などでまとめる | 数値・具体描写・動作へ。何をしたか、何が変わったかに置換 |
-| 定型構文 | `〇〇そのものではなく△△すること` `〇〇というわけではなく` | 事実に沿って書き直す |
-| 定型導入 | `実は〜なのです` `〜してみませんか？` | 削除 |
-| 冗長助動詞 | `〜ということができます` `〜することが可能です` | `〜できます` |
-| 過剰謙遜 | `〜かもしれません` の乱用 | 事実なら言い切る |
-| 同じ文末連続 | `〜でした。` が3連続以上 | 一部を常体・体言止め・倒置に |
-| 同じ書き出し連続 | `今回は`〜/`今回の`〜 が3連続 | 主語・視点を変える |
-| 章末定型 | `いかがでしたか？` `この記事が〜の助けになれば` | 削除／体験ベースに |
-| pivot構文 | `〇〇ではなく△△` `〇〇というより△△` | 読者視点で対比が成立するか検証。成立しなければ一文で言い切る |
-| 章立て予告 | 冒頭で「この記事では次の流れで見ていきます」+ `1.〜N.` 列挙 | TL;DR と H2 目次で二重化。削除し 1 行導入に圧縮 |
-| 教訓風総括段落 | 節末の「ここでの学びはシンプルで、〜ことでした」「一番のポイントは〜ことでした」 | 動詞に溶かすか削除して結論を直結 |
-| 判断不在の正論 | 誰が書いても成立する一般論だけが並ぶ | 書き手が何を重視したか、どこで迷ったか、何を先にやったかを少し残す |
-| 説教締め | まとめ末の「〇〇な人でも、まずは〜くらいの使い方からでも十分助かりました」 | 著者の予告・次の行動・主観で閉じる |
-| 節冒頭テンプレ | 「〇〇だけだと△△までは届きません。ここも AI に任せました」 | 導入を落とし、指示内容から直入り |
-| 見出し復唱 | H2/H3 直後の「ここが一番効いたポイントでした」 | 削除。見出しで言ったことは本文で繰り返さない |
-| ポイント専用節 | 「試行錯誤で効いたコツ」「ここが効いた」の H2 独立 | まとめ節に吸収 |
-| 当たり前解説 | コード/表直後の「こうしておくと〜が分かります」「〇〇だと把握しづらいです」 | 削除 |
-| 内部資産列挙 | `SSOT` `handbook` `playbook` `checklist` `運営メモ` などの内部資産名を棚卸しする | 公開文では一覧化せず、「何がやりやすくなったか」に圧縮 |
-| 便利語口癖化 | `一気に` `強い` `助かる` `そのまま` `しっかり` が同記事に3回以上 | 半分以上を削除または具体語に置換 |
-| コア論点ずれ | TL;DR／振り返り節／まとめで「主な争点／答え」の語彙が一致しない | 3 箇所で同じ語彙を使う |
-| オチ見出し | Step/章タイトルに「〜で全体像を掴む」「〜まで持っていく」「〜ラベル化したら読めるようになった」「〜実用的になる」など結果/教訓/感嘆を入れる | 見出しは**動作の目的**だけを名詞句/短い動詞句で（例: 「Python で可視化する」「IP にラベルを付ける」「Markdown レポートにまとめる」） |
-| 余談マーカー見出し | 「ちなみに〜」「実際にやってみた感想」「やってみたら〜だった」の口語前置き | 「補足」「感想」「〇〇ではない」等の短い名詞句、または節ごと削除 |
-| 断片ヘッダ | 見出し直後の「まずはこちらです」「この節では〜」「初回イベントはこちらです」 | 見出しに吸収し、本題から始める |
-| 急な文体シフト | 1 段落だけ広報文・論文調・テンプレ文に跳ねる | 周囲の温度に合わせ、浮いた段落を解体する |
+| カテゴリ           | パターン                                                                                                                                    | 置換方針                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| 定型接続詞         | `つまり、` `要は` `言い換えると` `すなわち`                                                                                                 | 削除、または具体語へ                                                                                                                 |
+| 空虚な断定・抽象語 | `かなり` `十分` `しっかり` `活用` `効率化` `土台` `価値` などでまとめる                                                                     | 数値・具体描写・動作へ。何をしたか、何が変わったかに置換                                                                             |
+| 定型構文           | `〇〇そのものではなく△△すること` `〇〇というわけではなく`                                                                                   | 事実に沿って書き直す                                                                                                                 |
+| 定型導入           | `実は〜なのです` `〜してみませんか？`                                                                                                       | 削除                                                                                                                                 |
+| 冗長助動詞         | `〜ということができます` `〜することが可能です`                                                                                             | `〜できます`                                                                                                                         |
+| 過剰謙遜           | `〜かもしれません` の乱用                                                                                                                   | 事実なら言い切る                                                                                                                     |
+| 同じ文末連続       | `〜でした。` が3連続以上                                                                                                                    | 一部を常体・体言止め・倒置に                                                                                                         |
+| 同じ書き出し連続   | `今回は`〜/`今回の`〜 が3連続                                                                                                               | 主語・視点を変える                                                                                                                   |
+| 章末定型           | `いかがでしたか？` `この記事が〜の助けになれば`                                                                                             | 削除／体験ベースに                                                                                                                   |
+| pivot構文          | `〇〇ではなく△△` `〇〇というより△△`                                                                                                         | 読者視点で対比が成立するか検証。成立しなければ一文で言い切る                                                                         |
+| 章立て予告         | 冒頭で「この記事では次の流れで見ていきます」+ `1.〜N.` 列挙                                                                                 | TL;DR と H2 目次で二重化。削除し 1 行導入に圧縮                                                                                      |
+| 教訓風総括段落     | 節末の「ここでの学びはシンプルで、〜ことでした」「一番のポイントは〜ことでした」                                                            | 動詞に溶かすか削除して結論を直結                                                                                                     |
+| 判断不在の正論     | 誰が書いても成立する一般論だけが並ぶ                                                                                                        | 書き手が何を重視したか、どこで迷ったか、何を先にやったかを少し残す                                                                   |
+| 説教締め           | まとめ末の「〇〇な人でも、まずは〜くらいの使い方からでも十分助かりました」                                                                  | 著者の予告・次の行動・主観で閉じる                                                                                                   |
+| 節冒頭テンプレ     | 「〇〇だけだと△△までは届きません。ここも AI に任せました」                                                                                  | 導入を落とし、指示内容から直入り                                                                                                     |
+| 見出し復唱         | H2/H3 直後の「ここが一番効いたポイントでした」                                                                                              | 削除。見出しで言ったことは本文で繰り返さない                                                                                         |
+| ポイント専用節     | 「試行錯誤で効いたコツ」「ここが効いた」の H2 独立                                                                                          | まとめ節に吸収                                                                                                                       |
+| 当たり前解説       | コード/表直後の「こうしておくと〜が分かります」「〇〇だと把握しづらいです」                                                                 | 削除                                                                                                                                 |
+| 内部資産列挙       | `SSOT` `handbook` `playbook` `checklist` `運営メモ` などの内部資産名を棚卸しする                                                            | 公開文では一覧化せず、「何がやりやすくなったか」に圧縮                                                                               |
+| 便利語口癖化       | `一気に` `強い` `助かる` `そのまま` `しっかり` が同記事に3回以上                                                                            | 半分以上を削除または具体語に置換                                                                                                     |
+| コア論点ずれ       | TL;DR／振り返り節／まとめで「主な争点／答え」の語彙が一致しない                                                                             | 3 箇所で同じ語彙を使う                                                                                                               |
+| オチ見出し         | Step/章タイトルに「〜で全体像を掴む」「〜まで持っていく」「〜ラベル化したら読めるようになった」「〜実用的になる」など結果/教訓/感嘆を入れる | 見出しは**動作の目的**だけを名詞句/短い動詞句で（例: 「Python で可視化する」「IP にラベルを付ける」「Markdown レポートにまとめる」） |
+| 余談マーカー見出し | 「ちなみに〜」「実際にやってみた感想」「やってみたら〜だった」の口語前置き                                                                  | 「補足」「感想」「〇〇ではない」等の短い名詞句、または節ごと削除                                                                     |
+| 断片ヘッダ         | 見出し直後の「まずはこちらです」「この節では〜」「初回イベントはこちらです」                                                                | 見出しに吸収し、本題から始める                                                                                                       |
+| 急な文体シフト     | 1 段落だけ広報文・論文調・テンプレ文に跳ねる                                                                                                | 周囲の温度に合わせ、浮いた段落を解体する                                                                                             |
 
 ### 英語シグナル（高優先）
 
-| カテゴリ | パターン | 置換方針 |
-|---|---|---|
-| Buzz nouns | `delve`, `tapestry`, `realm`, `landscape`, `testament`, `paramount`, `cornerstone`, `beacon`, `symphony`, `crucible`, `nuance`, `intricacies` | 具体名詞へ |
-| Buzz verbs | `embark`, `unleash`, `unlock`, `harness`, `leverage`, `navigate`, `foster`, `streamline`, `empower`, `elevate`, `orchestrate`, `bolster`, `cultivate` | 普通の動詞へ |
-| Buzz adjectives | `ever-evolving`, `seamless`, `robust`, `cutting-edge`, `game-changing`, `transformative`, `unparalleled`, `pivotal`, `holistic`, `multifaceted`, `meticulous` | 事実の描写へ |
-| Filler openers | `In today's fast-paced world`, `In the rapidly evolving world of`, `In the ever-changing landscape of`, `It is important to note that`, `It's worth noting that`, `At its core` | 削除 |
-| Exploratory openers | `Let's explore`, `Let's dive into`, `Let's take a closer look at`, `Let's unpack`, `step-by-step guide` | 削除 or 題材名から書き始める |
-| Pivot constructions | `Not just X but Y`, `X isn't just Y, it's Z`, `It's not about X, it's about Y`, `Rather than X, consider Y` | 一文で言い切る |
-| Parallel triples | `A, B, and C` が段落ごとに反復 | 1〜2個は崩す |
-| Em-dash 多用 | 段落内 `—` が 2 回以上 | 句点・括弧に置換 |
-| Hedge stacking | `can`, `may`, `might`, `could`, `potentially`, `arguably` の連鎖 | 断定可なら断定 |
-| Transition tells | `Furthermore,`, `Moreover,`, `Additionally,`, `That said,`, `Having said that,`, `As we've seen,` の乱用 | 削除 or `Also,` |
-| Conclusion tell | `In conclusion,`, `Ultimately,`, `To sum it all up,`, `In a nutshell,`, `All in all,` の多用 | 削除 |
-| Engagement tell | `I hope this helps!`, `Feel free to reach out`, `Happy coding!` をテンプレで付ける | 本物の一言に差し替え |
-| Rhetorical Q | `But what does this really mean?`, `Why does this matter?` | 具体主張に |
-| Throat-clearing | `Before we dive in,`, `With that out of the way,` | 削除 |
-| Emoji-heading | 見出し先頭の 🚀 ✨ 🔥 が毎節 | 必要な節だけ残す |
+| カテゴリ            | パターン                                                                                                                                                                        | 置換方針                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Buzz nouns          | `delve`, `tapestry`, `realm`, `landscape`, `testament`, `paramount`, `cornerstone`, `beacon`, `symphony`, `crucible`, `nuance`, `intricacies`                                   | 具体名詞へ                   |
+| Buzz verbs          | `embark`, `unleash`, `unlock`, `harness`, `leverage`, `navigate`, `foster`, `streamline`, `empower`, `elevate`, `orchestrate`, `bolster`, `cultivate`                           | 普通の動詞へ                 |
+| Buzz adjectives     | `ever-evolving`, `seamless`, `robust`, `cutting-edge`, `game-changing`, `transformative`, `unparalleled`, `pivotal`, `holistic`, `multifaceted`, `meticulous`                   | 事実の描写へ                 |
+| Filler openers      | `In today's fast-paced world`, `In the rapidly evolving world of`, `In the ever-changing landscape of`, `It is important to note that`, `It's worth noting that`, `At its core` | 削除                         |
+| Exploratory openers | `Let's explore`, `Let's dive into`, `Let's take a closer look at`, `Let's unpack`, `step-by-step guide`                                                                         | 削除 or 題材名から書き始める |
+| Pivot constructions | `Not just X but Y`, `X isn't just Y, it's Z`, `It's not about X, it's about Y`, `Rather than X, consider Y`                                                                     | 一文で言い切る               |
+| Parallel triples    | `A, B, and C` が段落ごとに反復                                                                                                                                                  | 1〜2個は崩す                 |
+| Em-dash 多用        | 段落内 `—` が 2 回以上                                                                                                                                                          | 句点・括弧に置換             |
+| Hedge stacking      | `can`, `may`, `might`, `could`, `potentially`, `arguably` の連鎖                                                                                                                | 断定可なら断定               |
+| Transition tells    | `Furthermore,`, `Moreover,`, `Additionally,`, `That said,`, `Having said that,`, `As we've seen,` の乱用                                                                        | 削除 or `Also,`              |
+| Conclusion tell     | `In conclusion,`, `Ultimately,`, `To sum it all up,`, `In a nutshell,`, `All in all,` の多用                                                                                    | 削除                         |
+| Engagement tell     | `I hope this helps!`, `Feel free to reach out`, `Happy coding!` をテンプレで付ける                                                                                              | 本物の一言に差し替え         |
+| Rhetorical Q        | `But what does this really mean?`, `Why does this matter?`                                                                                                                      | 具体主張に                   |
+| Throat-clearing     | `Before we dive in,`, `With that out of the way,`                                                                                                                               | 削除                         |
+| Emoji-heading       | 見出し先頭の 🚀 ✨ 🔥 が毎節                                                                                                                                                    | 必要な節だけ残す             |
 
 ### 構造シグナル（言語共通）
 
@@ -164,17 +167,21 @@ Phase 1 の検出結果を次の形式で返す。
 ## AI-likeness Audit
 
 ### High-priority (要修正)
+
 - L42 「つまり、〜」→ 定型接続詞。削除 or 具体語
   before: つまり、サービス名に近い根拠を優先します。
   after : サービス名に近い根拠を優先する、という順番です。
 
 ### Medium
+
 - L58-62 文末「〜でした」×4 連続 → 一部崩す
 
 ### Low (任意)
+
 - L110 「かなり読みやすい」→ 具体数値があれば置換
 
 ### 構造
+
 - 見出し語尾: 8箇所中7箇所が「〜した」→ 1箇所変える
 - 段落長: 全段落 3-4 文で均一 → 短段落を2つ混ぜる
 ```

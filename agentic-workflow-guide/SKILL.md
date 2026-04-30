@@ -31,12 +31,12 @@ Selection details: [references/customization-decision.md](references/customizati
 
 ## When to Use
 
-| Action     | Triggers                                                                     |
-| ---------- | ---------------------------------------------------------------------------- |
-| **Create** | New `.agent.md`, workflow architecture, scaffolding                          |
-| **Review** | Orchestrator not delegating, design principle check, context overflow        |
-| **Update** | Adding Handoffs, improving delegation, tool configuration                    |
-| **Debug**  | Agent not found, subagent not working, picker visibility, access control     |
+| Action     | Triggers                                                                      |
+| ---------- | ----------------------------------------------------------------------------- |
+| **Create** | New `.agent.md`, workflow architecture, scaffolding                           |
+| **Review** | Orchestrator not delegating, design principle check, context overflow         |
+| **Update** | Adding Handoffs, improving delegation, tool configuration                     |
+| **Debug**  | Agent not found, subagent not working, picker visibility, access control      |
 | **Decide** | Determining whether multi-agent is justified or a simpler primitive is enough |
 
 ## Core Principles
@@ -64,19 +64,19 @@ Pattern details: [references/workflow-patterns/overview.md](references/workflow-
 ## Design Workflow
 
 1. **Extract from conversation**
-  Repeated behavior, tool preferences, workflow shape, and obvious specialization を先に拾う。
+   Repeated behavior, tool preferences, workflow shape, and obvious specialization を先に拾う。
 2. **Choose primitive + scope**
-  Prompt / instruction / skill / agent / hook と workspace / profile を決める。
+   Prompt / instruction / skill / agent / hook と workspace / profile を決める。
 3. **Clarify only the gaps**
-  挙動を変える曖昧さだけ聞く。
+   挙動を変える曖昧さだけ聞く。
 4. **Check escalation**
-  agent や multi-agent が本当に必要か確認する。
+   agent や multi-agent が本当に必要か確認する。
 5. **Choose pattern**
-  complexity が上がるなら pattern を明示して設計する。
+   complexity が上がるなら pattern を明示して設計する。
 6. **Review before expanding**
-  split / compact / reference 化で済まないかを見る。
+   split / compact / reference 化で済まないかを見る。
 7. **Implement and iterate**
-  最初から完成形を狙わず、弱い箇所を見つけて詰める。
+   最初から完成形を狙わず、弱い箇所を見つけて詰める。
 
 ## Escalation Rules
 
@@ -109,20 +109,20 @@ Full checklist: [references/review-checklist.md](references/review-checklist.md)
 
 ## Reference Map
 
-| Topic | Reference |
-| --- | --- |
-| Primitive decision | [references/customization-decision.md](references/customization-decision.md) |
-| Design principles | [references/design-principles.md](references/design-principles.md) |
-| Workflow patterns | [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md) |
-| Splitting criteria | [references/splitting-criteria.md](references/splitting-criteria.md) |
-| Review checklist | [references/review-checklist.md](references/review-checklist.md) |
-| Context management | [references/context-engineering.md](references/context-engineering.md) |
-| Agent guide / template | [references/agent-guide.md](references/agent-guide.md), [references/agent-template.md](references/agent-template.md) |
-| Handoffs / placement | [references/handoffs-guide.md](references/handoffs-guide.md), [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
-| Hooks | [references/hooks-guide.md](references/hooks-guide.md) |
-| Evaluation | [references/agent-evaluation.md](references/agent-evaluation.md) |
-| Examples / scaffold | [references/scaffold-usage.md](references/scaffold-usage.md), [references/examples/](references/examples/) |
-| External links | [references/external-resources.md](references/external-resources.md) |
+| Topic                  | Reference                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Primitive decision     | [references/customization-decision.md](references/customization-decision.md)                                                               |
+| Design principles      | [references/design-principles.md](references/design-principles.md)                                                                         |
+| Workflow patterns      | [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)                                                       |
+| Splitting criteria     | [references/splitting-criteria.md](references/splitting-criteria.md)                                                                       |
+| Review checklist       | [references/review-checklist.md](references/review-checklist.md)                                                                           |
+| Context management     | [references/context-engineering.md](references/context-engineering.md)                                                                     |
+| Agent guide / template | [references/agent-guide.md](references/agent-guide.md), [references/agent-template.md](references/agent-template.md)                       |
+| Handoffs / placement   | [references/handoffs-guide.md](references/handoffs-guide.md), [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
+| Hooks                  | [references/hooks-guide.md](references/hooks-guide.md)                                                                                     |
+| Evaluation             | [references/agent-evaluation.md](references/agent-evaluation.md)                                                                           |
+| Examples / scaffold    | [references/scaffold-usage.md](references/scaffold-usage.md), [references/examples/](references/examples/)                                 |
+| External links         | [references/external-resources.md](references/external-resources.md)                                                                       |
 
 ## External References
 
@@ -150,13 +150,13 @@ You MUST use agent for each file. Do NOT read files directly.
 
 → **[references/agent-template.md](references/agent-template.md)**
 
-| Purpose   | VS Code Copilot          | Claude Code |
-| --------- | ------------------------ | ----------- |
-| Shell     | `execute/runInTerminal`  | `Bash`      |
-| Read      | `read/readFile`          | `Read`      |
-| Edit      | `edit/editFiles`         | `Write`     |
-| Subagent  | `agent`                  | `Task`      |
-| Web fetch | `web/fetch`              | (MCP)       |
+| Purpose   | VS Code Copilot         | Claude Code |
+| --------- | ----------------------- | ----------- |
+| Shell     | `execute/runInTerminal` | `Bash`      |
+| Read      | `read/readFile`         | `Read`      |
+| Edit      | `edit/editFiles`        | `Write`     |
+| Subagent  | `agent`                 | `Task`      |
+| Web fetch | `web/fetch`             | (MCP)       |
 
 ## Done Criteria
 

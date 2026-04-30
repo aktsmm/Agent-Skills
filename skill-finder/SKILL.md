@@ -24,13 +24,13 @@ Full-featured Agent Skills management tool.
 
 Before searching, check whether the user really wants a **skill**.
 
-| If the ask sounds like... | Prefer... |
-| ------------------------- | --------- |
-| Single slash task | Prompt |
-| Always-on or file-scoped guidance | Instruction |
-| Persona, tool restrictions, delegation | Agent |
-| Deterministic enforcement | Hook |
-| Reusable packaged workflow | Skill |
+| If the ask sounds like...              | Prefer...   |
+| -------------------------------------- | ----------- |
+| Single slash task                      | Prompt      |
+| Always-on or file-scoped guidance      | Instruction |
+| Persona, tool restrictions, delegation | Agent       |
+| Deterministic enforcement              | Hook        |
+| Reusable packaged workflow             | Skill       |
 
 If the answer is not **Skill**, explain that first instead of forcing a skill recommendation.
 

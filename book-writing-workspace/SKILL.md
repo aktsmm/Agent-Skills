@@ -84,12 +84,12 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 
 ## Reference Map
 
-| Topic | Reference |
-| --- | --- |
-| Folder structure | [references/folder-structure.md](references/folder-structure.md) |
-| Setup workflow | [references/setup-workflow.md](references/setup-workflow.md) |
+| Topic                | Reference                                                                |
+| -------------------- | ------------------------------------------------------------------------ |
+| Folder structure     | [references/folder-structure.md](references/folder-structure.md)         |
+| Setup workflow       | [references/setup-workflow.md](references/setup-workflow.md)             |
 | Customization points | [references/customization-points.md](references/customization-points.md) |
-| Re:VIEW / PDF tips | [references/review-pdf-tips.md](references/review-pdf-tips.md) |
+| Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)           |
 
 ## Done Criteria
 
