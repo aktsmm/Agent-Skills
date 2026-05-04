@@ -335,7 +335,7 @@ Re:VIEW supports two PDF layout modes via `texdocumentclass` options:
 | Page margins  | Asymmetric (inner/outer for bind) | Symmetric (equal left/right)         |
 | `openright`   | Active (blank pages inserted)     | Ignored (chapters start immediately) |
 | Intended use  | Physical printing / offset        | Screen reading / digital PDF         |
-| Output folder | `output_pdf/`                     | `output_ebook/`                      |
+| Output folder | `{book}/pdf/` (shared)            | `{book}/pdf/` (shared)               |
 
 ### Build Script Pattern
 
@@ -390,6 +390,23 @@ directly, without separate `output_pdf/` and `output_ebook/` subfolders), three 
    if expected.exists():
        expected.unlink()
    ```
+
+### Recommended Output Path
+
+Place both PDFs in a shallow `{book}/pdf/` folder rather than nested subfolders
+inside the Re:VIEW build directory:
+
+```text
+gh900/
+  pdf/
+    github-foundations.pdf        ← print
+    github-foundations-ebook.pdf  ← ebook
+  manuscript/
+    03_re-view_output/            ← intermediate files only
+```
+
+This keeps the final deliverables 2 levels from the workspace root instead of 4,
+and separates build intermediates from finished output.
 
 ### Why This Matters
 
