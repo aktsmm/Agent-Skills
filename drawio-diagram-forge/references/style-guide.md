@@ -59,6 +59,11 @@ swimlane;horizontal=1;startSize=30;
 
 ## Layout Recommendations
 
+### Title / Caption
+
+- **Do NOT embed title text in the diagram** (e.g., "図1-1 ..."). Captions belong in the document layer (Markdown `![caption](...)`, Re:VIEW `//image[id][caption]`, etc.).
+- Embedding titles causes duplication when the document already renders a figure caption.
+
 ### Spacing
 
 | Element | Recommended Gap |
@@ -90,14 +95,18 @@ When combining diagonal branch/merge lines with annotation boxes (e.g., GitHub F
 - Align nodes in grid (gridSize=10)
 - Center labels in nodes
 - Use consistent node sizes
+- **Container with children** → `verticalAlign=top;spacingTop=5;` to keep the label above child nodes
+- **Standalone box (no children)** → `verticalAlign=middle;` to center text and avoid lopsided whitespace
 
 ### Diagram Size
 
 | Complexity | Recommended Canvas |
 |------------|---------------------|
-| Simple (≤5 nodes) | 800x600 |
-| Moderate (6-15 nodes) | 1200x800 |
-| Complex (>15 nodes) | 1600x1200 |
+| Simple (≤5 nodes) | 800–900 × 400–500 |
+| Moderate (6-15 nodes) | 1000–1200 × 500–700 |
+| Complex (>15 nodes) | 1200–1600 × 700–1000 |
+
+Always shrink-wrap: set page width/height to tightest bounding box + 20px margin.
 
 ## Font Settings
 
