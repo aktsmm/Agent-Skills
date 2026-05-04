@@ -119,8 +119,76 @@ def validate_drawio(filepath: str) -> dict:
             f"Deprecated Azure format detected: 'mxgraph.azure.*' "
             f"Use 'img/lib/azure2/**/*.svg' instead for VS Code compatibility"
         )
-    
+
+    # Check diagonal edges crossing vertex boxes
+    _check_edge_box_overlap(root, result)
+
     return result
+
+
+def _check_edge_box_overlap(root, result: dict) -> None:
+    """Detect diagonal edges whose path crosses through vertex bounding boxes."""
+    import re as _re
+
+    cells = root.findall(".//mxCell")
+    vertices = [c for c in cells if c.get("vertex") == "1"]
+    edges = [c for c in cells if c.get("edge") == "1"]
+
+    # Collect vertex bounding boxes
+    boxes = {}
+    for v in vertices:
+        vid = v.get("id", "")
+        geom = v.find("mxGeometry")
+        if geom is None:
+            continue
+        try:
+            x = float(geom.get("x", 0))
+            y = float(geom.get("y", 0))
+            w = float(geom.get("width", 0))
+            h = float(geom.get("height", 0))
+        except (TypeError, ValueError):
+            continue
+        if w > 0 and h > 0:
+            # Skip tiny markers (dots, icons) — only check substantial boxes
+            if w >= 30 and h >= 30:
+                boxes[vid] = (x, y, w, h)
+
+    # Collect edges with explicit source/target points (diagonal lines)
+    for edge in edges:
+        edge_id = edge.get("id", "unknown")
+        geom = edge.find("mxGeometry")
+        if geom is None:
+            continue
+        src_pt = geom.find("mxPoint[@as='sourcePoint']")
+        tgt_pt = geom.find("mxPoint[@as='targetPoint']")
+        if src_pt is None or tgt_pt is None:
+            continue
+        try:
+            sx = float(src_pt.get("x", 0))
+            sy = float(src_pt.get("y", 0))
+            tx = float(tgt_pt.get("x", 0))
+            ty = float(tgt_pt.get("y", 0))
+        except (TypeError, ValueError):
+            continue
+
+        # Skip horizontal/vertical edges (no diagonal crossing concern)
+        if sx == tx or sy == ty:
+            continue
+
+        for vid, (bx, by, bw, bh) in boxes.items():
+            # Quick bounding-box rejection
+            if bx + bw < min(sx, tx) or bx > max(sx, tx):
+                continue
+            if by + bh < min(sy, ty) or by > max(sy, ty):
+                continue
+            # Line Y at box center X
+            cx = bx + bw / 2
+            line_y = sy + (ty - sy) * (cx - sx) / (tx - sx)
+            if by <= line_y <= by + bh:
+                result["warnings"].append(
+                    f"Edge '{edge_id}' diagonal ({sx:.0f},{sy:.0f})->({tx:.0f},{ty:.0f}) "
+                    f"crosses vertex '{vid}' box"
+                )
 
 
 def print_result(result: dict) -> None:

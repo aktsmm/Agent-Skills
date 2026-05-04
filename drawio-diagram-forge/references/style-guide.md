@@ -77,6 +77,14 @@ When using nested rectangles to show hierarchy (e.g., Enterprise > Org > Team > 
 - **Page size** = tightest bounding box of all elements + 20px margin. Avoid "generous" pages that create dead whitespace.
 - **Edges are optional** — spatial containment already conveys hierarchy. Only add arrows when showing data/control flow across containers.
 
+### Flow Diagrams (Branch/Merge Lines)
+
+When combining diagonal branch/merge lines with annotation boxes (e.g., GitHub Flow step labels):
+
+- **Place step boxes below the diagonal endpoints** — if a diagonal goes from (x1,y1) to (x2,y2), boxes must have `y > max(y1, y2)` to avoid crossing.
+- **Dashed connectors** starting from a box edge should begin at `y - 2px` (not exactly at the top edge) to avoid false overlap in validators.
+- **Keep horizontal feature branch and step row on separate Y bands** — minimum 40px gap between the branch line Y and the top of step boxes.
+
 ### Alignment
 
 - Align nodes in grid (gridSize=10)
