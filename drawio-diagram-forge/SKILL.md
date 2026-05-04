@@ -141,6 +141,7 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | Icons missing                     | Enable Azure/AWS shapes                                                                        |
 | README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio`                   |
 | Too many crossing arrows          | Simplify the main flow first, then move secondary flows to separate lanes or separate diagrams |
+| Legend inside a container          | Move legend outside the outermost box. See [style-guide.md](references/style-guide.md) Nested Containers |
 
 ## Done Criteria
 

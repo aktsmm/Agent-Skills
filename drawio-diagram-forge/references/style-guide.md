@@ -68,6 +68,15 @@ swimlane;horizontal=1;startSize=30;
 | Group padding | 20px |
 | Edge clearance | 10px minimum |
 
+### Nested Containers (Hierarchy Diagrams)
+
+When using nested rectangles to show hierarchy (e.g., Enterprise > Org > Team > Repo):
+
+- **Container height** = content bottom edge + 15–20px padding. Do not use large fixed heights when children are few.
+- **Legend placement** = always outside the outermost container. Never inside a child container — it reads as part of that group.
+- **Page size** = tightest bounding box of all elements + 20px margin. Avoid "generous" pages that create dead whitespace.
+- **Edges are optional** — spatial containment already conveys hierarchy. Only add arrows when showing data/control flow across containers.
+
 ### Alignment
 
 - Align nodes in grid (gridSize=10)
