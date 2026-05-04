@@ -35,7 +35,9 @@ Prefer Output Channel logs for extension diagnostics. Use **Help** → **Toggle 
 // In activate()
 const output = vscode.window.createOutputChannel("My Extension");
 const commands = await vscode.commands.getCommands();
-output.appendLine(`Registered: ${commands.filter((c) => c.includes("myExt")).join(", ")}`);
+output.appendLine(
+  `Registered: ${commands.filter((c) => c.includes("myExt")).join(", ")}`,
+);
 ```
 
 ## Keyboard Shortcuts Not Working
@@ -150,12 +152,12 @@ npx @vscode/vsce ls
 
 ## Webview 真っ白 / SyntaxError
 
-| 症状 | 原因 | 解決策 |
-|------|------|--------|
-| 画面真っ白 | JavaScript SyntaxError | Webview DevTools Console でエラー確認 |
+| 症状                               | 原因                               | 解決策                                        |
+| ---------------------------------- | ---------------------------------- | --------------------------------------------- |
+| 画面真っ白                         | JavaScript SyntaxError             | Webview DevTools Console でエラー確認         |
 | `Invalid regular expression: /^*/` | 正規表現のバックスラッシュが消えた | テンプレート内で二重エスケープ (`\\d`, `\\s`) |
-| `Unexpected token` | minify時にクォートが崩れた | `data-action` + イベント委譲パターンに変更 |
-| ボタンが反応しない | innerHTML後の onclick が効かない | `document.addEventListener` で委譲 |
+| `Unexpected token`                 | minify時にクォートが崩れた         | `data-action` + イベント委譲パターンに変更    |
+| ボタンが反応しない                 | innerHTML後の onclick が効かない   | `document.addEventListener` で委譲            |
 
 ### デバッグ手順
 
@@ -166,10 +168,10 @@ npx @vscode/vsce ls
 
 ## 命名の不一致
 
-| 症状 | 原因 | 解決策 |
-|------|------|--------|
-| 設定が効かない | 設定キーがコードと不一致 | package.json と getConfiguration() を統一 |
-| コマンドが見つからない | コマンドIDがpackage.jsonと不一致 | 全箇所で同じIDを使用 |
+| 症状                   | 原因                             | 解決策                                    |
+| ---------------------- | -------------------------------- | ----------------------------------------- |
+| 設定が効かない         | 設定キーがコードと不一致         | package.json と getConfiguration() を統一 |
+| コマンドが見つからない | コマンドIDがpackage.jsonと不一致 | 全箇所で同じIDを使用                      |
 
 ### 命名一貫性チェック
 

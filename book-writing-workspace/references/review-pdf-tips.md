@@ -228,6 +228,59 @@ occupy a full page with centered layout and decorative rules:
 
 The `\clearpage` at the end forces the first `##` (section) to start on the next page.
 
+### Variant: Heading shares page with body
+
+To let the chapter title appear at the top of the page and the body continue immediately
+on the same page, drop `\vfill` and `\clearpage` and use a fixed trailing space instead:
+
+```latex
+\def\@makechapterhead#1{%
+  \vspace*{12\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    {\color{ReviewChapterRule}\hrule height 1.2pt\relax}\par
+    \vspace{1.2\baselineskip}%
+    \ifnum \c@secnumdepth >\m@ne
+      {\headfont\fontsize{11pt}{14pt}\selectfont \@chapapp\thechapter\@chappos\par\nobreak}%
+      \vspace{0.5\baselineskip}%
+    \fi
+    {\headfont\fontsize{20pt}{24pt}\selectfont #1\par\nobreak}%
+    \vspace{1.8\baselineskip}}}
+```
+
+`\vfill` + `\clearpage` together are what make the heading occupy the whole page —
+the layout looks like a printing-style chapter title, but body content always pushes
+to the next page. A plain `\vspace{...}` keeps body text on the same page as the heading,
+which is closer to a typical Japanese tech book chapter opening.
+
+Pick one based on the book's layout:
+
+- Full-page chapter title: keep `\vfill` + `\clearpage`
+- Heading + body on the same page: replace with `\vspace{1.8\baselineskip}`
+
+### Section pagebreak pattern (converter side)
+
+If chapter headings share a page with the chapter intro, you usually still want each
+top-level section (`##` in Markdown / `==` in Re:VIEW) to start on a new page.
+
+Handle this in the Markdown → Re:VIEW converter, not in LaTeX. Insert `//pagebreak`
+before the first `==` of every chapter:
+
+```python
+# inside the heading branch of the converter
+if level == 2 and not first_section_emitted:
+    first_section_emitted = True
+    output.append("//pagebreak")
+    output.append("")
+output.append(f"{'=' * level}{notoc}{{{label}}} {title}")
+```
+
+Why converter-side, not LaTeX:
+
+- Keeps the rule visible in the generated `.re` files (easy to audit and override per file)
+- Avoids fragile `\AtBeginSection`-style hooks in jsbook
+- Plays well with partial chapter builds — `//pagebreak` is regenerated whenever the
+  source is reconverted, regardless of which range is built
+
 ## Custom Titlepage: Authors Not Populated
 
 ### Problem
@@ -277,12 +330,12 @@ set correctly in the `.tex` source, but the rendered output stays at the column'
 
 Re:VIEW supports two PDF layout modes via `texdocumentclass` options:
 
-| Option         | Print (`media=print`)             | Ebook (`media=ebook`)               |
-| -------------- | --------------------------------- | ------------------------------------ |
-| Page margins   | Asymmetric (inner/outer for bind) | Symmetric (equal left/right)         |
-| `openright`    | Active (blank pages inserted)     | Ignored (chapters start immediately) |
-| Intended use   | Physical printing / offset        | Screen reading / digital PDF         |
-| Output folder  | `output_pdf/`                     | `output_ebook/`                      |
+| Option        | Print (`media=print`)             | Ebook (`media=ebook`)                |
+| ------------- | --------------------------------- | ------------------------------------ |
+| Page margins  | Asymmetric (inner/outer for bind) | Symmetric (equal left/right)         |
+| `openright`   | Active (blank pages inserted)     | Ignored (chapters start immediately) |
+| Intended use  | Physical printing / offset        | Screen reading / digital PDF         |
+| Output folder | `output_pdf/`                     | `output_ebook/`                      |
 
 ### Build Script Pattern
 

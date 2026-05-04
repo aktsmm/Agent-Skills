@@ -16,10 +16,10 @@ Generated projects use the following top-level layout.
 
 ## Optional Folders
 
-| Folder               | Created When                                     |
-| -------------------- | ------------------------------------------------ |
-| `03_re-view_output/` | Created when `--with-review` is used             |
-| `99_material/`       | Default reference materials folder                |
+| Folder               | Created When                         |
+| -------------------- | ------------------------------------ |
+| `03_re-view_output/` | Created when `--with-review` is used |
+| `99_material/`       | Default reference materials folder   |
 
 ## Chapter Layout
 

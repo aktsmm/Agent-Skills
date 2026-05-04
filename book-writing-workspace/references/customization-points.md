@@ -56,12 +56,12 @@ Likewise, diagrams often drift into all-English labeling even when the manuscrip
 
 ## Automation
 
-| File                              | Why edit it                                              |
-| --------------------------------- | -------------------------------------------------------- |
-| `.github/agents/*.agent.md`       | Tune writing/review permissions for your team workflow   |
-| `scripts/count_chars.py`          | Check manuscript length against page allocation targets  |
-| `scripts/convert_md_to_review.py` | Optional: extend conversion rules when Re:VIEW is enabled |
-| `scripts/build_review_pdf.py`     | Optional: build the final PDF and regenerate cover assets |
+| File                              | Why edit it                                                       |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `.github/agents/*.agent.md`       | Tune writing/review permissions for your team workflow            |
+| `scripts/count_chars.py`          | Check manuscript length against page allocation targets           |
+| `scripts/convert_md_to_review.py` | Optional: extend conversion rules when Re:VIEW is enabled         |
+| `scripts/build_review_pdf.py`     | Optional: build the final PDF and regenerate cover assets         |
 | `scripts/review_metadata.py`      | Optional: merge metadata defaults and generate config/cover files |
 
 ## Metadata Layer

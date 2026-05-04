@@ -2,10 +2,10 @@
 
 The following agents are available in this workspace.
 
-| Agent                                                         | Role                              |
-| ------------------------------------------------------------- | --------------------------------- |
-| [@writing](.github/agents/writing.agent.md)                   | Manuscript writing and editing    |
-| [@writing-reviewer](.github/agents/writing-reviewer.agent.md) | Quality review (P1/P2/P3)         |
+| Agent                                                         | Role                           |
+| ------------------------------------------------------------- | ------------------------------ |
+| [@writing](.github/agents/writing.agent.md)                   | Manuscript writing and editing |
+| [@writing-reviewer](.github/agents/writing-reviewer.agent.md) | Quality review (P1/P2/P3)      |
 
 If Re:VIEW/PDF support is enabled, add a converter agent for Markdown to Re:VIEW conversion.
 
