@@ -119,4 +119,16 @@ fontSize=12;fontStyle=0;fontFamily=Helvetica;
 | Node label    | 12px      |
 | Edge label    | 10px      |
 | Group title   | 14px      |
-| Diagram title | 16-18px   |
+
+## Export for PDF Pipelines
+
+When diagrams are embedded in PDF (via Re:VIEW, LaTeX, Pandoc, etc.):
+
+- **Export directly from `.drawio` to PNG** using the draw.io desktop CLI:
+  ```
+  draw.io --export --format png --scale 2 --output out.png source.drawio
+  ```
+- **Do NOT use browser/Edge `--screenshot` on SVG** — this produces a fixed-viewport capture (e.g., 756×488) regardless of diagram size, causing blurriness and cropping.
+- `--scale 2` produces 2× resolution for crisp text at print DPI.
+- The exported SVG from draw.io CLI is "plain SVG" (not re-editable in the VS Code Draw.io extension). Keep the `.drawio` as the editable source.
+- For Markdown preview, reference `*.drawio.svg`. For PDF build, use the PNG export.

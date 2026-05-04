@@ -144,6 +144,7 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | Legend inside a container          | Move legend outside the outermost box. See [style-guide.md](references/style-guide.md) Nested Containers |
 | Diagonal edge crosses a box        | Move annotation boxes below diagonal endpoints. See [style-guide.md](references/style-guide.md) Flow Diagrams |
 | Title duplicated in PDF/HTML        | Remove title mxCell from diagram; let the document layer handle captions |
+| PNG export blurry or cropped        | Use `draw.io --export --format png --scale 2` instead of browser screenshot. See [style-guide.md](references/style-guide.md) Export for PDF Pipelines |
 
 ## Done Criteria
 
