@@ -360,6 +360,37 @@ config_data["texdocumentclass"][1] = opts
 (no flag)       Build both
 ```
 
+### Same-Folder Output Pitfalls
+
+When both print and ebook PDFs are written to the same directory (e.g. `03_re-view_output/`
+directly, without separate `output_pdf/` and `output_ebook/` subfolders), three issues arise:
+
+1. **Filename collision**: Both configs produce `{bookname}.pdf` by default. Override `bookname`
+   in the ebook config to add a suffix:
+
+   ```python
+   config_data["bookname"] = config_data.get("bookname", "book") + "-ebook"
+   ```
+
+2. **Self-move error**: If the build script uses `shutil.move(src, dest)` where `src == dest`
+   (because the Docker-generated PDF is already in the output directory), the move raises
+   `FileNotFoundError` on Windows. Skip the move when source and destination resolve to the same path:
+
+   ```python
+   if built_pdf.resolve() == dest.resolve():
+       pass  # already in place
+   ```
+
+3. **Stale-PDF cleanup destroys prior builds**: A naive `for f in dir.glob("*.pdf"): f.unlink()`
+   before each build removes the other variant's PDF. Instead, delete only the expected output
+   file (derived from `bookname` in the config being built):
+
+   ```python
+   expected = review_root / (config_data["bookname"] + ".pdf")
+   if expected.exists():
+       expected.unlink()
+   ```
+
 ### Why This Matters
 
 Authors and publishers typically need both formats: print for physical distribution
