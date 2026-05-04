@@ -83,7 +83,7 @@ npx @vscode/vsce package   # Creates .vsix
 ### Extension Host 境界
 
 - Extension Host 上で動く scanner / provider / TreeView は、同じことができるなら Node 固有の `path` / `Buffer` / 生 `fs` より VS Code API を優先する。Problems と実ビルドの環境差を避けやすい。
-- Built-in resources や bundled extension を探すときは、ユーザーのホーム配下を広く推測せず、VS Code app root、extension context、bundled extension path など信頼できる runtime root から辿る。
+- 自分の拡張に同梱したリソースは、ユーザーのホーム配下や VS Code のインストール先を推測せず、`context.extensionUri` と `vscode.Uri.joinPath` など extension context から解決する。
 - Runtime の診断ログは `console.log` に散らさず、Output Channel ベースの logger に集約する。ユーザーがログを開ける導線も command / notification / README のどこかに用意する。
 
 ### Manifest / Docs / Localization
