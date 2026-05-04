@@ -1,7 +1,6 @@
 ---
 name: converter
 description: Markdown to Re:VIEW conversion agent
-model: Claude Opus 4.5
 ---
 
 # Converter Agent

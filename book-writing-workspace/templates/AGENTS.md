@@ -6,16 +6,8 @@ The following agents are available in this workspace.
 | ------------------------------------------------------------- | --------------------------------- |
 | [@writing](.github/agents/writing.agent.md)                   | Manuscript writing and editing    |
 | [@writing-reviewer](.github/agents/writing-reviewer.agent.md) | Quality review (P1/P2/P3)         |
-| [@converter](.github/agents/converter.agent.md)               | Markdown to Re:VIEW conversion    |
-| [@orchestrator](.github/agents/orchestrator.agent.md)         | Multi-agent workflow coordination |
 
-## Quick Commands
-
-| Prompt             | Action              |
-| ------------------ | ------------------- |
-| `/gc_Commit`       | Git commit          |
-| `/gcp_Commit_Push` | Git commit and push |
-| `/gpull`           | Git pull            |
+If Re:VIEW/PDF support is enabled, add a converter agent for Markdown to Re:VIEW conversion.
 
 ## Folder Permissions
 
@@ -23,16 +15,16 @@ The following agents are available in this workspace.
 | ------------------------ | -------- | -------- | --------- |
 | `01_contents_keyPoints/` | Read     | Read     | Read      |
 | `02_contents/`           | **Edit** | Read     | Read      |
-| `03_re-view_output/`     | -        | -        | **Edit**  |
+| `03_re-view_output/`     | -        | -        | Optional  |
 | `04_images/`             | Read     | Read     | Read      |
 
 ## Workflow
 
 ```text
-Key Points -> Draft -> Review -> Fix -> Convert -> PDF
+Key Points -> Draft -> Review -> Fix -> Optional Convert/PDF
    ↓          ↓        ↓       ↓       ↓
 01_contents  02_contents  Loop until  03_re-view
-_keyPoints              P1=0, P2=0   _output
+_keyPoints              P1=0, P2=0   _output when enabled
 ```
 
 ## Data Verification

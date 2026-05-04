@@ -7,7 +7,6 @@ Creates a complete book writing workspace with:
 - Directory structure for manuscripts, images, materials
 - AI agent configurations
 - Writing instructions and guidelines
-- Git prompts
 - Utility scripts
 
 Usage:
@@ -15,10 +14,9 @@ Usage:
 """
 
 import argparse
-import os
 import shutil
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 # Script location (for finding templates)
 SCRIPT_DIR = Path(__file__).parent
@@ -30,7 +28,7 @@ ASSETS_DIR = SKILL_DIR / "assets"
 def create_directory_structure(
     base_path: Path,
     chapters: List[str],
-    include_review: bool = True,
+    include_review: bool = False,
     include_materials: bool = True
 ) -> None:
     """Create the complete directory structure."""
@@ -39,12 +37,9 @@ def create_directory_structure(
     dirs = [
         ".github/agents",
         ".github/instructions/writing",
-        ".github/instructions/git",
-        ".github/prompts",
         "docs",
         "docs/templates",
         "scripts",
-        "output_sessions",
     ]
     
     # Chapter-based directories
@@ -67,9 +62,7 @@ def create_directory_structure(
     # Optional: Materials
     if include_materials:
         dirs.extend([
-            "99_material/01_contracts",
-            "99_material/02_proposals",
-            "99_material/03_references",
+            "99_material/references",
         ])
     
     # Create all directories
@@ -78,22 +71,16 @@ def create_directory_structure(
         print(f"  ✅ Created: {dir_path}")
 
 
-def copy_template_files(base_path: Path, book_title: str) -> None:
+def copy_template_files(base_path: Path, book_title: str, include_review: bool = False) -> None:
     """Copy and customize template files."""
     
     # Copy from references directory
     templates = {
         "agents/writing.agent.md": ".github/agents/writing.agent.md",
         "agents/writing-reviewer.agent.md": ".github/agents/writing-reviewer.agent.md",
-        "agents/converter.agent.md": ".github/agents/converter.agent.md",
-        "agents/orchestrator.agent.md": ".github/agents/orchestrator.agent.md",
         "instructions/writing.instructions.md": ".github/instructions/writing/writing.instructions.md",
         "instructions/writing-heading.instructions.md": ".github/instructions/writing/writing-heading.instructions.md",
         "instructions/writing-notation.instructions.md": ".github/instructions/writing/writing-notation.instructions.md",
-        "instructions/commit-format.instructions.md": ".github/instructions/git/commit-format.instructions.md",
-        "prompts/gc_Commit.prompt.md": ".github/prompts/gc_Commit.prompt.md",
-        "prompts/gcp_Commit_Push.prompt.md": ".github/prompts/gcp_Commit_Push.prompt.md",
-        "prompts/gpull.prompt.md": ".github/prompts/gpull.prompt.md",
         "docs/writing-guide.md": "docs/writing-guide.md",
         "docs/naming-conventions.md": "docs/naming-conventions.md",
         "docs/page-allocation.md": "docs/page-allocation.md",
@@ -120,14 +107,17 @@ def copy_template_files(base_path: Path, book_title: str) -> None:
         else:
             print(f"  ⚠️ Template not found: {src}")
 
-    review_templates = {
-        "custom-titlepage.tex": "03_re-view_output/custom-titlepage.tex",
-        "review-ext.rb": "03_re-view_output/review-ext.rb",
-        "sty/review-custom.sty": "03_re-view_output/sty/review-custom.sty",
-        "sty/review-style.sty": "03_re-view_output/sty/review-style.sty",
-        "review-metadata/common.yml": "config/review-metadata/common.yml",
-        "review-metadata/project.yml": "config/review-metadata/project.yml",
-    }
+    review_templates = {}
+    if include_review:
+        review_templates = {
+            "agents/converter.agent.md": ".github/agents/converter.agent.md",
+            "custom-titlepage.tex": "03_re-view_output/custom-titlepage.tex",
+            "review-ext.rb": "03_re-view_output/review-ext.rb",
+            "sty/review-custom.sty": "03_re-view_output/sty/review-custom.sty",
+            "sty/review-style.sty": "03_re-view_output/sty/review-style.sty",
+            "review-metadata/common.yml": "config/review-metadata/common.yml",
+            "review-metadata/project.yml": "config/review-metadata/project.yml",
+        }
 
     for src, dst in review_templates.items():
         src_path = TEMPLATES_DIR / src
@@ -142,16 +132,19 @@ def copy_template_files(base_path: Path, book_title: str) -> None:
             print(f"  ⚠️ Template not found: {src}")
 
 
-def copy_scripts(base_path: Path) -> None:
+def copy_scripts(base_path: Path, include_review: bool = False) -> None:
     """Copy utility scripts."""
     
     scripts = [
         "count_chars.py",
-        "convert_md_to_review.py",
-        "build_review_pdf.py",
-        "inspect_pdf.py",
-        "review_metadata.py",
     ]
+    if include_review:
+        scripts.extend([
+            "convert_md_to_review.py",
+            "build_review_pdf.py",
+            "inspect_pdf.py",
+            "review_metadata.py",
+        ])
     
     for script in scripts:
         src_path = TEMPLATES_DIR / "scripts" / script
@@ -254,28 +247,34 @@ def main():
         help="Custom chapter titles (space-separated)"
     )
     parser.add_argument(
+        "--with-review",
         "--include-review",
+        dest="include_review",
         action="store_true",
-        default=True,
-        help="Include Re:VIEW output directory"
+        help="Include optional Re:VIEW/PDF scaffolding"
     )
     parser.add_argument(
         "--no-review",
-        action="store_true",
-        help="Exclude Re:VIEW output directory"
+        dest="include_review",
+        action="store_false",
+        help="Exclude Re:VIEW/PDF scaffolding"
     )
+    parser.set_defaults(include_review=False)
     parser.add_argument(
+        "--with-materials",
         "--include-materials",
+        dest="include_materials",
         action="store_true",
-        default=True,
-        help="Include materials directory"
+        help="Include a reference materials directory"
     )
     parser.add_argument(
         "--no-materials",
-        action="store_true",
-        help="Exclude materials directory"
+        dest="include_materials",
+        action="store_false",
+        help="Exclude reference materials directory"
     )
-    
+    parser.set_defaults(include_materials=True)
+
     args = parser.parse_args()
     
     # Determine chapter titles
@@ -291,8 +290,8 @@ def main():
         chapters.append("Conclusion")
     
     # Resolve options
-    include_review = not args.no_review
-    include_materials = not args.no_materials
+    include_review = args.include_review
+    include_materials = args.include_materials
     
     # Create base path
     base_path = Path(args.path) / args.name
@@ -316,10 +315,10 @@ def main():
     create_directory_structure(base_path, chapters, include_review, include_materials)
     
     print("\n📄 Creating template files...")
-    copy_template_files(base_path, args.title)
+    copy_template_files(base_path, args.title, include_review)
     
     print("\n📜 Copying utility scripts...")
-    copy_scripts(base_path)
+    copy_scripts(base_path, include_review)
     
     print("\n📦 Copying asset files...")
     copy_assets(base_path)
@@ -330,10 +329,10 @@ def main():
     print(f"\n✅ Workspace created successfully at: {base_path}")
     print("\n📋 Next steps:")
     print(f"   1. cd \"{base_path}\"")
-    print("   2. git init && git add . && git commit -m 'Initial commit'")
-    print(f"   3. code \"{base_path}\"")
-    print("   4. Edit docs/page-allocation.md to set word count targets")
-    print("   5. Start writing in 01_contents_keyPoints/")
+    print(f"   2. code \"{base_path}\"")
+    print("   3. Edit docs/page-allocation.md to set word count targets")
+    print("   4. Start writing in 01_contents_keyPoints/")
+    print("   5. Follow your repository's existing Git workflow when saving changes")
     
     return 0
 

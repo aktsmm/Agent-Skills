@@ -58,11 +58,11 @@ Likewise, diagrams often drift into all-English labeling even when the manuscrip
 
 | File                              | Why edit it                                              |
 | --------------------------------- | -------------------------------------------------------- |
-| `.github/agents/*.agent.md`       | Tune permissions or prompts for your team workflow       |
-| `.github/prompts/*.prompt.md`     | Update branch or git conventions if needed               |
-| `scripts/convert_md_to_review.py` | Extend conversion rules when the manuscript format grows |
-| `scripts/build_review_pdf.py`     | Build the final PDF and regenerate cover assets          |
-| `scripts/review_metadata.py`      | Merge metadata defaults and generate config/cover files  |
+| `.github/agents/*.agent.md`       | Tune writing/review permissions for your team workflow   |
+| `scripts/count_chars.py`          | Check manuscript length against page allocation targets  |
+| `scripts/convert_md_to_review.py` | Optional: extend conversion rules when Re:VIEW is enabled |
+| `scripts/build_review_pdf.py`     | Optional: build the final PDF and regenerate cover assets |
+| `scripts/review_metadata.py`      | Optional: merge metadata defaults and generate config/cover files |
 
 ## Metadata Layer
 
@@ -108,7 +108,7 @@ do not stop at the first rename.
 
 - Rename the manuscript heading and every synchronized path together
 - Check that the old folder or file no longer exists physically
-- Grep the old chapter title after the rename to catch leftovers in docs, prompts, or instructions
+- Grep the old chapter title after the rename to catch leftovers in docs, agents, or instructions
 - Rebuild Re:VIEW/PDF output and confirm the old path is not still being converted
 
 ### Why This Matters

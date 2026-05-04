@@ -6,22 +6,20 @@ Generated projects use the following top-level layout.
 
 | Folder                   | Purpose                                                |
 | ------------------------ | ------------------------------------------------------ |
-| `.github/agents/`        | Writing, review, conversion, and orchestration agents  |
-| `.github/instructions/`  | Writing and git instructions used by the agents        |
-| `.github/prompts/`       | Reusable git prompts such as `/gc_Commit`              |
+| `.github/agents/`        | Writing and review agents                              |
+| `.github/instructions/`  | Writing instructions used by the agents                |
 | `01_contents_keyPoints/` | Outline and section key points                         |
 | `02_contents/`           | Draft and final manuscript files                       |
 | `04_images/`             | Figures and image assets by chapter                    |
 | `docs/`                  | Page allocation, schedule, naming rules, workflow docs |
-| `scripts/`               | Helper scripts for counting and Re:VIEW conversion     |
-| `output_sessions/`       | Temporary working output from agent sessions           |
+| `scripts/`               | Helper scripts for manuscript checks                   |
 
 ## Optional Folders
 
 | Folder               | Created When                                     |
 | -------------------- | ------------------------------------------------ |
-| `03_re-view_output/` | Default. Skip only when `--no-review` is used    |
-| `99_material/`       | Default. Skip only when `--no-materials` is used |
+| `03_re-view_output/` | Created when `--with-review` is used             |
+| `99_material/`       | Default reference materials folder                |
 
 ## Chapter Layout
 

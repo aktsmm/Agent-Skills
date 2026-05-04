@@ -1,7 +1,6 @@
 ---
 name: writing
 description: Manuscript writing agent for the book project
-model: Claude Opus 4.5
 ---
 
 # Writing Agent

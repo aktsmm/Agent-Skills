@@ -1,7 +1,6 @@
 ---
 name: writing-reviewer
 description: Manuscript review agent with P1/P2/P3 priority system
-model: Claude Opus 4.5
 ---
 
 # Writing Reviewer Agent

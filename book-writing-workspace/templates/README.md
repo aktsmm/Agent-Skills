@@ -16,12 +16,11 @@ This repository contains the manuscript workspace for "{{BOOK_TITLE}}".
 | ------------------------ | ------------------------------------------- |
 | `01_contents_keyPoints/` | Outline and key-point drafts                |
 | `02_contents/`           | Main manuscript files                       |
-| `03_re-view_output/`     | Re:VIEW source and PDF output               |
+| `03_re-view_output/`     | Optional Re:VIEW source and PDF output      |
 | `04_images/`             | Figures and screenshots                     |
-| `99_material/`           | Contracts, proposals, and reference sources |
+| `99_material/`           | Reference sources                           |
 | `.github/agents/`        | Writing workflow agents                     |
-| `.github/instructions/`  | Writing and git conventions                 |
-| `.github/prompts/`       | Reusable prompts such as `/gc_Commit`       |
+| `.github/instructions/`  | Writing conventions                         |
 | `docs/`                  | Schedule, naming rules, and writing docs    |
 | `scripts/`               | Counting and conversion helpers             |
 
@@ -29,9 +28,11 @@ This repository contains the manuscript workspace for "{{BOOK_TITLE}}".
 
 ```powershell
 python scripts/count_chars.py
-python scripts/convert_md_to_review.py
-python scripts/build_review_pdf.py
-python scripts/inspect_pdf.py 03_re-view_output/output_pdf/book.pdf
+
+# If Re:VIEW/PDF support is enabled:
+# python scripts/convert_md_to_review.py
+# python scripts/build_review_pdf.py
+# python scripts/inspect_pdf.py 03_re-view_output/output_pdf/book.pdf
 ```
 
 ## Workflow
@@ -39,8 +40,8 @@ python scripts/inspect_pdf.py 03_re-view_output/output_pdf/book.pdf
 1. Draft the structure in `01_contents_keyPoints/`
 2. Write the manuscript in `02_contents/`
 3. Review with `@writing-reviewer`
-4. Convert with `scripts/convert_md_to_review.py`
-5. Build or polish PDF assets in `03_re-view_output/`
+4. Convert with `scripts/convert_md_to_review.py` if Re:VIEW support is enabled
+5. Build or polish PDF assets only when PDF output is in scope
 
 ## Metadata Layer
 

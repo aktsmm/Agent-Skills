@@ -11,22 +11,14 @@ Book writing workflow for "{{BOOK_TITLE}}".
 | Key Points | Write in `01_contents_keyPoints/` | Create outline  |
 | Draft      | Write in `02_contents/`           | Full manuscript |
 | Review     | `@writing-reviewer`               | P1/P2/P3 review |
-| Convert    | `@converter`                      | Re:VIEW to PDF  |
-
-### Git Prompts
-
-| Prompt             | Action          |
-| ------------------ | --------------- |
-| `/gc_Commit`       | Commit          |
-| `/gcp_Commit_Push` | Commit and push |
-| `/gpull`           | Pull            |
+| Convert    | Optional                          | Re:VIEW/PDF output when enabled |
 
 ## Folder Structure
 
 ```text
 01_contents_keyPoints/  # Outlines
 02_contents/            # Final manuscripts
-03_re-view_output/      # Re:VIEW and PDF
+03_re-view_output/      # Optional Re:VIEW and PDF output
 04_images/              # Images
 99_material/            # Reference materials
 docs/                   # Documentation
@@ -50,14 +42,3 @@ scripts/                # Utility scripts
 | [naming-conventions.md](naming-conventions.md)                                                       | File naming       |
 | [page-allocation.md](page-allocation.md)                                                             | Word counts       |
 | [AGENTS.md](../AGENTS.md)                                                                            | Agent definitions |
-
-## Git Commit Format
-
-```text
-<type>(<scope>): <subject>
-```
-
-Examples:
-
-- `feat(ch01): Add introduction`
-- `fix(ch02): Correct terminology`

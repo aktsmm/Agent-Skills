@@ -10,6 +10,14 @@ python scripts/setup_workspace.py `
     --title "Book Title" `
     --path "D:\target\path" `
     --chapters 8
+
+# Add Re:VIEW/PDF support only when the project needs it.
+python scripts/setup_workspace.py `
+    --name "project-name" `
+    --title "Book Title" `
+    --path "D:\target\path" `
+    --chapters 8 `
+    --with-review
 ```
 
 ## Main Options
@@ -21,16 +29,18 @@ python scripts/setup_workspace.py `
 | `--path`           | Parent directory where the workspace will be created |
 | `--chapters`       | Number of generated chapter folders                  |
 | `--chapter-titles` | Explicit chapter names instead of defaults           |
-| `--no-review`      | Skip `03_re-view_output/`                            |
+| `--with-review`    | Add optional Re:VIEW/PDF scaffolding                 |
+| `--with-materials` | Add `99_material/references/`                        |
 | `--no-materials`   | Skip `99_material/`                                  |
 
 ## What Gets Generated
 
-1. Folder structure for outlines, drafts, images, docs, and output
-2. Agent, instruction, and prompt files under `.github/`
+1. Folder structure for outlines, drafts, images, docs, and optional output
+2. Writing/review agents and writing instructions under `.github/`
 3. Project docs such as `README.md`, `docs/page-allocation.md`, and `docs/schedule.md`
-4. Helper scripts such as `scripts/count_chars.py` and `scripts/convert_md_to_review.py`
+4. Helper scripts such as `scripts/count_chars.py`
 5. Initial chapter intro files in both outline and manuscript folders
+6. Optional Re:VIEW/PDF scripts and metadata when `--with-review` is used
 
 ## Post-Setup Checks
 

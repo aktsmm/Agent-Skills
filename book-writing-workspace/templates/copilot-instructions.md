@@ -34,17 +34,8 @@ This is the book writing workspace for "{{BOOK_TITLE}}".
 | File naming    | `../docs/naming-conventions.md`                         |
 | Agents         | `../AGENTS.md`                                          |
 
-## Git Operations
+## Version Control
 
-- **Before work**: `git fetch origin` to sync
-- **After work**: `git add`, `git commit` (Japanese, concise)
-- **Push**: Only when explicitly instructed
-- **Important**: Verify current directory before commands
-
-## Quick Commands
-
-| Prompt             | Action              |
-| ------------------ | ------------------- |
-| `/gc_Commit`       | Commit changes      |
-| `/gcp_Commit_Push` | Commit and push     |
-| `/gpull`           | Pull remote changes |
+- Follow this repository's existing Git workflow.
+- Do not push unless explicitly instructed.
+- Verify the current directory before running commands.
