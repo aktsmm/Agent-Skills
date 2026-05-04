@@ -12,6 +12,10 @@ metadata:
 
 Create, develop, and publish VS Code extensions.
 
+Community English adaptation:
+- https://github.com/lewiswigmore/agent-skills/tree/main/skills/vscode-extension-guide-en
+- https://skills.sh/lewiswigmore/agent-skills/vscode-extension-guide-en
+
 ## When to Use
 
 - **VS Code extension**, **extension development**, **vscode plugin**
