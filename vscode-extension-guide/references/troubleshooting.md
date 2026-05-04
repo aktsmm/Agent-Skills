@@ -13,12 +13,13 @@ Common issues and solutions for VS Code extension development.
 ### Debug Activation
 
 ```typescript
-// Add at top of activate()
-console.log("Extension activating...");
-vscode.window.showInformationMessage("Extension activated!");
+// Add at top of activate() while debugging, or route this through your logger.
+const output = vscode.window.createOutputChannel("My Extension");
+output.appendLine("Extension activating...");
+output.show(true);
 ```
 
-Check: **Help** → **Toggle Developer Tools** → **Console**
+Prefer Output Channel logs for extension diagnostics. Use **Help** → **Toggle Developer Tools** → **Console** only for temporary investigation or webview/runtime errors that are not reaching your logger.
 
 ## Command Not Found
 
@@ -32,11 +33,9 @@ Check: **Help** → **Toggle Developer Tools** → **Console**
 
 ```typescript
 // In activate()
+const output = vscode.window.createOutputChannel("My Extension");
 const commands = await vscode.commands.getCommands();
-console.log(
-  "Registered:",
-  commands.filter((c) => c.includes("myExt")),
-);
+output.appendLine(`Registered: ${commands.filter((c) => c.includes("myExt")).join(", ")}`);
 ```
 
 ## Keyboard Shortcuts Not Working
@@ -119,6 +118,8 @@ const outputChannel = vscode.window.createOutputChannel("My Extension");
 outputChannel.appendLine("Debug message");
 outputChannel.show();
 ```
+
+Keep runtime diagnostics behind a small logger wrapper so tests can assert the logging route and production code does not accumulate stray `console.log` calls.
 
 ### Extension Host Logs
 

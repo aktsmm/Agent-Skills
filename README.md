@@ -32,12 +32,6 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [skill-finder](skill-finder/)                       | Search skills and route to the right customization primitive / スキル検索と customization 振り分け            |
 | [vscode-extension-guide](vscode-extension-guide/)   | VS Code extension development guide / VS Code 拡張機能開発ガイド                                              |
 
-## Community Adaptations
-
-- English adaptation of `vscode-extension-guide` by lewiswigmore:
-	- GitHub: https://github.com/lewiswigmore/agent-skills/tree/main/skills/vscode-extension-guide-en
-	- skills.sh: https://skills.sh/lewiswigmore/agent-skills/vscode-extension-guide-en
-
 ## Usage / 使い方
 
 ### 🚀 Recommended: Agent Skill Ninja (VS Code Extension)

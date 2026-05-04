@@ -12,10 +12,6 @@ metadata:
 
 Create, develop, and publish VS Code extensions.
 
-Community English adaptation:
-- https://github.com/lewiswigmore/agent-skills/tree/main/skills/vscode-extension-guide-en
-- https://skills.sh/lewiswigmore/agent-skills/vscode-extension-guide-en
-
 ## When to Use
 
 - **VS Code extension**, **extension development**, **vscode plugin**
@@ -83,6 +79,23 @@ npx @vscode/vsce package   # Creates .vsix
 | Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)                                                      |
 
 ## Best Practices
+
+### Extension Host 境界
+
+- Extension Host 上で動く scanner / provider / TreeView は、同じことができるなら Node 固有の `path` / `Buffer` / 生 `fs` より VS Code API を優先する。Problems と実ビルドの環境差を避けやすい。
+- Built-in resources や bundled extension を探すときは、ユーザーのホーム配下を広く推測せず、VS Code app root、extension context、bundled extension path など信頼できる runtime root から辿る。
+- Runtime の診断ログは `console.log` に散らさず、Output Channel ベースの logger に集約する。ユーザーがログを開ける導線も command / notification / README のどこかに用意する。
+
+### Manifest / Docs / Localization
+
+- `package.json` の commands、views、configuration、menus を変えたら、コード上の command ID / setting key と同時に確認する。
+- Marketplace 表示や設定説明をローカライズしている拡張では、`package.nls.json` と対象言語の `package.nls.*.json` を同じ変更で更新する。
+- 設定の並び順や説明を変えたら README の設定表、manifest consistency test、release notes の必要有無までまとめて見る。
+
+### Generated Sections
+
+- `START` / `END` marker で囲む generated section は単一の SSOT として扱う。
+- 重複した marker pair を見つけたら、両方を残して追記せず、内容を統合して marker pair を1つに戻す。
 
 ### 命名の一貫性
 
