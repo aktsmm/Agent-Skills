@@ -172,12 +172,12 @@ doc.insert_pdf(back_cover_doc, from_page=0, to_page=0, start_at=-1)
 
 ### Why Not LaTeX-Side?
 
-| Approach | Result in vvakame/review Docker |
-| --- | --- |
-| `coverimage` in config.yml | Blank page (dvipdfmx rendering issue) |
-| `eso-pic` package | Compile error (`pxesopic` conflict) |
+| Approach                                      | Result in vvakame/review Docker              |
+| --------------------------------------------- | -------------------------------------------- |
+| `coverimage` in config.yml                    | Blank page (dvipdfmx rendering issue)        |
+| `eso-pic` package                             | Compile error (`pxesopic` conflict)          |
 | Manual `\vspace*` offset + `\includegraphics` | Positioning unreliable, margins clip content |
-| PyMuPDF post-processing | Full-bleed, reliable, format-agnostic |
+| PyMuPDF post-processing                       | Full-bleed, reliable, format-agnostic        |
 
 ---
 
