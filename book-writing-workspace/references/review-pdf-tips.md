@@ -86,16 +86,100 @@ If you regenerate only a subset of chapters and also regenerate `catalog.yml` fo
 Re:VIEW will number those chapters from 1 again.
 This is correct for the temporary partial catalog, but misleading for final numbering review.
 
+Additionally, if `write_review_support_files()` is called with the partial file list,
+the resulting `catalog.yml` will contain **only** those chapters. A subsequent full-book
+PDF build using this truncated catalog will silently produce a PDF missing all other chapters.
+
 ### Recommended Rule
 
 - Use partial conversion/builds for fast iteration on layout, wording, and local rendering issues
 - Do not treat chapter numbers or TOC numbering from a partial catalog as the final source of truth
 - For chapter-number review, regenerate the full catalog and rebuild the full book range
+- After a partial conversion, always run the full conversion before the final PDF build to restore `catalog.yml`
 
 ### Why This Matters
 
 Partial build output is useful for speed, but it can make a later chapter look like `Chapter 1`
-simply because the catalog was narrowed for debugging. Without an explicit rule, reviewers often misdiagnose the problem as a heading bug instead of a catalog-range effect.
+simply because the catalog was narrowed for debugging. Worse, if a full PDF build is triggered
+without regenerating the full catalog first, the PDF ships with chapters missing — a silent data loss
+that looks normal in the TOC because the remaining chapters are renumbered from 1.
+
+## Cover Image Insertion (Full-Bleed)
+
+### Problem
+
+Re:VIEW's `coverimage` config option is designed to insert a cover image as the first page
+of the ebook PDF. However, with dvipdfmx in the `vvakame/review` Docker image (TeX Live 2022),
+the image is often invisible — a blank page appears with no visible content even though
+the image file is correctly referenced.
+
+Additionally, LaTeX-side workarounds such as `eso-pic` (`\AddToShipoutPictureBG*`) conflict
+with `pxesopic` bundled in the Docker image, causing compilation to fail with
+`Undefined control sequence: \pxesop@before`.
+
+### Recommended Solution: PyMuPDF Post-Processing
+
+Insert the cover image as a full-bleed first page **after** the PDF is built by Re:VIEW,
+using PyMuPDF (fitz). This completely bypasses LaTeX image-handling issues.
+
+```python
+import fitz
+import tempfile
+import os
+from pathlib import Path
+
+def insert_cover_page(pdf_path: Path, cover_image_path: Path) -> None:
+    if not cover_image_path.exists():
+        return
+    doc = fitz.open(str(pdf_path))
+    rect = doc[0].rect  # match existing page dimensions
+
+    cover_doc = fitz.open()
+    cover_page = cover_doc.new_page(width=rect.width, height=rect.height)
+    cover_page.insert_image(rect, filename=str(cover_image_path))
+
+    doc.insert_pdf(cover_doc, from_page=0, to_page=0, start_at=0)
+    cover_doc.close()
+
+    # PyMuPDF cannot save non-incrementally to the same path
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf", dir=str(pdf_path.parent))
+    os.close(tmp_fd)
+    doc.save(tmp_path, deflate=True)
+    doc.close()
+    Path(tmp_path).replace(pdf_path)
+```
+
+### Integration with Build Script
+
+1. Remove `coverimage` from `config.yml` so Re:VIEW does not attempt its own broken insertion
+2. Generate the cover image (PNG or JPG) during the build pipeline
+3. After `review-pdfmaker` produces the PDF, call `insert_cover_page()` for each output PDF
+
+### PyMuPDF Save Pitfall
+
+PyMuPDF raises `ValueError: save to original must be incremental` when saving with
+`incremental=False` to the same file that was opened. Always save to a temporary file
+first, then replace the original.
+
+### Back Cover
+
+The same technique can insert a back cover as the last page. Generate the back cover image
+separately (e.g. `generate_back_covers.py`) and append it:
+
+```python
+doc.insert_pdf(back_cover_doc, from_page=0, to_page=0, start_at=-1)
+```
+
+### Why Not LaTeX-Side?
+
+| Approach | Result in vvakame/review Docker |
+| --- | --- |
+| `coverimage` in config.yml | Blank page (dvipdfmx rendering issue) |
+| `eso-pic` package | Compile error (`pxesopic` conflict) |
+| Manual `\vspace*` offset + `\includegraphics` | Positioning unreliable, margins clip content |
+| PyMuPDF post-processing | Full-bleed, reliable, format-agnostic |
+
+---
 
 Custom headers and footers can be injected into `review-style.sty` using `fancyhdr`:
 

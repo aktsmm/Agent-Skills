@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 from review_metadata import generate_cover_image, load_review_metadata
@@ -64,7 +66,38 @@ def main() -> int:
     for pdf_path in REVIEW_ROOT.glob("*.pdf"):
         shutil.move(str(pdf_path), output_pdf_dir / pdf_path.name)
         print(f"Moved: {pdf_path.name} -> output_pdf/{pdf_path.name}")
+
+    # Post-process: insert cover image as full-bleed first page
+    cover_image = REVIEW_ROOT / "images" / "cover.png"
+    if not cover_image.exists():
+        cover_image = REVIEW_ROOT / "images" / "cover.jpg"
+    if cover_image.exists():
+        for pdf_file in output_pdf_dir.glob("*.pdf"):
+            _insert_cover_page(pdf_file, cover_image)
+            print(f"[cover] inserted {cover_image.name} into {pdf_file.name}")
+
     return 0
+
+
+def _insert_cover_page(pdf_path: Path, cover_image_path: Path) -> None:
+    """Insert cover image as full-bleed first page using PyMuPDF."""
+    import fitz
+
+    doc = fitz.open(str(pdf_path))
+    rect = doc[0].rect
+
+    cover_doc = fitz.open()
+    cover_page = cover_doc.new_page(width=rect.width, height=rect.height)
+    cover_page.insert_image(rect, filename=str(cover_image_path))
+
+    doc.insert_pdf(cover_doc, from_page=0, to_page=0, start_at=0)
+    cover_doc.close()
+
+    tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf", dir=str(pdf_path.parent))
+    os.close(tmp_fd)
+    doc.save(tmp_path, deflate=True)
+    doc.close()
+    Path(tmp_path).replace(pdf_path)
 
 
 if __name__ == "__main__":

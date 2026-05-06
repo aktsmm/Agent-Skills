@@ -116,8 +116,9 @@ def write_review_support_files(review_root: Path, generated_files: list[str], me
         if value:
             config_data[field] = value
 
-    if metadata.get("cover", {}).get("enabled", False):
-        config_data["coverimage"] = metadata["cover"]["image_name"]
+    # Cover image is handled by build_review_pdf.py post-processing (PyMuPDF).
+    # Do NOT set coverimage in config.yml — Re:VIEW's built-in handler produces
+    # blank pages with dvipdfmx in the vvakame/review Docker image.
 
     config_path.write_text(
         yaml.safe_dump(
@@ -237,4 +238,7 @@ def generate_cover_image(workspace_root: Path, review_root: Path, metadata: dict
         draw.text((width - 100 - publisher_width, int(cover["publisher_y"])), publisher, font=publisher_font, fill=cover["publisher_color"])
 
     image.save(output_path, quality=92)
+    # Also save as PNG for dvipdfmx compatibility and PyMuPDF insertion
+    png_path = output_path.with_suffix(".png")
+    image.save(png_path)
     return output_path
