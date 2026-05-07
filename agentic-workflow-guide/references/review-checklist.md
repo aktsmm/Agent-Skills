@@ -133,6 +133,8 @@ Minimum items to verify:
 - [ ] Is the same information defined in multiple places?
 - [ ] Is configuration/context centrally managed?
 - [ ] Is there a mechanism to reflect updates across the entire system?
+- [ ] Are central rules (AGENTS.md, shared config) propagated to each worker `.agent.md`?
+- [ ] When a central rule is added/changed, are all referencing files updated simultaneously?
 
 ## SRP (Single Responsibility Principle)
 

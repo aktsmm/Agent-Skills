@@ -26,6 +26,19 @@ A collection of principles for designing agent workflows.
 | **Violation Example**    | Each agent maintains the same settings separately    |
 | **Solution**             | Use shared context or configuration files            |
 
+**Multi-Agent Propagation Rule:**
+
+In Orchestrator-Workers patterns, writing a rule only in the central document (e.g., `AGENTS.md`) is not enough.
+Worker agents may not read or follow central rules unless they are **explicitly referenced or duplicated** in each `.agent.md`.
+
+| Symptom                            | Cause                                        | Fix                                          |
+| ---------------------------------- | -------------------------------------------- | -------------------------------------------- |
+| Workers ignore central conventions | Rule exists only in orchestrator-level doc   | Add rule reference in each worker definition |
+| Inconsistent output locations      | Output path defined centrally but not in workers | Include output path in worker prompt/definition |
+
+> **Lesson:** When adding shared rules to a central SSOT, always propagate to worker definitions simultaneously.
+> Update checklist: central doc + each `.agent.md` + scripts + instructions.
+
 ### 2. SRP (Single Responsibility Principle)
 
 **1 Agent = 1 Responsibility**
@@ -164,6 +177,24 @@ A collection of principles for designing agent workflows.
 | **Workflow Application** | Log key decisions as Issue comments, files, or documents |
 | **Violation Example**    | No visibility into why agent made a decision             |
 | **Solution**             | Decision logs, regular status reports for long tasks     |
+
+**Elapsed Time Tracking:**
+
+For multi-step workflows, record start/end timestamps to measure performance:
+
+```json
+// manifest/status.json
+{
+  "startedAt": "2026-05-08T04:37:00+09:00",
+  "completedAt": "2026-05-08T04:50:00+09:00",
+  "elapsedMinutes": 13.0
+}
+```
+
+This enables:
+- Performance regression detection across runs
+- User-facing elapsed time reports
+- Bottleneck identification (which step takes longest)
 
 **Decision Log Example:**
 
