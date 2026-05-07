@@ -6,12 +6,12 @@ Book writing workflow for "{{BOOK_TITLE}}".
 
 ### Writing Workflow
 
-| Step       | Action                            | Description                     |
-| ---------- | --------------------------------- | ------------------------------- |
-| Key Points | Write in `keypoints/`            | Create outline                  |
-| Draft      | Write in `sections/`             | Full manuscript                 |
-| Review     | `@writing-reviewer`               | P1/P2/P3 review                 |
-| Convert    | Optional                          | Re:VIEW/PDF output when enabled |
+| Step       | Action                | Description                     |
+| ---------- | --------------------- | ------------------------------- |
+| Key Points | Write in `keypoints/` | Create outline                  |
+| Draft      | Write in `sections/`  | Full manuscript                 |
+| Review     | `@writing-reviewer`   | P1/P2/P3 review                 |
+| Convert    | Optional              | Re:VIEW/PDF output when enabled |
 
 ## Folder Structure
 

@@ -12,17 +12,17 @@ This repository contains the manuscript workspace for "{{BOOK_TITLE}}".
 
 ## Repository Structure
 
-| Path                     | Purpose                                  |
-| ------------------------ | ---------------------------------------- |
-| `keypoints/`       | Outline and key-point drafts             |
-| `sections/`        | Main manuscript files                    |
-| `re-view-output/`  | Optional Re:VIEW source and PDF output   |
-| `images/`          | Figures and screenshots                  |
-| `materials/`       | Reference sources                        |
-| `.github/agents/`        | Writing workflow agents                  |
-| `.github/instructions/`  | Writing conventions                      |
-| `docs/`                  | Schedule, naming rules, and writing docs |
-| `scripts/`               | Counting and conversion helpers          |
+| Path                    | Purpose                                  |
+| ----------------------- | ---------------------------------------- |
+| `keypoints/`            | Outline and key-point drafts             |
+| `sections/`             | Main manuscript files                    |
+| `re-view-output/`       | Optional Re:VIEW source and PDF output   |
+| `images/`               | Figures and screenshots                  |
+| `materials/`            | Reference sources                        |
+| `.github/agents/`       | Writing workflow agents                  |
+| `.github/instructions/` | Writing conventions                      |
+| `docs/`                 | Schedule, naming rules, and writing docs |
+| `scripts/`              | Counting and conversion helpers          |
 
 ## Common Commands
 

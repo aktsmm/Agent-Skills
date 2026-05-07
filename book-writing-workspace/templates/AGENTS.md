@@ -11,12 +11,12 @@ If Re:VIEW/PDF support is enabled, add a converter agent for Markdown to Re:VIEW
 
 ## Folder Permissions
 
-| Folder             | Writing  | Reviewer | Converter |
-| ------------------ | -------- | -------- | --------- |
-| `keypoints/`       | Read     | Read     | Read      |
-| `sections/`        | **Edit** | Read     | Read      |
-| `re-view-output/`  | -        | -        | Optional  |
-| `images/`          | Read     | Read     | Read      |
+| Folder            | Writing  | Reviewer | Converter |
+| ----------------- | -------- | -------- | --------- |
+| `keypoints/`      | Read     | Read     | Read      |
+| `sections/`       | **Edit** | Read     | Read      |
+| `re-view-output/` | -        | -        | Optional  |
+| `images/`         | Read     | Read     | Read      |
 
 ## Workflow
 
