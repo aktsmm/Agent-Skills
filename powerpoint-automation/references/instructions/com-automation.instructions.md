@@ -8,6 +8,8 @@ Use this reference when editing existing PPTX files, especially files that may a
 - COM slide indexes are 1-based. `python-pptx` slide indexes are 0-based.
 - Prefer direct edits to the existing file. Do not create extra similarly named files unless lock handling requires it.
 - Save with `pres.Save()` after edits. If OneDrive sync causes a save error, wait briefly and retry.
+- Never call `app.Quit()` unless you own the entire PowerPoint process. Use `ReleaseComObject` (PowerShell) or `del app` (Python) to release the COM reference without killing the application.
+- For write operations on a user-visible file, call `pres.Save()` only. Do not call `pres.Close()`; the user needs the file open for review.
 - Run Japanese text scripts with `python -X utf8` to avoid PowerShell smart quote and encoding issues.
 - Colors are BGR in COM: `#0078D4` becomes `0xD47800`.
 - `Font.Bold = -1` means true. Do not use PowerShell `$true` in COM assignments.
@@ -18,6 +20,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Guard `Presentation.Name` and `Presentation.FullName` access with `try/except`; automation permission errors can occur.
 - If enumeration is unstable, use `DispatchEx` and open explicit paths. Use `ReadOnly=True` for reference decks and `ReadOnly=False` for the edit target.
 - For a deck the user is actively viewing, prefer `GetActiveObject("PowerPoint.Application")` and locate the open file by name.
+- After ad-hoc edits (slide moves, text changes), release the COM reference but leave the file open. Only `pres.Close()` for read-only verification scripts that opened the file themselves.
 
 ## Text and Paragraph Editing
 

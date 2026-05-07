@@ -31,9 +31,9 @@ A collection of principles for designing agent workflows.
 In Orchestrator-Workers patterns, writing a rule only in the central document (e.g., `AGENTS.md`) is not enough.
 Worker agents may not read or follow central rules unless they are **explicitly referenced or duplicated** in each `.agent.md`.
 
-| Symptom                            | Cause                                        | Fix                                          |
-| ---------------------------------- | -------------------------------------------- | -------------------------------------------- |
-| Workers ignore central conventions | Rule exists only in orchestrator-level doc   | Add rule reference in each worker definition |
+| Symptom                            | Cause                                            | Fix                                             |
+| ---------------------------------- | ------------------------------------------------ | ----------------------------------------------- |
+| Workers ignore central conventions | Rule exists only in orchestrator-level doc       | Add rule reference in each worker definition    |
 | Inconsistent output locations      | Output path defined centrally but not in workers | Include output path in worker prompt/definition |
 
 > **Lesson:** When adding shared rules to a central SSOT, always propagate to worker definitions simultaneously.
@@ -192,6 +192,7 @@ For multi-step workflows, record start/end timestamps to measure performance:
 ```
 
 This enables:
+
 - Performance regression detection across runs
 - User-facing elapsed time reports
 - Bottleneck identification (which step takes longest)
