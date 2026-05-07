@@ -9,7 +9,7 @@ Review manuscripts and provide structured feedback.
 
 ## Role
 
-Review Markdown files in `02_contents/` and provide prioritized improvement suggestions.
+Review Markdown files in `sections/` and provide prioritized improvement suggestions.
 
 ## Goals
 
@@ -88,7 +88,7 @@ Review Markdown files in `02_contents/` and provide prioritized improvement sugg
 
 ### Structure
 
-- [ ] Folder hierarchy matches `01_contents_keyPoints/`
+- [ ] Folder hierarchy matches `keypoints/`
 - [ ] Heading levels are correct (no `#` in section files)
 - [ ] File naming follows conventions
 

@@ -26,9 +26,9 @@ Create and maintain a reusable manuscript workspace with folders, writing agents
 
 Start by assessing the manuscript workspace, even when creating a new project:
 
-1. Confirm the main manuscript lives in `02_contents/` and uses one file per section.
+1. Confirm the main manuscript lives in `sections/` and uses one file per section.
 2. Confirm outlines or key points live separately from final manuscript files.
-3. Confirm chapter intro files use `ch*-00_*.md` and section files start at `ch*-01_*.md`.
+3. Confirm chapter intro files use kebab-case naming (e.g. `00-introduction/00-introduction.md`).
 4. Confirm writing, heading, notation, page allocation, and review rules are available.
 5. Decide whether Re:VIEW/PDF output is needed for this project; keep it optional unless the workflow requires it.
 
@@ -73,7 +73,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 
 ## Generated Workspace
 
-- Manuscript folders under `01_contents_keyPoints/`, `02_contents/`, and `04_images/`
+- Manuscript folders under `keypoints/`, `sections/`, and `images/`
 - AI workflow files under `.github/agents/` and `.github/instructions/`
 - Project docs such as `README.md`, `docs/page-allocation.md`, and `docs/schedule.md`
 - Helper scripts such as `scripts/count_chars.py`
@@ -82,7 +82,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 ## Recommended Writing Unit
 
 - Use **1 file = 1 section** as the default manuscript unit.
-- Keep chapter intro in `ch{N}-00_<title>.md` and section files in `ch{N}-01_...`, `ch{N}-02_...`.
+- Keep chapter intro in `{NN}-{slug}/{NN}-{slug}.md` and section files alongside it.
 - For PDF/Re:VIEW output, heading levels define hierarchy, while file split mainly improves authoring and review workflow.
 
 ## Agents Overview

@@ -1,5 +1,5 @@
 ---
-applyTo: "02_contents/**/*.md"
+applyTo: "sections/**/*.md"
 ---
 
 # Writing Notation Instructions

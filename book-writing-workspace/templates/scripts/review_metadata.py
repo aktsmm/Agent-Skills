@@ -55,7 +55,7 @@ def load_review_metadata(workspace_root: Path, metadata_name: str = "project") -
     merged.setdefault("titlefile", "custom-titlepage.tex")
     merged.setdefault("stylesheet", ["style.css"])
     merged.setdefault("texdocumentclass", DEFAULT_TEXDOCUMENTCLASS)
-    merged.setdefault("contentdir", "output_re")
+    merged.setdefault("contentdir", ".")
     merged.setdefault("date", today)
     merged.setdefault("history", [[f"{merged['date']} 初版第1刷"]])
     merged.setdefault("colophon", True)

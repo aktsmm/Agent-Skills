@@ -30,8 +30,8 @@ python scripts/setup_workspace.py `
 | `--chapters`       | Number of generated chapter folders                  |
 | `--chapter-titles` | Explicit chapter names instead of defaults           |
 | `--with-review`    | Add optional Re:VIEW/PDF scaffolding                 |
-| `--with-materials` | Add `99_material/references/`                        |
-| `--no-materials`   | Skip `99_material/`                                  |
+| `--with-materials` | Add `materials/references/`                          |
+| `--no-materials`   | Skip `materials/`                                    |
 
 ## What Gets Generated
 

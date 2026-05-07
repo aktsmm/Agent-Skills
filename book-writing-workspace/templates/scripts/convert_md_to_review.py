@@ -2,8 +2,8 @@
 """
 Markdown to Re:VIEW converter.
 
-Converts Markdown files under 02_contents/ into .re files under
-03_re-view_output/output_re/. The script intentionally covers a compact,
+Converts Markdown files under sections/ into .re files under
+re-view-output/. The script intentionally covers a compact,
 predictable subset of Markdown used by this workspace.
 """
 
@@ -18,10 +18,10 @@ def resolve_contents_dir() -> Path | None:
     if len(sys.argv) > 1:
         return Path(sys.argv[1])
     cwd = Path.cwd()
-    if (cwd / "02_contents").exists():
-        return cwd / "02_contents"
-    if (cwd.parent / "02_contents").exists():
-        return cwd.parent / "02_contents"
+    if (cwd / "sections").exists():
+        return cwd / "sections"
+    if (cwd.parent / "sections").exists():
+        return cwd.parent / "sections"
     return None
 
 
@@ -299,7 +299,7 @@ def build_output_name(md_file: Path) -> str:
 def main() -> int:
     contents_dir = resolve_contents_dir()
     if contents_dir is None:
-        print("Error: Could not find 02_contents/ folder")
+        print("Error: Could not find sections/ folder")
         print("Usage: python convert_md_to_review.py [path]")
         return 1
     if not contents_dir.exists():
@@ -307,7 +307,7 @@ def main() -> int:
         return 1
 
     project_root = contents_dir.parent
-    output_root = project_root / "03_re-view_output" / "output_re"
+    output_root = project_root / "re-view-output"
     output_root.mkdir(parents=True, exist_ok=True)
 
     generated_files: list[str] = []
@@ -320,7 +320,7 @@ def main() -> int:
         print(f"Converted: {md_file.relative_to(project_root)} -> {output_path.relative_to(project_root)}")
 
     metadata = load_review_metadata(project_root, "project")
-    write_review_support_files(output_root.parent, generated_files, metadata)
+    write_review_support_files(output_root, generated_files, metadata)
     print(f"Generated {len(generated_files)} Re:VIEW files in {output_root}")
     return 0
 

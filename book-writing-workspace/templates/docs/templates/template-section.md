@@ -34,7 +34,7 @@ def example_function():
 
 ### Figure Example (optional)
 
-![Figure caption](../04_images/{chapter_folder}/fig-{chapter}-{section}-{number}.png)
+![Figure caption](../images/{chapter_folder}/fig-{chapter}-{section}-{number}.png)
 
 ### Summary
 

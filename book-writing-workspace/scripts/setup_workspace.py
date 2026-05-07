@@ -44,25 +44,24 @@ def create_directory_structure(
     
     # Chapter-based directories
     for i, chapter in enumerate(chapters):
-        chapter_folder = f"{i}. {chapter}"
-        dirs.append(f"01_contents_keyPoints/{chapter_folder}")
-        dirs.append(f"02_contents/{chapter_folder}")
-        dirs.append(f"04_images/{i}_{chapter.replace(' ', '_')}")
+        chapter_num = str(i).zfill(2)
+        chapter_slug = chapter.lower().replace(' ', '-')
+        dirs.append(f"keypoints/{chapter_num}-{chapter_slug}")
+        dirs.append(f"sections/{chapter_num}-{chapter_slug}")
+        dirs.append(f"images/{chapter_num}-{chapter_slug}")
     
     # Optional: Re:VIEW output
     if include_review:
         dirs.extend([
             "config/review-metadata",
-            "03_re-view_output/output_re",
-            "03_re-view_output/output_pdf",
-            "03_re-view_output/images",
-            "03_re-view_output/sty",
+            "re-view-output/images",
+            "re-view-output/sty",
         ])
     
     # Optional: Materials
     if include_materials:
         dirs.extend([
-            "99_material/references",
+            "materials/references",
         ])
     
     # Create all directories
@@ -111,10 +110,10 @@ def copy_template_files(base_path: Path, book_title: str, include_review: bool =
     if include_review:
         review_templates = {
             "agents/converter.agent.md": ".github/agents/converter.agent.md",
-            "custom-titlepage.tex": "03_re-view_output/custom-titlepage.tex",
-            "review-ext.rb": "03_re-view_output/review-ext.rb",
-            "sty/review-custom.sty": "03_re-view_output/sty/review-custom.sty",
-            "sty/review-style.sty": "03_re-view_output/sty/review-style.sty",
+            "custom-titlepage.tex": "re-view-output/custom-titlepage.tex",
+            "review-ext.rb": "re-view-output/review-ext.rb",
+            "sty/review-custom.sty": "re-view-output/sty/review-custom.sty",
+            "sty/review-style.sty": "re-view-output/sty/review-style.sty",
             "review-metadata/common.yml": "config/review-metadata/common.yml",
             "review-metadata/project.yml": "config/review-metadata/project.yml",
         }
@@ -182,10 +181,12 @@ def create_chapter_intro_files(
     """Create initial chapter introduction files."""
     
     for i, chapter in enumerate(chapters):
-        chapter_folder = f"{i}. {chapter}"
+        chapter_num = str(i).zfill(2)
+        chapter_slug = chapter.lower().replace(' ', '-')
+        chapter_folder = f"{chapter_num}-{chapter_slug}"
         
         # Create intro file in keypoints
-        keypoints_file = base_path / f"01_contents_keyPoints/{chapter_folder}/ch{i}-00_{chapter}.md"
+        keypoints_file = base_path / f"keypoints/{chapter_folder}/{chapter_folder}.md"
         keypoints_content = f"""# {chapter}
 
 ## Overview
@@ -206,7 +207,7 @@ def create_chapter_intro_files(
         keypoints_file.write_text(keypoints_content, encoding="utf-8")
         
         # Create intro file in contents
-        contents_file = base_path / f"02_contents/{chapter_folder}/ch{i}-00_{chapter}.md"
+        contents_file = base_path / f"sections/{chapter_folder}/{chapter_folder}.md"
         contents_content = f"""# {chapter}
 
 (Write the introduction paragraph here)
@@ -331,7 +332,7 @@ def main():
     print(f"   1. cd \"{base_path}\"")
     print(f"   2. code \"{base_path}\"")
     print("   3. Edit docs/page-allocation.md to set word count targets")
-    print("   4. Start writing in 01_contents_keyPoints/")
+    print("   4. Start writing in keypoints/")
     print("   5. Follow your repository's existing Git workflow when saving changes")
     
     return 0

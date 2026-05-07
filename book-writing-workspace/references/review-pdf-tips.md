@@ -446,8 +446,8 @@ config_data["texdocumentclass"][1] = opts
 
 ### Same-Folder Output Pitfalls
 
-When both print and ebook PDFs are written to the same directory (e.g. `03_re-view_output/`
-directly, without separate `output_pdf/` and `output_ebook/` subfolders), three issues arise:
+When both print and ebook PDFs are written to the same directory (e.g. `re-view-output/`
+directly), three issues arise:
 
 1. **Filename collision**: Both configs produce `{bookname}.pdf` by default. Override `bookname`
    in the ebook config to add a suffix:
@@ -486,7 +486,7 @@ gh900/
     github-foundations.pdf        ← print
     github-foundations-ebook.pdf  ← ebook
   manuscript/
-    03_re-view_output/            ← intermediate files only
+    re-view-output/               ← intermediate files only
 ```
 
 This keeps the final deliverables 2 levels from the workspace root instead of 4,

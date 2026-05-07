@@ -8,21 +8,21 @@ Book writing workflow for "{{BOOK_TITLE}}".
 
 | Step       | Action                            | Description                     |
 | ---------- | --------------------------------- | ------------------------------- |
-| Key Points | Write in `01_contents_keyPoints/` | Create outline                  |
-| Draft      | Write in `02_contents/`           | Full manuscript                 |
+| Key Points | Write in `keypoints/`            | Create outline                  |
+| Draft      | Write in `sections/`             | Full manuscript                 |
 | Review     | `@writing-reviewer`               | P1/P2/P3 review                 |
 | Convert    | Optional                          | Re:VIEW/PDF output when enabled |
 
 ## Folder Structure
 
 ```text
-01_contents_keyPoints/  # Outlines
-02_contents/            # Final manuscripts
-03_re-view_output/      # Optional Re:VIEW and PDF output
-04_images/              # Images
-99_material/            # Reference materials
-docs/                   # Documentation
-scripts/                # Utility scripts
+keypoints/          # Outlines
+sections/           # Final manuscripts
+re-view-output/     # Optional Re:VIEW and PDF output
+images/             # Images
+materials/          # Reference materials
+docs/               # Documentation
+scripts/            # Utility scripts
 ```
 
 ## Templates

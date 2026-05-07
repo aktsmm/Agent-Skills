@@ -11,20 +11,20 @@ If Re:VIEW/PDF support is enabled, add a converter agent for Markdown to Re:VIEW
 
 ## Folder Permissions
 
-| Folder                   | Writing  | Reviewer | Converter |
-| ------------------------ | -------- | -------- | --------- |
-| `01_contents_keyPoints/` | Read     | Read     | Read      |
-| `02_contents/`           | **Edit** | Read     | Read      |
-| `03_re-view_output/`     | -        | -        | Optional  |
-| `04_images/`             | Read     | Read     | Read      |
+| Folder             | Writing  | Reviewer | Converter |
+| ------------------ | -------- | -------- | --------- |
+| `keypoints/`       | Read     | Read     | Read      |
+| `sections/`        | **Edit** | Read     | Read      |
+| `re-view-output/`  | -        | -        | Optional  |
+| `images/`          | Read     | Read     | Read      |
 
 ## Workflow
 
 ```text
 Key Points -> Draft -> Review -> Fix -> Optional Convert/PDF
    ↓          ↓        ↓       ↓       ↓
-01_contents  02_contents  Loop until  03_re-view
-_keyPoints              P1=0, P2=0   _output when enabled
+keypoints  sections  Loop until  re-view-output
+                     P1=0, P2=0  when enabled
 ```
 
 ## Data Verification
@@ -33,4 +33,4 @@ Before completing a chapter:
 
 1. Run `python scripts/count_chars.py` to check word counts
 2. Verify against `docs/page-allocation.md` targets
-3. Ensure folder structure matches `01_contents_keyPoints/`
+3. Ensure folder structure matches `keypoints/`

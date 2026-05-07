@@ -2,7 +2,7 @@
 """
 Character Counter Script
 
-Count characters in Markdown files under 02_contents/.
+Count characters in Markdown files under sections/.
 Excludes Markdown syntax such as headings, code blocks, and links.
 """
 
@@ -56,17 +56,17 @@ def resolve_base_path() -> Path | None:
     if len(sys.argv) > 1:
         return Path(sys.argv[1])
     cwd = Path.cwd()
-    if (cwd / "02_contents").exists():
-        return cwd / "02_contents"
-    if (cwd.parent / "02_contents").exists():
-        return cwd.parent / "02_contents"
+    if (cwd / "sections").exists():
+        return cwd / "sections"
+    if (cwd.parent / "sections").exists():
+        return cwd.parent / "sections"
     return None
 
 
 def main() -> int:
     base_path = resolve_base_path()
     if base_path is None:
-        print("Error: Could not find 02_contents/ folder")
+        print("Error: Could not find sections/ folder")
         print("Usage: python count_chars.py [path]")
         return 1
     if not base_path.exists():

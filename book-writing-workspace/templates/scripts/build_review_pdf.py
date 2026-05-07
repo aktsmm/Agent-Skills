@@ -10,7 +10,7 @@ from review_metadata import generate_cover_image, load_review_metadata
 
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
-REVIEW_ROOT = WORKSPACE_ROOT / "03_re-view_output"
+REVIEW_ROOT = WORKSPACE_ROOT / "re-view-output"
 
 
 def bootstrap_sty() -> None:
@@ -59,20 +59,20 @@ def main() -> int:
         check=True,
     )
 
-    output_pdf_dir = REVIEW_ROOT / "output_pdf"
-    output_pdf_dir.mkdir(parents=True, exist_ok=True)
-    for stale_output_pdf in output_pdf_dir.glob("*.pdf"):
-        stale_output_pdf.unlink()
+    pdf_dir = WORKSPACE_ROOT / "pdf"
+    pdf_dir.mkdir(parents=True, exist_ok=True)
+    for stale_pdf in pdf_dir.glob("*.pdf"):
+        stale_pdf.unlink()
     for pdf_path in REVIEW_ROOT.glob("*.pdf"):
-        shutil.move(str(pdf_path), output_pdf_dir / pdf_path.name)
-        print(f"Moved: {pdf_path.name} -> output_pdf/{pdf_path.name}")
+        shutil.move(str(pdf_path), pdf_dir / pdf_path.name)
+        print(f"Moved: {pdf_path.name} -> pdf/{pdf_path.name}")
 
     # Post-process: insert cover image as full-bleed first page
     cover_image = REVIEW_ROOT / "images" / "cover.png"
     if not cover_image.exists():
         cover_image = REVIEW_ROOT / "images" / "cover.jpg"
     if cover_image.exists():
-        for pdf_file in output_pdf_dir.glob("*.pdf"):
+        for pdf_file in pdf_dir.glob("*.pdf"):
             _insert_cover_page(pdf_file, cover_image)
             print(f"[cover] inserted {cover_image.name} into {pdf_file.name}")
 

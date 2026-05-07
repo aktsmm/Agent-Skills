@@ -16,11 +16,11 @@ This is the book writing workspace for "{{BOOK_TITLE}}".
 
 | Folder                   | Purpose                 |
 | ------------------------ | ----------------------- |
-| `01_contents_keyPoints/` | Outlines and key points |
-| `02_contents/`           | Final manuscripts       |
-| `03_re-view_output/`     | Re:VIEW source and PDF  |
-| `04_images/`             | Image assets            |
-| `99_material/`           | Reference materials     |
+| `keypoints/`       | Outlines and key points |
+| `sections/`        | Final manuscripts       |
+| `re-view-output/`  | Re:VIEW source and PDF  |
+| `images/`          | Image assets            |
+| `materials/`       | Reference materials     |
 | `docs/`                  | Project documentation   |
 | `scripts/`               | Utility scripts         |
 

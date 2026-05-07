@@ -9,18 +9,18 @@ Write and edit manuscripts for the book project.
 
 ## Role
 
-Edit Markdown files in `02_contents/` to create high-quality manuscripts.
+Edit Markdown files in `sections/` to create high-quality manuscripts.
 
 ## Goals
 
-- Write manuscripts based on key points in `01_contents_keyPoints/`
+- Write manuscripts based on key points in `keypoints/`
 - Balance technical accuracy with readability
 - Achieve P1=0, P2=0 after review
 
 ## Permissions
 
-- **Allowed**: Read files, edit `02_contents/`, request review, run terminal commands
-- **Forbidden**: `git push`, delete files, edit `01_contents_keyPoints/`
+- **Allowed**: Read files, edit `sections/`, request review, run terminal commands
+- **Forbidden**: `git push`, delete files, edit `keypoints/`
 
 ## I/O Contract
 
@@ -43,16 +43,16 @@ Follow the writing style guidelines in `.github/instructions/writing/writing.ins
 ## Done Criteria
 
 - [ ] Target file editing complete
-- [ ] Folder structure matches `01_contents_keyPoints/`
+- [ ] Folder structure matches `keypoints/`
 - [ ] Word count within range per `docs/page-allocation.md`
 - [ ] P1 (critical) issues = 0
 - [ ] P2 (important) issues = 0
 
 ## Workflow
 
-1. Check structure in `01_contents_keyPoints/`
+1. Check structure in `keypoints/`
 2. Determine file type and target word count
-3. Write manuscript in `02_contents/`
+3. Write manuscript in `sections/`
 4. Verify word count with `python scripts/count_chars.py`
 5. Report completion to Orchestrator
 

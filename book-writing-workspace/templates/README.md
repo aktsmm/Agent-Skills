@@ -7,18 +7,18 @@ This repository contains the manuscript workspace for "{{BOOK_TITLE}}".
 1. Review `docs/page-allocation.md` and set character targets
 2. Review `docs/schedule.md` and replace placeholder dates
 3. Edit `.github/copilot-instructions.md` for audience and goals
-4. Start outlining in `01_contents_keyPoints/`
-5. Write drafts in `02_contents/`
+4. Start outlining in `keypoints/`
+5. Write drafts in `sections/`
 
 ## Repository Structure
 
 | Path                     | Purpose                                  |
 | ------------------------ | ---------------------------------------- |
-| `01_contents_keyPoints/` | Outline and key-point drafts             |
-| `02_contents/`           | Main manuscript files                    |
-| `03_re-view_output/`     | Optional Re:VIEW source and PDF output   |
-| `04_images/`             | Figures and screenshots                  |
-| `99_material/`           | Reference sources                        |
+| `keypoints/`       | Outline and key-point drafts             |
+| `sections/`        | Main manuscript files                    |
+| `re-view-output/`  | Optional Re:VIEW source and PDF output   |
+| `images/`          | Figures and screenshots                  |
+| `materials/`       | Reference sources                        |
 | `.github/agents/`        | Writing workflow agents                  |
 | `.github/instructions/`  | Writing conventions                      |
 | `docs/`                  | Schedule, naming rules, and writing docs |
@@ -32,13 +32,13 @@ python scripts/count_chars.py
 # If Re:VIEW/PDF support is enabled:
 # python scripts/convert_md_to_review.py
 # python scripts/build_review_pdf.py
-# python scripts/inspect_pdf.py 03_re-view_output/output_pdf/book.pdf
+# python scripts/inspect_pdf.py pdf/book.pdf
 ```
 
 ## Workflow
 
-1. Draft the structure in `01_contents_keyPoints/`
-2. Write the manuscript in `02_contents/`
+1. Draft the structure in `keypoints/`
+2. Write the manuscript in `sections/`
 3. Review with `@writing-reviewer`
 4. Convert with `scripts/convert_md_to_review.py` if Re:VIEW support is enabled
 5. Build or polish PDF assets only when PDF output is in scope

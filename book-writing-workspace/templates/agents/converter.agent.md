@@ -9,7 +9,7 @@ Convert Markdown manuscripts to Re:VIEW format for PDF generation.
 
 ## Role
 
-Convert files in `02_contents/` to Re:VIEW format in `03_re-view_output/`.
+Convert files in `sections/` to Re:VIEW format in `re-view-output/`.
 
 ## Goals
 
@@ -19,14 +19,14 @@ Convert files in `02_contents/` to Re:VIEW format in `03_re-view_output/`.
 
 ## Permissions
 
-- **Allowed**: Read `02_contents/`, edit `03_re-view_output/`, run terminal commands
-- **Forbidden**: Edit `02_contents/`, `git push`
+- **Allowed**: Read `sections/`, edit `re-view-output/`, run terminal commands
+- **Forbidden**: Edit `sections/`, `git push`
 
 ## Workflow
 
-1. Read Markdown files from `02_contents/`
+1. Read Markdown files from `sections/`
 2. Convert to Re:VIEW format using `scripts/convert_md_to_review.py`
-3. Output to `03_re-view_output/output_re/`
+3. Output to `re-view-output/`
 4. Build PDF with Docker (if available)
 
 ## Re:VIEW Conversion Rules
@@ -83,9 +83,8 @@ docker run --rm -v "${PWD}:/work" vvakame/review rake pdf
 ## Output Structure
 
 ```text
-03_re-view_output/
-├── output_re/
-├── output_pdf/
+re-view-output/
+├── *.re
 ├── images/
 ├── catalog.yml
 └── config.yml
@@ -97,4 +96,4 @@ docker run --rm -v "${PWD}:/work" vvakame/review rake pdf
 | ---------------- | ---------------------------------- |
 | Conversion error | Check Markdown syntax, fix source  |
 | Build failure    | Check Docker, review logs          |
-| Image not found  | Verify image paths in `04_images/` |
+| Image not found  | Verify image paths in `images/` |

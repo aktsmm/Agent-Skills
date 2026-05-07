@@ -28,7 +28,7 @@ Thumbs.db
 Desktop.ini
 
 # Build outputs
-03_re-view_output/output_pdf/*.pdf
+pdf/*.pdf
 *.log
 
 # Temporary files
