@@ -99,12 +99,12 @@ Use `agent:` only when the prompt should consistently route through a specific a
 
 Both `agent` and `tools` are **restrictive** by default. Specifying them narrows what the prompt can do.
 
-| Field   | Effect when present                                              | Effect when absent                              |
-| ------- | ---------------------------------------------------------------- | ----------------------------------------------- |
-| `agent` | Routes execution through that specific agent's role and tool set | Uses the default agent with full tool access    |
-| `tools` | **Only** listed tools are available during execution             | All tools the agent has access to are available |
+| Field | Effect when present | Effect when absent |
+| --- | --- | --- |
+| `agent` | Routes execution through that specific agent's role and tool set | Uses the default agent with full tool access |
+| `tools` | **Only** listed tools are available during execution | All tools the agent has access to are available |
 
-**Design rule**: Use these fields only when you want to _restrict_, not to _describe_.
+**Design rule**: Use these fields only when you want to *restrict*, not to *describe*.
 
 - General-purpose prompts that may need web search, doc fetch, file editing, terminal, etc. → **omit both**
 - Security-sensitive prompts that must not touch files or run commands → specify `tools` to allowlist

@@ -43,10 +43,18 @@ npx @vscode/vsce ls-publishers
 # Publish new version
 npx @vscode/vsce publish
 
+# Publish an already-built VSIX (prevents packaging the wrong artifact)
+npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix
+
+# Confirm an already-published version without failing the release script
+npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix --skip-duplicate
+
 # Publish with version bump
 npx @vscode/vsce publish minor  # 0.1.0 → 0.2.0
 npx @vscode/vsce publish patch  # 0.1.0 → 0.1.1
 ```
+
+> `vsce` option names vary by version. If `--packagePath` is rejected, check the local `vsce publish --help` and prefer the supported package input option such as `-i`. Do not paste help output into public logs if it displays PAT defaults.
 
 ## Pre-publish Checklist
 
@@ -103,6 +111,8 @@ npx @vscode/vsce ls
 npx @vscode/vsce package
 ```
 
+If the project has a repository-specific release hygiene test, treat that test as the source of truth for payload safety. `vsce ls` flags differ between CLI versions, while a project test can assert the exact entrypoint and excluded files required by that extension.
+
 ## .vscodeignore
 
 Minimize package size:
@@ -149,13 +159,25 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 
 ## Common Errors
 
-| Error                      | Cause                        | Fix                                |
-| -------------------------- | ---------------------------- | ---------------------------------- |
-| `Missing publisher`        | No publisher in package.json | Add `"publisher": "your-id"`       |
-| `Personal Access Token...` | PAT invalid or expired       | Regenerate PAT with correct scopes |
-| `version already exists`   | Same version published       | Increment version number           |
-| `README not found`         | File missing or wrong case   | Create `README.md` (lowercase)     |
-| `invalid prerelease`       | Version like `1.0.0-beta`    | Use standard version format        |
+| Error                      | Cause                        | Fix                                                   |
+| -------------------------- | ---------------------------- | ----------------------------------------------------- |
+| `Missing publisher`        | No publisher in package.json | Add `"publisher": "your-id"`                          |
+| `Personal Access Token...` | PAT invalid or expired       | Regenerate PAT with correct scopes                    |
+| `version already exists`   | Same version published       | Increment version number                              |
+| `README not found`         | File missing or wrong case   | Create `README.md` (lowercase)                        |
+| `invalid prerelease`       | Version like `1.0.0-beta`    | Use standard version format                           |
+| `unknown option`           | Local `vsce` version differs | Check `vsce <command> --help` and use supported flags |
+
+## GitHub Release After Marketplace Publish
+
+When attaching the VSIX to a GitHub Release, pin the release to a full commit SHA if you use `--target`. Short SHAs can be rejected by the GitHub API.
+
+```powershell
+$full = git rev-parse HEAD
+gh release create v1.0.0 .\my-extension-1.0.0.vsix --target $full --title "v1.0.0 - Release title" --notes-file .\release-notes-v1.0.0.md
+```
+
+After publishing, `vsce show` output can lag or sort versions unexpectedly. If you need a deterministic confirmation, run duplicate-safe publish against the exact VSIX and verify that the Marketplace reports the version as already published.
 
 ## Marketplace URLs
 
@@ -191,6 +213,7 @@ if ($env:VSCE_PAT) { "present (length: $($env:VSCE_PAT.Length))" } else { "missi
 
 - ❌ Never paste a PAT into chat, issue comments, or commit messages
 - ❌ Never echo `$env:VSCE_PAT` – check existence/length only
+- ❌ Avoid sharing raw `vsce publish --help` output when `VSCE_PAT` is set; some versions display the effective PAT default in help text
 - ✅ Use `VSCE_PAT` env var; `vsce publish` picks it up automatically
 - ✅ Set expiry ≤ 1 year and rotate on a schedule
 
