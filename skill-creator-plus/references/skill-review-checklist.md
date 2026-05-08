@@ -28,8 +28,6 @@ When a skill feels crowded, review in this order:
 
 ### Line Count Target
 
-| Status      | Lines   | Action                   |
-| ----------- | ------- | ------------------------ |
 | ✅ Good     | < 150   | Maintain                 |
 | ⚠️ Warning  | 150-300 | Consider splitting       |
 | ❌ Too Long | > 300   | Must split to references |
@@ -57,6 +55,11 @@ When a skill feels crowded, review in this order:
 | Core workflow               | Long examples           |
 | Misuse-prevention decisions | Implementation variants |
 | Minimal review gates        | Link collections        |
+
+### Evaluation Asset Checks
+
+- [ ] Evaluation assets avoid temp paths and environment-specific assertions
+- [ ] Validation checks rely on stable structure/tool behavior, not long literal outputs
 
 ## Content Quality
 
@@ -192,6 +195,16 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 3. Remove optional frontmatter fields that were copied blindly
 4. Verify links are relative
 
+### Issue 6: Brittle Evaluation Assets
+
+**Symptoms:** The skill ships review prompts, graders, or eval files that only pass for one recorded run.
+
+**Fix:**
+
+1. Replace temporary or machine-specific paths with stable identifiers
+2. Replace long exact-string assertions with structure checks, schema checks, or tool-usage checks
+3. Re-run validation after renames so prompts, examples, and evals stay aligned
+
 ## Review Template
 
 ```markdown
@@ -209,6 +222,8 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 - [ ] No auxiliary docs (README, CHANGELOG)
 - [ ] References properly linked
 - [ ] No append-only growth smell in main SKILL
+- [ ] Evaluation assets avoid temp paths and environment-specific assertions
+- [ ] Validation checks rely on stable structure/tool behavior, not long literal outputs
 
 ### Content
 

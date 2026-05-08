@@ -123,6 +123,15 @@ Run a quick validation pass before calling the skill done.
 - Bundled resources are in `scripts/`, `references/`, or `assets/`
 - Links are relative and shallow
 
+### Evaluation Assets
+
+If the skill includes review prompts, graders, or eval suites:
+
+- Prefer deterministic checks over replaying a specific session transcript
+- Avoid temporary workspace paths or machine-specific paths in assertions
+- Prefer structure checks (`headings`, `schema`, `tool usage`, `stable identifiers`) over long exact-string output matches
+- Re-run validation after renames so examples, prompts, and graders stay aligned
+
 ### Primitive Fit
 
 - The workflow still belongs in a skill

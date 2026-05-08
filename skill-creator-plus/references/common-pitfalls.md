@@ -68,6 +68,22 @@ Good:
 
 Avoid absolute paths or workspace-specific locations.
 
+### Brittle Evaluation Assets
+
+Eval files, graders, or review prompts can silently rot when they depend on one recorded session.
+
+Avoid:
+
+- temporary workspace paths
+- machine-specific absolute paths
+- long exact-string output assertions that encode one specific run
+
+Prefer:
+
+- headings or schema checks
+- tool-usage checks
+- stable identifiers such as file basenames or declared section names
+
 ## Review Smells
 
 - The description cannot be understood without reading the whole body.
@@ -75,3 +91,4 @@ Avoid absolute paths or workspace-specific locations.
 - The workflow has no validation step.
 - The skill cannot explain why it is a skill instead of a prompt or agent.
 - Example triggers are missing from both description and `## When to Use`.
+- Eval assets only pass for one captured session and break after simple renames.

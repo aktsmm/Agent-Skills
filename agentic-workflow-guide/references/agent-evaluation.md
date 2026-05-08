@@ -241,6 +241,22 @@ test_cases:
 | **Performance Metrics**   | Measure execution time, tool call count       |
 | **Constraint Violations** | Check against rule list (deleted files, etc.) |
 
+#### Prefer Stable Assertions
+
+Programmatic evaluation is strongest when assertions survive renames, workspace changes, and normal output variation.
+
+Prefer:
+
+- schema or heading checks over long exact-string matches
+- tool-usage checks over replaying one transcript verbatim
+- stable identifiers (file basenames, declared section names, output schema keys)
+
+Avoid:
+
+- temporary workspace paths
+- machine-specific absolute paths
+- exact output assertions copied from a single recorded run
+
 #### What Requires Human Review
 
 | Aspect                   | Why Human Needed                              |
@@ -349,6 +365,8 @@ graph LR
 }
 ```
 
+Logs are valuable inputs for designing evals, but they should not become the assertion wholesale. Use logs to discover robust checks, then reduce them to stable criteria.
+
 ### 5. Continuous Monitoring
 
 **Evaluation isn't one-time; monitor in production**
@@ -414,6 +432,16 @@ graph LR
 - Run before each release
 - Automate where possible
 
+### 6. Brittle Recorded Evaluations
+
+**Problem:** A recorded test only passes for the original session because it encodes one temporary path or one exact output.
+
+**Solution:**
+
+- Rewrite assertions around structure, tool behavior, or schema
+- Replace workspace-specific paths with stable identifiers
+- Re-run evaluation after renames to confirm the checks still hold
+
 ---
 
 ## Evaluation Checklist
@@ -427,6 +455,7 @@ Before deploying an agent workflow:
 - [ ] Tested all major workflows
 - [ ] Verified tool call accuracy
 - [ ] Confirmed constraint adherence
+- [ ] Assertions rely on stable structure or tool behavior, not one recorded run
 - [ ] Logged evaluation results
 - [ ] Identified improvement areas
 - [ ] Documented known limitations
