@@ -173,6 +173,7 @@ async ({ apiBase, pageSize }) => {
 - `page.goto()` → DOM 操作 → フォーム送信: UI が唯一の入口のときだけ
 - `page.evaluate` + `fetch()`: REST API があるサイトで bulk read/write するとき
 - 同一 eval 内で fetch → 判定 → 更新 → 結果返却まで完結させると、Python ⇔ CDP 往復が 1 回で済む
+- **Navigate-free 設計**: `page.goto()` は CDP 接続不安定の最大要因。API があるサイトでは `page.evaluate` + `fetch()` だけで全操作を完結させ、`page.goto()` を一切使わない構成が最も安定する。初期ページ（ログイン済みの任意ページ）に一度だけ接続すれば、以降はすべて evaluate 内の fetch で済む
 
 **注意**: JS 内ロジックが Python 正本と乖離すると false positive を生む。判定ロジックは Python 側に寄せ、JS は fetch + PUT の実行役に徹するのが安全。
 
