@@ -209,6 +209,63 @@ preflight では最低限、以下を確認する:
 - CDP の別 context/page を使い、未ログイン画面や別アカウントを操作してしまう
 - 「見えているがクリックできない」状態を無理に通常 click で押し切る
 
+## Subprocess + CDP Stability (Windows)
+
+CLI で Playwright / CDP 子プロセスを呼ぶとき、Windows 固有の落とし穴がある。
+
+### PIPE デッドロック
+
+`subprocess.Popen(stdout=PIPE)` + `proc.communicate()` は、Playwright が内部で起動する Node.js ツリーがパイプハンドルを保持するためデッドロックする。`taskkill /F /T` で子プロセスを殺してもパイプの `join()` が戻らない。
+
+**解決策**: stdout / stderr をファイルにリダイレクトし、`proc.poll()` ループで完了を検知する。
+
+```python
+with open(stdout_path, "w", encoding="utf-8") as fout, \
+     open(stderr_path, "w", encoding="utf-8") as ferr:
+    proc = subprocess.Popen(cmd, stdout=fout, stderr=ferr,
+                            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+
+while proc.poll() is None:
+    if time.time() - start > timeout:
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+                       capture_output=True, timeout=10)
+        proc.wait()
+        break
+    time.sleep(0.5)
+```
+
+### VS Code ターミナルの SIGINT 干渉
+
+VS Code 共有ターミナルで長時間の `time.sleep()` や `proc.communicate()` を実行すると、ターミナルが予期しない `SIGINT` を送り `KeyboardInterrupt` で死ぬことがある。
+
+対策:
+
+1. スクリプト冒頭で `signal.signal(signal.SIGINT, signal.SIG_IGN)` を宣言する
+2. または `Start-Process -Wait` で独立プロセスとして実行する
+
+```powershell
+Start-Process -FilePath ".venv\Scripts\python.exe" `
+  -ArgumentList "script.py","--all" `
+  -NoNewWindow -Wait `
+  -RedirectStandardOutput "stdout.txt" `
+  -RedirectStandardError "stderr.txt"
+```
+
+### taskkill ツリー kill
+
+CDP 経由の子プロセスは Node.js + ブラウザ接続のツリーを持つ。`proc.kill()` では孫プロセスが残る。
+
+```powershell
+taskkill /F /T /PID <pid>
+```
+
+Python から:
+
+```python
+subprocess.run(["taskkill", "/F", "/T", "/PID", str(proc.pid)],
+               capture_output=True, timeout=10)
+```
+
 ## Done Criteria
 
 - MCP または CDP 設定が完了している
