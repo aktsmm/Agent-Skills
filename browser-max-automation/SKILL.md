@@ -142,6 +142,40 @@ snapshot で ref 取得
 
 判断基準: **発注確定など不可逆操作の直前・直後は `browser_take_screenshot` で証跡を残し、中間のフォーム入力は evaluate で高速化**するのが実用的なバランス。
 
+### evaluate + fetch() による API bulk 操作
+
+ログイン済みブラウザ上で `page.evaluate` 内から `fetch()` を使うと、認証 cookie が自動付与されるため **認証処理なしで API を叩ける**。`page.goto()` も不要なので CDP ナビゲーション不安定の影響がゼロ。
+
+| 方式 | 速度 | 安定性 | 用途 |
+|------|------|--------|------|
+| MCP 標準 (snapshot → click) | 遅い | 高い | 初回探索、デバッグ |
+| evaluate + DOM操作 | 速い | 中 | 定型フォーム |
+| **evaluate + fetch()** | **最速** | **最高** | **認証済みセッションでの API bulk 操作** |
+
+```javascript
+// page.evaluate 内: credentials: 'same-origin' でセッション cookie を自動送信
+async ({ apiBase, pageSize }) => {
+  const results = [];
+  let path = `${apiBase}?page_size=${pageSize}`;
+  while (path) {
+    const resp = await fetch(path, { credentials: 'same-origin' });
+    if (!resp.ok) return { error: resp.status, text: (await resp.text()).slice(0, 200) };
+    const data = await resp.json();
+    results.push(...(data.results || []));
+    path = data.next ? new URL(data.next).pathname + new URL(data.next).search : null;
+  }
+  return { total: results.length, results };
+}
+```
+
+**使い分け判断**:
+
+- `page.goto()` → DOM 操作 → フォーム送信: UI が唯一の入口のときだけ
+- `page.evaluate` + `fetch()`: REST API があるサイトで bulk read/write するとき
+- 同一 eval 内で fetch → 判定 → 更新 → 結果返却まで完結させると、Python ⇔ CDP 往復が 1 回で済む
+
+**注意**: JS 内ロジックが Python 正本と乖離すると false positive を生む。判定ロジックは Python 側に寄せ、JS は fetch + PUT の実行役に徹するのが安全。
+
 ## Safety Rules
 
 ### CDP 排他制御
