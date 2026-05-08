@@ -95,6 +95,23 @@ tools: [search, web]
 
 Use `agent:` only when the prompt should consistently route through a specific agent role. Otherwise omit it.
 
+### When to use `agent` and `tools`
+
+Both `agent` and `tools` are **restrictive** by default. Specifying them narrows what the prompt can do.
+
+| Field | Effect when present | Effect when absent |
+| --- | --- | --- |
+| `agent` | Routes execution through that specific agent's role and tool set | Uses the default agent with full tool access |
+| `tools` | **Only** listed tools are available during execution | All tools the agent has access to are available |
+
+**Design rule**: Use these fields only when you want to *restrict*, not to *describe*.
+
+- General-purpose prompts that may need web search, doc fetch, file editing, terminal, etc. → **omit both**
+- Security-sensitive prompts that must not touch files or run commands → specify `tools` to allowlist
+- Prompts that need a specialist persona or delegation boundary → specify `agent`
+
+**Common mistake**: Listing tools you expect to use (e.g. `tools: [edit/editFiles, execute/runInTerminal]`) on a general prompt. This silently blocks web search, doc retrieval, and other tools the task may need at runtime.
+
 ### Tool priority
 
 When both a prompt and a referenced custom agent define tools, the prompt-level tool configuration wins.
