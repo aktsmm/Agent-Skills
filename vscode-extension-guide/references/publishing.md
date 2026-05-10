@@ -108,10 +108,31 @@ Notebooks, Education, Testing, AI, Chat
 npx @vscode/vsce ls
 
 # Create VSIX without publishing (for inspection)
-npx @vscode/vsce package
+mkdir -p artifacts/vsix
+npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
 ```
 
 If the project has a repository-specific release hygiene test, treat that test as the source of truth for payload safety. `vsce ls` flags differ between CLI versions, while a project test can assert the exact entrypoint and excluded files required by that extension.
+
+## Local VSIX Artifact Hygiene
+
+Store generated `.vsix` files under `artifacts/vsix/` rather than the repository root. This keeps the root readable, makes cleanup scriptable, and reduces the chance of attaching or inspecting the wrong local file.
+
+```powershell
+New-Item -ItemType Directory -Force artifacts/vsix | Out-Null
+npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
+npx @vscode/vsce publish -i ./artifacts/vsix/my-extension-1.0.0.vsix
+```
+
+When you keep historical local builds, set a retention rule and prune old archives automatically. Keeping only the latest 10 local VSIX files is usually enough for rollback and spot-checking.
+
+```powershell
+$vsixDir = "artifacts/vsix"
+Get-ChildItem $vsixDir -Filter "my-extension-*.vsix" |
+  Sort-Object { [version]($_.BaseName -replace '^my-extension-', '') } -Descending |
+  Select-Object -Skip 10 |
+  Remove-Item -Force
+```
 
 ## .vscodeignore
 
@@ -134,6 +155,7 @@ tsconfig*.json
 .github/**
 .vscode/**
 *.vsix
+artifacts/**
 ```
 
 ## Updating Published Extensions
@@ -174,7 +196,7 @@ When attaching the VSIX to a GitHub Release, pin the release to a full commit SH
 
 ```powershell
 $full = git rev-parse HEAD
-gh release create v1.0.0 .\my-extension-1.0.0.vsix --target $full --title "v1.0.0 - Release title" --notes-file .\release-notes-v1.0.0.md
+gh release create v1.0.0 .\artifacts\vsix\my-extension-1.0.0.vsix --target $full --title "v1.0.0 - Release title" --notes-file .\release-notes-v1.0.0.md
 ```
 
 After publishing, `vsce show` output can lag or sort versions unexpectedly. If you need a deterministic confirmation, run duplicate-safe publish against the exact VSIX and verify that the Marketplace reports the version as already published.

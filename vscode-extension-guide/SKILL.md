@@ -38,6 +38,7 @@ my-extension/
 ├── package.json          # Extension manifest (CRITICAL)
 ├── src/extension.ts      # Entry point
 ├── out/                  # Compiled JS (gitignore)
+├── artifacts/vsix/       # Keep local VSIX archives out of the repo root
 ├── images/icon.png       # 128x128 PNG for Marketplace
 └── .vscodeignore         # Exclude files from VSIX
 ```
@@ -47,8 +48,11 @@ my-extension/
 ```bash
 npm run compile      # Build once
 npm run watch        # Watch mode (F5 to launch debug)
-npx @vscode/vsce package   # Creates .vsix
+mkdir -p artifacts/vsix
+npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
 ```
+
+Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository root, and prune old local builds on a schedule so release artifacts do not pile up.
 
 ## Done Criteria
 
@@ -56,6 +60,7 @@ npx @vscode/vsce package   # Creates .vsix
 - [ ] All commands registered and working
 - [ ] Package size < 5MB (use `.vscodeignore`)
 - [ ] README.md includes Marketplace/GitHub links
+- [ ] Local VSIX artifacts stored outside the repo root and pruned regularly
 
 ## Quick Troubleshooting
 
