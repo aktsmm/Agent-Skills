@@ -59,7 +59,7 @@ description: One-line summary of what this prompt does
 VS Code validates frontmatter strictly. Only use supported fields — unsupported fields cause validation errors.
 
 - The opening `---` must be the very first bytes in the file. Any stray characters or BOM-like garbage before it can prevent the prompt from being discovered in the slash prompt picker.
-- `agent` is optional for `.prompt.md`. If you use it, the value must match a real registered agent name. Do not use placeholders such as `agent: agent`.
+- `agent` is optional for `.prompt.md`. If omitted, VS Code uses the current agent/mode. Use `agent: agent` when a prompt must consistently run in Agent mode, or `agent: <custom-agent-name>` when it should bind to a specific custom agent. Use `agent: ask` or `agent: plan` only when the prompt should avoid autonomous edit/execute behavior.
 
 | File type          | Supported fields                                                  | Notes                                                       |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
@@ -93,18 +93,26 @@ tools: [search, web]
 ---
 ```
 
-Use `agent:` only when the prompt should consistently route through a specific agent role. Otherwise omit it.
+Use `agent:` only when the prompt should consistently route through a specific built-in mode or custom agent role. Otherwise omit it.
+
+### `agent` / `model` decision rules for `.prompt.md`
+
+- Use `agent: agent` for execution prompts that are expected to edit files, run tests, use tools, or continue autonomously even when invoked from another chat mode.
+- Use `agent: <custom-agent-name>` when the prompt depends on that custom agent's persona, tool restrictions, handoffs, or subagent policy.
+- Omit `agent` when the prompt should respect the user's currently selected chat mode or agent.
+- Omit `model` unless you have verified the exact model display name in the current environment and intentionally want to pin or provide an ordered fallback. Model names change; stale `model:` values create portability friction.
+- Do not use `mode:` in new prompt files. It is deprecated; use `agent:` or omit the field.
 
 ### When to use `agent` and `tools`
 
 Both `agent` and `tools` are **restrictive** by default. Specifying them narrows what the prompt can do.
 
-| Field | Effect when present | Effect when absent |
-| --- | --- | --- |
-| `agent` | Routes execution through that specific agent's role and tool set | Uses the default agent with full tool access |
-| `tools` | **Only** listed tools are available during execution | All tools the agent has access to are available |
+| Field   | Effect when present                                         | Effect when absent                              |
+| ------- | ----------------------------------------------------------- | ----------------------------------------------- |
+| `agent` | Routes execution through that built-in mode or custom agent | Uses the current agent/mode                     |
+| `tools` | **Only** listed tools are available during execution        | All tools the selected/current agent can access |
 
-**Design rule**: Use these fields only when you want to *restrict*, not to *describe*.
+**Design rule**: Use these fields only when you want to _restrict_, not to _describe_.
 
 - General-purpose prompts that may need web search, doc fetch, file editing, terminal, etc. → **omit both**
 - Security-sensitive prompts that must not touch files or run commands → specify `tools` to allowlist

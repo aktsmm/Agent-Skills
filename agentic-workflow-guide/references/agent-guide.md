@@ -68,6 +68,8 @@ Use when you want to:
 | **File-by-file operations** | Fix ESLint errors in each file independently           |
 | **Phase-based workflows**   | Plan → Implement → Review (each phase = sub-agent)     |
 
+When a workflow matches these scenarios or the thresholds in [splitting-criteria.md](splitting-criteria.md), write delegation as a requirement, not permission. Prefer "MUST use agent for these files/logs/URLs" over "may use sub-agents if needed". If the orchestrator intentionally does not delegate, record the reason: small scope, enough context already loaded, tool unavailable, or overhead greater than benefit.
+
 ### ❌ When NOT to Use Sub-agents
 
 → **[splitting-criteria.md#part-4-when-not-to-split](splitting-criteria.md#part-4-when-not-to-split)** for detailed decision matrix and complexity scaling guidelines.

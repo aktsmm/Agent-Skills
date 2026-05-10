@@ -222,6 +222,12 @@ Minimum items to verify:
 - [ ] Is there handling for unexpected errors?
 - [ ] Are recovery procedures defined?
 
+## Resource Cleanup
+
+- [ ] Are temporary terminals, tasks, dev servers, watchers, browsers, emulators, and local APIs stopped after verification?
+- [ ] If a long-running session must remain open, is the reason and stop procedure reported?
+- [ ] Are scratch files, temporary tasks, generated logs, and throwaway outputs removed or explicitly kept with rationale?
+
 ## Security
 
 - [ ] Is sensitive information being handled appropriately?
