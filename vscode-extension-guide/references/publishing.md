@@ -134,6 +134,8 @@ Get-ChildItem $vsixDir -Filter "my-extension-*.vsix" |
   Remove-Item -Force
 ```
 
+If the project ships multiple package variants such as a release VSIX and a dev/coexistence VSIX, keep **all** of them under `artifacts/vsix/` except the one release artifact you intentionally attach. Apply the same hygiene checks to every variant so the smaller test build does not silently diverge from the release payload.
+
 ## .vscodeignore
 
 Minimize package size:
@@ -259,11 +261,17 @@ src/**
 node_modules/**
 
 # Dev-only content (never ship to users)
+docs/**
+output/**
 output_sessions/**
 research/**
 session/**
 FULL_SPECIFICATION.md
 AGENTS.md
+
+# Secondary docs or local artifacts that are not needed in the VSIX
+README_ja.md
+artifacts/**
 
 # Large or unnecessary assets
 images/demo-animated.gif
@@ -281,6 +289,11 @@ those paths against `repository.url` in `package.json` and fetch the file from
 `raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>`. So as long as the
 image is committed and pushed to the default branch, you can keep it **out of
 the VSIX** to drop multi-megabyte demo media without breaking the listing.
+
+This auto-resolution applies to **images**, not to arbitrary Markdown links. If
+you exclude secondary documents such as `README_ja.md` from the VSIX, link to
+them with an absolute GitHub URL from the primary `README.md` instead of a
+relative Markdown link.
 
 A single 15 MB demo GIF can shrink a VSIX from ~15 MB to ~175 KB (≈99% reduction)
 with no visible difference in Marketplace rendering.
@@ -308,3 +321,18 @@ mtime), not on console messages — terminal capture sometimes drops the
 Get-ChildItem artifacts/vsix/my-extension-1.0.0.vsix |
   Select-Object Length, LastWriteTime
 ```
+
+If the extension manifest references icons such as `icon.png` for the Marketplace
+tile and `icon.svg` for activity bar or command UI, add a release check that
+asserts the referenced files physically exist before packaging.
+
+## Post-publish Verification
+
+`vsce show --json` is useful, but its metadata can lag right after publish.
+Treat the publish command's result as the first source of truth and use at least
+one more independent check.
+
+- Run duplicate-safe publish against the exact VSIX and confirm `already published`
+- If you use Git tags or GitHub Releases, verify the release/tag exists too
+- If the Marketplace listing lags, do not republish a new version just because
+  `vsce show` still returns the previous metadata snapshot

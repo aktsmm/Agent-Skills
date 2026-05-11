@@ -69,11 +69,11 @@ output.appendLine(
 
 ## Packaging Issues
 
-| Symptom               | Cause                  | Solution                                    |
-| --------------------- | ---------------------- | ------------------------------------------- |
-| VSIX too large        | node_modules included  | Add to .vscodeignore                        |
-| Files missing in VSIX | Over-aggressive ignore | Use `npx @vscode/vsce ls` to check          |
-| Icon not showing      | Wrong path or format   | Use 128x128 PNG, check path in package.json |
+| Symptom                                                          | Cause                                        | Solution                                                                                    |
+| ---------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| VSIX too large                                                   | node_modules included                        | Add to .vscodeignore                                                                        |
+| Files missing in VSIX                                            | Over-aggressive ignore                       | Use `npx @vscode/vsce ls` to check                                                          |
+| Icon not showing                                                 | Wrong path or format                         | Use 128x128 PNG, check path in package.json                                                 |
 | `End of central directory record signature not found` on install | Truncated / corrupt VSIX (build interrupted) | Re-run `vsce package`; verify with `code --install-extension <vsix> --force` before publish |
 
 ### Inspect VSIX Contents
