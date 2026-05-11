@@ -30,6 +30,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [packet-capture-analysis](packet-capture-analysis/)     | Packet capture analysis workflow with labeling and visualization / パケットキャプチャ解析とラベル付け・可視化 |
 | [powerpoint-automation](powerpoint-automation/)         | Create PPTX from web articles / Web記事からPowerPoint自動生成                                                 |
 | [receipt-ocr-sorter](receipt-ocr-sorter/)               | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計                                          |
+| [retro-copilot](retro-copilot/)                         | Reflect session learnings into ~/.copilot assets / `.copilot` 資産へのレトロ反映                              |
 | [skill-creator-plus](skill-creator-plus/)               | Design, review, and fix Agent Skills with better triggering / スキル設計・レビュー・発火改善                  |
 | [skill-finder](skill-finder/)                           | Search skills and route to the right customization primitive / スキル検索と customization 振り分け            |
 | [vscode-extension-guide](vscode-extension-guide/)       | VS Code extension development guide / VS Code 拡張機能開発ガイド                                              |
