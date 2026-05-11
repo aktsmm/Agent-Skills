@@ -1,6 +1,6 @@
 ---
 name: azure-env-builder
-description: "[Alpha] Enterprise Azure environment builder. Deploy apps to App Service/AKS/Container Apps, generate Bicep with AVM modules, configure service connections and CI/CD. Use when building Azure infrastructure, deploying applications, or designing Hub-Spoke/AKS/AI Foundry architectures."
+description: "[Alpha] Experimental Azure environment builder for infrastructure and deployment design. Use when building Azure infrastructure, generating Bicep with AVM modules, deploying apps to App Service/AKS/Container Apps, or designing Hub-Spoke, AKS, and AI Foundry architectures."
 argument-hint: "構築したい Azure 構成、アプリ、制約条件"
 user-invocable: true
 license: CC BY-NC-SA 4.0

@@ -1,6 +1,6 @@
 ---
 name: humanize-writing
-description: "AIっぽい文章を人間らしいトーンに直す／最初から書かせるSkill。日本語（Qiita/WordPress/note）と英語（Medium）に対応。定型接続詞・抽象語・整いすぎた文型・書き出し連発・過剰em-dashなど既知シグナルを検出して置換する。Use when: 原稿レビュー、AIっぽさ監査、Humanize、文体チェック、AI感を消したい、ChatGPT tells。"
+description: "Remove AI-generated tone and make writing sound more human in Japanese and English. Use when reviewing drafts for AIっぽさ, humanizing article/blog text, 文体チェック, AI感を消したい, or ChatGPT tells."
 argument-hint: "直したい原稿、対象媒体、気になる AI っぽさ"
 user-invocable: true
 license: CC BY-NC-SA 4.0

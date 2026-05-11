@@ -1,6 +1,6 @@
 ---
 name: retro-copilot
-description: "Run a retro for ~/.copilot assets. Use when reflecting learnings from incidents or conversations into copilot-instructions, instructions, skills, agents, hooks, or related .copilot config without touching memory."
+description: "Run a retro for ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Triggers on retro, retrospective, incident learning, error analysis, copilot setup, instructions update, インシデント, and 知見反映."
 argument-hint: "エラーログ、diff、会話要約、既存 .copilot 資産、またはインシデント内容"
 user-invocable: true
 ---

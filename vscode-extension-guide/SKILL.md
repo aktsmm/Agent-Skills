@@ -1,6 +1,6 @@
 ---
 name: vscode-extension-guide
-description: "Guide for creating VS Code extensions from scratch to Marketplace publication. Use when: (1) Creating a new VS Code extension, (2) Adding commands, keybindings, or settings to an extension, (3) Publishing to VS Code Marketplace, (4) Troubleshooting extension activation or packaging issues, (5) Building TreeView or Webview UI, (6) Setting up extension tests."
+description: "Guide for creating VS Code extensions and plugins from scratch through Marketplace publication. Use when developing a VS Code extension/plugin, adding commands or keybindings, building TreeView or Webview UI, publishing to Marketplace, or troubleshooting activation and packaging issues."
 argument-hint: "作りたい拡張機能、追加したい機能、困っている点"
 user-invocable: true
 license: CC BY-NC-SA 4.0

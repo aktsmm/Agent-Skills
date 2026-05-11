@@ -1,6 +1,6 @@
 ---
 name: skill-finder
-description: "Search, install, and manage Agent Skills, and help decide whether the user actually needs a skill before recommending one. Use when looking for skills, installing skills, managing your skill collection, or deciding between a skill and another customization primitive."
+description: "Search, install, and manage Agent Skills locally and from GitHub, then help decide whether the task really needs a skill or another customization primitive. Use when looking for skills, installing skills, managing a skill collection, or choosing between a skill, prompt, instruction, or agent."
 argument-hint: "探したい skill の用途やキーワード"
 user-invocable: true
 license: CC BY-NC-SA 4.0
