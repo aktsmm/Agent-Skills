@@ -272,3 +272,39 @@ images/demo-animated.gif
 
 > **Tip**: Run `npx @vscode/vsce ls` to preview exactly what will be packaged
 > before running `vsce package` or `vsce publish`.
+
+### Marketplace auto-resolves relative-path images
+
+When the README references images by relative path (e.g. `![demo](images/demo.gif)`),
+the Marketplace web view and the in-VS Code extension details pane both resolve
+those paths against `repository.url` in `package.json` and fetch the file from
+`raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>`. So as long as the
+image is committed and pushed to the default branch, you can keep it **out of
+the VSIX** to drop multi-megabyte demo media without breaking the listing.
+
+A single 15 MB demo GIF can shrink a VSIX from ~15 MB to ~175 KB (≈99% reduction)
+with no visible difference in Marketplace rendering.
+
+### Verify VSIX integrity before publish
+
+`vsce ls` validates `.vscodeignore` filtering, but it cannot detect a truncated
+or zip-corrupt VSIX (which can happen when the package step is interrupted by
+build watchers or transient I/O). Always do a local install round-trip before
+`vsce publish`:
+
+```powershell
+$cli = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
+& $cli --install-extension artifacts\vsix\my-extension-1.0.0.vsix --force
+# If you see:
+#   Error: End of central directory record signature not found.
+# the VSIX is truncated; rebuild it with `vsce package` and re-test.
+```
+
+Also treat `vsce package` completion based on the **output file** (size +
+mtime), not on console messages — terminal capture sometimes drops the
+`DONE Packaged: ...` line, but the artifact on disk is the source of truth.
+
+```powershell
+Get-ChildItem artifacts/vsix/my-extension-1.0.0.vsix |
+  Select-Object Length, LastWriteTime
+```
