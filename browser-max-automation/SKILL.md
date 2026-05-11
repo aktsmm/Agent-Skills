@@ -286,6 +286,22 @@ Start-Process -FilePath ".venv\Scripts\python.exe" `
   -RedirectStandardError "stderr.txt"
 ```
 
+### JSON status artifact を正本にする
+
+長時間 runner が `--output-json` や同等の status file を返せるなら、完了判定は terminal の見た目ではなく **JSON の機械可読フィールド** を正本にする。
+
+- `final_status` / `overall_status` / `status` のような field を優先して見る
+- stdout の完了メッセージ、文字化け、途中で切れたログは補助証跡として扱う
+- Windows terminal では encoding 崩れや出力欠落が起きるため、`stdout に成功っぽい文が出た` だけで完了扱いにしない
+
+推奨:
+
+```python
+result = json.loads(Path(output_json).read_text(encoding="utf-8"))
+if result.get("final_status") != "passed":
+    raise RuntimeError(f"runner failed: {result.get('final_status')}")
+```
+
 ### taskkill ツリー kill
 
 CDP 経由の子プロセスは Node.js + ブラウザ接続のツリーを持つ。`proc.kill()` では孫プロセスが残る。
