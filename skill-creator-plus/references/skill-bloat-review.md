@@ -33,6 +33,7 @@ Use this order every time:
 - Large examples, schemas, command catalogs, or recipes
 - Long external link lists
 - Variant-specific guidance that not every invocation needs
+- Repo-global instruction files that started absorbing domain-specific workflow detail
 
 ### Add Candidates
 
@@ -48,6 +49,8 @@ Use this order every time:
 - Main SKILL reads like a knowledge dump instead of an operating guide
 - References exist, but detail still stays inline in SKILL.md
 - Line count grows while the core workflow becomes harder to find
+- A workspace entry file such as `copilot-instructions.md` starts acting like a full operations manual
+- Persona rules, routing rules, and domain workflow rules are mixed in one always-loaded file
 
 ## Keep vs Move
 

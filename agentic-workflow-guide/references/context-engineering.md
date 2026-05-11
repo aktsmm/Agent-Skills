@@ -274,6 +274,13 @@ For `.instructions.md`, `.prompt.md`, `.agent.md`, and `SKILL.md`:
 - Prefer a curated small external-links section over a giant link dump in the main file
 - Treat append-only growth as a smell, not as normal maintenance
 
+For always-loaded workspace entry files such as `.github/copilot-instructions.md`:
+
+- Keep only repo-wide routing and a few global guardrails in the entry file
+- Move domain workflows, review rules, upload procedures, and long failure playbooks into dedicated `.github/instructions/**/*.instructions.md`
+- If the entry file starts mixing persona, routing, workflow details, and domain-specific prohibitions, treat that as context-hoarding rather than good documentation
+- If removing or renaming the entry file suddenly makes casual chat behave normally again, that is a strong signal the entry file has become too heavy for its role
+
 ---
 
 ## Long-Horizon Task Checklist
@@ -342,6 +349,16 @@ Duplicate content across global and workspace scopes doubles token cost.
 - [ ] All `.prompt.md` files have a `description` frontmatter
 - [ ] Stale IDs, paths, or settings removed
 - [ ] No conflicting instructions across files
+- [ ] Workspace entry files still read like a short routing layer, not like a full operating manual
+
+### Red Flags
+
+| Smell | Why it hurts |
+| --- | --- |
+| `.github/copilot-instructions.md` keeps absorbing workflow-specific sections | The file is loaded too often to be a safe place for deep procedure detail |
+| The same rule appears in the entry file and again in domain instructions | Duplicate always-loaded guidance increases token cost and conflict risk |
+| Persona, routing, task policy, and domain-specific operations are all mixed together | The agent spends context budget resolving instruction priority before it can do the task |
+| Casual chat improves only after disabling the workspace entry file | The entry file is likely over-scoped rather than merely verbose |
 
 ---
 
