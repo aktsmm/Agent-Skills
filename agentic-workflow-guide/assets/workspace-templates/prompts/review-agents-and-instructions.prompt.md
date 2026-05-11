@@ -86,6 +86,9 @@ Check only 5 items first. If any ❌, proceed to detailed review:
 | 3   | **agent delegation**: Orchestrator working?      | ❌ if Workflow contains direct file-read/edit tools |
 | 4   | **SSOT**: Same definition in 2+ places?          | Use `grep_search` to detect duplicates              |
 | 5   | **Done Criteria**: Verifiable completion?        | ❌ if just "complete" without specific checklist    |
+| 6   | **Deterministic Offload**: LLM doing pure work?  | ❌ if extract / count / validate / diff / format steps live in agent loops instead of scripts / IR / hooks |
+
+> Detail: see Deterministic Offload Check in `agentic-workflow-guide/references/review-checklist.md`.
 
 ### Tier 1: Core Principles (Required)
 

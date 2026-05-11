@@ -38,6 +38,7 @@ Minimum items to verify:
 - [ ] Can results be verified at each step? (Feedback Loop)
 - [ ] Is there any possibility of infinite loops?
 - [ ] Are related files (references, scripts) simple and minimal? (DRY)
+- [ ] Are deterministic steps offloaded to scripts / IR / hooks instead of LLM loops? (Deterministic Offload)
 ```
 
 ---
@@ -124,6 +125,33 @@ Minimum items to verify:
 - [ ] Is a hook needed only for deterministic enforcement?
 - [ ] Is workspace vs user profile scope chosen intentionally?
 ```
+
+### Deterministic Offload Check
+
+⚠️ **Critical for cost and hallucination control.** Detect agent steps that should be replaced by deterministic code.
+
+LLM / agent に任せている処理のうち、決定論的に書ける部分が混ざっていないかを確認する。
+混ざっていると、実行時間と幻覚リスクの両方が悪化する。
+
+```markdown
+## Script-First Offload
+
+- [ ] Does an agent's responsibility include extract / count / validate / diff / format / parse / lint?
+      → Offload to a script (regex / parser / JSON schema validator), keep the agent for judgment only
+- [ ] Are LLM generation and deterministic transformation packed into the same agent?
+      → Insert an IR boundary and split into two stages (see workflow-patterns/ir-architecture.md)
+- [ ] Is LLM output consumed directly without an IR + script gate?
+      → Add a structured IR + validator between LLM and downstream steps
+- [ ] Is an LLM called inside a loop where the body is effectively a pure function?
+      → Replace the loop body with deterministic code, keep the LLM outside the loop
+- [ ] Does the workflow say "verify visually" or "check consistency" where a script could compare values?
+      → Replace with a script gate that fails fast on mismatch
+- [ ] Are rules that can be enforced by hook / pre-commit / CI being delegated to an agent at runtime?
+      → Move enforcement to a hook (see references/hooks-guide.md)
+```
+
+**Rationale:** Agent-only loops scale poorly: each step costs tokens, latency, and a chance to hallucinate.
+Deterministic offload (script + IR + hook) keeps the agent focused on judgment, where LLMs add real value.
 
 ### Core Principles Check
 

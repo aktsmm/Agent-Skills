@@ -104,6 +104,7 @@ Threshold details: [references/splitting-criteria.md](references/splitting-crite
 - [ ] Errors can be detected and stopped early
 - [ ] Results are verifiable at each step
 - [ ] Context can be compacted or split before adding more orchestration
+- [ ] Deterministic parts are offloaded to scripts / IR / hooks (not LLM loops)
 
 Full checklist: [references/review-checklist.md](references/review-checklist.md)
 
