@@ -119,6 +119,16 @@ snapshot で ref 取得
       └─ 見えていない → wait / reload
 ```
 
+### read-only データ抽出を高速化する
+
+一覧表、残高、ステータス確認など、**読み取りだけ** の fallback では、巨大な `browser_snapshot` を何度も解析しない。手順が分かっている画面は `browser_evaluate` で DOM から必要な行だけを JSON 化して返す。
+
+- ページ到達やログイン状態の判定: `browser_snapshot` で証跡を残す
+- 表・明細・残高などの定型抽出: `browser_evaluate` で `document.querySelectorAll("tr")` や `document.body.innerText` を処理して JSON を返す
+- 不可逆操作の直前・直後: snapshot または screenshot を残す
+
+また、helper / probe / cache の JSON artifact を一次ソースにする場合は、内容を見る前に `timestamp` や対象日を確認する。日付が現在の実行日と合わない artifact は stale とみなし、`ok` や `fast_path_ok` が true でも確定情報として使わない。
+
 ### iframe と force click
 
 - iframe が多段なら `contentFrame()` を順に辿る
