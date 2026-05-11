@@ -201,6 +201,17 @@ $full = git rev-parse HEAD
 gh release create v1.0.0 .\artifacts\vsix\my-extension-1.0.0.vsix --target $full --title "v1.0.0 - Release title" --notes-file .\release-notes-v1.0.0.md
 ```
 
+If you already calculate the VSIX checksum locally, record the **size** and
+**SHA256 digest** in the release notes too. GitHub Release asset metadata then
+becomes an independent proof of exactly which artifact was published, which is
+useful when Marketplace metadata is still stale right after publish.
+
+```powershell
+$vsix = ".\artifacts\vsix\my-extension-1.0.0.vsix"
+Get-Item $vsix | Select-Object Name, Length
+Get-FileHash $vsix -Algorithm SHA256 | Select-Object Hash
+```
+
 After publishing, `vsce show` output can lag or sort versions unexpectedly. If you need a deterministic confirmation, run duplicate-safe publish against the exact VSIX and verify that the Marketplace reports the version as already published.
 
 ## Marketplace URLs
