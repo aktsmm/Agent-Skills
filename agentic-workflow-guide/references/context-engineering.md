@@ -360,6 +360,20 @@ Duplicate content across global and workspace scopes doubles token cost.
 | Persona, routing, task policy, and domain-specific operations are all mixed together | The agent spends context budget resolving instruction priority before it can do the task |
 | Casual chat improves only after disabling the workspace entry file | The entry file is likely over-scoped rather than merely verbose |
 
+### Diagnosis Order
+
+When workspace behavior becomes unstable, do not jump straight to `AGENTS.md` mismatch.
+
+Check in this order:
+
+1. Is the always-loaded workspace entry file (`.github/copilot-instructions.md`) trying to do too many jobs at once?
+2. Is the same rule duplicated across entry file, domain instructions, and prompt / agent assets?
+3. Only after that, check whether `AGENTS.md` and agent definitions disagree about workflow entry points or role boundaries.
+
+Reason:
+
+- `AGENTS.md` inconsistency can matter, but over-scoped always-loaded instructions usually create broader symptoms first, especially when casual chat normalizes as soon as the entry file is removed or renamed.
+
 ---
 
 ## Anti-Patterns
