@@ -58,6 +58,7 @@ Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -Ar
 #### 既存CDPを再利用する場合
 
 既にデバッグポート付きブラウザが起動しているなら、毎回再起動する必要はない。ただし、**ポートが開いていること** と **目的のプロファイル/ログイン状態であること** は別問題として確認する。
+CDP endpoint は環境変数や設定ファイルに入っていても、それだけでは正本にしない。毎回 `/json/version` と port owner を確認し、当回で検証できた endpoint を script / helper / MCP に揃える。
 
 ```powershell
 # 9222 を握っているプロセスを確認
@@ -70,7 +71,9 @@ if ($conn) {
 
 - `--profile-directory` や `--user-data-dir` を見て、意図したプロファイルか確認する
 - 既存CDPが別プロファイルなら、既存ブラウザを落とす前に別ポートで目的プロファイルを起動できるか検討する
-- 自動化スクリプト側は `http://localhost:9222` 固定にせず、検出・起動したCDP URLを引数で受け取れるようにする
+- 自動化スクリプト側は `http://localhost:9222` 固定にせず、検出・起動したCDP URLを引数や環境変数で受け取れるようにする
+- 既存の endpoint 値があっても「前回は正しかった値」にすぎない。別セッションのブラウザが同じ port を使うことがあるため、接続失敗や login redirect が出たら再ログインより先に endpoint drift を疑う
+- helper を複数呼ぶ場合は、途中で endpoint を再推測させず、検証済みの同じ CDP URL を同一 process 環境から渡す
 
 直接 WebSocket CDP の起動フラグ、`websocket-client` 接続、SPA hash navigation、virtual scroll 操作は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
