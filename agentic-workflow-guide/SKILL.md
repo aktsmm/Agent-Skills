@@ -97,16 +97,38 @@ Quick signals:
 
 Threshold details: [references/splitting-criteria.md](references/splitting-criteria.md)
 
+## Entry Boundary Smells
+
+### Instruction Elevation Smell
+
+always-loaded entry において、強い命令語が直下の catalog、reference list、workflow map、rule inventory を会話の優先レイヤーへ昇格させる状態。
+
+### Always-Loaded Entry Budget
+
+always-loaded entry は会話境界と最小 guardrail のみを持つ。catalog、詳細手順、広い参照一覧は docs、README、task-specific assets へ退避する。
+
+### Runtime Boundary Rule
+
+Review assets improve design quality and detect structural problems. Default conversational behavior is controlled by always-loaded entries.
+
+### Casual Input Safety Check
+
+Lightweight inputs such as greetings, short Q&A, and numeric-only replies should not be force-routed into task intake unless the task context is explicit.
+
 ## Review Gates
 
 - [ ] Primitive choice is simpler than agent if possible
 - [ ] Placement is appropriate and always-loaded entry files stay thin
 - [ ] New additions are proposed only after delete / merge / split / move options are checked
 - [ ] `copilot-instructions.md` and `AGENTS.md` keep distinct always-on roles and do not duplicate intake / routing / catalog content
+- [ ] always-loaded entries do not combine strong directive wording with catalogs or reference inventories
+- [ ] findings distinguish runtime-affected entry issues from review-only asset issues
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early
 - [ ] Results are verifiable at each step
+- [ ] lightweight conversational inputs are not unnecessarily forced into task intake
 - [ ] Context can be compacted or split before adding more orchestration
+- [ ] catalogs and workflow maps are separated from always-loaded entry files
 - [ ] Deterministic parts are offloaded to scripts / IR / hooks (not LLM loops)
 
 Full checklist: [references/review-checklist.md](references/review-checklist.md)

@@ -89,6 +89,9 @@ Check these 7 items first. If any ❌, proceed to detailed review:
 | 5   | **Done Criteria**: Verifiable completion?        | ❌ if just "complete" without specific checklist                                                           |
 | 6   | **Deterministic Offload**: LLM doing pure work?  | ❌ if extract / count / validate / diff / format steps live in agent loops instead of scripts / IR / hooks |
 | 7   | **Placement**: Is the content in the right file? | ❌ if catalogs/detail live in always-loaded entry files                                                    |
+| 8   | **Elevation Wording**: Does strong wording escalate the wrong layer? | ❌ if always-loaded entry wording elevates nearby catalogs or rule inventories |
+| 9   | **Runtime Boundary**: Is the issue runtime-affecting or review-only? | ❌ if findings do not distinguish always-loaded entry behavior from invoked review assets |
+| 10  | **Casual Input Safety**: Are lightweight inputs safe? | ❌ if greetings, short Q&A, or numeric-only replies are force-routed into task intake |
 
 > Detail: see Deterministic Offload Check in `agentic-workflow-guide/references/review-checklist.md`.
 
@@ -174,6 +177,9 @@ agent({
 - [ ] Are prohibited operations (from instructions) not granted in Permissions?
 - [ ] Do README/docs catalogs carry indexes and workflow maps instead of always-loaded entry files?
 - [ ] No duplicate information between `AGENTS.md`, `.github/copilot-instructions.md`, and `.agent.md` files? (SSOT)
+- [ ] Do always-loaded entry files avoid combining strong directive wording with nearby catalogs or rule inventories?
+- [ ] Are findings classified as runtime-affected or review-only depending on whether they change default conversational behavior?
+- [ ] Do greetings, short Q&A, and numeric-only replies avoid forced routing into task intake unless the task context is explicit?
 - [ ] Does workflow align with project context described in README.md?
 - [ ] Does workflow respect dependencies defined in other agents?
 
@@ -260,6 +266,7 @@ Review is complete when:
 ### ⚠️ Improvements Needed
 
 - [Improvement points]
+  - Include `Impact=runtime-affected|review-only` and `Trigger=wording-only|wording + catalog|duplicated entry routing|always-loaded boundary violation` when relevant
 
 ### Recommendation
 
@@ -290,6 +297,11 @@ Review is complete when:
 
 - 🟡 **Missing Error Handling**: `{agent}.agent.md` has no retry policy
   → Add "escalate to human after 3 consecutive failures"
+
+- 🟠 **Entry Boundary Collision**: `.github/copilot-instructions.md` combines strong routing language with a nearby workflow catalog
+  - L{line}: `always-loaded entry wording near workflow map`
+    → Move catalog detail to README/docs and keep the entry file focused on guardrails
+    → Impact=runtime-affected | Trigger=wording + catalog
 
 - 🟡 **Redundant Definition**: "{definition}" appears in multiple places:
   - `{file-1}.instructions.md` (L{line}) ← SSOT
