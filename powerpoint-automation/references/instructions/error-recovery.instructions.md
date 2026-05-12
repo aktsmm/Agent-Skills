@@ -129,4 +129,39 @@ python scripts/create_from_template.py "user_presentation.pptx" `
     --config "output_manifest/user_presentation_layouts.json"
 ```
 
+### Recovery: Scratch Build (no template at all)
+
+When no usable template exists (corrupted bundled template, ad-hoc LT deck, simple
+slides), build directly with `python-pptx` using the blank layout:
+
+```python
+from pptx import Presentation
+from pptx.util import Inches
+prs = Presentation()
+prs.slide_width = Inches(13.33)   # 16:9
+prs.slide_height = Inches(7.5)
+slide = prs.slides.add_slide(prs.slide_layouts[6])  # 6 = blank
+# Build everything with add_textbox / add_shape
+```
+
+Use this only when template-based generation is infeasible. Output is not bound
+to layout XML, so master/layout consistency must be enforced in code.
+
+## PPTX File Lock During Rebuild
+
+When iterating on a deck the user is reviewing in PowerPoint, `python-pptx.save()`
+fails with `PermissionError`. Close only the target presentation, then rebuild:
+
+```python
+import win32com.client as w
+app = w.GetActiveObject("PowerPoint.Application")
+for p in list(app.Presentations):
+    if "target-deck-name" in p.Name:
+        p.Close()
+# Now python-pptx can save
+```
+
+Do not call `app.Quit()`; leave PowerPoint running so the user can reopen the
+rebuilt file with `Start-Process`.
+
 > 📖 **Full template requirements:** See [template.instructions.md](template.instructions.md) > Template Preparation
