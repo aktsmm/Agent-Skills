@@ -224,4 +224,5 @@ error_handling:
 - **単一エージェント**: `.github/agents/<name>.agent.md`
 - **ワークフロー**: `.github/agents/<name>.agent.md`（オーケストレーター）+ 個別エージェント
 
-作成後、`AGENTS.md` にも追記すること。
+作成後、必要なら README / docs などの catalog を更新すること。
+`AGENTS.md` は shared guardrail や entry behavior を変更する場合だけ更新すること。

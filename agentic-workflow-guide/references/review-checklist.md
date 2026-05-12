@@ -276,8 +276,6 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Could any reference files be consolidated?
 - [ ] Are large files (>200 lines) well-structured with TOC?
 - [ ] Is there orphaned documentation no longer referenced?
-- [ ] Do VS Code Markdown diagnostics pass for local relative links?
-      → For workspace templates, check both the template source location and the generated workspace location.
 
 ## Scripts (scripts/)
 
@@ -291,8 +289,6 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Are prompts reused where possible? (DRY)
 - [ ] Is there copy-pasted prompt text that should be templated?
 - [ ] Are prompt variations clearly organized?
-- [ ] Do `.agent.md`, `.prompt.md`, and `.instructions.md` templates start with raw YAML frontmatter, not fenced examples?
-- [ ] Are sample/template agents kept outside `.github/agents/` direct children unless they should be invocable?
 
 ## Overall Structure
 

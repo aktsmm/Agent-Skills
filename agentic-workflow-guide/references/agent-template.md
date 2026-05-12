@@ -63,10 +63,10 @@ disable-model-invocation: false # Optional: Prevent subagent invocation (default
 
 > **Model note:** `model:` is optional. Do not guess model names. If you have not verified the exact display name in the current environment, omit `model:` instead of using speculative values like `gpt-4o`.
 
-When fallback matters, `model:` can be an ordered array and the first available model is used.
+When fallback matters, `model:` can be an ordered array and the first available model is used. Use only model display names verified in the current environment.
 
 ```yaml
-model: ["GPT-5 (copilot)", "Claude Sonnet 4.5 (copilot)"]
+model: ["<verified-model-name-1>", "<verified-model-name-2>"]
 ```
 
 `handoffs` は文字列配列ではなく、`label`・`agent`・`prompt`・`send` を持つオブジェクト配列で定義する。

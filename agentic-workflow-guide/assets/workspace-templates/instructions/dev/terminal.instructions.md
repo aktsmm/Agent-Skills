@@ -30,8 +30,8 @@ applyTo: "**"
 # 1. 現在地を確認
 Get-Location
 
-# 2. 必要に応じて移動
-Set-Location "d:\03_github\ghc_template"
+# 2. 必要に応じてワークスペースルートへ移動
+Set-Location "<workspace-root>"
 
 # 3. コマンド実行
 git status

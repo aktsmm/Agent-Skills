@@ -8,7 +8,7 @@ description: 複数エージェントのオーケストレーション計画
 
 ## 前提条件
 
-- 参照: `AGENTS.md` (利用可能なエージェント一覧、存在する場合)
+- 参照: `.github/agents/*.agent.md` と README / docs の catalog（存在する場合）
 - 参照: `.github/instructions/agents/agent-design.instructions.md` (設計原則、存在する場合)
 
 > 参照ファイルが無い場合は、利用可能なエージェント一覧と制約をユーザーに確認する。
@@ -18,7 +18,7 @@ description: 複数エージェントのオーケストレーション計画
 ユーザーのタスクを達成するために、以下のステップで計画を立ててください。
 
 1. **タスク分解**: タスクを独立したサブタスクに分解する。
-2. **エージェント選定**: 各サブタスクに最適なエージェントを `AGENTS.md` から選ぶ（なければ新規作成を提案）。
+2. **エージェント選定**: 各サブタスクに最適なエージェントを `.github/agents/*.agent.md` と catalog から選ぶ（なければ新規作成を提案）。
 3. **フロー定義**: エージェント間のデータの受け渡し（成果物）と順序を定義する。
 4. **実行計画**: `agent`（旧 runSubagent）を使用した具体的な実行手順を示す。
 
@@ -31,9 +31,10 @@ description: 複数エージェントのオーケストレーション計画
    - Goal: ユーザーの要望を整理し、必要なら新規エージェント作成を提案する。
    - Output: `docs/requirements.md`（要件の叩き台）
 2. **Step 2: 実装計画**
-  - Agent: `.github/agents/templates/sample-agent.md`（※用途に応じて適切なエージェントに差し替え）
-   - Input: Step 1 の `docs/requirements.md`
-   - Goal: 実装方針を `docs/plan.md` にまとめる。
+
+- Agent: `.github/agents/templates/sample-agent.md`（※用途に応じて適切なエージェントに差し替え）
+- Input: Step 1 の `docs/requirements.md`
+- Goal: 実装方針を `docs/plan.md` にまとめる。
 
 ### agent 呼び出し例
 

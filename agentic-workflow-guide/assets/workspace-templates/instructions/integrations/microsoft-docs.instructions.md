@@ -127,7 +127,7 @@ Microsoft 製品に関する回答には、以下を含めてください：
 
 ### 参照ソース
 
-- ドキュメントタイトル: <公式URL> - Microsoft Learn
+- [ドキュメントタイトル](URL) - Microsoft Learn
 - API バージョン: 2024-01-01
 ```
 
@@ -154,7 +154,7 @@ Microsoft 製品に関する回答には、以下を含めてください：
 Azure サービスの最新アップデート情報を取得するための MCP ツールです。
 
 > ⚠️ **セットアップが必要**: この MCP サーバーはローカルビルドが必要です。
-> 詳細は `docs/azure-updates-mcp-setup.md`（存在する場合）を参照してください。
+> 詳細は [Azure Updates MCP セットアップガイド](../../../docs/azure-updates-mcp-setup.md) を参照してください。
 
 ### 7.1 ツール一覧
 

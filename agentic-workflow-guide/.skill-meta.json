@@ -4,5 +4,6 @@
   "description": "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design.",
   "whenToUse": "Create: New .agent.md, workflow architecture, scaffolding; Review: Orchestrator not delegating, design principle check, context overflow",
   "categories": [],
-  "installedAt": "2026-01-31T17:40:46.674Z"
+  "remotePath": "agentic-workflow-guide",
+  "installedAt": "2026-05-11T22:24:20.699Z"
 }

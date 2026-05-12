@@ -46,7 +46,7 @@ Communicate findings with specific evidence and actionable recommendations.
 **Optional:**
 
 - Terminal history (commands executed, outputs, errors)
-- Scope of reflection (Agents.md / \*.agent.md / instructions) — defaults to all
+- Scope of reflection (`AGENTS.md` / \*.agent.md / instructions / README / docs) — defaults to all
 
 ## Steps
 
@@ -129,10 +129,11 @@ Impact: Add "numbered steps" pattern to prompt guidelines
 **Target mapping:**
 | Learning Type | Target File |
 |---------------|-------------|
-| Common principle | AGENTS.md |
+| Shared guardrail / entry boundary | AGENTS.md or .github/copilot-instructions.md |
 | Agent-specific | .github/agents/\*.agent.md |
 | Workflow rule | .github/instructions/\*.md |
 | Prompt pattern | .github/prompts/\*.prompt.md |
+| Catalog / reference map | README.md or docs/\*.md |
 
 **If target file is unclear:**
 
@@ -144,7 +145,7 @@ Impact: Add "numbered steps" pattern to prompt guidelines
 **Gate criteria (all must pass before output):**
 
 - [ ] No duplicate rules → verified via grep search
-- [ ] Consistent with existing design → cross-referenced AGENTS.md
+- [ ] Consistent with existing design → cross-referenced the relevant guardrail and catalog files
 - [ ] Minimal and focused change → each file modification < 20 lines added/changed (if larger, split into multiple changes)
 
 **If any gate fails:**

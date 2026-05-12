@@ -179,27 +179,38 @@ def lint_files(path: str) -> None:
         print("  - L2 → L3: Use agent for sub-tasks")
 
 
-# Pattern-specific AGENTS.md templates
-AGENTS_MD_TEMPLATES = {
-    "basic": '''# {workflow_name} - Agent Workflow
+AGENTS_SHARED_TEMPLATE = '''# {workflow_name} - Shared Guardrails
 
-## Entry Point
+This file is the thin, cross-agent guardrail for the workflow.
+Catalogs, workflow maps, and detailed asset indexes belong in `README.md` or `docs/`.
 
-**Start with the Orchestrator agent.** It coordinates all workflow tasks.
+## Scope
 
-→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
+- Shared behavior boundaries for all agents
+- Safety and communication rules that apply across tools
+- Minimal entry guidance for non-Copilot agents
 
-## Generic Rules
+## Entry Boundaries
+
+- GitHub Copilot entry file: `.github/copilot-instructions.md`
+- Agent definitions: `.github/agents/*.agent.md`
+- Catalogs and workflow maps: `README.md` or `docs/*.md`
+- This file should not duplicate agent tables, flow charts, or prompt catalogs
+
+## Workflow Pattern
+
+**{pattern_name}** - {pattern_description}
+
+## Shared Rules
 
 ### Behavior
 
 1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
-2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
+2. **Context Awareness**: Read relevant files before working. Do not assume; check existing patterns.
 3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
 
 ### Communication
 
-- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
 - **Conclusion First**: State conclusion, then reasons and details.
 - **Match User Language**: Respond in the user's language.
 
@@ -209,499 +220,22 @@ AGENTS_MD_TEMPLATES = {
 - **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
 - **Minimal Permissions**: Request only what's needed.
 
-## Agents
-
-| Agent | Role | Entry Point |
-|-------|------|-------------|
-| [orchestrator](.github/agents/orchestrator.agent.md) | Task decomposition, delegation, progress management | ✅ **Yes** |
-| [worker](.github/agents/worker.agent.md) | Execute assigned subtasks | |
-
-## Workflow Pattern
-
-**basic** - Basic orchestrator-worker workflow
-
-## Flow
-
-```mermaid
-graph TD
-    User[👤 User Request] --> Orch[🎯 Orchestrator]
-    Orch --> |analyze & delegate| W1[⚙️ Worker]
-    W1 --> |result| Orch
-    Orch --> |report| User
-```
-
-## How It Works
-
-1. **User** sends a request
-2. **Orchestrator** analyzes and creates a plan
-3. **Orchestrator** delegates subtasks to **Worker**
-4. **Worker** executes and returns results
-5. **Orchestrator** aggregates and reports to **User**
-
-## Design Principles
-
-- **SSOT**: Single source of truth for all data
-- **SRP**: Each agent has one responsibility
-- **Fail Fast**: Errors are caught early
-- **Iterative**: Small, verifiable steps
-- **Idempotency**: Same input → same output
-
 ## References
 
-- [Design Document](docs/design.md)
 - [Copilot Instructions](.github/copilot-instructions.md)
-- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
-''',
-
-    "prompt-chaining": '''# {workflow_name} - Agent Workflow
-
-## Entry Point
-
-**Start with the Orchestrator agent.** It coordinates the sequential step execution.
-
-→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
-
-## Generic Rules
-
-### Behavior
-
-1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
-2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
-3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
-
-### Communication
-
-- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
-- **Conclusion First**: State conclusion, then reasons and details.
-- **Match User Language**: Respond in the user's language.
-
-### Safety
-
-- **No `git push`**: Do not push without explicit user instruction.
-- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
-- **Minimal Permissions**: Request only what's needed.
-
-## Agents
-
-| Agent | Role | Entry Point |
-|-------|------|-------------|
-| [orchestrator](.github/agents/orchestrator.agent.md) | Coordinate sequential execution | ✅ **Yes** |
-| [step1](.github/agents/step1.agent.md) | Handle first step | |
-| [step2](.github/agents/step2.agent.md) | Handle second step | |
-| [step3](.github/agents/step3.agent.md) | Handle final step | |
-
-## Workflow Pattern
-
-**prompt-chaining** - Sequential processing with gates between steps
-
-## Flow
-
-```mermaid
-graph LR
-    User[👤 User] --> Orch[🎯 Orchestrator]
-    Orch --> S1[📝 Step 1]
-    S1 --> G1{{🚦 Gate 1}}
-    G1 -->|pass| S2[📝 Step 2]
-    G1 -->|fail| Orch
-    S2 --> G2{{🚦 Gate 2}}
-    G2 -->|pass| S3[📝 Step 3]
-    G2 -->|fail| Orch
-    S3 --> Orch
-    Orch --> User
-```
-
-## How It Works
-
-1. **Orchestrator** receives request and initiates Step 1
-2. **Step 1** processes and outputs intermediate result
-3. **Gate 1** validates output (pass → continue, fail → retry/abort)
-4. **Step 2** takes Step 1's output as input
-5. **Gate 2** validates again
-6. **Step 3** produces final output
-7. **Orchestrator** reports to user
-
-## Gate Validation
-
-Each gate checks:
-- Output format correctness
-- Required fields present
-- Quality thresholds met
-
-See `gates/gate_template.md` for validation criteria.
-
-## Design Principles
-
-- **SSOT**: Single source of truth for all data
-- **SRP**: Each agent has one responsibility
-- **Fail Fast**: Errors are caught early at gates
-- **Iterative**: Small, verifiable steps
-- **Idempotency**: Same input → same output
-
-## References
-
 - [Design Document](docs/design.md)
-- [Gate Template](gates/gate_template.md)
-- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
-''',
-
-    "parallelization": '''# {workflow_name} - Agent Workflow
-
-## Entry Point
-
-**Start with the Orchestrator agent.** It coordinates parallel task execution.
-
-→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
-
-## Generic Rules
-
-### Behavior
-
-1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
-2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
-3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
-
-### Communication
-
-- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
-- **Conclusion First**: State conclusion, then reasons and details.
-- **Match User Language**: Respond in the user's language.
-
-### Safety
-
-- **No `git push`**: Do not push without explicit user instruction.
-- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
-- **Minimal Permissions**: Request only what's needed.
-
-## Agents
-
-| Agent | Role | Entry Point |
-|-------|------|-------------|
-| [orchestrator](.github/agents/orchestrator.agent.md) | Dispatch tasks & aggregate results | ✅ **Yes** |
-| [worker1](.github/agents/worker1.agent.md) | Handle parallel task 1 | |
-| [worker2](.github/agents/worker2.agent.md) | Handle parallel task 2 | |
-| [worker3](.github/agents/worker3.agent.md) | Handle parallel task 3 | |
-
-## Workflow Pattern
-
-**parallelization** - Execute independent tasks simultaneously
-
-## Flow
-
-```mermaid
-graph TD
-    User[👤 User] --> Orch[🎯 Orchestrator]
-    Orch --> |spawn| W1[⚙️ Worker 1]
-    Orch --> |spawn| W2[⚙️ Worker 2]
-    Orch --> |spawn| W3[⚙️ Worker 3]
-    W1 --> |result| Agg[📊 Aggregator]
-    W2 --> |result| Agg
-    W3 --> |result| Agg
-    Agg --> Orch
-    Orch --> User
-```
-
-## How It Works
-
-1. **Orchestrator** analyzes request and identifies independent subtasks
-2. **Orchestrator** spawns multiple **Workers** in parallel
-3. Each **Worker** executes its subtask independently
-4. Results are **aggregated** (merge, vote, or combine)
-5. **Orchestrator** reports final result to user
-
-## Parallelization Strategy
-
-| Strategy | Use Case |
-|----------|----------|
-| **Sectioning** | Split large task into chunks (e.g., process files in parallel) |
-| **Voting** | Multiple workers solve same task, majority wins |
-| **Specialization** | Different workers handle different aspects |
-
-## Design Principles
-
-- **SSOT**: Single source of truth for all data
-- **SRP**: Each agent has one responsibility
-- **Fail Fast**: Errors are caught early
-- **Iterative**: Small, verifiable steps
-- **Idempotency**: Same input → same output
-
-## References
-
-- [Design Document](docs/design.md)
-- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
-''',
-
-    "orchestrator-workers": '''# {workflow_name} - Agent Workflow
-
-## Entry Point
-
-**Start with the Orchestrator agent.** It dynamically decomposes tasks and assigns to workers.
-
-→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
-
-## Generic Rules
-
-### Behavior
-
-1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
-2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
-3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
-
-### Communication
-
-- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
-- **Conclusion First**: State conclusion, then reasons and details.
-- **Match User Language**: Respond in the user's language.
-
-### Safety
-
-- **No `git push`**: Do not push without explicit user instruction.
-- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
-- **Minimal Permissions**: Request only what's needed.
-
-## Agents
-
-| Agent | Role | Entry Point |
-|-------|------|-------------|
-| [orchestrator](.github/agents/orchestrator.agent.md) | Dynamic task decomposition & coordination | ✅ **Yes** |
-| [worker](.github/agents/worker.agent.md) | Execute assigned subtasks | |
-
-## Workflow Pattern
-
-**orchestrator-workers** - Dynamic task decomposition with flexible worker assignment
-
-## Flow
-
-```mermaid
-graph TD
-    User[👤 User] --> Orch[🎯 Orchestrator]
-    Orch --> |analyze| Plan[📋 Task Plan]
-    Plan --> |subtask 1| W1[⚙️ Worker]
-    Plan --> |subtask 2| W2[⚙️ Worker]
-    Plan --> |subtask N| WN[⚙️ Worker]
-    W1 --> |result| Orch
-    W2 --> |result| Orch
-    WN --> |result| Orch
-    Orch --> |synthesize| Result[📊 Final Result]
-    Result --> User
-```
-
-## How It Works
-
-1. **Orchestrator** receives complex request
-2. **Orchestrator** analyzes and creates dynamic task plan
-3. **Orchestrator** assigns subtasks to **Workers** (sequential or parallel)
-4. **Workers** execute and return results
-5. **Orchestrator** synthesizes all results
-6. **Orchestrator** reports to user (may iterate if needed)
-
-## Dynamic Decomposition
-
-Unlike fixed workflows, the orchestrator:
-- Determines number of subtasks at runtime
-- Adjusts strategy based on intermediate results
-- Can spawn additional workers as needed
-- Handles dependencies between subtasks
-
-## Design Principles
-
-- **SSOT**: Single source of truth for all data
-- **SRP**: Each agent has one responsibility
-- **Fail Fast**: Errors are caught early
-- **Iterative**: Small, verifiable steps
-- **Idempotency**: Same input → same output
-
-## References
-
-- [Design Document](docs/design.md)
-- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
-''',
-
-    "evaluator-optimizer": '''# {workflow_name} - Agent Workflow
-
-## Entry Point
-
-**Start with the Orchestrator agent.** It coordinates the generate-evaluate-improve loop.
-
-→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
-
-## Generic Rules
-
-### Behavior
-
-1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
-2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
-3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
-
-### Communication
-
-- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
-- **Conclusion First**: State conclusion, then reasons and details.
-- **Match User Language**: Respond in the user's language.
-
-### Safety
-
-- **No `git push`**: Do not push without explicit user instruction.
-- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
-- **Minimal Permissions**: Request only what's needed.
-
-## Agents
-
-| Agent | Role | Entry Point |
-|-------|------|-------------|
-| [orchestrator](.github/agents/orchestrator.agent.md) | Coordinate generation-evaluation loop | ✅ **Yes** |
-| [generator](.github/agents/generator.agent.md) | Generate content/code | |
-| [evaluator](.github/agents/evaluator.agent.md) | Evaluate and provide feedback | |
-
-## Workflow Pattern
-
-**evaluator-optimizer** - Iterative improvement through feedback loops
-
-## Flow
-
-```mermaid
-graph TD
-    User[👤 User] --> Orch[🎯 Orchestrator]
-    Orch --> Gen[✨ Generator]
-    Gen --> |output| Eval[🔍 Evaluator]
-    Eval --> |score & feedback| Orch
-    Orch --> |pass?| Decision{{✅ Good enough?}}
-    Decision --> |no| Gen
-    Decision --> |yes| Result[📊 Final Output]
-    Result --> User
-```
-
-## How It Works
-
-1. **Orchestrator** receives request and sends to **Generator**
-2. **Generator** produces initial output
-3. **Evaluator** scores output against criteria
-4. If score < threshold:
-   - **Evaluator** provides specific feedback
-   - **Generator** improves based on feedback
-   - Loop continues (max N iterations)
-5. If score ≥ threshold or max iterations reached:
-   - **Orchestrator** returns best result to user
-
-## Loop Configuration
-
-See `config/loop_config.yaml`:
-
-```yaml
-max_iterations: 5
-threshold: 0.8
-on_max_reached: return_best  # or: fail
-```
-
-## Evaluation Criteria
-
-The evaluator checks (customize in evaluator.agent.md):
-- [ ] Criterion 1: [Description]
-- [ ] Criterion 2: [Description]
-- [ ] Criterion 3: [Description]
-
-## Design Principles
-
-- **SSOT**: Single source of truth for all data
-- **SRP**: Each agent has one responsibility
-- **Fail Fast**: Errors are caught early
-- **Iterative**: Small, verifiable steps
-- **Idempotency**: Same input → same output
-
-## References
-
-- [Design Document](docs/design.md)
-- [Loop Configuration](config/loop_config.yaml)
-- [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
-''',
-
-    "routing": '''# {workflow_name} - Agent Workflow
-
-## Entry Point
-
-**Start with the Orchestrator (Router) agent.** It classifies input and routes to appropriate handlers.
-
-→ [.github/agents/orchestrator.agent.md](.github/agents/orchestrator.agent.md)
-
-## Generic Rules
-
-### Behavior
-
-1. **Plan First**: Present a step-by-step plan before tackling complex tasks. Get approval before execution.
-2. **Context Awareness**: Read relevant files before working. Don't assume; check existing patterns.
-3. **Self-Correction**: Run verification after changes. Analyze errors and propose fixes.
-
-### Communication
-
-- **Friendly Tone**: Be approachable and supportive, like a helpful friend.
-- **Conclusion First**: State conclusion, then reasons and details.
-- **Match User Language**: Respond in the user's language.
-
-### Safety
-
-- **No `git push`**: Do not push without explicit user instruction.
-- **Confirm Destructive Ops**: Always confirm before deletion or irreversible changes.
-- **Minimal Permissions**: Request only what's needed.
-
-## Agents
-
-| Agent | Role | Entry Point |
-|-------|------|-------------|
-| [orchestrator](.github/agents/orchestrator.agent.md) | Classify input and route to handlers | ✅ **Yes** |
-| [handler-a](.github/agents/handler-a.agent.md) | Handle Type A requests | |
-| [handler-b](.github/agents/handler-b.agent.md) | Handle Type B requests | |
-| [handler-c](.github/agents/handler-c.agent.md) | Handle Type C requests | |
-
-## Workflow Pattern
-
-**routing** - Classify input and route to specialized handlers
-
-## Flow
-
-```mermaid
-graph TD
-    User[👤 User] --> Router[🎯 Orchestrator/Router]
-    Router --> |classify| Decision{{📋 Request Type?}}
-    Decision --> |Type A| HA[🅰️ Handler A]
-    Decision --> |Type B| HB[🅱️ Handler B]
-    Decision --> |Type C| HC[🅲 Handler C]
-    HA --> Router
-    HB --> Router
-    HC --> Router
-    Router --> User
-```
-
-## How It Works
-
-1. **Orchestrator (Router)** receives request
-2. **Router** classifies the request type using rules/LLM
-3. **Router** dispatches to appropriate **Handler**
-4. **Handler** processes and returns result
-5. **Router** may post-process and returns to user
-
-## Routing Rules
-
-| Request Pattern | Route To | Example |
-|-----------------|----------|---------|
-| Type A keywords | Handler A | "create", "new", "add" |
-| Type B keywords | Handler B | "update", "modify", "change" |
-| Type C keywords | Handler C | "delete", "remove", "clean" |
-| Ambiguous | Ask user for clarification | - |
-
-Customize routing logic in `orchestrator.agent.md`.
-
-## Design Principles
-
-- **SSOT**: Single source of truth for all data
-- **SRP**: Each agent has one responsibility
-- **Fail Fast**: Errors are caught early
-- **Iterative**: Small, verifiable steps
-- **Idempotency**: Same input → same output
-
-## References
-
-- [Design Document](docs/design.md)
+- [.github/agents/](.github/agents/)
 - [agentic-workflow-guide](https://github.com/aktsmm/Agent-Skills/tree/master/agentic-workflow-guide)
 '''
+
+# Pattern-specific AGENTS.md templates
+AGENTS_MD_TEMPLATES = {
+    "basic": AGENTS_SHARED_TEMPLATE,
+    "prompt-chaining": AGENTS_SHARED_TEMPLATE,
+    "parallelization": AGENTS_SHARED_TEMPLATE,
+    "orchestrator-workers": AGENTS_SHARED_TEMPLATE,
+    "evaluator-optimizer": AGENTS_SHARED_TEMPLATE,
+    "routing": AGENTS_SHARED_TEMPLATE,
 }
 
 # Common templates (used for all patterns)
@@ -710,9 +244,14 @@ COMMON_TEMPLATES = {
 
 This workflow uses agentic pattern. See the following files for details.
 
-## Entry Point
+## Role
 
-- [AGENTS.md](../AGENTS.md) - **Start here**. Orchestrator entry point and generic rules.
+This file is the GitHub Copilot entry file for the workflow.
+Use it for repo-wide routing and global guardrails only.
+
+## Shared Guardrails
+
+- [AGENTS.md](../AGENTS.md) - Cross-agent guardrails and entry boundaries
 
 ## Agent Definitions
 
@@ -728,6 +267,10 @@ This workflow uses agentic pattern. See the following files for details.
 ## Prompts
 
 - [.github/prompts/](.github/prompts/) - Reusable prompt templates
+
+## Catalogs
+
+- [README.md](../README.md) or [docs/design.md](../docs/design.md) - Workflow maps and reference-only details
 
 ## References
 
@@ -758,9 +301,9 @@ Rules applied to the entire workflow.
 
 ```
 {workflow_name}/
-├── AGENTS.md                # Entry point (orchestrator-first)
+├── AGENTS.md                # Shared guardrails (thin)
 ├── .github/
-│   ├── copilot-instructions.md
+│   ├── copilot-instructions.md # GitHub Copilot entry file
 │   ├── instructions/
 │   ├── agents/              # Agent definitions
 │   │   ├── orchestrator.agent.md  # Entry point
@@ -878,7 +421,7 @@ Prompt for creating a new agent definition (`.agent.md`).
 
 ## Prerequisites
 
-- Reference: `agents/sample.agent.md` (template)
+- Reference: `.github/agents/templates/sample-agent.md` (template)
 - Reference: `.github/instructions/agents.instructions.md`
 
 ## Instructions
@@ -1119,12 +662,12 @@ You are an "AI Agent Design Improvement Architect".
 
 ## Input
 - Response history (timeline, logs, error messages, fixes)
-- Scope of reflection (Agents.md / *.agent.md / instructions)
+- Scope of reflection (AGENTS.md / README.md / docs / *.agent.md / instructions)
 
 ## Steps
 
 ### Step 0: Context Collection
-1. Read target files (Agents.md, agents/*.agent.md, instructions/*.md)
+1. Read target files (AGENTS.md, README.md / docs/*.md, agents/*.agent.md, instructions/*.md)
 2. Summarize existing rules in 5 lines or less
 
 ### Step 1: Extract and Classify Learnings
@@ -1140,9 +683,10 @@ For each learning, determine:
 - Check for duplicates/conflicts
 
 ### Step 3: Determine Reflection Target
-- Common principles → Agents.md
+- Shared guardrail / entry boundary → AGENTS.md or .github/copilot-instructions.md
 - Agent-specific → .github/agents/*.agent.md
 - Overall constraints → .github/instructions/*.md
+- Catalog / workflow map → README.md or docs/*.md
 
 ### Step 4: Present Update Content
 Show "exactly how to rewrite" in code blocks:
@@ -1947,7 +1491,11 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
     
     # Generate AGENTS.md with pattern-specific template
     agents_md_template = AGENTS_MD_TEMPLATES.get(pattern, AGENTS_MD_TEMPLATES["basic"])
-    agents_md_content = agents_md_template.format(workflow_name=name)
+    agents_md_content = agents_md_template.format(
+        workflow_name=name,
+        pattern_name=pattern,
+        pattern_description=pattern_info["description"],
+    )
     (base_path / "AGENTS.md").write_text(agents_md_content, encoding="utf-8")
     
     # Generate common templates (excluding AGENTS.md which is pattern-specific)
@@ -2032,14 +1580,15 @@ Generated with `agentic-workflow-guide` skill.
 
 ## Entry Point
 
-**Start with [AGENTS.md](AGENTS.md)** - It defines the orchestrator entry point and generic rules.
+**Start with [.github/copilot-instructions.md](.github/copilot-instructions.md)** for GitHub Copilot behavior.
+Use [AGENTS.md](AGENTS.md) only for shared cross-agent guardrails.
 
 ## Directory Structure
 ```
 {name}/
-├── AGENTS.md                   # Entry point (orchestrator-first)
+├── AGENTS.md                   # Shared guardrails (thin)
 ├── .github/
-│   ├── copilot-instructions.md # Links to agent files
+│   ├── copilot-instructions.md # GitHub Copilot entry file
 │   ├── instructions/           # Individual instructions
 │   ├── agents/                 # Agent definitions
 │   │   ├── orchestrator.agent.md  # Entry point
@@ -2051,20 +1600,21 @@ Generated with `agentic-workflow-guide` skill.
 
 ## Quick Start
 
-1. Read **AGENTS.md** to understand the workflow entry point
-2. Customize orchestrator in **.github/agents/orchestrator.agent.md**
-3. Add workers in **.github/agents/**
-4. Set up prompts in **.github/prompts/**
-5. Document design in **docs/design.md**
+1. Read **.github/copilot-instructions.md** for GitHub Copilot entry behavior
+2. Read **AGENTS.md** for shared cross-agent guardrails
+3. Customize orchestrator in **.github/agents/orchestrator.agent.md**
+4. Add workers in **.github/agents/**
+5. Document workflow maps in **README.md** or **docs/design.md**
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `AGENTS.md` | Entry point with generic rules |
-| `.github/copilot-instructions.md` | Links to agent files |
+| `AGENTS.md` | Shared guardrails and entry boundaries |
+| `.github/copilot-instructions.md` | GitHub Copilot entry file |
 | `.github/agents/*.agent.md` | Agent definitions |
 | `.github/prompts/*.prompt.md` | Prompt templates |
+| `README.md` / `docs/*.md` | Catalogs and workflow maps |
 | `.github/instructions/*.instructions.md` | File pattern-specific rules |
 
 ## Design Principles

@@ -100,6 +100,9 @@ Threshold details: [references/splitting-criteria.md](references/splitting-crite
 ## Review Gates
 
 - [ ] Primitive choice is simpler than agent if possible
+- [ ] Placement is appropriate and always-loaded entry files stay thin
+- [ ] New additions are proposed only after delete / merge / split / move options are checked
+- [ ] `copilot-instructions.md` and `AGENTS.md` keep distinct always-on roles and do not duplicate intake / routing / catalog content
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early
 - [ ] Results are verifiable at each step
@@ -163,6 +166,9 @@ You MUST use agent for each file. Do NOT read files directly.
 
 - [ ] Primitive and scope selected intentionally
 - [ ] Workflow pattern selected and confirmed with user
-- [ ] `.agent.md` file created with clear Role/Workflow/Done Criteria
+- [ ] New or updated assets have clear Role/Workflow/Done Criteria where applicable
 - [ ] Design principles checklist passed
-- [ ] Agent registered in AGENTS.md (if applicable)
+- [ ] Recommendations are classified as delete / merge / split / move / add / keep where applicable
+- [ ] Always-on instruction boundaries and DRY / SSOT risks are explicitly reviewed when `copilot-instructions.md` or `AGENTS.md` are in scope
+- [ ] New agent / workflow assets are registered in the appropriate catalog or docs when needed
+- [ ] `AGENTS.md` is updated only when shared guardrails or entry behavior need to change

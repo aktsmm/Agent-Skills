@@ -23,7 +23,7 @@
 
 5.  **フェイルファースト (Fail Fast)**:
     - 作業開始前に「Phase 0: 事前チェック」を実施してください。
-    - 主要ファイル/設定の存在確認（例: `AGENTS.md`, `.github/instructions/**`, 対象ファイルパスの検証）。
+    - 主要ファイル/設定の存在確認（例: `README.md` / `docs/**`, `.github/instructions/**`, `.github/agents/**`, 対象ファイルパスの検証）。
     - `manage_todo_list` にゲート条件を設定し、未充足なら中断・是正してから再開。
 
 ## コミュニケーションスタイル
@@ -60,9 +60,10 @@
 
 | Skill                                                            | 用途                              | トリガー                                          |
 | ---------------------------------------------------------------- | --------------------------------- | ------------------------------------------------- |
-| `agentic-workflow-guide` | ワークフロー設計・レビュー・改善  | `.github/` 配下のファイル編集、エージェント設計時 |
+| [agentic-workflow-guide](skills/agentic-workflow-guide/SKILL.md) | ワークフロー設計・レビュー・改善  | `.github/` 配下のファイル編集、エージェント設計時 |
 | skill-finder（存在する場合）                                     | Skills の検索・インストール・管理 | 新しい Skill を探すとき                           |
 
 ## ファイルマップ
 
-エージェント一覧・関連アセットの詳細は `AGENTS.md` を参照してください（存在する場合）。
+エージェント一覧・workflow map・関連アセットの詳細は `README.md` や `docs/` の catalog を参照してください（存在する場合）。
+`AGENTS.md` は shared guardrail と entry boundary の確認に使います。

@@ -50,10 +50,11 @@ For long-horizon or complex agent workflows, check:
 
 ### Required Files (If Exists)
 
-- [ ] `AGENTS.md` — Agent registry and workflow definitions（存在する場合）
+- [ ] `AGENTS.md` — Shared guardrails and entry boundaries（存在する場合）
 - [ ] `CLAUDE.md` — Anthropic Claude Code rules（存在する場合）
 - [ ] `CODEX.md` — OpenAI Codex CLI rules（存在する場合）
 - [ ] `.github/copilot-instructions.md` — GitHub Copilot global guardrails（存在する場合）
+- [ ] `README.md` / `docs/**/*.md` — Catalogs, workflow maps, and reference-only docs（存在する場合）
 - [ ] `.github/instructions/**/*.md` — All instruction files（存在する場合、`file_search` で一覧）
 - [ ] `.github/agents/*.agent.md` — All agent definitions（存在する場合、`file_search` で一覧）
 - [ ] `.github/prompts/*.prompt.md` — All prompt files（存在する場合、`file_search` で一覧）
@@ -67,7 +68,7 @@ If a specific review target is specified, you may skip unrelated files:
 | Target            | Files to Read                                                 |
 | ----------------- | ------------------------------------------------------------- |
 | Specific agent    | Target `.agent.md` + referenced `.instructions.md`            |
-| Specific workflow | Relevant section in AGENTS.md + related agent group           |
+| Specific workflow | Relevant README/docs catalog + related agent group            |
 | Prompts only      | `.github/prompts/*.prompt.md` and check for unused/duplicates |
 | Claude/Codex only | `CLAUDE.md` and/or `CODEX.md` at repository root              |
 
@@ -77,16 +78,17 @@ If a specific review target is specified, you may skip unrelated files:
 
 ### 🚀 Quick Check (Check These First)
 
-Check only 5 items first. If any ❌, proceed to detailed review:
+Check these 7 items first. If any ❌, proceed to detailed review:
 
-| #   | Check Item                                       | Detection Method                                    |
-| --- | ------------------------------------------------ | --------------------------------------------------- |
-| 1   | **SRP**: 1 agent = 1 responsibility?             | ❌ if Role cannot be stated in 1 sentence           |
-| 2   | **Fail Fast**: Error detection in first 2 steps? | ❌ if no validation in Workflow Step 1-2            |
-| 3   | **agent delegation**: Orchestrator working?      | ❌ if Workflow contains direct file-read/edit tools |
-| 4   | **SSOT**: Same definition in 2+ places?          | Use `grep_search` to detect duplicates              |
-| 5   | **Done Criteria**: Verifiable completion?        | ❌ if just "complete" without specific checklist    |
+| #   | Check Item                                       | Detection Method                                                                                           |
+| --- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| 1   | **SRP**: 1 agent = 1 responsibility?             | ❌ if Role cannot be stated in 1 sentence                                                                  |
+| 2   | **Fail Fast**: Error detection in first 2 steps? | ❌ if no validation in Workflow Step 1-2                                                                   |
+| 3   | **agent delegation**: Orchestrator working?      | ❌ if Workflow contains direct file-read/edit tools                                                        |
+| 4   | **SSOT**: Same definition in 2+ places?          | Use `grep_search` to detect duplicates                                                                     |
+| 5   | **Done Criteria**: Verifiable completion?        | ❌ if just "complete" without specific checklist                                                           |
 | 6   | **Deterministic Offload**: LLM doing pure work?  | ❌ if extract / count / validate / diff / format steps live in agent loops instead of scripts / IR / hooks |
+| 7   | **Placement**: Is the content in the right file? | ❌ if catalogs/detail live in always-loaded entry files                                                    |
 
 > Detail: see Deterministic Offload Check in `agentic-workflow-guide/references/review-checklist.md`.
 
@@ -168,9 +170,10 @@ agent({
 
 ## Cross-Reference Validation
 
-- [ ] Does AGENTS.md role description match .agent.md Role section?
+- [ ] If `AGENTS.md` exists, does it stay at shared guardrail / entry-boundary level?
 - [ ] Are prohibited operations (from instructions) not granted in Permissions?
-- [ ] No duplicate information between AGENTS.md and .agent.md? (SSOT)
+- [ ] Do README/docs catalogs carry indexes and workflow maps instead of always-loaded entry files?
+- [ ] No duplicate information between `AGENTS.md`, `.github/copilot-instructions.md`, and `.agent.md` files? (SSOT)
 - [ ] Does workflow align with project context described in README.md?
 - [ ] Does workflow respect dependencies defined in other agents?
 
@@ -180,7 +183,7 @@ agent({
 
 - [ ] No duplicate definitions (e.g., page allocation tables, keyword guidelines) across multiple files?
 - [ ] Definitions consolidated in one place with references elsewhere?
-- [ ] No rule duplication between AGENTS.md and instructions?
+- [ ] No rule duplication between always-loaded entry files and scoped instructions?
 
 ### SSOT Validation (Within-file)
 
@@ -199,8 +202,6 @@ agent({
 
 - [ ] MCP tool names are correct? (e.g., `mcp_microsoftdocs_*`)
 - [ ] File reference paths exist?
-- [ ] VS Code Markdown diagnostics are clean for local relative links?
-  - For workspace templates, check both the source template location and generated workspace location.
 - [ ] No contradictions with other instructions?
 
 ### Maintainability
@@ -226,7 +227,6 @@ agent({
 ### Consistency Check
 
 - [ ] File references in prompts point to existing files?
-- [ ] VS Code Markdown diagnostics do not report unresolved local links?
 - [ ] Output format examples match current project conventions?
 - [ ] MCP tool names are correct?
 
@@ -312,7 +312,8 @@ This prompt is generic and can be used across any repository with agent workflow
 Expected file structure:
 - Agent definitions: .github/agents/*.agent.md (or similar)
 - Instructions: .github/instructions/*.instructions.md (or similar)
-- Agent registry: AGENTS.md (recommended)
+- Agent / workflow catalog: README.md or docs/*.md (recommended)
+- Shared guardrails: AGENTS.md (optional)
 - Global rules: .github/copilot-instructions.md (optional)
 
 External References:
