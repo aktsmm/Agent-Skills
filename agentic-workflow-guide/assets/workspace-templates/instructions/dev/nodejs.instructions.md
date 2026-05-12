@@ -1,3 +1,8 @@
+---
+description: "Node.js バージョン管理とパッケージ管理のルール"
+applyTo: "**/*.{js,ts,mjs,cjs,jsx,tsx},**/package.json"
+---
+
 # Node.js Environment Instructions
 
 Node.js プロジェクトでは**バージョン管理ツールを使用**してください。直接インストールよりも柔軟に対応できます。

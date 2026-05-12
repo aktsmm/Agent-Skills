@@ -199,6 +199,8 @@ agent({
 
 - [ ] MCP tool names are correct? (e.g., `mcp_microsoftdocs_*`)
 - [ ] File reference paths exist?
+- [ ] VS Code Markdown diagnostics are clean for local relative links?
+  - For workspace templates, check both the source template location and generated workspace location.
 - [ ] No contradictions with other instructions?
 
 ### Maintainability
@@ -224,6 +226,7 @@ agent({
 ### Consistency Check
 
 - [ ] File references in prompts point to existing files?
+- [ ] VS Code Markdown diagnostics do not report unresolved local links?
 - [ ] Output format examples match current project conventions?
 - [ ] MCP tool names are correct?
 

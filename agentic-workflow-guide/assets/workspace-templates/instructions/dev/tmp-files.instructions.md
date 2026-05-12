@@ -1,4 +1,5 @@
 ---
+description: "一時ファイルの配置・命名・完了時 cleanup ルール"
 applyTo: "**"
 ---
 

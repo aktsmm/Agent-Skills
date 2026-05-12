@@ -31,7 +31,7 @@ description: 複数エージェントのオーケストレーション計画
    - Goal: ユーザーの要望を整理し、必要なら新規エージェント作成を提案する。
    - Output: `docs/requirements.md`（要件の叩き台）
 2. **Step 2: 実装計画**
-   - Agent: `.github/agents/sample.agent.md`（※用途に応じて適切なエージェントに差し替え）
+  - Agent: `.github/agents/templates/sample-agent.md`（※用途に応じて適切なエージェントに差し替え）
    - Input: Step 1 の `docs/requirements.md`
    - Goal: 実装方針を `docs/plan.md` にまとめる。
 

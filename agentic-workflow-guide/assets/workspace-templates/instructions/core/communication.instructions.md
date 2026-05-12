@@ -1,4 +1,5 @@
 ---
+description: "ユーザー応答・確認・エラー報告のコミュニケーションルール"
 applyTo: "**"
 ---
 
@@ -89,7 +90,7 @@ Aを使用することを推奨します。
 ### コード参照
 
 - 具体的な行番号やシンボル名を明記してください。
-- 例: `[handler.ts#L42](src/handler.ts#L42)` の `processRequest` メソッド
+- 例: `src/handler.ts#L42` の `processRequest` メソッド
 
 ### 外部リソース
 

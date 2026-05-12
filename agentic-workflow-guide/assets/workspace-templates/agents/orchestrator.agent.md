@@ -1,4 +1,3 @@
-```chatagent
 ---
 name: orchestrator
 description: サブエージェントを統括する司令塔
@@ -10,7 +9,8 @@ tools: ["agent", "read", "search", "todo"]
 このファイルはオーケストレーターエージェントの **日本語テンプレート** です。
 
 → **正本（SSOT）**: 詳細な英語版は以下を参照してください:
-  - [../../references/examples/orchestrator.agent.md](../../references/examples/orchestrator.agent.md)
+
+- [../../../references/examples/orchestrator.agent.md](../../../references/examples/orchestrator.agent.md)
 
 ## Role
 
@@ -38,11 +38,10 @@ tools: ["agent", "read", "search", "todo"]
 
 1. **Analyze** → 2. **Plan** → 3. **Delegate** (agent) → 4. **Monitor** → 5. **Report**
 
-→ 詳細な Workflow、I/O Contract、Error Handling は [正本](../../references/examples/orchestrator.agent.md) を参照
+→ 詳細な Workflow、I/O Contract、Error Handling は [正本](../../../references/examples/orchestrator.agent.md) を参照
 
 ## References
 
 - [Git Rules](../instructions/dev/git.instructions.md)（存在する場合）
 - [Terminal Rules](../instructions/dev/terminal.instructions.md)（存在する場合）
 - [Security Rules](../instructions/core/security.instructions.md)（存在する場合）
-```

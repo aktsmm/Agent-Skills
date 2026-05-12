@@ -1,3 +1,8 @@
+---
+description: "Git 操作と Conventional Commits のルール"
+applyTo: "**"
+---
+
 # Git Commit Instructions
 
 このプロジェクトでは **Conventional Commits** に従ったコミットメッセージを必須とします。

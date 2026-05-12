@@ -1,3 +1,8 @@
+---
+description: "外部参照・出典確認・レビュー根拠の扱い"
+applyTo: "**"
+---
+
 # External References (Prompts / Reviews) — Summary Instructions
 
 このファイルは、README の External References を実務に落とし込むための要点まとめ。各 URL は必ず参照元として残し、詳細は原文を確認する。

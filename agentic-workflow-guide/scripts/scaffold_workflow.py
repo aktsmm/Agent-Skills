@@ -24,6 +24,91 @@ THRESHOLDS = {
     "step_count_warning": 5,
 }
 
+FRONTMATTER_RE = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.DOTALL)
+
+
+def yaml_quote(value: str) -> str:
+    return '"' + value.replace('"', '\\"') + '"'
+
+
+def infer_description(path: Path, content: str) -> str:
+    for line in content.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("# "):
+            return stripped.lstrip("#").strip()
+    return path.stem.replace("-", " ").replace("_", " ")
+
+
+def infer_instruction_apply_to(path: Path) -> str:
+    path_text = path.as_posix()
+    name = path.name
+    if "/instructions/agents/" in path_text:
+        return ".github/agents/**"
+    if "/instructions/prompts/" in path_text:
+        return ".github/prompts/**"
+    if name == "python.instructions.md":
+        return "**/*.py,**/pyproject.toml,**/requirements*.txt"
+    if name == "nodejs.instructions.md":
+        return "**/*.{js,ts,mjs,cjs,jsx,tsx},**/package.json"
+    return "**"
+
+
+def normalize_customization_content(path: Path, content: str) -> str:
+    """Ensure generated customization files have VS Code-readable frontmatter."""
+    is_agent = path.name.endswith(".agent.md")
+    is_prompt = path.name.endswith(".prompt.md")
+    is_instruction = path.name.endswith(".instructions.md")
+    if not (is_agent or is_prompt or is_instruction):
+        return content
+
+    description = infer_description(path, content)
+    match = FRONTMATTER_RE.match(content)
+    if match:
+        front = match.group(1)
+        additions: list[str] = []
+        if not re.search(r"(?m)^description\s*:", front):
+            additions.append(f"description: {yaml_quote(description)}")
+        if is_instruction and not re.search(r"(?m)^applyTo\s*:", front):
+            additions.append(f"applyTo: {yaml_quote(infer_instruction_apply_to(path))}")
+        if is_agent and not re.search(r"(?m)^name\s*:", front):
+            agent_name = path.name[: -len(".agent.md")]
+            additions.append(f"name: {agent_name}")
+        if not additions:
+            return content
+        insert_at = match.start(1)
+        return content[:insert_at] + "\n".join(additions) + "\n" + content[insert_at:]
+
+    lines: list[str] = ["---"]
+    if is_agent:
+        agent_name = path.name[: -len(".agent.md")]
+        lines.append(f"name: {agent_name}")
+    lines.append(f"description: {yaml_quote(description)}")
+    if is_instruction:
+        lines.append(f"applyTo: {yaml_quote(infer_instruction_apply_to(path))}")
+    lines.append("---")
+    return "\n".join(lines) + "\n\n" + content
+
+
+def rewrite_full_workspace_links(base_path: Path) -> None:
+    replacements = {
+        Path(".github/agents/orchestrator.agent.md"): {
+            "../../../references/": "../../references/",
+        },
+        Path(".github/instructions/agents/agent-design.instructions.md"): {
+            "../../../../references/": "../../../references/",
+        },
+    }
+    for relative_path, path_replacements in replacements.items():
+        path = base_path / relative_path
+        if not path.exists():
+            continue
+        content = path.read_text(encoding="utf-8")
+        updated = content
+        for source, target in path_replacements.items():
+            updated = updated.replace(source, target)
+        if updated != content:
+            path.write_text(updated, encoding="utf-8")
+
 
 def lint_files(path: str) -> None:
     """Lint prompt/agent files for complexity thresholds."""
@@ -1818,6 +1903,7 @@ def create_structure(base_path: Path, structure: dict, workflow_name: str):
                 task_description="",
                 output_format=""
             )
+            file_content = normalize_customization_content(path, file_content)
             path.write_text(file_content, encoding="utf-8")
 
 
@@ -1882,6 +1968,7 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
             good_example="",
             bad_example=""
         )
+        content = normalize_customization_content(file_path, content)
         file_path.write_text(content, encoding="utf-8")
     
     # Generate extended instructions if requested
@@ -1890,7 +1977,8 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
         for filename, template in EXTENDED_INSTRUCTIONS.items():
             file_path = base_path / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            file_path.write_text(template, encoding="utf-8")
+            content = normalize_customization_content(file_path, template)
+            file_path.write_text(content, encoding="utf-8")
     
     # Copy full workspace templates if requested
     if full_workspace:
@@ -1918,11 +2006,20 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
                 src_folder = templates_dir / folder
                 dst_folder = github_dir / folder
                 if src_folder.exists():
-                    if dst_folder.exists():
-                        shutil.rmtree(dst_folder)
-                    shutil.copytree(src_folder, dst_folder)
+                    shutil.copytree(src_folder, dst_folder, dirs_exist_ok=True)
                     file_count = len(list(dst_folder.rglob("*")))
                     print(f"   📁 {folder}/ ({file_count} files)")
+
+            src_references = script_dir.parent / "references"
+            dst_references = base_path / "references"
+            if src_references.exists():
+                if dst_references.exists():
+                    shutil.rmtree(dst_references)
+                shutil.copytree(src_references, dst_references)
+                file_count = len(list(dst_references.rglob("*")))
+                print(f"   📁 references/ ({file_count} files)")
+
+            rewrite_full_workspace_links(base_path)
     
     # Generate README.md
     readme_content = f'''# {name}
@@ -2049,7 +2146,7 @@ def main():
     parser.add_argument(
         "--full-workspace", "-f",
         action="store_true",
-        help="Copy full workspace templates (agents, instructions, prompts) from bundled assets"
+        help="Copy full workspace templates (agents, instructions, prompts, references) from bundled assets"
     )
     parser.add_argument(
         "--lint",

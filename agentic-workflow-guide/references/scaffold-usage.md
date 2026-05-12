@@ -34,6 +34,7 @@ python scripts/scaffold_workflow.py --list-patterns
 ```
 my-workflow/
 ├── README.md                       # Usage guide
+├── references/                     # Shared design references (full workspace mode)
 ├── .github/
 │   ├── copilot-instructions.md    # GitHub Copilot instructions
 │   ├── agents/                     # Custom agent definitions
@@ -50,6 +51,7 @@ my-workflow/
 ```
 
 **Note**: Custom agents use `.agent.md` extension in `.github/agents/` directory (VS Code 1.106+).
+`--full-workspace` also copies `references/` so bundled templates can keep their SSOT links valid after generation.
 
 ## Pattern Selection
 

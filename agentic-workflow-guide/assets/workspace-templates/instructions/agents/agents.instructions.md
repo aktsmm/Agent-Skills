@@ -1,4 +1,5 @@
 ---
+description: ".github/agents 配下の agent 定義編集ルール"
 applyTo: ".github/agents/**"
 ---
 

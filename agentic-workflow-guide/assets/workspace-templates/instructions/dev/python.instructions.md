@@ -1,3 +1,8 @@
+---
+description: "Python 仮想環境と依存管理のルール"
+applyTo: "**/*.py,**/pyproject.toml,**/requirements*.txt"
+---
+
 # Python Environment Instructions
 
 Python プロジェクトでは**必ず仮想環境を使用**してください。グローバル環境への直接インストールは禁止です。

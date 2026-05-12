@@ -1,3 +1,8 @@
+---
+description: "機密情報・外部API・入力検証のセキュリティルール"
+applyTo: "**"
+---
+
 # Security Instructions
 
 エージェントがコードを生成・操作する際のセキュリティガイドラインです。
