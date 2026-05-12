@@ -277,7 +277,7 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Are large files (>200 lines) well-structured with TOC?
 - [ ] Is there orphaned documentation no longer referenced?
 - [ ] Do VS Code Markdown diagnostics pass for local relative links?
-    → For workspace templates, check both the template source location and the generated workspace location.
+      → For workspace templates, check both the template source location and the generated workspace location.
 
 ## Scripts (scripts/)
 

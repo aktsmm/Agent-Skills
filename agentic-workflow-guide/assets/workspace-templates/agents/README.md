@@ -3,8 +3,10 @@
 Copilot で扱う構造化エージェントのマニフェストを置く場所だよ。テンプレとしてこのフォルダをコピーする場合は、以下の手順でエージェントを追加してね。
 
 1. `*.agent.md` 形式でエージェントを定義する。
-  - `templates/sample-agent.md` — 最小構成の例（Role/Goals/Permissions/References/Workflow 構成）
-   - `orchestrator.agent.md` — サブエージェントを統括する司令塔の例
+
+- `templates/sample-agent.md` — 最小構成の例（Role/Goals/Permissions/References/Workflow 構成）
+- `orchestrator.agent.md` — サブエージェントを統括する司令塔の例
+
 2. `AGENTS.md` に行を追加して、ここに置いたマニフェストへリンクさせる。
 3. 必要に応じて `.github/copilot-instructions.md` から読み込む（存在する場合）。
 4. agent（旧 runSubagent）を使うときは「コンテキスト隔離」が主目的。計画 → 実装 → レビューのように工程を分ける用途に向いている一方、軽いタスクには向かないのでツール選択欄に書きすぎない。

@@ -1,6 +1,6 @@
 ---
 name: azure-advisor-report
-description: "Generate customer-facing Azure environment reports (Markdown + PowerPoint) from Azure Advisor and Cost Management API, including recommendations, cost trends, and security/reliability sections. Use when creating Advisor reports, Azure monthly reports, subscription reports, Azure環境レポート, or 顧客向け Azure レポート."
+description: "Generate Azure environment monthly report (Markdown + PowerPoint) from Azure Advisor and Cost Management API. Use when creating Advisor recommendations report, cost trend analysis, or security/reliability assessment for a customer subscription. Triggers on 'Advisor report', 'Azure monthly report', 'subscription report', 'Azure環境レポート', '簡易月次レポート'."
 argument-hint: "Subscription ID(s) and Tenant ID(s), optionally target month (e.g., 2026-04)"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -73,7 +73,7 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 3. **🔴 エグゼクティブサマリー**（優先度 🔴🟡⚪ 付き重要ポイント）
 4. **💰 コスト最適化（Cost）**（Advisor Cost 件数 + 推定削減ポテンシャル + 代表リソース名）
 5. **🔒 セキュリティ（Security）**（Advisor Security 件数 + 重要度分析）
-6. **🛡️ 信頼性・可用性（Reliability）**（Advisor Reliability 件数 + Zone冗長/Backup 改善提案）
+6. **⚡ 信頼性・可用性（Reliability）**（Advisor Reliability 件数 + Zone冗長/Backup 改善提案）
 7. **⚙️ オペレーショナルエクセレンス**（Advisor OpEx 件数。**必ず取得すること**。「未取得」「次回予定」は禁止。結果が0件なら「0件（推奨なし）」と記載）
 8. **📊 全体サマリー**（サブスク × カテゴリ一覧 + グループ別集計）
 9. **🎯 推奨アクション（優先順）**（優先度付き・具体的・actionable）
@@ -89,15 +89,13 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
   - PowerShell は DateTime 型の自動変換で `.SubString()` エラーが頻発するため回避
 - Cost Management API は **JPY**（日本リージョン）、C360 CSV は **USD** — 通貨を必ず明示
 
-### 出力先のフォルダ配置
-
-- 顧客管理フォルダがある場合、ファイル作成前に **顧客マッピング定義** で正しいフォルダ名を確認する
-- 類似名の別顧客フォルダに誤配置しないこと（例: 富士通 ≠ 富士ソフト）
-
 ### PPTX 生成のルール
 
 - **スライドノート必須**: 全コンテンツスライドに `add_notes()` で詳細な説明ノートを追加すること
   - データソース、キーテイクアウェイ、推奨アクション、プレゼンター向けの補足情報を含む
+- **データソース取得日必須**: PowerPoint の表紙または補足で、各データソースの取得日を明示すること
+- **ワイドスクリーン PPTX のフォントサイズ下限**: テーブル本文 11pt / ibox 本文 11pt / セクションラベル 13pt / スライドタイトル 24pt 以上。10pt 以下はスライドサイズに対して読みにくい
+- **テーブル列幅の明示指定**: 番号・件数・影響度のような短い列はデフォルト等幅だと無駄に広くなる。`col_widths` パラメータで短い列を狭め、推奨事項・リソース名列に幅を配分する
 - **出力ファイル名**: 一時ファイル名（`.tmp.pptx`）で生成し、成功後にリネーム
   - VS Code / PowerPoint のプレビューによる PermissionError を回避
 - **テンプレート流用**: ヘルパー関数（add_notes, add_shape_bg, tb, ap, tbl, hdr, ibox）のみ流用し、スライドデータ部分は新規記述
