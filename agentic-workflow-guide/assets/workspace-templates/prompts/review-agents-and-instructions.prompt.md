@@ -207,6 +207,7 @@ agent({
 ### Consistency Check
 
 - [ ] MCP tool names are correct? (e.g., `mcp_microsoftdocs_*`)
+- [ ] Frontmatter is valid for the file type and required fields are present?
 - [ ] File reference paths exist?
 - [ ] No contradictions with other instructions?
 
@@ -232,6 +233,7 @@ agent({
 
 ### Consistency Check
 
+- [ ] Frontmatter is valid for the file type and required fields are present?
 - [ ] File references in prompts point to existing files?
 - [ ] Output format examples match current project conventions?
 - [ ] MCP tool names are correct?

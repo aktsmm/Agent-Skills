@@ -163,6 +163,8 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Is there a mechanism to reflect updates across the entire system?
 - [ ] Are central rules (AGENTS.md, shared config) propagated to each worker `.agent.md`?
 - [ ] When a central rule is added/changed, are all referencing files updated simultaneously?
+- [ ] Do customization files keep file-type-appropriate frontmatter, without missing required fields or using unsupported properties?
+- [ ] Do relative Markdown links resolve to existing local files?
 
 ## SRP (Single Responsibility Principle)
 
