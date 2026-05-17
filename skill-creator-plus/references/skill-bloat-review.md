@@ -32,6 +32,7 @@ Use this order every time:
 - Sections longer than roughly 40-50 lines
 - Large examples, schemas, command catalogs, or recipes
 - Long external link lists
+- Markdown-linked catalogs inside always-loaded entry files such as `copilot-instructions.md` or `AGENTS.md`
 - Variant-specific guidance that not every invocation needs
 - Repo-global instruction files that started absorbing domain-specific workflow detail
 
@@ -51,6 +52,7 @@ Use this order every time:
 - Line count grows while the core workflow becomes harder to find
 - A workspace entry file such as `copilot-instructions.md` starts acting like a full operations manual
 - Persona rules, routing rules, and domain workflow rules are mixed in one always-loaded file
+- An always-loaded entry file becomes a Markdown-linked directory of rules, agents, or docs
 
 ## Keep vs Move
 
@@ -61,6 +63,13 @@ Use this order every time:
 | Core workflow                     | Implementation variants |
 | Misuse-prevention decision points | Long examples           |
 | Minimal review gates              | Link collections        |
+
+## Entry File Note
+
+For always-loaded entry files such as `copilot-instructions.md` and `AGENTS.md`, a short body is not enough.
+
+- If the file becomes a Markdown-linked index, treat it as bloat even when line count still looks reasonable
+- Prefer a one-line pointer to `instructions/`, `README`, or `docs` over a linked catalog in the entry file
 
 ## Decision Questions
 

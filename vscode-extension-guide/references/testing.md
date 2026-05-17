@@ -156,14 +156,14 @@ npm test
 
 Run a full compile first, then add targeted checks based on what changed.
 
-| Change area                                   | Extra checks                                                                                                                          |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Commands / settings / views in `package.json` | Verify manifest consistency, command IDs, setting keys, menu `when` clauses, and README setting tables                                |
-| `package.nls.json` or localized manifest text | Compare all localized key sets and confirm missing keys fail tests                                                                    |
-| Runtime logging / diagnostics                 | Verify logs go through an Output Channel logger instead of direct `console.*` calls in extension runtime paths                        |
+| Change area                                   | Extra checks                                                                                                                                                                                                                                         |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Commands / settings / views in `package.json` | Verify manifest consistency, command IDs, setting keys, menu `when` clauses, and README setting tables                                                                                                                                               |
+| `package.nls.json` or localized manifest text | Compare all localized key sets and confirm missing keys fail tests                                                                                                                                                                                   |
+| Runtime logging / diagnostics                 | Verify logs go through an Output Channel logger instead of direct `console.*` calls in extension runtime paths                                                                                                                                       |
 | Resource scanners / providers                 | Test with extension-host APIs available and with missing/empty roots; avoid relying on local filesystem guesses; if you scan installed extensions, cover both known `resources/*` roots and manifest-declared `chatAgents` / `chatPromptFiles` paths |
-| Installer / updater / index merge logic       | Run focused regression scripts plus a broader smoke test because these paths often cross manifest, filesystem, and network boundaries |
-| Generated marker sections                     | Test duplicate marker handling and confirm the final file contains exactly one generated section pair                                 |
+| Installer / updater / index merge logic       | Run focused regression scripts plus a broader smoke test because these paths often cross manifest, filesystem, and network boundaries                                                                                                                |
+| Generated marker sections                     | Test duplicate marker handling and confirm the final file contains exactly one generated section pair                                                                                                                                                |
 
 For small fixes, a good baseline is `npm run compile` plus the smallest script or test file that exercises the changed behavior. For shared manifest, installer, updater, or scanner code, prefer adding one regression test over relying only on manual verification.
 

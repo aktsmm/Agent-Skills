@@ -278,6 +278,7 @@ For always-loaded workspace entry files such as `.github/copilot-instructions.md
 
 - Keep only repo-wide routing and a few global guardrails in the entry file
 - Move domain workflows, review rules, upload procedures, and long failure playbooks into dedicated `.github/instructions/**/*.instructions.md`
+- Do not turn the entry file into a Markdown-linked index of rules, skills, or docs. Even when the body stays short, linked references can still make the entry behave like a heavy context surface
 - If the entry file starts mixing persona, routing, workflow details, and domain-specific prohibitions, treat that as context-hoarding rather than good documentation
 - If removing or renaming the entry file suddenly makes casual chat behave normally again, that is a strong signal the entry file has become too heavy for its role
 
@@ -353,12 +354,13 @@ Duplicate content across global and workspace scopes doubles token cost.
 
 ### Red Flags
 
-| Smell | Why it hurts |
-| --- | --- |
-| `.github/copilot-instructions.md` keeps absorbing workflow-specific sections | The file is loaded too often to be a safe place for deep procedure detail |
-| The same rule appears in the entry file and again in domain instructions | Duplicate always-loaded guidance increases token cost and conflict risk |
+| Smell                                                                                | Why it hurts                                                                             |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `.github/copilot-instructions.md` keeps absorbing workflow-specific sections         | The file is loaded too often to be a safe place for deep procedure detail                |
+| The same rule appears in the entry file and again in domain instructions             | Duplicate always-loaded guidance increases token cost and conflict risk                  |
+| The entry file becomes a Markdown-linked catalog of instructions, agents, or docs    | Even with a short body, the entry can still act like a large retrieval surface           |
 | Persona, routing, task policy, and domain-specific operations are all mixed together | The agent spends context budget resolving instruction priority before it can do the task |
-| Casual chat improves only after disabling the workspace entry file | The entry file is likely over-scoped rather than merely verbose |
+| Casual chat improves only after disabling the workspace entry file                   | The entry file is likely over-scoped rather than merely verbose                          |
 
 ### Diagnosis Order
 
@@ -368,7 +370,8 @@ Check in this order:
 
 1. Is the always-loaded workspace entry file (`.github/copilot-instructions.md`) trying to do too many jobs at once?
 2. Is the same rule duplicated across entry file, domain instructions, and prompt / agent assets?
-3. Only after that, check whether `AGENTS.md` and agent definitions disagree about workflow entry points or role boundaries.
+3. Has the entry file become a Markdown-linked index that keeps pulling deeper material into the conversational surface?
+4. Only after that, check whether `AGENTS.md` and agent definitions disagree about workflow entry points or role boundaries.
 
 Reason:
 
