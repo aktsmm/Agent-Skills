@@ -89,6 +89,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 - Extension Host 上で動く scanner / provider / TreeView は、同じことができるなら Node 固有の `path` / `Buffer` / 生 `fs` より VS Code API を優先する。Problems と実ビルドの環境差を避けやすい。
 - 自分の拡張に同梱したリソースは、ユーザーのホーム配下や VS Code のインストール先を推測せず、`context.extensionUri` と `vscode.Uri.joinPath` など extension context から解決する。
+- 他の installed extension に同梱されたリソースを読む必要がある場合も、`resources/agents|skills|prompts|instructions|hooks|mcp` の既知 root と、manifest の `chatAgents` / `chatPromptFiles` 宣言を優先して見る。built-in resource とは別の read-only resource として扱い、削除や再インストール導線を混ぜない。
 - Runtime の診断ログは `console.log` に散らさず、Output Channel ベースの logger に集約する。ユーザーがログを開ける導線も command / notification / README のどこかに用意する。
 
 ### Manifest / Docs / Localization
