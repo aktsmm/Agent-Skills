@@ -60,13 +60,13 @@ YYYY-MM-DD-国コード-金額[-カード]-分類.ext
 
 ```powershell
 # Dry-run（確認のみ、ファイル移動なし）
-python receipt_sorter.py --project "202602_TechConnect_Seattle" --dry-run
+python receipt_sorter.py --project "202602_Domestic_Trip" --dry-run
 
 # 本実行
-python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "incoming\unassigned"
+python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming\unassigned"
 
 # ログ指定
-python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "incoming\unassigned" --log "result.csv"
+python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming\unassigned" --log "result.csv"
 ```
 
 ### Options

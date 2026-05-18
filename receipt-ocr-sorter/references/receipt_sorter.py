@@ -3,9 +3,9 @@
 receipt_sorter.py - OCR領収書自動仕分けツール
 
 Usage:
-  python receipt_sorter.py --project "202602_TechConnect_Seattle"
-  python receipt_sorter.py --project "202602_TechConnect_Seattle" --dry-run
-    python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "incoming/unassigned"
+    python receipt_sorter.py --project "202602_Domestic_Trip"
+    python receipt_sorter.py --project "202602_Domestic_Trip" --dry-run
+    python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming/unassigned"
 """
 
 import sys
@@ -717,12 +717,12 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 例:
-  python receipt_sorter.py --project "202602_TechConnect_Seattle"
-  python receipt_sorter.py --project "202602_TechConnect_Seattle" --dry-run
-    python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "incoming/unassigned"
+    python receipt_sorter.py --project "202602_Domestic_Trip"
+    python receipt_sorter.py --project "202602_Domestic_Trip" --dry-run
+    python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming/unassigned"
 """)
     parser.add_argument("--project",  required=True,
-                        help='出力プロジェクトフォルダ名 (例: 202602_TechConnect_Seattle)')
+                                                help='出力プロジェクトフォルダ名 (例: 202602_Domestic_Trip)')
     parser.add_argument("--input",    default=None,
                                                 help=f"入力フォルダ (デフォルト: incoming/unassigned/)")
     parser.add_argument("--dry-run",  action="store_true",
