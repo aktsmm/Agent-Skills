@@ -5,7 +5,7 @@ receipt_sorter.py - OCR領収書自動仕分けツール
 Usage:
   python receipt_sorter.py --project "202602_TechConnect_Seattle"
   python receipt_sorter.py --project "202602_TechConnect_Seattle" --dry-run
-  python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "未仕分け/iCloud写真"
+    python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "incoming/unassigned"
 """
 
 import sys
@@ -32,7 +32,7 @@ if sys.stderr.encoding.lower() not in ("utf-8", "utf8"):
 
 # ── ディレクトリ設定 ──────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
-DEFAULT_INPUT = BASE_DIR / "未仕分け"
+DEFAULT_INPUT = BASE_DIR / "incoming" / "unassigned"
 UNCLASSIFIED_NAME = "未分類"
 
 SUPPORTED_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".tif"}
@@ -719,12 +719,12 @@ def main():
 例:
   python receipt_sorter.py --project "202602_TechConnect_Seattle"
   python receipt_sorter.py --project "202602_TechConnect_Seattle" --dry-run
-  python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "未仕分け/iCloud写真"
+    python receipt_sorter.py --project "202602_TechConnect_Seattle" --input "incoming/unassigned"
 """)
     parser.add_argument("--project",  required=True,
                         help='出力プロジェクトフォルダ名 (例: 202602_TechConnect_Seattle)')
     parser.add_argument("--input",    default=None,
-                        help=f"入力フォルダ (デフォルト: 未仕分け/)")
+                                                help=f"入力フォルダ (デフォルト: incoming/unassigned/)")
     parser.add_argument("--dry-run",  action="store_true",
                         help="実際にファイルを移動せず結果のみ表示")
     parser.add_argument("--log",      default=None,

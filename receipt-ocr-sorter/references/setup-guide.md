@@ -55,6 +55,19 @@ ffmpeg -version
 `receipt_sorter.py` をワークスペースルートに配置する。
 Skill の `references/receipt_sorter.py` にリファレンスコピーがある。
 
+## Step 6: Intake Folder を決める
+
+未分類の生ファイルは、workspace root に置かず専用の intake folder に集約する。
+
+例:
+
+```text
+incoming/unassigned/
+```
+
+- 案件が確定しているファイルは intake folder を経由せず、対象の project folder に直接置いてよい
+- dry-run 用のコピーや検証入力は一時フォルダで扱い、完了後に削除する
+
 ## 環境変数
 
 | 変数 | 値 | 説明 |
