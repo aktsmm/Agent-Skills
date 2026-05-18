@@ -33,6 +33,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [retro-copilot](retro-copilot/)                         | Reflect session learnings into ~/.copilot assets / `.copilot` 資産へのレトロ反映                              |
 | [skill-creator-plus](skill-creator-plus/)               | Design, review, and fix Agent Skills with better triggering / スキル設計・レビュー・発火改善                  |
 | [skill-finder](skill-finder/)                           | Search skills and route to the right customization primitive / スキル検索と customization 振り分け            |
+| [web-accessibility](web-accessibility/)                 | Build and review accessible web products with WCAG 2.2 AA / Web アクセシビリティ実装・レビュー               |
 | [vscode-extension-guide](vscode-extension-guide/)       | VS Code extension development guide / VS Code 拡張機能開発ガイド                                              |
 
 ## Usage / 使い方
