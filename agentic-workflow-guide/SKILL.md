@@ -1,7 +1,7 @@
 ---
 name: agentic-workflow-guide
-description: "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for any .agent.md file work, workflow architecture, orchestration planning, or when agent workflows may be overkill. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計', 'orchestrator'."
-argument-hint: "作りたい .agent.md、設計したい workflow、または困っている症状"
+description: "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for .agent.md / .instructions.md / .prompt.md / AGENTS.md work, workflow architecture, orchestration planning, or when agent workflows may be overkill. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計', 'orchestrator'."
+argument-hint: "作りたい .agent.md / .instructions.md / .prompt.md / AGENTS.md、設計したい workflow、または困っている症状"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -33,7 +33,7 @@ Selection details: [references/customization-decision.md](references/customizati
 
 | Action     | Triggers                                                                      |
 | ---------- | ----------------------------------------------------------------------------- |
-| **Create** | New `.agent.md`, workflow architecture, scaffolding                           |
+| **Create** | New `.agent.md`, `.instructions.md`, `.prompt.md`, `AGENTS.md`, or workflow architecture |
 | **Review** | Orchestrator not delegating, design principle check, context overflow         |
 | **Update** | Adding Handoffs, improving delegation, tool configuration                     |
 | **Debug**  | Agent not found, subagent not working, picker visibility, access control      |
@@ -157,7 +157,6 @@ Full checklist: [references/review-checklist.md](references/review-checklist.md)
 | Handoffs / placement   | [references/handoffs-guide.md](references/handoffs-guide.md), [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |
 | Hooks                  | [references/hooks-guide.md](references/hooks-guide.md)                                                                                     |
 | Evaluation             | [references/agent-evaluation.md](references/agent-evaluation.md)                                                                           |
-| Examples / scaffold    | [references/scaffold-usage.md](references/scaffold-usage.md), [references/examples/](references/examples/)                                 |
 | External links         | [references/external-resources.md](references/external-resources.md)                                                                       |
 
 ## External References
