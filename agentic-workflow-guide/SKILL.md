@@ -78,6 +78,12 @@ Pattern details: [references/workflow-patterns/overview.md](references/workflow-
 7. **Implement and iterate**
    最初から完成形を狙わず、弱い箇所を見つけて詰める。
 
+## Rule Placement
+
+- 汎用的な workflow 設計原則は、この SKILL と `references/` を SSOT にする。
+- repo local の `.instructions.md` には workspace 固有の差分だけを残す。差分が無い generic instruction は merge back して削除候補にする。
+- IR は原則 in-memory で扱う。validator、script、deterministic handoff が必要な場合だけ中間 file を materialize し、不要になったら片付ける。
+
 ## Escalation Rules
 
 - **L0**: Single Prompt
@@ -120,6 +126,7 @@ Lightweight inputs such as greetings, short Q&A, and numeric-only replies should
 - [ ] Primitive choice is simpler than agent if possible
 - [ ] Placement is appropriate and always-loaded entry files stay thin
 - [ ] New additions are proposed only after delete / merge / split / move options are checked
+- [ ] Repo-local design instructions keep workspace-specific delta only; generic guidance lives in this skill or its references
 - [ ] Frontmatter review validates file-type-specific supported and unsupported properties, not just missing fields
 - [ ] `copilot-instructions.md` and `AGENTS.md` keep distinct always-on roles and do not duplicate intake / routing / catalog content
 - [ ] always-loaded entries do not combine strong directive wording with catalogs or reference inventories
@@ -131,6 +138,7 @@ Lightweight inputs such as greetings, short Q&A, and numeric-only replies should
 - [ ] Context can be compacted or split before adding more orchestration
 - [ ] catalogs and workflow maps are separated from always-loaded entry files
 - [ ] Deterministic parts are offloaded to scripts / IR / hooks (not LLM loops)
+- [ ] File-based IR is introduced only when deterministic handoff requires it, and cleanup is defined
 
 Full checklist: [references/review-checklist.md](references/review-checklist.md)
 

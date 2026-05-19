@@ -218,7 +218,7 @@ External References (Optional):
 
 1. **Learning**: Subagent calls should include explicit success criteria
    - Evidence: `agent` returned ambiguous result; caller couldn't determine if task succeeded
-   - Action: → `.github/instructions/agents/agent-design.instructions.md`
+   - Action: → `.github/instructions/agents.instructions.md`
 
 2. **Learning**: Always validate subagent output format before processing
    - Evidence: Subagent returned prose instead of expected JSON, causing parse error
@@ -226,7 +226,7 @@ External References (Optional):
 
 ## Changes
 
-**File: `.github/instructions/agents/agent-design.instructions.md`**
+**File: `.github/instructions/agents.instructions.md`**
 
 Add to "Orchestrator" section:
 

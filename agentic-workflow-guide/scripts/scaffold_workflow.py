@@ -94,9 +94,6 @@ def rewrite_full_workspace_links(base_path: Path) -> None:
         Path(".github/agents/orchestrator.agent.md"): {
             "../../../references/": "../../references/",
         },
-        Path(".github/instructions/agents/agent-design.instructions.md"): {
-            "../../../../references/": "../../../references/",
-        },
     }
     for relative_path, path_replacements in replacements.items():
         path = base_path / relative_path
@@ -794,55 +791,6 @@ architecture:
 
 # Extended instruction templates (optional, generated with --include-instructions flag)
 EXTENDED_INSTRUCTIONS = {
-    ".github/instructions/agent-design.instructions.md": '''---
-applyTo: "**"
----
-
-# Agent Workflow Design Instructions
-
-## Part 1: Agent Design Principles
-
-### 1. Single Responsibility Principle (SRP)
-- **1 Agent, 1 Goal**: Give each agent one clearly defined role.
-- **Separation of Roles**: Separate by phase: "planning", "implementation", "review", "testing".
-
-### 2. Stateless & Idempotency
-- Design agents to judge based on file system state, not conversation history.
-- Design workflows to converge to correct state when re-run.
-
-### 3. Orchestration
-- For complex tasks, use "manager agent" delegating to "worker agents".
-- Clearly define expected deliverables for handoffs.
-
-### 4. Fail-safe & Human-in-the-loop
-- Before irreversible operations, ask human confirmation.
-- Design prompts to analyze errors and attempt fixes.
-
-### 5. Observability
-- Record decisions as Issue comments or documents.
-- For long tasks, have regular status reports.
-
-## Part 2: Workflow Architecture
-
-### 6. Two-stage Architecture
-Input → IR (Intermediate Representation) → Output
-
-### 7. IR Specification
-- Define allowed structure (JSON/YAML/structured Markdown)
-- Strict validation; do not auto-complete
-
-### 8. Separation of Concerns
-| Responsibility | Description |
-|---------------|-------------|
-| Generate | Generate IR |
-| Validate | Verify IR |
-| Transform | Convert IR to output |
-| Render | Output to final format |
-
-### 9. Determinism
-Same IR → Same output. No creativity in transformation.
-''',
-    
     ".github/instructions/communication.instructions.md": '''---
 applyTo: "**"
 ---
@@ -1719,7 +1667,6 @@ def main():
             print(f"    {info['description']}")
             print()
         print("Extended instructions (use --include-instructions):")
-        print("  - agent-design.instructions.md")
         print("  - communication.instructions.md")
         print("  - git.instructions.md")
         print("  - terminal.instructions.md")

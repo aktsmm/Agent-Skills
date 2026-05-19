@@ -55,7 +55,6 @@ instructions/
 │   ├── nodejs.instructions.md             # Node.js環境設定
 │   └── tmp-files.instructions.md          # 一時ファイル管理
 ├── agents/                                # エージェント設計系
-│   ├── agent-design.instructions.md       # 設計原則
 │   └── agents.instructions.md             # .github/agents 向けルール
 └── integrations/                          # 外部連携系
     └── microsoft-docs.instructions.md     # MS Docs MCP連携
@@ -67,7 +66,7 @@ instructions/
 | --------------- | -------------------------- | ----------------------------- |
 | `core/`         | 全エージェント共通のルール | レビュー規約、命名規則        |
 | `dev/`          | 開発ツール操作のルール     | Docker, npm, pytest, tmp管理  |
-| `agents/`       | エージェント設計・運用     | オーケストレーション、IR 設計 |
+| `agents/`       | `.github/agents/` 向け差分 | repo 固有の local delta       |
 | `integrations/` | 外部サービス連携           | Azure CLI, GitHub API, OpenAI |
 
 ## カスタマイズ

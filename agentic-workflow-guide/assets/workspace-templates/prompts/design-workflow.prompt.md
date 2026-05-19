@@ -9,9 +9,8 @@ description: 新しいエージェントワークフローの設計
 
 ## 前提条件
 
-- 参照: `.github/instructions/agents/agent-design.instructions.md` (オーケストレーションの原則、存在する場合)
-
-> 参照ファイルが無い場合は、ユーザーに追加要件を確認し、ここに書かれた指示のみで設計する。
+- 利用可能なら workflow design skill / references を参照する
+- 参照資産が無い場合は、ここに書かれた指示のみで設計する
 
 ## 指示
 

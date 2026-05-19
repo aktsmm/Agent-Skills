@@ -46,10 +46,6 @@
   - [Node.js Rules](instructions/dev/nodejs.instructions.md) (nvm 推奨、パッケージマネージャー)
   - [Microsoft Docs](instructions/integrations/microsoft-docs.instructions.md) (MCP 連携、ソース明記) - Microsoft Docs MCP ツール名（正規）: `mcp_microsoftdocs_microsoft_docs_search`, `mcp_microsoftdocs_microsoft_code_sample_search`, `mcp_microsoftdocs_microsoft_docs_fetch`
 
-## エージェント設計
-
-- 詳細ルール: [Agent Design](instructions/agents/agent-design.instructions.md)（存在する場合）
-
 ## セキュリティとコンプライアンス
 
 - 詳細ルール: [Security Rules](instructions/core/security.instructions.md)（存在する場合）

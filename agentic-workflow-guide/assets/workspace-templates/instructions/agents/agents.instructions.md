@@ -7,13 +7,11 @@ applyTo: ".github/agents/**"
 
 Rules applied when editing files in the `.github/agents/` directory.
 
-> **詳細は [agent-design.instructions.md](agent-design.instructions.md) を参照（存在する場合）**
-
 ## Quick Reference
 
 ### Agent Definition Structure
 
-各エージェントは以下のセクションを持つ（詳細は agent-design.instructions.md 参照）：
+各エージェントは以下のセクションを持つ：
 
 | セクション    | 必須 | 説明               |
 | ------------- | ---- | ------------------ |

@@ -9,9 +9,9 @@ description: 複数エージェントのオーケストレーション計画
 ## 前提条件
 
 - 参照: `.github/agents/*.agent.md` と README / docs の catalog（存在する場合）
-- 参照: `.github/instructions/agents/agent-design.instructions.md` (設計原則、存在する場合)
+- 利用可能なら workflow design skill / references を参照する
 
-> 参照ファイルが無い場合は、利用可能なエージェント一覧と制約をユーザーに確認する。
+> 参照資産が無い場合は、利用可能なエージェント一覧と制約をユーザーに確認する。
 
 ## 指示
 
