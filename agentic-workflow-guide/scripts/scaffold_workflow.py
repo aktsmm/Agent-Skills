@@ -235,6 +235,23 @@ AGENTS_MD_TEMPLATES = {
     "routing": AGENTS_SHARED_TEMPLATE,
 }
 
+FULL_WORKSPACE_PROMPT_FILES = [
+    "README.md",
+    "create-workflow.prompt.md",
+    "plan-workflow.prompt.md",
+    "design-workflow.prompt.md",
+    "sample.prompt.md",
+]
+
+SKIP_COMMON_TEMPLATE_FILES = {
+    ".github/prompts/system.prompt.md",
+    ".github/prompts/create-agent.prompt.md",
+    ".github/prompts/review-agent.prompt.md",
+    ".github/prompts/error-handling.prompt.md",
+    ".github/prompts/review-retrospective-learnings.prompt.md",
+    ".github/prompts/create-agentWF.prompt.md",
+}
+
 # Common templates (used for all patterns)
 COMMON_TEMPLATES = {
     ".github/copilot-instructions.md": '''# Copilot Instructions for {workflow_name}
@@ -1448,6 +1465,8 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
     
     # Generate common templates (excluding AGENTS.md which is pattern-specific)
     for filename, template in COMMON_TEMPLATES.items():
+        if filename in SKIP_COMMON_TEMPLATE_FILES:
+            continue
         file_path = base_path / filename
         file_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -1497,14 +1516,27 @@ def scaffold_workflow(name: str, pattern: str = "basic", output_path: str = ".",
                 shutil.copy2(src_copilot, github_dir / "copilot-instructions.md")
                 print("   📄 copilot-instructions.md")
             
-            # Copy agents/, instructions/, prompts/ directories
-            for folder in ["agents", "instructions", "prompts"]:
+            # Copy agents/ and instructions/ directories.
+            # Prompts are curated separately to avoid shipping generic local helpers.
+            for folder in ["agents", "instructions"]:
                 src_folder = templates_dir / folder
                 dst_folder = github_dir / folder
                 if src_folder.exists():
                     shutil.copytree(src_folder, dst_folder, dirs_exist_ok=True)
                     file_count = len(list(dst_folder.rglob("*")))
                     print(f"   📁 {folder}/ ({file_count} files)")
+
+            src_prompts = templates_dir / "prompts"
+            dst_prompts = github_dir / "prompts"
+            if src_prompts.exists():
+                dst_prompts.mkdir(parents=True, exist_ok=True)
+                copied_prompts = 0
+                for filename in FULL_WORKSPACE_PROMPT_FILES:
+                    src_file = src_prompts / filename
+                    if src_file.exists():
+                        shutil.copy2(src_file, dst_prompts / filename)
+                        copied_prompts += 1
+                print(f"   📁 prompts/ ({copied_prompts} curated files)")
 
             src_references = script_dir.parent / "references"
             dst_references = base_path / "references"

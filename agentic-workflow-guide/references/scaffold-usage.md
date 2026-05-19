@@ -52,6 +52,7 @@ my-workflow/
 
 **Note**: Custom agents use `.agent.md` extension in `.github/agents/` directory (VS Code 1.106+).
 `--full-workspace` also copies `references/` so bundled templates can keep their SSOT links valid after generation.
+`--full-workspace` の `.github/prompts/` は curated set のみをコピーし、Git/debug/review 系の汎用 prompt は含めません。
 
 ## Pattern Selection
 
