@@ -58,6 +58,10 @@ description: One-line summary of what this prompt does
 
 VS Code validates frontmatter strictly. Only use supported fields — unsupported fields cause validation errors.
 
+- Review missing required fields and unsupported properties separately. Missing-field-only checks miss real validation failures.
+- If repo-local authoring rules disagree with the current platform support matrix, treat that as contract drift and fix the rule before bulk-editing prompts.
+- When possible, verify support mechanically with the local validator or current product docs instead of assuming one repo's convention is authoritative.
+
 - The opening `---` must be the very first bytes in the file. Any stray characters or BOM-like garbage before it can prevent the prompt from being discovered in the slash prompt picker.
 - `agent` is optional for `.prompt.md`. If omitted, VS Code uses the current agent/mode. Use `agent: agent` when a prompt must consistently run in Agent mode, or `agent: <custom-agent-name>` when it should bind to a specific custom agent. Use `agent: ask` or `agent: plan` only when the prompt should avoid autonomous edit/execute behavior.
 

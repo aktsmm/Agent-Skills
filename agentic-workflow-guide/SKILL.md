@@ -120,6 +120,7 @@ Lightweight inputs such as greetings, short Q&A, and numeric-only replies should
 - [ ] Primitive choice is simpler than agent if possible
 - [ ] Placement is appropriate and always-loaded entry files stay thin
 - [ ] New additions are proposed only after delete / merge / split / move options are checked
+- [ ] Frontmatter review validates file-type-specific supported and unsupported properties, not just missing fields
 - [ ] `copilot-instructions.md` and `AGENTS.md` keep distinct always-on roles and do not duplicate intake / routing / catalog content
 - [ ] always-loaded entries do not combine strong directive wording with catalogs or reference inventories
 - [ ] findings distinguish runtime-affected entry issues from review-only asset issues
@@ -142,6 +143,7 @@ Full checklist: [references/review-checklist.md](references/review-checklist.md)
 | Workflow patterns      | [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)                                                       |
 | Splitting criteria     | [references/splitting-criteria.md](references/splitting-criteria.md)                                                                       |
 | Review checklist       | [references/review-checklist.md](references/review-checklist.md)                                                                           |
+| Prompt template        | [references/prompt-template.md](references/prompt-template.md)                                                                             |
 | Context management     | [references/context-engineering.md](references/context-engineering.md)                                                                     |
 | Agent guide / template | [references/agent-guide.md](references/agent-guide.md), [references/agent-template.md](references/agent-template.md)                       |
 | Handoffs / placement   | [references/handoffs-guide.md](references/handoffs-guide.md), [references/vscode-agent-placement.md](references/vscode-agent-placement.md) |

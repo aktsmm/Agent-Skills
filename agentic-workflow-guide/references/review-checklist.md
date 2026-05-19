@@ -39,6 +39,7 @@ Minimum items to verify:
 - [ ] Is there any possibility of infinite loops?
 - [ ] Are related files (references, scripts) simple and minimal? (DRY)
 - [ ] Are deterministic steps offloaded to scripts / IR / hooks instead of LLM loops? (Deterministic Offload)
+- [ ] Are frontmatter fields checked against the current file-type support matrix, not just repo-local convention? (Frontmatter Hygiene)
 ```
 
 ---
@@ -113,6 +114,20 @@ Minimum items to verify:
 ---
 
 ## Detailed Check
+
+### Frontmatter Hygiene Check
+
+⚠️ **Critical for prompt / instruction / agent review.** Missing-field checks alone are insufficient.
+
+```markdown
+## File-Type Frontmatter Validation
+
+- [ ] Are required fields checked per file type (`description`, `applyTo`, `name`, etc.)?
+- [ ] Are unsupported properties checked per file type, not just missing required fields?
+- [ ] Are repo-local authoring rules consistent with the current platform support matrix?
+- [ ] If local rules and platform-supported keys conflict, is that drift called out explicitly before bulk edits?
+- [ ] Is there a mechanical scan for both missing and unsupported keys?
+```
 
 ### Primitive Fit Check
 
