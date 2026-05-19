@@ -23,6 +23,7 @@ Rules:
 - `--remote-debugging-port=<port>` exposes the CDP endpoint.
 - `--remote-allow-origins=*` avoids WebSocket `403 Forbidden` in environments that enforce origin checks.
 - `--restore-last-session` is useful when the existing tab/session matters.
+- If only one browser profile has the right login state, keep the default browser user data and pin `--profile-directory=<known profile>` instead of creating an ad-hoc `--user-data-dir`.
 - Use a separate port when Playwright MCP already owns another CDP endpoint.
 
 ## Direct WebSocket Connection
@@ -106,6 +107,15 @@ text = cdp(ws, 'Runtime.evaluate', {
     'returnByValue': True,
 })['result']['result']['value']
 ```
+
+## Session Extraction and Headless Handoff
+
+If the browser already holds the valid login state, prefer extracting session material at runtime and moving the bulk operation out of visible UI flows.
+
+- Use CDP to read cookies, local storage, CSRF tokens, or in-page bootstrap state from the live browser session.
+- Pass the extracted values directly to a headless HTTP/API helper in the same run.
+- Keep the browser UI for login, target verification, and before/after evidence only.
+- Do not persist tokens, cookies, or auth headers to tracked files.
 
 ## Virtual Scroll and Modal Patterns
 

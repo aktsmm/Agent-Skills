@@ -70,6 +70,7 @@ if ($conn) {
 ```
 
 - `--profile-directory` や `--user-data-dir` を見て、意図したプロファイルか確認する
+- 認証が特定プロファイルでしか通らないサイトは、既定 user data を再利用したまま `--profile-directory=<known profile>` を明示する。isolated な `--user-data-dir` は別ログイン状態と巨大なプロファイルごみを生みやすいため、必要時だけ使う
 - 既存CDPが別プロファイルなら、既存ブラウザを落とす前に別ポートで目的プロファイルを起動できるか検討する
 - 自動化スクリプト側は `http://localhost:9222` 固定にせず、検出・起動したCDP URLを引数や環境変数で受け取れるようにする
 - 既存の endpoint 値があっても「前回は正しかった値」にすぎない。別セッションのブラウザが同じ port を使うことがあるため、接続失敗や login redirect が出たら再ログインより先に endpoint drift を疑う
@@ -157,7 +158,7 @@ snapshot で ref 取得
 
 ### evaluate + fetch() による API bulk 操作
 
-ログイン済みブラウザ上で `page.evaluate` 内から `fetch()` を使うと、認証 cookie が自動付与されるため **認証処理なしで API を叩ける**。`page.goto()` も不要なので CDP ナビゲーション不安定の影響がゼロ。
+ログイン済みブラウザ上で、または live session から Cookie / CSRF token / 認証ヘッダーを実行直前に抽出できる場合、`page.evaluate` 内から `fetch()` を使うと **認証処理なしで API を叩ける**。`page.goto()` も不要なので CDP ナビゲーション不安定の影響がゼロ。
 
 | 方式 | 速度 | 安定性 | 用途 |
 |------|------|--------|------|
@@ -187,6 +188,7 @@ async ({ apiBase, pageSize }) => {
 - `page.evaluate` + `fetch()`: REST API があるサイトで bulk read/write するとき
 - 同一 eval 内で fetch → 判定 → 更新 → 結果返却まで完結させると、Python ⇔ CDP 往復が 1 回で済む
 - **Navigate-free 設計**: `page.goto()` は CDP 接続不安定の最大要因。API があるサイトでは `page.evaluate` + `fetch()` だけで全操作を完結させ、`page.goto()` を一切使わない構成が最も安定する。初期ページ（ログイン済みの任意ページ）に一度だけ接続すれば、以降はすべて evaluate 内の fetch で済む
+- live session から session 情報を取れたら、ブラウザ UI は login / preflight / before-after 証跡だけに寄せ、bulk 処理は headless な HTTP/API helper に handoff する
 
 **注意**: JS 内ロジックが Python 正本と乖離すると false positive を生む。判定ロジックは Python 側に寄せ、JS は fetch + PUT の実行役に徹するのが安全。
 
