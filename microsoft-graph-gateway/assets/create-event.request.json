@@ -1,0 +1,22 @@
+{
+  "method": "POST",
+  "path": "/me/events",
+  "apiVersion": "v1.0",
+  "permissionProfile": "calendar-write",
+  "intentSummary": "Create a short calendar smoke-test event",
+  "body": {
+    "subject": "[Graph Gateway Test] Calendar smoke test",
+    "body": {
+      "contentType": "Text",
+      "content": "Temporary calendar smoke test created by the Microsoft Graph gateway."
+    },
+    "start": {
+      "dateTime": "2026-05-21T18:00:00",
+      "timeZone": "Tokyo Standard Time"
+    },
+    "end": {
+      "dateTime": "2026-05-21T18:15:00",
+      "timeZone": "Tokyo Standard Time"
+    }
+  }
+}

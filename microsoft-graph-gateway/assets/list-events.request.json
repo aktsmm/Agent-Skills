@@ -1,0 +1,12 @@
+{
+  "method": "GET",
+  "path": "/me/events",
+  "apiVersion": "v1.0",
+  "query": {
+    "select": "subject,start,end,organizer,responseStatus",
+    "top": 10,
+    "orderby": "start/dateTime"
+  },
+  "permissionProfile": "calendar-read-basic",
+  "intentSummary": "List upcoming events with a minimal useful projection"
+}

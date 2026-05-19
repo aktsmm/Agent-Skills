@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/me/events/{event-id}/accept",
+  "apiVersion": "v1.0",
+  "permissionProfile": "calendar-write",
+  "intentSummary": "Accept a meeting request",
+  "body": {
+    "comment": "Accepted.",
+    "sendResponse": true
+  }
+}

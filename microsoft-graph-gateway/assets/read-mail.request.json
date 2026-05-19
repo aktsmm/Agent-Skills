@@ -1,0 +1,11 @@
+{
+  "method": "GET",
+  "path": "/me/messages",
+  "apiVersion": "v1.0",
+  "query": {
+    "select": "subject,from,receivedDateTime",
+    "top": 5
+  },
+  "permissionProfile": "mail-read-basic",
+  "intentSummary": "Read the latest messages with a minimal projection"
+}
