@@ -1,7 +1,7 @@
 ---
 name: vscode-extension-guide
 description: "Guide for creating VS Code extensions and plugins from scratch through Marketplace publication. Use when developing a VS Code extension/plugin, adding commands or keybindings, building TreeView or Webview UI, publishing to Marketplace, or troubleshooting activation and packaging issues."
-argument-hint: "作りたい拡張機能、追加したい機能、困っている点"
+argument-hint: "Extension idea, feature to add, or issue to troubleshoot"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -11,6 +11,8 @@ metadata:
 # VS Code Extension Guide
 
 Create, develop, and publish VS Code extensions.
+
+> **English version**: [vscode-extension-guide-en](https://github.com/lewiswigmore/agent-skills/tree/main/vscode-extension-guide-en) by [@lewiswigmore](https://github.com/lewiswigmore)
 
 ## When to Use
 
