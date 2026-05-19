@@ -140,7 +140,7 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | Edges not visible                 | Verify node IDs                                                                                |
 | Icons missing                     | Enable Azure/AWS shapes                                                                        |
 | README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio`                   |
-| Too many crossing arrows          | Simplify the main flow first, then move secondary flows to separate lanes or separate diagrams |
+| Too many crossing arrows          | Align source/target y to make edges horizontal; spread `entryY` on shared targets. See [style-guide.md](references/style-guide.md) Edge Crossing Prevention |
 | Legend inside a container          | Move legend outside the outermost box. See [style-guide.md](references/style-guide.md) Nested Containers |
 | Diagonal edge crosses a box        | Move annotation boxes below diagonal endpoints. See [style-guide.md](references/style-guide.md) Flow Diagrams |
 | Title duplicated in PDF/HTML        | Remove title mxCell from diagram; let the document layer handle captions |

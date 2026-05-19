@@ -36,8 +36,6 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [web-accessibility](web-accessibility/)                 | Build and review accessible web products with WCAG 2.2 AA / Web アクセシビリティ実装・レビュー                |
 | [vscode-extension-guide](vscode-extension-guide/)       | VS Code extension development guide / VS Code 拡張機能開発ガイド                                              |
 
-> **English version**: [vscode-extension-guide-en](https://github.com/lewiswigmore/agent-skills/tree/main/vscode-extension-guide-en) by [@lewiswigmore](https://github.com/lewiswigmore) — an English adaptation of `vscode-extension-guide` with updates for recent VS Code extension API changes.
-
 ## Usage / 使い方
 
 ### 🚀 Recommended: Agent Skill Ninja (VS Code Extension)

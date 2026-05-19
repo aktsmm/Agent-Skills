@@ -73,6 +73,16 @@ swimlane;horizontal=1;startSize=30;
 | Group padding    | 20px            |
 | Edge clearance   | 10px minimum    |
 
+### Edge Crossing Prevention
+
+For complex diagrams (>15 nodes) with many-to-one or fan-out edges:
+
+- **Align source and target y** — place each agent/processor at the same y as its output node. Lines stay horizontal, crossing drops to near zero.
+- **Avoid swimlane-relative coordinates** — when edges cross swimlane boundaries, `exitX`/`entryY` resolve to group-relative positions that are hard to predict. Use absolute positioning (`parent="1"`) for all nodes instead.
+- **Spread entryY on shared targets** — when multiple edges enter the same node, enlarge the node height and assign distinct `entryY` values (e.g., 0.1 / 0.5 / 0.9) so lines arrive at different vertical points.
+- **Collapse fan-out into one edge** — instead of N individual arrows from an orchestrator to N children, draw a single dashed arrow to a group outline and label it (e.g., "delegates").
+- **Separate auxiliary elements** — legends, data stores, and footnotes must sit below the main flow with ≥40px vertical gap from the lowest flow node. Never place them at the same y as flow outputs.
+
 ### Nested Containers (Hierarchy Diagrams)
 
 When using nested rectangles to show hierarchy (e.g., Enterprise > Org > Team > Repo):
