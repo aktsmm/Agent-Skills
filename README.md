@@ -12,30 +12,30 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ## Skills
 
-| Skill                                                   | Description / 説明                                                                                            |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| [agentic-workflow-guide](agentic-workflow-guide/)       | Design agentic workflows and choose the right primitive first / エージェントワークフロー設計と primitive 選定 |
-| [azure-advisor-report](azure-advisor-report/)           | Generate Azure monthly reports from Advisor and Cost Management / Azure Advisor・コスト管理の簡易月次レポート |
-| [azure-env-builder](azure-env-builder/)                 | ⚠️ **Alpha** - Azure environment builder with Bicep / Azure 環境構築支援                                      |
-| [biz-ops-setup](biz-ops-setup/)                         | Business operations workspace setup / 業務管理ワークスペース構築                                              |
-| [book-writing-workspace](book-writing-workspace/)       | Book writing workspace / 書籍執筆ワークスペース                                                               |
-| [browser-max-automation](browser-max-automation/)       | Browser automation via Playwright MCP / ブラウザ自動操作                                                      |
-| [chrome-extension-dev](chrome-extension-dev/)           | Chrome extension development guide / Chrome 拡張機能開発ガイド                                                |
-| [code-simplifier](code-simplifier/)                     | Simplify and refactor complex code / コード簡略化・リファクタリング                                           |
-| [customer-workspace](customer-workspace/)               | Customer workspace initialization / 顧客ワークスペース初期化                                                  |
-| [drawio-diagram-forge](drawio-diagram-forge/)           | Create draw.io diagrams from text / テキストから draw.io 図を生成                                             |
-| [humanize-writing](humanize-writing/)                   | Humanize AI-sounding drafts and preserve author voice / AIっぽい原稿を人間らしく整え、書き手の癖を残す        |
-| [local-media-transcription](local-media-transcription/) | Transcribe local audio/video and prepare minutes / ローカル音声・動画の文字起こしと議事録化                   |
+| Skill                                                   | Description / 説明                                                                                                  |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [agentic-workflow-guide](agentic-workflow-guide/)       | Design agentic workflows and choose the right primitive first / エージェントワークフロー設計と primitive 選定       |
+| [azure-advisor-report](azure-advisor-report/)           | Generate Azure monthly reports from Advisor and Cost Management / Azure Advisor・コスト管理の簡易月次レポート       |
+| [azure-env-builder](azure-env-builder/)                 | ⚠️ **Alpha** - Azure environment builder with Bicep / Azure 環境構築支援                                            |
+| [biz-ops-setup](biz-ops-setup/)                         | Business operations workspace setup / 業務管理ワークスペース構築                                                    |
+| [book-writing-workspace](book-writing-workspace/)       | Book writing workspace / 書籍執筆ワークスペース                                                                     |
+| [browser-max-automation](browser-max-automation/)       | Browser automation via Playwright MCP / ブラウザ自動操作                                                            |
+| [chrome-extension-dev](chrome-extension-dev/)           | Chrome extension development guide / Chrome 拡張機能開発ガイド                                                      |
+| [code-simplifier](code-simplifier/)                     | Simplify and refactor complex code / コード簡略化・リファクタリング                                                 |
+| [customer-workspace](customer-workspace/)               | Customer workspace initialization / 顧客ワークスペース初期化                                                        |
+| [drawio-diagram-forge](drawio-diagram-forge/)           | Create draw.io diagrams from text / テキストから draw.io 図を生成                                                   |
+| [humanize-writing](humanize-writing/)                   | Humanize AI-sounding drafts and preserve author voice / AIっぽい原稿を人間らしく整え、書き手の癖を残す              |
+| [local-media-transcription](local-media-transcription/) | Transcribe local audio/video and prepare minutes / ローカル音声・動画の文字起こしと議事録化                         |
 | [microsoft-graph-gateway](microsoft-graph-gateway/)     | Route Microsoft Graph read and write workflows with safe execution scaffolds / Microsoft Graph 操作の安全な gateway |
-| [ocr-super-surya](ocr-super-surya/)                     | GPU-optimized OCR using Surya (90+ languages) / GPU 最適化 OCR                                                |
-| [packet-capture-analysis](packet-capture-analysis/)     | Packet capture analysis workflow with labeling and visualization / パケットキャプチャ解析とラベル付け・可視化 |
-| [powerpoint-automation](powerpoint-automation/)         | Create PPTX from web articles / Web記事からPowerPoint自動生成                                                 |
-| [receipt-ocr-sorter](receipt-ocr-sorter/)               | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計                                          |
-| [retro-copilot](retro-copilot/)                         | Reflect session learnings into ~/.copilot assets / `.copilot` 資産へのレトロ反映                              |
-| [skill-creator-plus](skill-creator-plus/)               | Design, review, and fix Agent Skills with better triggering / スキル設計・レビュー・発火改善                  |
-| [skill-finder](skill-finder/)                           | Search skills and route to the right customization primitive / スキル検索と customization 振り分け            |
-| [web-accessibility](web-accessibility/)                 | Build and review accessible web products with WCAG 2.2 AA / Web アクセシビリティ実装・レビュー                |
-| [vscode-extension-guide](vscode-extension-guide/)       | VS Code extension development guide / VS Code 拡張機能開発ガイド                                              |
+| [ocr-super-surya](ocr-super-surya/)                     | GPU-optimized OCR using Surya (90+ languages) / GPU 最適化 OCR                                                      |
+| [packet-capture-analysis](packet-capture-analysis/)     | Packet capture analysis workflow with labeling and visualization / パケットキャプチャ解析とラベル付け・可視化       |
+| [powerpoint-automation](powerpoint-automation/)         | Create PPTX from web articles / Web記事からPowerPoint自動生成                                                       |
+| [receipt-ocr-sorter](receipt-ocr-sorter/)               | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計                                                |
+| [retro-copilot](retro-copilot/)                         | Reflect session learnings into ~/.copilot assets / `.copilot` 資産へのレトロ反映                                    |
+| [skill-creator-plus](skill-creator-plus/)               | Design, review, and fix Agent Skills with better triggering / スキル設計・レビュー・発火改善                        |
+| [skill-finder](skill-finder/)                           | Search skills and route to the right customization primitive / スキル検索と customization 振り分け                  |
+| [web-accessibility](web-accessibility/)                 | Build and review accessible web products with WCAG 2.2 AA / Web アクセシビリティ実装・レビュー                      |
+| [vscode-extension-guide](vscode-extension-guide/)       | VS Code extension development guide / VS Code 拡張機能開発ガイド                                                    |
 
 ## Usage / 使い方
 
