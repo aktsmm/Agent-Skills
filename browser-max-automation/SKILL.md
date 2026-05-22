@@ -141,6 +141,59 @@ snapshot で ref 取得
 
 また、helper / probe / cache の JSON artifact を一次ソースにする場合は、内容を見る前に `timestamp` や対象日を確認する。日付が現在の実行日と合わない artifact は stale とみなし、`ok` や `fast_path_ok` が true でも確定情報として使わない。
 
+### Angular Material フォーム自動化
+
+Angular Material (`mat-select`, `mat-dialog`, `cdk-overlay`) を Playwright で操作するときの共通パターン。
+
+**mat-select は nativeInputValueSetter では動かない**
+
+Angular の `mat-select` や `mat-form-field` は、`Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call()` で値を書き込んでも **form control の内部状態が更新されない**。ボタンの `disabled` が解除されない、validation が通らない等の症状が出る。
+
+正しい操作:
+1. `.mat-select-trigger` をクリックして overlay を開く
+2. `[role="option"]` から目的の選択肢を `click()` する
+3. 数値入力は increment/decrement ボタン (`[aria-label*="Increment"]`) を N 回クリックする
+
+```javascript
+// ❌ 動かない
+setNativeValue(input, '04');
+
+// ✅ 正しい: increment ボタンを N 回クリック
+for (let i = 0; i < 4; i++) {
+  document.querySelector('[aria-label*="Increment by 1"]').click();
+  await new Promise(r => setTimeout(r, 100));
+}
+```
+
+**cdk-overlay が操作を塞ぐ**
+
+`mat-select` をクリックすると `cdk-global-overlay-wrapper` が画面を覆う。option 選択後も overlay が残ることがあり、次の `mat-select` や入力要素をクリックできなくなる。
+
+対処:
+- option 選択後に `Escape` キーを送って overlay を閉じる
+- または次の `mat-select` の `.mat-select-trigger` を直接 `click()` する（overlay は自動的に閉じて新しい overlay が開く）
+
+**Update / Save が disabled のまま**
+
+Angular reactive form では、必須フィールドが 1 つでも未入力なら submit ボタンが `disabled` のままになる。
+
+診断:
+```javascript
+const invalids = [...form.querySelectorAll('[class*="ng-invalid"]')]
+  .filter(el => el.offsetParent)
+  .map(el => el.getAttribute('formcontrolname') || el.tagName);
+// → ["lateReason"] のように未入力の control 名が分かる
+```
+
+**UI state の事前確認**
+
+`page.evaluate` で連続操作する前に、前回操作の「残り状態」が残っていないかを確認する:
+- 日付・タブ・フィルタの選択状態
+- 未閉じの overlay / dialog / modal
+- URL のハッシュフラグメント（SPA router state）
+
+前回の操作で水曜が選択されたまま次の投入を実行すると、意図しない日に集中する。操作の冒頭で目的の state を明示的にセットする。
+
 ### iframe と force click
 
 - iframe が多段なら `contentFrame()` を順に辿る
