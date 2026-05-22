@@ -154,6 +154,8 @@ Angular の `mat-select` や `mat-form-field` は、`Object.getOwnPropertyDescri
 2. `[role="option"]` から目的の選択肢を `click()` する
 3. 数値入力は increment/decrement ボタン (`[aria-label*="Increment"]`) を N 回クリックする
 
+選択肢ラベルが似ている場合は、**部分一致ではなく exact match を優先**する。`Delivery` と `(ISD only) Delivery` のように部分一致で誤選択しやすい UI は、`/Delivery/i` ではなく `innerText.trim() === 'Delivery'` で選ぶ。
+
 ```javascript
 // ❌ 動かない
 setNativeValue(input, '04');
@@ -163,6 +165,12 @@ for (let i = 0; i < 4; i++) {
   document.querySelector('[aria-label*="Increment by 1"]').click();
   await new Promise(r => setTimeout(r, 100));
 }
+
+// ✅ 類似ラベルは exact match を優先
+const options = [...document.querySelectorAll('[role="option"]')]
+  .filter(o => o.offsetParent);
+const exact = options.find(o => o.innerText.trim() === 'Delivery');
+if (exact) exact.click();
 ```
 
 **cdk-overlay が操作を塞ぐ**
@@ -177,12 +185,19 @@ for (let i = 0; i < 4; i++) {
 
 Angular reactive form では、必須フィールドが 1 つでも未入力なら submit ボタンが `disabled` のままになる。
 
+また、modal / overlay が複数重なっている画面では、`document.querySelector('form')` のような広すぎる検索で **古い dialog を掴む** ことがある。フォーム操作は常に **active な overlay / dialog に scope** する。
+
 診断:
 ```javascript
 const invalids = [...form.querySelectorAll('[class*="ng-invalid"]')]
   .filter(el => el.offsetParent)
   .map(el => el.getAttribute('formcontrolname') || el.tagName);
 // → ["lateReason"] のように未入力の control 名が分かる
+
+// active dialog を最後の visible overlay に限定
+const overlays = [...document.querySelectorAll('.cdk-overlay-pane, mat-dialog-container')]
+  .filter(d => d.offsetParent);
+const activeForm = overlays[overlays.length - 1]?.querySelector('form');
 ```
 
 **UI state の事前確認**
