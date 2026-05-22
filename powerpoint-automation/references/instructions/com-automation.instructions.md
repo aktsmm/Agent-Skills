@@ -30,7 +30,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Add a trailing `chr(13)` when needed to prevent newly inserted text from merging with the next paragraph.
 - `IndentLevel` is valid from 1 to 5. Setting 0 raises an out-of-range COM error.
 - If run boundaries split text, `Runs(r).Text` replacement may miss. Use `Characters(start, length).Text = "new"` for reliable replacement.
-- For major paragraph restructuring, clear and rebuild the text range instead of stacking many `InsertAfter` calls.
+- For major paragraph restructuring, clear and rebuild the whole `TextRange.Text` in a single assignment, then reapply per-paragraph formatting. Do not loop over `Paragraphs(n).Text = newValue`: a trailing `\r` in `newValue` silently appends a new paragraph and shifts later indexes, leaving later paragraphs unmodified.
 - To insert before the first paragraph, use `InsertBefore(chr(13))`, then set `Paragraphs(1)` text and font.
 
 ## Font and Layout Stability
