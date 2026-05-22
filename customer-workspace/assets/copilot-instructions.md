@@ -46,6 +46,7 @@ graph TD
 | 箇条書きのみ（`-` で始まる行が主）              | インボックス   | `inbox` に追記            |
 | 文脈なしの短文メモ                              | インボックス   | `inbox` に追記            |
 | 質問形式（「?」「教えて」「どうすれば」等）     | 質問           | 通常応答                  |
+| 「質問を抽出」「質問事項を」「宿題を抜き出し」  | 質問抽出       | `extract-questions`       |
 
 ### インボックス追記時の動作
 
@@ -86,3 +87,4 @@ graph TD
 
 - `inbox.prompt.md` - インボックス追記の詳細ルール
 - `convert-meeting-minutes.prompt.md` - 議事録変換
+- `extract-questions.prompt.md` - 質問事項抽出

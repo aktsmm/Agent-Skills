@@ -25,6 +25,7 @@ Initialize customer-specific workspaces with information accumulation and meetin
 | -------------------- | ----------------------------------------- |
 | **Inbox**            | Paste chat/email for auto-classification  |
 | **Meeting Notes**    | Convert Teams AI notes to template format |
+| **Questions**        | Extract questions/actions from meeting log |
 | **Auto-Routing**     | Route input based on pattern detection    |
 | **Customer Profile** | Centralized customer information          |
 
@@ -50,8 +51,9 @@ Initialize customer-specific workspaces with information accumulation and meetin
 {workspace}/
 ├── .github/
 │   ├── copilot-instructions.md    ← Auto-routing rules
-│   └── prompts/                   ← Inbox, meeting notes
+│   └── prompts/                   ← Inbox, meeting notes, questions
 ├── _inbox/{YYYY-MM}.md            ← Inbox files
+├── _questions/{YYYY-MM}.md        ← Accumulated questions (optional)
 ├── _customer/profile.md           ← Customer profile
 └── _templates/                    ← Templates
 ```
@@ -91,4 +93,5 @@ Initialize customer-specific workspaces with information accumulation and meetin
 - `assets/_templates/` - Template files
 - `assets/inbox.prompt.md` - Inbox prompt
 - `assets/convert-meeting-minutes.prompt.md` - Meeting notes prompt
+- `assets/extract-questions.prompt.md` - Question extraction prompt
 - `assets/copilot-instructions.md` - Auto-routing rules
