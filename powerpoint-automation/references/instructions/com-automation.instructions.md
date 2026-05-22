@@ -62,14 +62,16 @@ Use this reference when editing existing PPTX files, especially files that may a
 ## RefURL Placement
 
 - Shape name: `RefURL`.
-- Position: bottom-right. Recommended margin: right 12 pt, bottom 2 pt.
-- Font: Calibri + BIZ UDPGothic, 13 pt or larger.
+- Position: bottom-right or bottom-left. Pick one and keep it consistent across the deck. Recommended margin: 12-16 pt from the side, 2-6 pt from bottom.
+- Font: Calibri + BIZ UDPGothic, 13 pt or larger. Typical width: 540 pt at 13 pt, 600 pt at 14 pt to fit Microsoft Learn URLs on one line.
 - Show both title and URL. Use either `Page title | URL` or two lines.
 - Title color: gray `0x808080`. URL color: blue `0xD47800` / `#0078D4`.
-- Use left paragraph alignment for multi-line reference boxes.
+- Use left paragraph alignment for multi-line reference boxes. Set horizontal alignment via `ParagraphFormat.Alignment`; do not assign `TextFrame.HorizontalAnchor` because COM `TextFrame` does not expose it and raises a bounds error. `TextFrame.VerticalAnchor` is supported.
+- One URL per text box when multiple URLs must be clickable. Stack them vertically with a small gap (3-4 pt) and recompute top positions after font-size changes.
 - Recalculate height after font-size changes using `TextRange.BoundHeight`.
-- Recalculate width using `TextRange.BoundWidth + padding`, while keeping the right-bottom anchor.
+- Recalculate width using `TextRange.BoundWidth + padding`, while keeping the chosen bottom-side anchor.
 - Verify `Shape.Left + Shape.Width <= SlideWidth` and `Shape.Top + Shape.Height <= SlideHeight`.
+- For Microsoft Learn / Docs URLs, prefer the localized variant (`ja-jp`, `ja`) and verify the page returns 200 before completion.
 - Before completion, verify URLs return a valid page and that the displayed title matches the destination.
 
 ## Review Gates
