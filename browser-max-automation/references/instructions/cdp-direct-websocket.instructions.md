@@ -18,6 +18,13 @@ Start-Process 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' `
   -ArgumentList '--remote-debugging-port=9223', '--remote-allow-origins=*', '--restore-last-session'
 ```
 
+If you need `--profile-directory=Profile 2` or any other argument whose value contains spaces, pass that flag as one quoted argument. Otherwise PowerShell can split it and launch the wrong profile.
+
+```powershell
+Start-Process 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' `
+  -ArgumentList '--remote-debugging-port=9223', '--remote-allow-origins=*', '"--profile-directory=Profile 2"'
+```
+
 Rules:
 
 - `--remote-debugging-port=<port>` exposes the CDP endpoint.

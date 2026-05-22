@@ -55,6 +55,13 @@ Browser automation via Playwright MCP.
 Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -ArgumentList "--remote-debugging-port=9222"
 ```
 
+PowerShell の `Start-Process -ArgumentList` では、`--profile-directory=Profile 2` のように**値にスペースが入る引数**をそのまま渡すと、別引数に分割されて意図しないプロファイルで起動しうる。1 つの quoted argument として渡す。
+
+```powershell
+Start-Process "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" `
+  -ArgumentList '--remote-debugging-port=9222', '"--profile-directory=Profile 2"'
+```
+
 #### 既存CDPを再利用する場合
 
 既にデバッグポート付きブラウザが起動しているなら、毎回再起動する必要はない。ただし、**ポートが開いていること** と **目的のプロファイル/ログイン状態であること** は別問題として確認する。
@@ -192,6 +199,16 @@ async ({ apiBase, pageSize }) => {
 - live session から session 情報を取れたら、ブラウザ UI は login / preflight / before-after 証跡だけに寄せ、bulk 処理は headless な HTTP/API helper に handoff する
 
 **注意**: JS 内ロジックが Python 正本と乖離すると false positive を生む。判定ロジックは Python 側に寄せ、JS は fetch + PUT の実行役に徹するのが安全。
+
+### API write が不安定なときの最小 UI fallback
+
+認証済み API が read では使えるのに write だけ backend state や preflight guard で止まることがある。こういうときは mutation を無理に押し切らず、**安定している最小 UI 経路だけ**を使う。
+
+- API write が `404` / stale state / guardrail refusal で止まるなら、先に UI 側の保存経路が安定しているか確認する
+- UI fallback では、検索 → 対象行選択 → 必須項目だけ入力 → Save の最短経路に絞る
+- 保存後は一覧、明細、または画面上の数値で before/after を確認する
+- backend が後追いで整合するまで、台帳やログには `saved in UI / pending submit` のように状態を分けて記録する
+- 次回の再実行価値があるなら、使い捨て手順で終わらせず helper / CLI に昇格する
 
 ## Safety Rules
 
