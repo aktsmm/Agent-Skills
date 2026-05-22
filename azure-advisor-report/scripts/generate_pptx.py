@@ -2,18 +2,18 @@
 Azure Advisor Monthly Report - PowerPoint Generator (Template)
 
 Usage:
-    py -3 generate_pptx.py
+    py -3 generate_pptx.py --output report.pptx
 
 This script generates a widescreen PowerPoint report with Azure Advisor
 recommendations and cost trend analysis.
 
 Customize the DATA section below with actual values from Azure CLI / Cost Management API.
 """
-import sys, io, argparse
+import sys, io, os, argparse
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 from pptx import Presentation
-from pptx.util import Inches, Pt
+from pptx.util import Inches, Pt, Cm
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
@@ -21,7 +21,8 @@ from pptx.enum.shapes import MSO_SHAPE
 # ============================================================
 # CONFIG - Customize these
 # ============================================================
-FONT_NAME = 'BIZ UDPゴシック'
+FONT_ASCII = 'Calibri'
+FONT_EAST_ASIAN = 'BIZ UDPGothic'
 SLIDE_W = Inches(13.333)
 SLIDE_H = Inches(7.5)
 
@@ -50,37 +51,54 @@ LIGHT_GREEN = RGBColor(0xD5, 0xF5, 0xE3)
 # HELPER FUNCTIONS
 # ============================================================
 
+def _set_font(font, size, bold=False, color=DARK_GRAY):
+    """Apply consistent font settings."""
+    font.size = Pt(size)
+    font.bold = bold
+    font.color.rgb = color
+    font.name = FONT_ASCII
+    font._element.attrib['{http://schemas.openxmlformats.org/drawingml/2006/main}altLang'] = 'ja-JP'
+    # Set East Asian font via XML for proper fallback
+    from pptx.oxml.ns import qn
+    rPr = font._element
+    ea = rPr.find(qn('a:ea'))
+    if ea is None:
+        from lxml import etree
+        ea = etree.SubElement(rPr, qn('a:ea'))
+    ea.set('typeface', FONT_EAST_ASIAN)
+
 def add_bg(sl, l, t, w, h, c):
     """Add colored rectangle background."""
     s = sl.shapes.add_shape(MSO_SHAPE.RECTANGLE, l, t, w, h)
     s.fill.solid(); s.fill.fore_color.rgb = c; s.line.fill.background()
 
 def tb(sl, l, t, w, h, txt, fs=12, b=False, c=DARK_GRAY, a=PP_ALIGN.LEFT):
-    """Add text box."""
+    """Add text box with proper font settings."""
     bx = sl.shapes.add_textbox(l, t, w, h); tf = bx.text_frame; tf.word_wrap = True
-    p = tf.paragraphs[0]; p.text = txt; p.font.size = Pt(fs); p.font.bold = b
-    p.font.color.rgb = c; p.alignment = a; p.font.name = FONT_NAME
+    p = tf.paragraphs[0]; p.text = txt; _set_font(p.font, fs, b, c); p.alignment = a
     return tf
 
 def ap(tf, txt, fs=12, b=False, c=DARK_GRAY):
     """Add paragraph to text frame."""
-    p = tf.add_paragraph(); p.text = txt; p.font.size = Pt(fs); p.font.bold = b
-    p.font.color.rgb = c; p.space_before = Pt(1); p.font.name = FONT_NAME
+    p = tf.add_paragraph(); p.text = txt; _set_font(p.font, fs, b, c)
+    p.space_before = Pt(2)
 
-def tbl(sl, l, t, w, h, data, hc=MS_BLUE):
-    """Add table with header coloring."""
+def tbl(sl, l, t, w, h, data, hc=MS_BLUE, col_widths=None):
+    """Add table with header coloring and optional column width ratios."""
     r, co = len(data), len(data[0])
     ts = sl.shapes.add_table(r, co, l, t, w, h).table
+    # Apply column widths if specified (list of relative proportions)
+    if col_widths and len(col_widths) == co:
+        total = sum(col_widths)
+        for j, cw in enumerate(col_widths):
+            ts.columns[j].width = int(w * cw / total)
     for i, rd in enumerate(data):
         for j, ct in enumerate(rd):
             cell = ts.cell(i, j); cell.text = str(ct)
             for p in cell.text_frame.paragraphs:
-                p.font.size = Pt(11); p.font.name = FONT_NAME
+                _set_font(p.font, 11, bold=(i == 0), color=WHITE if i == 0 else DARK_GRAY)
                 if i == 0:
-                    p.font.bold = True; p.font.color.rgb = WHITE
                     p.alignment = PP_ALIGN.CENTER
-                else:
-                    p.font.color.rgb = DARK_GRAY
             if i == 0:
                 cell.fill.solid(); cell.fill.fore_color.rgb = hc
             elif i % 2 == 0:
@@ -101,6 +119,11 @@ def ibox(sl, l, t, w, h, title, lines, bg=LIGHT_BLUE, tc=DARK_BLUE):
             title, fs=12, b=True, c=tc)
     for ln in lines:
         ap(tf, ln, fs=11, c=DARK_GRAY)
+
+def add_notes(sl, text):
+    """Add speaker notes to a slide."""
+    notes_slide = sl.notes_slide
+    notes_slide.notes_text_frame.text = text
 
 
 # ============================================================
@@ -181,7 +204,9 @@ tb(sl, Inches(1), Inches(5.0), Inches(6), Inches(0.4),
 sub_data = [["環境", "サブスクリプション名", "Subscription ID", "年間利用額"]]
 for env, name, sid, annual in SUBSCRIPTIONS:
     sub_data.append([env, name, sid, annual])
-tbl(sl, Inches(6.5), Inches(4.5), Inches(6.3), Inches(1.5), sub_data)
+tbl(sl, Inches(6.5), Inches(4.5), Inches(6.3), Inches(1.5), sub_data,
+    col_widths=[1, 3, 3, 2])
+add_notes(sl, f"表紙スライド。対象: {len(SUBSCRIPTIONS)} サブスクリプション。データ取得日: {REPORT_DATE}")
 
 # ----- S2: Cost Trend -----
 sl = prs.slides.add_slide(prs.slide_layouts[6])
@@ -209,7 +234,8 @@ tb(sl, MARGIN, CONTENT_TOP, Inches(6), Inches(0.3),
    "本番系", fs=13, b=True, c=DARK_BLUE)
 cost_prod_data = [["推奨事項", "件数", "年間削減", "対象リソース例"]] + ADVISOR_COST_PROD
 cost_h = min(Inches(0.35) * len(cost_prod_data), Inches(2.0))
-tbl(sl, MARGIN, CONTENT_TOP + Inches(0.4), FULL_W, cost_h, cost_prod_data)
+tbl(sl, MARGIN, CONTENT_TOP + Inches(0.4), FULL_W, cost_h, cost_prod_data,
+    col_widths=[5, 1, 2, 5])
 
 # Evaluation cost table
 eval_top = CONTENT_TOP + Inches(0.4) + cost_h + GAP
@@ -217,36 +243,49 @@ tb(sl, MARGIN, eval_top, Inches(6), Inches(0.3),
    "評価系", fs=13, b=True, c=DARK_BLUE)
 cost_eval_data = [["推奨事項", "件数", "年間削減", "対象リソース"]] + ADVISOR_COST_EVAL
 eval_h = min(Inches(0.35) * len(cost_eval_data), Inches(1.5))
-tbl(sl, MARGIN, eval_top + Inches(0.4), FULL_W, eval_h, cost_eval_data)
+tbl(sl, MARGIN, eval_top + Inches(0.4), FULL_W, eval_h, cost_eval_data,
+    col_widths=[5, 1, 2, 5])
+add_notes(sl, "コスト最適化: Advisor Cost カテゴリの推奨事項。年間削減額は Advisor 推定値。")
 
 # ----- S4: Security (Production) -----
 sl = prs.slides.add_slide(prs.slide_layouts[6])
 hdr(sl, "セキュリティ — 本番系")
 sec_data = [["推奨事項", "件数", "影響度", "対象リソース（代表3件 + 残数）"]] + ADVISOR_SEC_PROD
 sec_h = min(Inches(0.35) * len(sec_data), Inches(3.5))
-tbl(sl, MARGIN, CONTENT_TOP, FULL_W, sec_h, sec_data, hc=RGBColor(0xC0, 0x39, 0x2B))
+tbl(sl, MARGIN, CONTENT_TOP, FULL_W, sec_h, sec_data, hc=RGBColor(0xC0, 0x39, 0x2B),
+    col_widths=[5, 1, 1, 6])
+add_notes(sl, "セキュリティ（本番系）: Advisor Security カテゴリ。High 影響度を優先対応。")
 
 # ----- S5: Security (Evaluation) -----
 sl = prs.slides.add_slide(prs.slide_layouts[6])
 hdr(sl, "セキュリティ — 評価系")
 sec2_data = [["推奨事項", "件数", "影響度", "対象リソース（代表3件 + 残数）"]] + ADVISOR_SEC_EVAL
 sec2_h = min(Inches(0.35) * len(sec2_data), Inches(3.0))
-tbl(sl, MARGIN, CONTENT_TOP, FULL_W, sec2_h, sec2_data, hc=RGBColor(0xC0, 0x39, 0x2B))
+tbl(sl, MARGIN, CONTENT_TOP, FULL_W, sec2_h, sec2_data, hc=RGBColor(0xC0, 0x39, 0x2B),
+    col_widths=[5, 1, 1, 6])
+add_notes(sl, "セキュリティ（評価系）: 本番と同様に High 影響度を中心に確認。")
 
 # ----- S6: Reliability (Production) -----
 sl = prs.slides.add_slide(prs.slide_layouts[6])
 hdr(sl, "信頼性・可用性 — 本番系")
 rel_data = [["推奨事項", "件数", "影響度", "対象リソース"]] + ADVISOR_REL_PROD
 rel_h = min(Inches(0.35) * len(rel_data), Inches(3.5))
-# Use LEFT_W for table, RIGHT_X for insight box (no overlap)
-tbl(sl, MARGIN, CONTENT_TOP, LEFT_W, rel_h, rel_data, hc=RGBColor(0x29, 0x80, 0xB9))
+tbl(sl, MARGIN, CONTENT_TOP, LEFT_W, rel_h, rel_data, hc=RGBColor(0x29, 0x80, 0xB9),
+    col_widths=[5, 1, 1, 5])
+ibox(sl, RIGHT_X, CONTENT_TOP, RIGHT_W, Inches(2.5),
+     "💡 改善ポイント",
+     ["Zone 冗長化やバックアップ設定を", "優先的に確認してください"],
+     bg=LIGHT_GREEN, tc=RGBColor(0x1A, 0x5E, 0x3A))
+add_notes(sl, "信頼性（本番系）: Advisor HighAvailability カテゴリ。Zone 冗長・Backup を優先。")
 
 # ----- S7: Reliability (Evaluation) -----
 sl = prs.slides.add_slide(prs.slide_layouts[6])
 hdr(sl, "信頼性・可用性 — 評価系")
 rel2_data = [["推奨事項", "件数", "影響度", "対象リソース"]] + ADVISOR_REL_EVAL
 rel2_h = min(Inches(0.35) * len(rel2_data), Inches(3.5))
-tbl(sl, MARGIN, CONTENT_TOP, LEFT_W, rel2_h, rel2_data, hc=RGBColor(0x29, 0x80, 0xB9))
+tbl(sl, MARGIN, CONTENT_TOP, LEFT_W, rel2_h, rel2_data, hc=RGBColor(0x29, 0x80, 0xB9),
+    col_widths=[5, 1, 1, 5])
+add_notes(sl, "信頼性（評価系）: 評価環境の冗長化は必要性を判断の上対応。")
 
 # ----- S8: Appendix -----
 sl = prs.slides.add_slide(prs.slide_layouts[6])
@@ -259,20 +298,18 @@ for label, url in PORTAL_LINKS:
     ap(tf, label, fs=12, b=True)
     ap(tf, url, fs=9, c=MS_BLUE)
 
-tf2 = tb(sl, Inches(7), CONTENT_TOP + Inches(0.2), Inches(5.8), Inches(4),
-         "免責事項", fs=14, b=True, c=DARK_BLUE)
-ap(tf2, "")
-ap(tf2, "❗ 免責事項", fs=12, b=True, c=RED)
-ap(tf2, "本レポートのコスト削減見込額は Azure Advisor の", fs=11)
-ap(tf2, "推定値に基づく概算値です。実際の削減額は、", fs=11)
-ap(tf2, "利用状況・価格改定・為替変動等により", fs=11)
-ap(tf2, "異なる場合があります。", fs=11)
-ap(tf2, "")
-ap(tf2, "注意事項", fs=12, b=True)
-ap(tf2, "* 推奨事項の件数・対象リソースは日々変動します", fs=11)
-ap(tf2, "* 最新の状況は Azure Portal からご確認ください", fs=11)
-ap(tf2, "")
-ap(tf2, f"データ取得日: {REPORT_DATE}", fs=12, b=True)
+ibox(sl, Inches(7), CONTENT_TOP + Inches(0.2), Inches(5.8), Inches(4),
+     "❗ 免責事項",
+     ["本レポートのコスト削減見込額は Azure Advisor の推定値に基づく概算値です。",
+      "実際の削減額は利用状況・価格改定・為替変動等により異なる場合があります。",
+      "",
+      "注意事項:",
+      "・推奨事項の件数・対象リソースは日々変動します",
+      "・最新の状況は Azure Portal からご確認ください",
+      "",
+      f"データ取得日: {REPORT_DATE}"],
+     bg=LIGHT_RED, tc=RED)
+add_notes(sl, "補足情報: Portal 直リンクと免責事項。データ取得日を明示。")
 
 
 # ============================================================
@@ -283,5 +320,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate Azure Advisor monthly report PPTX")
     parser.add_argument("--output", "-o", default="report.pptx", help="Output file path")
     args = parser.parse_args()
-    prs.save(args.output)
-    print(f"Saved: {args.output}")
+    out = args.output
+    tmp = out + '.tmp.pptx'
+    prs.save(tmp)
+    if os.path.exists(out):
+        os.remove(out)
+    os.rename(tmp, out)
+    print(f"Saved: {out}")
