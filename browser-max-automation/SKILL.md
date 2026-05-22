@@ -72,6 +72,7 @@ if ($conn) {
 - `--profile-directory` や `--user-data-dir` を見て、意図したプロファイルか確認する
 - 認証が特定プロファイルでしか通らないサイトは、既定 user data を再利用したまま `--profile-directory=<known profile>` を明示する。isolated な `--user-data-dir` は別ログイン状態と巨大なプロファイルごみを生みやすいため、必要時だけ使う
 - 既存CDPが別プロファイルなら、既存ブラウザを落とす前に別ポートで目的プロファイルを起動できるか検討する
+- 同じ user-data-dir で既に CDP ポート付き Edge が起動済み（例: `--remote-debugging-port=9222 --profile-directory=Default`）のとき、別プロファイルが必要なら **ポート指定なし** で起動する（`msedge.exe --profile-directory="Profile 2" <url>`）。新ウィンドウが同一プロセスに合流し、既存 CDP ポートで両方のプロファイルタブにアクセスできる。全 Edge を kill する必要はない
 - 自動化スクリプト側は `http://localhost:9222` 固定にせず、検出・起動したCDP URLを引数や環境変数で受け取れるようにする
 - 既存の endpoint 値があっても「前回は正しかった値」にすぎない。別セッションのブラウザが同じ port を使うことがあるため、接続失敗や login redirect が出たら再ログインより先に endpoint drift を疑う
 - helper を複数呼ぶ場合は、途中で endpoint を再推測させず、検証済みの同じ CDP URL を同一 process 環境から渡す

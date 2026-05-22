@@ -92,7 +92,16 @@ cdp(ws, 'Runtime.evaluate', {
 })
 ```
 
-After hash navigation, wait for the target UI state using polling rather than fixed sleeps when possible.
+Some SPAs (e.g., Angular with `HashLocationStrategy`) do not respond to `location.hash` assignment alone. If the route change does not take effect, use full `location.href` assignment instead:
+
+```python
+cdp(ws, 'Runtime.evaluate', {
+    'expression': 'location.href = "https://app.example.com/#/target-route"',
+    'returnByValue': True,
+})
+```
+
+Never use `Page.navigate` for hash-based SPA routes — the SPA router will not fire, and the page may reload to a default/home route.
 
 ## Screenshot and Text Extraction
 
