@@ -73,6 +73,16 @@ swimlane;horizontal=1;startSize=30;
 | Group padding    | 20px            |
 | Edge clearance   | 10px minimum    |
 
+### Top Callouts / Note Boxes
+
+For explanatory note boxes placed near the top of a panel or container:
+
+- **Inset from the outer frame** by at least 16-24px. Do not let the note box kiss or visually merge with the panel border.
+- **Prefer 3-4 short lines** over 2 long lines. If Japanese text feels tight, reduce line length before reducing font size.
+- **Increase note box height first** when text feels crowded. Do not solve crowding only by shrinking fonts.
+- **Keep arrow labels on a separate Y band** from the note box. Labels that sit at the same height tend to look overlapped in exports.
+- **Review at actual embed width** after export. A diagram that looks fine at full canvas size can still collide when embedded in Markdown or docs.
+
 ### Edge Crossing Prevention
 
 For complex diagrams (>15 nodes) with many-to-one or fan-out edges:
@@ -117,6 +127,13 @@ When combining diagonal branch/merge lines with annotation boxes (e.g., GitHub F
 | Complex (>15 nodes)   | 1200–1600 × 700–1000 |
 
 Always shrink-wrap: set page width/height to tightest bounding box + 20px margin.
+
+## Editable Source Policy
+
+- Treat `.drawio` as the editable source of truth for documentation diagrams.
+- Treat `.drawio.svg` as the delivery/render artifact for Markdown and web embedding.
+- If a diagram required manual SVG-level cleanup, recreate or preserve the equivalent `.drawio` source before calling it done.
+- Do not leave a documentation diagram as SVG-only unless the user explicitly asked for a disposable one-off artifact.
 
 ## Font Settings
 

@@ -58,6 +58,8 @@ For documentation-facing diagrams, generate outputs as a pair:
 - `name.drawio` for editing in VS Code Draw.io
 - `name.drawio.svg` for README / web embedding
 
+If the visible asset started from manual SVG cleanup or hand-authored layout tweaks, still keep a matching `name.drawio` as the editable SSOT. Do not leave documentation diagrams as SVG-only when future edits are expected.
+
 Recommended markdown pattern:
 
 ```markdown
@@ -139,7 +141,9 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | Blank in draw.io                  | Check `content` attribute                                                                      |
 | Edges not visible                 | Verify node IDs                                                                                |
 | Icons missing                     | Enable Azure/AWS shapes                                                                        |
+| Text overlaps near outer frame    | Inset top note/callout boxes 16-24px from the panel border, increase box height, and wrap to 3-4 lines. Review at actual embed width before finishing. See [style-guide.md](references/style-guide.md) Top Callouts / Note Boxes |
 | README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio`                   |
+| SVG is viewable but hard to edit later | Keep a paired `*.drawio` source and treat it as the editable SSOT; use SVG as delivery output, not as the only source file |
 | Too many crossing arrows          | Align source/target y to make edges horizontal; spread `entryY` on shared targets. See [style-guide.md](references/style-guide.md) Edge Crossing Prevention |
 | Legend inside a container          | Move legend outside the outermost box. See [style-guide.md](references/style-guide.md) Nested Containers |
 | Diagonal edge crosses a box        | Move annotation boxes below diagonal endpoints. See [style-guide.md](references/style-guide.md) Flow Diagrams |
@@ -153,3 +157,4 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 - [ ] All nodes and edges visible
 - [ ] Quality gate score ≥ 85
 - [ ] If diagram is referenced from documentation, both editable source and embeddable image are provided
+- [ ] Render review completed at the target embed width with no text overlap, clipping, or border collisions
