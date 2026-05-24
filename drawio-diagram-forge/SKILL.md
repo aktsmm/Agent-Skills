@@ -103,6 +103,8 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 
 → **[references/cloud-icons.md](references/cloud-icons.md)**
 
+For Azure-centric diagrams, proactively use the official Azure icon set when a verified Azure2 icon exists. Prefer icon + short label over plain rounded boxes for first-class Azure services. Fall back to generic boxes only when the icon is missing, misleading, or would hurt readability.
+
 ### Enable in VS Code
 
 1. Open `.drawio` file
@@ -119,6 +121,13 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 <!-- CORRECT -->
 <mxCell style="aspect=fixed;image=img/lib/azure2/networking/Front_Doors.svg;..." />
 ```
+
+### Azure Icon Preference
+
+- Use Azure service icons aggressively for Azure architecture diagrams when the service has a verified Azure2 path.
+- Keep the service name as a short text label even when the icon is obvious.
+- Do not mix verified Azure2 icons with generic blue boxes for the same diagram layer unless there is a clear reason.
+- If only some services have official icons, use icons for those services and use neutral fallback boxes for the rest.
 
 ## References
 

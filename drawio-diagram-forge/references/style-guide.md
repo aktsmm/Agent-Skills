@@ -141,11 +141,11 @@ Always shrink-wrap: set page width/height to tightest bounding box + 20px margin
 fontSize=12;fontStyle=0;fontFamily=Helvetica;
 ```
 
-| Element       | Font Size |
-| ------------- | --------- |
-| Node label    | 12px      |
-| Edge label    | 10px      |
-| Group title   | 14px      |
+| Element     | Font Size |
+| ----------- | --------- |
+| Node label  | 12px      |
+| Edge label  | 10px      |
+| Group title | 14px      |
 
 ## Export for PDF Pipelines
 

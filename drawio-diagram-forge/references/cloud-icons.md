@@ -6,6 +6,18 @@
 
 必ず `img/lib/azure2/**/*.svg` 形式を使用すること。
 
+## Icon Selection Policy
+
+Azure 中心の構成図では、**使える Azure アイコンは積極的に使う**。
+
+- Azure サービスに verified な Azure2 アイコンがあるなら、まずアイコン利用を検討する
+- アイコンを使っても、サービス名の短いラベルは残す
+- 同じ図の同じレイヤーでは、Azure アイコンと generic box を無秩序に混在させない
+- アイコンが存在しない、誤解を招く、または図が読みにくくなる場合だけ generic box に落とす
+- 初回レビューでは「この図で icon 化できるノードを box のまま放置していないか」を確認する
+
+> 目安: Azure Architecture / Hub-Spoke / Landing Zone / Service topology のような図では、主要な Azure サービスは box より icon を優先する。
+
 | 形式                            | Web 版 | VS Code 版  | 推奨 |
 | ------------------------------- | ------ | ----------- | ---- |
 | `shape=mxgraph.azure.*`         | ✅     | ❌ 青い四角 | ❌   |
