@@ -110,6 +110,15 @@ When combining diagonal branch/merge lines with annotation boxes (e.g., GitHub F
 - **Dashed connectors** starting from a box edge should begin at `y - 2px` (not exactly at the top edge) to avoid false overlap in validators.
 - **Keep horizontal feature branch and step row on separate Y bands** — minimum 40px gap between the branch line Y and the top of step boxes.
 
+### Icons On Connectors
+
+When a small service icon sits close to a busy connector or arrow:
+
+- **Prefer icon-only** and let the nearby node / edge label carry the meaning. Do not force a second label under the icon if it creates collisions.
+- **Move the icon 10-20px away from the connector centerline** before shrinking it further.
+- **Keep the icon above the connector in z-order / draw order** so the arrow does not cut through the symbol.
+- If the connector already has a readable label, avoid repeating the same service name under the icon.
+
 ### Alignment
 
 - Align nodes in grid (gridSize=10)

@@ -83,6 +83,14 @@ If multilingual variants are needed, keep parallel filenames instead of overwrit
 
 This keeps the editable source, the embeddable image, and the language variants aligned.
 
+For local article drafting, if the Markdown preview surface does not reliably render the SVG variant, it is acceptable to:
+
+- keep `.drawio` as the editable source
+- keep `.drawio.svg` as the web / embeddable artifact
+- temporarily reference a generated `*.png` from the draft article for local preview stability
+
+At publish time, replace local relative preview paths with the final hosted asset URL.
+
 ## Workflow
 
 ```
@@ -160,6 +168,7 @@ For Azure-centric diagrams, proactively use the official Azure icon set when a v
 | Text overlaps near outer frame    | Inset top note/callout boxes 16-24px from the panel border, increase box height, and wrap to 3-4 lines. Review at actual embed width before finishing. See [style-guide.md](references/style-guide.md) Top Callouts / Note Boxes |
 | README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio`                   |
 | SVG is viewable but hard to edit later | Keep a paired `*.drawio` source and treat it as the editable SSOT; use SVG as delivery output, not as the only source file |
+| Local Markdown preview does not show the expected diagram | Export `*.png` from `.drawio` and use that in the draft article preview. Keep `.drawio` and `*.drawio.svg` as the editable and embeddable pair for final delivery |
 | Too many crossing arrows          | Align source/target y to make edges horizontal; spread `entryY` on shared targets. See [style-guide.md](references/style-guide.md) Edge Crossing Prevention |
 | Legend inside a container          | Move legend outside the outermost box. See [style-guide.md](references/style-guide.md) Nested Containers |
 | Diagonal edge crosses a box        | Move annotation boxes below diagonal endpoints. See [style-guide.md](references/style-guide.md) Flow Diagrams |
