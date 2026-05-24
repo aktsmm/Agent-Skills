@@ -19,6 +19,13 @@ Generate **draw.io editable diagrams** using AI-powered workflow.
 - Transforming images/screenshots into editable format
 - Generating swimlane, sequence diagrams
 
+Choose this skill when the result will need later **GUI editing** in draw.io, cloud icons, or documentation-facing diagram assets.
+
+## When NOT to Use
+
+- Quick inline diagrams that are easier to keep as Mermaid in README or Markdown
+- One-off text-native diagrams where manual GUI adjustment is not expected
+
 ## Prerequisites
 
 | Tool                                                                                            | Required |
