@@ -173,6 +173,37 @@ Rules:
 - Reuse the already-open draft/editor tab; do not navigate away from an unsaved page.
 - Prefer HTML-diff URL detection after upload instead of assuming the last image on the page is the new one.
 - Use this fallback when Playwright `connect_over_cdp()` reaches `<ws connected>` and then times out, or when MCP cannot drive the file chooser cleanly.
+- If upload still times out on an existing draft/editor tab, open a **fresh draft** (`/drafts/new`) in a separate tab and retry there. Some long-lived unsaved drafts do not trigger upload reliably even when `DOM.setFileInputFiles` succeeds.
+
+## Azure Portal OOPIF and Trusted Event Notes
+
+Azure Portal often renders blade content inside `sandbox-*.reactblade.portal.azure.net` iframe targets. In CDP, these can appear as separate `type=iframe` targets.
+
+```python
+targets = cdp(browser_ws, 'Target.getTargets')['result']['targetInfos']
+portal_iframes = [
+  t for t in targets
+  if t.get('type') == 'iframe' and 'reactblade.portal.azure.net' in (t.get('url') or '')
+]
+```
+
+If outer-frame DOM inspection cannot see the content, attach directly to the iframe target:
+
+```python
+attach = cdp(browser_ws, 'Target.attachToTarget', {
+  'targetId': iframe_target_id,
+  'flatten': True,
+})
+session_id = attach['result']['sessionId']
+
+cdp(browser_ws, 'Runtime.enable', session_id=session_id)
+```
+
+Important:
+
+- Some Azure Portal actions call internal SDK methods such as `openBlade()`.
+- You may be able to inspect React handlers or invoke `onClick`, but blade navigation can still fail because the Portal expects a **trusted user event**.
+- When iframe text is visible but programmatic click / handler invocation does not navigate, treat this as a Portal constraint and switch the last click to a human.
 
 ## Session Extraction and Headless Handoff
 
