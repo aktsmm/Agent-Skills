@@ -221,6 +221,17 @@ const activeForm = overlays[overlays.length - 1]?.querySelector('form');
 - ダメなら別ページへ移動する
 - CDP 競合が疑わしいなら Python プロセスや MCP 接続を整理する
 
+### unsaved editor / draft タブを壊さない
+
+Qiita や CMS の draft editor のように、未保存変更を持つタブへそのまま `drafts/new` や別 URL を開かせると、`beforeunload` dialog が出て upload や遷移が壊れることがある。
+
+- 既に目的の editor / draft タブが開いているなら、そのタブを優先して再利用する
+- 新しい draft が必要でも、**既存タブを別 URL へ飛ばさず、新しいタブを開く**
+- `dialog.accept()` で無理に吸収する設計を通常フローにしない。beforeunload は race で失敗しやすい
+- file upload の前に、現在タブが本当に editor 本体かを URL と title で確認する
+
+このパターンは、Qiita に限らず「未保存フォームを持つ管理画面」全般で効く。
+
 ### `browser_run_code` / `page.evaluate` の速度 vs 証跡
 
 `browser_run_code` + `page.evaluate(JS)` で直接 DOM 操作すると、`browser_snapshot` → `browser_click` の MCP 標準フローより速い。ただし snapshot が出ないため、操作の証跡が残りにくい。
