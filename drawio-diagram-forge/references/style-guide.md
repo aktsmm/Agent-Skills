@@ -63,6 +63,9 @@ swimlane;horizontal=1;startSize=30;
 
 - **Do NOT embed title text in the diagram** (e.g., "図1-1 ..."). Captions belong in the document layer (Markdown `![caption](...)`, Re:VIEW `//image[id][caption]`, etc.).
 - Embedding titles causes duplication when the document already renders a figure caption.
+- If the exported image is likely to circulate **standalone** (chat, slide, ticket, SNS, pasted image), use the diagram title/subtitle to identify the **feature or topic name** directly. Avoid generic headings like `before / after` alone.
+- Good: `Summarized Gateway Prefixes の before / after`
+- Weak: `ExpressRoute の広告ルート数を before / after でみる` when the feature name is missing from the image itself.
 
 ### Spacing
 
@@ -126,6 +129,12 @@ When a small service icon sits close to a busy connector or arrow:
 - Use consistent node sizes
 - **Container with children** → `verticalAlign=top;spacingTop=5;` to keep the label above child nodes
 - **Standalone box (no children)** → `verticalAlign=middle;` to center text and avoid lopsided whitespace
+
+### Public-safe Labels
+
+- For diagrams that may be published externally, avoid customer-specific or vendor-internal acronyms unless the acronym itself is the subject of the diagram.
+- Prefer generic labels such as `On-premises gateway`, `On-premises router`, or `Edge network` over terms that only make sense in one customer's environment.
+- If an internal acronym must appear somewhere, keep it in the surrounding article text, not as the primary label inside the figure.
 
 ### Diagram Size
 
