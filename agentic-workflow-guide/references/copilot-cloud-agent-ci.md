@@ -40,7 +40,7 @@ if (pullRequests.length === 0 && context.payload.workflow_run.head_branch) {
   const { data: prs } = await github.rest.pulls.list({
     owner: context.repo.owner,
     repo: context.repo.repo,
-    state: 'open',
+    state: "open",
     head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
     per_page: 1,
   });
