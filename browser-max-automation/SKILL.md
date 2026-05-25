@@ -141,6 +141,17 @@ snapshot で ref 取得
 
 また、helper / probe / cache の JSON artifact を一次ソースにする場合は、内容を見る前に `timestamp` や対象日を確認する。日付が現在の実行日と合わない artifact は stale とみなし、`ok` や `fast_path_ok` が true でも確定情報として使わない。
 
+### unsaved editor / draft タブを壊さない
+
+Qiita や CMS の draft editor のように、未保存変更を持つタブへそのまま別 URL を開かせると、`beforeunload` dialog が出て upload や遷移が壊れることがある。
+
+- 既に目的の editor / draft タブが開いているなら、そのタブを優先して再利用する
+- 新しい draft が必要でも、**既存タブを別 URL へ飛ばさず、新しいタブを開く**
+- `dialog.accept()` で無理に吸収する設計を通常フローにしない。beforeunload は race で失敗しやすい
+- file upload の前に、現在タブが本当に editor 本体かを URL と title で確認する
+
+このパターンは、Qiita に限らず「未保存フォームを持つ管理画面」全般で効く。
+
 ### Angular Material フォーム自動化
 
 Angular Material (`mat-select`, `mat-dialog`, `cdk-overlay`) を Playwright で操作するときの共通パターン。
