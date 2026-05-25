@@ -65,12 +65,26 @@ jobs:
 - self-heal コメント後に Copilot reviewer を再要求し、再修正の起点を明示する
 - 同じ原因の自動修正は最大 3 回まで。超えたら PR を close し、linked issue / PR の両方に `needs-human-review` を付ける
 - `already gave up` 状態では重複コメントを増やさない
+- PR だけでなく linked issue にも escalation コメントを残し、`なぜ blocked なのか` を issue 単体で読めるようにする
 
 ### Metadata and Closing Discipline
 
 - generated PR の title / body は opened / synchronize 時に正規化する
 - linked issue を閉じたいなら、merge job 側の best effort close だけに頼らず、PR body に closing reference を注入する
 - source marker と closing reference が missing のままだと、PR merge 後に issue が残留しやすい
+
+### Human-Review Block Discipline
+
+- `needs-human-review` が付いた linked issue は、authoring workflow 側で **自動 assignment と shepherd を止める**
+- blocked issue を定期実行や手動再実行で勝手に再開しない
+- issue のラベル再設定時に `needs-human-review` を消さない
+- 再開条件は明示する。例: `ラベルを外すと再度自動化できます`
+
+### Resume Semantics
+
+- blocked issue を再開するとき、Copilot が assignee に残っていても `already assigned` だけでは不十分
+- **対応する open generated PR が無い**なら、assignment を再実行して作業を再開する
+- open PR が既にある場合だけ `already assigned / in progress` と判定する
 
 ### Duplicate PR Canonicalization
 
