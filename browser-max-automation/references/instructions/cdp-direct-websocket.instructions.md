@@ -54,6 +54,17 @@ ws = websocket.create_connection(
 )
 ```
 
+If the task depends on an already-open draft/editor tab, do not stop at `/json/version`. Query `/json/list`, filter for `type == 'page'`, and pick the tab by URL/title pattern before sending commands.
+
+```python
+tabs = json.loads(urllib.request.urlopen('http://localhost:9223/json/list').read())
+draft_tabs = [
+  tab for tab in tabs
+  if tab.get('type') == 'page' and 'qiita.com/drafts/' in (tab.get('url') or '')
+]
+target_tab = draft_tabs[0]
+```
+
 ## Command Helper
 
 CDP targets can emit many events. Always wait for the matching command `id` rather than reading the next message blindly.
@@ -123,6 +134,45 @@ text = cdp(ws, 'Runtime.evaluate', {
     'returnByValue': True,
 })['result']['result']['value']
 ```
+
+## Hidden File Input Upload
+
+For editors that hide `input[type=file]` behind custom buttons, raw CDP can upload without Playwright `connect_over_cdp()` or a visible file chooser.
+
+```python
+cdp(ws, 'DOM.enable')
+cdp(ws, 'Runtime.enable')
+
+root = cdp(ws, 'DOM.getDocument', {'depth': -1, 'pierce': True})['result']['root']
+node_id = cdp(ws, 'DOM.querySelector', {
+  'nodeId': root['nodeId'],
+  'selector': 'input[type="file"]',
+})['result']['nodeId']
+
+before_urls = cdp(ws, 'Runtime.evaluate', {
+  'expression': '(document.documentElement.outerHTML.match(/https://qiita-image-store\\.s3[^"\'\\s)]+/g) || [])',
+  'returnByValue': True,
+})['result']['result']['value']
+
+cdp(ws, 'DOM.setFileInputFiles', {
+  'nodeId': node_id,
+  'files': [image_path],  # absolute local path resolved by the caller
+})
+cdp(ws, 'Runtime.evaluate', {
+  'expression': '''(() => {
+    const input = document.querySelector('input[type="file"]');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  })()''',
+  'awaitPromise': True,
+})
+```
+
+Rules:
+
+- Reuse the already-open draft/editor tab; do not navigate away from an unsaved page.
+- Prefer HTML-diff URL detection after upload instead of assuming the last image on the page is the new one.
+- Use this fallback when Playwright `connect_over_cdp()` reaches `<ws connected>` and then times out, or when MCP cannot drive the file chooser cleanly.
 
 ## Session Extraction and Headless Handoff
 

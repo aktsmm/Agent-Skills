@@ -243,6 +243,15 @@ const activeForm = overlays[overlays.length - 1]?.querySelector('form');
 - ダメなら別ページへ移動する
 - CDP 競合が疑わしいなら Python プロセスや MCP 接続を整理する
 
+### hidden file input upload の fallback
+
+Qiita などの editor では、hidden `input[type=file]` が upload の正体で、Playwright `connectOverCDP()` は WebSocket 接続後に timeout することがある。
+
+- `connectOverCDP()` timeout でも `/json/list` と page target の WebSocket URL が取れるなら、raw CDP に切り替える
+- 既に開いている draft / editor tab を target にし、`DOM.setFileInputFiles` で hidden input へ直接流し込む
+- upload 後は page HTML か editor text に増えた `qiita-image-store` URL を見て、新しい URL だけを拾う
+- beforeunload を避けるため、既存の unsaved draft tab は再利用し、別 URL へ飛ばさない
+
 ### unsaved editor / draft タブを壊さない
 
 Qiita や CMS の draft editor のように、未保存変更を持つタブへそのまま `drafts/new` や別 URL を開かせると、`beforeunload` dialog が出て upload や遷移が壊れることがある。
