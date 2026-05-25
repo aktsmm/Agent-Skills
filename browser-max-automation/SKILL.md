@@ -160,8 +160,23 @@ Azure Portal のような hash-routing な管理画面は、**新しいタブで
 - 既存タブ上で `page.goto()` や hash 遷移を使い、目的画面へ移動する
 - 到達確認は URL だけで済ませず、**title と本文テキスト** も見る
 - `.../bgpPeers` のような subview URL でも、overview に戻ったりローディングのまま止まることがある。必要なら raw screenshot を 1 枚残してから次操作へ進む
+- Azure Portal のコンテンツ部分は `sandbox-*.reactblade.portal.azure.net` の **iframe 内** にレンダリングされている。`page.evaluate()` では outer frame しか見えないため、タブやフォームの操作は `page.frames()` で iframe を探し、`contentFrame.evaluate()` で操作する
 
-判断基準は単純で、**新規タブで login に落ちたら再ログインより先に既存 Portal タブの再利用を試す**。
+```javascript
+// Azure Portal の iframe 内コンテンツを操作する例
+const contentFrame = page.frames().find(f => f.url().includes('sandbox-1.reactblade'));
+if (contentFrame) {
+  const text = await contentFrame.evaluate(() => document.body.innerText);
+  // タブクリックも contentFrame 内で行う
+  await contentFrame.evaluate(() => {
+    const tab = [...document.querySelectorAll('[role="tab"]')]
+      .find(t => t.innerText.includes('対象タブ名'));
+    if (tab) tab.click();
+  });
+}
+```
+
+判断基準は単純で、**新規タブで login に落ちたら再ログインより先に既存 Portal タブの再利用を試す**。**`page.evaluate` でコンテンツが見えなければ iframe を疑う**。
 
 ### Angular Material フォーム自動化
 
