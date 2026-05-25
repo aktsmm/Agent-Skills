@@ -88,6 +88,22 @@ if (pullRequests.length === 0 && context.payload.workflow_run.head_branch) {
 - `Closes #XX` パターンを PR body から抽出して linked issue を閉じる
 - 閉じた PR/issue にはコメントで理由を残す
 
+### Generated Data Invariants
+
+collector が自動修復を持っていても、**壊れた生成物が main に入らない guard** を別に置く。
+
+- `collect` 後に generated data validator を実行する
+- generated PR validation でも同じ validator を実行する
+- validator は source 実装ではなく**生成済み artifact の不変条件**を見る
+
+例:
+
+- 同じ stable article URL が複数の日次 JSON に出ない
+- source marker や closing reference のような canonical metadata が欠落しない
+- generated output に既知の不正状態（generic fallback、同一記事の日跨ぎ重複など）が残らない
+
+重要なのは、`collect can repair` だけで終わらず、`repair に失敗した run は CI を落とす` まで入れること。
+
 ### In-Band Self-Heal Rules
 
 - validate failure 時は、失敗ステップ名だけでなく**修正ルール**を PR コメントに書く
