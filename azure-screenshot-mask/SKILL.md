@@ -123,6 +123,29 @@ for line in page.text_lines:
 
 依存: `surya-ocr`, `Pillow`。`ocr-super-surya` skill の環境を使う。
 
+## OCR-guided Highlight（赤枠注釈）
+
+before / after 比較や検証記事で「この行を見てほしい」と伝えたいとき、OCR で bbox を取得してから `ImageDraw.rectangle` で赤枠を入れる。座標を手入力するより確実に当たる。
+
+```python
+from PIL import Image, ImageDraw
+
+# OCR で取得済みの bbox を使って赤枠を描画
+img = Image.open("screenshot.png")
+draw = ImageDraw.Draw(img)
+
+# 行全体をハイライト（太い赤枠）
+draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
+
+img.save("screenshot.png")
+```
+
+ポイント:
+
+- モザイクと違い、元テキストを隠さず「ここを見て」と指すための注釈
+- 記事本文で「（赤枠の行）」と書いて、画像と本文をリンクさせる
+- 1 画像に 2〜3 箇所程度に絞る。多すぎると逆に見づらい
+
 ## Tips
 
 - **viewport を毎回 1912 px 前後に揃える**と、`--topright-*` を毎回触らずに済む
