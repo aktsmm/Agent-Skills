@@ -167,6 +167,14 @@ Worker agents may not read or follow central rules unless they are **explicitly 
 | **Violation Example**    | Retrying causes data duplication                          |
 | **Solution**             | State checking, use unique IDs                            |
 
+**Queue Hygiene for Issue/PR Automation:**
+
+For workflows that create or resume work through Issues, labels, and PRs, retry safety depends on treating those queue artifacts as workflow state.
+
+- Before creating new work, check whether an equivalent Issue or PR is already open.
+- If a blocker label such as `needs-human-review` can become stale, only auto-clear it under explicit safe conditions, for example when no open PR remains and the rerun was manual or triggered by a fresh failure.
+- If the latest evaluation says there is no actionable work, auto-close stale request Issues so the queue does not look blocked forever.
+
 ### 12. Observability
 
 **Record decisions and make progress visible**
@@ -177,6 +185,11 @@ Worker agents may not read or follow central rules unless they are **explicitly 
 | **Workflow Application** | Log key decisions as Issue comments, files, or documents |
 | **Violation Example**    | No visibility into why agent made a decision             |
 | **Solution**             | Decision logs, regular status reports for long tasks     |
+
+**Idle State Visibility:**
+
+If `0 new items` is a valid and healthy result, surface that state separately from `latest published artifact date`.
+Otherwise, users may misread a normal no-op run as a stale deployment or failed automation.
 
 **Elapsed Time Tracking:**
 

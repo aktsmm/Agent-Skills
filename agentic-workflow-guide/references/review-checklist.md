@@ -226,6 +226,7 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Is validation performed at each step?
 - [ ] Are conditions for proceeding clearly defined?
 - [ ] Is handling for validation failures defined?
+- [ ] If `0 new items` is a valid outcome, is that state shown separately from the latest published artifact date so normal no-op runs do not look stale?
 
 ## DRY (Don't Repeat Yourself)
 
@@ -244,6 +245,8 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Is it safe to retry?
 - [ ] Does executing the same operation multiple times produce the same result?
 - [ ] Are side effects being managed?
+- [ ] For Issue/PR-driven automation, does retry logic reuse existing queue artifacts instead of spawning duplicates?
+- [ ] Are stale blocker labels and stale request Issues cleaned up or safely resumed under explicit conditions when no open PR remains?
 ```
 
 ### Scale & Safety Check
