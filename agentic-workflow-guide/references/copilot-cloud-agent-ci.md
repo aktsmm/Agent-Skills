@@ -27,6 +27,35 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
 ```
 
+### `workflow_run` 連携時の PR 解決
+
+`pull_request_target` を起点にした workflow を、別 workflow の `workflow_run` で受ける場合、`context.payload.workflow_run.pull_requests` が空になることがある。
+
+- `pull_requests[0].number` を前提にしない
+- `workflow_run.head_branch` から open PR を逆引きする fallback を持つ
+
+```js
+let pullRequests = context.payload.workflow_run.pull_requests || [];
+if (pullRequests.length === 0 && context.payload.workflow_run.head_branch) {
+  const { data: prs } = await github.rest.pulls.list({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    state: 'open',
+    head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
+    per_page: 1,
+  });
+  pullRequests = prs;
+}
+```
+
+### `pull_request_target` で PR head を実行する場合の注意
+
+`pull_request_target` は base branch の workflow 定義で動くが、checkout を PR head SHA に向けると **PR 側の script / package.json / build code を実行する**。
+
+- same-repo guard を必須にする
+- 実行を許す script / 生成物の allowlist を絞る
+- fork PR や不特定 contributor を対象に同じ設計を使わない
+
 ### 参照
 
 - [GitHub Docs: Automatic token authentication](https://docs.github.com/en/actions/security-guides/automatic-token-authentication)
@@ -54,7 +83,7 @@ jobs:
 
 - merge 前にファイル allowlist を検証する（auto-merge と同じ基準）
 - `needs-human-review` ラベル付き PR はスキップする
-- merge 成功後に pages deploy を dispatch する
+- merge 後の副作用（deploy、release、通知）は **1 workflow に責務を寄せる**。`pull_request_target: closed` など別 workflow が拾うなら、merge job 側で同じ dispatch を重複実行しない
 - PR body を正規化し、`Generated from data/events/YYYY-MM-DD.json` と `Closes #XX` を必ず入れる
 - `Closes #XX` パターンを PR body から抽出して linked issue を閉じる
 - 閉じた PR/issue にはコメントで理由を残す
