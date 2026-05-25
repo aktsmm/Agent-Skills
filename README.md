@@ -16,7 +16,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | [agentic-workflow-guide](agentic-workflow-guide/)       | Design agentic workflows and choose the right primitive first / エージェントワークフロー設計と primitive 選定       |
 | [azure-advisor-report](azure-advisor-report/)           | Generate Azure monthly reports from Advisor and Cost Management / Azure Advisor・コスト管理の簡易月次レポート       |
-| [azure-troubleshooting](azure-troubleshooting/)         | Read-only Azure incident troubleshooting / Azure 障害調査・切り分け                                                  |
+| [azure-troubleshooting](azure-troubleshooting/)         | Read-only Azure incident troubleshooting / Azure 障害調査・切り分け                                                 |
 | [azure-env-builder](azure-env-builder/)                 | ⚠️ **Alpha** - Azure environment builder with Bicep / Azure 環境構築支援                                            |
 | [biz-ops-setup](biz-ops-setup/)                         | Business operations workspace setup / 業務管理ワークスペース構築                                                    |
 | [book-writing-workspace](book-writing-workspace/)       | Book writing workspace / 書籍執筆ワークスペース                                                                     |
