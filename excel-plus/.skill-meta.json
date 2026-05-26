@@ -1,0 +1,12 @@
+{
+  "name": "excel-plus",
+  "source": "workspace-custom",
+  "description": "Advanced Excel workflow covering both general spreadsheet work and enterprise update troubleshooting.",
+  "description_ja": "Excel汎用操作と更新トラブル対応（ロック/IRM/形式不一致）を統合したスキル",
+  "categories": [
+    "excel",
+    "troubleshooting"
+  ],
+  "installedAt": "2026-05-26T12:20:00.000Z",
+  "whenToUse": "`xlsx` の汎用機能を包含し、加えて enterprise 更新時のトラブル分岐を標準化したスキル。"
+}
