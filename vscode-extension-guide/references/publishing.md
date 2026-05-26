@@ -24,10 +24,12 @@ Complete guide for publishing your VS Code extension.
 2. Sign in → User Settings (top right) → **Personal access tokens**
 3. Click **New Token**
 4. Configure:
-  - **Name**: "VS Code Marketplace" (or any descriptive name)
-  - **Organization**: **All accessible organizations** ← Critical!
-  - **Expiration**: Up to 1 year
-  - **Scopes**: Custom defined → **Marketplace** → ✅ **Publish** (or **Manage** if your process also updates publisher metadata)
+
+- **Name**: "VS Code Marketplace" (or any descriptive name)
+- **Organization**: **All accessible organizations** ← Critical!
+- **Expiration**: Up to 1 year
+- **Scopes**: Custom defined → **Marketplace** → ✅ **Publish** (or **Manage** if your process also updates publisher metadata)
+
 5. Click **Create** and **copy token immediately** (shown only once)
 
 Before publishing, verify the token from the same terminal session that will run `vsce`:
@@ -199,15 +201,15 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 
 ## Common Errors
 
-| Error                      | Cause                        | Fix                                                   |
-| -------------------------- | ---------------------------- | ----------------------------------------------------- |
-| `Missing publisher`        | No publisher in package.json | Add `"publisher": "your-id"`                          |
-| `Personal Access Token...` | PAT invalid or expired       | Regenerate PAT with correct scopes                    |
+| Error                                   | Cause                                                                               | Fix                                                                                                         |
+| --------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `Missing publisher`                     | No publisher in package.json                                                        | Add `"publisher": "your-id"`                                                                                |
+| `Personal Access Token...`              | PAT invalid or expired                                                              | Regenerate PAT with correct scopes                                                                          |
 | `Access Denied... PAT used has expired` | The current `VSCE_PAT` value is expired or the open terminal still has an old value | Regenerate the PAT, update `VSCE_PAT`, reload the current process, and run `vsce verify-pat` before publish |
-| `version already exists`   | Same version published       | Increment version number                              |
-| `README not found`         | File missing or wrong case   | Create `README.md` (lowercase)                        |
-| `invalid prerelease`       | Version like `1.0.0-beta`    | Use standard version format                           |
-| `unknown option`           | Local `vsce` version differs | Check `vsce <command> --help` and use supported flags |
+| `version already exists`                | Same version published                                                              | Increment version number                                                                                    |
+| `README not found`                      | File missing or wrong case                                                          | Create `README.md` (lowercase)                                                                              |
+| `invalid prerelease`                    | Version like `1.0.0-beta`                                                           | Use standard version format                                                                                 |
+| `unknown option`                        | Local `vsce` version differs                                                        | Check `vsce <command> --help` and use supported flags                                                       |
 
 ## GitHub Release After Marketplace Publish
 

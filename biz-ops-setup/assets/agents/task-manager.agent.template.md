@@ -40,11 +40,11 @@ Always sync `DASHBOARD.md` when updating tasks.
 
 ### Sync Targets
 
-| DASHBOARD Section | Sync Source                                              |
-| ----------------- | -------------------------------------------------------- |
-| Today's Focus     | Top 3 high-priority tasks from `Tasks/active.md`       |
-| This Week         | Tasks due this week from `Tasks/active.md`             |
-| Recent Completed  | Latest 3 from `Tasks/completed.md`                     |
+| DASHBOARD Section | Sync Source                                      |
+| ----------------- | ------------------------------------------------ |
+| Today's Focus     | Top 3 high-priority tasks from `Tasks/active.md` |
+| This Week         | Tasks due this week from `Tasks/active.md`       |
+| Recent Completed  | Latest 3 from `Tasks/completed.md`               |
 
 ### Sync Timing
 
@@ -52,7 +52,6 @@ Always sync `DASHBOARD.md` when updating tasks.
 - On task status update
 - On task completion
 - On "Update dashboard" command
-
 
 ## Error Handling
 
@@ -105,25 +104,25 @@ graph TD
 
 ### workIQ Queries (Period: Last Update to Now)
 
-| Data Source    | Query Example                                                  |
-| -------------- | -------------------------------------------------------------- |
+| Data Source    | Query Example                                                                                        |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
 | Meetings       | "List of meetings in {period}. Name, date, participants, decisions, my action items, next milestone" |
-| Teams Mentions | "Chats with mentions to me in {period}. Content, reply status" |
-| Sent Emails    | "Emails sent in {period}. Subject, recipient"                  |
-| Edited Files   | "Files edited in {period}"                                     |
-| OneNote        | "OneNote updated in {period}. Note name, section"              |
-| Meeting Notes  | "Decisions, action items, owners, and next milestone from {meeting name}" |
+| Teams Mentions | "Chats with mentions to me in {period}. Content, reply status"                                       |
+| Sent Emails    | "Emails sent in {period}. Subject, recipient"                                                        |
+| Edited Files   | "Files edited in {period}"                                                                           |
+| OneNote        | "OneNote updated in {period}. Note name, section"                                                    |
+| Meeting Notes  | "Decisions, action items, owners, and next milestone from {meeting name}"                            |
 
 ### Progress Detection Rules
 
-| Activity Log     | Detection Condition            | Task Status                  |
-| ---------------- | ------------------------------ | ---------------------------- |
-| Meeting attended | Attended task-related meeting  | `in-progress`                |
+| Activity Log               | Detection Condition                                             | Task Status                         |
+| -------------------------- | --------------------------------------------------------------- | ----------------------------------- |
+| Meeting attended           | Attended task-related meeting                                   | `in-progress`                       |
 | Meeting follow-up assigned | Meeting notes include my action item or prep for next milestone | add new task or split existing task |
-| Email sent       | Sent task-related materials    | `in-progress` or `completed` |
-| File edited      | Edited task-related file       | `in-progress`                |
-| Action completed | Completion reported in meeting | `completed`                  |
-| Mention          | "Done", "Completed" message    | `completed`                  |
+| Email sent                 | Sent task-related materials                                     | `in-progress` or `completed`        |
+| File edited                | Edited task-related file                                        | `in-progress`                       |
+| Action completed           | Completion reported in meeting                                  | `completed`                         |
+| Mention                    | "Done", "Completed" message                                     | `completed`                         |
 
 ### Task-Activity Association
 
