@@ -1,6 +1,6 @@
 ---
 name: excel-plus
-description: "Advanced Excel workflow covering both general spreadsheet work and enterprise update troubleshooting. Use for creating/editing/analyzing .xlsx/.xlsm/.csv/.tsv and for lock/IRM/format mismatch failures during scripted updates."
+description: "Unified Excel workflow for spreadsheet work and update troubleshooting. Use for .xlsx/.xlsm/.csv/.tsv tasks and for lock, IRM, or format mismatch failures during scripted updates."
 argument-hint: "対象ファイル、更新スクリプト、更新日付（例: --date 20260526）"
 user-invocable: true
 license: Proprietary. LICENSE.txt has complete terms
@@ -8,7 +8,7 @@ license: Proprietary. LICENSE.txt has complete terms
 
 # Excel Plus
 
-`xlsx` の汎用機能を包含し、加えて enterprise 更新時のトラブル分岐を標準化したスキル。
+スプレッドシート作業全般と、更新時のロック・IRM・形式不一致対応をまとめたスキル。
 
 ## Excel Plus Extensions
 
