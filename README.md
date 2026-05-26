@@ -25,7 +25,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [code-simplifier](code-simplifier/)                     | Simplify and refactor complex code / コード簡略化・リファクタリング                                                 |
 | [customer-workspace](customer-workspace/)               | Customer workspace initialization / 顧客ワークスペース初期化                                                        |
 | [drawio-diagram-forge](drawio-diagram-forge/)           | Create draw.io diagrams from text / テキストから draw.io 図を生成                                                   |
-| [excel-plus](excel-plus/)                               | Unified Excel skill (general operations + troubleshooting) / Excel 汎用操作と更新トラブル対応を統合                |
+| [excel-plus](excel-plus/)                               | Unified Excel workflow for spreadsheet work and update troubleshooting / Excel 汎用操作と更新トラブル対応を統合     |
 | [humanize-writing](humanize-writing/)                   | Humanize AI-sounding drafts and preserve author voice / AIっぽい原稿を人間らしく整え、書き手の癖を残す              |
 | [local-media-transcription](local-media-transcription/) | Transcribe local audio/video and prepare minutes / ローカル音声・動画の文字起こしと議事録化                         |
 | [microsoft-graph-gateway](microsoft-graph-gateway/)     | Route Microsoft Graph read and write workflows with safe execution scaffolds / Microsoft Graph 操作の安全な gateway |
