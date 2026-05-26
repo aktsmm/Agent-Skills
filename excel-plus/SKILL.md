@@ -22,18 +22,28 @@ license: Proprietary. LICENSE.txt has complete terms
 ### Procedure (Troubleshooting)
 
 1. 対象の更新スクリプトと必須引数を確認する
-2. ブックが開いている場合でも、まず `--dry-run` を実行する
-3. エラー種別で分岐する（下の Branches）
-4. dry-run 成功後に本更新を実行する
-5. 更新結果（作成シート名、変更件数、保存成功）を確認する
-6. 一時ファイル/一時スクリプトを削除して終了する
+2. 日付、対象パス、出力先などの引数を workbook open / COM 起動より前に検証する
+3. ブックが開いている場合でも、まず `--dry-run` を実行する
+4. エラー種別で分岐する（下の Branches）
+5. dry-run 成功後に本更新を実行する
+6. 更新結果（作成シート名、変更件数、保存成功）を確認する
+7. 一時ファイル/一時スクリプトを削除して終了する
 
 ### Branches
 
 - PermissionError: まず snapshot export や open-workbook COM 更新を試す。開いたブックの未保存変更も snapshot で読む。閉じるのは最終手段
-- BadZipFile: 先頭バイトで形式確認（`PK`=xlsx, `D0 CF`=旧形式）。必要なら `.xlsx` で保存し直す。開いているブックなら COM で snapshot を作って継続
-- IRM/保護: 解除または編集可能コピーで更新後、必要なら保護を戻す
-- ハング: 長い1行コマンドを避け、短いコマンドか一時スクリプトに分割
+- BadZipFile: 先頭バイトで形式確認（`PK`=xlsx, `D0 CF`=旧形式/OLE/IRM の可能性）。必要なら `.xlsx` で保存し直す。開いているブックなら COM で snapshot を作って継続
+- IRM/保護: hidden Excel で勝手に open しない。ユーザーが Excel Desktop で対話的に開き、保護/IRM ダイアログを解決済みの workbook にだけ attach する。hidden open を許す場合は明示フラグ、短い timeout、fail-fast、cleanup を必須にする
+- ハング: 長い1行コマンドを避け、短いコマンドか一時スクリプトに分割する。COM helper は `Workbooks.Open` / `SaveAs` / `Save` が戻らない前提で timeout を置き、finally だけに依存しない
+- hidden Excel 残留: `EXCEL.EXE` の window title/handle が空のプロセスを dry-run で列挙し、ユーザーが Excel を閉じてよいと確認できた場合だけ PID を絞って終了する。`taskkill /IM excel.exe /F` のような全 kill は避ける
+
+### COM Guardrails (Troubleshooting)
+
+- 保護付き・IRM・形式不一致が疑われる workbook は、`PK` でない時点で非対話ライブラリ処理を fail-fast させる
+- `RequireOpenWorkbook` 相当のガードを持たせ、対象 workbook が既に開いていない場合は hidden Excel を新規作成しない
+- `--dry-run` / `--plan-output` のような機械可読プレビューを優先し、本更新前に変更行・未解決行・追加候補を確認する
+- 一時 snapshot / temp copy は成功・失敗・timeout の全経路で削除する
+- 回帰テストでは、実 workbook や Excel COM 更新を使わず、OpenXML の一時 workbook で dry-run / 実更新 / 引数検証 / 非 OpenXML fail-fast / hidden Excel 非生成を確認する
 
 ### Quality Gates (Troubleshooting)
 
@@ -43,6 +53,7 @@ license: Proprietary. LICENSE.txt has complete terms
 - [ ] 変更件数を確認した（0件でも理由を説明できる）
 - [ ] 一時ファイルを削除した
 - [ ] 開いていたブックが閉じられていないこと、または意図せず別名保存されていないことを確認した
+- [ ] `EXCEL.EXE` の hidden 残留と workbook lock file がないことを確認した
 
 # Requirements for Outputs
 
