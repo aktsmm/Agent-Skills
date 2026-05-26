@@ -107,18 +107,19 @@ graph TD
 
 | Data Source    | Query Example                                                  |
 | -------------- | -------------------------------------------------------------- |
-| Meetings       | "List of meetings in {period}. Name, date, participants"       |
+| Meetings       | "List of meetings in {period}. Name, date, participants, decisions, my action items, next milestone" |
 | Teams Mentions | "Chats with mentions to me in {period}. Content, reply status" |
 | Sent Emails    | "Emails sent in {period}. Subject, recipient"                  |
 | Edited Files   | "Files edited in {period}"                                     |
 | OneNote        | "OneNote updated in {period}. Note name, section"              |
-| Meeting Notes  | "Decisions and action items from {meeting name}"               |
+| Meeting Notes  | "Decisions, action items, owners, and next milestone from {meeting name}" |
 
 ### Progress Detection Rules
 
 | Activity Log     | Detection Condition            | Task Status                  |
 | ---------------- | ------------------------------ | ---------------------------- |
 | Meeting attended | Attended task-related meeting  | `in-progress`                |
+| Meeting follow-up assigned | Meeting notes include my action item or prep for next milestone | add new task or split existing task |
 | Email sent       | Sent task-related materials    | `in-progress` or `completed` |
 | File edited      | Edited task-related file       | `in-progress`                |
 | Action completed | Completion reported in meeting | `completed`                  |

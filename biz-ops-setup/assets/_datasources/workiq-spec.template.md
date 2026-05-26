@@ -147,9 +147,11 @@ Use `mcp_workiq_ask_work_iq` tool to automatically retrieve data from Microsoft 
 
 ```
 "Meeting notes from {meeting name}"
-"Decisions and action items from today's meetings"
+"Decisions, action items, owners, and next milestone from today's meetings"
 "AI transcript from {meeting name}"
 ```
+
+- For ongoing customer work, ask for **your action items, counterpart action items, and the next milestone** even when no new Request / RMOT / Assignment ID was created.
 
 ---
 
@@ -180,7 +182,7 @@ Step 3: Get edited files
   Query: "Word/PowerPoint/Excel files I edited on {date}"
 
 Step 4: Get Teams meeting notes (key meetings only)
-  Query: "Decisions and action items from {meeting name}"
+  Query: "Decisions, action items, owners, and next milestone from {meeting name}"
 
 Step 5: Get mentions
   Query: "Mentions to me on {date}. Include content, reply status"
@@ -205,7 +207,7 @@ Step 4: Get edited files summary
   Query: "Files I edited this week"
 
 Step 5: Get key meeting notes
-  Query: "Key decisions from this week's meetings"
+  Query: "Key decisions, action items with owners, and next milestone from this week's meetings"
 ```
 
 ### 2.3 Monthly Report Generation
