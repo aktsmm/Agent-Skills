@@ -27,8 +27,8 @@ Complete guide for publishing your VS Code extension.
 
 - **Name**: "VS Code Marketplace" (or any descriptive name)
 - **Organization**: **All accessible organizations** ← Critical!
-- **Expiration**: Up to 1 year
-- **Scopes**: Custom defined → **Marketplace** → ✅ **Publish** (or **Manage** if your process also updates publisher metadata)
+- **Expiration**: Pick a real future date such as `1 year`. The `Custom defined` field defaults to today's date in some Azure DevOps UIs, so a token issued without changing it is valid only for the current day — `vsce verify-pat` passes the same day, but `vsce publish` fails with `Access Denied: The Personal Access Token used has expired.` the moment the day rolls over.
+- **Scopes**: Click **Show all scopes** if `Marketplace` is hidden, then under **Marketplace** check **Manage** (preferred — `Publish` alone may be rejected by some publish API paths even when `verify-pat` succeeds)
 
 5. Click **Create** and **copy token immediately** (shown only once)
 
@@ -205,7 +205,7 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 | --------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `Missing publisher`                     | No publisher in package.json                                                        | Add `"publisher": "your-id"`                                                                                |
 | `Personal Access Token...`              | PAT invalid or expired                                                              | Regenerate PAT with correct scopes                                                                          |
-| `Access Denied... PAT used has expired` | The current `VSCE_PAT` value is expired or the open terminal still has an old value | Regenerate the PAT, update `VSCE_PAT`, reload the current process, and run `vsce verify-pat` before publish |
+| `Access Denied... PAT used has expired` | The current `VSCE_PAT` value is expired, the open terminal still has an old value, the PAT was issued with `Custom defined` expiration defaulting to today, or the PAT lacks `Marketplace > Manage` scope (so `verify-pat` passes but `publish` is rejected) | Regenerate the PAT with a real future expiration and `Marketplace > Manage` scope, update `VSCE_PAT`, reload the current process, and run `vsce verify-pat` before publish |
 | `version already exists`                | Same version published                                                              | Increment version number                                                                                    |
 | `README not found`                      | File missing or wrong case                                                          | Create `README.md` (lowercase)                                                                              |
 | `invalid prerelease`                    | Version like `1.0.0-beta`                                                           | Use standard version format                                                                                 |

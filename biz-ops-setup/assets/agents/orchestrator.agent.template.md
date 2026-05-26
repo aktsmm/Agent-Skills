@@ -246,11 +246,11 @@ runSubagent({
 
 When returning sub-agent results to user, **do NOT omit**:
 
-| Sub-agent             | Required Sections                                           |
-| --------------------- | ----------------------------------------------------------- |
+| Sub-agent             | Required Sections                                          |
+| --------------------- | ---------------------------------------------------------- |
 | `availability-finder` | Both "Confirmed free" **and** "Adjustable (Tentative/etc)" |
-| `report-generator`    | All sections (summary, details, PR points)                  |
-| `task-manager`        | Updated task list, status change history                    |
+| `report-generator`    | All sections (summary, details, PR points)                 |
+| `task-manager`        | Updated task list, status change history                   |
 
 **⚠️ FORBIDDEN**: "Simplifying" summary to drop information when returning to user.
 
