@@ -201,15 +201,15 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 
 ## Common Errors
 
-| Error                                   | Cause                                                                                                                                                                                                                                                        | Fix                                                                                                                                                                        |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Missing publisher`                     | No publisher in package.json                                                                                                                                                                                                                                 | Add `"publisher": "your-id"`                                                                                                                                               |
-| `Personal Access Token...`              | PAT invalid or expired                                                                                                                                                                                                                                       | Regenerate PAT with correct scopes                                                                                                                                         |
+| Error                                   | Cause                                                                               | Fix                                                                                                         |
+| --------------------------------------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `Missing publisher`                     | No publisher in package.json                                                        | Add `"publisher": "your-id"`                                                                                |
+| `Personal Access Token...`              | PAT invalid or expired                                                              | Regenerate PAT with correct scopes                                                                          |
 | `Access Denied... PAT used has expired` | The current `VSCE_PAT` value is expired, the open terminal still has an old value, the PAT was issued with `Custom defined` expiration defaulting to today, or the PAT lacks `Marketplace > Manage` scope (so `verify-pat` passes but `publish` is rejected) | Regenerate the PAT with a real future expiration and `Marketplace > Manage` scope, update `VSCE_PAT`, reload the current process, and run `vsce verify-pat` before publish |
-| `version already exists`                | Same version published                                                                                                                                                                                                                                       | Increment version number                                                                                                                                                   |
-| `README not found`                      | File missing or wrong case                                                                                                                                                                                                                                   | Create `README.md` (lowercase)                                                                                                                                             |
-| `invalid prerelease`                    | Version like `1.0.0-beta`                                                                                                                                                                                                                                    | Use standard version format                                                                                                                                                |
-| `unknown option`                        | Local `vsce` version differs                                                                                                                                                                                                                                 | Check `vsce <command> --help` and use supported flags                                                                                                                      |
+| `version already exists`                | Same version published                                                              | Increment version number                                                                                    |
+| `README not found`                      | File missing or wrong case                                                          | Create `README.md` (lowercase)                                                                              |
+| `invalid prerelease`                    | Version like `1.0.0-beta`                                                           | Use standard version format                                                                                 |
+| `unknown option`                        | Local `vsce` version differs                                                        | Check `vsce <command> --help` and use supported flags                                                       |
 
 ## GitHub Release After Marketplace Publish
 
@@ -348,6 +348,10 @@ $cli = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
 Also treat `vsce package` completion based on the **output file** (size +
 mtime), not on console messages — terminal capture sometimes drops the
 `DONE Packaged: ...` line, but the artifact on disk is the source of truth.
+If the VSIX exists but ZIP inspection fails, check whether `node` / `vsce` is
+still writing the file. Once no package process remains, delete the corrupt
+artifact, rebuild with a deterministic output path, and inspect that rebuilt
+file instead of reusing the partial archive.
 
 ```powershell
 Get-ChildItem artifacts/vsix/my-extension-1.0.0.vsix |
