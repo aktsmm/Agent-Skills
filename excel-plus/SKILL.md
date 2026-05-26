@@ -22,7 +22,7 @@ license: Proprietary. LICENSE.txt has complete terms
 ### Procedure (Troubleshooting)
 
 1. 対象の更新スクリプトと必須引数を確認する
-2. 先に `--dry-run` を実行する
+2. ブックが開いている場合でも、まず `--dry-run` を実行する
 3. エラー種別で分岐する（下の Branches）
 4. dry-run 成功後に本更新を実行する
 5. 更新結果（作成シート名、変更件数、保存成功）を確認する
@@ -30,8 +30,8 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ### Branches
 
-- PermissionError: ブックを閉じる。必要なら不要な Excel プロセスを停止し再実行
-- BadZipFile: 先頭バイトで形式確認（`PK`=xlsx, `D0 CF`=旧形式）。必要なら `.xlsx` で保存し直し
+- PermissionError: まず snapshot export や open-workbook COM 更新を試す。開いたブックの未保存変更も snapshot で読む。閉じるのは最終手段
+- BadZipFile: 先頭バイトで形式確認（`PK`=xlsx, `D0 CF`=旧形式）。必要なら `.xlsx` で保存し直す。開いているブックなら COM で snapshot を作って継続
 - IRM/保護: 解除または編集可能コピーで更新後、必要なら保護を戻す
 - ハング: 長い1行コマンドを避け、短いコマンドか一時スクリプトに分割
 
@@ -42,6 +42,7 @@ license: Proprietary. LICENSE.txt has complete terms
 - [ ] 期待シート（例: `YYYYMMDD`）が作成/更新されている
 - [ ] 変更件数を確認した（0件でも理由を説明できる）
 - [ ] 一時ファイルを削除した
+- [ ] 開いていたブックが閉じられていないこと、または意図せず別名保存されていないことを確認した
 
 # Requirements for Outputs
 
