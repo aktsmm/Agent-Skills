@@ -27,8 +27,21 @@ Complete guide for publishing your VS Code extension.
    - **Name**: "VS Code Marketplace" (or any descriptive name)
    - **Organization**: **All accessible organizations** ← Critical!
    - **Expiration**: Up to 1 year
-   - **Scopes**: Custom defined → **Marketplace** → ✅ **Manage**
+    - **Scopes**: Custom defined → **Marketplace** → ✅ **Publish** (or **Manage** if your process also updates publisher metadata)
 5. Click **Create** and **copy token immediately** (shown only once)
+
+Before publishing, verify the token from the same terminal session that will run `vsce`:
+
+```powershell
+npx --yes vsce verify-pat -p "$env:VSCE_PAT"
+```
+
+If `verify-pat` fails but `VSCE_PAT` exists in the User environment, reload it into the current process before retrying:
+
+```powershell
+$env:VSCE_PAT = [System.Environment]::GetEnvironmentVariable("VSCE_PAT", "User")
+npx --yes vsce verify-pat -p "$env:VSCE_PAT"
+```
 
 ## Login and Publish
 
@@ -39,6 +52,9 @@ npx @vscode/vsce login <publisher-id>
 
 # Verify login
 npx @vscode/vsce ls-publishers
+
+# Verify the PAT used by this terminal before publish
+npx --yes vsce verify-pat -p "$env:VSCE_PAT"
 
 # Publish new version
 npx @vscode/vsce publish
@@ -187,6 +203,7 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 | -------------------------- | ---------------------------- | ----------------------------------------------------- |
 | `Missing publisher`        | No publisher in package.json | Add `"publisher": "your-id"`                          |
 | `Personal Access Token...` | PAT invalid or expired       | Regenerate PAT with correct scopes                    |
+| `Access Denied... PAT used has expired` | The current `VSCE_PAT` value is expired or the open terminal still has an old value | Regenerate the PAT, update `VSCE_PAT`, reload the current process, and run `vsce verify-pat` before publish |
 | `version already exists`   | Same version published       | Increment version number                              |
 | `README not found`         | File missing or wrong case   | Create `README.md` (lowercase)                        |
 | `invalid prerelease`       | Version like `1.0.0-beta`    | Use standard version format                           |
@@ -237,6 +254,8 @@ if ($env:VSCE_PAT) { "present (length: $($env:VSCE_PAT.Length))" } else { "missi
 
 > ⚠️ `SetEnvironmentVariable` does **not** update already-open terminals.
 > Open a new terminal (or restart VS Code) after persisting.
+
+If a publish command still uses an expired token after you update the User environment, the current terminal probably kept the old process value. Reassign `$env:VSCE_PAT` from the User value in that terminal, then run `verify-pat` again.
 
 ### If the PAT was accidentally exposed
 
