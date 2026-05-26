@@ -24,10 +24,10 @@ Complete guide for publishing your VS Code extension.
 2. Sign in → User Settings (top right) → **Personal access tokens**
 3. Click **New Token**
 4. Configure:
-   - **Name**: "VS Code Marketplace" (or any descriptive name)
-   - **Organization**: **All accessible organizations** ← Critical!
-   - **Expiration**: Up to 1 year
-    - **Scopes**: Custom defined → **Marketplace** → ✅ **Publish** (or **Manage** if your process also updates publisher metadata)
+  - **Name**: "VS Code Marketplace" (or any descriptive name)
+  - **Organization**: **All accessible organizations** ← Critical!
+  - **Expiration**: Up to 1 year
+  - **Scopes**: Custom defined → **Marketplace** → ✅ **Publish** (or **Manage** if your process also updates publisher metadata)
 5. Click **Create** and **copy token immediately** (shown only once)
 
 Before publishing, verify the token from the same terminal session that will run `vsce`:
