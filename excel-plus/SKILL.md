@@ -42,6 +42,7 @@ license: Proprietary. LICENSE.txt has complete terms
 - 保護付き・IRM・形式不一致が疑われる workbook は、`PK` でない時点で非対話ライブラリ処理を fail-fast させる
 - `RequireOpenWorkbook` 相当のガードを持たせ、対象 workbook が既に開いていない場合は hidden Excel を新規作成しない
 - `--dry-run` / `--plan-output` のような機械可読プレビューを優先し、本更新前に変更行・未解決行・追加候補を確認する
+- URL 列では、表示文字列と実 hyperlink metadata を分けて扱う。`RMOT...` `SCOP...` `ROSS...` の ID が見えていてもクリック不能なことがあるため、推定可能なリンク先は repair pass で再付与し、表示値だけで完了判定しない
 - 一時 snapshot / temp copy は成功・失敗・timeout の全経路で削除する
 - 回帰テストでは、実 workbook や Excel COM 更新を使わず、OpenXML の一時 workbook で dry-run / 実更新 / 引数検証 / 非 OpenXML fail-fast / hidden Excel 非生成を確認する
 
@@ -51,6 +52,7 @@ license: Proprietary. LICENSE.txt has complete terms
 - [ ] 本更新が成功し、保存完了メッセージを確認した
 - [ ] 期待シート（例: `YYYYMMDD`）が作成/更新されている
 - [ ] 変更件数を確認した（0件でも理由を説明できる）
+- [ ] URL / ID 列を補修した場合、代表セルで hyperlink の有無と target を spot-check した
 - [ ] 一時ファイルを削除した
 - [ ] 開いていたブックが閉じられていないこと、または意図せず別名保存されていないことを確認した
 - [ ] `EXCEL.EXE` の hidden 残留と workbook lock file がないことを確認した
