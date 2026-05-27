@@ -53,6 +53,25 @@ $SkillRoot = Split-Path -Parent $ScriptDir
 $AssetsPath = Join-Path $SkillRoot "assets"
 $TemplatesPath = Join-Path $AssetsPath "_templates"
 
+function Expand-TemplateContent {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TemplatePath
+    )
+
+    $content = Get-Content $TemplatePath -Raw
+    $content = $content -replace '\{\{CUSTOMER_NAME\}\}', $CustomerName
+    $content = $content -replace '\{\{CONTRACT_TYPE\}\}', $(if ($ContractType) { $ContractType } else { "未設定" })
+    $content = $content -replace '\{\{CONTRACT_PERIOD\}\}', $(if ($ContractPeriod) { $ContractPeriod } else { "未設定" })
+    $content = $content -replace '\{\{KEY_CONTACTS\}\}', $(if ($KeyContacts) { $KeyContacts } else { "" })
+    $content = $content -replace '\{\{YEAR\}\}', (Get-Date -Format "yyyy")
+    $content = $content -replace '\{\{YEAR_MONTH\}\}', (Get-Date -Format "yyyy-MM")
+    $content = $content -replace '\{\{START_DATE\}\}', (Get-Date -Format "yyyy-MM-dd")
+    $content = $content -replace '\{\{TODAY\}\}', (Get-Date -Format "yyyy-MM-dd")
+
+    return $content
+}
+
 Write-Host "🚀 顧客ワークスペース初期化を開始します..." -ForegroundColor Cyan
 Write-Host "   顧客名: $CustomerName" -ForegroundColor Gray
 Write-Host "   ワークスペース: $WorkspacePath" -ForegroundColor Gray
@@ -124,12 +143,30 @@ foreach ($template in $templates) {
     $src = Join-Path $TemplatesPath $template
     $dst = Join-Path $WorkspacePath "_templates\$template"
     if (Test-Path $src) {
-        $content = Get-Content $src -Raw
-        $content = $content -replace '\{\{CUSTOMER_NAME\}\}', $CustomerName
-        $content = $content -replace '\{\{YEAR\}\}', (Get-Date -Format "yyyy")
-        $content = $content -replace '\{\{TODAY\}\}', (Get-Date -Format "yyyy-MM-dd")
+        $content = Expand-TemplateContent -TemplatePath $src
         Set-Content -Path $dst -Value $content -Encoding UTF8
         Write-Host "   📝 作成: _templates/$template" -ForegroundColor Green
+    }
+}
+
+# ルートドキュメントの作成
+$workspaceReadmePath = Join-Path $WorkspacePath "README.md"
+if (-not (Test-Path $workspaceReadmePath)) {
+    $workspaceReadmeTemplate = Join-Path $TemplatesPath "workspace-readme.md"
+    if (Test-Path $workspaceReadmeTemplate) {
+        $content = Expand-TemplateContent -TemplatePath $workspaceReadmeTemplate
+        Set-Content -Path $workspaceReadmePath -Value $content -Encoding UTF8
+        Write-Host "   📝 作成: README.md" -ForegroundColor Green
+    }
+}
+
+$workspaceSummaryPath = Join-Path $WorkspacePath "workspace-summary.md"
+if (-not (Test-Path $workspaceSummaryPath)) {
+    $workspaceSummaryTemplate = Join-Path $TemplatesPath "workspace-summary.md"
+    if (Test-Path $workspaceSummaryTemplate) {
+        $content = Expand-TemplateContent -TemplatePath $workspaceSummaryTemplate
+        Set-Content -Path $workspaceSummaryPath -Value $content -Encoding UTF8
+        Write-Host "   📝 作成: workspace-summary.md" -ForegroundColor Green
     }
 }
 
@@ -168,13 +205,7 @@ $profilePath = Join-Path $WorkspacePath "_customer\profile.md"
 if (-not (Test-Path $profilePath)) {
     $profileTemplate = Join-Path $TemplatesPath "customer-profile.md"
     if (Test-Path $profileTemplate) {
-        $content = Get-Content $profileTemplate -Raw
-        $content = $content -replace '\{\{CUSTOMER_NAME\}\}', $CustomerName
-        $content = $content -replace '\{\{CONTRACT_TYPE\}\}', $(if ($ContractType) { $ContractType } else { "未設定" })
-        $content = $content -replace '\{\{CONTRACT_PERIOD\}\}', $(if ($ContractPeriod) { $ContractPeriod } else { "未設定" })
-        $content = $content -replace '\{\{KEY_CONTACTS\}\}', $(if ($KeyContacts) { $KeyContacts } else { "" })
-        $content = $content -replace '\{\{START_DATE\}\}', (Get-Date -Format "yyyy-MM-dd")
-        $content = $content -replace '\{\{TODAY\}\}', (Get-Date -Format "yyyy-MM-dd")
+        $content = Expand-TemplateContent -TemplatePath $profileTemplate
         Set-Content -Path $profilePath -Value $content -Encoding UTF8
         Write-Host "   📝 作成: _customer/profile.md" -ForegroundColor Green
     }
@@ -188,6 +219,8 @@ Write-Host "   - .github/copilot-instructions.md（自動判定ルール）"
 Write-Host "   - .github/prompts/inbox.prompt.md（インボックス）"
 Write-Host "   - .github/prompts/convert-meeting-minutes.prompt.md（議事録変換）"
 Write-Host "   - .github/prompts/extract-questions.prompt.md（質問抽出）"
+Write-Host "   - README.md（開始案内）"
+Write-Host "   - workspace-summary.md（引き継ぎサマリ）"
 Write-Host "   - _inbox/$currentYearMonth.md（インボックス）"
 Write-Host "   - _questions/$currentYearMonth.md（質問・アクション）"
 Write-Host "   - _customer/profile.md（顧客プロファイル）"

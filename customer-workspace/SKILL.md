@@ -47,10 +47,14 @@ Initialize customer-specific workspaces with information accumulation, meeting n
   -KeyContacts "John Doe (Infra Lead)"
 ```
 
+If PowerShell is unavailable, manually create the same folders, copy the prompt/template files from `assets/`, and create `README.md` plus `workspace-summary.md` from the workspace root templates.
+
 ## Generated Structure
 
 ```
 {workspace}/
+├── README.md                    ← Start here / workspace overview
+├── workspace-summary.md         ← Handoff-ready summary
 ├── .github/
 │   ├── copilot-instructions.md    ← Auto-routing rules
 │   └── prompts/                   ← Inbox, meeting notes, questions
@@ -81,6 +85,8 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 ## Done Criteria
 
 - [ ] Workspace folder created
+- [ ] `README.md` exists at workspace root
+- [ ] `workspace-summary.md` exists at workspace root
 - [ ] `_inbox/{YYYY-MM}.md` exists
 - [ ] `_questions/{YYYY-MM}.md` exists
 - [ ] `_customer/profile.md` configured
