@@ -292,7 +292,23 @@ jobs:
 
 ---
 
+## WXT Typecheck
+
+WXT の生成型を含めた型検査は、root `tsconfig.json` や `.wxt/tsconfig.json` だけでは不足することがある。専用 `tsconfig.typecheck.json` を用意し、`.wxt/wxt.d.ts` と必要な browser API 型を include する。
+```json
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["wxt/client", "chrome"],
+    "jsx": "react-jsx"
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".wxt/wxt.d.ts"]
+}
+```
+`entrypoints/` 配下に補助 `.d.ts` を置くと WXT が entrypoint と誤認することがあるため、shim は root か型専用フォルダに置く。
 ## テスト Tips
+
 
 ### Chrome API の詳細モック
 

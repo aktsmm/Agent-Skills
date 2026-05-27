@@ -1,0 +1,12 @@
+{
+  "name": "chrome-extension-dev",
+  "source": "aktsmm-Agent-Skills",
+  "description": "Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on",
+  "whenToUse": "ブラウザ拡張機能を作りたい、Chrome拡張、browser extension; WXT フレームワークでの開発; Content Script / Service Worker の実装; Chrome API（tabs, storage, cookies等）の使用; Manifest V3 への対応・移行",
+  "categories": [],
+  "installedAt": "2026-05-26T20:41:51.894Z",
+  "relativePath": "chrome-extension-dev",
+  "remotePath": "chrome-extension-dev",
+  "installedVia": "direct",
+  "metadataVersion": 2
+}
