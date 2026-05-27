@@ -10,24 +10,26 @@ metadata:
 
 # Customer Workspace Skill
 
-Initialize customer-specific workspaces with information accumulation and meeting notes management.
+Initialize customer-specific workspaces with information accumulation, meeting notes management, and handoff-ready summaries.
 
 ## When to Use
 
-- **Customer workspace**, **inbox**, **meeting notes**
+- **Customer workspace**, **inbox**, **meeting notes**, **workspace summary**, **handoff**
 - Setting up per-customer workspaces
 - Adding inbox or meeting minutes management
+- Creating handoff-ready workspace summaries with source file paths
 - Implementing auto-classification rules for customer information
 
 ## Features
 
-| Feature              | Description                               |
-| -------------------- | ----------------------------------------- |
-| **Inbox**            | Paste chat/email for auto-classification  |
-| **Meeting Notes**    | Convert Teams AI notes to template format |
-| **Questions**        | Extract questions/actions from meeting log |
-| **Auto-Routing**     | Route input based on pattern detection    |
-| **Customer Profile** | Centralized customer information          |
+| Feature               | Description                                |
+| --------------------- | ------------------------------------------ |
+| **Inbox**             | Paste chat/email for auto-classification   |
+| **Meeting Notes**     | Convert Teams AI notes to template format  |
+| **Questions**         | Extract questions/actions from meeting log |
+| **Auto-Routing**      | Route input based on pattern detection     |
+| **Customer Profile**  | Centralized customer information           |
+| **Workspace Summary** | Handoff summary with related file paths    |
 
 ---
 
@@ -87,6 +89,7 @@ Initialize customer-specific workspaces with information accumulation and meetin
 
 - [Inbox Rules](references/inbox-rules.md)
 - [Meeting Minutes Rules](references/meeting-minutes-rules.md)
+- [Workspace Summary Rules](references/workspace-summary-rules.md)
 
 ## Assets
 
