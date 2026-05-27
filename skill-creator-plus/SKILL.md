@@ -1,6 +1,6 @@
 ---
 name: skill-creator-plus
-description: Guide for designing and reviewing high-quality Agent Skills, and for deciding when a request should be a skill instead of a prompt, instruction, agent, or hook. Use when creating a new skill, updating an existing skill, reviewing SKILL.md files, or fixing poor skill triggering. Triggers on "create skill", "/create-skill", "review skill", "fix skill trigger", "SKILL.md", "スキル作成".
+description: Create or review a reusable skill (SKILL.md) that packages a workflow, and decide whether the request should be a skill instead of a prompt, instruction, agent, or hook. Use when creating a new skill, extracting a workflow from a conversation, updating an existing skill, reviewing SKILL.md quality, or fixing weak skill triggering. Triggers on "create skill", "/create-skill", "new skill", "review skill", "fix skill trigger", "SKILL.md", "スキル作成".
 argument-hint: "作りたい skill の目的、trigger、入れたい resources"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -10,7 +10,7 @@ metadata:
 
 # Skill Creator+
 
-Design and review Agent Skills that trigger reliably and stay lean.
+Design and review reusable skills that trigger reliably and stay lean.
 
 ## Decision Flow
 
@@ -30,11 +30,18 @@ If the answer is not **Skill**, stop and create the right primitive instead.
 
 ## When to Use
 
-- **Create skill**, **/create-skill**, **new skill**, **review skill**, **fix skill trigger**, **SKILL.md**, **スキル作成**
+- **Create skill**, **/create-skill**, **new skill**, **review skill**, **fix skill trigger**, **SKILL.md**, **workflow**, **スキル作成**
 - Creating a new skill from scratch
+- Extracting a repeated workflow from a conversation, incident, or checklist
 - Updating or refactoring an existing skill
 - Reviewing existing SKILL.md files
 - Deciding whether a customization should be a skill before authoring it
+
+## Start Here
+
+1. Extract the workflow you want to package.
+2. Clarify only the missing dimensions: target outcome, personal vs workspace scope, checklist vs full workflow.
+3. Draft the smallest useful SKILL.md, then move detail into references.
 
 ## Core Principles
 
@@ -77,12 +84,18 @@ skill-name/
 | Step | Action                                                |
 | ---- | ----------------------------------------------------- |
 | 0    | Choose primitive + scope (skill vs prompt/agent/etc.) |
-| 1    | Understand with concrete examples and trigger phrases |
+| 1    | Extract the workflow from the conversation or examples |
 | 2    | Plan reusable contents (scripts/references/assets)    |
 | 3    | Initialize or refactor the skill folder               |
 | 4    | Write SKILL.md and implement resources                |
 | 5    | Validate frontmatter, structure, and trigger quality  |
 | 6    | Test on real prompt patterns and iterate              |
+
+## Clarify if Needed
+
+- What outcome should this skill produce?
+- Should it live in workspace scope or personal scope?
+- Is a short checklist enough, or does it need a full multi-step workflow?
 
 ### Refactor Order
 
@@ -147,11 +160,17 @@ Start with **generic keywords** users are likely to say:
 
 - Use imperative/infinitive form
 - Link to references for details
+- Capture decision points and branching logic when they affect success
 - Keep essential workflow only
-- Add decision points when misuse is common
 - Reuse a proven shape from `references/skill-structure-gallery.md` before inventing a custom layout
 - Push reference material out of SKILL.md aggressively
 - Prefer replacing or compressing existing text over appending a new subsection
+
+## Iteration Loop
+
+1. Draft the skill and save it.
+2. Identify the weakest or most ambiguous parts.
+3. Tighten those parts, then summarize what the skill produces and example prompts to try.
 
 ## Review Checklist
 
