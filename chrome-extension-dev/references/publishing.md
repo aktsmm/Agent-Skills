@@ -23,6 +23,12 @@
 
 ---
 
+## Release Gate
+
+- 既存 tag に後続修正が入った場合、tag 付け替えではなく patch version を上げる。
+- 公開前に `npm run test`, `npm run lint`, `npm run typecheck`, `npm run validate:bridge`, `npm audit --omit=dev`, `npm run zip` を通す。
+- full `npm audit` が WXT 経由の dev-only 脆弱性を返す場合は、`--omit=dev` の runtime audit と分けて判断する。semver-major の WXT 更新は別サイクルで扱う。
+
 ## ZIP パッケージ作成
 
 ### WXT の場合
@@ -68,13 +74,13 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 
 ストア審査では、使用する各権限の正当化が求められる。
 
-| 権限           | 正当化例                                               |
-| -------------- | ------------------------------------------------------ |
-| `tabs`         | タブのURL/タイトルを表示するため                       |
-| `<all_urls>`   | すべてのウェブサイトでコンテンツスクリプトを実行するため |
-| `storage`      | ユーザー設定を保存するため                             |
-| `cookies`      | ログイン状態を確認するため                             |
-| `activeTab`    | ユーザーがクリックした時のみ現在のタブにアクセスするため |
+| 権限         | 正当化例                                                 |
+| ------------ | -------------------------------------------------------- |
+| `tabs`       | タブのURL/タイトルを表示するため                         |
+| `<all_urls>` | すべてのウェブサイトでコンテンツスクリプトを実行するため |
+| `storage`    | ユーザー設定を保存するため                               |
+| `cookies`    | ログイン状態を確認するため                               |
+| `activeTab`  | ユーザーがクリックした時のみ現在のタブにアクセスするため |
 
 ---
 
@@ -87,14 +93,14 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 
 ### よくあるリジェクト理由
 
-| 理由                     | 対策                                       |
-| ------------------------ | ------------------------------------------ |
-| 権限の過剰要求           | 必要最小限の権限に変更                     |
-| プライバシーポリシー不備 | ユーザーデータの取り扱いを明記             |
-| 機能の説明不足           | ストア説明を詳細化                         |
-| リモートコード           | すべてのコードをバンドルに含める           |
-| 誤解を招く説明           | 正確な機能説明に修正                       |
-| 低品質のUI               | UIを改善                                   |
+| 理由                     | 対策                             |
+| ------------------------ | -------------------------------- |
+| 権限の過剰要求           | 必要最小限の権限に変更           |
+| プライバシーポリシー不備 | ユーザーデータの取り扱いを明記   |
+| 機能の説明不足           | ストア説明を詳細化               |
+| リモートコード           | すべてのコードをバンドルに含める |
+| 誤解を招く説明           | 正確な機能説明に修正             |
+| 低品質のUI               | UIを改善                         |
 
 ---
 
@@ -120,6 +126,16 @@ export default defineConfig({
 5. 送信して審査を待つ
 
 ---
+
+## Artifact Hygiene
+
+- ZIP の中身を列挙し、`src/`, `tests/`, `.github/`, `.vscode/`, `store-assets/`, `*.map`, log が入っていないことを確認する。
+- `publish-extension` は `.env.submit` を自動読込する。OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可後に再実行する。
+- 再認可時の auth code や refresh token はチャットやログへ貼らず、ターミナルへ直接入力する。更新後は secret を表示せず token exchange の成功だけ確認する。
+- live retry 前に `publish-extension --dry-run --chrome-zip <zip>` を通し、認証と設定だけ先に確認する。
+- CWS publish が止まった場合でも、ZIP と SHA256 を GitHub Release に残して再開可能にする。
+- publish 後の CWS API 確認は item endpoint に `?projection=DRAFT` を付ける。`crxVersion` が対象版で `itemError` が 0 件なら API 側の確認は通過扱いにし、`uploadState: NOT_FOUND` だけで失敗判定や再アップロードをしない。
+- API 応答が疎または stale な場合、最終ステータスは Chrome Web Store Developer Dashboard で確認する。
 
 ## 自動パブリッシング
 
