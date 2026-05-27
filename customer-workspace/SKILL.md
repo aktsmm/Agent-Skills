@@ -82,6 +82,7 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 
 - [ ] Workspace folder created
 - [ ] `_inbox/{YYYY-MM}.md` exists
+- [ ] `_questions/{YYYY-MM}.md` exists
 - [ ] `_customer/profile.md` configured
 - [ ] Auto-routing rules working
 

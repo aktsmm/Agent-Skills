@@ -62,6 +62,7 @@ $folders = @(
     ".github",
     ".github\prompts",
     "_inbox",
+    "_questions",
     "_customer",
     "_templates"
 )
@@ -107,7 +108,7 @@ if (Test-Path $copilotInstructionsPath) {
 }
 
 # プロンプトファイルのコピー
-$prompts = @("inbox.prompt.md", "convert-meeting-minutes.prompt.md")
+$prompts = @("inbox.prompt.md", "convert-meeting-minutes.prompt.md", "extract-questions.prompt.md")
 foreach ($prompt in $prompts) {
     $src = Join-Path $AssetsPath $prompt
     $dst = Join-Path $WorkspacePath ".github\prompts\$prompt"
@@ -147,6 +148,21 @@ if (-not (Test-Path $inboxPath)) {
     Write-Host "   📝 作成: _inbox/$currentYearMonth.md" -ForegroundColor Green
 }
 
+# 質問一覧初期ファイル作成
+$questionsPath = Join-Path $WorkspacePath "_questions\$currentYearMonth.md"
+if (-not (Test-Path $questionsPath)) {
+    $questionsContent = @"
+# $currentYearMonth 質問・アクション
+
+> 💡 ``/prompt extract-questions`` で会議ログから抽出して追記。
+
+---
+
+"@
+    Set-Content -Path $questionsPath -Value $questionsContent -Encoding UTF8
+    Write-Host "   📝 作成: _questions/$currentYearMonth.md" -ForegroundColor Green
+}
+
 # 顧客プロファイル作成
 $profilePath = Join-Path $WorkspacePath "_customer\profile.md"
 if (-not (Test-Path $profilePath)) {
@@ -171,7 +187,9 @@ Write-Host "📁 作成されたファイル:" -ForegroundColor Cyan
 Write-Host "   - .github/copilot-instructions.md（自動判定ルール）"
 Write-Host "   - .github/prompts/inbox.prompt.md（インボックス）"
 Write-Host "   - .github/prompts/convert-meeting-minutes.prompt.md（議事録変換）"
+Write-Host "   - .github/prompts/extract-questions.prompt.md（質問抽出）"
 Write-Host "   - _inbox/$currentYearMonth.md（インボックス）"
+Write-Host "   - _questions/$currentYearMonth.md（質問・アクション）"
 Write-Host "   - _customer/profile.md（顧客プロファイル）"
 Write-Host "   - _templates/（テンプレート）"
 Write-Host ""
