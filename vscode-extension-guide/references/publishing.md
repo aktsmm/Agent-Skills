@@ -374,3 +374,4 @@ one more independent check.
 - If you use Git tags or GitHub Releases, verify the release/tag exists too
 - If the Marketplace listing lags, do not republish a new version just because
   `vsce show` still returns the previous metadata snapshot
+- If publish is paused by review, auth, duplicate, or permissions, report version, artifact, checksum, commit, tag, push, and publish state separately so the same VSIX can be resumed without guessing.

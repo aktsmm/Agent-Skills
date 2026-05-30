@@ -28,6 +28,7 @@
 - 既存 tag に後続修正が入った場合、tag 付け替えではなく patch version を上げる。
 - 公開前に `npm run test`, `npm run lint`, `npm run typecheck`, `npm run validate:bridge`, `npm audit --omit=dev`, `npm run zip` を通す。
 - full `npm audit` が WXT 経由の dev-only 脆弱性を返す場合は、`--omit=dev` の runtime audit と分けて判断する。semver-major の WXT 更新は別サイクルで扱う。
+- CLI stdout や success marker だけで gate 完了を判定しない。ZIP の存在、サイズ、更新時刻、checksum、プロセス残存なしを別経路で確認する。
 
 ## ZIP パッケージ作成
 
@@ -134,6 +135,9 @@ export default defineConfig({
 - 再認可時の auth code や refresh token はチャットやログへ貼らず、ターミナルへ直接入力する。更新後は secret を表示せず token exchange の成功だけ確認する。
 - live retry 前に `publish-extension --dry-run --chrome-zip <zip>` を通し、認証と設定だけ先に確認する。
 - CWS publish が止まった場合でも、ZIP と SHA256 を GitHub Release に残して再開可能にする。
+- 審査中、認証、権限、duplicate など外部状態で publish だけ止まる場合は、ZIP / SHA256 / version / commit / tag / upload の状態を分けて記録し、再開条件を明記する。
+- ブロッカー解消後の再開では、**最新タグの ZIP を rollup 提出**する。ブロック時点の古い ZIP を蘇生せず、間に積まれた patch をまとめて出す（実例: v0.1.11→v0.1.15 で 4 版分を一括公開）。
+- `publish-extension` が `400 "Publish condition not met: You may not edit or publish an item that is in review."` で失敗する場合は、前回の draft が審査キュー残留中。先に `?projection=DRAFT` で stuck している `crxVersion` を確認し、Dashboard UI から `more_vert` → 審査をキャンセル → 確認ダイアログで取り下げる。ステータスバッジが「公開済み」に戻り次第 `publish-extension` を再実行できる。
 - publish 後の CWS API 確認は item endpoint に `?projection=DRAFT` を付ける。`crxVersion` が対象版で `itemError` が 0 件なら API 側の確認は通過扱いにし、`uploadState: NOT_FOUND` だけで失敗判定や再アップロードをしない。
 - API 応答が疎または stale な場合、最終ステータスは Chrome Web Store Developer Dashboard で確認する。
 
