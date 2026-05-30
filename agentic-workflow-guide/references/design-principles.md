@@ -377,17 +377,19 @@ Core principle: **Same IR → Same Output.** No creativity in transformation pha
 5. **Testing** - Actually use it and iterate
 6. **Example Usage** - Include usage examples in description
 7. **Poka-yoke** - Design to prevent mistakes (e.g., use absolute paths)
+8. **Display Surface Fit** - Match output structure to where users will read it, such as cards/fields for chat embeds instead of dense text
 
 ### Format Selection
 
 Choose formats that minimize cognitive load for LLMs:
 
-| Good Format                 | Avoid                              |
-| --------------------------- | ---------------------------------- |
-| Markdown code blocks        | JSON with escaped strings          |
-| Absolute file paths         | Relative paths (context-dependent) |
-| Structured sections         | Free-form text with implicit rules |
-| Clear delimiters (XML tags) | Ambiguous separators               |
+| Good Format                               | Avoid                                  |
+| ----------------------------------------- | -------------------------------------- |
+| Markdown code blocks                      | JSON with escaped strings              |
+| Absolute file paths                       | Relative paths (context-dependent)     |
+| Structured sections                       | Free-form text with implicit rules     |
+| Clear delimiters (XML tags)               | Ambiguous separators                   |
+| Native UI payloads for the target surface | One dense text block for every channel |
 
 ### Anthropic's Tool Format Recommendations
 
@@ -421,6 +423,7 @@ Choose formats that minimize cognitive load for LLMs:
 - [ ] Does running multiple test inputs produce expected outputs?
 - [ ] Are error messages actionable?
 - [ ] Is the output format consistent and parseable?
+- [ ] Has the output been checked in the final reading surface or a faithful dry-run payload?
 - [ ] Does the tool handle edge cases gracefully?
 ```
 
