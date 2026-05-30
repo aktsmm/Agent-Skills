@@ -8,6 +8,7 @@ Primary month: {{YEAR_MONTH}}
 - Active inbox: `_inbox/{{YEAR_MONTH}}.md`
 - Active questions: `_questions/{{YEAR_MONTH}}.md`
 - Customer profile: `_customer/profile.md`
+- Material folders when used: `_received/`, `_working/`, `_provided/`
 - Important working files:
 
 ## Source of Truth
@@ -24,6 +25,7 @@ Primary month: {{YEAR_MONTH}}
 
 - Files the next owner must open first
 - Current working notes for {{YEAR_MONTH}}
+- Current material ledgers when customer-shared files are part of active work
 - Pending actions and deadlines
 
 ### Reference-Only

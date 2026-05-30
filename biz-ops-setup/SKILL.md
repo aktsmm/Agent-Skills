@@ -72,6 +72,7 @@ Collect the following information:
 - [ ] 4 prompts deployed to `.github/prompts/`
 - [ ] Customer mappings configured in `copilot-instructions.md`
 - [ ] Workflow verification passed (daily report test)
+- [ ] Preflight checks fire (missing-report detection runs before requests; see [references/agent-list.md](references/agent-list.md))
 
 ## Key References
 

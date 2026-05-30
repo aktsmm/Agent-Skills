@@ -18,6 +18,7 @@ Generate **draw.io editable diagrams** using AI-powered workflow.
 - Converting flowcharts from text descriptions
 - Transforming images/screenshots into editable format
 - Generating swimlane, sequence diagrams
+- Editing Azure/AWS icons in existing .drawio files
 
 Choose this skill when the result will need later **GUI editing** in draw.io, cloud icons, or documentation-facing diagram assets.
 
@@ -64,6 +65,8 @@ For documentation-facing diagrams, generate outputs as a pair:
 
 - `name.drawio` for editing in VS Code Draw.io
 - `name.drawio.svg` for README / web embedding
+
+Reserve `*.drawio.svg` for SVG files that actually contain draw.io metadata. If you hand-author or post-process a plain SVG without embedded draw.io metadata, name it `*.svg` instead of `*.drawio.svg`.
 
 If the visible asset started from manual SVG cleanup or hand-authored layout tweaks, still keep a matching `name.drawio` as the editable SSOT. Do not leave documentation diagrams as SVG-only when future edits are expected.
 
@@ -129,6 +132,8 @@ For Azure-centric diagrams, proactively use the official Azure icon set when a v
 
 ### Azure Format (Critical)
 
+This format applies to both new diagrams and edits to existing .drawio files. When fixing or replacing Azure icons, always use this format.
+
 ```xml
 <!-- WRONG -->
 <mxCell style="shape=mxgraph.azure.front_door;..." />
@@ -168,6 +173,7 @@ For Azure-centric diagrams, proactively use the official Azure icon set when a v
 | Text overlaps near outer frame    | Inset top note/callout boxes 16-24px from the panel border, increase box height, and wrap to 3-4 lines. Review at actual embed width before finishing. See [style-guide.md](references/style-guide.md) Top Callouts / Note Boxes |
 | README image only links to source | Generate `*.drawio.svg` and embed that instead of linking only to `*.drawio`                   |
 | SVG is viewable but hard to edit later | Keep a paired `*.drawio` source and treat it as the editable SSOT; use SVG as delivery output, not as the only source file |
+| VS Code says a `.drawio.svg` or `.drawio` file cannot be opened even though the file exists | Check whether the file is actually a plain SVG misnamed as `.drawio.svg`; if so, rename it to `*.svg`. If path resolution still looks stale, create a short alias filename such as `current-understanding.drawio` / `current-understanding.svg` and repoint links |
 | Local Markdown preview does not show the expected diagram | Export `*.png` from `.drawio` and use that in the draft article preview. Keep `.drawio` and `*.drawio.svg` as the editable and embeddable pair for final delivery |
 | Too many crossing arrows          | Align source/target y to make edges horizontal; spread `entryY` on shared targets. See [style-guide.md](references/style-guide.md) Edge Crossing Prevention |
 | Legend inside a container          | Move legend outside the outermost box. See [style-guide.md](references/style-guide.md) Nested Containers |
