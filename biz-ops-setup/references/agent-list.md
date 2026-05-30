@@ -48,17 +48,17 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 
 ## Agent Details
 
-| Agent                | Role                                                           |
-| -------------------- | -------------------------------------------------------------- |
-| **orchestrator**     | Coordination, task routing, pre-flight report check            |
-| **report-generator** | Automated generation of daily/weekly/monthly reports           |
-| **report-reviewer**  | Results-oriented review (IMPACT framework)                     |
-| **task-manager**     | Task creation, updates, classification, progress management    |
-| **data-collector**   | Data collection, normalization, customer/internal auto-routing |
-| **work-inventory**   | Work inventory, analysis, manager PR material creation         |
-| **1on1-assistant**   | 1on1 meeting prep, activity summary, action item extraction    |
-| **general-worker**       | Fallback handler for unclassified tasks, pattern detection     |
-| **availability-finder**  | Calendar analysis, free slot extraction, scheduling messages   |
+| Agent                   | Role                                                           |
+| ----------------------- | -------------------------------------------------------------- |
+| **orchestrator**        | Coordination, task routing, pre-flight report check            |
+| **report-generator**    | Automated generation of daily/weekly/monthly reports           |
+| **report-reviewer**     | Results-oriented review (IMPACT framework)                     |
+| **task-manager**        | Task creation, updates, classification, progress management    |
+| **data-collector**      | Data collection, normalization, customer/internal auto-routing |
+| **work-inventory**      | Work inventory, analysis, manager PR material creation         |
+| **1on1-assistant**      | 1on1 meeting prep, activity summary, action item extraction    |
+| **general-worker**      | Fallback handler for unclassified tasks, pattern detection     |
+| **availability-finder** | Calendar analysis, free slot extraction, scheduling messages   |
 
 ## IMPACT Framework (Review Criteria)
 
@@ -91,15 +91,31 @@ Data retrieved from workIQ for report generation and task updates:
 
 ## Automatic Routing Rules
 
-| Input Pattern                                  | Destination      |
-| ---------------------------------------------- | ---------------- |
-| "Report", "Daily", "Weekly", "Monthly"         | report-generator |
-| "Task", "TODO", "Issue", "Progress"            | task-manager     |
-| Teams/Email format paste                       | data-collector   |
-| "Inventory", "Analysis", "PR", "Retrospective" | work-inventory   |
-| "1on1", "1:1", "ワンオンワン", "prep"           | 1on1-assistant       |
-| "空き時間", "日程調整", "候補日", "いつ空いてる"   | availability-finder  |
-| (No match / Fallback)                          | general-worker       |
+| Input Pattern                                    | Destination         |
+| ------------------------------------------------ | ------------------- |
+| "Report", "Daily", "Weekly", "Monthly"           | report-generator    |
+| "Task", "TODO", "Issue", "Progress"              | task-manager        |
+| Teams/Email format paste                         | data-collector      |
+| "Inventory", "Analysis", "PR", "Retrospective"   | work-inventory      |
+| "1on1", "1:1", "ワンオンワン", "prep"            | 1on1-assistant      |
+| "空き時間", "日程調整", "候補日", "いつ空いてる" | availability-finder |
+| (No match / Fallback)                            | general-worker      |
+
+## Preflight Checks (Orchestrator)
+
+Before processing any request, the orchestrator runs a lightweight, read-only preflight so missing work surfaces automatically instead of being noticed late.
+
+| Check                   | Trigger / Window                                    | Action                                               |
+| ----------------------- | --------------------------------------------------- | ---------------------------------------------------- |
+| Missing daily report    | Past 2 business days (holiday/weekend-normalized)   | Notify user, offer to auto-generate                  |
+| Missing weekly report   | On the first business day of a new week             | Notify user, offer to auto-generate                  |
+| Missing monthly report  | On the first 1-3 days of a new month                | Notify user, offer to auto-generate                  |
+| Non-business-day work   | Weekend/holiday between last business day and today | If activity exists, fold it into today's report      |
+| Customer data freshness | Before customer-facing or 1on1 prep work            | If profile `last-updated` is stale, offer to refresh |
+
+- Normalize target dates against the configured holiday list (see [holidays.md](holidays.md)) so weekends and holidays never count as missing.
+- Keep preflight read-only and delegated; let the user choose `generate now` / `later` / `skip` before doing the original request.
+- Run preflight via a read-only worker, not by having the orchestrator read or write files directly.
 
 ## Post-Setup Customization
 
@@ -130,6 +146,3 @@ Add contact→customer mappings:
 ### 3. External Paths (report-generator)
 
 Configure external folders from interview in `_datasources/external-paths.md`.
-
-
-

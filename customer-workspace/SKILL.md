@@ -31,6 +31,7 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 | **Customer Profile**  | Centralized customer information                     |
 | **Workspace Summary** | Handoff summary with related file paths              |
 | **Next Actions**      | Per-MTG homework workspace with bidirectional links  |
+| **Material Split**    | Optional split for customer originals, working copies, and customer-facing files |
 
 ---
 
@@ -72,6 +73,30 @@ If PowerShell is unavailable, manually create the same folders, copy the prompt/
     │   └── research/               ← Supplementary research/validation
     └── ongoing/                    ← Continuing items without a deadline
 ```
+
+## Optional Material Folders
+
+When customer-shared diagrams, decks, tables, or schedules start to accumulate, split by lifecycle first and scope second.
+
+```text
+_received/                       ← customer originals only
+  overall-architecture/          ← cross-meeting baseline material
+  mtg-YYYY-MM-DD-name/           ← meeting-specific material
+
+_working/                        ← internal edited / annotated / draft copies
+  overall-architecture/
+  mtg-YYYY-MM-DD-name/
+
+_provided/                       ← customer-facing copies, send-out decks, projection versions
+  overall-architecture/
+  mtg-YYYY-MM-DD-name/
+```
+
+- Use `_received/` for customer originals and avoid editing files in place.
+- Use `_working/` for annotated copies, extracted pages, redlines, and draft comparisons.
+- Use `_provided/` only for versions safe to show or send to the customer.
+- Use `overall-architecture/` when the material stays relevant across multiple meetings.
+- Use `mtg-YYYY-MM-DD-name/` only when the material is truly scoped to one meeting.
 
 ---
 

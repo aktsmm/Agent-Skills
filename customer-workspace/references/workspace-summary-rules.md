@@ -27,6 +27,12 @@
 - Separate files to carry into the new workspace from files kept only for reference.
 - Use this split when preparing a portable customer workspace package.
 
+### Material-Heavy Workspaces
+
+- If customer-shared files such as diagrams, decks, schedules, or comparison tables are part of the ongoing work, split folders by lifecycle first: `_received/`, `_working/`, `_provided/`.
+- Within those folders, use `overall-architecture/` for cross-meeting baseline material and `mtg-YYYY-MM-DD-name/` only for truly meeting-scoped material.
+- In summaries, link the ledger README or index file rather than only a deep file path when the material set is still growing.
+
 ## Writing Rules
 
 - Don't write only generic labels such as `日報`, `準備メモ`, or `タスク`.

@@ -305,3 +305,5 @@ if sys.stderr.encoding and sys.stderr.encoding.lower() != 'utf-8':
 | Click does nothing in virtual scroll        | DOM reference lost or wrong target node    | Use one async eval and ancestor clickable search                 |
 | Later modal operations fail                 | Overlay state is stale                     | Close overlays and reopen from a known state                     |
 | `UnicodeEncodeError: cp932`                 | Windows default console encoding           | Set `chcp 65001`, `PYTHONIOENCODING`, and stdout/stderr encoding |
+| CDP connects to wrong tab (e.g. `sw.js`)   | SPA registers service worker tabs          | Filter `/json` results: exclude `sw.js` URLs and `type !== "page"` tabs. Pass verified `webSocketDebuggerUrl` or filter in helper |
+| Date-click or `select_date` fails silently  | SPA updated CSS classes for date buttons   | Do not rely on fixed CSS class selectors (e.g. `.carousel-date-btn`). Match buttons by visible `innerText` with day number + weekday pattern instead |

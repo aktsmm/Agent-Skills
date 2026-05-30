@@ -150,8 +150,10 @@ Always shrink-wrap: set page width/height to tightest bounding box + 20px margin
 
 - Treat `.drawio` as the editable source of truth for documentation diagrams.
 - Treat `.drawio.svg` as the delivery/render artifact for Markdown and web embedding.
+- Do not label a plain SVG as `.drawio.svg`. That suffix is reserved for metadata-embedded SVG exports that Draw.io can reopen.
 - If a diagram required manual SVG-level cleanup, recreate or preserve the equivalent `.drawio` source before calling it done.
 - Do not leave a documentation diagram as SVG-only unless the user explicitly asked for a disposable one-off artifact.
+- If the editor keeps resolving a stale path or refuses to open a file that exists, it is acceptable to create short alias filenames such as `current-understanding.drawio` and `current-understanding.svg`, then repoint local links to the alias pair.
 
 ## Font Settings
 
