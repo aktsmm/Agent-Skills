@@ -268,6 +268,13 @@ py -3 .\scripts\get-legacy-usage-summary.py {subscriptionId} {YYYY-MM-01} {YYYY-
 - `The subscription ... doesn't exist in cloud 'AzureCloud'`:
   - サブスク未可視。tenant 切り替えからやり直す
 
+- Usage Details が 200 + `value: []` / `itemCount: 0`:
+  - 認証エラーではなく、subscription scope に billed usage 明細が無い可能性が高い
+  - Azure RBAC を確認し、Owner / Contributor / Reader があるなら resource/subscription 権限不足とは切り分ける
+  - MCA / Internal / DevTest / Sandbox などでは billing profile / invoice section scope 側に費用が寄る可能性があるため、`billingProperty.default` の `billingProfileId` / `invoiceSectionId` を確認する
+- billing role assignments API が `403 Forbidden`:
+  - subscription RBAC ではなく billing scope の権限不足。Billing account / Billing profile / Invoice section の Reader 以上に相当する権限を持つアカウントで確認する
+
 ### 実務で使う集計列
 
 - `Cost` または `PreTaxCost` のどちらが返っているかを確認する
