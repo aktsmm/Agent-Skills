@@ -23,6 +23,7 @@ from pptx.enum.shapes import MSO_SHAPE
 # ============================================================
 FONT_ASCII = 'Calibri'
 FONT_EAST_ASIAN = 'BIZ UDPGothic'
+MIN_CONTENT_FONT_SIZE = 14
 SLIDE_W = Inches(13.333)
 SLIDE_H = Inches(7.5)
 
@@ -53,7 +54,7 @@ LIGHT_GREEN = RGBColor(0xD5, 0xF5, 0xE3)
 
 def _set_font(font, size, bold=False, color=DARK_GRAY):
     """Apply consistent font settings."""
-    font.size = Pt(size)
+    font.size = Pt(max(size, MIN_CONTENT_FONT_SIZE))
     font.bold = bold
     font.color.rgb = color
     font.name = FONT_ASCII
@@ -96,7 +97,7 @@ def tbl(sl, l, t, w, h, data, hc=MS_BLUE, col_widths=None):
         for j, ct in enumerate(rd):
             cell = ts.cell(i, j); cell.text = str(ct)
             for p in cell.text_frame.paragraphs:
-                _set_font(p.font, 11, bold=(i == 0), color=WHITE if i == 0 else DARK_GRAY)
+                _set_font(p.font, MIN_CONTENT_FONT_SIZE, bold=(i == 0), color=WHITE if i == 0 else DARK_GRAY)
                 if i == 0:
                     p.alignment = PP_ALIGN.CENTER
             if i == 0:

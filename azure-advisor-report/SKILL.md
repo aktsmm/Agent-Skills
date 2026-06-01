@@ -51,6 +51,7 @@ Azure Advisor 推奨事項・コスト推移を分析し、顧客向けの簡易
 ### Phase 3: PowerPoint レポート生成
 
 [PPTX 生成スクリプト](./scripts/generate_pptx.py) を使用。
+複数サブスクリプションの場合は Subscription ID ごとに章を分ける。重要な推奨事項は個別ページを作り、英語原文、日本語訳、リスク、推奨アクション、是正手順、Microsoft Learn URL を入れる。
 
 ```powershell
 py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.pptx
@@ -59,8 +60,10 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 ### Phase 4: 検証
 
 1. PPTX を開いて表示確認（要素の重なりがないか）
-2. 数値の検算（コスト合計、変動率の基準月明示）
-3. 社内情報・社内用語が含まれていないか最終チェック
+2. 全コンテンツスライドに speaker notes があるか確認
+3. 表・本文・参照 URL が 14pt 未満になっていないか確認
+4. 数値の検算（コスト合計、変動率の基準月明示）
+5. 社内情報・社内用語が含まれていないか最終チェック
 
 ## 品質基準（Lessons Learned）
 
@@ -94,7 +97,7 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 - **スライドノート必須**: 全コンテンツスライドに `add_notes()` で詳細な説明ノートを追加すること
   - データソース、キーテイクアウェイ、推奨アクション、プレゼンター向けの補足情報を含む
 - **データソース取得日必須**: PowerPoint の表紙または補足で、各データソースの取得日を明示すること
-- **ワイドスクリーン PPTX のフォントサイズ下限**: テーブル本文 11pt / ibox 本文 11pt / セクションラベル 13pt / スライドタイトル 24pt 以上。10pt 以下はスライドサイズに対して読みにくい
+- **ワイドスクリーン PPTX のフォントサイズ下限**: 表・本文・参照 URL は 14pt 以上、スライドタイトルは 24pt 以上。14pt 未満は顧客向け PPTX では原則使わない
 - **テーブル列幅の明示指定**: 番号・件数・影響度のような短い列はデフォルト等幅だと無駄に広くなる。`col_widths` パラメータで短い列を狭め、推奨事項・リソース名列に幅を配分する
 - **出力ファイル名**: 一時ファイル名（`.tmp.pptx`）で生成し、成功後にリネーム
   - VS Code / PowerPoint のプレビューによる PermissionError を回避

@@ -86,11 +86,11 @@
 | 項目               | 値                                    |
 | ------------------ | ------------------------------------- |
 | フォント           | BIZ UDPゴシック                       |
-| 本文サイズ         | 12pt                                  |
-| テーブルサイズ     | 11pt                                  |
-| インサイトボックス | 11pt                                  |
+| 本文サイズ         | 14pt 以上                             |
+| テーブルサイズ     | 14pt 以上                             |
+| インサイトボックス | 14pt 以上                             |
 | ヘッダー           | 24pt                                  |
-| サブヘッダー       | 13pt                                  |
+| サブヘッダー       | 14pt 以上                             |
 | スライドサイズ     | 13.333 x 7.5 inch（ワイドスクリーン） |
 
 ### スライドノート（MANDATORY）
@@ -110,6 +110,37 @@
 notes = slide.notes_slide
 notes.notes_text_frame.text = "ノートテキスト"
 ```
+
+### 複数サブスクリプションの PPTX 構成
+
+複数サブスクリプションを扱う PowerPoint では、環境名だけでまとめず **Subscription ID ごとに章を分ける**。
+
+推奨構成:
+
+1. 表紙
+2. エグゼクティブサマリー
+3. 全体コスト推移
+4. Subscription ID ごとのセクション区切り
+5. 各サブスクリプションの Cost 状況
+6. 各サブスクリプションの Advisor 推奨事項
+7. 推奨アクション / 免責事項
+
+章区切りスライドには Subscription ID と Tenant ID を明記し、発表時にどの環境の話か迷わないようにする。
+Cost スライドには月別合計、明細件数、主要サービス別推移を入れる。Advisor Overview スライドにはカテゴリ別件数と件数上位の推奨事項を入れる。重要な推奨事項は個別ページを作り、英語原文、その直下の日本語訳、リスク、推奨アクション、是正手順、Microsoft Learn URL を入れる。全体推奨アクションも別途まとめる。
+
+是正手順は Microsoft Learn の公式 URL を根拠にする。Microsoft Docs / code sample search が不安定な場合でも、Docs search / fetch で取得できた公式ページを使い、根拠なしの手順やコマンド例を書かない。
+
+### PPTX 生成後チェック
+
+生成後は以下を確認してから完了扱いにする:
+
+- PPTX ファイルが存在し、PowerPoint で開けること
+- 全コンテンツスライドに speaker notes があること
+- テーブルや RefURL がスライド外へはみ出していないこと
+- PowerPoint COM で `TextRange.BoundHeight/BoundWidth` を確認し、実レンダリング上の overflow が 0 件であること
+- 表・本文・参照 URL の表示テキストに 14pt 未満がないこと
+- 旧顧客名・旧 Subscription ID・旧 URL が残っていないこと
+- 生成に使った Cost / Advisor の JSON と PPTX 上の主要数値が一致すること
 
 ## ファイル命名規則
 
