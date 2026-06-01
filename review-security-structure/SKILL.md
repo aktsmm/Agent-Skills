@@ -3,6 +3,9 @@ name: review-security-structure
 description: "Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings. Use when asked for security review, vulnerability review, AST structure map review, SAST triage, Source/Sink, taint flow, parser/scanner hardening, CI/CD security, LLM/agent tool boundary review, 脆弱性レビュー, 構造マップ, セキュリティレビュー."
 argument-hint: "対象パス、構造マップ、ASTレポート、call graph、scan結果など"
 user-invocable: true
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Review Security Structure

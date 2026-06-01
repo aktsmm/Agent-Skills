@@ -4,6 +4,8 @@ description: "Unified Excel workflow for spreadsheet work and update troubleshoo
 argument-hint: "対象ファイル、更新スクリプト、更新日付（例: --date 20260526）"
 user-invocable: true
 license: Proprietary. LICENSE.txt has complete terms
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Excel Plus

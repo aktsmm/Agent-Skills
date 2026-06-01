@@ -27,6 +27,12 @@ Add phrases users actually say: file names, verbs, and common shorthand.
 - `review skill`
 - domain-specific phrases
 
+### Method-First Names
+
+Skill names that foreground an implementation detail (tool, input format, intermediate artifact) make slash commands harder to find and reuse. Lead with the user-visible task or outcome; keep techniques in `description` and `## When to Use`.
+
+Example: `review-security-structure` for a security review skill — mention AST, structure maps, call graphs, Source/Sink in description only.
+
 ## YAML and Frontmatter
 
 ### Unquoted Colons

@@ -6,7 +6,8 @@ Checklist for reviewing and improving SKILL.md files.
 
 ```markdown
 - [ ] SKILL.md is under 150 lines? (GitHub guideline: "2 pages or less")
-- [ ] Frontmatter has name + description only?
+- [ ] Frontmatter has name + description?
+- [ ] Self-authored skills have license + metadata.author?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
 - [ ] No README.md or auxiliary docs in skill folder?
@@ -45,9 +46,9 @@ Checklist for reviewing and improving SKILL.md files.
 ---
 name: skill-name # Required
 description: "..." # Required - include trigger conditions
-license: MIT # Optional
-metadata: # Optional
-  author: name
+license: CC BY-NC-SA 4.0 # Required for self-authored skills
+metadata: # Required for self-authored skills
+  author: yamapan (https://github.com/aktsmm)
 ---
 ```
 
