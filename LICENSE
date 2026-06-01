@@ -1,118 +1,39 @@
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
-
-Copyright (c) 2026 yamapan (@aktsmm)
-
-You are free to:
-
-Share — copy and redistribute the material in any medium or format
-Adapt — remix, transform, and build upon the material
-
-Under the following terms:
-
-Attribution — You must give appropriate credit, provide a link to the
-license, and indicate if changes were made. You may do so in any reasonable
-manner, but not in any way that suggests the licensor endorses you or your
-use.
-
-NonCommercial — You may not use the material for commercial purposes.
-
-ShareAlike — If you remix, transform, or build upon the material, you must
-distribute your contributions under the same license as the original.
-
-No additional restrictions — You may not apply legal terms or technological
-measures that legally restrict others from doing anything the license permits.
-
-Notices:
-
-You do not have to comply with the license for elements of the material in
-the public domain or where your use is permitted by an applicable exception
-or limitation.
-
-No warranties are given. The license may not give you all of the permissions
-necessary for your intended use. For example, other rights such as publicity,
-privacy, or moral rights may limit how you use the material.
-
-For the full license text, see:
-https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
-
+# License / ライセンス
+This repository contains multiple skills, each with its own license.
+Please refer to the `LICENSE.txt` file in each skill folder.
+このリポジトリには複数のスキルが含まれており、それぞれ個別のライセンスが適用されます。
+各スキルフォルダ内の `LICENSE.txt` を参照してください。
+## License Summary / ライセンス一覧
+| Skill | License |
+|-------|---------|
+| agentic-workflow-guide | CC BY-NC-SA 4.0 |
+| azure-advisor-report | CC BY-NC-SA 4.0 |
+| azure-env-builder | CC BY-NC-SA 4.0 |
+| azure-infra-validation | CC BY-NC-SA 4.0 |
+| azure-screenshot-mask | CC BY-NC-SA 4.0 |
+| azure-troubleshooting | CC BY-NC-SA 4.0 |
+| biz-ops-setup | CC BY-NC-SA 4.0 |
+| book-writing-workspace | CC BY-NC-SA 4.0 |
+| browser-max-automation | CC BY-NC-SA 4.0 |
+| chrome-extension-dev | CC BY-NC-SA 4.0 |
+| code-simplifier | CC BY-NC-SA 4.0 |
+| customer-workspace | CC BY-NC-SA 4.0 |
+| drawio-diagram-forge | CC BY-NC-SA 4.0 |
+| excel-plus | Proprietary. LICENSE.txt has complete terms |
+| humanize-writing | CC BY-NC-SA 4.0 |
+| local-media-transcription | CC BY-NC-SA 4.0 |
+| microsoft-graph-gateway | CC BY-NC-SA 4.0 |
+| ocr-super-surya | CC BY-NC-SA 4.0 |
+| packet-capture-analysis | CC BY-NC-SA 4.0 |
+| peer-feedback | CC BY-NC-SA 4.0 |
+| powerpoint-automation | CC BY-NC-SA 4.0 |
+| receipt-ocr-sorter | CC BY-NC-SA 4.0 |
+| retro-copilot | CC BY-NC-SA 4.0 |
+| review-security-structure | CC BY-NC-SA 4.0 |
+| skill-creator-plus | CC BY-NC-SA 4.0 |
+| skill-finder | CC BY-NC-SA 4.0 |
+| vscode-extension-guide | CC BY-NC-SA 4.0 |
+| web-accessibility | CC BY-NC-SA 4.0 |
 ---
-
-Supplementary Terms
-
-The following supplementary terms apply in addition to the CC BY-NC-SA 4.0
-license above. These terms are set by the copyright holder and apply to all
-files in this repository unless otherwise noted.
-
-1. Microsoft Employee Exception
-
-   Employees of Microsoft Corporation are granted permission to use, modify,
-   and distribute the contents of this repository for internal and commercial
-   purposes within the scope of their employment at Microsoft, provided that
-   appropriate attribution is given.
-
-2. Prohibition of AI/ML Training Use
-
-   The contents of this repository shall NOT be used, in whole or in part, as
-   training data, fine-tuning data, or evaluation data for any artificial
-   intelligence (AI) or machine learning (ML) model, including but not limited
-   to large language models (LLMs), without explicit written permission from
-   the copyright holder.
-
-3. Prohibition of Collection/Aggregation Redistribution
-
-   The contents of this repository shall NOT be included, in whole or in part,
-   in any collection, aggregation, compilation, or "awesome list" repository
-   for the purpose of redistribution or public re-hosting. Linking to this
-   repository (via URL) is permitted and encouraged.
-
-4. Attribution Format
-
-   When providing attribution, please use the following format:
-
-   yamapan (@aktsmm) - https://github.com/aktsmm
-
-5. Commercial Licensing
-
-   For commercial use beyond the scope of this license, please contact:
-   yamapan (@aktsmm) - https://github.com/aktsmm
-
-   Individual use for personal learning and study is welcome and encouraged.
-
----
-
-補足条項（日本語）
-
-以下の補足条項は、上記 CC BY-NC-SA 4.0 に加えて適用されます。
-これらの補足条項は著作権者が定めるものであり、特に注記がない限り本リポジトリ内の
-全ファイルに適用されます。
-
-1. Microsoft 社員例外
-
-   Microsoft Corporation の従業員は、Microsoft における業務の範囲内において、
-   本リポジトリの内容を社内利用および商用目的で利用・改変・配布することを許可します。
-   ただし、適切なクレジット表記を行うことを条件とします。
-
-2. AI/ML 学習用途の禁止
-
-   本リポジトリの内容の全部または一部を、明示的な書面による許可なく、
-   AI / 機械学習（ML）モデル（LLM を含む）の学習データ、ファインチューニングデータ、
-   または評価データとして使用することを禁止します。
-
-3. コレクション/集約リポジトリへの再配布禁止
-
-   本リポジトリの内容の全部または一部を、再配布または公的な再ホスティングを目的として、
-   コレクション、集約、コンピレーション、または "awesome list" 等のリポジトリに含めることを禁止します。
-   ただし、本リポジトリへの URL リンクによる紹介は許可し、推奨します。
-
-4. クレジット表記（推奨形式）
-
-   クレジット表記は、以下の形式を使用してください：
-
-   yamapan (@aktsmm) - https://github.com/aktsmm
-
-5. 商用ライセンス
-
-   本ライセンスの範囲を超える商用利用を希望される場合は、以下までご連絡ください：
-   yamapan (@aktsmm) - https://github.com/aktsmm
-
-   個人の学習・研究目的での利用は歓迎します。
+Copyright (c) 2025-2026 yamapan (aktsmm)
+https://github.com/aktsmm
