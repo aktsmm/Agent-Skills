@@ -203,3 +203,4 @@ You MUST use agent for each file. Do NOT read files directly.
 - [ ] Always-on instruction boundaries and DRY / SSOT risks are explicitly reviewed when `copilot-instructions.md` or `AGENTS.md` are in scope
 - [ ] New agent / workflow assets are registered in the appropriate catalog or docs when needed
 - [ ] `AGENTS.md` is updated only when shared guardrails or entry behavior need to change
+- [ ] Long-running or ad-hoc terminals/tasks started during the workflow are closed, or remaining terminals are explicitly reported with a reason
