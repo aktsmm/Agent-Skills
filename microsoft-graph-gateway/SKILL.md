@@ -3,6 +3,9 @@ name: microsoft-graph-gateway
 description: "Route Microsoft Graph work in this workspace. Use when users want to read or write Outlook mail, calendar events, contacts, OneDrive or SharePoint files, Teams, Planner, To Do, users, groups, directory data, or arbitrary Microsoft Graph endpoints from VS Code. Prefer WorkIQ for common read scenarios. Use Microsoft Graph for write actions and gap-read scenarios that need exact Graph properties, filters, permissions, or endpoints."
 argument-hint: "Describe the Graph task, target resource, and any draft payload, endpoint, or constraints"
 user-invocable: true
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Microsoft Graph Gateway

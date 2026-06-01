@@ -3,6 +3,9 @@ name: retro-copilot
 description: "Run a retro for ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Triggers on retro, retrospective, incident learning, error analysis, copilot setup, instructions update, インシデント, and 知見反映."
 argument-hint: "エラーログ、diff、会話要約、既存 .copilot 資産、またはインシデント内容"
 user-invocable: true
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # Retro Copilot
