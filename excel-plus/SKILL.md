@@ -45,6 +45,9 @@ license: Proprietary. LICENSE.txt has complete terms
 - URL 列では、表示文字列と実 hyperlink metadata を分けて扱う。`RMOT...` `SCOP...` `ROSS...` の ID が見えていてもクリック不能なことがあるため、推定可能なリンク先は repair pass で再付与し、表示値だけで完了判定しない
 - 一時 snapshot / temp copy は成功・失敗・timeout の全経路で削除する
 - 回帰テストでは、実 workbook や Excel COM 更新を使わず、OpenXML の一時 workbook で dry-run / 実更新 / 引数検証 / 非 OpenXML fail-fast / hidden Excel 非生成を確認する
+- **COM 接続が `AttributeError: Excel.Application.Workbooks` や `GetActiveObject` 失敗で連続拒否される場合**、Python/PS 側のリトライより先に **Excel 側の状態**を疑う: セル編集中 / モーダルダイアログ表示中（「他のプロセスで変更されました。再読み込みしますか？」「保存しますか？」等）/ Excel 応答停止。対処順: Esc でセル編集解除 → ダイアログを閉じる → 再試行。それでも復旧しないなら Excel を一度終了 → 再起動 → 再試行
+- **PowerShell 7 (`pwsh`) では `[System.Runtime.InteropServices.Marshal]::GetActiveObject` が削除済み**。Excel COM に接続する PS スクリプトは `powershell.exe`（PowerShell 5.1）を明示指定する
+- **PowerShell 5.1 の `.ps1` ファイル UTF-8 読み込みは壊れる**（日本語文字列が `EDE COMPLETE (縲・026-05-31)` のように化けて構文エラー）。日本語を含む payload は Python 側で `base64.b64encode(json.dumps(payload, ensure_ascii=False).encode("utf-8"))` して環境変数経由で渡し、PS 側で `[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:VAR)) | ConvertFrom-Json` でデコードする
 
 ### Quality Gates (Troubleshooting)
 
