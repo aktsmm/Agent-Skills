@@ -124,6 +124,8 @@ Both `agent` and `tools` are **restrictive** by default. Specifying them narrows
 
 **Common mistake**: Listing tools you expect to use (e.g. `tools: [edit/editFiles, execute/runInTerminal]`) on a general prompt. This silently blocks web search, doc retrieval, and other tools the task may need at runtime.
 
+In VS Code, prompt-level `tools:` can also surface as a current-chat-session-only tools configuration in the picker. If a global Agent tool set appears to shrink after running a slash prompt, check the prompt file's frontmatter first.
+
 ### Tool priority
 
 When both a prompt and a referenced custom agent define tools, the prompt-level tool configuration wins.

@@ -128,6 +128,7 @@ Lightweight inputs such as greetings, short Q&A, and numeric-only replies should
 - [ ] New additions are proposed only after delete / merge / split / move options are checked
 - [ ] Repo-local design instructions keep workspace-specific delta only; generic guidance lives in this skill or its references
 - [ ] Frontmatter review validates file-type-specific supported and unsupported properties, not just missing fields
+- [ ] Prompt-level `tools:` is present only when a slash prompt intentionally narrows capabilities; otherwise prompts inherit the selected agent tools
 - [ ] `copilot-instructions.md` and `AGENTS.md` keep distinct always-on roles and do not duplicate intake / routing / catalog content
 - [ ] always-loaded entries do not combine strong directive wording with catalogs or reference inventories
 - [ ] findings distinguish runtime-affected entry issues from review-only asset issues

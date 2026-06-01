@@ -1,8 +1,6 @@
 ---
 description: Monthly report generation from weekly reports and activity logs
 agent: report-generator
-tools:
-  ["read/readFile", "edit/editFiles", "search/fileSearch", "search/textSearch"]
 ---
 
 # Prompt: Monthly Report Generator

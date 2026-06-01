@@ -62,6 +62,13 @@ Use complexity only when required.
 - Workspace asset proposed for a purely personal preference
 - Questions asked before extracting obvious specialization from the conversation
 - Hook proposed before confirming a lifecycle event or deterministic need
+- Prompt file lists tools only to make them available; in VS Code `tools:` is an allowlist and should be omitted unless narrowing is intentional
+
+## Prompt Tool Boundary Rule
+
+In `.prompt.md`, `tools:` is an allowlist, not a hint. Omit it unless the slash prompt must intentionally narrow the selected agent's tools.
+
+If tool boundaries are stable and role-like, prefer a custom agent over prompt-level `tools:`.
 
 ## Creation Loop
 

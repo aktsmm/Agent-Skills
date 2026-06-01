@@ -80,6 +80,8 @@ You are a senior code reviewer...
 - Identify bugs, security issues, and performance problems
 ```
 
+Note: In `.prompt.md`, `tools:` is an allowlist and overrides the selected or referenced agent's tools for that prompt run. Omit `tools:` in general prompt files unless the prompt intentionally restricts capabilities. Put stable role/tool boundaries in `.agent.md` instead.
+
 ## ディレクトリ構造例
 
 ```

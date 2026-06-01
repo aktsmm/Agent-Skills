@@ -107,8 +107,11 @@ name: my-agent
 ```yaml
 ---
 description: <description> # Required: Brief description of the prompt
+# agent: <agent-name> # Optional: Bind to a specific agent
 ---
 ```
+
+Do not add `tools:` to `.prompt.md` by default. Prompt-level `tools:` is an allowlist that overrides the selected or referenced agent's tools for that prompt run. Use it only when losing unrelated built-in, extension, web, or MCP tools is intentional.
 
 ### ⚠️ Deprecated Fields
 
@@ -197,14 +200,6 @@ description: Daily report generator
 ---
 description: デイリーレポート自動生成（業務ログから1日分のレポートを作成）
 agent: report-generator
-tools:
-  [
-    "read/readFile",
-    "edit/editFiles",
-    "search/fileSearch",
-    "search/textSearch",
-    "workiq/*",
-  ]
 ---
 ```
 

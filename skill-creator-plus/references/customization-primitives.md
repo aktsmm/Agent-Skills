@@ -38,6 +38,7 @@ Default to workspace only when the behavior should be shared through version con
 - If the request starts with "when I type /", it is usually a prompt or skill.
 - If the request needs scripts, templates, or structured references, lean toward a skill.
 - If the request is about a specialist persona or safe tool boundaries, lean toward a custom agent.
+- If a prompt only lists tools to make them available, remove `tools:`. Prompt-level `tools:` narrows availability; it does not request tools opportunistically.
 - If the request is about blocking commands or auto-running checks, use a hook.
 - Treat prompts, templates, quick actions, and canned responses as product surfaces: define grounding source, prohibited actions, output format, and unknown-handling before adding examples or tone guidance.
 

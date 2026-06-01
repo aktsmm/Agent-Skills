@@ -1,8 +1,6 @@
 ---
 description: Weekly report generation from daily reports and activity logs
 agent: report-generator
-tools:
-  ["read/readFile", "edit/editFiles", "search/fileSearch", "search/textSearch"]
 ---
 
 # Prompt: Weekly Report Generator

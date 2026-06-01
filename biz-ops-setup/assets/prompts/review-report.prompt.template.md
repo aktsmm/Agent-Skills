@@ -1,7 +1,6 @@
 ---
 description: Report review using IMPACT framework (results-oriented evaluation and improvement)
 agent: report-reviewer
-tools: ["read/readFile", "search/textSearch", "search/fileSearch"]
 ---
 
 # Prompt: Report Review with IMPACT Framework

@@ -51,6 +51,14 @@ description: "Use when: reviewing skills"
 
 Do not add `argument-hint`, `user-invocable`, or `disable-model-invocation` unless they change behavior.
 
+### Accidental Prompt Tool Restrictions
+
+In VS Code prompt files, `tools:` is not harmless metadata. It overrides the default agent's enabled tools for that prompt run and can appear in the tools picker as a current-session-only configuration.
+
+Use `tools:` in `*.prompt.md` only when the prompt must deliberately narrow capabilities. If the prompt should inherit the user's normal Agent tools, omit `tools:` entirely.
+
+Prefer custom agents for stable role/tool boundaries. Use prompt-level `tools:` only for narrow slash commands where losing unrelated built-in, extension, or MCP tools is intentional.
+
 ## Structure Problems
 
 ### Monolithic SKILL.md

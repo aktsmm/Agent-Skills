@@ -127,6 +127,8 @@ Minimum items to verify:
 - [ ] Are repo-local authoring rules consistent with the current platform support matrix?
 - [ ] If local rules and platform-supported keys conflict, is that drift called out explicitly before bulk edits?
 - [ ] Is there a mechanical scan for both missing and unsupported keys?
+- [ ] For `.prompt.md`, is `tools:` omitted unless the prompt deliberately needs an allowlisted tool set?
+- [ ] If a prompt references an agent, does it avoid overriding that agent's tools accidentally?
 ```
 
 ### Primitive Fit Check

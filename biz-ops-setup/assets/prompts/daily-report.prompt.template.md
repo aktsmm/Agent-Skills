@@ -1,8 +1,6 @@
 ---
 description: Daily report auto-generation from activity logs
 agent: report-generator
-tools:
-  ["read/readFile", "edit/editFiles", "search/fileSearch", "search/textSearch"]
 ---
 
 # Prompt: Daily Report Generator
