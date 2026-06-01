@@ -119,9 +119,25 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 ```typescript
 type NotificationMode = "sound" | "silentToast" | "silentStatus";
 
+function normalizeNotificationMode(mode: unknown): NotificationMode {
+  switch (mode) {
+    case "sound":
+    case "silentToast":
+    case "silentStatus":
+      return mode;
+    default:
+      return "sound";
+  }
+}
+
 function getNotificationMode(): NotificationMode {
   const config = vscode.workspace.getConfiguration("myExtension");
-  return config.get<NotificationMode>("notificationMode", "sound");
+  if (config.get<boolean>("showNotifications", true) === false) {
+    return "silentStatus";
+  }
+  return normalizeNotificationMode(
+    config.get<NotificationMode>("notificationMode", "sound"),
+  );
 }
 
 function notifyInfo(message: string, timeoutMs = 4000): void {
@@ -152,4 +168,4 @@ function notifyError(message: string, timeoutMs = 6000): void {
 }
 ```
 
-設定で `notificationMode` を選べるようにすることで、ユーザーが通知音を制御可能。
+設定値は型注釈だけで信用せず、runtime で既知 enum へ正規化してください。設定ファイルの手編集や migration ずれで無効値が入っても通知経路を壊さないようにします。
