@@ -238,6 +238,9 @@ Invoke-RestMethod -Method Get -Uri $uri -Headers $headers |
 ```powershell
 $env:AZURE_ACCESS_TOKEN = az account get-access-token --resource https://management.azure.com/ --query accessToken -o tsv
 py -3 .\scripts\get-legacy-usage-summary.py {subscriptionId} {YYYY-MM-01} {YYYY-MM-DD} usage-summary.json
+
+# ページングやローカル接続枯渇が不安定な場合は、単月単発 + 大きめ page size でページングを避ける
+py -3 .\scripts\get-legacy-usage-summary.py {subscriptionId} {YYYY-MM-01} {YYYY-MM-DD} usage-summary.json 5000
 ```
 
 - 出力は `usage-summary.json` に保存する
@@ -247,10 +250,11 @@ py -3 .\scripts\get-legacy-usage-summary.py {subscriptionId} {YYYY-MM-01} {YYYY-
 
 ### 実装上の注意
 
-- page size は 100 程度から始める。大きすぎると 1 ページ目の応答が重くなる
+- page size は 100 程度から始める。ページングで `WinError 10048` が出る場合は、単月単発で `5000` 程度へ上げ、1ページ取得を優先する
 - `nextLink` は相対 URL を返すことがあるため、`https://management.azure.com` を補う
 - `nextLink` 内に空白が残る場合があるので `%20` へエンコードする
-- Python / HTTP 実装で新規接続を張り直すと `WinError 10048` が出る環境がある。**同一 HTTPS 接続の再利用**を優先する
+- Windows / GSA 環境では `az rest` や Azure CLI Python module を月ごと・ページごとに連打すると `WinError 10048` になることがある。`az account get-access-token` はトークン取得だけに使い、Usage Details は Python `http.client` で単月単発取得する
+- 複数 tenant を同時ログインできない環境では、tenant ごとに MFA → その tenant のサブスクだけ収集 → 次 tenant へ切り替える。未認証 tenant を混ぜて一括収集しない
 - 件数が多いサブスクリプションではページ数と総件数も一緒に保存する
 
 ### 失敗時の切り分け

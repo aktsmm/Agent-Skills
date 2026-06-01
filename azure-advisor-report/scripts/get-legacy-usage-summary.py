@@ -32,6 +32,8 @@ def get_access_token() -> str:
         check=True,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     return result.stdout.strip()
 
@@ -74,16 +76,17 @@ def build_initial_url(subscription_id: str, start_date: str, end_date: str, page
 
 
 def main() -> int:
-    if len(sys.argv) != 5:
+    if len(sys.argv) not in (5, 6):
         print(
-            "Usage: py -3 scripts/get-legacy-usage-summary.py <subscription_id> <start_date> <end_date> <output_path>",
+            "Usage: py -3 scripts/get-legacy-usage-summary.py <subscription_id> <start_date> <end_date> <output_path> [page_size]",
             file=sys.stderr,
         )
         return 2
 
     subscription_id, start_date, end_date, output_path = sys.argv[1:5]
+    page_size = int(sys.argv[5]) if len(sys.argv) == 6 else 100
     token = get_access_token()
-    next_url = build_initial_url(subscription_id, start_date, end_date, 100)
+    next_url = build_initial_url(subscription_id, start_date, end_date, page_size)
     connection = http.client.HTTPSConnection("management.azure.com", timeout=60)
 
     total_cost = 0.0
@@ -133,6 +136,7 @@ def main() -> int:
         "subscriptionId": subscription_id,
         "startDate": start_date,
         "endDate": end_date,
+        "pageSize": page_size,
         "currency": currency,
         "totalCost": round(total_cost, 4),
         "itemCount": item_count,
