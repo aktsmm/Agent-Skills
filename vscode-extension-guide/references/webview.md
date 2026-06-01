@@ -157,6 +157,56 @@ if (state) {
 }
 ```
 
+When an edit form shows values derived from current settings defaults, capture a
+normalized baseline **when edit starts** and diff against that frozen baseline
+on submit. Do not recompute the original side of the diff from current defaults,
+or unchanged fields can become false updates if settings change mid-edit.
+
+```javascript
+let editingTaskSnapshot = null;
+let editingTaskNormalizedSnapshot = null;
+
+function normalizeTaskForDiff(task, currentDefaults) {
+  const source = task || {};
+  return {
+    jitterSeconds:
+      source.jitterSeconds != null
+        ? Number(source.jitterSeconds)
+        : currentDefaults.jitterSeconds,
+    autoMode: source.autoMode === true,
+    chatSession:
+      source.chatSession === "new" || source.chatSession === "continue"
+        ? source.chatSession
+        : "default",
+  };
+}
+
+function beginEdit(task, currentDefaults) {
+  editingTaskSnapshot = { ...task };
+  editingTaskNormalizedSnapshot = normalizeTaskForDiff(task, currentDefaults);
+}
+
+function buildUpdateData(formData, currentDefaults) {
+  const current = normalizeTaskForDiff(formData, currentDefaults);
+  const original =
+    editingTaskNormalizedSnapshot ||
+    normalizeTaskForDiff(editingTaskSnapshot, currentDefaults);
+  const diff = {};
+
+  for (const key of Object.keys(current)) {
+    if (current[key] !== original[key]) {
+      diff[key] = formData[key];
+    }
+  }
+
+  return diff;
+}
+```
+
+This matters when you correctly keep create-form defaults reactive but avoid
+overwriting active edit forms during `updateDefaults` / configuration-change
+events.
+
 ## VS Code Theme Integration
 
 Use CSS variables for consistent theming:
@@ -607,12 +657,14 @@ const html = `<script>var everyN = /^\\*\\/(\\d+)$/.exec(minute);</script>`;
 ```
 
 **影響を受けるパターン:**
+
 - `\d` → `\\d`
 - `\s` → `\\s`
 - `\*` → `\\*`
 - `\/` → `\\/`
 
 **デバッグ方法:**
+
 1. Webview Developer Toolsを開く
 2. Consoleで `Invalid regular expression: /^*/: Nothing to repeat` を探す
 3. ビルド出力 (`out/extension.js`) で該当の正規表現を確認
@@ -628,7 +680,7 @@ const configWatcher = vscode.workspace.onDidChangeConfiguration((e) => {
     // Webviewを新しい言語で再レンダリング
     MyWebview.refreshLanguage(getCurrentData());
   }
-  
+
   if (
     e.affectsConfiguration("myExtension.globalPromptsPath") ||
     e.affectsConfiguration("myExtension.globalAgentsPath")
@@ -706,12 +758,14 @@ return `<!DOCTYPE html>
 ```typescript
 // Tighten localResourceRoots to only what is needed
 this.panel = vscode.window.createWebviewPanel(
-  "myWebview", "My View", vscode.ViewColumn.One,
+  "myWebview",
+  "My View",
+  vscode.ViewColumn.One,
   {
     enableScripts: true,
     retainContextWhenHidden: true,
     localResourceRoots: [
-      vscode.Uri.joinPath(extensionUri, "media"),  // JS / CSS
+      vscode.Uri.joinPath(extensionUri, "media"), // JS / CSS
       vscode.Uri.joinPath(extensionUri, "images"), // icons
       // ❌ Don't pass extensionUri directly – too broad
     ],
@@ -739,7 +793,9 @@ function serializeForWebview(value: unknown): string {
   try {
     var el = document.getElementById("initial-data");
     if (el) initialData = JSON.parse(el.textContent || "{}");
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
   // … use initialData …
 })();
 ```
