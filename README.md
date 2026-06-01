@@ -10,6 +10,10 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 
 ![OCR Demo](assets/image.png)
 
+### draw.io Diagram Forge
+
+![draw.io Demo](assets/drawio-demo.gif)
+
 ## Skills
 
 | Skill                                                   | Description / 説明                                                                                                  |
