@@ -51,7 +51,8 @@ Azure Advisor 推奨事項・コスト推移を分析し、顧客向けの簡易
 ### Phase 3: PowerPoint レポート生成
 
 [PPTX 生成スクリプト](./scripts/generate_pptx.py) を使用。
-複数サブスクリプションの場合は Subscription ID ごとに章を分ける。重要な推奨事項は個別ページを作り、英語原文、日本語訳、リスク、推奨アクション、是正手順、Microsoft Learn URL を入れる。
+複数サブスクリプションの場合は Subscription ID ごとに章を分ける。重要な推奨事項は個別ページを作り、英語原文、日本語訳、リスク、推奨アクション、メリット / デメリット、是正手順、Microsoft Learn URL を入れる。
+Executive Summary と推奨アクションでは、必要に応じて WAF / CAF の観点も添える。
 
 ```powershell
 py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.pptx
@@ -63,7 +64,8 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 2. 全コンテンツスライドに speaker notes があるか確認
 3. 表・本文・参照 URL が 14pt 未満になっていないか確認
 4. 数値の検算（コスト合計、変動率の基準月明示）
-5. 社内情報・社内用語が含まれていないか最終チェック
+5. 英語推奨事項に日本語訳があり、「日本語訳未登録」のような placeholder が残っていないか確認
+6. 社内情報・社内用語が含まれていないか最終チェック
 
 ## 品質基準（Lessons Learned）
 

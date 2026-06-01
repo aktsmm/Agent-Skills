@@ -81,6 +81,14 @@
 - ○ 「Storage が 63% 減少しています。データ移行・削除・オンプレ回帰などの可能性があり、利用トレンドの確認を推奨します」
 - ○ 「Advisor が 14 台の VM を低使用率と判定しています。利用率を確認のうえ、サイズダウンまたは停止スケジュールの設定をご検討ください」
 
+### WAF / CAF 観点の添え方
+
+Executive Summary と推奨アクションでは、単に Advisor 件数を並べず、必要に応じて Microsoft Learn の公式フレームワークに沿って意味付けする。
+
+- Well-Architected Framework: Reliability / Security / Cost Optimization / Operational Excellence / Performance Efficiency のどの柱に効くかを添える
+- Cloud Adoption Framework: Govern / Secure / Manage / Ready など、運用・統制のどの活動に関係するかを添える
+- WAF / CAF はコメントの補助軸であり、Advisor 取得値や Cost 実データを置き換える根拠にしない
+
 ## PowerPoint テンプレート設定
 
 | 項目               | 値                                    |
@@ -126,9 +134,11 @@ notes.notes_text_frame.text = "ノートテキスト"
 7. 推奨アクション / 免責事項
 
 章区切りスライドには Subscription ID と Tenant ID を明記し、発表時にどの環境の話か迷わないようにする。
-Cost スライドには月別合計、明細件数、主要サービス別推移を入れる。Advisor Overview スライドにはカテゴリ別件数と件数上位の推奨事項を入れる。重要な推奨事項は個別ページを作り、英語原文、その直下の日本語訳、リスク、推奨アクション、是正手順、Microsoft Learn URL を入れる。全体推奨アクションも別途まとめる。
+Cost スライドには月別合計、明細件数、主要サービス別推移を入れる。Advisor Overview スライドにはカテゴリ別件数と件数上位の推奨事項を入れる。重要な推奨事項は個別ページを作り、英語原文、その直下の日本語訳、リスク、推奨アクション、メリット / デメリット、是正手順、Microsoft Learn URL を入れる。全体推奨アクションも別途まとめる。
 
-是正手順は Microsoft Learn の公式 URL を根拠にする。Microsoft Docs / code sample search が不安定な場合でも、Docs search / fetch で取得できた公式ページを使い、根拠なしの手順やコマンド例を書かない。
+是正手順は Microsoft Learn の公式 URL を根拠にする。コマンドや具体的な操作例を書く場合は `microsoft_code_sample_search` で公式サンプルを確認する。code sample search が不安定な場合でも、Docs search / fetch で取得できた公式ページを使い、根拠なしの手順やコマンド例を書かない。
+
+英語の Advisor 推奨事項は、そのまま出さず必ず直下に日本語訳を添える。辞書未登録の場合でも「日本語訳未登録」と表示せず、最低限、自然な日本語要約へ置き換える。
 
 ### PPTX 生成後チェック
 
