@@ -102,6 +102,16 @@ graph TD
 
 ---
 
+## 受領資料取り込み
+
+- ユーザーが「ルートに資料を置いた」と言ったら、まずルート直下の全ファイルを確認し、PDF だけでなく PowerPoint / Excel / Word / 画像 / 図面も受領候補として見る。
+- 受領原本は日付付きの安定名にリネームし、分類後は `_received/overall-architecture/` または該当 `mtg-YYYY-MM-DD-name/` へ移す。未分類だけ `_received/incoming/` に残す。
+- 拡張子と実体を確認する。`.pptx` が OLE/旧 Office 実体なら `.ppt` として整理し、内容確認は COM も使う。
+- PDF は全ページ、PowerPoint は全スライドを確認してから要点メモへ反映する。途中ページや冒頭だけで完了扱いにしない。
+- ルート直下の受領候補確認には、必要に応じて customer-workspace skill の `scripts/Test-ReceivedMaterialPlacement.ps1` を使う。このスクリプトは read-only の監査だけを行う。
+
+---
+
 ## 次回までの宿題ワークスペース運用ルール
 
 ミーティング後に発生した作業は `next-actions/` 配下に切り出し、ミーティングノート自体は決定事項と宿題の発生記録までで止める。

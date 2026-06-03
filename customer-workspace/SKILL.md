@@ -97,6 +97,11 @@ _provided/                       ← customer-facing copies, send-out decks, pro
 - Use `_provided/` only for versions safe to show or send to the customer.
 - Use `overall-architecture/` when the material stays relevant across multiple meetings.
 - Use `mtg-YYYY-MM-DD-name/` only when the material is truly scoped to one meeting.
+- When a user says files were placed at the workspace root, inspect all root files first; treat PDFs, decks, spreadsheets, documents, images, and diagrams as possible received materials.
+- Rename received originals with a date-prefixed stable name before classification. Leave only unclassified items in `_received/incoming/`.
+- Check actual file signatures as well as extensions. For example, a `.pptx` file with an OLE/legacy Office signature should be handled as `.ppt`, and COM may be needed for content inspection.
+- Review PDFs by all pages and decks by all slides before updating working summaries; do not summarize only the first pages or the first matching file.
+- Read-only root audits can use `scripts/Test-ReceivedMaterialPlacement.ps1` from this skill.
 
 ---
 
@@ -154,3 +159,4 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 - `assets/convert-meeting-minutes.prompt.md` - Meeting notes prompt
 - `assets/extract-questions.prompt.md` - Question extraction prompt
 - `assets/copilot-instructions.md` - Auto-routing rules
+- `scripts/Test-ReceivedMaterialPlacement.ps1` - Read-only root audit for unclassified received-material candidates

@@ -81,6 +81,13 @@
 - ○ 「Storage が 63% 減少しています。データ移行・削除・オンプレ回帰などの可能性があり、利用トレンドの確認を推奨します」
 - ○ 「Advisor が 14 台の VM を低使用率と判定しています。利用率を確認のうえ、サイズダウンまたは停止スケジュールの設定をご検討ください」
 
+### コスト上位リソースの扱い
+
+- 上位リソース表には **リソース名だけでなく種類（例: Search service, Recovery Services vault, Container Registry, Cognitive Services）** を併記する
+- MonthToDate のコストは発生済みコストであり、削除済み・削除中リソースも表示される。現在状態が分かる場合は `Current / Deleting / Deleted` を併記する
+- ユーザーまたは運用担当が「アプリで使用中」と確認したリソースは、コスト上位でも削除候補と断定しない。推奨は「維持」「SKU/容量見直し」「利用量監視」に留める
+- Backup / Recovery Services vault は削除要求後も `Deleting` が長く続くことがある。削除効果は即時ではなく、翌日以降または翌月のコストで確認する
+
 ### WAF / CAF 観点の添え方
 
 Executive Summary と推奨アクションでは、単に Advisor 件数を並べず、必要に応じて Microsoft Learn の公式フレームワークに沿って意味付けする。
