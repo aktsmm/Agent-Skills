@@ -152,6 +152,8 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 
 ## Assets
 
+> **Note**: `assets/` 配下の prompt / instruction / template は、新しい顧客ワークスペースを初期化するときの **コピー元** として使う scaffolding 用ファイル。ホスト workspace の `.github/prompts/` や `.github/copilot-instructions.md` とは独立に進化させてよい（同期は必須ではない）。ホスト側で機能追加した場合に scaffolding にも反映したいときは、明示的にこのフォルダへ back-port する。
+
 - `assets/_templates/` - Template files
 - `assets/_templates/next-actions-readme.md` - Per-MTG progress board template
 - `assets/_templates/next-actions-task.md` - Single task file template (homework / proposal / research)
