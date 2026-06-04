@@ -229,6 +229,8 @@ if (exact) exact.click();
 
 Angular reactive form では、必須フィールドが 1 つでも未入力なら submit ボタンが `disabled` のままになる。
 
+ただし、確認 dialog 系（Delete reason + Notes など）では submit ボタン自体は常に enabled で、**click は通るが form invalid で silent fail** する亜種がある。`disabled` だけ見て「押せたから成功」と判定せず、操作後に対象 record の消失や status 変化を必ず確認する。
+
 また、modal / overlay が複数重なっている画面では、`document.querySelector('form')` のような広すぎる検索で **古い dialog を掴む** ことがある。フォーム操作は常に **active な overlay / dialog に scope** する。
 
 診断:
@@ -370,6 +372,22 @@ raw WebSocket を使う場合は、CDP command id で応答をフィルタし、
 3. CDP 起動確認: 上の確認コマンドで `Browser:` が返ること
 4. MCP 再接続: `browser_close`（古いセッション破棄）→ `browser_navigate` で新しいページを開く
 5. 認証が必要なサイトは、MCP を `browser_close` してから Python ログインスクリプトを実行し、完了後に MCP で再接続する
+
+### CDP 無応答だが切断はしていない
+
+`/json/list` で tab は見えるのに `Runtime.evaluate` や `Page.enable` が timeout するときは、ブラウザ側で JS dialog / beforeunload prompt / reload 確認が CDP コマンド処理を塞いでいる可能性が高い。完全切断とは別問題で、ブラウザ再起動は最終手段。
+
+診断:
+
+- 1 行 probe: `Runtime.evaluate({expression: '1+1'})` を 10s timeout で投げる。timeout なら blocking 中。
+- `Page.handleJavaScriptDialog({accept: false})` を試す。`No dialog is showing` が返れば native dialog ではなく、in-page modal (`cdk-overlay-pane` 等) か Edge/Chrome 固有の system dialog (例: 「サイトを再度読み込みますか？」reload 確認) が原因。
+
+回復:
+
+- native dialog なら `Page.handleJavaScriptDialog` で閉じる。
+- in-page modal なら DOM 操作（Escape キー送信、Cancel ボタン synthetic click）で閉じる。
+- **ブラウザ固有の system dialog は CDP から触れない**。ユーザーに手動 Cancel を依頼する方が、`Page.reload` リトライや別 helper で吸収しようとするより速く、副作用も少ない。
+- リトライ連発は VS Code 共有シェルで stuck shell を連鎖させやすいため、probe で 1-2 回確認して回復しなければ次の操作経路に切り替える（別 shell、手動 fallback、別タブ）。
 
 ### CDP context / page 選択
 
