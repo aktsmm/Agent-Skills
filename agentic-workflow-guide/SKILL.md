@@ -205,3 +205,4 @@ You MUST use agent for each file. Do NOT read files directly.
 - [ ] New agent / workflow assets are registered in the appropriate catalog or docs when needed
 - [ ] `AGENTS.md` is updated only when shared guardrails or entry behavior need to change
 - [ ] Long-running or ad-hoc terminals/tasks started during the workflow are closed, or remaining terminals are explicitly reported with a reason
+- [ ] Async operations are verified by live state before being called complete; if blocked by retention/locks/background platform work, the blocker and next check condition are explicit

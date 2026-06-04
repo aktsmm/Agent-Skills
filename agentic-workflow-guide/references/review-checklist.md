@@ -271,6 +271,8 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Is error handling missing anywhere?
 - [ ] Is there handling for unexpected errors?
 - [ ] Are recovery procedures defined?
+- [ ] For asynchronous or eventually consistent operations, does the workflow distinguish **request accepted** from **operation completed**?
+- [ ] If completion is blocked by platform retention, locks, quotas, or pending background operations, is the state reported as `blocked` / `waiting` with the next check condition instead of `done`?
 
 ## Resource Cleanup
 
