@@ -59,6 +59,7 @@
 - [ ] Recovery Services Vault が設定 (必要な場合)
 - [ ] バックアップポリシーが要件を満たす
 - [ ] Geo 冗長 / ゾーン冗長の設定が適切
+- [ ] Recovery Services vault / Backup Vault を作る場合、soft delete retention と削除時の運用手順（保護停止、backup data 削除、container unregister、soft-deleted instance の purge 待ち）を README または運用メモに記載している
 
 ## ドキュメント
 

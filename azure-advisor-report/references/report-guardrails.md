@@ -87,6 +87,7 @@
 - MonthToDate のコストは発生済みコストであり、削除済み・削除中リソースも表示される。現在状態が分かる場合は `Current / Deleting / Deleted` を併記する
 - ユーザーまたは運用担当が「アプリで使用中」と確認したリソースは、コスト上位でも削除候補と断定しない。推奨は「維持」「SKU/容量見直し」「利用量監視」に留める
 - Backup / Recovery Services vault は削除要求後も `Deleting` が長く続くことがある。削除効果は即時ではなく、翌日以降または翌月のコストで確認する
+- Backup Vault / Data Protection Backup Vault は soft-deleted backup instance の保持により、`scheduledPurgeTime` まで完全削除できないことがある。この場合は「削除失敗」ではなく「soft delete retention 待ち」として、purge 予定時刻を明記する
 
 ### WAF / CAF 観点の添え方
 

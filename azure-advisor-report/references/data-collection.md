@@ -245,6 +245,43 @@ az resource list --subscription $subId `
 
 注意: Cost Management の MonthToDate / 過去月データは **発生済みコスト** であり、削除済みリソースも当月明細に残る。削除後の効果を見る場合は、当月 MTD だけでなく翌日以降または翌月の発生額で確認する。
 
+### Step 4.3: Backup / RSV 系リソースの削除完了判定
+
+Recovery Services vault / Backup vault / Data Protection Backup Vault は、削除要求が通っても即時に RG から消えないことがある。コスト削減レポートや削除後確認では、次の順で状態を分けて記録する。
+
+1. `Microsoft.RecoveryServices/vaults` が残っているか確認する
+2. `Microsoft.DataProtection/backupVaults` が残っているか確認する
+3. Recovery Services vault は protected item / container / storage account registration が残っていないか確認する
+4. Backup vault は `deletedBackupInstances` を確認し、`SoftDeleted` と `scheduledPurgeTime` を記録する
+5. `scheduledPurgeTime` がある場合、削除は「完了」ではなく **soft delete retention 待ち** として扱う
+
+```powershell
+# Recovery Services / Data Protection の残存確認
+az resource list --subscription $subId `
+    --query "[?contains(type, 'RecoveryServices') || contains(type, 'DataProtection')].{RG:resourceGroup,Type:type,Name:name}" `
+    -o table
+
+# Data Protection Backup Vault の soft-deleted backup instance 確認
+$vaultId = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.DataProtection/backupVaults/{backupVaultName}"
+az rest --method get `
+    --url "https://management.azure.com${vaultId}/deletedBackupInstances?api-version=2023-01-01" `
+    --query "value[].{name:name,state:properties.currentProtectionState,purge:properties.deletionInfo.scheduledPurgeTime,billingEnd:properties.deletionInfo.billingEndDate}" `
+    -o table
+```
+
+実績ベースの注意:
+
+- Recovery Services vault は、VM backup / Azure Files backup などの保護停止 + backup data 削除後も、container / storage account registration が残ると vault delete が拒否される
+- Data Protection Backup Vault は、backup instance 削除後に `SoftDeleted` として残り、`scheduledPurgeTime` まで vault delete が拒否されることがある
+- RG が `Deleting` になっている間は vault の soft delete 設定変更が `ResourceGroupBeingDeleted` で拒否されることがある
+- 最新 API では Backup Vault の soft delete が Always-On 前提になる場合があり、`DppAlwaysOnSoftDeleteStateMandatory` が出たら即時削除ではなく retention 待ちとして報告する
+- レポートでは「削除要求済み」「保護項目削除済み」「soft delete retention 待ち」「完全削除済み」を分けて書く
+
+公式 Docs:
+
+- Delete Azure Backup Recovery Services vault: https://learn.microsoft.com/en-us/azure/backup/backup-azure-delete-vault
+- Azure Backup soft delete / secure by default: https://learn.microsoft.com/en-us/azure/backup/backup-azure-security-feature-cloud
+
 ### `query` が 429 のとき
 
 - `429 Too many requests` が返る環境では、同一ターン内での短時間連打を避ける
