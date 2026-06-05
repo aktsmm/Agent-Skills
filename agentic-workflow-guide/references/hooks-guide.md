@@ -98,9 +98,36 @@ Use `PostToolUse` when formatting, linting, or policy checks should run after su
 
 Use `SessionStart` when the agent should receive deterministic context before normal work begins.
 
+### Session-scoped guardrails
+
+If the platform supports hooks that are activated only for a specific skill, command, or session, use them for safeguards that would be too noisy as always-on policy.
+
+Good fits:
+
+- stricter destructive-command blocking while touching production or infrastructure
+- write-freeze rules during debugging or audit-only work
+- temporary validation that belongs to one workflow but not normal chat
+
+Keep these hooks narrow, visible, and easy to disable when the workflow ends.
+
+### Lightweight telemetry
+
+Hooks can also record small routing or workflow signals when you need evidence for improvement.
+
+Good fits:
+
+- skill name or workflow name
+- manual vs automatic trigger
+- success, fallback, or blocked outcome
+- missing expected trigger, when the platform exposes it
+
+Use local append-only logs or aggregated counters. Do not log prompt text, secrets, personal data, customer data, or raw tool payloads.
+
 ## Anti-patterns
 
 - using hooks for soft preferences that belong in instructions
 - building large workflow logic inside hooks
 - creating hooks before you can name the lifecycle event they depend on
 - running slow hooks that make ordinary tasks feel broken
+- making a high-friction hook always-on when it only belongs to one risky workflow
+- collecting telemetry broadly without a concrete routing or quality question

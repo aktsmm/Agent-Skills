@@ -113,6 +113,8 @@ if ($conn) {
 4. browser_snapshot or screenshot で結果確認する
 ```
 
+UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
+
 ## Decision Patterns
 
 ### MCP で続けるか、CLI に切り替えるか

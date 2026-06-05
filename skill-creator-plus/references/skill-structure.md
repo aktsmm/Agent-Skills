@@ -33,7 +33,7 @@ Every SKILL.md consists of:
 Executable code for tasks requiring deterministic reliability or repeatedly rewritten.
 
 - **When to include**: Same code rewritten repeatedly or deterministic reliability needed
-- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
+- **Examples**: `scripts/rotate_pdf.py` for PDF rotation tasks; `scripts/verify_flow.py` for state assertions after UI or CLI workflows
 - **Benefits**: Token efficient, deterministic, executed without loading into context
 
 ### References (`references/`)
@@ -52,6 +52,16 @@ Files used in output, not loaded into context.
 - **When to include**: Files used in final output
 - **Examples**: `assets/logo.png`, `assets/template.pptx`
 - **Use cases**: Templates, images, icons, boilerplate code
+
+### Config and Local State
+
+Use structured state only when it is part of the workflow contract.
+
+- **Config**: `config.json` for user-specific defaults such as channels, environments, output folders, or deployment targets
+- **Run logs**: append-only logs for recurring workflows that need delta-only output or previous-run awareness
+- **Avoid**: secrets, personal data, machine-specific absolute paths, and session transcripts
+
+If config is missing, the skill should ask only for the missing setup value and then continue.
 
 ## What NOT to Include
 

@@ -28,6 +28,16 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 3. Include source breakdown table
 4. Propose next actions
 
+## Collection Stewardship
+
+When the user asks what to add, promote, or clean up in a skill collection:
+
+1. Separate candidates from proven skills.
+2. Prefer skills with repeated successful use, clear triggers, and maintained resources.
+3. Flag skills that are installed but rarely selected, vague in description, or duplicated by better entries.
+4. Use available stats, logs, stars, or repeated user requests to distinguish popular skills from under-triggering ones.
+5. Recommend sandboxing unproven skills before adding them to a default source or private marketplace.
+
 ## Skill Search Workflow
 
 0. **Classify the ask first**
@@ -65,11 +75,11 @@ When user asks for recommendations (e.g., "おすすめは？", "何かいいス
 
 4. **🚨 MANDATORY: Propose next actions**
 
-   | Situation            | Proposal                     |
-   | -------------------- | ---------------------------- |
-   | Skill found          | "Install it?"                |
-   | Good repo discovered | "Add to sources?"            |
-   | lastUpdated > 7 days | "⚠️ Index outdated. Update?" |
+   | Situation            | Proposal                                     |
+   | -------------------- | -------------------------------------------- |
+   | Skill found          | "Install it?"                                |
+   | Good repo discovered | "Add to sources?"                            |
+   | lastUpdated > 7 days | "⚠️ Index outdated. Update?"                 |
    | Better non-skill fit | "Use prompt/instruction/agent/hook instead?" |
 
 ## 🚨 Mandatory Proposal Block
@@ -158,3 +168,4 @@ python scripts/search_skills.py --install docx  ← NG!
 - [ ] Showed `lastUpdated` date
 - [ ] Added numbered action menu
 - [ ] Included web search option
+- [ ] For collection changes, separated candidate / adopted / shared / retire decisions

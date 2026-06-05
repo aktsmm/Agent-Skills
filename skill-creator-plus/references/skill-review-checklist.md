@@ -11,6 +11,9 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
 - [ ] No README.md or auxiliary docs in skill folder?
+- [ ] The skill fits one primary archetype, or the split is intentional?
+- [ ] Non-obvious gotchas are captured where they affect correctness?
+- [ ] Success can be verified by scripts, assertions, artifacts, or explicit checks?
 ```
 
 ## Size & Structure
@@ -39,6 +42,22 @@ Checklist for reviewing and improving SKILL.md files.
 ```
 
 ## Content Quality
+
+### Skill Archetype Fit
+
+Before reviewing wording, identify the primary kind of skill:
+
+- Library / API reference
+- Product verification
+- Data fetching / analysis
+- Business process automation
+- Code scaffolding / templates
+- Code quality / review
+- CI/CD / deployment
+- Runbook / debugging
+- Infrastructure operations
+
+If it claims several at once, split it or move secondary behavior into references. A skill can depend on another skill, but its own responsibility should stay crisp.
 
 ### Frontmatter
 
@@ -69,6 +88,17 @@ metadata: # Required for self-authored skills
 ### What NOT to Include
 
 → See [skill-structure.md > What NOT to Include](skill-structure.md#what-not-to-include) for the complete list.
+
+### Gotchas and Verification
+
+High-signal skill content is usually specific failure avoidance, not obvious process narration.
+
+Check for:
+
+- common field-name mismatches, API quirks, stale state, or misleading success responses
+- verification steps that inspect real state, not just command exit codes
+- scripts or assertions for fragile workflows such as UI flows, deployments, data pulls, or interactive CLIs
+- setup state such as `config.json` when a missing channel, environment, or destination should trigger a user question
 
 ## References Organization
 
@@ -135,6 +165,18 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 - Task keywords ("extract text", "rotate page")
 - Context conditions ("when working with...")
 
+### Issue 5: Obvious Guidance Without Gotchas
+
+**Symptoms:** The skill says what any capable agent would already do, but omits the edge cases that caused past failures.
+
+**Fix:** Replace generic advice with specific gotchas, verification checks, or reusable scripts.
+
+Good examples:
+
+- "A UI success banner can appear before backend processing finishes; verify the persisted state."
+- "Two systems expose similar request identifiers; document the canonical join key."
+- "Append-only history tables need an explicit rule for choosing the active row."
+
 ## Review Template
 
 ```markdown
@@ -145,6 +187,7 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 - [ ] Line count: \_\_\_ (target: < 150)
 - [ ] Frontmatter valid: Yes/No
 - [ ] Description has triggers: Yes/No
+- [ ] Primary archetype: **\_\_**
 
 ### Structure
 
@@ -157,6 +200,8 @@ description: "Extract text, rotate pages, and fill forms in PDF files. Use when 
 - [ ] Single responsibility (SRP)
 - [ ] No duplicate information
 - [ ] Examples minimal but sufficient
+- [ ] Gotchas are specific and actionable
+- [ ] Verification path is explicit
 
 ### Action Items
 

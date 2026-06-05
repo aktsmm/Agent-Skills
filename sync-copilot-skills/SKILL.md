@@ -58,6 +58,7 @@ Sync locally installed Skill folders from the user's `.copilot` directory into t
 - Do not write outside `<private-repo>\.github\skills`.
 - Do not edit `~\.copilot` during sync; it is read-only source.
 - Do not delete private repo skills that no longer exist locally unless the user explicitly asks for cleanup.
+- Treat sync as backup/staging, not shared promotion. Do not make every synced skill a default recommendation or public/shared source without observed use.
 - Do not push automatically.
 - If private repo resolution fails, stop with `private repo 未解決`.
 

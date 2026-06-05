@@ -29,11 +29,12 @@ AI エージェント開発に役立つ外部リソース集。
 
 ## Claude Code 関連
 
-| リソース                       | 説明                              | URL                                                      |
-| ------------------------------ | --------------------------------- | -------------------------------------------------------- |
-| **Awesome Claude Code**        | スキル・フック・コマンド集 (22k★) | https://github.com/hesreallyhim/awesome-claude-code      |
-| **Claude Code System Prompts** | 公式システムプロンプト抽出        | https://github.com/Piebald-AI/claude-code-system-prompts |
-| **Claude Code Docs Mirror**    | Anthropic ドキュメントミラー      | https://github.com/ericbuess/claude-code-docs            |
+| リソース                                                | 説明                                                        | URL                                                                         |
+| ------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Awesome Claude Code**                                 | スキル・フック・コマンド集 (22k★)                           | https://github.com/hesreallyhim/awesome-claude-code                         |
+| **Anthropic: Lessons from building Claude Code skills** | skill の分類、配布、計測、progressive disclosure の運用知見 | https://claude.com/blog/lessons-from-building-claude-code-how-we-use-skills |
+| **Claude Code System Prompts**                          | 公式システムプロンプト抽出                                  | https://github.com/Piebald-AI/claude-code-system-prompts                    |
+| **Claude Code Docs Mirror**                             | Anthropic ドキュメントミラー                                | https://github.com/ericbuess/claude-code-docs                               |
 
 ## VS Code カスタマイズ
 
