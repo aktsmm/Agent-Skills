@@ -1,6 +1,6 @@
 ---
 name: azure-env-builder
-description: "[Alpha] Experimental Azure environment builder for infrastructure and deployment design. Use when building Azure infrastructure, generating Bicep with AVM modules, deploying apps to App Service/AKS/Container Apps, or designing Hub-Spoke, AKS, and AI Foundry architectures."
+description: "[Alpha] Experimental Azure environment builder for infrastructure and deployment design. Use when building Azure infrastructure, generating Bicep with AVM modules, deploying apps to App Service/AKS/Container Apps, designing Hub-Spoke/AKS/AI Foundry architectures, or creating low-cost Azure operations demos."
 argument-hint: "構築したい Azure 構成、アプリ、制約条件"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -18,6 +18,7 @@ Enterprise Azure environment builder skill.
 - Building enterprise Azure environments
 - Deploying apps to App Service, AKS, or Container Apps
 - Designing Hub-Spoke, AKS, or AI Foundry architectures
+- Creating low-cost Azure operations demos with alerts, logs, portal steps, and minimal always-on resources
 
 ## Features
 
@@ -28,6 +29,7 @@ Enterprise Azure environment builder skill.
 | VM Init        | Squid, Nginx, Docker, IIS setup    |
 | Config Linking | SQL/Storage/Redis, Managed ID RBAC |
 | CI/CD          | GitHub Actions / Azure Pipelines   |
+| Ops Demo       | Low-cost app, alert, log, and control-plane failure patterns |
 
 ## Workflow
 
@@ -93,6 +95,7 @@ az deployment group create --resource-group <rg> --template-file main.bicep
 | [avm-modules.md](references/avm-modules.md)                           | AVM module catalog     |
 | [vm-app-scripts.md](references/vm-app-scripts.md)                     | VM init scripts        |
 | [app-deploy-patterns.md](references/app-deploy-patterns.md)           | App deploy patterns    |
+| [low-cost-ops-demo.md](references/low-cost-ops-demo.md)               | Low-cost operations demos |
 | [service-config-templates.md](references/service-config-templates.md) | Service config linking |
 | [cicd-templates/](references/cicd-templates/)                         | CI/CD templates        |
 
