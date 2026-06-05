@@ -86,6 +86,16 @@ For explanatory note boxes placed near the top of a panel or container:
 - **Keep arrow labels on a separate Y band** from the note box. Labels that sit at the same height tend to look overlapped in exports.
 - **Review at actual embed width** after export. A diagram that looks fine at full canvas size can still collide when embedded in Markdown or docs.
 
+### Article Concept / Lifecycle Diagrams
+
+For article-facing concept diagrams that explain a repeated workflow:
+
+- **Keep the main cycle to 3-4 primary nodes**. Support tools, marketplaces, and implementation aids should be a footer note or side callout, not peer nodes in the main loop.
+- **Use outcome-oriented node titles** such as `Skill を改善`, not implementation-detail titles such as `Gotchas に戻す`. Highlight the important detail (`Gotchas`) inside the node body instead.
+- **Split long slash-separated phrases** into separate short lines. If a line like `description / Gotchas / references` feels tight at embed width, rewrite it as `description を整える` + `Gotchas / references に分ける`.
+- **Shrink-wrap the canvas after layout changes**. If footer notes move up, reduce page height so exported assets do not carry large dead whitespace.
+- **Validate both source and delivery artifacts** after wording tweaks: `.drawio` is the editable SSOT, and `.drawio.svg` is the Markdown/web artifact.
+
 ### Edge Crossing Prevention
 
 For complex diagrams (>15 nodes) with many-to-one or fan-out edges:
