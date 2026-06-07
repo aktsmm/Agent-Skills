@@ -94,6 +94,8 @@ For local article drafting, if the Markdown preview surface does not reliably re
 
 At publish time, replace local relative preview paths with the final hosted asset URL.
 
+For Qiita articles, do not leave non-trivial diagrams as Mermaid blocks in the article body. Qiita rendering can be inconsistent. Create a `.drawio` source, export PNG for Qiita image upload, keep `.drawio.svg` as the web artifact, and replace the draft-local path with the hosted Qiita image URL before publish.
+
 ## Workflow
 
 ```

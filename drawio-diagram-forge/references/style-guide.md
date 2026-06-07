@@ -90,6 +90,8 @@ For explanatory note boxes placed near the top of a panel or container:
 
 For article-facing concept diagrams that explain a repeated workflow:
 
+- Use a single visible start point. If the flow begins from multiple places, readers often cannot tell what to follow first.
+- For metric diagrams such as usage rate, show denominator and numerator explicitly, then summarize the formula in one final node. Avoid long dashed aggregation lines that make the diagram feel like a wiring diagram.
 - **Keep the main cycle to 3-4 primary nodes**. Support tools, marketplaces, and implementation aids should be a footer note or side callout, not peer nodes in the main loop.
 - **Use outcome-oriented node titles** such as `Skill を改善`, not implementation-detail titles such as `Gotchas に戻す`. Highlight the important detail (`Gotchas`) inside the node body instead.
 - **Split long slash-separated phrases** into separate short lines. If a line like `description / Gotchas / references` feels tight at embed width, rewrite it as `description を整える` + `Gotchas / references に分ける`.
