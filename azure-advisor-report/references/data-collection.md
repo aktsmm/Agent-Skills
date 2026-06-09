@@ -17,12 +17,23 @@ Get-Date -Format "yyyy-MM-dd (ddd)"
 ## Step 2: テナント/サブスクリプション切替
 
 ```powershell
-az login --tenant {tenantId}
 az account set --subscription {subscriptionId}
 az account show --query "{name:name, id:id, tenantId:tenantId}" -o json
 ```
 
-> ⚠️ 複数サブスクリプションが別テナントにある場合、テナントごとに `az login` が必要。
+`az account set` が対象 subscription を見失う場合でも、既存認証で対象 tenant の ARM token が取れることがある。対話ログインへ進む前に、tenant-scoped token + REST 経路を確認する。
+
+```powershell
+az account get-access-token `
+    --tenant {tenantId} `
+    --resource https://management.azure.com/ `
+    --query "{tenant:tenant,expiresOn:expiresOn,subscription:subscription}" `
+    -o json
+```
+
+- token が取れる場合: `az account set` に依存しない REST helper で Cost / Advisor を取得する
+- token が取れない場合: `az login --tenant {tenantId}` を実行し、ログイン後に再確認する
+- token 本体は保存・表示しない。出力する場合は tenant / expiresOn などのメタデータだけにする
 
 ## Step 2.5: 事前チェック（API 経路の確定）
 
@@ -35,7 +46,7 @@ az account list --all --query "[?id=='{subscriptionId}'].{name:name,id:id,tenant
 ```
 
 - 空配列なら、まず tenant を見直す
-- `az account set --subscription {subscriptionId}` が失敗する状態では、後続のコスト API を叩かない
+- `az account set --subscription {subscriptionId}` が失敗しても、対象 tenant の ARM token が取れる場合は REST 経路で続行できる
 
 ### 2.5.2 offer type / billing 情報チェック
 
@@ -70,8 +81,8 @@ az account show --query "{name:name,id:id,tenantId:tenantId}" -o json
 ```
 
 - 空配列なら tenant を見直す
-- `az account set --subscription {subscriptionId}` が失敗する状態では Advisor 取得も進めない
-- 取得前に subscription context がズレていないことを毎回確認する
+- `az account set --subscription {subscriptionId}` が失敗しても、対象 tenant の ARM token が取れる場合は REST 経路で続行できる
+- CLI 経路で取得する場合は、取得前に subscription context がズレていないことを毎回確認する
 
 ### Step 3.2: CLI と REST の役割分担
 
@@ -124,7 +135,7 @@ GET https://management.azure.com/subscriptions/{subscriptionId}/providers/Micros
 - `az advisor recommendation list` が category 不正扱い、または help に category が出ない:
   - REST helper に切り替える
 - `az account set --subscription ...` 失敗:
-  - tenant / subscription 可視性の問題。Step 2 へ戻る
+  - まず tenant-scoped ARM token が取れるか確認する。取れる場合は REST helper に切り替え、取れない場合だけ Step 2 の tenant login へ戻る
 - 一部カテゴリだけ 0 件:
   - 取得失敗と決め打ちせず、まず `0件（推奨なし）` を候補にする
   - ただし OpEx だけ 0 件で CLI 経路を使っていた場合は REST で再確認する

@@ -145,6 +145,12 @@ Azure の障害調査、切り分け、初動確認、復旧確認を read-only 
 
 - MFA 再認証が必要なら、その事実を報告する
 - 共有ターミナルが対話プロンプトで詰まったら、独立 task や別プロセスで read-only 調査を続ける
+- `az login --use-device-code` が Conditional Access でブロックされる場合は、通常のブラウザー対話ログイン（`az login -t <tenantId>`）を優先する
+
+### Resource Graph Gaps
+
+- Resource Graph は child resource を返さないことがある。親リソースは見えるのに child が 0 件なら、親の resource ID から child ID を組み立てて `az resource show --ids ... --api-version <version>` で直接確認する
+- AVS の cluster SKU 確認では、`az vm list` ではなく `Microsoft.AVS/privateClouds/<name>/clusters/<cluster>` の `sku.name` と `properties.clusterSize` を見る
 
 ### Resource Health Already Recovered
 
