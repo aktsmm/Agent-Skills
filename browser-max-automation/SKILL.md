@@ -89,6 +89,12 @@ if ($conn) {
 - 既存の endpoint 値があっても「前回は正しかった値」にすぎない。別セッションのブラウザが同じ port を使うことがあるため、接続失敗や login redirect が出たら再ログインより先に endpoint drift を疑う
 - helper を複数呼ぶ場合は、途中で endpoint を再推測させず、検証済みの同じ CDP URL を同一 process 環境から渡す
 
+#### 認証状態を使う CDP では profile と URL 作成を疑う
+
+認証済み cookie や device-auth が必要なサイトでは、headless や一時 `--user-data-dir` より **headful の既存 profile + CDP** を優先する。Chrome では `--remote-debugging-port` が command line に出ていても port が listen しない場合があるため、既存 profile の user data directory を `--user-data-dir=<existing-user-data-dir>` として明示し、`/json/version` で確認してから操作する。
+
+また、CDP の `/json/new?<url>` で認証 URL や OAuth callback URL を開く場合は、target URL 全体を URL encode する。未 encode のまま `&param2=...` などを含む URL を渡すと、CDP endpoint 側の query として分解され、サイト側では token / state / verifier が欠落して即期限切れになることがある。古い認証タブは期限切れ状態を持ち越すため、再試行前に閉じる。
+
 直接 WebSocket CDP の起動フラグ、`websocket-client` 接続、SPA hash navigation、virtual scroll 操作は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
 ## Quick Reference

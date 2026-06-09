@@ -130,6 +130,9 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 
 - technical content verification workflow
 - shape-based architecture diagrams
+- template-based slide XML editing order
+- rendered-slide visual QA loop
+- PptxGenJS hardening pitfalls
 - hyperlink batch processing
 - customer-facing deck surface / notes separation
 - font theme token resolution
@@ -149,4 +152,6 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - template / layout の前提が確認できている
 - technical content は一次情報確認が済んでいる
 - operational text がスライド面に出ていない
+- template 利用時は単調な同一レイアウト反復と余剰 placeholder を確認している
+- visual QA はレンダー画像で行い、修正後に該当スライドを再確認している
 - build 後に overflow / consistency / hyperlink をレビューできている
