@@ -109,8 +109,11 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - **PowerPoint lock first**: 開いている PPTX に対して python-pptx で上書きしない
 - **COM for open decks**: 開いている PPTX や既存 deck の直接編集は [references/instructions/com-automation.instructions.md](references/instructions/com-automation.instructions.md) を参照する
 - **Operational text stays in notes**: 運営メモはスライド面に出さない
+- **Customer-facing surface only**: 顧客向け deck のスライド面には内部向け話法、避ける表現、作業メモ、検証メモ、ファイル用途ラベルを混ぜない。話者向け情報は speaker notes へ分離する
+- **Template means template**: ユーザー指定テンプレートがある場合、特に表紙はテンプレートの既存プレースホルダー/レイアウトを使い、上から別図形を重ねて隠さない
 - **Architecture diagrams use shapes**: ASCII art ではなく図形で組む
 - **Appendix URLs use Title - URL**: 参考 URL の表示形式は統一する
+- **Review content and visuals separately**: 生成後は見た目レビューだけでなく、公式情報との正確性レビュー、URL hyperlink 数、notes 数、placeholder/internal wording を確認する
 
 ## Reference Map
 
@@ -121,12 +124,14 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - [references/content-guidelines.md](references/content-guidelines.md)
 - [references/IMPLEMENTATION_PATTERNS.md](references/IMPLEMENTATION_PATTERNS.md)
 - [references/instructions/com-automation.instructions.md](references/instructions/com-automation.instructions.md)
+- [references/instructions/customer-facing-deck.instructions.md](references/instructions/customer-facing-deck.instructions.md)
 
 ### Go to Implementation Patterns For
 
 - technical content verification workflow
 - shape-based architecture diagrams
 - hyperlink batch processing
+- customer-facing deck surface / notes separation
 - font theme token resolution
 - section / layout XML manipulation
 - hidden slide cleanup

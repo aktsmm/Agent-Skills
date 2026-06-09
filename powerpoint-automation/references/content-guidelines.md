@@ -245,6 +245,15 @@ gh api "repos/MicrosoftDocs/azure-docs/commits?path=articles/{service}/{file}.md
 
 > ⚠️ If slide numbers don't appear, enable them in the template via "Insert → Header and Footer".
 
+## Technical Capability Claims
+
+When a presentation claims that AI, agents, automation, or a platform can perform an operational task, include the concrete executable surface behind the claim.
+
+- Prefer a compact matrix: `User goal` / `Command or API` / `Agent role` / `Approval boundary`.
+- Name official commands or APIs when known, such as PowerShell cmdlets, REST endpoints, Graph APIs, KQL tables, or browser automation entry points.
+- Avoid saying "AI can do this" without showing whether the work is scriptable, API-accessible, or only UI-driven.
+- For customer-facing operational decks, keep table text at 12 pt or larger; if a matrix only fits at 8-9 pt, reduce rows or split the slide instead.
+
 ## Base File Management (★★ Critical)
 
 **Rule**: Always load the **latest user-modified file** as the base for script modifications. Never revert to an earlier version.
