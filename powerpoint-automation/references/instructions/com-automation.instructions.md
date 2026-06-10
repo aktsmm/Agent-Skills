@@ -19,6 +19,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Do not assume `app.Presentations(1)` is the target. Search by presentation name or path.
 - Guard `Presentation.Name` and `Presentation.FullName` access with `try/except`; automation permission errors can occur.
 - For OneDrive-synced files, `Presentation.FullName` may resolve to a SharePoint URL even when opened from a local path. Match by basename as well as full path.
+- For read-only extraction from OneDrive-synced legacy `.ppt` files, direct `Presentations.Open()` can fail when the file is a reparse point. Copy the file to a local workspace temp folder first, then open the copy with `ReadOnly=True` / `WithWindow=False` or equivalent COM flags.
 - If enumeration is unstable, use `DispatchEx` and open explicit paths. Use `ReadOnly=True` for reference decks and `ReadOnly=False` for the edit target.
 - For a deck the user is actively viewing, prefer `GetActiveObject("PowerPoint.Application")` and locate the open file by name.
 - After ad-hoc edits (slide moves, text changes), release the COM reference but leave the file open. Only `pres.Close()` for read-only verification scripts that opened the file themselves.

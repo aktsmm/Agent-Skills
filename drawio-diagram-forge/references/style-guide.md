@@ -103,6 +103,7 @@ For article-facing concept diagrams that explain a repeated workflow:
 For complex diagrams (>15 nodes) with many-to-one or fan-out edges:
 
 - **Align source and target y** — place each agent/processor at the same y as its output node. Lines stay horizontal, crossing drops to near zero.
+- **Reorder sibling nodes before drawing detours** — if a connector from one item in a stacked group must jump around another item, first swap or move the related item closer to its target/callout. A short straight connector is usually clearer than a routed line that skirts sibling boxes.
 - **Avoid swimlane-relative coordinates** — when edges cross swimlane boundaries, `exitX`/`entryY` resolve to group-relative positions that are hard to predict. Use absolute positioning (`parent="1"`) for all nodes instead.
 - **Spread entryY on shared targets** — when multiple edges enter the same node, enlarge the node height and assign distinct `entryY` values (e.g., 0.1 / 0.5 / 0.9) so lines arrive at different vertical points.
 - **Collapse fan-out into one edge** — instead of N individual arrows from an orchestrator to N children, draw a single dashed arrow to a group outline and label it (e.g., "delegates").
