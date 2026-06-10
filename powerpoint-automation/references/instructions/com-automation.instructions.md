@@ -106,3 +106,4 @@ Use this reference when editing existing PPTX files, especially files that may a
 - When inserting section cover slides, delete the old section boundary with `SectionProperties.Delete(index, 0)` and re-add it before the correct slide.
 - Track moved slides by `SlideID`, not by changing index.
 - For large restructures, rebuild all sections by scanning section title layouts and calling `AddBeforeSlide()` again.
+- On some template-derived or cloud-synced decks, `SectionProperties.Delete()` or `Rename()` can fail with an error equivalent to "presentation cannot be modified" even when `ReadOnly=0`. If section mutation fails, stop trying to patch the existing deck in place. Instead, build a fresh presentation copy, bring the slides into that clean deck, and add the desired sections there.
