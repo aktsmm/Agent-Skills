@@ -18,6 +18,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 
 - Do not assume `app.Presentations(1)` is the target. Search by presentation name or path.
 - Guard `Presentation.Name` and `Presentation.FullName` access with `try/except`; automation permission errors can occur.
+- For OneDrive-synced files, `Presentation.FullName` may resolve to a SharePoint URL even when opened from a local path. Match by basename as well as full path.
 - If enumeration is unstable, use `DispatchEx` and open explicit paths. Use `ReadOnly=True` for reference decks and `ReadOnly=False` for the edit target.
 - For a deck the user is actively viewing, prefer `GetActiveObject("PowerPoint.Application")` and locate the open file by name.
 - After ad-hoc edits (slide moves, text changes), release the COM reference but leave the file open. Only `pres.Close()` for read-only verification scripts that opened the file themselves.
@@ -65,6 +66,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 ## RefURL Placement
 
 - Shape name: `RefURL`.
+- Before adding or updating RefURL boxes, delete existing `RefURL*` shapes and bottom-area URL text boxes. Repeated post-processing can otherwise leave duplicate visible citations.
 - Position: bottom-right or bottom-left. Pick one and keep it consistent across the deck. Recommended margin: 12-16 pt from the side, 2-6 pt from bottom.
 - Font: Calibri + BIZ UDPGothic, 13 pt or larger. Typical width: 540 pt at 13 pt, 600 pt at 14 pt to fit Microsoft Learn URLs on one line.
 - Show both title and URL. Use either `Page title | URL` or two lines.

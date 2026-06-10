@@ -56,6 +56,9 @@ Use these rules when creating or revising decks intended to be shown directly to
 ## Story Flow and Sections
 
 - For customer decks longer than about 10 slides, add PowerPoint sections so the left pane communicates the story structure.
+- For multi-session customer decks, include the session number on the file name and slide surface, for example `YYYYMMDD-01_04-topic.pptx` and `Session 1 of 4`.
+- Near the end of recurring support decks, include must-decide items such as next meeting date, attendees, owners, and what the customer will try before the next session.
+- Carry forward explicit requests from previous meeting notes, such as basic Git/GitHub explanations, but keep them scoped so they support the main story instead of becoming a separate training deck.
 - Recommended flow for product introduction decks:
   1. Why now / announcement context
   2. What it is and how it differs from nearby products
