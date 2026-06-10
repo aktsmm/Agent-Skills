@@ -233,6 +233,8 @@ for i, slide in enumerate(prs.slides, 1):
 3. Ensure new shape's `top >= previous shape's bottom + gap`
 4. Shrink oversized textbox `height` (e.g. subtitle placeholders have large default height)
 
+For cover slides, also check whether the title textbox is visually too large, not only whether it technically fits. A title that fills the center of a sparse corporate template can look heavy even without overflow; reduce the textbox size and font before handoff.
+
 **Validation snippet**:
 
 ```python
@@ -251,6 +253,24 @@ for i, slide in enumerate(prs.slides, 1):
             t2 = shapes[j+1].text_frame.paragraphs[0].text[:30]
             print(f"⚠️ Slide {i}: overlap! [{t1}] bottom={bottom} > [{t2}] top={next_top}")
 ```
+
+### Template Placeholder Collision (★★ Important)
+
+**Problem**: On some user-supplied templates, the `Title and Content` layout has a very tall title placeholder while the content placeholder starts too high. Template-based generation can then place the title and the first bullet lines on top of each other even when the text itself is reasonable.
+
+**Detection pattern**:
+
+- Title placeholder height is unusually large for a normal content slide
+- Title bottom is close to or below the body placeholder top
+- Rendered slide shows the title and first bullet line touching or overlapping
+
+**Recommended fix**:
+
+1. Render representative content slides after generation, not only the cover
+2. Inspect the actual title/body placeholder geometry on the generated deck
+3. If `title.top + title.height > body.top`, run a COM cleanup pass before handoff
+4. In that pass, move the title nearer the top margin, move the body placeholder down, and reduce body font if needed
+5. Re-render the affected slides and confirm the collision is gone
 
 ---
 

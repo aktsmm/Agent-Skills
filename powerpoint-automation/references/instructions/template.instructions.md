@@ -25,6 +25,17 @@ Template-based PPTX generation rules.
 
 > 📖 See [tools-reference.instructions.md](tools-reference.instructions.md) for method selection details.
 
+### Deck vs Template Gate
+
+Before authoring, distinguish the requested deliverable:
+
+| User intent | Deliverable | Work to do |
+| --- | --- | --- |
+| "Create the next meeting deck" / "make slides from this content" | A populated presentation deck | Fill audience-ready slides from content and validate visuals |
+| "Create a reusable template" / "make the slide master" | A template PPTX | Create/clean slide master and reusable custom layouts; sample slides are only previews |
+
+Do not drift from deck creation into template authoring unless the user explicitly asks for a reusable template or slide master. Conversely, when the user asks for a template, do not stop at sample slides; verify the slide master and custom layouts are actually reusable.
+
 ---
 
 ## Quick Start (New Generation) ★ Recommended
@@ -172,6 +183,8 @@ python scripts/create_from_template.py "user_presentation.pptx" `
     "output_manifest/content.json" "output_ppt/result.pptx" `
     --config "output_manifest/user_presentation_layouts.json"
 ```
+
+If the user intends to reuse the same external template across follow-up updates, stage that PPTX in a stable template location (for example, an `assets/templates/` directory in the working project) and keep the analyzed `*_layouts.json` next to the staged copy. Reuse the staged copy and its cached layout mapping instead of repeatedly pointing at ad hoc original paths.
 
 ### Layout Detection Keywords
 

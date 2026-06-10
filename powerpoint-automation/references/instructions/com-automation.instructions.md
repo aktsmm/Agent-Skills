@@ -21,6 +21,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - If enumeration is unstable, use `DispatchEx` and open explicit paths. Use `ReadOnly=True` for reference decks and `ReadOnly=False` for the edit target.
 - For a deck the user is actively viewing, prefer `GetActiveObject("PowerPoint.Application")` and locate the open file by name.
 - After ad-hoc edits (slide moves, text changes), release the COM reference but leave the file open. Only `pres.Close()` for read-only verification scripts that opened the file themselves.
+- If the user asks for a direct touch-up on an already-open deck, do not rebuild-and-reopen by default. Locate the active presentation, apply the minimal edits with COM, call `pres.Save()`, and leave it open.
 
 ## Text and Paragraph Editing
 
@@ -107,3 +108,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Track moved slides by `SlideID`, not by changing index.
 - For large restructures, rebuild all sections by scanning section title layouts and calling `AddBeforeSlide()` again.
 - On some template-derived or cloud-synced decks, `SectionProperties.Delete()` or `Rename()` can fail with an error equivalent to "presentation cannot be modified" even when `ReadOnly=0`. If section mutation fails, stop trying to patch the existing deck in place. Instead, build a fresh presentation copy, bring the slides into that clean deck, and add the desired sections there.
+
+## Template Surface Fallbacks
+
+- Some cloud-synced or protected templates can reject `Slides.InsertFromFile`, `Slide.Copy`, `Shapes.AddPicture`, `Shapes.AddShape`, or `Slide.FollowMasterBackground` with an access-denied error. If preserving the exact template surface is still required, render the source template slide to an image, use that image as a full-slide visual surface in a fresh/editable deck, and place editable text on top only after clearing or masking original placeholder text. Treat this as a fallback when real slide duplication is blocked, and disclose it if the user explicitly required fully editable template shapes.

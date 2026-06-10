@@ -13,6 +13,7 @@ Use these rules when creating or revising decks intended to be shown directly to
 ## Template Fidelity
 
 - When the user provides a PowerPoint template, reuse the actual template cover and its placeholders.
+- If the user says to use the template's "page 1" or "page 2" design, treat that as a real slide design requirement, not as a slide master/layout hint. Prefer duplicating or visually preserving the actual source slide surface before falling back to a similar layout.
 - Do not cover template placeholder text with opaque rectangles or overlaid text boxes; replace or delete the placeholder itself.
 - Before handoff, inspect the rendered cover for leftover placeholders such as `Event name`, `presentation`, `XXXXXX`, or old dates.
 - Do not add generic labels such as "customer introduction deck" to the slide surface unless the user explicitly requested that wording.

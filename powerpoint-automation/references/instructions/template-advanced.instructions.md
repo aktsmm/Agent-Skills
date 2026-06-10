@@ -129,6 +129,57 @@ python scripts/create_clean_template.py input/presentation.pptx "templates/${bas
 
 ---
 
+## Reusable Template Creation from Scratch
+
+Use this when the user wants a reusable PowerPoint template, not just a one-off deck.
+
+### Goal
+
+Create a clean template file with:
+
+- one slide master
+- only the custom layouts the user will actually reuse
+- generic layout names, not customer/project-specific names
+- sample slides that demonstrate each layout
+- theme fonts set for both Latin and Japanese text
+
+### Recommended layout set
+
+Keep the first version small. A useful internal template usually needs only:
+
+| Layout | Purpose |
+| --- | --- |
+| `Internal Title Slide` | Cover |
+| `Internal Section Header` | Section divider |
+| `Internal Title and Content` | Normal body slide |
+| `Internal Process` | Simple flow / process diagram |
+| `Internal References` | Page title + URL reference list |
+
+### Procedure
+
+1. Start from a new blank presentation instead of modifying a busy existing template.
+2. Create one slide master and add only the required custom layouts.
+3. Delete unused default/custom layouts if PowerPoint inserted them.
+4. Add one sample slide per layout so future users can preview the template.
+5. Use generic names such as `Internal ...`; do not bake customer names or project names into reusable templates.
+6. Set theme fonts and placeholder fonts explicitly. For Japanese decks, set Latin and Far East fonts together.
+7. Run `analyze_template.py` and verify that `title`, `content`, and `section` map to the intended custom layouts.
+8. Inspect the resulting PPTX theme/layout XML if font correctness matters. Confirm the theme uses the intended Japanese font, not just visible shapes.
+
+### Done checks
+
+- `masters=1` unless the user explicitly asked for multiple masters
+- custom layouts are limited to the intended reusable set
+- generated mapping points to the intended layouts
+- no customer-specific words remain in layout names or sample placeholders
+- theme XML and layout XML include the intended fonts
+
+### Common pitfall
+
+Creating five sample slides is not the same as creating a reusable template. The reusable value is in the slide master and custom layouts; sample slides are only previews.
+
+---
+
 ## PREPARE_TEMPLATE Phase (Required)
 
 When using external templates, always execute:
