@@ -22,6 +22,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - For a deck the user is actively viewing, prefer `GetActiveObject("PowerPoint.Application")` and locate the open file by name.
 - After ad-hoc edits (slide moves, text changes), release the COM reference but leave the file open. Only `pres.Close()` for read-only verification scripts that opened the file themselves.
 - If the user asks for a direct touch-up on an already-open deck, do not rebuild-and-reopen by default. Locate the active presentation, apply the minimal edits with COM, call `pres.Save()`, and leave it open.
+- For direct touch-ups, keep edit and verification in the same COM session and audit the active `Presentation` object. Do not verify a stale copied file or a separate read-only presentation unless the task is explicitly read-only.
 
 ## Text and Paragraph Editing
 
@@ -39,6 +40,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Japanese font replacement must set `Name`, `NameAscii`, `NameFarEast`, and `NameComplexScript` together.
 - Update slide master and custom layouts as well as visible shapes; otherwise placeholder edits can revert to old fonts.
 - If a text box has shape-level default bold, `Run.Font.Bold = 0` may not override it. Recreate the text box at the same location and size.
+- When replacing most of a slide, do not hide old placeholders with a white rectangle or overlay text boxes. Inspect the shape list first, delete or reuse the real placeholder shapes, or create a new blank slide and move it into position.
 - Table cell word wrap should not be set explicitly. `cell.Shape.TextFrame.WordWrap = -1` can raise a bounds error.
 - `Slides.Range()` footer/header batch updates can fail. Set `Slides(i).HeadersFooters` per slide.
 - Notes can often be accessed through `slide.NotesPage.Shapes.Placeholders(2)` even when `HasNotesPage` is false.
@@ -86,6 +88,8 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Flag unsupported numbers in KPIs, success criteria, or examples; add source or mark as example-specific.
 - If one slide has inconsistent font size, bold, or color, scan the whole deck for the same issue.
 - After font replacement, audit overflow with `TextRange.BoundHeight > Shape.Height`.
+- For COM touch-ups, audit text density, hyperlink count, and overflow before releasing the reference; this avoids repeated open/close cycles while the user is reviewing the deck.
+- If a COM edit script fails before save, inspect the active deck state before retrying. Do not run multiple partially failing scripts against the same deck; repair or rebuild the affected slide first.
 - Move audience-visible navigation paths and URLs from notes to slide body when appropriate.
 - Remove empty placeholders left by `Slides.AddSlide()`.
 - Prefer integrating useful points from reference decks into existing summary slides instead of copying whole slides.
