@@ -250,6 +250,71 @@ If your PPTX lacks properly named layouts:
 4. **Close Slide Master** → Save
 5. **Re-analyze**: `python scripts/analyze_template.py "updated.pptx"`
 
+### Editing Slide Master with COM
+
+Use this when the user asks to improve an existing reusable template or base slide master directly. This is different from polishing one populated deck: update `SlideMaster.CustomLayouts` and their placeholders so future decks inherit the change.
+
+```python
+import win32com.client
+
+template = r"C:\path\to\template_master.pptx"
+app = win32com.client.DispatchEx("PowerPoint.Application")
+app.Visible = True
+pres = app.Presentations.Open(template, False, False, False)
+
+FONT_JA = "BIZ UDPゴシック"
+FONT_LATIN = "BIZ UDPGothic"
+ppAlignLeft = 1
+ppAlignCenter = 2
+msoAnchorTop = 1
+msoAnchorMiddle = 3
+msoTrue = -1
+
+def set_text_defaults(shape, size=None, align=None, vertical=None):
+    if not shape.HasTextFrame:
+        return
+    tr = shape.TextFrame.TextRange
+    tr.Font.Name = FONT_JA
+    tr.Font.NameFarEast = FONT_JA
+    tr.Font.NameAscii = FONT_LATIN
+    if size:
+        tr.Font.Size = size
+    if align:
+        tr.ParagraphFormat.Alignment = align
+    if vertical:
+        shape.TextFrame.VerticalAnchor = vertical
+
+for design in pres.Designs:
+    master = design.SlideMaster
+    for layout in master.CustomLayouts:
+        for shape in layout.Shapes:
+            try:
+                ph_type = shape.PlaceholderFormat.Type if shape.Type == 14 else None
+            except Exception:
+                ph_type = None
+            # Placeholder types: 1=Title, 2=Body, 4=Subtitle, 13=Slide number
+            if ph_type == 1:
+                set_text_defaults(shape, size=30, align=ppAlignLeft, vertical=msoAnchorMiddle)
+            elif ph_type == 2:
+                set_text_defaults(shape, size=16, align=ppAlignLeft, vertical=msoAnchorTop)
+            elif ph_type == 4:
+                set_text_defaults(shape, size=16, align=ppAlignLeft, vertical=msoAnchorMiddle)
+            elif ph_type == 13:
+                set_text_defaults(shape, size=10, align=ppAlignCenter, vertical=msoAnchorMiddle)
+
+pres.Save()
+pres.Close()
+app.Quit()
+```
+
+Practical rules:
+
+- Back up the template before COM edits; OneDrive/SharePoint templates may open with a URL-backed `FullName`.
+- Edit `SlideMaster.CustomLayouts`, not only sample slides. Sample slides are previews; custom layouts are what future decks inherit.
+- For Japanese templates, set `Name`, `NameFarEast`, and `NameAscii` together; visible sample text can look correct while layout defaults still inherit a different font.
+- Keep body placeholders around 16pt by default. If a sample table needs more room, shorten text or rebalance columns/rows before shrinking below the readability target.
+- After saving, create a test slide from the edited layout or export sample slides as images. Verify title/body spacing, table readability, and that no old placeholder text bleeds through.
+
 ### Recommended Requirements
 
 | Requirement      | Description                               |

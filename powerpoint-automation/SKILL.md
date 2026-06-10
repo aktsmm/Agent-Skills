@@ -125,6 +125,7 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - [references/content-guidelines.md](references/content-guidelines.md)
 - [references/IMPLEMENTATION_PATTERNS.md](references/IMPLEMENTATION_PATTERNS.md)
 - [references/instructions/com-automation.instructions.md](references/instructions/com-automation.instructions.md)
+- [references/instructions/template.instructions.md](references/instructions/template.instructions.md)
 - [references/instructions/customer-facing-deck.instructions.md](references/instructions/customer-facing-deck.instructions.md)
 
 ### Go to Implementation Patterns For
@@ -132,6 +133,7 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - technical content verification workflow
 - shape-based architecture diagrams
 - template-based slide XML editing order
+- COM SlideMaster / CustomLayouts edits for reusable templates
 - rendered-slide visual QA loop
 - PptxGenJS hardening pitfalls
 - hyperlink batch processing
