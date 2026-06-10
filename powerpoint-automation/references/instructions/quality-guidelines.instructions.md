@@ -220,6 +220,14 @@ for i, slide in enumerate(prs.slides, 1):
 
 ---
 
+## Table Readability QA (★ Important)
+
+- Presentation tables should use 16pt or larger body text when the user will read them on screen. If the table does not fit, shorten labels, rebalance columns/rows, or split the table before shrinking text.
+- Header cells should be horizontally centered and vertically middle-aligned. Body cells should left-align descriptive columns and center numeric / short category columns.
+- After broad font normalization, re-render both table slides and normal body slides. A geometry-only check can miss accidental style regressions such as body text being promoted to title size/color.
+
+---
+
 ## Textbox Overlap Prevention (★ Important)
 
 **Rule**: Textboxes must not overlap. Verify that `shape.top + shape.height <= next_shape.top`.
@@ -369,4 +377,3 @@ for slide in prs.slides:
 5. Validate font sizes (≥ 12pt)
 6. Check textbox overlaps
 7. Verify text overflow (paragraph count, char count)
-

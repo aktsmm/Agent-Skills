@@ -43,6 +43,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Update slide master and custom layouts as well as visible shapes; otherwise placeholder edits can revert to old fonts.
 - If a text box has shape-level default bold, `Run.Font.Bold = 0` may not override it. Recreate the text box at the same location and size.
 - When replacing most of a slide, do not hide old placeholders with a white rectangle or overlay text boxes. Inspect the shape list first, delete or reuse the real placeholder shapes, or create a new blank slide and move it into position.
+- For visual touch-ups on an existing slide, never assume a new card/shape covers old content. Hide/delete the original title, bullet, table, or callout shapes explicitly, then export the active deck and inspect the affected slide image before continuing.
 - Table cell word wrap should not be set explicitly. `cell.Shape.TextFrame.WordWrap = -1` can raise a bounds error.
 - `Slides.Range()` footer/header batch updates can fail. Set `Slides(i).HeadersFooters` per slide.
 - Notes can often be accessed through `slide.NotesPage.Shapes.Placeholders(2)` even when `HasNotesPage` is false.
@@ -91,6 +92,8 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Flag unsupported numbers in KPIs, success criteria, or examples; add source or mark as example-specific.
 - If one slide has inconsistent font size, bold, or color, scan the whole deck for the same issue.
 - After font replacement, audit overflow with `TextRange.BoundHeight > Shape.Height`.
+- After broad font normalization, re-render representative body slides as well as table slides. A geometry-only check can miss accidental style changes such as body text being promoted to title size/color.
+- For tables intended for presentation, keep body cells at 16 pt or larger when space allows; center header text horizontally and vertically, and shorten wording or rebalance row/column sizes instead of shrinking below the readability target.
 - For COM touch-ups, audit text density, hyperlink count, and overflow before releasing the reference; this avoids repeated open/close cycles while the user is reviewing the deck.
 - If a COM edit script fails before save, inspect the active deck state before retrying. Do not run multiple partially failing scripts against the same deck; repair or rebuild the affected slide first.
 - Move audience-visible navigation paths and URLs from notes to slide body when appropriate.
