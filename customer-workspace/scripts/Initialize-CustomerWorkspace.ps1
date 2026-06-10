@@ -83,7 +83,8 @@ $folders = @(
     "_inbox",
     "_questions",
     "_customer",
-    "_templates"
+    "_templates",
+    "research-reports"
 )
 
 foreach ($folder in $folders) {
@@ -225,6 +226,7 @@ Write-Host "   - _inbox/$currentYearMonth.md（インボックス）"
 Write-Host "   - _questions/$currentYearMonth.md（質問・アクション）"
 Write-Host "   - _customer/profile.md（顧客プロファイル）"
 Write-Host "   - _templates/（テンプレート）"
+Write-Host "   - research-reports/（調査・レポート成果物）"
 Write-Host ""
 Write-Host "🎯 使い方:" -ForegroundColor Cyan
 Write-Host "   1. 情報を貼るだけ → 自動でインボックスに蓄積"

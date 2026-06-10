@@ -8,16 +8,18 @@ Primary month: {{YEAR_MONTH}}
 - Active inbox: `_inbox/{{YEAR_MONTH}}.md`
 - Active questions: `_questions/{{YEAR_MONTH}}.md`
 - Customer profile: `_customer/profile.md`
+- Research/report outputs: `research-reports/`
 - Material folders when used: `_received/`, `_working/`, `_provided/`
 - Important working files:
 
 ## Source of Truth
 
-| Topic                  | Source file                    | Notes                               |
-| ---------------------- | ------------------------------ | ----------------------------------- |
-| Customer profile       | `_customer/profile.md`         | Contract, contacts, account context |
-| Current month intake   | `_inbox/{{YEAR_MONTH}}.md`     | Raw notes and imported material     |
-| Open questions/actions | `_questions/{{YEAR_MONTH}}.md` | Track follow-up items               |
+| Topic                   | Source file                    | Notes                               |
+| ----------------------- | ------------------------------ | ----------------------------------- |
+| Customer profile        | `_customer/profile.md`         | Contract, contacts, account context |
+| Current month intake    | `_inbox/{{YEAR_MONTH}}.md`     | Raw notes and imported material     |
+| Open questions/actions  | `_questions/{{YEAR_MONTH}}.md` | Track follow-up items               |
+| Research/report outputs | `research-reports/`            | Generated Markdown deliverables     |
 
 ## Bring-Along vs Reference-Only
 

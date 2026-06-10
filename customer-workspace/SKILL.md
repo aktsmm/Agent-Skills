@@ -31,6 +31,7 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 | **Customer Profile**  | Centralized customer information                     |
 | **Workspace Summary** | Handoff summary with related file paths              |
 | **Next Actions**      | Per-MTG homework workspace with bidirectional links  |
+| **Research Reports**  | Store generated research/report Markdown away from root |
 | **Material Split**    | Optional split for customer originals, working copies, and customer-facing files |
 
 ---
@@ -64,6 +65,7 @@ If PowerShell is unavailable, manually create the same folders, copy the prompt/
 ├── _questions/{YYYY-MM}.md        ← Accumulated questions (optional)
 ├── _customer/profile.md           ← Customer profile
 ├── _templates/                    ← Templates
+├── research-reports/              ← Generated research/report Markdown
 ├── meeting-notes/                 ← Meeting minutes (one file per MTG)
 └── next-actions/                  ← Per-MTG homework workspace
     ├── to-YYYY-MM-DD/             ← Tasks for the next MTG
@@ -73,6 +75,10 @@ If PowerShell is unavailable, manually create the same folders, copy the prompt/
     │   └── research/               ← Supplementary research/validation
     └── ongoing/                    ← Continuing items without a deadline
 ```
+
+## Research Reports
+
+Use `research-reports/` for Markdown deliverables created by the agent or team, such as research notes, comparison memos, report drafts, and demo specification notes. Do not leave these generated artifacts at the workspace root; root should stay reserved for entry files and customer workspace controls.
 
 ## Optional Material Folders
 
@@ -142,6 +148,7 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 - [ ] `_inbox/{YYYY-MM}.md` exists
 - [ ] `_questions/{YYYY-MM}.md` exists
 - [ ] `_customer/profile.md` configured
+- [ ] `research-reports/` exists for generated Markdown deliverables
 - [ ] Auto-routing rules working
 
 ## Key References
