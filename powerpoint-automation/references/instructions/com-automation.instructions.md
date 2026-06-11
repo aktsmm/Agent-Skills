@@ -8,6 +8,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 - COM slide indexes are 1-based. `python-pptx` slide indexes are 0-based.
 - Prefer direct edits to the existing file. Do not create extra similarly named files unless lock handling requires it.
 - Save with `pres.Save()` after edits. If OneDrive sync causes a save error, wait briefly and retry.
+- For OneDrive/SharePoint templates or slide-master work, do not assume a successful COM save preserved OpenXML `.pptx` packaging. Verify the saved file is a ZIP package (`PK` header / `zipfile.is_zipfile`) before doing python-pptx or package-level edits.
 - Never call `app.Quit()` unless you own the entire PowerPoint process. Use `ReleaseComObject` (PowerShell) or `del app` (Python) to release the COM reference without killing the application.
 - For write operations on a user-visible file, call `pres.Save()` only. Do not call `pres.Close()`; the user needs the file open for review.
 - Run Japanese text scripts with `python -X utf8` to avoid PowerShell smart quote and encoding issues.
@@ -19,6 +20,9 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Do not assume `app.Presentations(1)` is the target. Search by presentation name or path.
 - Guard `Presentation.Name` and `Presentation.FullName` access with `try/except`; automation permission errors can occur.
 - For OneDrive-synced files, `Presentation.FullName` may resolve to a SharePoint URL even when opened from a local path. Match by basename as well as full path.
+- Read-only presentations can still hold a OneDrive/PowerPoint lock and block rename/move/delete. Close every matching open presentation by basename before filesystem operations.
+- If PowerPoint shows a coauthoring/競合の解決 dialog, stop automation and resolve/close the dialog before continuing. Do not keep running file operations while the dialog is open.
+- Opening a OneDrive deck for review can still change timestamps, locks, or packaging. Keep a validated temp artifact for automation, and treat the user-opened file as a review surface until it is closed and revalidated.
 - For read-only extraction from OneDrive-synced legacy `.ppt` files, direct `Presentations.Open()` can fail when the file is a reparse point. Copy the file to a local workspace temp folder first, then open the copy with `ReadOnly=True` / `WithWindow=False` or equivalent COM flags.
 - If enumeration is unstable, use `DispatchEx` and open explicit paths. Use `ReadOnly=True` for reference decks and `ReadOnly=False` for the edit target.
 - For a deck the user is actively viewing, prefer `GetActiveObject("PowerPoint.Application")` and locate the open file by name.
@@ -41,6 +45,9 @@ Use this reference when editing existing PPTX files, especially files that may a
 
 - Japanese font replacement must set `Name`, `NameAscii`, `NameFarEast`, and `NameComplexScript` together.
 - Update slide master and custom layouts as well as visible shapes; otherwise placeholder edits can revert to old fonts.
+- For reusable templates, sample slide text is not enough. Put prompt text, default fonts, slide numbers, reusable background art, and reusable image placeholders on `SlideMaster.CustomLayouts`; remove literal placeholder strings from sample slides.
+- When a sample slide's background or image frame is unique, create/assign a distinct custom layout for that surface before moving art to the layout. Shared layouts should only contain genuinely shared design elements.
+- To verify reusable layouts, add temporary preview slides to the same presentation/copy that owns the layouts. Do not pass a `CustomLayout` object from one presentation into `Slides.AddSlide()` on another presentation.
 - If a text box has shape-level default bold, `Run.Font.Bold = 0` may not override it. Recreate the text box at the same location and size.
 - When replacing most of a slide, do not hide old placeholders with a white rectangle or overlay text boxes. Inspect the shape list first, delete or reuse the real placeholder shapes, or create a new blank slide and move it into position.
 - For visual touch-ups on an existing slide, never assume a new card/shape covers old content. Hide/delete the original title, bullet, table, or callout shapes explicitly, then export the active deck and inspect the affected slide image before continuing.

@@ -311,9 +311,24 @@ Practical rules:
 
 - Back up the template before COM edits; OneDrive/SharePoint templates may open with a URL-backed `FullName`.
 - Edit `SlideMaster.CustomLayouts`, not only sample slides. Sample slides are previews; custom layouts are what future decks inherit.
+- When turning existing sample slides into a reusable template, move reusable background art, logos, arcs, lines, and image placeholders into the custom layout. Leave content-specific screenshots/photos/text on the sample slide. A clean slide count is not enough if a blank slide created from the layout loses the design.
+- Placeholder prompt text belongs on the layout/master, not as literal text on sample slides. After editing, scan actual slide XML/text for literals such as `<Title>`, `<Body>`, `<Subtitle>`, `Date`, and `Footer`; they should not appear as user-visible sample-slide text.
+- If multiple sample slides share one source layout but have different visual surfaces, duplicate the layout first and assign one custom layout per distinct surface before moving art. Otherwise a closing/next-event/title design can overwrite another slide's inherited background.
+- Add slide-number placeholders on non-cover layouts only. Do not leave a slide-number placeholder on the cover layout unless the user explicitly wants cover numbering.
 - For Japanese templates, set `Name`, `NameFarEast`, and `NameAscii` together; visible sample text can look correct while layout defaults still inherit a different font.
 - Keep body placeholders around 16pt by default. If a sample table needs more room, shorten text or rebalance columns/rows before shrinking below the readability target.
-- After saving, create a test slide from the edited layout or export sample slides as images. Verify title/body spacing, table readability, and that no old placeholder text bleeds through.
+- After saving, create test slides from the edited layouts, not only the existing sample slides. Create those test slides inside the same presentation/copy that owns the layouts; passing `CustomLayout` objects across presentations can fail in COM. Verify title/body spacing, table readability, inherited background/images, slide numbers, and that no old placeholder text bleeds through.
+
+### OneDrive / COM Safety for Template Masters
+
+When a template lives in OneDrive or has been opened by the user, PowerPoint COM can silently save a `.pptx` path as a legacy/OLE body or trigger coauthoring conflict dialogs. Use this safer sequence for slide-master work:
+
+1. Close the target presentation without saving, or work from a local temp copy.
+2. Normalize the editable copy with `Presentation.SaveAs(path, 24)` only when the result is verified as a ZIP/OpenXML package.
+3. Before package-level work, verify `zipfile.is_zipfile(path)` and the first bytes are `PK`; if the first bytes are `D0 CF 11 E0`, treat it as legacy/OLE and do not use `python-pptx` or ZIP edits on it.
+4. Prefer OpenXML package edits for repetitive layout cleanup: duplicate layout parts, update slide layout relationships, move reusable art into `ppt/slideLayouts/*`, and update layout relationships for copied images.
+5. Re-verify after every open/save cycle. PowerPoint may convert the file shape again after a read-only review or conflict resolution.
+6. For final user review, open read-only copies when possible and do not save them. If PowerPoint changes timestamps or package format during review, restore from the last validated OpenXML artifact before continuing automation.
 
 ### Recommended Requirements
 

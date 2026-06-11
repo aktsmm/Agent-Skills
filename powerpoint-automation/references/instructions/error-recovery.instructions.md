@@ -99,6 +99,9 @@ python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --reset
 - `BadZipFile: Bad magic number for central directory`
 - `zipfile.BadZipFile: File is not a zip file`
 - PPTX header is not `PK` (hex: `50-4B`)
+- PPTX header is `D0-CF-11-E0` even though the extension is `.pptx` (legacy/OLE body)
+- PowerPoint opens the file but python-pptx reports `PackageNotFoundError`
+- PowerPoint shows a coauthoring/競合の解決 dialog after automation
 
 ### Diagnosis
 
@@ -114,6 +117,30 @@ python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --reset
 | OneDrive sync    | File incomplete during sync |
 | Git autocrlf     | Binary treated as text      |
 | Partial download | Network interruption        |
+| COM save mode    | PowerPoint saved a `.pptx` path as legacy/OLE body |
+| Open read-only deck | Read-only review still held a OneDrive/PowerPoint lock |
+
+### Recovery: Normalize Before Package Edits
+
+For OneDrive or template-master work, verify and normalize the file before using python-pptx or ZIP-level edits.
+
+```python
+from pathlib import Path
+from zipfile import is_zipfile
+
+p = Path("template.pptx")
+if not is_zipfile(p):
+    raise RuntimeError("Not an OpenXML PPTX package; normalize with PowerPoint SaveAs(..., 24) or restore a known-good copy first.")
+```
+
+Rules:
+
+- Keep a known-good OpenXML copy before iterative COM work.
+- After any PowerPoint open/save/review cycle, re-check `is_zipfile(path)`; COM/OneDrive can change the file body back to legacy/OLE.
+- If the file is open in PowerPoint, close the matching presentation by basename before rename/move/delete. A read-only window can still block filesystem operations.
+- If a conflict dialog appears, resolve/close it first. Do not continue automation against a deck in a modal dialog state.
+- Prefer local temp copies for destructive template rewrites; replace the OneDrive file only after the temp copy opens and validates.
+- If validation passes before user review but fails afterward, assume the review/open cycle changed the file state; restore from the last validated temp artifact before attempting more package edits.
 
 ### Recovery: Use Your Own Template
 

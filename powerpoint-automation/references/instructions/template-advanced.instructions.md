@@ -78,7 +78,7 @@ python scripts/diagnose_template.py templates/sample.pptx
 
 | Issue               | Description                    | Resolution               |
 | ------------------- | ------------------------------ | ------------------------ |
-| Background images   | Images in master layouts       | clean_template           |
+| Background images   | Images in the wrong surface    | classify as reusable layout art vs slide content |
 | Broken references   | Invalid blip references        | clean_template           |
 | External links      | Broken links                   | Manual removal           |
 | Narrow placeholders | Title width too narrow         | Auto-fix or alt template |
@@ -98,7 +98,7 @@ python scripts/clean_template.py templates/sample.pptx "output_manifest/${base}_
 
 ### Processing
 
-- Removes PICTURE shapes from masters/layouts
+- Removes or relocates PICTURE shapes from masters/layouts when they are not reusable template art
 - Removes blip references from Picture Placeholders
 - Removes broken external links
 - Normalizes viewProps.xml
@@ -163,8 +163,12 @@ Keep the first version small. A useful internal template usually needs only:
 4. Add one sample slide per layout so future users can preview the template.
 5. Use generic names such as `Internal ...`; do not bake customer names or project names into reusable templates.
 6. Set theme fonts and placeholder fonts explicitly. For Japanese decks, set Latin and Far East fonts together.
-7. Run `analyze_template.py` and verify that `title`, `content`, and `section` map to the intended custom layouts.
-8. Inspect the resulting PPTX theme/layout XML if font correctness matters. Confirm the theme uses the intended Japanese font, not just visible shapes.
+7. Move reusable visual design into layouts: background arcs, brand marks, decorative lines, slide-number placeholders, and reusable image frames belong on custom layouts; concrete screenshots/photos/body text belong on sample slides.
+8. Keep placeholder prompt strings on layouts only. Sample slides should not visibly contain literal `<Title>`, `<Body>`, `Date`, or `Footer` text unless intentionally demonstrating a placeholder.
+9. Duplicate layouts when different sample slides need different inherited backgrounds. Do not reuse one custom layout for visually distinct surfaces just to keep the layout count small.
+10. Run `analyze_template.py` and verify that `title`, `content`, and `section` map to the intended custom layouts.
+11. Inspect the resulting PPTX theme/layout XML if font correctness matters. Confirm the theme uses the intended Japanese font, not just visible shapes.
+12. Create blank test slides from each custom layout in the same presentation/copy and render them. Existing sample slides can look correct even when the layout is missing its background art, page number, or image placeholder.
 
 ### Done checks
 
@@ -173,10 +177,16 @@ Keep the first version small. A useful internal template usually needs only:
 - generated mapping points to the intended layouts
 - no customer-specific words remain in layout names or sample placeholders
 - theme XML and layout XML include the intended fonts
+- sample slide XML does not contain literal placeholder prompt strings as visible text
+- non-cover layouts include slide-number placeholders when the template convention requires page numbers
+- blank slides created from each layout inherit the expected design surface
+- verification uses layouts from the same presentation/copy, not `CustomLayout` COM objects passed across decks
 
 ### Common pitfall
 
 Creating five sample slides is not the same as creating a reusable template. The reusable value is in the slide master and custom layouts; sample slides are only previews.
+
+Also avoid the opposite failure mode: deleting too aggressively until the layout is clean but visually empty. A reusable template must preserve intended design in the layout itself, not only in the preview slide.
 
 ---
 
