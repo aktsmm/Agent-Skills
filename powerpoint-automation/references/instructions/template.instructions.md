@@ -254,6 +254,19 @@ If your PPTX lacks properly named layouts:
 
 Use this when the user asks to improve an existing reusable template or base slide master directly. This is different from polishing one populated deck: update `SlideMaster.CustomLayouts` and their placeholders so future decks inherit the change.
 
+### Converting an Example Deck into a Reusable Template
+
+When the source file is an example deck with real slides, first identify the **primary source layout** from the actual slides and the user's intent. Do not synthesize new "actual slide" layouts by copying every text box into fresh placeholders unless the user explicitly wants one new layout per slide.
+
+Practical rules:
+
+- Count actual slide usage by `Slide.CustomLayout.Design.Name` and `Slide.CustomLayout.Name`; the main template should preserve the heavily used layout, not replace it with a reconstructed lookalike.
+- For product/service menu one-pagers, treat the original `1 Pager`-style custom layout as the master source of truth. Keep its geometry, fonts, footer, slide number, and inherited visuals; replace text in-place on sample slides for placeholder previews.
+- If the user asks to "add slide masters from actual slides," interpret this as "promote reusable existing layouts and sample surfaces," not "create malformed placeholders over the visual design." Only duplicate a layout when a sample slide has a genuinely distinct reusable surface that is not already represented by an existing custom layout.
+- Build a placeholder/sample set by duplicating the original sample slides that already use the target layout, then replacing their text with neutral prompts. This catches whether a new slide created from the layout still inherits the intended design.
+- Include other reusable original layouts (for example agenda / two-content pages) as separate sample pages when they exist in the source, instead of forcing everything into the main one-pager layout.
+- Before handoff, open the sample set and verify each sample slide still reports the intended `Design.Name` and `CustomLayout.Name`. A slide that visually degrades into generic bullets or floating blue placeholder squares fails the template conversion.
+
 ```python
 import win32com.client
 
