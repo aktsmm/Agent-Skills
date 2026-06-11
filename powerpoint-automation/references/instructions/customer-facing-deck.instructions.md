@@ -31,6 +31,9 @@ Use these rules when creating or revising decks intended to be shown directly to
 - Each visible URL must be a real PowerPoint hyperlink, not plain text.
 - Use neutral source labels for customer-facing decks. Avoid internal or overly personal labels unless the user wants them.
 - Verify hyperlink count after generation.
+- If a claim comes from a private customer notification, email, or tenant message, label it as such and do not imply that a public URL proves the exact notification text or date. Separate visible wording into: `Notification says ...` and `Public docs confirm ...`.
+- For customer-facing technical decks, put a compact source strip on each factual slide when the slide makes a pricing, deadline, supportability, limitation, or actionability claim. The appendix can hold the full URL list, but it is not a substitute for slide-level citations.
+- Presenter notes should use the deck language unless the user asks otherwise. For Japanese customer decks, do not leave English notes such as `Presenter guidance` or `Slide purpose`; localize notes before handoff.
 - If screenshots come from the user's environment, mask personal data, customer/tenant names, email addresses, session identifiers, local file names, and other environment-specific details before insertion.
 - Do not add a visible "masked" disclaimer unless the user asks for one; put that note in speaker notes instead.
 
