@@ -214,6 +214,39 @@ Layouts are also detected by placeholder types:
 | Content     | `OBJECT`, `CONTENT`     | Two-column     |
 | Picture     | `PICTURE`               | Photo layouts  |
 
+### Cover Placeholder Fidelity Gate
+
+When the user provides a template and expects the cover to use it, treat the
+cover as a fidelity requirement, not just a visual background.
+
+Before adding any title text to the cover:
+
+1. Inspect the actual cover slide placeholders with COM:
+   - `slide.Shapes.Placeholders`
+   - each placeholder's `Name`, `PlaceholderFormat.Type`, `Left`, `Top`,
+     `Width`, `Height`, and current text
+2. Fill the existing slide-level placeholders first. Typical cover placeholders
+   are `Title 1` and `Text Placeholder 2` / body placeholder.
+3. Preserve template font sizes and geometry unless the user explicitly asks for
+   a redesign. Do not set arbitrary title sizes just because the text is longer.
+4. Do not cover leftover placeholder text with a same-color rectangle, image, or
+   new text box. If placeholder text remains visible, the placeholder was not
+   correctly filled or removed.
+5. Render the cover, then close and reopen the deck and render the cover again.
+   A COM edit that appears correct before reopen can still be wrong if it
+   touched a layout placeholder instead of the slide placeholder.
+
+If `CustomLayout.Shapes` exposes placeholder text but changing it does not
+appear on the slide, do not claim the template placeholder was filled. In many
+legacy/OLE templates the editable placeholders are on `slide.Shapes`, while the
+layout placeholders are only defaults. Fill the slide placeholders or reinsert
+the original cover slide and fill its placeholders.
+
+If a required subtitle/date does not fit the existing subtitle placeholder,
+prefer shortening the visible subtitle and moving details to notes over adding
+a second overlapping text box. Only add a normal text box when the user accepts
+that it is no longer a pure placeholder-filled cover.
+
 ### Verification
 
 ```powershell
