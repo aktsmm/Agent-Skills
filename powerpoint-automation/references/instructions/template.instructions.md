@@ -219,6 +219,11 @@ Layouts are also detected by placeholder types:
 When the user provides a template and expects the cover to use it, treat the
 cover as a fidelity requirement, not just a visual background.
 
+- Use the actual title/subtitle placeholders on the template cover whenever possible.
+- Do not cover template placeholder text with opaque rectangles or independent text boxes.
+- Preserve the template's background, whitespace, and master intent; only add overlays when the placeholder cannot be edited and the user accepts the tradeoff.
+- After editing the cover, render slide 1 and check for leftover placeholder text, duplicated titles, covered template elements, and contrast problems.
+
 Before adding any title text to the cover:
 
 1. Inspect the actual cover slide placeholders with COM:

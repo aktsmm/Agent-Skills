@@ -36,6 +36,7 @@ Use these rules when creating or revising decks intended to be shown directly to
 - Presenter notes should use the deck language unless the user asks otherwise. For Japanese customer decks, do not leave English notes such as `Presenter guidance` or `Slide purpose`; localize notes before handoff.
 - If screenshots come from the user's environment, mask personal data, customer/tenant names, email addresses, session identifiers, local file names, and other environment-specific details before insertion.
 - Do not add a visible "masked" disclaimer unless the user asks for one; put that note in speaker notes instead.
+- Visible slide text must not include presenter-only meta language such as "talk track", "how to say this", "explanation tip", "validation note", or "work memo". Convert these to audience wording or move them to speaker notes.
 
 ## Images and Screenshots
 
@@ -44,6 +45,8 @@ Use these rules when creating or revising decks intended to be shown directly to
 - Official images can be used as visual anchors, but captions must explain why the image matters to the slide's message.
 - If an official image includes "AI-generated content may be incorrect" or similar caveats, avoid using it as factual proof. Use it only as an illustrative visual and keep factual claims in text sourced from documentation.
 - After inserting images, render the slide and check that the image is large enough to read. Tiny screenshots are worse than no screenshot.
+- If reusing a screenshot from an existing slide, ensure the screenshot itself is inserted, not a cropped render of the whole source slide with its old title/body.
+- If the screenshot must be cropped, verify all important UI edges are visible in the rendered output.
 
 ## Content Accuracy Review
 
@@ -83,3 +86,4 @@ Use these rules when creating or revising decks intended to be shown directly to
 - If card body text is enlarged, re-check `TextRange.BoundHeight` or image output for bottom clipping.
 - Check for duplicate text introduced by iterative COM edits, especially footers, slide numbers, and titles.
 - Re-run review after sectioning or slide insertion because slide numbers, notes, and flow can shift.
+- For decks with media, verify the visible slide count and media slide positions after every restore, insertion, deletion, or reorder operation.
