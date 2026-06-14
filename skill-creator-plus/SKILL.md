@@ -26,6 +26,8 @@ Start by deciding whether the user really needs a skill.
 
 If the answer is not **Skill**, stop and create the right primitive instead.
 
+> 上表は「skill にすべきか」の即時ゲート。primitive 選択の詳細 SSOT は **agentic-workflow-guide** skill。
+
 → **[references/customization-primitives.md](references/customization-primitives.md)** for the full selection guide
 
 ## When to Use
@@ -57,11 +59,7 @@ If the answer is not **Skill**, stop and create the right primitive instead.
 
 > **Default assumption:** Claude is already very smart. Challenge each piece: "Does this justify its token cost?"
 
-Before adding a new section, ask three questions:
-
-1. Can this update an existing rule instead?
-2. Can this move to `references/` instead of staying in `SKILL.md`?
-3. Is this actually reusable, or is it just a session-specific note?
+Before adding a new section, ask whether it can replace an existing rule, move to `references/`, or be dropped as session-specific.
 
 ## Skill Structure
 
@@ -108,63 +106,15 @@ When improving an existing skill, use this order:
 
 ## Frontmatter and Triggering
 
-Use the smallest viable frontmatter.
+Use the smallest viable frontmatter: `name`, `description`, and only behavior-changing optional fields. `name` must match the folder and `description` must include trigger conditions.
 
-```yaml
----
-name: skill-name
-description: "What it does. Use when [trigger conditions]. Triggers on 'keyword', 'phrase'."
-argument-hint: "Optional slash-command hint"
-user-invocable: true
-disable-model-invocation: false
----
-```
-
-- `name` must match the folder name
-- `description` must say both **what** and **when**
-- For manually used skills, default to explicit `argument-hint` and `user-invocable: true`
-- Use `argument-hint` as short input guidance, not as a long explanation
-- Use `user-invocable: false` only for background knowledge skills you do not want in the `/` menu
-- Use `disable-model-invocation: true` only for manual-only skills
-- Optional fields should be intentional, not boilerplate
-- Resource links must stay relative and shallow
-
-→ **[references/common-pitfalls.md](references/common-pitfalls.md)** for silent failures and trigger misses
+Frontmatter details and silent failures: [references/common-pitfalls.md](references/common-pitfalls.md)
 
 ## SKILL.md Guidelines
 
-### Size Target
+Keep `SKILL.md` lean: <150 lines is good, >300 lines must split to references. Start `When to Use` with user phrases, keep essential workflow only, and push long examples / schemas / recipes to references.
 
-→ See [skill-review-checklist.md > Line Count Target](references/skill-review-checklist.md#line-count-target) for size guidelines.
-
-**Quick rule:** < 150 lines is good, > 300 lines must split to references.
-
-| ✅ Good                                                                                                                                                                 | ❌ Bad               |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| Extract text and tables from PDF files, fill forms, merge documents. **Use when** working with PDF files or when the user mentions PDFs, forms, or document extraction. | Helps with documents |
-| Set up book writing workspace. **Triggers on** "book writing", "執筆ワークスペース", "technical writing project".                                                       | Creates workspaces   |
-
-### When to Use Section
-
-Start with **generic keywords** users are likely to say:
-
-```markdown
-## When to Use
-
-- **PDF**, **extract text**, **form filling** ← Keywords first
-- Processing documents with embedded images
-- Filling PDF forms programmatically
-```
-
-### Body
-
-- Use imperative/infinitive form
-- Link to references for details
-- Capture decision points and branching logic when they affect success
-- Keep essential workflow only
-- Reuse a proven shape from `references/skill-structure-gallery.md` before inventing a custom layout
-- Push reference material out of SKILL.md aggressively
-- Prefer replacing or compressing existing text over appending a new subsection
+Detailed review criteria: [references/skill-review-checklist.md](references/skill-review-checklist.md)
 
 ## Iteration Loop
 
@@ -174,20 +124,7 @@ Start with **generic keywords** users are likely to say:
 
 ## Review Checklist
 
-→ **[references/skill-review-checklist.md](references/skill-review-checklist.md)**
-
-For bloat review specifically, use [references/skill-bloat-review.md](references/skill-bloat-review.md).
-
-```markdown
-- [ ] SKILL.md under 150 lines?
-- [ ] Request truly needs a skill?
-- [ ] Description has trigger conditions?
-- [ ] `argument-hint` is present for manually used skills?
-- [ ] `user-invocable` is set intentionally?
-- [ ] Optional frontmatter fields are intentional?
-- [ ] Details moved to references/?
-- [ ] No README.md or auxiliary docs?
-```
+Use [references/skill-review-checklist.md](references/skill-review-checklist.md). For bloat review, use [references/skill-bloat-review.md](references/skill-bloat-review.md).
 
 ## Key References
 

@@ -73,10 +73,10 @@ If the visible asset started from manual SVG cleanup or hand-authored layout twe
 Recommended markdown pattern:
 
 ```markdown
-![Architecture Diagram](outputs/name.drawio.svg)
+Use `outputs/name.drawio.svg` as the embedded image path.
 
-- [outputs/name.drawio.svg](outputs/name.drawio.svg)
-- [outputs/name.drawio](outputs/name.drawio)
+- outputs/name.drawio.svg
+- outputs/name.drawio
 ```
 
 If multilingual variants are needed, keep parallel filenames instead of overwriting a single asset:

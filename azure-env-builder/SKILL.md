@@ -20,6 +20,13 @@ Enterprise Azure environment builder skill.
 - Designing Hub-Spoke, AKS, or AI Foundry architectures
 - Creating low-cost Azure operations demos with alerts, logs, portal steps, and minimal always-on resources
 
+## When NOT to Use
+
+- 使い捨ての検証 lab を作って機能・制約・route 挙動を試し、cleanup まで回したいとき
+  - → `azure-infra-validation`
+- 本番障害を read-only で切り分けたいとき
+  - → `azure-troubleshooting`
+
 ## Features
 
 | Category       | Capabilities                       |

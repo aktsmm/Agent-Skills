@@ -34,6 +34,8 @@ Before searching, check whether the user really wants a **skill**.
 
 If the answer is not **Skill**, explain that first instead of forcing a skill recommendation.
 
+> 上表は「skill を勧めるべきか」の即時ゲート。primitive 選択の詳細 SSOT は **agentic-workflow-guide** skill。
+
 → **[references/customization-routing.md](references/customization-routing.md)** for routing patterns
 
 ## Features
