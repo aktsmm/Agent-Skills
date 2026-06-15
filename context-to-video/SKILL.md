@@ -115,6 +115,7 @@ python scripts\ellipse_overlay.py --project D:\path\to\project
 - **章/コース化** (学習教材): script.json を章単位に分割、共通イントロ/アウトロ
 - **多言語版**: `voice` 切替 + script を翻訳
 - **チャンネル固定キャラ生成**: SDXL でマスコット作って seed 保存 ([avatar-generation-sdxl.md](references/avatar-generation-sdxl.md))
+- **VOICEVOX + 公式キャラ立ち絵**: ずんだもん等の「ゆるふわ解説」チャンネル向け、PSDレイヤー差分で本格リップシンク ([voiced-mascot.md](references/voiced-mascot.md))
 - **円形アバターワイプ**: ffmpeg geq filter で円形マスク + アクセントリング ([ffmpeg-advanced-filters.md](references/ffmpeg-advanced-filters.md))
 - **YouTube 自動配信**: API で公開予約 + サムネ ([youtube-upload.md](references/youtube-upload.md))
 - **PoC → 定期配信チャンネル昇格**: ディレクトリ再設計 ([scale-up-production.md](references/scale-up-production.md))
