@@ -14,6 +14,8 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Run Japanese text scripts with `python -X utf8` to avoid PowerShell smart quote and encoding issues.
 - Colors are BGR in COM: `#0078D4` becomes `0xD47800`.
 - `Font.Bold = -1` means true. Do not use PowerShell `$true` in COM assignments.
+- `Shape.Adjustments.Item(n) = value` raises SyntaxError in Python (assignment to function call). Use `Shape.Adjustments.SetItem(n, value)` for rounded-rect corner radius etc.
+- Iterating `for pres in app.Presentations` can raise `自動化の権限がありません` on some open decks (e.g., cloud-protected or hidden window). Iterate by index with `try/except`: `for i in range(1, app.Presentations.Count+1): try: p = app.Presentations(i) ...`.
 
 ## Open Presentation Handling
 
@@ -43,6 +45,9 @@ Use this reference when editing existing PPTX files, especially files that may a
 
 ## Font and Layout Stability
 
+- `CustomLayouts.Add(idx)` auto-inserts Title / Footer / SlideNumber placeholders. Slides switched to the new layout inherit empty "タイトルを入力" ghosts. Delete unwanted placeholders from the layout AND from each affected slide (`sh.Type == 14` placeholder, delete those with empty `TextFrame.TextRange.Text`).
+- For layout-driven backgrounds: `lay.FollowMasterBackground = 0`; `lay.Background.Fill.Solid()`; `lay.Background.Fill.ForeColor.RGB = COLOR`. Then delete per-slide full-slide background rectangles (detect with `Left<5, Top<5, Width>950, Height>530, Type==1`). Bake repeating shapes (vertical bars, accent rules) into the layout itself.
+- `Slides.InsertFromFile(src_path, after_index, start, end)` copies slides from another pptx and inherits theme/fonts of the target deck. Useful for community-title / self-intro templates. After insert, fill placeholders by name (`"Title"`, `"Subtitle"`) and set `SlideShowTransition.Hidden = -1` for variant slides.
 - Japanese font replacement must set `Name`, `NameAscii`, `NameFarEast`, and `NameComplexScript` together.
 - Update slide master and custom layouts as well as visible shapes; otherwise placeholder edits can revert to old fonts.
 - For reusable templates, sample slide text is not enough. Put prompt text, default fonts, slide numbers, reusable background art, and reusable image placeholders on `SlideMaster.CustomLayouts`; remove literal placeholder strings from sample slides.
@@ -95,10 +100,12 @@ Use this reference when editing existing PPTX files, especially files that may a
 - Image-heavy slides should not be judged by text volume alone.
 - Confirm the story order moves from concept to basics to application to practice.
 - After slide moves or insertions, re-check slide numbers and section boundaries.
+- Footer page-number renumber heuristic: scan all shapes per slide, find textboxes where text `isdigit()` and `Top > 490` and `Left > 800` (typical bottom-right corner), and rewrite to `str(SlideIndex)`. Run after any insert/move/delete.
 - Normalize slide number placeholders if they contain non-numeric copied text.
 - Flag unsupported numbers in KPIs, success criteria, or examples; add source or mark as example-specific.
 - If one slide has inconsistent font size, bold, or color, scan the whole deck for the same issue.
 - After font replacement, audit overflow with `TextRange.BoundHeight > Shape.Height`.
+- Safe text-size bump algorithm for small-text cleanup: compute current fill = `TextRange.BoundHeight / Shape.Height`; predict new_fill = fill * (new_size / current_size); accept only if predicted ≤ 0.95; after applying, re-measure actual fill and step down 1pt at a time until ≤ 1.0. Skip URLs (`startswith('http')`), code paths (`startswith('~','/')`), and footer textboxes (`Top > 490`).
 - After broad font normalization, re-render representative body slides as well as table slides. A geometry-only check can miss accidental style changes such as body text being promoted to title size/color.
 - For tables intended for presentation, keep body cells at 16 pt or larger when space allows; center header text horizontally and vertically, and shorten wording or rebalance row/column sizes instead of shrinking below the readability target.
 - For COM touch-ups, audit text density, hyperlink count, and overflow before releasing the reference; this avoids repeated open/close cycles while the user is reviewing the deck.
