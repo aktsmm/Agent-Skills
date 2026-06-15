@@ -210,6 +210,16 @@ graph TD
     EN --> FN[Step 4: Finalize]
 ```
 
+## Map-Reduce Synthesis for Cross-Item Coherence
+
+When a review/audit orchestrator must check **cross-item coherence** (across chapters, files, sections), re-reading every item's full text in the orchestrator inflates context and pulls it back into "reviewing directly".
+
+- Each worker returns `findings` **plus** a compact extract (terms / definitions / key claims / assumptions) — not the raw body.
+- The orchestrator reduces over the extract index only to detect cross-item conflicts (definition drift, term/naming inconsistency, broken forward/back references, one item's premise contradicting another). The body is never passed to the reduce step.
+- Attribute each conflict to the findings of **both** items involved.
+
+This keeps Context Discipline and delegation discipline intact: per-item judgment stays in workers (map), and only compact extracts cross into the orchestrator (reduce).
+
 ## Dynamic Worker Creation (New Task Detection)
 
 When the orchestrator encounters a task type that doesn't match existing workers, it should **ask for user confirmation** before creating a new sub-agent.
