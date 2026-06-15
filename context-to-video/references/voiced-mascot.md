@@ -178,33 +178,28 @@ box=1:boxcolor=black@0.5:boxborderw=10:x=w-tw-32:y=32" -c:a copy out.mp4
 - ユーザーが「徹底的に」と言ったら **本気で品質を上げる**。ショートカット禁止
 - 一方、**勝手な実装簡略化や時短判断は事前に意図を伝えて承認を取る**
 
-## 英単語の読みは原稿でカタカナ化する (必須)
+## 英単語の読みは原稿でカタカナ化する (必須・ただし二層分離)
 
-VOICEVOX は英単語のスペルを誤読する。**ナレ原稿には最初からカタカナで書く** ことを徹底:
+VOICEVOX は英単語のスペルを誤読する。だが **スライド表示まで全部カタカナにすると逆に読みにくい・カッコ悪い** ことが ep01 制作で判明。
+**ナレ(音声) と スライド表示(視覚) を分離する** のが必須:
 
-| 原則 | 例 |
+| 場面 | 表記 |
 |---|---|
-| 「日本人エンジニアが普段会話で発音している読み」を採用 | Azure → アジュール |
-| 製品名は Microsoft 公式日本語サイト・GitHub Docs 日本語版の表記を最優先 | Copilot → コパイロット |
-| 公式読みが無ければエンジニア界隈の一般慣用 | repository → リポジトリ |
-| 迷ったら検索: `<英単語> 読み方 エンジニア` | YAML → ヤメル or ワイエーエムエル |
-| 原稿側のナレ文字列に半角英字を残さない (数字とURLは例外) | — |
+| **ナレ原稿(narration)** | **カタカナで書く** (`ギット`, `ギットハブ`, `プッシュ`) |
+| **スライド見出し・箇条書き(heading/bullets)** | **英語そのまま** (`Git`, `GitHub`, `push`, `pull`) |
+| **初出時のナレ補足** | 「ギットハブ。スペルは ジー アイ ティー エイチ ユー ビー なのだ」と1回だけ読み方を明示 |
+
+一般的に日本語混じりで英語のまま書く慣習がある用語(`Git`, `GitHub`, `Pull Request`, `README`, `LICENSE`, `commit`, `push`, `pull`, `branch`, `clone`, `fork`, `Issue`, `Actions`, `Copilot` 等) は **スライドでは英語推奨**。視覚的に読みやすい。
 
 頻出辞書例 (シリーズ・チャンネルごとに専用辞書を持つこと):
-- Azure → アジュール
-- GitHub → ギットハブ
-- Git → ギット
-- Copilot → コパイロット
-- Codespaces → コードスペース
-- pull request → プルリクエスト
-- repository → リポジトリ
-- README → リードミー
-- 2FA → ツーエフエー
-- API → エーピーアイ
-- CI/CD → シーアイ シーディー
+- Azure → ナレ「アジュール」/ スライド「Azure」
+- GitHub → ナレ「ギットハブ」/ スライド「GitHub」
+- Copilot → ナレ「コパイロット」/ スライド「Copilot」
+- pull request → ナレ「プルリクエスト」/ スライド「Pull Request」
+- README → ナレ「リードミー」/ スライド「README」
 
 シリーズ用辞書テンプレ: `<content-workspace>/_shared/voicevox-readings.md`
-将来的に `content_to_script.py` で **辞書ベース自動置換** を実装すると、原稿に英字が残っても変換時にカタカナ化される(両方の保険)。
+変換スクリプト `content_to_script.py` 側で **ナレフィールドだけカタカナ化適用、bullets/headingは英語のまま** にする実装が安全。
 
 ## 漢字の誤読対策 (必須)
 
@@ -235,6 +230,254 @@ VOICEVOX は文脈で漢字も誤読する。**用言・接続詞・副詞・同
 3. 違和感あった単語は **辞書に追記**
 
 詳細表: `<content-workspace>/_shared/voicevox-readings.md` の「漢字の誤読対策」セクション
+
+## OP/タイトルスライドの尺ルール (ep01 教訓)
+
+タイトルスライド1枚に **OPナレ全部(挨拶+シリーズ紹介+テーマ+フック計30秒以上)** を流すと、視聴者は「タイトル画面長すぎ」と感じる(`スライドが遅い` フィードバックの実態)。
+
+**ルール:**
+- タイトルスライド(slide_00) の音声は **最大10-12秒** に収める
+- それ以上の OP 内容は **slide_01 として「今日のテーマ + フック」スライド** を1枚作って分割
+- 1スライドあたりの音声 = 上限 60-90秒。それを超えるなら2枚以上に分ける
+- 視覚要素(スライド)と聴覚要素(ナレ)の **テンポを合わせる**
+
+## クイズスライドは bullets 必須
+
+確認問題スライドで bullets(=選択肢A〜D)が空だと、視聴者は **選択肢を耳だけで覚える** ことになり、考える時間がない。
+
+**ルール:**
+- クイズ問題スライドの `bullets` には **必ず選択肢A〜Dを書く**
+- 表示テキスト例: `A. git push` / `B. git add` / `C. git commit` / `D. git pull`
+- 解説スライドの bullets は **正解の根拠を3点** (なぜ正解 / 他がなぜ違う / 試験頻度)
+
+## 絵文字は使わない (BIZ UDGothic 等の和文フォントに無いので豆腐になる)
+
+スライドの bullets / heading に **絵文字を入れない**:
+
+- ❌ `❌ fix → ダメ` (豆腐 □ になる)
+- ❌ `⭕ 良い書き方`
+- ❌ `🌱 ED`
+- ❌ `📌 ポイント`
+
+代替:
+- 評価表現は **`BAD:` / `MID:` / `GOOD:`** または **`NG:` / `OK:`** のテキストラベル
+- 「ポイント」「重要」等は **`POINT:` / `KEY:`** または `★`(これは大丈夫)
+- 装飾アイコンは Pillow で描画(`d.ellipse()` 等)
+
+ナレ(音声)側にも絵文字は入れない(VOICEVOX が読み飛ばすので不要)。
+
+## 和欧混植: 半角英数字の前後に半角スペースを入れる
+
+スライド表示の **可読性向上** のため、和文中の半角英数字には **必ず前後に半角スペース**:
+
+- ❌ `Gitのコミット履歴` (詰まって読みにくい)
+- ⭕ `Git のコミット履歴`
+- ❌ `GH-900合格コース第1話`
+- ⭕ `GH-900 合格コース 第1話`
+- ❌ `git addコマンドで`
+- ⭕ `git add コマンドで`
+- ❌ `Pull RequestをDraftで`
+- ⭕ `Pull Request を Draft で`
+
+例外:
+- 半角句読点/括弧の隣接時は不要: `Git(ギット)` / `Git, GitHub` はOK
+- ナレ(音声)は VOICEVOX が読むだけなのでスペース不要
+
+`script.md` のテーブルや bullets を書くときに意識する。
+
+## スライドは「箇条書きだけ」にしない (図表必須)
+
+20分動画で **全スライド = 見出し + 箇条書きのみ** だと飽きる・記憶残らない。
+種類別に slide_type を分けて、内容に応じて視覚化方法を選ぶ:
+
+| slide_type | 用途 | 実装 |
+|---|---|---|
+| `title` | OP/ED 表紙 | 大きめテキスト |
+| `content` | 通常の解説 | 見出し + 箇条書き(最大4個) |
+| `quiz` | 確認問題 | A〜D 選択肢 bullets 必須 |
+| **`table`** | 2-3列の比較 (Git vs GitHub等) | 行 = 観点、列 = 対象 |
+| **`flow`** | 矢印付きフロー (push/pull 向き、GitHub Flow 6段階) | 横並び/縦並びの箱+矢印 |
+| **`hierarchy`** | ピラミッド (Role 5段階、Org階層) | 上下に積む |
+| **`timeline`** | 状態遷移 (Modified→Staged→Committed) | 横線+ノード |
+| **`screenshot`** | UI 説明 (GitHub画面+注釈矢印) | スクショ画像+赤枠/矢印 |
+| **`mermaid`** | 複雑図 | Mermaid 記法 → 別レンダラで PNG 化 |
+
+### 使い分けの目安
+
+1本の動画で **content 6-8割 / 図表 2-4割** が目安。少なくとも以下は必ず図表化:
+
+- **2つを比較する話** (Git vs GitHub、Merge 3方式) → `table`
+- **順序・遷移がある話** (GitHub Flow、ファイル状態) → `flow` or `timeline`
+- **階層がある話** (Role、Org構造) → `hierarchy`
+- **UI 操作** (Issue 作成画面等) → `screenshot`
+
+### 実装の現実解
+
+- 全部 Pillow で書くのは大変なので、**段階導入**:
+  - 第1段階: `table` と `timeline` だけ実装(最頻出)
+  - 第2段階: `flow` を Mermaid 経由で実装
+  - 第3段階: スクショ取り込みフロー整備
+- やまぱんさんが原稿で `**タイプ**: table` と書いたら自動でテーブル描画されるようにする
+
+### script.md でのテンプレ例
+
+```markdown
+### スライドXX - Git vs GitHub 比較 (60秒)
+
+**タイプ**: table
+**見出し**: 一目でわかるGitとGitHub
+**テーブル**:
+| 観点 | Git | GitHub |
+|---|---|---|
+| 役割 | 履歴管理の仕組み | 共同作業プラットフォーム |
+| 場所 | ローカル | クラウド |
+| 主な操作 | commit/branch/merge | Issue/PR/Actions |
+
+**ナレ**:
+```text
+ここで一覧で見てみるのだ! ...
+```
+```
+
+詳細実装ガイド: 別 reference (`slide-visuals-guide.md`) として今後拡充予定。
+
+## 動画 mp4 concat の安全パターン
+
+ffmpeg concat demuxer は **list.txt 内のパスが相対だと cwd 依存で失敗する**(`returned non-zero exit status 4294967294` の元凶):
+
+```python
+list_file.write_text(
+    "".join(f"file '{p.resolve().as_posix()}'\n" for p in segs),  # 必ず resolve() で絶対化
+    encoding="utf-8"
+)
+subprocess.run([..., "-i", str(list_file.resolve()), "-c", "copy", str(out.resolve())])
+```
+
+`Path.resolve()` で絶対化 + `as_posix()` で Windows パス区切りを `/` に。**両方やる**(`as_posix()` だけだと相対パスのまま forward slash になるだけで cwd 依存は解消されない)。
+
+## スライドと音声のインデックス対応 (ep01 v3教訓・致命的バグ)
+
+`script.json` が以下構造のとき:
+```
+slides[0] = {heading: "OP", narration: <OP用>}      # 仮想スライド
+slides[1] = {heading: "今日のテーマ", narration: ...}  # 実コンテンツ1枚目
+slides[2] = ...                                       # 実コンテンツ2枚目
+```
+
+`build_episode.py` で **`for i, s in enumerate(slides, start=1):` だと**:
+- `slide_01.png` ← `render_content(slides[0])` = **「OP」テキストが描かれた空スライド**
+- `slide_02.png` ← `render_content(slides[1])` = 今日のテーマ
+- → 全画像が1枚ズレ
+
+正しい実装:
+```python
+# slides[0] が "OP" heading なら、それは OP 音声専用。 content_slides を別取り出し。
+op_narration = ""
+content_slides = slides
+if slides and slides[0].get("heading") == "OP":
+    op_narration = slides[0]["narration"]
+    content_slides = slides[1:]
+
+# render
+for i, s in enumerate(content_slides, start=1):
+    render_content(s, slides_dir / f"slide_{i:02d}.png", ...)
+
+# audio: slide_00(title)=op_narration、slide_NN=content_slides[N-1].narration
+for i in range(total):
+    text = op_narration if i == 0 else content_slides[i - 1]["narration"]
+```
+
+**症状**: 視聴者は「スライドが音声に1枚遅れてる」と感じる。
+**検出方法**: `slide_01.png` を目視 → そこに heading「OP」とか空白のスライドが描かれていたらこのバグ。
+
+## 生成パイプラインの索引ズレ防止 (一般則)
+
+`script.md → script.json → 画像 + 音声 + 動画` のように **複数段階の変換** がある生成パイプラインでは、**段階間でインデックスがズレる** バグが頻発する。再発防止のため:
+
+### ルール1: 仮想スライド(OP/EDの音声のみ等) は構造で区別する
+
+JSON 上で **「描画する」スライドと「音声だけ」スライドが混在**するなら、`heading: "OP"` のような **マーカー** を使う or **別フィールド** (`op_narration`, `ed_narration`) に分離する。後段スクリプトは構造を見て分岐する。
+
+### ルール2: 1段階の出力ごとに「期待件数」を print する
+
+```python
+print(f"[ok] rendered {total} slides (1 title + {len(content_slides)} content)")
+print(f"[ok] generated {total} audio files")
+print(f"[ok] {len(segs)} segments built")
+```
+
+→ 数字が一致しなければ即発見できる。
+
+### ルール3: ファイル名のインデックスを「意味」とそろえる
+
+- `slide_00.png` = title slide
+- `slide_01.png` = content_slides[0] (← 実コンテンツ1枚目)
+- `audio_00.wav` = OP 音声
+- `audio_01.wav` = content_slides[0] の音声
+
+→ **`slide_NN` と `audio_NN` は同じ瞬間に再生される** ことを保証する。
+
+### ルール4: 試聴前に視覚チェックを1枚だけ手動でやる
+
+フル動画生成は20-30分かかる。途中で1枚だけ目視確認すべきポイント:
+
+- `slide_01.png` の見出しが期待通りか(「OP」とか空白だったらバグ)
+- `audio_01.wav` を再生して、`slide_01` の見出しと文脈が合うか
+- `slide_(末尾).png` が空白でないか
+
+これだけで **致命的なインデックスズレ** は事前に潰せる。
+
+### ルール5: 「修正→全部再生成」を避ける中間キャッシュ
+
+スライド画像と音声は分離して `.png/.wav` で持つ。動画 concat だけ失敗したなら、画像/音声は再利用して concat だけリトライ。20分のフル再生成を毎回やらない。
+
+## スライド生成の3軸チェックリスト (ep01教訓)
+
+スライド画像を Pillow で生成するときは、フル動画ビルド (20-30分) 前に **3軸を必ず手動チェック**:
+
+### 1. フォント軸 (字形の有無)
+
+そのフォントに字形があるかを確認。和文フォント (BIZ UDGothic / Yu Gothic / Meiryo) の典型欠落:
+
+| 欠落するもの | 代替 |
+|---|---|
+| 絵文字 (❌⭕🌱📌等) | テキストラベル (`BAD:`/`GOOD:`) / Pillow 描画 |
+| 一部の記号 (♥♦等) | `★◆●▲` 等の基本記号を使う |
+| 特殊な漢字 (旧字体・人名外字) | 別フォント / ふりがな化 |
+
+検証: 生成画像を目視。豆腐 (□) があったらフォント欠落。
+
+### 2. レイアウト軸 (画面領域の確保)
+
+オーバーレイ (アバター/ワイプ/字幕焼き込み) と本コンテンツが **重ならない**:
+
+- アバター用に **右下 X% を予約領域** として確保 (例: 380px幅×540px高)
+- table/timeline 等の自動レイアウトは **`avail_w = W - margin - mascot_reserve`** で計算
+- 字幕焼き込みする場合は **下 10-15%** を字幕用予約
+
+検証: アバター付き mp4 でなく、まず **スライド単体 PNG** で「予約領域に何も無いか」を見る。
+
+### 3. 文字種軸 (和欧混植・改行・読み速度)
+
+CJK 文字と ASCII 文字が混在するときの可読性ルール:
+
+- **半角英数字の前後に半角スペース**: `Git のコミット` (`Gitのコミット` は詰まる)
+- **長い英単語の改行**: `pull_request_review_comment` 等は折り返し配慮(改行可能位置を考慮)
+- **数字+単位**: 必ず半角スペース: `120 分` / `1080 px` (ASCII 数字)、`30秒` でも可 (全角混じり)
+
+自動化案: 変換スクリプトで `re.sub(r"([ぁ-んァ-ヶ一-龥])([A-Za-z0-9])", r"\1 \2", text)` を入れる(narration 除外)。
+
+### 検証フロー
+
+フル動画生成 (20-30分) する前に **1スライドだけ手動 PNG 出力 → 目視チェック**:
+
+```python
+# Quick sanity check before full build
+render_slide(test_slide, "test.png", page=1, total=1, brand="test")
+# Open test.png and verify: no tofu / no overlay collision / spaces in JP-EN
+```
+
+これだけで「フル生成→違和感→全部やり直し (合計 60-90分ロス)」が防げる。
 
 ## 関連スキル
 

@@ -155,6 +155,24 @@ end
 > **Warning**: Adding `xurl` alone will appear to fix the build (no compile errors),
 > but the PDF will still have overflowing URLs. Both changes are required.
 
+### Alternative: Converter-side label stripping
+
+If you control the Markdown-to-Re:VIEW converter, a cleaner alternative to the
+`review-ext.rb` override is to strip the label when it equals the URL, so Re:VIEW
+emits a bare `@<href>{url}`:
+
+- Re:VIEW 5.x `compile_href`: `@<href>{url, label}` -> `\href{url}{label}` (not breakable),
+  while bare `@<href>{url}` -> `\url{url}` (breakable once `xurl` is loaded).
+- In the converter, when a Markdown `[label](url)` has `label == url`, emit `@<href>{url}`
+  (drop the label). Keep `@<href>{url, label}` for human-readable labels (e.g. table cells).
+- With this approach, only the LaTeX-side `xurl` is needed; the Ruby `inline_href` override
+  becomes optional.
+
+> **Gotcha**: `\reviewhref` does **not** exist in Re:VIEW 5.9.0. Do not try to
+> `\renewcommand{\reviewhref}` in the custom sty — the build fails with an undefined
+> control sequence. Fix link breaking via `xurl` + bare `\url{}` (converter or `review-ext.rb`),
+> not by redefining a Re:VIEW href macro.
+
 ### Where to Add
 
 Place these lines in `review-custom.sty` or the build script's custom sty injection point.
