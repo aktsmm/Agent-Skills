@@ -24,6 +24,17 @@ BIZ UDGothic は Windows 10/11 にプリインストール:
 python -c "import edge_tts, imageio_ffmpeg, PIL; print('ok')"
 ```
 
+## アバター(SadTalker)を使う場合の追加 PATH 注意
+
+ffprobe が pydub に必要だが winget でインストールしてもセッションごとに PATH が引き継がれないことがある。スクリプト先頭で明示する:
+
+```powershell
+$ffdir = (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Gyan.FFmpeg*" -Recurse -Filter ffmpeg.exe | Select-Object -First 1).Directory.FullName
+$env:PATH = "$ffdir;$env:PATH"
+```
+
+Python から呼ぶ場合は `os.environ["PATH"] = FFMPEG_DIR + os.pathsep + os.environ["PATH"]` を実行ファイルの先頭で行う。
+
 ## トラブル
 
 | 症状 | 対処 |
@@ -34,3 +45,6 @@ python -c "import edge_tts, imageio_ffmpeg, PIL; print('ok')"
 | 文字化け | `script.json` を UTF-8 (BOM 無し) で保存 |
 | 日本語フォント崩れ | `.ttc` パスを絶対指定、別フォントへフォールバック |
 | concat で映像/音声ズレ | セグメント mp4 の fps と sample rate を揃える (本スクリプトは 30fps / 44.1kHz aac で統一済み) |
+| `uv venv` 直後の python で `No module named pip` | `uv pip install --python <venv>\Scripts\python.exe <pkg>` を使う(`-m pip` ではなく `uv pip`) |
+| `pydub` が `FileNotFoundError: ffprobe` | ffmpeg だけでは不足。ffprobe を含む完全版を winget でインストール (`Gyan.FFmpeg`) し、PATH を明示 |
+| `Failed to initialize NumPy: _ARRAY_API not found` | torch 2.1.2 cu121 を入れると NumPy 2.x が自動で入る。`pip install "numpy==1.23.5"` で強制ダウングレード |

@@ -65,6 +65,31 @@ photorealistic portrait of a Japanese woman in her 30s, friendly smile,
 news anchor style, clean background, soft lighting, high detail
 ```
 
+## 前処理: SD 生成顔は要パディング
+
+Stable Diffusion などで生成した「顔アップ」画像をそのまま渡すと、SadTalker の `--preprocess full` が OpenCV ROI assertion で失敗する。
+
+**対処**: 元画像を 720x720 にリサイズし、1024x1024 白背景にセンター配置してから渡す。
+
+```python
+from PIL import Image
+src = Image.open(SRC).convert("RGB").resize((720, 720), Image.LANCZOS)
+pad = Image.new("RGB", (1024, 1024), "white")
+pad.paste(src, ((1024 - 720) // 2, (1024 - 720) // 2))
+pad.save(FACE_JPG, quality=95)
+```
+
+加えて、SD 生成のヘッドショットには **`--preprocess crop`** のほうが安定する (`full` は背景含む全身想定)。
+
+## 推奨コマンド (style別)
+
+| 元画像タイプ | preprocess | 備考 |
+|---|---|---|
+| 普通の証明写真風 | `full` | デフォルト |
+| SD 生成ヘッドショット (バストアップ) | `crop` + パディング | OOM/ROIエラー回避 |
+| 全身ポートレート | `full` | 動きを許容するなら `--still` 外す |
+| イラスト/アニメ | `crop` | 口パクの自然さは下がる |
+
 ## 推論コマンド
 
 ```powershell
@@ -119,9 +144,11 @@ geq=r='if(between(hypot(..,..),0.94,1),56,r(X,Y))':...  ← リング描画
 | `FileNotFoundError: ffprobe` | `winget install Gyan.FFmpeg` + PATH 通す。`pydub` は ffprobe 必須 |
 | `UserWarning: Failed to initialize NumPy` | `pip install "numpy==1.23.5"` で 1.x に固定 |
 | `face_alignment` インストール失敗 (Python 3.12) | Python 3.10 を使う (`uv python install 3.10`) |
+| OpenCV ROI assertion failure | SD ヘッドショットを `--preprocess full` で渡している。`crop` + 1024x1024 白パディングへ |
 | 顔が検出されない | `--preprocess crop` に変更 / 顔がはっきり写った写真に差し替え |
 | 口パクが完全に外れる | 音声が極端に短い (<1秒) と起きやすい。短いセグメントは結合 |
 | OOM | `--size 256` に下げる / 1音声ずつ処理 (本リポの `add_avatar.py` 実装済み) |
+| 単発で exit code 3221226505 | 一時的な CUDA blip。同じ引数で単体リトライすれば通ることが多い |
 | OpenCV MP4V タグ警告 | 無視可 (出力 mp4 は正常) |
 
 ## 商用代替

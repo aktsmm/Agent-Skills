@@ -110,10 +110,14 @@ python scripts\ellipse_overlay.py --project D:\path\to\project
 ## Common Variants
 
 - **9:16 ショート版** (X/Reels): `W,H = 1080, 1920`、ナレを 60 秒に圧縮
-- **字幕焼き込み**: ffmpeg `subtitles=final.srt` フィルタで動画に焼く
-- **BGM 追加**: 別 mp3 を低音量でミックス (`-filter_complex amix`)
+- **字幕焼き込み**: ffmpeg `subtitles=final.srt` フィルタで動画に焼く ([ffmpeg-advanced-filters.md](references/ffmpeg-advanced-filters.md))
+- **BGM 追加**: 別 mp3 を低音量でミックス ([ffmpeg-advanced-filters.md](references/ffmpeg-advanced-filters.md))
 - **章/コース化** (学習教材): script.json を章単位に分割、共通イントロ/アウトロ
 - **多言語版**: `voice` 切替 + script を翻訳
+- **チャンネル固定キャラ生成**: SDXL でマスコット作って seed 保存 ([avatar-generation-sdxl.md](references/avatar-generation-sdxl.md))
+- **円形アバターワイプ**: ffmpeg geq filter で円形マスク + アクセントリング ([ffmpeg-advanced-filters.md](references/ffmpeg-advanced-filters.md))
+- **YouTube 自動配信**: API で公開予約 + サムネ ([youtube-upload.md](references/youtube-upload.md))
+- **PoC → 定期配信チャンネル昇格**: ディレクトリ再設計 ([scale-up-production.md](references/scale-up-production.md))
 
 ## Done Criteria
 
