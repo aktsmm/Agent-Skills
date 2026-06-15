@@ -36,6 +36,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [ocr-super-surya](ocr-super-surya/)                     | GPU-optimized OCR using Surya (90+ languages) / GPU 最適化 OCR                                                      |
 | [packet-capture-analysis](packet-capture-analysis/)     | Packet capture analysis workflow with labeling and visualization / パケットキャプチャ解析とラベル付け・可視化       |
 | [powerpoint-automation](powerpoint-automation/)         | Create PPTX from web articles / Web記事からPowerPoint自動生成                                                       |
+| [powerpoint-planning](powerpoint-planning/)             | Plan PowerPoint structure and storyline before automation / PowerPoint資料の構成・ストーリーライン設計              |
 | [receipt-ocr-sorter](receipt-ocr-sorter/)               | OCR receipt auto-sort & rename / OCR領収書自動仕分け・リネーム・集計                                                |
 | [retro-copilot](retro-copilot/)                         | Reflect session learnings into ~/.copilot assets / `.copilot` 資産へのレトロ反映                                    |
 | [skill-creator-plus](skill-creator-plus/)               | Design, review, and fix Agent Skills with better triggering / スキル設計・レビュー・発火改善                        |
