@@ -213,6 +213,24 @@ npx @vscode/vsce unpublish <publisher>.<extension>
 | `invalid prerelease`                    | Version like `1.0.0-beta`                                                                                                                                                                                                                                    | Use standard version format                                                                                                                                                |
 | `unknown option`                        | Local `vsce` version differs                                                                                                                                                                                                                                 | Check `vsce <command> --help` and use supported flags                                                                                                                      |
 
+## Release Completion Contract
+
+When the user explicitly asks to release a VS Code extension, do not stop at a
+version bump, commit, or push. Treat the release as incomplete until all of these
+are done or explicitly blocked:
+
+1. Package the VSIX under `artifacts/vsix/`.
+2. Inspect the VSIX contents or run the repo-specific package integrity test.
+3. Install the generated VSIX locally with `code --install-extension ... --force`.
+4. Publish the exact VSIX to Marketplace.
+5. Create and push the release tag.
+6. Create the GitHub Release with the VSIX attached.
+7. Verify through at least two non-stale channels, such as publish success output,
+   `gh release view`, and `git ls-remote --tags`.
+
+If a blocker appears after the version bump, report the state separately:
+`Version`, `VSIX`, `Marketplace publish`, `Git tag`, and `GitHub Release`.
+
 ## GitHub Release After Marketplace Publish
 
 When attaching the VSIX to a GitHub Release, pin the release to a full commit SHA if you use `--target`. Short SHAs can be rejected by the GitHub API.
@@ -234,6 +252,19 @@ Get-FileHash $vsix -Algorithm SHA256 | Select-Object Hash
 ```
 
 After publishing, `vsce show` output can lag or sort versions unexpectedly. If you need a deterministic confirmation, run duplicate-safe publish against the exact VSIX and verify that the Marketplace reports the version as already published.
+
+Marketplace metadata can be stale immediately after a successful publish. If
+`vsce show --json` or the public Marketplace page still shows the previous
+version, do not republish or bump the version just from that signal. First verify
+the GitHub Release and remote tag:
+
+```powershell
+gh release view vX.Y.Z --json "tagName,name,url,isDraft,isPrerelease,publishedAt"
+git ls-remote --tags origin vX.Y.Z
+```
+
+If `vsce publish` reported success and GitHub Release plus remote tag are present,
+treat the Marketplace mismatch as propagation delay and recheck later.
 
 ## Marketplace URLs
 
