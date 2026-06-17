@@ -346,6 +346,16 @@ images/demo-animated.gif
 > **Tip**: Run `npx @vscode/vsce ls` to preview exactly what will be packaged
 > before running `vsce package` or `vsce publish`.
 
+> **Gotcha**: `vsce ls --packagePath foo.vsix` does not enumerate entries; for
+> packaged VSIX verification (e.g. confirming `node_modules/**` is excluded),
+> open the VSIX as a ZIP and list every entry instead:
+>
+> ```powershell
+> Add-Type -AssemblyName System.IO.Compression.FileSystem
+> $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path foo.vsix))
+> $zip.Entries | Select-Object FullName, Length
+> ```
+
 ### Judging `node_modules/**` exclusion
 
 Before excluding `node_modules/**`, confirm `out/*.js` only requires `vscode`
