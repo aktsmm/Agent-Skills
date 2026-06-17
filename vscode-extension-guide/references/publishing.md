@@ -346,6 +346,25 @@ images/demo-animated.gif
 > **Tip**: Run `npx @vscode/vsce ls` to preview exactly what will be packaged
 > before running `vsce package` or `vsce publish`.
 
+### Judging `node_modules/**` exclusion
+
+Before excluding `node_modules/**`, confirm `out/*.js` only requires `vscode`
+and Node built-ins, with no live external imports:
+
+```powershell
+Select-String -Path out\*.js -Pattern 'require\("([^.][^"]+)"\)' -AllMatches
+Select-String -Path out\*.js -Pattern 'import\("[^.]'  # dynamic imports
+```
+
+A `dependencies` entry that is only reached through a guarded dynamic `import(...)`
+disabled in the extension host (e.g. a CLI-side SDK that exits early when
+`vscode` is present) ships its entire transitive tree as dead weight. One real
+case: `@github/copilot-sdk` → `@github/copilot` ≈ 285 MB → packaged VSIX 181 MB.
+After moving the unused dep out and excluding `node_modules/**`, the same VSIX
+dropped to ~45 KB (≈4000× smaller). Compare VSIX size against the previous
+release; an unchanged-huge size usually means `.vscodeignore` is not actually
+excluding `node_modules/**`.
+
 ### Marketplace auto-resolves relative-path images
 
 When the README references images by relative path (e.g. `![demo](images/demo.gif)`),

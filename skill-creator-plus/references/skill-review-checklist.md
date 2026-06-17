@@ -10,6 +10,7 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Self-authored skills have license + metadata.author?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
+- [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere?
 - [ ] No README.md or auxiliary docs in skill folder?
 - [ ] The skill fits one primary archetype, or the split is intentional?
 - [ ] Non-obvious gotchas are captured where they affect correctness?

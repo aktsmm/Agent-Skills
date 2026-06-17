@@ -56,6 +56,7 @@ If the answer is not **Skill**, stop and create the right primitive instead.
 | **Integrate Before Add**   | Update, merge, or replace existing guidance before appending more.   |
 | **Right Primitive**        | A good skill is not a fallback for prompt/agent/instruction design.  |
 | **Scope Before File**      | Decide workspace vs profile before creating anything.                |
+| **Self-Contained**         | The skill must carry its own knowledge. Bundle into references/scripts; do not just link to workspace files (instructions, memory, ledgers) that die when copied elsewhere. Abstract env-specific values (paths, names) into args/config. |
 
 > **Default assumption:** Claude is already very smart. Challenge each piece: "Does this justify its token cost?"
 

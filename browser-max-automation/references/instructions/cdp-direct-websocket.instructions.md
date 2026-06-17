@@ -121,6 +121,26 @@ cdp(ws, 'Runtime.evaluate', {
 
 Never use `Page.navigate` for hash-based SPA routes — the SPA router will not fire, and the page may reload to a default/home route.
 
+Do not hammer an authenticated SPA with repeated `Page.navigate` / `Page.reload`. Rapid back-to-back reloads can corrupt the session/auth token and surface errors like "Authorization failed" or "Unable to retrieve your profile". Keep it to one navigate, then `wait`, then confirm render with `document.body.innerText.length` before the next action. If auth errors appear, stop automating and let the session settle (it usually self-heals) instead of reloading again.
+
+## Network Capture to Replicate an API Request
+
+When a UI action persists data through an internal API and you want to drive that API directly (faster and more reliable than clicking), capture the real request first, then replay its shape with `urllib` / `requests`.
+
+```python
+cdp(ws, 'Network.enable')
+# Perform the UI action once (click Save, etc.), then read captured events.
+# Filter requestWillBeSent for the target URL + POST/PUT/PATCH,
+# then pull the body with getRequestPostData by requestId.
+post_data = cdp(ws, 'Network.getRequestPostData', {'requestId': rid})['result']['postData']
+```
+
+Rules:
+
+- Match the captured `method`, URL path, headers, and **exact body shape**. Server contracts are picky: a .NET `[FromBody] List<T>` endpoint wants a bare JSON array `[payload]`, not `{"wrapperName": [payload]}` — the wrong shape returns `400 Mandatory parameter <name> not provided`.
+- A `201` with the expected status field (e.g. `laborStatus: "Draft"`) plus a re-read of the resource is the real success signal, not the POST returning without exception.
+- If `requestWillBeSent` carries no body, call `getRequestPostData` with the `requestId`; large bodies are not inlined.
+
 ## Screenshot and Text Extraction
 
 ```python
