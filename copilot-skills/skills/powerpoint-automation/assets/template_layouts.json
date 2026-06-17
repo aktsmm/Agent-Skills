@@ -1,0 +1,290 @@
+{
+  "template": "template.pptx",
+  "template_path": "./template.pptx",
+  "slide_width_inches": 13.33,
+  "slide_height_inches": 7.5,
+  "aspect_ratio": "16:9",
+  "masters": [
+    {
+      "index": 0,
+      "name": "Master_0",
+      "layout_count": 11
+    },
+    {
+      "index": 1,
+      "name": "Master_1",
+      "layout_count": 6
+    }
+  ],
+  "layouts": [
+    {
+      "index": 0,
+      "name": "Title square photo 2",
+      "category": "photo",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": true,
+      "has_content": false,
+      "has_picture": true,
+      "body_count": 1,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 12,
+          "type": "BODY (2)"
+        },
+        {
+          "idx": 13,
+          "type": "PICTURE (18)"
+        },
+        {
+          "idx": 14,
+          "type": "FOOTER (15)"
+        },
+        {
+          "idx": 15,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "name": "タイトルとコンテンツ",
+      "category": "content",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": false,
+      "has_content": true,
+      "has_picture": false,
+      "body_count": 0,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 10,
+          "type": "OBJECT (7)"
+        },
+        {
+          "idx": 14,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Title Only - left side ",
+      "category": "title_only",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": false,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 0,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 14,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Header Background Title and Content",
+      "category": "content",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": false,
+      "has_content": true,
+      "has_picture": false,
+      "body_count": 0,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 10,
+          "type": "OBJECT (7)"
+        },
+        {
+          "idx": 14,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "name": "Header Line Title and Content",
+      "category": "content",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": false,
+      "has_content": true,
+      "has_picture": false,
+      "body_count": 0,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 10,
+          "type": "OBJECT (7)"
+        },
+        {
+          "idx": 14,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "name": "Quote slide 2b",
+      "category": "quote",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": true,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 2,
+      "placeholders": [
+        {
+          "idx": 18,
+          "type": "BODY (2)"
+        },
+        {
+          "idx": 20,
+          "type": "BODY (2)"
+        },
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "name": "Demo slide 2",
+      "category": "content",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": true,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 1,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 12,
+          "type": "BODY (2)"
+        },
+        {
+          "idx": 14,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "name": "Section Divider",
+      "category": "section",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": true,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 1,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 12,
+          "type": "BODY (2)"
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "name": "Section Divider 2",
+      "category": "section",
+      "has_title": true,
+      "has_subtitle": false,
+      "has_body": true,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 1,
+      "placeholders": [
+        {
+          "idx": 0,
+          "type": "TITLE (1)"
+        },
+        {
+          "idx": 12,
+          "type": "BODY (2)"
+        },
+        {
+          "idx": 14,
+          "type": "SLIDE_NUMBER (13)"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "name": "Apendix Blue Bkg",
+      "category": "unknown",
+      "has_title": false,
+      "has_subtitle": false,
+      "has_body": true,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 1,
+      "placeholders": [
+        {
+          "idx": 10,
+          "type": "BODY (2)"
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "name": "Closing logo slide",
+      "category": "closing",
+      "has_title": false,
+      "has_subtitle": false,
+      "has_body": false,
+      "has_content": false,
+      "has_picture": false,
+      "body_count": 0,
+      "placeholders": []
+    }
+  ],
+  "layout_mapping": {
+    "title": 0,
+    "content": 1,
+    "section": 7,
+    "agenda": 1,
+    "summary": 1,
+    "closing": 10,
+    "two_column": 3,
+    "code": 4,
+    "photo": 0,
+    "blank": 2,
+    "title_only": 2,
+    "quote": 5,
+    "demo": 6
+  }
+}

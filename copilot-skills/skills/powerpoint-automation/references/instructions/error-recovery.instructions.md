@@ -26,7 +26,6 @@
 | REVIEW(PPTX)   | Slide count mismatch | BUILD            | Re-run `create_from_template.py` |
 | REVIEW(PPTX)   | Layout issues        | PREPARE_TEMPLATE | Re-diagnose template             |
 | BUILD          | Template load error  | PREPARE_TEMPLATE | Run `diagnose_template.py`       |
-| BUILD          | Slide paste fails (all) | BUILD         | Switch to `Slides.InsertFromFile` (clipboard-independent) |
 | **3 failures** | Any                  | **ESCALATE**     | Wait for human intervention      |
 
 ---
@@ -191,19 +190,5 @@ for p in list(app.Presentations):
 
 Do not call `app.Quit()`; leave PowerPoint running so the user can reopen the
 rebuilt file with `Start-Process`.
-
-## COM Slide Insertion: Prefer InsertFromFile
-
-`Slide.Copy()` + `Slides.Paste()` relies on the system clipboard and can fail for
-**every** slide where the clipboard is blocked (e.g. Global Secure Access).
-Symptoms: each insert retries then skips, leaving a template-only deck.
-
-- Default to `Slides.InsertFromFile(path, index, start, end)` — clipboard-independent.
-  Insert happens *after* `index`, so pass `insertPos - 1`.
-- Read the source from a **local temp copy** (`[IO.File]::ReadAllBytes` then write to
-  `$env:TEMP`), not the COM-opened presentation. Avoids OneDrive hydration stalls and
-  file-lock contention in one step.
-- Never `Stop-Process POWERPNT` while a build is running. Killing a live COM instance
-  makes the in-flight automation fail with RPC error `0x800706BE`.
 
 > 📖 **Full template requirements:** See [template.instructions.md](template.instructions.md) > Template Preparation
