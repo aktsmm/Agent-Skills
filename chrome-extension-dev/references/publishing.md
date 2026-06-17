@@ -105,6 +105,23 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 
 ---
 
+## 商標セーフな命名 (公開後の takedown 対策)
+
+審査通過後でも、商標権者の代理 (例: Microsoft 代理の Tracer `microsoft@tracer.ai`) が
+Google 経由で商標侵害を申し立てると、7 日以内に是正しないと item が suspend される。
+
+- 苦情が狙うのは **item の Title** に当たる箇所: manifest `name` / `action.default_title` /
+  ストアリスティング名。ここから他社商標 (GITHUB, Copilot, Microsoft 等) を外す。
+- `description` / README / keywords での **nominative な互換性言及** は許容
+  (例: `Works with GitHub Copilot or local LLMs`)。エスカレートしたら description も中立化するが、
+  Title 修正だけで suspend リスクは消える。
+- 商標対応で **manifest `name` の内部 ID や設定キー prefix を変えない** —
+  既存ユーザーのインストール / 設定が壊れる。変えるのは人間が見る Title 文字列だけ。
+- リネーム後は全面 grep して、ビルド生成物 (`.output` の manifest、コンパイル済み JS) からも
+  旧 Title が消えていることを確認する。
+
+---
+
 ## アップデート公開
 
 ### バージョン更新

@@ -69,12 +69,12 @@ output.appendLine(
 
 ## Packaging Issues
 
-| Symptom                                                          | Cause                                        | Solution                                                                                    |
-| ---------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| VSIX too large                                                   | node_modules included                        | Add to .vscodeignore                                                                        |
-| Files missing in VSIX                                            | Over-aggressive ignore                       | Use `npx @vscode/vsce ls` to check                                                          |
-| Icon not showing                                                 | Wrong path or format                         | Use 128x128 PNG, check path in package.json                                                 |
-| `End of central directory record signature not found` on install | Truncated / corrupt VSIX (build interrupted) | Re-run `vsce package`; verify with `code --install-extension <vsix> --force` before publish |
+| Symptom                                                          | Cause                                               | Solution                                                                                                |
+| ---------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| VSIX too large (100MB+)                                          | `node_modules` shipped, incl. a huge transitive dep | Exclude `node_modules/**` in `.vscodeignore` when `out/` needs no external runtime packages (see below) |
+| Files missing in VSIX                                            | Over-aggressive ignore                              | Use `npx @vscode/vsce ls` to check                                                                      |
+| Icon not showing                                                 | Wrong path or format                                | Use 128x128 PNG, check path in package.json                                                             |
+| `End of central directory record signature not found` on install | Truncated / corrupt VSIX (build interrupted)        | Re-run `vsce package`; verify with `code --install-extension <vsix> --force` before publish             |
 
 ### Inspect VSIX Contents
 
@@ -85,6 +85,44 @@ npx @vscode/vsce ls
 # Extract and inspect VSIX
 unzip -l my-extension-1.0.0.vsix
 ```
+
+### When it is safe to exclude `node_modules/**` entirely
+
+A bundled extension (esbuild/webpack) needs no `node_modules` in the VSIX. An
+unbundled extension only needs the packages its compiled `out/` actually
+`require`s at runtime. Check before trusting `dependencies`:
+
+```powershell
+# What does the compiled output actually require at runtime?
+Select-String -Path out\*.js -Pattern 'require\("([^.][^"]+)"\)' -AllMatches |
+  ForEach-Object { $_.Matches } | ForEach-Object { $_.Groups[1].Value } |
+  Sort-Object -Unique
+# Also scan for dynamic import("pkg")
+```
+
+If the only externals are `vscode` (provided by the host) and Node built-ins
+(`fs`, `path`, `http`, `child_process`, ...), add `node_modules/**` to
+`.vscodeignore` and ship none of it. A dependency that is only reached through a
+**guarded dynamic `import()` disabled inside the extension host** is dead weight
+— e.g. `@github/copilot-sdk` pulls a ~285MB `@github/copilot` tree that kept one
+VSIX at 181MB; excluding `node_modules` produced an identical-functioning ~45KB
+build.
+
+### Always list every entry, not just the size
+
+```powershell
+# Enumerate all VSIX entries and flag leaked temp files
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$z = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path my-extension-1.0.0.vsix))
+$z.Entries | Sort-Object FullName | ForEach-Object { '{0,8}  {1}' -f $_.Length, $_.FullName }
+$z.Dispose()
+```
+
+Block the build if temp runner scripts (`_*.ps1`), logs, or stray `*.vsix`
+leaked in, and add the matching ignore patterns (`*.ps1`, `*.log`, `*.vsix`) to
+`.vscodeignore`. Compare the new VSIX size against the previous version: an
+unexpectedly large or unchanged-huge size means `.vscodeignore` is not excluding
+`node_modules`.
 
 ## Publishing Errors
 
