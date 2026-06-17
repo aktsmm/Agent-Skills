@@ -8,7 +8,6 @@ Use these patterns after the normal MCP snapshot/click flow has established the 
 - For editors with hidden `input[type=file]`, target the existing editor tab and use `DOM.setFileInputFiles`.
 - Do not navigate an unsaved draft tab to a new URL. Open a separate new tab for a fresh draft if needed.
 - Verify upload by checking the new file URL in page HTML or editor text.
-- When using Playwright `connect_over_cdp`, some Google-style drop zones don't reflect `set_input_files` on the visible hidden `input` (Chrome Web Store Screenshots slot is one). Reliable path: click the drop zone inside `page.expect_file_chooser()` and call `fc.set_files(path)`. Always verify a thumbnail/preview shows up afterward — different upload widgets on the same page behave differently (icon slot may accept the direct input, screenshots slot may not).
 
 ## evaluate + fetch
 
