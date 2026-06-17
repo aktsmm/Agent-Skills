@@ -157,7 +157,9 @@ export default defineConfig({
 
 ## Artifact Hygiene
 
+- WXT 拡張の配布 ZIP は `npx wxt zip` で作る（`npm run build` の生成物はキャッシュが残ってリビルドされないことがある）。
 - ZIP の中身を列挙し、`src/`, `tests/`, `.github/`, `.vscode/`, `store-assets/`, `*.map`, log が入っていないことを確認する。
+  ZIP 検査は `.NET` の `System.IO.Compression.ZipFile` で**全エントリを直接列挙**する方が確実（メタコマンドのフィルタを当てにしない）。
 - `publish-extension` は `.env.submit` を自動読込する。OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可後に再実行する。
 - 再認可時の auth code や refresh token はチャットやログへ貼らず、ターミナルへ直接入力する。更新後は secret を表示せず token exchange の成功だけ確認する。
 - live retry 前に `publish-extension --dry-run --chrome-zip <zip>` を通し、認証と設定だけ先に確認する。
