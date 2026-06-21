@@ -3,6 +3,36 @@
 UltraGoal から取り込む設計要素のうち、goal-loop に合うものだけをまとめる。
 Codex goal tool、hidden thread state、生存・継続系の機能は扱わない。
 
+## Effort Scaling
+
+ゴールの大きさに応じて重さを変える。小さいゴールに full loop を被せない。
+
+| ゴールの規模               | orchestrator                | worker                         | evaluator          | final reviewer         | ledger             | Small-Bet      |
+| -------------------------- | --------------------------- | ------------------------------ | ------------------ | ---------------------- | ------------------ | -------------- |
+| 些末（1 ファイル・自明）   | この skill を使わず直接実行 | -                              | -                  | -                      | -                  | -              |
+| 小（数ステップ・低リスク） | 軽量                        | 1-2 直列                       | 外部検証 1 回      | 外部 evidence 突合で可 | 暗黙でよい         | 任意           |
+| 中（複数成果物・依存あり） | 通常                        | 並列 read-only + 直列 mutation | rubric 評価        | 別 subagent 推奨       | 明示               | 大変更時は必須 |
+| 大（不可逆・広範囲・多段） | 厳格                        | 多段 + replan                  | rubric + reference | 別 subagent 必須       | 明示・毎ループ更新 | 必須           |
+
+Roles: orchestrator は state を所有するが、自分の成果に最終合格判定を出さない。mutation する worker と判定する evaluator / reviewer は別人格にし、役割を「読み取り/実装」と「評価/レビュー」の 2 系統に寄せる。
+
+長期・多段・context compaction で再開が必要なゴールだけ Durable Ledger Mode を使う。会話内 ledger で足りる小さいゴールではファイルを作らない。
+
+## Anti-Patterns
+
+- criteria 未合意のまま実行を始める。
+- 自己評価だけで PASS を出す。
+- max iteration だけで stop を組む。
+- 大きな変更を pilot 無しで全体適用する。
+- 「委譲する」と言って orchestrator が広い調査・実装・primary verifier 実行を抱え込む。
+- worker に checkpoint / complete / blocked 判定を任せる。
+- ループ中に criteria をこっそり緩める。
+- 改定後 criteria の PASS を original criteria の PASS として報告する。
+- 実サーフェスが必要な成果を mock / static check / unit test だけで完了扱いする。
+- deploy / 配布 goal を `Succeeded` 応答や build-pass だけで完了扱いする。
+- worker に full transcript を渡して context を膨らませる。
+- サブゴールを hard-delete する。不要になったものは `superseded` として audit-visible に残す。
+
 ## Dynamic Steering
 
 Steering は、original brief と criteria を守ったままサブゴール分解だけを変える操作。
