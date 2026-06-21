@@ -92,8 +92,13 @@ Record:
 - clean-state, reload, restart, failure-recovery, or negative-path checks when risk justifies them;
 - required capability and fallback owner if the agent cannot access the surface.
 
-Do not silently replace a needed real-surface verifier with a weaker check. If unavailable, record the capability gap and hand off the exact manual test and required evidence.
+Do not silently replace a needed real-surface verifier with a weaker check. If worker / verifier cannot access the real surface,
+record the capability gap and hand off the exact manual test and required evidence to the user. Do not attempt broad real-surface
+verification yourself as orchestrator.
 
 ## Worker Boundary
 
-Workers may investigate, edit, test, and return evidence. They must not own the durable ledger, mark the goal complete, or decide that a blocker is final. The orchestrator reconciles worker evidence with frozen criteria and updates the ledger.
+Workers may investigate, edit, test, and return evidence. Verifier workers may run the primary verifier and return exit code,
+logs, screenshots, or readbacks. They must not own the durable ledger, mark the goal complete, or decide that a blocker is final.
+The orchestrator reconciles worker evidence with frozen criteria and updates the ledger; it should not absorb broad research,
+implementation, pilot, or primary-verifier execution into the main context.

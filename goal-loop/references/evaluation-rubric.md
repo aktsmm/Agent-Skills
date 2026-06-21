@@ -56,6 +56,17 @@ Non-clean の扱い:
 - review finding を evidence として、blocker 解消サブゴールを追加してループ継続する。
 - 自力で解消できない外的 blocker だけ Phase 6 の HITL へ回す。
 
+## Capability Gap Rule
+
+Primary verifier に必要な credential / tool / device / account / environment を worker / verifier が持たない場合:
+
+1. 弱い検証へ黙って置き換えない。
+2. capability gap を ledger の Deferred / Next Actions へ移す。
+3. ユーザーへ、実行不可の要件・手動検証手順・必要 evidence を明示する。
+4. Primary verifier を `BLOCKED` とし、supporting checks は partial evidence として扱う。
+
+保留項目が must AC または primary verifier に必要なら、全体 status は complete ではなく HITL / partial handoff とする。
+
 ## Judge Bias と対策（LLM 評価を使うとき）
 
 LLM-as-judge には系統的バイアスがある。次で抑える。
@@ -69,6 +80,8 @@ LLM-as-judge には系統的バイアスがある。次で抑える。
 
 ## 評価を別 subagent にするとき
 
+- 小規模・read-only・低リスクを除き、evaluator は別 subagent として起動する。
+- worker が mutation した成果物を評価する場合、evaluator を worker とは別人格にする。
 - evaluator subagent には **成果物 + rubric + Phase 4 検証出力**だけ渡す（生成過程は渡さない）。
 - 「あなたは生成者ではなく審査員。rubric の反例に該当しないかを探せ」と役割を固定する。
 - 出力フォーマットを固定する: 基準ごとに `PASS/FAIL`・根拠・gap、最後に総合 `PASS/FAIL`・confidence。
