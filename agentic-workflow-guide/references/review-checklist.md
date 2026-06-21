@@ -40,6 +40,7 @@ Minimum items to verify:
 - [ ] Are related files (references, scripts) simple and minimal? (DRY)
 - [ ] Are deterministic steps offloaded to scripts / IR / hooks instead of LLM loops? (Deterministic Offload)
 - [ ] Are frontmatter fields checked against the current file-type support matrix, not just repo-local convention? (Frontmatter Hygiene)
+- [ ] Are sub-review / sub-agent findings (file sizes, line ranges, duplication claims, missing sections) verified against the actual code by grep / read before being acted on? (Sub-Review Verification)
 ```
 
 ---
