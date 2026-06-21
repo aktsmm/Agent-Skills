@@ -29,6 +29,8 @@ if ($conn) {
 - Do not trust an endpoint value from an environment variable or previous run without `/json/version` and process command-line verification.
 - If Chrome owns the intended Edge port, use another port or close Chrome before starting Edge.
 - If the same Edge user-data-dir already has a CDP port, launch another profile without `--remote-debugging-port`; the window joins the existing process and remains visible through the existing CDP endpoint.
+- If Edge is already running **without** any debug port, a new `--remote-debugging-port` launch joins the existing portless process and the port never opens (`/json/version` keeps failing). Close all Edge processes first, then relaunch with the port. Closing all Edge is destructive (drops every open tab), so confirm with the user before `Stop-Process -Name msedge`.
+- When a helper connects from Node, pass `http://127.0.0.1:<port>` rather than `localhost`. `localhost` can resolve to IPv6 `::1` while the CDP endpoint listens on IPv4, so PowerShell reaches it but Node `fetch` fails with `fetch failed`.
 - Pass the verified CDP URL explicitly to helpers so later scripts do not re-guess a different endpoint.
 
 ## Authentication Gotchas

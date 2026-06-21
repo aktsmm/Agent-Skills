@@ -4,7 +4,7 @@ Choose the strongest route available in the current environment. Prefer native R
 
 ## GitHub Copilot CLI
 
-Use native Rubber Duck first when available.
+Use native Rubber Duck as the critic step of the loop: you keep producing the work and call Rubber Duck at each checkpoint defined in [loop protocol](./loop-protocol.md), then revise and re-consult until it passes. Native Rubber Duck already runs the critic on a different model family, so it fits the loop directly.
 
 Preferred prompts:
 
@@ -27,16 +27,16 @@ Do not present fallback output as built-in Rubber Duck output.
 
 ## VS Code
 
-Use the skill inline as the orchestrator. If the workspace or user profile already has suitable reviewer agents, select one as the fallback reviewer lane.
+You (the main conversation) are the **producer** and keep owning the plan, code, and tests. The **critic** is a separate read-only subagent run via `runSubagent`, ideally on a different model family. Do not delegate the whole task to the subagent — only the review of your current checkpoint.
 
 Keep companion `.agent.md` files outside this skill. If the user later asks for click-selected reviewer agents, treat that as a separate customization request with its own scope, plan, and verification.
 
-Recommended VS Code flow:
+Recommended VS Code loop:
 
-1. Run `/duck-critic <target>`.
-2. Choose the route and reviewer lane.
-3. Invoke an existing read-only reviewer agent, subagent, or separate model session.
-4. Reconcile the feedback in the main conversation.
+1. Run `/duck-critic <target>` and keep producing the artifact yourself up to the first checkpoint from [loop protocol](./loop-protocol.md).
+2. Pick the critic route and reviewer lane. For the subagent critic, prefer a different model family than the producer; pass the `model` parameter to `runSubagent` to pin a different-family reviewer when one is available, and verify the exact model name first.
+3. Send the critic packet to a read-only `runSubagent` reviewer (or an existing read-only reviewer agent / separate model session). The subagent only reviews — it must not edit files or run mutating commands.
+4. Reconcile the findings in the main conversation, revise the artifact yourself, and re-consult the critic. Repeat until a stop condition in [loop protocol](./loop-protocol.md) is met.
 
 ## Claude Code
 
@@ -52,10 +52,12 @@ Claude-specific variant, if desired:
 ```yaml
 context: fork
 agent: general-purpose
-model: inherit
+# Set model to a different family than the producer; do not inherit the
+# producer's model, which would make the critic same-family.
+model: <different-family-model>
 ```
 
-Use exact model names only after checking the target Claude Code environment. If using a Claude Opus-class reviewer, pair it with work produced by a different model family when possible.
+Use exact model names only after checking the target Claude Code environment. Inheriting the producer's model is a last resort to call out explicitly, since a same-family critic mostly echoes the producer's blind spots.
 
 ## Generic Agent Harnesses
 

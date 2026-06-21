@@ -16,7 +16,7 @@ Use one lane by default. Use multiple lanes only when the work is broad, risky, 
 
 ## Model Diversity
 
-Prefer a reviewer from a different model family than the producer when available.
+The producer and the critic must be different model families whenever the harness allows it. A second opinion from the same model as the producer mostly echoes the producer's own blind spots, so a same-family critic is a last resort to note explicitly, not the default.
 
 Examples:
 
@@ -25,6 +25,17 @@ Examples:
 - Work produced by an unknown model: choose the strongest available read-only reviewer and state the uncertainty.
 
 These are role lanes, not fixed model IDs. Exact local names vary by product, license, and rollout. Verify the model picker or CLI configuration before storing a `model` value in handoffs or harness-specific configuration.
+
+## Model Fallback
+
+A different-family critic is preferred, not required. When one cannot be selected, fall back in this order and never block the loop on model choice:
+
+1. **Different family, explicitly chosen** — the user named a model/family, or a different family is available. Use it.
+2. **Different family, auto-selected** — no model was specified, but the harness exposes a different family than the producer. Pick the strongest available read-only one.
+3. **Same family, different instance/session** — only the producer's family is available. Use a fresh read-only critic on it and **state in the output that the critic is same-family**, so the second opinion is known to be weaker.
+4. **Self-critique** — no separate critic is available at all. Run the [reviewer rubric](./reviewer-rubric.md) against your own artifact as an explicit critic pass, and clearly label it self-review, not an independent second opinion.
+
+If the user gave no model instruction, default to step 2: do not stop and ask — auto-select a different-family critic and report which route was used. Only pause for the user when the choice is genuinely ambiguous or costly (for example, a deep multi-lane review on expensive models).
 
 ## Reviewer Depth
 
