@@ -1,7 +1,7 @@
 # Steering and Final Gates
 
-UltraGoal から取り込む設計要素のうち、goal-loop に合うものだけをまとめる。
-Codex goal tool、hidden thread state、生存・継続系の機能は扱わない。
+goal-loop の subgoal steering、durable ledger、final gate の実行ルール。
+Codex goal tool、hidden thread state、生存・継続系の機能は扱わない。設計背景と外部出典は [design-rationale.md](./design-rationale.md) に置く。
 
 ## Effort Scaling
 
@@ -83,7 +83,7 @@ Keep the aggregate objective as a pointer to the durable plan, not a duplicated 
 
 ## Final Quality Gate
 
-Use this gate for large code changes, architecture changes, schema changes, security-sensitive work, or user-facing workflows.
+Use this gate only for high-risk changes: security-sensitive work, schema changes, deployment/distribution, wide refactors, architecture changes, or user-facing workflows.
 
 Gate order:
 
