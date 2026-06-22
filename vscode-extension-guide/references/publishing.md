@@ -134,6 +134,8 @@ npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
 
 If the project has a repository-specific release hygiene test, treat that test as the source of truth for payload safety. `vsce ls` flags differ between CLI versions, while a project test can assert the exact entrypoint and excluded files required by that extension.
 
+If a release test asserts the extension version inside docs or spec files (README, CHANGELOG, a `FULL_SPECIFICATION`-style file), bump **every** one of them together with `package.json`. A single doc lagging the package version fails the release gate even when the build itself is correct, so update the version in all asserted files before tagging.
+
 ## Packaging Runner Gotchas
 
 - Treat the VSIX file as the completion source of truth. A quiet or truncated terminal is not success; confirm the artifact exists, has a fresh timestamp, and has a plausible size before moving to publish.

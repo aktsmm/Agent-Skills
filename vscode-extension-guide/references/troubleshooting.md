@@ -172,6 +172,21 @@ Keep runtime diagnostics behind a small logger wrapper so tests can assert the l
 
 - **Ctrl+Shift+P** → "Developer: Reload Window"
 
+## Driving Copilot Chat From an Extension
+
+Extensions that launch chat via the internal `workbench.action.chat.open` command (passing `mode`, `modelSelector`, or a settings-based reasoning effort) hit a recurring confusion: **writing the setting correctly is not the same as the host honoring it.**
+
+- Separate the two failure surfaces: (1) does your extension pass the right argument / write the right config, and (2) does the host act on it. Confirm (1) from your own Output Channel logs, then judge (2) from host behavior — do not conclude (1) is broken from a (2) symptom.
+- Inspect host runtime logs (and the VS Code source for the internal command) **early**. Do not theorize about model-specific differences (e.g. "Opus ignores it") before verifying the same `mode`/`reasoningEffort` is actually sent for every model. In practice the arguments are identical across models and the difference is host-side handling.
+- Reasoning effort applied through the settings path (e.g. an experimental `chatLanguageModels.json` entry in global storage) is written by the extension but honored by the platform. If the chosen depth is not reflected, the extension can still be correct — surface a short UI note ("applied depending on platform support") instead of chasing a non-existent bug.
+- These internal commands are undocumented and version-sensitive. Guard the argument shape and add fallback tiers (e.g. retry without reasoning effort before a legacy fallback); never let a fallback silently drop **both** the agent and the reasoning effort.
+
+### Discovering `.agent.md` Custom Agents
+
+If your extension lists custom agents in a picker, exclude agents whose frontmatter sets `user-invocable: false` — those cannot be directly invoked and only confuse users when shown. A surprising "agent can't be selected" report is usually this flag, not a model or API limitation.
+
+- Cache agent discovery and invalidate it from a file watcher on `**/*.agent.md` (and `**/AGENTS.md`); raise any scan cap well above a handful of files, and warm the cache on activation so the first picker open is not empty.
+
 ## Quick Fixes Summary
 
 ```bash
