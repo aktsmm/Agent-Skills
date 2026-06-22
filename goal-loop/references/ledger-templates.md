@@ -14,64 +14,19 @@ Durable mode でも hidden runtime state を操作したと主張しない。フ
 
 ## Task Ledger
 
-ゴールと計画の現在像。Phase 1 合意後に初期化し、replan のたびに作り直す。
+ゴールと計画の現在像。通常はこの最小形でよい。長期・多段・再開前提のときだけ項目を増やす。
 
 ```markdown
-# Task Ledger — <goal 名>
-
-## Goal
-
-<1 文>
-
-## Grounding
-
-- audience: <誰にとって成功か>
-- destination: <反映 / 提出 / 配置先>
-- baseline: <現状態 / exact failure / starting metric>
-- constraints: <範囲・承認・環境・互換性>
-- evidence gaps: <未確認事項>
-
-## Acceptance Criteria（freeze 済み）
-
-- AC1: <条件> / verify: <コマンド> / status: PASS|FAIL|未検証
-- AC2: <条件> / verify: <コマンド> / status: ...
-
-## Verification Design
-
-- primary verifier: <実成功面に最も近い検証>
-- supporting checks: <補助検証>
-- real surface: <URL / app / account / device / starting state。不要なら N/A>
-- evidence to capture: <commands / outputs / paths / screenshots / logs / readbacks>
-- capability gaps: <不足 tool / credential / environment と handoff>
-
-## Persistence Profile
-
-- profile: <Standard / Persistent / Exhaustive>
-- max iteration: <profile 既定 or 合意した上限>
-- stall→replan: <profile 既定 or 合意した上限>
-- replan→HITL: <profile 既定 or 合意した上限>
-- blocker 判定前の別 approach: <profile 既定 or 合意した数>
-
-## Constraints / must NOT
-
-- <触ってよい範囲・禁止近道>
-
-## Architecture / Domain Invariants
-
-- <invariant> / source: <brief/spec/interview> / verify: <test/review/観測>
-
-## 確定した事実（検証で裏が取れたこと）
-
-- <fact 1>
-
-## 未確定の推測（まだ裏が取れていない前提）
-
-- <assumption 1>
-
-## 現計画（サブゴール列）
-
-1. <subtask> — 入力 / 期待出力 / 依存 / 並列可否 / status: pending|in_progress|complete|failed|blocked|review_blocked|superseded
-2. <subtask> — ...
+- Goal: <完了状態を 1 文>
+- Scope: <触る範囲 / out of scope / must NOT>
+- Verifier: <primary verifier / supporting checks / capability gaps>
+- AC status:
+  - AC1: PASS|FAIL|BLOCKED — verify: <手段> — evidence: <command/log/readback>
+  - AC2: PASS|FAIL|BLOCKED — verify: <手段> — evidence: <...>
+- Current gaps: <未達・残リスク>
+- Attempts: <直近の失敗 signal と次に避けること>
+- Subgoals: <pending / in_progress / complete / failed / blocked / review_blocked / superseded>
+- Next action: <worker / verifier / replan / handoff>
 ```
 
 Status rules:
@@ -196,7 +151,7 @@ Pruning rule:
 - 同じサブタスクで attempt が 5 件を超えたら、古い詳細は要約し、最新・再発防止に必要な教訓だけ残す。
 - attempt 数が 4 を超える前に replan / oscillation trigger を見直す。
 
-## 運用ヒント
+## 運用ルール
 
 - ledger は会話内に書いて更新すれば十分。長い・多段ゴールでファイル化するなら
   作業フォルダ配下（例 `tmp/` や日付フォルダ）に置き、Phase 7 で不要なら cleanup する。

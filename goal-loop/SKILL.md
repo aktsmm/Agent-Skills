@@ -25,68 +25,63 @@ metadata:
 - 普通の相談、計画だけ、コードレビューだけ、事実確認だけ。
 - skill / prompt / instruction / agent 自体の設計レビュー。まず `skill-creator-plus` や `agentic-workflow-guide` を使う。
 
-## Core Rules
+## Execution Contract
 
-- **Scope 合意は必須**。Phase 1 で Scope Terminus、Goal、Acceptance Criteria、Primary Verifier、Out of Scope、must NOT、Autonomy Mode、Persistence Profile を合意して freeze する。合意前に実行へ進まない。
-- **外部 signal を一次情報にする**。test / lint / build / grep / schema / live surface の exit code や観測結果で判定する。自己評価だけで PASS しない。
-- **orchestrator は実作業を抱え込まない**。調査・実装・検証は利用可能な subagent tool（例: `runSubagent` がある環境ではそれ）で worker / verifier に委譲し、delta evidence だけ受け取る。
-- **workers は goal state を所有しない**。worker は evidence を返すだけ。checkpoint / complete / blocked 判定は orchestrator が ledger で行う。
-- **大きな変更は Small-Bet-First**。backup → pilot → verify → expansion の順で進める。
-- **ループは多層 stop で止める**。max iteration だけに頼らず、stall / oscillation / diminishing returns / budget / genuine blocker を見る。
+- Freeze scope, AC, verifier, out-of-scope, must NOT, autonomy, and persistence before execution.
+- Keep a compact ledger: AC status, evidence, attempts, gaps, and next action.
+- Delegate broad research, mutation, and primary verification when workers are available; workers return evidence only.
+- Judge by external signals first. Never PASS from self-evaluation, supporting checks alone, skipped tests, TODOs, or weakened criteria.
+- On failure, update the ledger from the failed signal, change approach, and avoid repeating attempts.
+- Use Small-Bet-First for broad, irreversible, dependency, schema, deployment, or user-facing changes.
+- Stop or replan on stall, oscillation, diminishing returns, budget exhaustion, or genuine external blockers.
 
 ## Phase 1: Scope + Criteria Freeze
 
 Use [criteria-agreement.md](./references/criteria-agreement.md).
 
-- ゴールの終点に幅がある場合は、実行前に選択式の確認を 1 回だけ挟む。
-- 各 Acceptance Criteria には `verify:` を必ず付ける。検証不能な基準は検証可能な形に書き直す。
-- deploy / runtime / UI / app では、build や control-plane 成功を primary verifier にしない。ユーザーが触れる live surface を primary にする。
-- Normal では criteria を自分で緩めない。超自律でも criteria 変更は記録+通知し、original と revised の達成状態を分ける。
+- Freeze goal, scope terminus, AC with `verify:`, primary verifier, out-of-scope, must NOT, autonomy, and persistence.
+- If the finish line is ambiguous, ask one structured question before execution.
+- Do not use build/control-plane success as the primary verifier when the real outcome is deploy / runtime / UI / app behavior.
 
 ## Phase 2: Plan Minimal Subgoals
 
 Use [steering-and-final-gates.md](./references/steering-and-final-gates.md) and [ledger-templates.md](./references/ledger-templates.md).
 
-- Effort Scaling で重さを選び、些末タスクならこの skill から降格する。
-- 検証可能な最小サブゴール列へ分解する。
-- `pending` / `in_progress` / `complete` / `failed` / `blocked` / `review_blocked` / `superseded` で状態を記録する。
-- 独立した read-only 調査だけ並列にし、mutation は直列にする。
+- Pick the lightest effort level that still protects the goal; downgrade trivial work.
+- Split into verifiable subgoals, record status, parallelize only independent read-only work.
 
 ## Phase 3: Delegate Workers
 
 Use [loop-control.md](./references/loop-control.md).
 
-- 大きい変更は pilot から始める。FAIL した pilot を全体へ展開しない。
-- worker prompt には該当サブゴール、受入基準、境界、禁止事項、過去 attempt の教訓、期待する evidence だけ渡す。
-- subagent tool が無い環境では黙って main context で代行しない。小規模へ降格するか degraded mode を ledger に記録して進める。
+- Start broad or risky changes with a pilot; never expand a failed pilot.
+- Give workers only the subgoal, AC, boundaries, must NOT, relevant attempt lessons, and expected evidence.
+- If no subagent tool exists, record degraded mode; only downgraded small work may run in main context.
 
 ## Phase 4: External Verification
 
-- worker / verifier が Phase 1 の `verify:` を実行し、exit code と実出力を返す。
-- primary verifier が capability gap で実行不能なら、弱い検証で完了扱いにしない。Deferred / Next Actions に手動検証手順と必要 evidence を残す。
+- Run the frozen `verify:` steps and capture exit codes, logs, screenshots, readbacks, or capability gaps.
+- If the primary verifier is unavailable, record exact manual verification steps and required evidence; do not complete from weaker checks.
 
 ## Phase 5: Evaluate
 
 Use [evaluation-rubric.md](./references/evaluation-rubric.md).
 
-- 外部検証の出力を rubric で criteria と項目単位に突合する。
-- 小規模・read-only・低リスクを除き、evaluator は worker とは別 subagent にする。
-- PASS はすべての must 基準 PASS かつ confidence 閾値以上のときだけ。
+- Reconcile evidence against each AC. Use a separate evaluator for non-small or non-read-only work.
+- PASS only when every must AC passes and confidence is above threshold.
 
 ## Phase 6: Loop Control
 
 Use [loop-control.md](./references/loop-control.md).
 
-- 未達なら Progress Ledger を更新し、外部 signal 起点で reflection する。
-- 前進が止まったら worker 増設ではなく replan する。
-- Blocker Test で本物のブロッカーと判定できるまで HITL に逃げない。
+- If unmet, update the ledger from the external signal and replan before adding workers.
+- Escalate only after the Blocker Test proves the blocker is external or structural.
 
 ## Phase 7: Report or Handoff
 
-- 各 AC の `verify:` 結果、primary verifier、supporting checks を分けて示す。
-- 大きな変更では final quality gate と independent review を通す。orchestrator が自分の成果に最終 PASS を出さない。
-- Deferred / Next Actions、backup の場所と戻し方、criteria 変更、残リスクを簡潔に報告する。
-- 一時ファイルや scratch ledger は cleanup する。途中停止時は再開に必要な ledger state を残す。
+- Report AC-by-AC status, primary evidence, supporting checks, capability gaps, criteria changes, and residual risks.
+- For high-risk changes, include final quality gate and independent review evidence.
+- Cleanup scratch state unless it is needed for resumability.
 
 ## References
 
