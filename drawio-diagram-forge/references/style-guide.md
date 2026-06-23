@@ -180,6 +180,15 @@ fontSize=12;fontStyle=0;fontFamily=Helvetica;
 | Edge label  | 10px      |
 | Group title | 14px      |
 
+For book/PDF diagrams that are scaled down by the publishing pipeline, raise the floor before export:
+
+- Use at least `13px` for minor labels, `15-17px` for edge/action labels, and `17-23px` for primary state or step nodes.
+- Delete legend, tips, and sentence-like explanations from the figure when the surrounding text already explains them. Extra text shrinks the real teaching labels.
+- Use dead whitespace to enlarge boxes and labels, then shrink-wrap the canvas. A wide empty margin makes every label smaller in the final PDF.
+- Put arrow labels on their own lane, or remove labels already implied by nearby text. Never let a label hide the arrow shaft or arrowhead.
+- For hierarchy diagrams, stack sparse sibling groups vertically when that lets labels and child boxes grow.
+- For workflow diagrams, move trigger/source groups above the main workflow when side-by-side placement creates wasted width.
+
 ## Export for PDF Pipelines
 
 When diagrams are embedded in PDF (via Re:VIEW, LaTeX, Pandoc, etc.):
@@ -192,3 +201,5 @@ When diagrams are embedded in PDF (via Re:VIEW, LaTeX, Pandoc, etc.):
 - `--scale 2` produces 2× resolution for crisp text at print DPI.
 - The exported SVG from draw.io CLI is "plain SVG" (not re-editable in the VS Code Draw.io extension). Keep the `.drawio` as the editable source.
 - For Markdown preview, reference `*.drawio.svg`. For PDF build, use the PNG export.
+- Render the final PDF page, not only the exported PNG. The publishing layer may scale, float, or move the image.
+- If changing a wrapper macro does not affect image size, inspect generated TeX for per-image options such as `width=\maxwidth`. In that case, enlarge the diagram content and shrink-wrap the canvas instead of assuming the global width rule applies.
