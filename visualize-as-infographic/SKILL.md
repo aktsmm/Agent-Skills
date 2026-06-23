@@ -22,7 +22,12 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 
 - Target: explicit argument if provided; otherwise summarize the latest relevant session context.
 - Usage: default is X / SNS. If the user mentions book chapter inserts, OGP, slide, or PDF, adapt the ratio and style.
-- Ask at most one clarifying question only if the output would materially change.
+- If brightness, signature/title text, or aspect ratio are unspecified, ask once before authoring with compact choices:
+  - Brightness: default dark / brighter / white background
+  - Signature or title mark: default none / small mark / specify text
+  - Ratio: default X multi-pattern / 16:9 only / square only
+- Treat `default` as the normal fallback when the user says default or gives no preference. Do not use a separate `omakase` option when it means the same thing as default.
+- Ask additional clarifying questions only if the output would materially change.
 
 ## Output Defaults
 
@@ -45,21 +50,26 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 - Use stable dimensions for cards, badges, rails, and panels so text or icons cannot push adjacent elements.
 - For chapter inserts, match the book's palette and mood; do not force SNS-dark neon styling if the publication design is quiet.
 - Do not add signatures, account names, license text, or skill names unless the user asks.
+- Do not render usage labels or production notes such as `X main`, `best use`, or `list + highlight` in image corners. Keep usage and recommendation notes in the completion report only.
 
 ## Rendering Procedure
 
 1. Create the output folder.
 2. Create independent HTML files. Do not pack multiple patterns into one HTML.
 3. Render with Playwright. Prefer Python Playwright if available. A helper script is provided: [render_infographics.py](./scripts/render_infographics.py).
-4. Render at `device_scale_factor=2`, wait 1-1.5 seconds after page load for fonts.
-5. Inspect every PNG with `view_image`.
-6. If any PNG has overlap, clipping, unreadable text, wrong order, or excessive density, fix the HTML, render again, and re-check that PNG.
-7. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
+4. Use viewport-size clipping, not `fullPage`, when decorative elements can overflow the poster. `fullPage` may capture off-canvas decoration and create white margins.
+5. Use `domcontentloaded` plus a short fixed wait if external fonts make `load` or `networkidle` hang.
+6. Use `device_scale_factor=1` when the PNG must be the stated size. Use `2` only when high-density output is desired and the larger pixel dimensions are acceptable.
+7. Inspect every PNG with `view_image`.
+8. If any PNG has overlap, clipping, unreadable text, wrong order, unexpected margins, wrong pixel size, or excessive density, fix the HTML or renderer, render again, and re-check that PNG.
+9. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
 
 ## Visual QA Checklist
 
 - No text overlaps other text, icons, rails, cards, or borders.
 - No content is clipped at the image edge.
+- No unintended white margins or oversized canvas from screenshot capture.
+- Pixel dimensions match the promised output size unless high-density output was explicitly chosen.
 - Step numbers and visual order match DOM / reading order.
 - Card text fits without cramped line breaks.
 - Contrast is readable on the final PNG, not just in HTML.

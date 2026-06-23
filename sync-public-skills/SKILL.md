@@ -1,8 +1,11 @@
 ---
 name: sync-public-skills
 description: Sync curated skills from the private skill repo to public, EMU private, and GIM internal repos, then push or mirror as needed. Use when publishing/updating public skills, syncing private→public, or running internal/private skill sync for EMU and GIM. Audits license, duplication, visibility, and secrets before publishing. Triggers on "sync public skills", "publish skills", "public 公開", "private を public に同期", "EMU internal skill sync", "GIM internal skill sync".
+argument-hint: "対象 skill 名、private/public/EMU/GIM repo path（任意）、mode（safe-auto / review-only / dry-run / all）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
 ---
 
 # sync-public-skills
@@ -11,9 +14,9 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## Scope
 
-- 対象 source: private repo の `.github/skills/<skill>/`（native skill）と `copilot-skills/{skills,m-skills}/`（`.copilot` 由来ミラー）
+- 対象 source: private repo の `.github/skills/<skill>/`（native skill）と `copilot-skills/skills/<skill>/`（`.copilot` 由来ミラー）。`copilot-skills/m-skills/<skill>/` は legacy/手動 opt-in として、明示時だけ扱う
 - 公開先: public skill repo, EMU private repo, GIM internal repo
-- 配布（public/private → 実行環境 `~/.copilot`）は Agent Skills Ninja の担当。この SKILL は public 公開のみを扱う
+- 配布（public/private → 実行環境 `~/.copilot`）は Agent Skills Ninja の担当。この SKILL は repo への同期 / 公開だけを扱う
 
 ## Environment
 
@@ -26,13 +29,13 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## Mode
 
-- 既定は `safe-auto`: 監査 → 行き先別に安全な skill だけ sync → push
+- 既定は `safe-auto`: この skill が明示実行された場合に限り、監査 → 行き先別に安全な skill だけ sync → push まで進める
 - `review-only` / `dry-run` / `プレビュー` 指定時は、候補・監査・予定差分・commit message を提示して停止する
 - `all` 指定時は、`primary` だけでなく private repo の未コミット skill 差分も対象にする（下記 All Mode）
 
 ## All Mode（`all` 指定時の dirty 取り込み）
 
-- 対象は skill content のみ: `.github/skills/<skill>/**` と `copilot-skills/{skills,m-skills}/<skill>/**`。`.skill-meta.json` と shared file（README / assets）は除外する
+- 対象は skill content のみ: `.github/skills/<skill>/**` と `copilot-skills/skills/<skill>/**`。`copilot-skills/m-skills/<skill>/**` は legacy/手動 opt-in 時だけ対象にする。`.skill-meta.json` と shared file（README / assets）は除外する
 - `.skill-meta.json` が未追跡で dirty に出たら local-only metadata とみなし、stage せず削除してよい。tracked なら自動削除せず停止する
 - skill 以外の dirty（scripts、設定、無関係ファイル、`/memories/**`）はコミットしない。混在すれば stage せず Not Done に列挙する
 - 各 dirty skill を skill 単位で個別コミットする（`feat|fix|docs(<skill>): ...`）。複数 skill を 1 コミットに混ぜない
@@ -57,11 +60,11 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 `copilot-skills/`（`.copilot` 由来ミラー）を broad sync で public へ出す前に、skill 単位で 3 観点を監査し、除外対象を `Sync-AndPush.ps1 -ExcludeCopilotSkills` に渡す。primary-only では primary の分類と漏れ込み確認だけを行い、対象外 skill の公開可否を毎回再判定しない。判断は必要時にここで行い、script にハードコードしない。
 
-- ①ライセンス: 第三者 Proprietary は除外。Anthropic / Microsoft Scout ビルトイン（`docx` / `pptx` / `xlsx` 等、LICENSE.txt が複製・派生・サービス外保持を禁止）は public 不可。LICENSE 不明（`expense-report` / `receipt-ocr` / `loop` / `excalidraw` 等）は安全側で除外。Apache 2.0 等の再配布可ライセンス（`web-artifacts-builder` 等）は LICENSE / NOTICE を保持して公開可
+- ①ライセンス: 第三者 Proprietary は除外。Anthropic / Microsoft Scout ビルトイン（`docx` / `pptx` / `xlsx` 等、LICENSE.txt が複製・派生・サービス外保持を禁止）は public 不可。LICENSE 不明（`expense-report` / `loop` / `excalidraw` 等）は安全側で除外。Apache 2.0 等の再配布可ライセンス（`web-artifacts-builder` 等）は LICENSE / NOTICE を保持して公開可。自作 skill（`receipt-ocr` / `permission-max` / `x-twitter-browser-ops` 等）は license / metadata.author / LICENSE.txt が揃っていれば公開候補にできる
 - ②DUP: 同名 skill が private repo `.github/skills/<skill>/` にある場合は、そちらを正として copilot-skills 側を public から除外する（二重公開防止）
-- ③機密: ユーザー名、ローカル絶対パス、Tenant ID、顧客名、個人メールを含む skill は、一般化できないなら除外する。一般化済みの自作 skill（`export-session-log` / `m365-copilot-research` / `retro-private-skills` / `permission-max` 等）は公開可
-- 既定ブラックリスト例: `docx,pptx,xlsx,expense-report,receipt-ocr,loop,excalidraw`（①②）＋ `.github/skills` と重複する skill（②）。新規 skill が増えたら上 3 観点で再判定してリストを更新する
-- `Sync-AndPush.ps1` は hard denylist（native: `c360-operations` / `excel-plus`、copilot: 上記ビルトイン 7 件）を引数に関わらず常に除外する。ここで確定する除外名は、それに上乗せする判断分だけ渡す
+- ③機密: ユーザー名、ローカル絶対パス、Tenant ID、顧客名、個人メールを含む skill は、一般化できないなら除外する。一般化済みの自作 skill でも license / metadata.author / LICENSE.txt の provenance が揃うまでは public へ出さない
+- 既定ブラックリスト例: `docx,pptx,xlsx,expense-report,loop,excalidraw`（①②）＋ `.github/skills` と重複する skill（②）。新規 skill が増えたら上 3 観点で再判定してリストを更新する
+- `Sync-AndPush.ps1` は hard denylist（native: `c360-operations` / `excel-plus`、copilot: 上記 6 件）を引数に関わらず常に除外する。ここで確定する除外名は、それに上乗せする判断分だけ渡す
 
 ## EMU Private Sync Gate
 
@@ -114,4 +117,5 @@ org-owned internal repo（既定 `gim-home/yamapan-skills`）へ MS 社内向け
 
 - `Sync-AndPush.ps1` は機械適用のみ。除外は `-ExcludeSkills`（native）/ `-ExcludeCopilotSkills`（copilot-skills）で渡し、internal mirror は `-SyncEmu` / `-SyncInternal`（`-EmuDryRun` / `-InternalDryRun` で preview）を明示する
 - 公開可否・internal 振り分けの判断はこの SKILL（と同名 prompt）が持つ。script は受け取ったリストを機械適用するだけ
-- push は明示実行のときだけ。VS Code では同名 prompt を使う
+- push はこの skill が明示実行され、`review-only` / `dry-run` でない場合だけ行う。VS Code では同名 prompt を使う
+

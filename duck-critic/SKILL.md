@@ -47,6 +47,7 @@ This is a loop. The producer advances to a checkpoint, the critic reviews, the p
    - Target types: `plan`, `diff`, `code`, `tests`, `design`, `architecture`, `deployment`, `security`.
    - Record the user goal, acceptance criteria if known, constraints, evidence already collected, and the current proposed approach.
    - Pick the route: native Rubber Duck inside GitHub Copilot CLI (`/rubber-duck <question>` or `Rubber duck your plan.`), or a fallback critic from [harness adapters](./references/harness-adapters.md). Use one critic lane by default; choose extra lanes from [model lanes](./references/model-lanes.md) only for broad, risky, or security-sensitive work.
+   - When running multiple critic lanes, separate them by **observational axis** so findings stay orthogonal: (1) correctness / facts / spec compliance, (2) structure / design / convention, (3) reception / second-order / reader-or-runtime impact. The axes are domain-agnostic. Example for an article: fact-check / structure & style / reader experience. Example for code: correctness & spec / API & architecture / runtime & security. Pick the 2–3 axes that matter for this checkpoint.
 2. Produce up to a checkpoint (producer).
    - Advance the actual work — draft the plan, write the code, or write the tests — until you reach a high-leverage checkpoint from [loop protocol](./references/loop-protocol.md).
 3. Build a compact critic packet.

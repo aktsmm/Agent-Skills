@@ -52,11 +52,15 @@ def main() -> int:
                 png_path = html_path.with_suffix(".png")
                 page = browser.new_page(
                     viewport={"width": width, "height": height},
-                    device_scale_factor=2,
+                    device_scale_factor=1,
                 )
-                page.goto(html_path.as_uri(), wait_until="load")
-                page.wait_for_timeout(1400)
-                page.screenshot(path=str(png_path), full_page=True)
+                page.goto(html_path.as_uri(), wait_until="domcontentloaded", timeout=5000)
+                page.wait_for_timeout(700)
+                page.screenshot(
+                    path=str(png_path),
+                    full_page=False,
+                    clip={"x": 0, "y": 0, "width": width, "height": height},
+                )
                 page.close()
                 print(f"rendered {png_path.name} {width}x{height}")
         finally:

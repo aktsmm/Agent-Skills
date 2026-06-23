@@ -54,6 +54,23 @@ Before large-scale drafting begins, decide two policy points explicitly.
 Speculative prose becomes expensive to detect once it has spread across multiple chapters.
 Likewise, diagrams often drift into all-English labeling even when the manuscript is written for another language audience, which creates avoidable reading friction.
 
+## Review-Issue Fix Hygiene
+
+When applying reviewer feedback to final manuscript files, treat the cited line as the starting point, not the whole scope.
+
+### Recommended Rule
+
+- Fix the cited defect, then grep the same chapter and all manuscript sections for the same pattern
+- Look for authoring residue such as source-question IDs, priority labels, review-template headings, `TODO`, `要確認`, `本文に入れて`, and similar planning language
+- Decide whether cross-chapter references like "covered later" are reader-facing bridges or internal planning notes before editing them
+- If section edits change manuscript length, refresh the workspace's character-count or page-allocation tracker in the same task
+- Check the matching outline/key-points file and update it only when structure, terms, or required coverage changed; record "no update needed" when the edit is prose-only
+
+### Why This Matters
+
+Reviewer issues often reveal a repeated authoring artifact, not just a single typo.
+Stopping at the quoted sentence leaves near-duplicates in other sections, while editing every search hit blindly can remove useful reader-facing navigation.
+
 ## Automation
 
 | File                              | Why edit it                                                       |
