@@ -72,6 +72,8 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - Ask for confirmation only for broad rewrites, deletion, ambiguous private/public boundaries, or possible secret/customer/private data handling
 - In `safe-auto`, create a focused local commit by default. If the private repo is 3 or more commits ahead of origin after the commit, push without an additional explicit user instruction. If it is 1-2 commits ahead, do not push.
 - Before any automatic push, verify the remote is the private repo, the working tree is clean, and the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
+- Treat dirty primary skill changes as authoring or intake material. In safe-auto, stage and commit only the target skill changes, and leave unrelated dirty paths untouched.
+- Do not run public, internal, or EMU sync from this skill. If distribution is needed, hand off the primary to `sync-public-skills` in the completion report.
 
 ## Routing Rules
 
@@ -101,6 +103,7 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 
 - Resolve private repo root.
 - Verify `.github/skills/` exists.
+- Check `git status --short --branch` plus ahead/behind, and classify dirty paths by skill. Do not stage dirty paths outside the target skill.
 - List candidate skills and read the most likely `SKILL.md` files. For large repos or thorough audits, delegate this inventory step to a sub-agent so scope is settled before extracting learnings.
 - If a `skill-creator-plus` skill exists in the private repo, follow its structure and review guidance for new or heavily changed skills.
 

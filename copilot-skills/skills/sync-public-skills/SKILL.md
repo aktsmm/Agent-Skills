@@ -42,6 +42,8 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## Gates（公開前に必ず確認）
 
+- `dirty` は sync 必要性ではなく、未確定 authoring の gate として扱う。通常 sync の要否は private source path と public / EMU / GIM destination path の content diff で判定する
+- primary が明示されている場合、既定の確認範囲は primary とその同期経路に限定する。全 skill 棚卸し、全 duplicate、全 copilot-skills license audit は `all` / `broad` / `audit` / `棚卸し` が明示された場合だけ行う
 - private-only / internal-only / MS 社内向け skill は public sync から除外する。社内限定は EMU private repo や GIM internal repo 経路へ逃がす
 - `.skill-meta.json` は local-only metadata として、dirty 判定 / stage / push / public diff から除外する
 - shared file（`.github/skills/README.md`、`assets/**`、自動生成の `.github/skills/LICENSE`）は skill commit と分離する。broad sync 後に `LICENSE` だけ generated drift が残ったら内容を確認し、意図どおりなら sync/index commit へ分ける
@@ -53,7 +55,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## Copilot-Skills Public Audit（license / DUP / secret）
 
-`copilot-skills/`（`.copilot` 由来ミラー）を public へ出す前に、skill 単位で 3 観点を監査し、除外対象を `Sync-AndPush.ps1 -ExcludeCopilotSkills` に渡す。判断は毎回ここで行い、script にハードコードしない。
+`copilot-skills/`（`.copilot` 由来ミラー）を broad sync で public へ出す前に、skill 単位で 3 観点を監査し、除外対象を `Sync-AndPush.ps1 -ExcludeCopilotSkills` に渡す。primary-only では primary の分類と漏れ込み確認だけを行い、対象外 skill の公開可否を毎回再判定しない。判断は必要時にここで行い、script にハードコードしない。
 
 - ①ライセンス: 第三者 Proprietary は除外。Anthropic / Microsoft Scout ビルトイン（`docx` / `pptx` / `xlsx` 等、LICENSE.txt が複製・派生・サービス外保持を禁止）は public 不可。LICENSE 不明（`expense-report` / `receipt-ocr` / `loop` / `excalidraw` 等）は安全側で除外。Apache 2.0 等の再配布可ライセンス（`web-artifacts-builder` 等）は LICENSE / NOTICE を保持して公開可
 - ②DUP: 同名 skill が private repo `.github/skills/<skill>/` にある場合は、そちらを正として copilot-skills 側を public から除外する（二重公開防止）
@@ -84,16 +86,18 @@ org-owned internal repo（既定 `gim-home/yamapan-skills`）へ MS 社内向け
 ## Sync Strategy
 
 - 今回同期する明示 skill を `primary` とする
-- `primary` が clean かつ commit 済みなら、unselected dirty があっても即停止しない
+- 対象 skill が明示されている場合は、その skill の readiness、source/destination diff、漏れ込みだけを先に確認する。既定は `primary-only` とする
+- `primary` が clean かつ commit 済みなら、unselected dirty があっても即停止しない。dirty が primary path にある場合は未確定 authoring とみなし、`all` 指定がない限り `retro-private-skills` へ戻す
+- private repo が clean で ahead の場合は、sync 前に remote private へ push してよい。private repo が clean かつ remote と同期済みでも、destination と content diff があれば sync 対象にする
 - `all` 指定時は unselected dirty を放置せず、All Mode で skill 単位にコミットしてから sync する
 - unselected dirty が public sync に漏れ得る場合は、main repo で直接実行せず isolated path を使う
 - isolated path: current HEAD の一時 clean worktree（同等の clean source）で public repo の `<primary>/` だけを更新する
-- `primary-only` では他 skill directory の削除、shared file 更新、broad 一括削除ロジックを使わない
+- `primary-only` では他 skill directory の削除、shared file 更新、broad 一括削除ロジックを使わない。public / internal diff が selected primary destination path だけであることを検証する
 
 ## Workflow
 
-1. private / public / script、必要なら EMU / GIM repo を解決し、`primary`・branch / remote・local commits・dirty 状態を確認する
-2. readiness を監査し、`shared-dirty` / `private-only-dirty` / `unselected-dirty` が public / EMU / GIM sync に漏れるかを判定する。`copilot-skills/` を含む場合は Public Audit の 3 観点でブラックリストを確定する
+1. private / public / script、必要なら EMU / GIM repo を解決し、`primary`・branch / remote・ahead/behind・dirty 状態を確認する
+2. `primary` の readiness と source/destination content diff を確認し、`shared-dirty` / `private-only-dirty` / `unselected-dirty` が public / EMU / GIM sync に漏れるかを判定する。broad sync で `copilot-skills/` を含む場合だけ Public Audit の 3 観点でブラックリストを確定する
 3. `all` 指定時は、All Mode に従い未コミットの skill 差分を skill 単位でコミットする（skill 以外の dirty は除外し Not Done へ回す）。コミット後に各 skill の public / EMU / GIM 振り分けを監査する
 4. safe path を選ぶ
    - 直接実行: 漏れ込みが無い場合は `Sync-AndPush.ps1 -Message "sync: <skill summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
