@@ -1,6 +1,6 @@
 ---
 name: "retro-private-skills"
-description: "Reflect reusable learnings into the private skill repository under .github/skills only. Use when: private skill retro, private skill repo authoring, private skill fix, create/update private SKILL.md, or converting the retro-private-skills prompt into Scout skill behavior."
+description: "Reflect reusable learnings into the private skill repository under .github/skills only, with safe-auto local commit and conditional push when the private repo is 3+ commits ahead. Use when: private skill retro, private skill repo authoring, private skill fix, create/update private SKILL.md, or converting the retro-private-skills prompt into Scout skill behavior."
 ---
 
 # retro private skills
@@ -70,6 +70,8 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - `review-only`, `dry-run`, or `プレビュー`: propose target changes and stop before editing
 - In `safe-auto`, edit directly when scope is clear, the safety gate passes, and the change is small or medium
 - Ask for confirmation only for broad rewrites, deletion, ambiguous private/public boundaries, or possible secret/customer/private data handling
+- In `safe-auto`, create a focused local commit by default. If the private repo is 3 or more commits ahead of origin after the commit, push without an additional explicit user instruction. If it is 1-2 commits ahead, do not push.
+- Before any automatic push, verify the remote is the private repo, the working tree is clean, and the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
 
 ## Routing Rules
 
@@ -118,7 +120,7 @@ Choose exactly one:
 - For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
 - For heavily changed existing skills, re-check frontmatter instead of assuming old metadata still routes correctly.
 - Add `references/` only when detail would bloat `SKILL.md`.
-- In `safe-auto`, make a local commit by default when the scope is clear and all changed paths are intended. Never push.
+- In `safe-auto`, make a local commit by default when the scope is clear and all changed paths are intended. Then push only when the private repo is 3+ commits ahead of origin and the automatic-push checks pass.
 
 ### 4. Bloat Check
 
@@ -134,7 +136,7 @@ Before final response:
 - Check description includes both what the skill does and when to use it, with trigger phrases users actually say.
 - Check required optional metadata is intentional: `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added.
-- Commit by default in `safe-auto`; commit only intended private skill repo changes and never push.
+- Commit by default in `safe-auto`; commit only intended private skill repo changes. Push only when the private repo is 3+ commits ahead of origin and the remote/clean-tree checks pass.
 
 ## Output
 
