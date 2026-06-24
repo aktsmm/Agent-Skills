@@ -59,3 +59,11 @@ prevention gate を通り抜けて漏洩した場合の復旧手順。internal s
 - **fork は親削除でも残る**。fork は独立 repo に昇格し旧 object を保持するため、申請文で fork 一覧も purge 依頼する
 - **star/fork がある repo は delete より rename**。rename は star / fork / URL redirect を維持し、削除のデメリットがない。新名で作り直したい場合も rename を優先する
 - **ローカル move の罠**: cross-directory の `Move-Item` は途中失敗で `.git` を空殻化することがある。`robocopy <src> <dst> /MOVE /E` を使い、`.git` が壊れたら GitHub から fresh clone で置き換える（GitHub 側が intact なら最も確実）
+
+## Sync Operational Hazards（broad sync 実行時の事故防止）
+
+`Sync-AndPush.ps1` の broad sync は「source にない skill を public から削除」するため、source が空だと public 全削除になる。実際に repo rename 後の env stale で 2 回起きた（2026-06-24）。
+
+- **env stale → public 全削除**: repo path / repo 名を rename した後、rename 前に起動した既存ターミナルは古い `SYNC_PUBLIC_SKILLS_PRIVATE_REPO` を保持する。`$DevRepo` が存在しない旧パスに解決され、source skill 0 件 → コピー 0 件 → 削除ループで public 全 skill が消える。対策として script に **DevRepo 健全性 Guard**（Step 0.0: source skill 数が下限 `$MinSourceSkills` 未満なら abort）と **削除 abort Guard**（コピー 0 件なら public 削除を中止）の二重防御を実装済み。rename 後は新ターミナルで env を読み直すか、プロセスに `$env:...` で明示注入してから sync する
+- **pwsh 7 専用**: `Sync-AndPush.ps1` は PowerShell 7 構文を使う。Windows PowerShell 5.1 で起動すると 40+ の parse error で落ちる。必ず `pwsh` で実行する（`powershell.exe` ではない）
+- **復旧手順**: 全削除に気づいたら、削除直前の正常 commit へ `git reset --hard <good-sha>` + `git push --force` で即復元できる（public repo の 1 commit 前がクリーンなら最速）
