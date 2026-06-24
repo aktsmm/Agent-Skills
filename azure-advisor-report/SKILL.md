@@ -92,7 +92,7 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
   ```
 - JSON の集計・ピボット処理は **Python を優先**（`json` + `collections.defaultdict`）
   - PowerShell は DateTime 型の自動変換で `.SubString()` エラーが頻発するため回避
-- Cost Management API は **JPY**（日本リージョン）、C360 CSV は **USD** — 通貨を必ず明示
+- Cost Management API は **JPY**（日本リージョン）、顧客ダッシュボード CSV は **USD** — 通貨を必ず明示
 - Cost Management Query API は 429 になりやすいため、半年分析では **月次 × ServiceName** を先に取得し、合計は ServiceName 行の合算で検算する。ResourceGroup / ResourceId の深掘りはスパイク月に限定する
 - コスト削減候補を提示する場合は、削除実行ではなく「要確認」「親リソースから確認」「削除候補」に分類する。`Do Not Delete` タグ、削除ロック、Backup vault、Activity Log Alerts、NetworkWatcher、managed resource group は安全側に倒して扱う
 - コスト上位リソース表では **リソース種類・現在状態** を併記する。MTD コストには削除済み/削除中リソースも残るため、現存リソース一覧と join して誤解を避ける
@@ -103,7 +103,7 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 汎用 PPTX 衛生ルール（スライドノート必須、フォント下限、テーブル列幅、`.tmp.pptx` で生成して PermissionError 回避、ヘルパー関数の扱いなど）は **powerpoint-automation** skill を SSOT とする。本レポート固有のルールのみ以下に残す。
 
 - **既存フル構成の継承**: 既存顧客に過去の完成度が高い PPTX / generator がある場合、別の薄い新規 deck を作らず、既存のフル構成へ最新データを差し替える。比較軸・カテゴリ別章・speaker notes が落ちると前回品質より劣化するため
-- **データソース取得日必須**: 表紙または補足で各データソースの取得日を明示する（Cost=JPY / C360=USD のように通貨も併記）
+- **データソース取得日必須**: 表紙または補足で各データソースの取得日を明示する（Cost=JPY / 顧客ダッシュボード=USD のように通貨も併記）
 - **スライドデータは新規記述**: テンプレート流用はヘルパー関数のみ。スライドデータ部分のコピー＆置換は旧顧客データが残存するため禁止
 
 ### Advisor データ取得のルール

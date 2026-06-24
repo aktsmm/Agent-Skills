@@ -23,7 +23,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 ## Not the Best Fit
 
 - API や CLI だけで完結する read/write は、まず該当 domain skill / script を使う
-- PowerPoint / Loop / Dynamics 365 MyExpense など専用 skill がある UI は、該当 skill の操作ルールを優先する
+- PowerPoint / Loop / Dynamics 365 の expense entry 画面など専用 skill がある UI は、該当 skill の操作ルールを優先する
 - 認証情報、秘密情報、MFA 応答をチャットで受け取らない。必要な入力はブラウザ上でユーザーに処理してもらう
 
 ## Choose Mode First

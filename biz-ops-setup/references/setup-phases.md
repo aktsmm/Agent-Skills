@@ -12,7 +12,7 @@ Create the standard workspace folders: `ActivityReport/`, `Customers/`, `Tasks/`
 
 ## Phase 3: Agents and Prompts
 
-Deploy the orchestrator, report, task, data, 1on1, availability, C360, and proposal agents. Deploy daily, weekly, monthly, and operations prompts when the workspace uses them.
+Deploy the orchestrator, report, task, data, 1on1, availability, customer-health, and proposal agents. Deploy daily, weekly, monthly, and operations prompts when the workspace uses them.
 
 ## Phase 4: Customer Workspaces
 
