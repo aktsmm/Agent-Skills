@@ -151,4 +151,5 @@ Use [references/skill-review-checklist.md](references/skill-review-checklist.md)
 - [ ] `user-invocable` is set intentionally
 - [ ] Optional fields are added only when they change behavior
 - [ ] Details moved to references/ (Progressive Disclosure)
+- [ ] Self-Contained: no hard reference to other skills / workspace files; env-specific values (paths, customer names, tenant IDs) abstracted
 - [ ] Review checklist passed

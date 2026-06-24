@@ -42,30 +42,7 @@ Use provided structure artifacts first, then inspect the smallest code/config ra
 
 ## Structure Map Build
 
-If no equivalent structure artifact exists, create a minimal read-oriented structure map before starting findings review. Do not skip this step unless generation is genuinely blocked; record blockers and limits in the Structure Map Summary.
-
-1. Look for existing artifacts in reports, manifest, tmp, CI output, README, package scripts, Makefile, or workflows.
-2. Prefer existing language-aware tools: TypeScript compiler, eslint, dependency graph scripts, language server data, test/coverage config, or standard-library parsers.
-3. Favor maps that include summaries, class/call graphs, function metrics, variable scopes, imports, taint flow, static findings, dependency audit, and high-complexity hotspots.
-4. Avoid installing new dependencies unless clearly justified. Prefer lockfile-backed local tools.
-5. Do not execute the target application behavior just to map it. Keep extraction static or read-only when possible.
-6. Redact secret values. Record only kind and location, not token/password/key material.
-7. For large repos, map entry points, changed files, public APIs, trust boundaries, and dangerous Sink neighborhoods first.
-
-Minimum map contract:
-
-| Item         | Requirement                                                                    |
-| ------------ | ------------------------------------------------------------------------------ |
-| entry_points | CLI, API handlers, commands, jobs, public APIs, workflows                      |
-| files        | reviewed files, language, inferred role                                        |
-| symbols      | classes/functions/methods and inferred responsibility                          |
-| imports      | external deps, dangerous APIs, security-boundary deps                          |
-| call_edges   | caller -> callee edges when practical                                          |
-| complexity   | large or high-branch functions when practical                                  |
-| sources      | HTTP, CLI args, env, files, network, deserialization, LLM input                |
-| sinks        | command, SQL, eval, template, path, file write, network, secret/log, tool call |
-| sanitizers   | validate, escape, normalize, authn/authz, schema checks                        |
-| scan_limits  | missing, approximate, unsupported, or unparsed areas                           |
+同等の成果物がない場合は、findings review に入る前に最小で read-only の structure map を作る。手順（8 steps）と minimum map contract (entry_points / files / symbols / imports / call_edges / complexity / sources / sinks / sanitizers / scan_limits) は [references/structure-map.md](references/structure-map.md)。生成ができない場合は Structure Map Summary に blocker と limits を記録する。
 
 ## Review Flow
 
@@ -89,46 +66,7 @@ Minimum map contract:
 
 ## Output Format
 
-Lead with Findings. If there are no confirmed findings, state that clearly first.
-
-### Findings
-
-| #   | Severity | Confidence | Target | Structural Signal | Reachability | Impact | Defensive Verification | Minimal Fix |
-| --- | -------- | ---------- | ------ | ----------------- | ------------ | ------ | ---------------------- | ----------- |
-
-### Structure Map Summary
-
-| Item      | Value                                                                |
-| --------- | -------------------------------------------------------------------- |
-| Source    | existing artifact / newly generated / quick extraction / unavailable |
-| Artifact  | saved path, or none                                                  |
-| Scope     | reviewed paths and boundaries                                        |
-| Method    | tools, scripts, or manual extraction used                            |
-| Limits    | unparsed or approximate areas                                        |
-| Redaction | redacted secret values, or none applicable                           |
-
-### Hypotheses
-
-| #   | Hypothesis | Missing Evidence | Next Check |
-| --- | ---------- | ---------------- | ---------- |
-
-### Code to Inspect
-
-| Priority | Path / Symbol | Why |
-| -------- | ------------- | --- |
-
-### Recommended Fix Plan
-
-1. Fix clear, reachable, high-impact issues first.
-2. Add safety guards such as size limits, timeouts, input validation, path normalization, auth checks, and log redaction.
-3. Split high-complexity code only where it reduces risk or enables tests.
-4. Verify the Source -> Sink path is blocked or constrained after the fix.
-
-### Verification Summary
-
-- Checks run: command/tool/read-only review performed, or not run with reason
-- Remaining risk: unresolved items, or none
-- External references: URLs used, or none
+Findings -> Structure Map Summary -> Hypotheses -> Code to Inspect -> Recommended Fix Plan -> Verification Summary の順で返す。全テーブルスキーマと Recommended Fix Plan 本文は [references/output-format.md](references/output-format.md)。Findings がゼロの場合はその旨を先頭に明示する。
 
 ## Thanks to / References
 

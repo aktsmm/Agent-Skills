@@ -54,6 +54,8 @@ ws = websocket.create_connection(
 )
 ```
 
+`suppress_origin=True` is the reliable fix for WebSocket `403 Forbidden` (`Rejected an incoming WebSocket connection from the http://127.0.0.1:<port> origin`). It works without relaunching the browser, so prefer it over `--remote-allow-origins=*` when the browser is already running — for example when you launched with `--user-data-dir=<profile>` for login state and only discover the 403 at connect time. Without it, `create_connection` fails the handshake even though `/json/version` and `/json/list` succeed over HTTP.
+
 If the task depends on an already-open draft/editor tab, do not stop at `/json/version`. Query `/json/list`, filter for `type == 'page'`, and pick the tab by URL/title pattern before sending commands.
 
 ```python

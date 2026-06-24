@@ -72,6 +72,46 @@ def upload(yt, mp4: Path, title: str, description: str, tags: list[str],
     return video_id
 ```
 
+## 字幕 (captions) を API でアップロード
+
+正確な `.srt` を載せたいときは **Studio の字幕エディタ UI を使わない**。UI は「セル→ファイルをアップロード→形式選択→**ネイティブ file chooser**→公開」の多段で、ブラウザ自動化だと file chooser がレンダラーをブロックして詰まりやすい。Data API なら冪等で堅牢。
+
+**スコープが別**: 動画 insert は `youtube.upload` だが、**captions は `youtube.force-ssl` が必要**。captions も使うなら token をその両スコープで取り直す。
+
+```python
+SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]  # captions 操作に必須
+
+def upload_caption(yt, video_id, srt_path, lang="ja", name="日本語", replace=False):
+    from googleapiclient.http import MediaFileUpload
+    existing = yt.captions().list(part="snippet", videoId=video_id).execute().get("items", [])
+    # ASR(自動字幕)とは trackKind で区別。手動トラックだけ対象にする
+    ours = [c for c in existing
+            if c["snippet"].get("language") == lang
+            and c["snippet"].get("trackKind") != "ASR"
+            and c["snippet"].get("name") == name]
+    if ours and not replace:
+        return "EXISTS"           # 冪等: 既存ならスキップ
+    if ours and replace:
+        for c in ours:
+            yt.captions().delete(id=c["id"]).execute()
+    body = {"snippet": {"videoId": video_id, "language": lang, "name": name, "isDraft": False}}
+    media = MediaFileUpload(srt_path, mimetype="application/octet-stream", resumable=False)
+    yt.captions().insert(part="snippet", body=body, media_body=media, sync=False).execute()
+    return "INSERTED"
+```
+
+- `sync=False` + `.srt` のタイムコードをそのまま使う（`sync=True` は字幕本文だけ渡して YT 側で時刻推定する別用途）。
+- アップロード後の確認は `captions().list`。手動トラックは `ja/standard/<name>`、自動は `ja/asr/` として両方並ぶ（共存して良い）。
+- クォータ: `captions.insert` ≈ 400 units/本（video.insert 1,600 よりずっと軽い）。
+
+## カスタムサムネは別の認証ゲート
+
+`thumbnails().set` も、Studio UI 手動も、**「ワンタイム認証 / 上級者向け機能」**（自撮り動画 or 身分証、審査 ~24h）が未完了だと使えない。これは**長尺動画用の電話認証とは別物**。未認証だとサムネは数枚だけ通って以降ブロックされることがある。サムネが効かないときはまずこの verification 状態を疑う。
+
+## AI 開示 (改変/合成コンテンツ) の判定
+
+VOICEVOX 等の**合成音声 + イラストキャラ + AI 制作支援(台本/サムネ/字幕生成)**は、YouTube の「開示**不要**」例に該当するので `AI の使用 = いいえ` でよい。開示が要るのは「実在人物が言っていないことを言ったように見せる」「実際の出来事を改変」など写真リアルで誤解を招くもの。合成音声を使っている旨は概要欄クレジットで別途明示すれば誠実性も担保できる。参照: https://support.google.com/youtube/answer/14328491
+
 ## クォータと制約
 
 | 項目 | 値 |

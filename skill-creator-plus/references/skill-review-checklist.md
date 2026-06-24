@@ -178,6 +178,24 @@ Good examples:
 - "Two systems expose similar request identifiers; document the canonical join key."
 - "Append-only history tables need an explicit rule for choosing the active row."
 
+### Issue 6: Not Self-Contained (Hidden Dependencies)
+
+**Symptoms:** Skill works in source repo but breaks when copied / synced elsewhere. Hard reference to a sibling skill, workspace file outside the skill folder, env-specific path (`D:\03_github\...`), customer name, tenant ID, or `~/.copilot/skills/...` link.
+
+**Allowed:**
+
+- Loose reference by skill name as a string (registry / denylist patterns). Loss of the named skill should degrade gracefully, not crash.
+- Links to files **inside the skill folder** (`./scripts/`, `./references/`, `./assets/`).
+
+**Not allowed:**
+
+- `../other-skill/...` links
+- Absolute paths (`D:\...`, `/Users/...`)
+- Customer / tenant / personal identifiers without abstraction (use `<placeholder>`)
+- "See instruction X in the workspace" without bundling the content here
+
+**Fix:** Bundle the knowledge into `references/` or `scripts/`. Abstract env-specific values to placeholders or arguments. Keep registry-style references as strings, but ensure the skill itself runs without them.
+
 ## Review Template
 
 ```markdown

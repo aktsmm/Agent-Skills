@@ -18,6 +18,7 @@ If `/json/list` works but `Runtime.evaluate` or `Page.enable` times out, suspect
 - Try `Page.handleJavaScriptDialog({accept: false})`.
 - If no native dialog exists, close in-page overlays with DOM/Escape.
 - Browser system dialogs may not be controllable by CDP; ask the user to cancel rather than retrying blindly.
+- Hard reset when a native dialog has wedged the renderer: closing the wedged tab releases the dialog. But closing the LAST tab via `/json/close/<id>` exits the whole browser process and the debug port closes — relaunch the browser with the same port + profile to recover. Keep a second blank tab open if you want to close a wedged tab without killing the browser.
 
 ## Context / Page Selection
 

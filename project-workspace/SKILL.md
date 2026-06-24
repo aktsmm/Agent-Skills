@@ -1,6 +1,6 @@
 ---
 name: project-workspace
-description: "Create and manage topic-specific project workspace folders for validation, investigation, PoC, comparison, or workstream projects. Use when creating/opening a project workspace, validation folder, topic-specific work folder, or cost comparison workspace."
+description: "Create and manage topic-specific project workspace folders for validation, investigation, PoC, comparison, or workstream projects. Use when creating/opening a project workspace, validation folder, topic-specific work folder, or cost comparison workspace. Triggers on project workspace, プロジェクトワークスペース, 検証フォルダ, PoC ワークスペース, トピック別作業フォルダ."
 argument-hint: "作成したいプロジェクト名や検証テーマ"
 user-invocable: true
 license: CC BY-NC-SA 4.0

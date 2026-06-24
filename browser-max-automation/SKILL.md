@@ -1,6 +1,6 @@
 ---
 name: browser-max-automation
-description: Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation. Use when navigating websites, clicking elements, filling forms, taking screenshots, testing web applications, reusing an existing browser session, or troubleshooting CDP / iframe / modal / file chooser issues.
+description: Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation. Use when navigating websites, clicking elements, filling forms, taking screenshots, testing web applications, reusing an existing browser session, or troubleshooting CDP / iframe / modal / file chooser / passkey (WebAuthn) issues.
 argument-hint: "自動化したい URL、操作内容、使いたいモード"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -22,9 +22,11 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 
 ## Not the Best Fit
 
-- API や CLI だけで完結する read/write は、まず該当 domain skill / script を使う
+- **API / CLI を先に検討**: 公式 API（YouTube Data API、Microsoft Graph、GitHub API 等）や CLI で read/write が完結するならそちらを優先し、UI が脆い兆候（native file chooser / shadow DOM / 多段ウィザード / レンダラーを止める modal）で固執せず切り替える（例: YouTube Studio UI → `captions.insert`）
+- API / CLI だけで完結するなら、該当 domain skill / script を使う
 - PowerPoint / Loop / Dynamics 365 の expense entry 画面など専用 skill がある UI は、該当 skill の操作ルールを優先する
 - 認証情報、秘密情報、MFA 応答をチャットで受け取らない。必要な入力はブラウザ上でユーザーに処理してもらう
+- 例外: 対象サイトが passkey / FIDO2 / WebAuthn 対応なら、CDP 仮想認証機で完全無人化できる。優先順位は **passkey (仮想認証機) > メール OTP > SMS > 物理キー / 生体**。詳細は [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) を参照する
 
 ## Choose Mode First
 
@@ -61,7 +63,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 
 UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
 
-保存・提出系 UI では、API と DOM の状態が一時的にずれることがある。API が stale / capture failure を返しても、画面上の cell / row の `aria-label` や status text が `PENDING APPROVAL` / `SUBMITTED` 等を示しているなら、その DOM status も正本候補として扱う。API だけで「未提出」「Draft のまま」と断定しない。
+API と DOM の状態が一時的にずれるケースがある。API が stale / capture failure を返しても、画面上の cell / row の `aria-label` や status text が進展した状態を示しているなら DOM も正本候補として扱う。API 単独で「未完了」と断定しない。
 
 ## Decision Patterns
 
@@ -94,19 +96,9 @@ snapshot で ref 取得
 - 表・明細・残高などの定型抽出: `browser_evaluate` で `document.querySelectorAll("tr")` や `document.body.innerText` を処理して JSON を返す
 - 不可逆操作の直前・直後: snapshot または screenshot を残す
 
-また、helper / probe / cache の JSON artifact を一次ソースにする場合は、内容を見る前に `timestamp` や対象日を確認する。日付が現在の実行日と合わない artifact は stale とみなし、`ok` や `fast_path_ok` が true でも確定情報として使わない。
-
 ### unsaved editor / draft タブを壊さない
 
-Qiita や CMS の draft editor のように、未保存変更を持つタブへそのまま別 URL を開かせると、`beforeunload` dialog が出て upload や遷移が壊れることがある。
-
-- 既に目的の editor / draft タブが開いているなら、そのタブを優先して再利用する
-- 新しい draft が必要でも、**既存タブを別 URL へ飛ばさず、新しいタブを開く**
-- `dialog.accept()` で無理に吸収する設計を通常フローにしない。beforeunload は race で失敗しやすい
-- file upload の前に、現在タブが本当に editor 本体かを URL と title で確認する
-- dirty な form / SPA では `page.reload()`、`location.reload()`、API 捕捉目的の reload trigger を使わない。まず保存・キャンセル・画面上の status 読み取りで clean にする。reload 確認や unsaved alert が出たら、追加自動化を止めて手動 Cancel / Stay を優先する
-
-このパターンは、Qiita に限らず「未保存フォームを持つ管理画面」全般で効く。
+未保存 form を持つ editor / SPA タブに別 URL を踏ませると `beforeunload` dialog で upload や遷移が崩れる。既存タブは再利用し、新規作業は別タブで開く。`dialog.accept()` / `page.reload()` / API トリガー目的の reload で dirty を踏み越さない。詳細と Qiita / CMS 例は [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md) を参照する。
 
 Azure Portal iframe / OOPIF / trusted event の注意は [references/instructions/azure-portal.md](references/instructions/azure-portal.md) を参照する。
 Angular Material / `mat-select` / `cdk-overlay` / disabled save の注意は [references/instructions/angular-material.md](references/instructions/angular-material.md) を参照する。
@@ -162,10 +154,12 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 | --- | --- |
 | Existing browser CDP, profile, port drift | [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) |
 | Raw CDP WebSocket | [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) |
+| WebAuthn virtual authenticator / passkey | [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) |
 | CDP recovery and context selection | [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) |
 | Azure Portal iframe / OOPIF | [references/instructions/azure-portal.md](references/instructions/azure-portal.md) |
 | Angular Material forms | [references/instructions/angular-material.md](references/instructions/angular-material.md) |
 | Hidden upload, evaluate+fetch, UI fallback | [references/instructions/ui-fallbacks.md](references/instructions/ui-fallbacks.md) |
+| Unsaved editor / draft tab safety | [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md) |
 | Windows subprocess stability | [references/instructions/windows-subprocess-cdp.md](references/instructions/windows-subprocess-cdp.md) |
 
 ## Done Criteria

@@ -1,6 +1,6 @@
 ---
 name: code-simplifier
-description: Guide for simplifying and refining code after coding sessions. Use when cleaning up complex code, reviewing PRs for readability, or applying consistent refactoring patterns.
+description: Guide for simplifying and refining code after coding sessions. Use when cleaning up complex code, reviewing PRs for readability, or applying consistent refactoring patterns. Triggers on simplify code, refactor, clean up, code review, コード整理, リファクタ, 複雑さ削減, コードレビュー.
 argument-hint: "整理したいコードや PR、気になる複雑さ"
 user-invocable: true
 license: CC BY-NC-SA 4.0

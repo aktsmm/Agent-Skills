@@ -79,6 +79,7 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
   - 永続化する知見は再利用可能なルールに抽象化されている
   - 証拠は必要最小限で、機微情報を含まない
   - `~/.copilot` 配下に置くべき内容か確認済み
+  - Self-Contained: 追加内容が他 file への hard reference や workspace 固有値に依存せず、`~/.copilot` 単体で機能する（ツール制約も尊重: 例 Copilot CLI は prompt 不可なので primitive は SKILL を選ぶ）
   - No Memory Targets Gate を通過済み
 
 ## Refactor Context Rules
@@ -107,6 +108,9 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
     - `~/.copilot/permissions-config.json`
     - `~/.copilot/mcp-config.json`
     - `~/.copilot/mcp-oauth-config/**`（customization と直接整合するものだけ）
+- 単一 vs 複数反映の判断
+  - 原則: 最も specific な 1 ファイルへ統合する
+  - 例外（複数反映を許可）: 複数 file が独立して owning すべき cross-cutting 原則（例: tool-platform 制約、Self-Contained gate、cwd discipline）は、該当する全 file に 1 行ずつ追加してよい。各コピーは独立 SSOT として、他 file への hard reference に依存せず単体で機能する形にする。同じ長いブロックをコピーせず、各 file には 1 行の判断だけを入れる
 - 反映禁止
   - workspace / repository の `AGENTS.md`、`.github/**`、workspace docs
   - VS Code User Data の `*.prompt.md` / `*.instructions.md` / `*.agent.md`
