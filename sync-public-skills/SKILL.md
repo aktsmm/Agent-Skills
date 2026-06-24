@@ -64,7 +64,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 - ②DUP: 同名 skill が private repo `.github/skills/<skill>/` にある場合は、そちらを正として copilot-skills 側を public から除外する（二重公開防止）
 - ③機密: ユーザー名、ローカル絶対パス、Tenant ID、顧客名、個人メールを含む skill は、一般化できないなら除外する。一般化済みの自作 skill でも license / metadata.author / LICENSE.txt の provenance が揃うまでは public へ出さない
 - 既定ブラックリスト例: `docx,pptx,xlsx,expense-report,loop,excalidraw`（①②）＋ `.github/skills` と重複する skill（②）。新規 skill が増えたら上 3 観点で再判定してリストを更新する
-- `Sync-AndPush.ps1` は hard denylist（native: `c360-operations` / `excel-plus`、copilot: 上記 6 件）を引数に関わらず常に除外する。ここで確定する除外名は、それに上乗せする判断分だけ渡す
+- `Sync-AndPush.ps1` は hard denylist（native: `<denied-skill-N>`, copilot: 上記 6 件）を引数に関わらず常に除外する。ここで確定する除外名は、それに上乗せする判断分だけ渡す
 
 ## EMU Private Sync Gate
 
@@ -76,9 +76,9 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## GIM Internal Sync Gate
 
-org-owned internal repo（既定 `gim-home/yamapan-skills`）へ MS 社内向け skill を集約するゲート。`Sync-InternalSkills.ps1` が実装を担うが、「どれを internal へ出すか」は毎回ここで判断する。
+org-owned internal repo（例: `<internal-org>/<internal-skills-repo>`）へ 社内向け skill を集約するゲート。`Sync-InternalSkills.ps1` が実装を担うが、「どれを internal へ出すか」は毎回ここで判断する。
 
-- 既定 internal セット（SSOT）: `c360-operations`, `d365-expense-sorter`, `m365-copilot-research`, `esxp-labor-entry`。新規 skill は下 3 観点で再判定して追加する
+- 既定 internal セット（SSOT）: `<denied-skill-1>`, `<denied-skill-2>`, `<denied-skill-3>`, `<denied-skill-4>`。新規 skill は下 3 観点で再判定して追加する
 - 判定 3 観点: ①社内専用（public 不可だが社内なら有益）②対象ロールまたは全社員に有益 ③匿名化済み（顧客実名 / TPID 実値 / 個人メール / ローカル絶対パスなし）
 - internal repo の visibility が `INTERNAL` または `PRIVATE` であることを確認する。`PUBLIC` なら停止する
 - internal skill は public sync の `ExcludeSkills` / `ExcludeCopilotSkills` に残し、public へ漏れないことを確認する（internal リストと public 除外リストは別管理）
