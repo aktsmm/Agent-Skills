@@ -47,6 +47,7 @@ Ignore these unless they affect the outcome:
 - Comment grammar.
 - Generic best practices without task-specific impact.
 - Refactors that do not reduce meaningful risk.
+- Pre-existing issues unrelated to the current task. Surfacing them distracts the producer and causes scope creep. Only raise them if the current change is built on top of them or makes them materially worse.
 
 ## Evidence Rules
 
@@ -54,6 +55,12 @@ Ignore these unless they affect the outcome:
 - If files were inspected, include file paths.
 - If files were not inspected, do not invent file references.
 - If the critic is uncertain, state what evidence would resolve the uncertainty.
+- Only report findings the critic is confident are real issues. Speculative "might be a problem" notes without concrete evidence should be omitted or downgraded to a Suggestion that names the open question.
+
+## Output Discipline
+
+- Return per-issue findings only. Do not include an overall go/no-go recommendation, an action plan, or instructions on what the producer should do next — that decision belongs to the producer.
+- If no blocking issues are found, say so explicitly (e.g. `PASS — no blocking issues`). Do not manufacture nits to look thorough; a clean PASS in zero or one round is a valid outcome.
 
 ## Reconciliation Rules
 
