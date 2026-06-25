@@ -39,8 +39,9 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 1. Normalizing manuscript folders and section naming.
 2. Keeping outlines, drafts, final manuscript, and images aligned by chapter.
 3. Running focused writing and review loops until P1/P2 issues are resolved.
-4. Checking word count targets and source confidence before finalizing text.
-5. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
+4. Applying reviewer fixes without leaving outlines, chapter maps, question digests, and progress trackers out of sync.
+5. Checking word count targets and source confidence before finalizing text.
+6. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
 
 ## Bootstrap Workflow
 

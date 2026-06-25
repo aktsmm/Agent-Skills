@@ -65,11 +65,15 @@ When applying reviewer feedback to final manuscript files, treat the cited line 
 - Decide whether cross-chapter references like "covered later" are reader-facing bridges or internal planning notes before editing them
 - If section edits change manuscript length, refresh the workspace's character-count or page-allocation tracker in the same task
 - Check the matching outline/key-points file and update it only when structure, terms, or required coverage changed; record "no update needed" when the edit is prose-only
+- Classify each review comment before editing: same-slice fix, synchronized terminology/title fix, or separate follow-up item that should become its own issue/PR instead of widening the current patch
+- If a fix changes a repeated chapter title or representative term, also check synchronized assets such as the chapter map/file map, chapter-end question digest, and progress or page-allocation tracker in the same task
+- If review fixes arrive through stacked pull requests, inspect commit ancestry and changed files before deciding merge order or judging overlap; when later PRs already include earlier commits, merge the older layer first or restack before review
 
 ### Why This Matters
 
 Reviewer issues often reveal a repeated authoring artifact, not just a single typo.
 Stopping at the quoted sentence leaves near-duplicates in other sections, while editing every search hit blindly can remove useful reader-facing navigation.
+Review comments can also expose scope boundaries: some belong in the current patch, while others should be preserved as separate follow-up work so the review trail stays understandable.
 
 ## Automation
 
