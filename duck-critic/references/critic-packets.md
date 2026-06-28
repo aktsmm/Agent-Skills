@@ -66,4 +66,5 @@ Confirm whether each prior blocking finding is resolved. Raise only new or still
 - Keep packets short enough to paste into another model session.
 - Do not include secrets, credentials, private tokens, or unrelated logs.
 - Do not include hidden reasoning or full transcripts.
+- Do not inherit the producer's custom agent instructions. Native Rubber Duck deliberately runs without the producer's custom agent instructions (`includeCustomAgentInstructions: false`). When spawning a critic in a non-native harness (for example a VS Code subagent), give it only the artifact, goal, constraints, and evidence — not the producer's `AGENTS.md`, custom instructions, or full system prompt. A critic that inherits the producer's project instructions collapses back toward the producer's blind spots, weakening the second opinion even when the model family differs.
 - Say when native Rubber Duck was not available.

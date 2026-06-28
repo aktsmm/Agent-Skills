@@ -63,7 +63,7 @@ Intake 対象と同名の curated private skill が `<private-repo>/.github/skil
 Resolve the private repo root in this order:
 
 1. Explicit private repo path from the user
-2. `SYNC_PUBLIC_SKILLS_PRIVATE_REPO` from Process/User environment
+2. `SYNC_PUBLIC_SKILLS_PRIVATE_REPO` from Process/User/Machine environment; if `$env:` is empty, explicitly check `[Environment]::GetEnvironmentVariable(name, 'Process'/'User'/'Machine')` before declaring it unset
 3. Parent repo inferred from `SYNC_PUBLIC_SKILLS_SCRIPT`
 4. Current workspace only if it contains `.github/skills/` and is clearly the private skill repo
 
@@ -162,3 +162,4 @@ Use this compact report:
 ```
 
 Stop reasons: `入力不足` / `private repo 未解決` / `scope 不一致` / `Safety Gate 失敗` / `actionable な知見なし` / `新規 skill 候補` / `review-only`.
+

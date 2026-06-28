@@ -26,6 +26,10 @@ Examples:
 
 These are role lanes, not fixed model IDs. Exact local names vary by product, license, and rollout. Verify the model picker or CLI configuration before storing a `model` value in handoffs or harness-specific configuration.
 
+## Context Independence
+
+Model diversity is only one axis of independence. The other is instruction independence: the critic must not inherit the producer's custom agent instructions, `AGENTS.md`, or full system prompt. Native Rubber Duck enforces this by running without the producer's custom agent instructions; reproduce it in other harnesses by handing the critic only the artifact, goal, constraints, and evidence. A critic that shares both the producer's model family and its project instructions stops being a second opinion at all. See `references/critic-packets.md` for what to include in the handoff.
+
 ## Model Fallback
 
 A different-family critic is preferred, not required. When one cannot be selected, fall back in this order and never block the loop on model choice:
