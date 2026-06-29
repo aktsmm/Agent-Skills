@@ -180,6 +180,23 @@ fontSize=12;fontStyle=0;fontFamily=Helvetica;
 | Edge label  | 10px      |
 | Group title | 14px      |
 
+### Web article / blog embed (Qiita, WordPress, Medium, note)
+
+For diagrams embedded in web articles that are viewed inline with body text (typically 700–900px wide, retina/HiDPI scaling), the floor must be raised:
+
+- **Title**: 18-22px (`fontSize=22;fontStyle=1`)
+- **Primary node label**: 14-18px
+- **Sub label / caption inside node**: 13-15px (use `<font style="font-size: 14px">` inline)
+- **Edge label**: 13px+
+- **Footnote / insight band**: 14-15px
+
+Verify by viewing the exported PNG at the article's actual rendered width (not at 100%). If the reader can't read the label on a 13-inch laptop screen without zooming, the font is too small. **Re-export and reload, don't ship.**
+
+Also avoid wasting interior space:
+
+- `verticalAlign=middle` for single-line cells. Use `top` + `spacingTop` only when the cell is a container with children below.
+- Box height should be roughly `font-size * line-count * 1.5 + 20-30px padding`. A 70px box with a single 14px label leaves ~40px of dead vertical space.
+
 For book/PDF diagrams that are scaled down by the publishing pipeline, raise the floor before export:
 
 - Use at least `13px` for minor labels, `15-17px` for edge/action labels, and `17-23px` for primary state or step nodes.
