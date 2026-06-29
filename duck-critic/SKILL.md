@@ -34,6 +34,7 @@ This is **not** "hand the whole task to a reviewer subagent". You stay the **pro
 - Always report the route used and how many rounds it took. Route values and verdicts are defined in [output format](./references/output-format.md).
 - Do not claim native Rubber Duck ran unless GitHub Copilot CLI actually used `/rubber-duck` or an explicit Rubber Duck consultation.
 - Keep the critic read-only. Do not edit files, run mutating commands, change settings, install packages, or update state from the critic role.
+- Do not ask fallback critics to append files or write review packets. If durable notes are needed, have the critic return findings in chat/output and let the producer write or update files after reconciliation. If a critic reports it has no write tools, treat the returned findings as valid input rather than a failed review.
 - Use a critic from a **different model family** than the producer whenever the harness allows it. If a different family is unavailable or no model was specified, fall back per [model lanes](./references/model-lanes.md) instead of blocking the loop, and report when the critic ended up same-family or self-review.
 - Do not hardcode model names in portable skill instructions. Verify exact local model names before storing them in harness-specific config or handoffs.
 - Ignore style-only, formatting-only, naming-preference, and generic best-practice comments unless they affect the task outcome.
