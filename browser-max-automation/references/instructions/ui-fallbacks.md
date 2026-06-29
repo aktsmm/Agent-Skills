@@ -47,3 +47,12 @@ If API write fails with stale state, guardrail refusal, or route mismatch:
 4. Record state precisely, such as `saved in UI / pending submit`.
 
 Do not change the business classification just because API automation failed. Change the operation path, then verify the intended destination.
+
+## Slow Transactional Forms
+
+Some enterprise forms keep a separate active-row state, right-pane state, and pending-save state. D365-style expense forms are a common example.
+
+- Treat one row edit as one transaction: select row -> wait for right-pane Amount/Merchant to match -> fill all required fields -> save -> re-read that same row.
+- Do not infer success from a button click, toast, or report-level summary. Verify the durable cell/status that represents the real outcome.
+- If a pending overlay such as `fastEditRailsMode`, `ShellBlockingDiv`, or `Your last action is still being worked on` appears, stop issuing new writes until it disappears.
+- Prefer screenshots plus targeted DOM reads for verification. Large snapshots can be stale or too noisy, while DOM-only reads can miss visually obvious row/detail mismatches.

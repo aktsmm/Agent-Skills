@@ -53,6 +53,19 @@ Receipt OCR Sorter でリネームしたファイルを D365 Finance Expense Rep
 3. `Add receipts` -> `Browse` でリネーム済みファイルを選ぶ
 4. `Upload` -> `OK` -> `Close`
 
+### Line-Level Receipt Matching
+
+D365 は report-level receipt と line-level receipt を別に扱う。report header の `Receipts = Yes` だけでは完了にせず、各 expense line の `Receipts attached = Yes` を確認する。
+
+1. 1つの receipt を選択する
+2. `Attach to expense` を押す
+3. 候補一覧で、金額・日付・merchant が一致する1行の `+` だけを押す
+4. 右下の選択済みリストに対象行が1件だけ入ったことを確認する
+5. `Next` で確定する
+6. Expense lines に戻り、その行の `Receipts attached = Yes` を確認する
+
+`+` を複数回押して右下リストへ複数行が増えた場合は誤紐付けの可能性がある。`Next` へ進まず、余分な行を外してから続ける。
+
 ## Replace Receipt
 
 1. `Receipts` の `Edit` を開く
@@ -78,6 +91,28 @@ Receipt OCR Sorter でリネームしたファイルを D365 Finance Expense Rep
 2. Category コンボボックスへカテゴリ名を入力
 3. `Tab` で確定して `Close`
 
+### Required Line Fields
+
+Expense line は1行単位で、以下を全部そろえてから保存する。部分保存や高速連続操作は、validation や別フィールドへの誤入力を起こしやすい。
+
+| 項目                 | 期待値                                 |
+| -------------------- | -------------------------------------- |
+| 新幹線カテゴリ       | `Ground Transportation`                |
+| タクシーカテゴリ     | `Ground Transportation \| Taxi`        |
+| Country/region       | `JPN`                                  |
+| Currency             | `JPY`                                  |
+| Item sales tax group | 通常 `2J`                              |
+| Description          | 目的、交通手段、区間、金額が分かる短文 |
+
+`Country/region` と `Item sales tax group` は別項目。`JPN` を税グループへ入れてしまった場合は `2J` に戻してから保存する。
+
 ## Browser Automation Note
 
 D365 のブラウザ操作は MCP Playwright tools (`browser_type` / `browser_click` / `browser_snapshot`) が安定しやすい。Playwright 直接スクリプトは動的 DOM で壊れやすい。
+
+### Async UI Gotchas
+
+- checkbox 選択と右ペインの active row は別物。編集前に Amount / Merchant / date-category が対象行と一致することを screenshot または DOM で確認する
+- `fastEditRailsMode`、`ShellBlockingDiv`、`Your last action is still being worked on` が見える間は次の操作へ進まない。Wait / overlay 消失 / 値反映を確認する
+- 右ペインの receipt summary は stale になり得る。line-level の証跡検証は Expense lines の `Receipts attached`、必要なら該当行の Receipts Edit の file name で確認する
+- Document Type は既存 receipt 一覧で編集できないことがある。画像 receipt はアップロード時に `Image` を選択し、アップロード後は File name と Notes を主証跡として確認する

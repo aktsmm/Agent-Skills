@@ -142,6 +142,8 @@ If a release test asserts the extension version inside docs or spec files (READM
 - If `vsce package` appears to hang inside a shared VS Code terminal during `vscode:prepublish`, check for active `node` processes and the expected artifact before retrying. Do not stack repeated `npx vsce package` attempts against the same output path.
 - When terminal capture is unreliable, redirect package output to a log file or run the package command as a dedicated VS Code task, then remove any temporary task entries before committing.
 - If prepublish already passed separately, still let `vsce package` run its configured prepublish unless the local `vsce package --help` explicitly documents a supported skip flag. Unsupported flags such as guessed `--no-prepublish` are a sign to check local help rather than continue by trial and error.
+- Prefer `npx vsce package --out <file>` over ambiguous `npm exec -- vsce package --out <file>` forms. If `vsce` reports `Invalid version <path>`, the package path was parsed as a version argument; switch runner syntax rather than changing the version.
+- Run `git status --short` after packaging and `vsce ls`, not only before committing. Repository prepublish scripts can regenerate tracked metadata or JSON formatting; if that happens after the release commit/tag, either commit the mutation before packaging or restore and rebuild the VSIX so the artifact matches the tagged commit.
 
 ## Local VSIX Artifact Hygiene
 
@@ -236,6 +238,11 @@ are done or explicitly blocked:
 6. Create the GitHub Release with the VSIX attached.
 7. Verify through at least two non-stale channels, such as publish success output,
    `gh release view`, and `git ls-remote --tags`.
+
+Marketplace metadata commands such as `vsce show --json` and the public item page
+can lag immediately after a successful publish. If publish output, remote tag,
+GitHub Release, and the attached VSIX asset are consistent, treat stale
+Marketplace metadata as propagation delay and do not republish or bump again.
 
 If a blocker appears after the version bump, report the state separately:
 `Version`, `VSIX`, `Marketplace publish`, `Git tag`, and `GitHub Release`.
