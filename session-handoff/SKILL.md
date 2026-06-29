@@ -1,6 +1,6 @@
 ---
 name: session-handoff
-description: "Create a compact handoff note so work can be resumed in a new chat/session. Use when the user asks to close the current session, make a message for the next session, create/export a handoff, resume later, セッションを閉じる, 引き継ぎを作る, or 伝言を作る. Do not use for pasted handoff notes that instruct the current agent to resume work; consume those as instructions instead."
+description: "Create a compact handoff note so a new chat/session can first acknowledge the current state before work resumes. Use when the user asks to close the current session, make a message for the next session, create/export a handoff, resume later, セッションを閉じる, 引き継ぎを作る, or 伝言を作る. Do not use for pasted handoff notes that instruct the current agent to resume work; consume those as instructions instead."
 argument-hint: "引き継ぎたい作業、完了条件、再開先セッションへ渡したい制約"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -10,8 +10,8 @@ metadata:
 
 # Session Handoff
 
-現在の作業を一度閉じ、新しいセッションで安全に再開できるように、貼り付け可能な伝言を作る。
-成果物は「次の agent が最初に読むべき最小コンテキスト」であり、作業ログの全文ではない。
+現在の作業を一度閉じ、新しいセッションでまず状態を認識できるように、貼り付け可能な伝言を作る。
+成果物は「次の agent が最初に読むべき最小コンテキスト」であり、作業ログの全文でも即時実行指示でもない。
 
 ## When to Use
 
@@ -39,7 +39,7 @@ metadata:
 
 ## Rubber-Duck Review Checklist
 
-- Does the first line say this is a handoff note pasted from another session and should be consumed as instructions by the current agent?
+- Does the first line say this is a handoff note pasted from another session, and the current agent should acknowledge the state before taking action?
 - Would a fresh agent know the goal without reading the old session?
 - Is the next concrete action unambiguous?
 - Are completed, pending, blocked, and unknown items separated?
@@ -51,7 +51,8 @@ metadata:
 ## Output Rules
 
 - Put the paste-ready handoff itself in one fenced `markdown` block so the user can copy it without surrounding commentary.
-- Start the block with a self-identifying line: it is a handoff note from another session, and the current agent should treat it as instructions to resume work now.
+- Start the block with a self-identifying line: it is a handoff note from another session, and the current agent should first acknowledge and summarize the state.
+- Do not instruct the next agent to start work immediately. Tell it to wait for explicit user approval before editing files, running commands, or operating external services.
 - Avoid wording that sounds like a request to create another handoff, such as starting only with `次のセッションでは...`.
 - Prefer bullets over narrative history.
 - Include exact commands only when they are safe and likely to be rerun.

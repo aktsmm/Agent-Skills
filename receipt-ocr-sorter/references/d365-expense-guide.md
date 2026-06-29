@@ -70,8 +70,12 @@ D365 は report-level receipt と line-level receipt を別に扱う。report he
 
 1. `Receipts` の `Edit` を開く
 2. 誤レシートを選択して `Remove`
-3. 正しいファイルを `Add receipts` で再アップロード
-4. `Close` -> `Save and continue`
+3. 確認ダイアログが出たら、対象ファイル名を再確認してから `Yes`
+4. 正しいファイルが report-level に既にある場合は `Add receipts` -> `Select existing` -> 対象ファイルを1件だけ選択 -> `Add`
+5. 正しいファイルが未アップロードの場合だけ `Add receipts` -> `Add new` でアップロード
+6. `Close` -> `Save and continue`
+
+既存 receipt 一覧には古い同名・近似名・別案件の候補が混在することがある。ファイル名、金額、用途が一致する1件だけを選び、同じ receipt を複数行へ誤って残さない。
 
 ## Mandatory Matching Checks
 
@@ -106,6 +110,8 @@ Expense line は1行単位で、以下を全部そろえてから保存する。
 
 `Country/region` と `Item sales tax group` は別項目。`JPN` を税グループへ入れてしまった場合は `2J` に戻してから保存する。
 
+Description は実態を推測して書かない。顧客訪問、出張先、イベント名、会議名などは、ユーザー提供の文脈を正として反映し、曖昧なら保存前に確認する。
+
 ## Browser Automation Note
 
 D365 のブラウザ操作は MCP Playwright tools (`browser_type` / `browser_click` / `browser_snapshot`) が安定しやすい。Playwright 直接スクリプトは動的 DOM で壊れやすい。
@@ -115,4 +121,6 @@ D365 のブラウザ操作は MCP Playwright tools (`browser_type` / `browser_cl
 - checkbox 選択と右ペインの active row は別物。編集前に Amount / Merchant / date-category が対象行と一致することを screenshot または DOM で確認する
 - `fastEditRailsMode`、`ShellBlockingDiv`、`Your last action is still being worked on` が見える間は次の操作へ進まない。Wait / overlay 消失 / 値反映を確認する
 - 右ペインの receipt summary は stale になり得る。line-level の証跡検証は Expense lines の `Receipts attached`、必要なら該当行の Receipts Edit の file name で確認する
+- receipt 差し替え後の正本確認は、右ペイン summary ではなく該当行の `Receipts` -> `Edit` に表示される `File name` で行う。summary が前行や古い添付を表示することがある
 - Document Type は既存 receipt 一覧で編集できないことがある。画像 receipt はアップロード時に `Image` を選択し、アップロード後は File name と Notes を主証跡として確認する
+- receipt 修正中は `Submit` を進捗確認や保存代わりに押さない。明示指示がない限り、保存は `Save and continue` までに留める
