@@ -1,15 +1,16 @@
 # Handoff Template
 
-Use this structure to produce one paste-ready message for a fresh session. Omit sections that do not apply.
+Use this structure to produce one paste-ready message for a fresh session. Omit sections that do not apply. In the final response, show this entire message in a single fenced `markdown` block.
 
 ```markdown
-次のセッションでは、以下の状態から作業を再開してください。
+これは前セッションから貼り付けた再開用メモです。現在のセッションの agent は、以下を自分への作業指示として扱い、別の引き継ぎ文面を作成せず、この状態から作業を再開してください。
 
 ## Goal
 
 - 目的:
 - 完了条件:
 - 明示された制約:
+- 禁止事項 / stop condition:
 
 ## Current State
 
@@ -36,6 +37,7 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 
 1. 最初にやること:
 2. その次に確認すること:
+3. 迷ったらユーザーに確認すること:
 
 ## Done Criteria
 
@@ -48,5 +50,7 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 - Prefer workspace-relative file paths.
 - Include exact error text only when it changes the next action.
 - Do not include tokens, passwords, cookies, private account identifiers, or sensitive URLs.
+- Write the opening line as an instruction to the current agent, not as a request to draft another handoff.
+- Keep prohibited actions and external-system safety constraints near the top.
 - If the previous terminal may be unreliable, say which artifacts or files should be trusted instead of stdout.
 - If a decision needs the user, write the exact question to ask next.
