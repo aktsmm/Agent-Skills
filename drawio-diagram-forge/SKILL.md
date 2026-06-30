@@ -59,6 +59,8 @@ From inputs/requirements.md, create a system diagram
 
 **Output**: `outputs/`
 
+If the user asks for an editable diagram, make `*.drawio` the primary deliverable. Do not let a plain SVG or preview artifact become the file the user is expected to edit.
+
 ### Recommended Delivery Pattern
 
 ドキュメント向けは `name.drawio` (editable) + `name.drawio.svg` (embed) を対で出す。多言語変体・Qiita への掲載・ローカル preview 脱出手順は → [references/delivery-patterns.md](references/delivery-patterns.md)。
@@ -150,6 +152,8 @@ This format applies to both new diagrams and edits to existing .drawio files. Wh
 - [ ] `.drawio` or `.drawio.svg` file generated
 - [ ] Diagram opens correctly in VS Code Draw.io extension
 - [ ] All nodes and edges visible
+- [ ] User-facing links point to the editable `.drawio` when editability is expected
+- [ ] Decision flows avoid long return/merge lines that bundle branch outputs back into one sink
 - [ ] Quality gate score ≥ 85
 - [ ] If diagram is referenced from documentation, both editable source and embeddable image are provided
 - [ ] Render review completed at the target embed width with no text overlap, clipping, or border collisions
