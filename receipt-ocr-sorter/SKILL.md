@@ -108,10 +108,10 @@ python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming\unas
 
 OCR 後のファイルを D365 Expense に添付する運用はこの skill の重要ユースケースだが、カテゴリ表と添付手順は本体から分離する。
 
-- カテゴリ対応表
-- 添付 / 差し替え手順
-- 添付時の照合ルール
-- ブラウザ操作の注意
+- Report 作成 / metadata 編集
+- Expense line の Category / Description / Country / tax group 編集
+- line-level receipt upload / 差し替え / 照合
+- D365 UI の stale 表示や active row ずれの回避
 
 詳細は [references/d365-expense-guide.md](references/d365-expense-guide.md) を参照。
 
