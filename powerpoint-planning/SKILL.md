@@ -63,6 +63,7 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 - Design section flow before slide details.
 - Make each slide answer one question and carry one main takeaway.
 - Make the title and lead sentence enough to understand the slide point.
+- For executive or customer-facing decks, make the slide message short, position-taking, and readable at a glance; split the slide if that cannot be done.
 - Use narrative lead sentences, not teaser copy.
 - Keep assumptions and hypotheses distinct from confirmed facts.
 - Let slide count increase when section dividers or split slides improve comprehension.

@@ -65,6 +65,7 @@ Use these rules when creating or revising decks intended to be shown directly to
 - For multi-session customer decks, include the session number on the file name and slide surface, for example `YYYYMMDD-01_04-topic.pptx` and `Session 1 of 4`.
 - Near the end of recurring support decks, include must-decide items such as next meeting date, attendees, owners, and what the customer will try before the next session.
 - Carry forward explicit requests from previous meeting notes, such as basic Git/GitHub explanations, but keep them scoped so they support the main story instead of becoming a separate training deck.
+- For customer sales or proposal decks, verify the story proves both customer fit and differentiation: name the customer's environment, risk, problem, constraint, or timing, then explain why this solution or vendor is objectively preferable to plausible alternatives.
 - On agenda slides, make main items visually stronger than explanatory sub-lines. Use brand color/bold for main items and muted gray/smaller text for sub-lines; avoid making sub-lines look like links or warnings.
 - Recommended flow for product introduction decks:
   1. Why now / announcement context

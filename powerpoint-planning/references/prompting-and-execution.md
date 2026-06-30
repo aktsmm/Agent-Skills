@@ -44,6 +44,12 @@ Organize the deck into clear sections. Add section divider slides when helpful, 
 Do not make every element equally prominent. Each slide must have one dominant primary message, one clear visual entry point, a deliberate reading path, supporting evidence that stays secondary, and quiet areas for notes, caveats, or assumptions.
 ```
 
+## Message-Discipline Block
+
+```text
+Each slide must have one clear, position-taking message, not a neutral topic label. Keep the message short enough to scan quickly, ideally within two lines. If the message cannot be shortened, either clarify the claim or split the slide instead of shrinking the font or burying the point in body text.
+```
+
 ## Card-Padding Block
 
 ```text

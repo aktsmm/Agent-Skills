@@ -23,10 +23,20 @@ Logic and evidence:
 - Are numbers, claims, timelines, and customer facts traceable?
 - Are assumptions marked as assumptions?
 
+Customer proposal fit:
+
+- Does the deck name the customer's actual environment, risk, problem, constraint, or decision timing before proposing an answer?
+- Does it explain why this solution or vendor is better, safer, faster, more credible, or more unique than plausible alternatives?
+- Are differentiation claims supported by evidence, examples, or conservative reasoning instead of slogans?
+- If the deck would still make sense with any customer name swapped in, add stronger customer-specific framing or move generic content to an appendix.
+
 Standalone readability:
 
 - Can the reader understand the slide by reading only the title and lead sentence?
 - Is the lead sentence a narrative explanation rather than a vague tagline?
+- Does the lead sentence take a clear position instead of merely labeling the topic?
+- Is the main message short enough to scan quickly, ideally within two lines?
+- If the message is long, is the problem unclear thinking, too much information on one slide, or both?
 - Does the body explain diagrams, cards, matrices, or flows instead of relying on visuals alone?
 
 Visual hierarchy:

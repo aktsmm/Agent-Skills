@@ -51,6 +51,26 @@ Rules:
 - Make Agenda and divider slides visually distinct from content slides.
 - Do not use dense card/table layouts for navigation slides.
 
+## Customer Proposal Fit Gate
+
+For customer-facing sales, proposal, or account decks, make the storyline prove both fit and differentiation.
+
+- **Fit to customer**: identify the customer's environment, risk, problem, constraint, timing, or success condition before proposing the answer.
+- **Differentiation**: explain why this offer, product, team, or approach is objectively stronger, safer, faster, cheaper, or more unique than plausible alternatives.
+- If the deck only says generic benefits, add customer-specific risk/problem framing before the recommendation.
+- If the deck only says the customer has a problem, add comparative reasons to choose this solution or vendor now.
+- Keep competitor or vendor claims evidence-based and conservative; mark unsupported positioning as a hypothesis or presenter note.
+
+## Slide Message Discipline
+
+For executive, customer-facing, or decision decks, define the slide message before layout details.
+
+- Use one slide for one message; if two conclusions compete, split the slide.
+- Make the message take a position, not just name a topic or category.
+- Keep the message short enough to read at a glance; a two-line lead is the practical upper bound.
+- If the message cannot be shortened, clarify the claim or remove secondary information before shrinking text.
+- Treat charts, tables, diagrams, footnotes, sources, and page numbers as support for the message, not substitutes for it.
+
 ## Slide Planning Fields
 
 For each slide, define:
