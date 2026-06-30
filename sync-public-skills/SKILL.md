@@ -60,6 +60,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 Destination 別の判定（公開可否 / 除外リスト / repo visibility / sensitive scan）はこの SKILL が決める。詳細手順と既定リストは [references/instructions/audits-and-gates.md](references/instructions/audits-and-gates.md)。
 - **New Skill Classification Gate**: `$KnownPublicSkills` / `$DefaultInternalSkills` / `$HardDeniedSkills` のどこにもない skill が private repo にある限り sync を強制停止する（`Sync-AndPush.ps1` の Step 0.5、incident 2026-06-24 の再発防止）。未分類 skill は public-safe / internal-only / public-denied へ分類してから再実行
+- **Agent Discovery Gate**: script の停止に頼らず、実行前に未分類 skill を検出したら必ずユーザーへ分類を確認する。内容から推測して分類せず、明示回答なしに `-AllowUnknownSkills` を使わない
 - **Copilot-Skills Public Audit**: license / DUP / secret の 3 観点で broad sync 除外を確定
 - **EMU Private Sync Gate**: visibility `PRIVATE`/`INTERNAL` 確認、secret 連を placeholder 化
 - **GIM Internal Sync Gate**: org-owned internal へ MS 社内向け skill を集約。既定 internal セット SSOT
@@ -79,7 +80,7 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 ## Workflow
 
 1. private / public / script、必要なら EMU / GIM repo を解決し、`primary`・branch / remote・ahead/behind・dirty 状態を確認する
-2. `primary` の readiness と source/destination content diff を確認し、`shared-dirty` / `private-only-dirty` / `unselected-dirty` が public / EMU / GIM sync に漏れるかを判定する。broad sync で `copilot-skills/` を含む場合だけ Public Audit の 3 観点でブラックリストを確定する
+2. `primary` の readiness と source/destination content diff を確認し、未分類 skill があれば先にユーザーへ分類確認する。`shared-dirty` / `private-only-dirty` / `unselected-dirty` が public / EMU / GIM sync に漏れるかを判定する。broad sync で `copilot-skills/` を含む場合だけ Public Audit の 3 観点でブラックリストを確定する
 3. `all` 指定時は、All Mode に従い未コミットの skill 差分を skill 単位でコミットする（skill 以外の dirty は除外し Not Done へ回す）。コミット後に各 skill の public / EMU / GIM 振り分けを監査する
 4. safe path を選ぶ
    - 直接実行: 漏れ込みが無い場合は `Sync-AndPush.ps1 -Message "sync: <skill summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`

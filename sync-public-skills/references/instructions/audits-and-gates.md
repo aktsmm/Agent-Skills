@@ -6,11 +6,13 @@
 
 `Sync-AndPush.ps1` は Step 0.5 で `Invoke-NewSkillGate` を実行し、private repo の `.github/skills/` 配下と、既知集合（`$KnownPublicSkills` + `$DefaultInternalSkills` + `$HardDeniedSkills`）を照合する。未分類 skill が 1 件でもあれば `exit 2` で sync を強制停止する。
 
+Agent はこの script 停止を待たず、sync 実行前に同じ照合を行う。未分類 skill があれば、内容・命名・直近会話から勝手に public/internal/private を推測せず、必ずユーザーに `public-safe` / `internal-only` / `public-denied` / `今回は同期しない` の分類を確認する。
+
 - 検知された skill は以下のいずれかへ分類してから再実行する
   - **public-safe**→ `$KnownPublicSkills` へ追記する。Copilot-Skills Public Audit Gate（下記 license / DUP / secret）を先に通す
   - **internal-only**→ `$DefaultInternalSkills` へ追記する。script が自動的に `$HardDeniedSkills` へマージし、public 除外され GIM/EMU へ mirror される
   - **public-denied**→ `$HardDeniedSkills` へ追記する。internal にも出さない
-- 例外扱いしたい場合だけ `-AllowUnknownSkills` を指定すると public-safe として同期される。面倒だからという理由で使わず、ケースごとに分類を保存する
+- 例外扱いしたい場合だけ、ユーザーの明示承認後に `-AllowUnknownSkills` を指定すると public-safe として同期される。面倒だからという理由で使わず、ケースごとに分類を保存する
 - この Gate は internal skill の public 漏洩（2026-06-24）の直接根原因（internal SSOT に未登録の skill が sync を通ってしまう）を防ぐために追加された
 
 ## Copilot-Skills Public Audit（license / DUP / secret）
