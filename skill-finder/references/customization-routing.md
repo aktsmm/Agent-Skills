@@ -43,6 +43,8 @@ When multiple skills match, prefer:
 3. Good resource structure (`scripts/`, `references/`, `assets/`)
 4. Recently maintained index entries
 
+If a curated native skill and an upstream / mirrored skill cover the same domain, prefer the curated native skill as the recommendation default. Treat the mirrored skill as a reference or intake source unless the user explicitly asks for that upstream workflow.
+
 ## Collection Management
 
 When deciding whether a discovered skill belongs in a shared collection, classify it first:
