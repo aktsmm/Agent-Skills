@@ -1,6 +1,6 @@
 ---
-name: receipt-ocr-sorter
-description: "Automatically OCR, rename, and sort receipt images/PDFs/videos by date, amount, and project, with summary reports and D365 expense mapping. Use when sorting receipts, organizing expense files, OCR renaming, receipt sorting, レシート仕分け, or D365経費カテゴリマッピング."
+name: receipt-expense-workflow
+description: "Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment. Use when sorting company expense receipts, organizing travel expense files, OCR renaming, receipt sorting, レシート仕分け, D365経費カテゴリマッピング, or D365経費精算."
 argument-hint: "仕分けたい領収書フォルダ、対象プロジェクト、必要な出力"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -8,7 +8,7 @@ metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
 
-# Receipt OCR Sorter
+# Receipt Expense Workflow
 
 OCR（Surya）を使った領収書の自動仕分け・リネーム・集計ツール。
 

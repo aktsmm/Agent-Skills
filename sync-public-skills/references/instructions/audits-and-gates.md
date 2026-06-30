@@ -17,7 +17,7 @@
 
 `copilot-skills/`（`.copilot` 由来ミラー）を broad sync で public へ出す前に、skill 単位で 3 観点を監査し、除外対象を `Sync-AndPush.ps1 -ExcludeCopilotSkills` に渡す。primary-only では primary の分類と漏れ込み確認だけを行い、対象外 skill の公開可否を毎回再判定しない。判断は必要時にここで行い、script にハードコードしない。
 
-- **①ライセンス**: 第三者 Proprietary は除外。Anthropic / Microsoft Scout ビルトイン（`docx` / `pptx` / `xlsx` 等、LICENSE.txt が複製・派生・サービス外保持を禁止）は public 不可。LICENSE 不明（`expense-report` / `loop` / `excalidraw` 等）は安全側で除外。Apache 2.0 等の再配布可ライセンス（`web-artifacts-builder` 等）は LICENSE / NOTICE を保持して公開可。自作 skill（`receipt-ocr` / `permission-max` / `x-twitter-browser-ops` 等）は license / metadata.author / LICENSE.txt が揃っていれば公開候補にできる
+- **①ライセンス**: 第三者 Proprietary は除外。Anthropic / Microsoft Scout ビルトイン（`docx` / `pptx` / `xlsx` 等、LICENSE.txt が複製・派生・サービス外保持を禁止）は public 不可。LICENSE 不明（`expense-report` / `loop` / `excalidraw` 等）は安全側で除外。Apache 2.0 等の再配布可ライセンス（`web-artifacts-builder` 等）は LICENSE / NOTICE を保持して公開可。自作 skill（`receipt-tax-ocr` / `permission-max` / `x-twitter-browser-ops` 等）は license / metadata.author / LICENSE.txt が揃っていれば公開候補にできる
 - **②DUP**: 同名 skill が private repo `.github/skills/<skill>/` にある場合は、そちらを正として copilot-skills 側を public から除外する（二重公開防止）
 - **③機密**: ユーザー名、ローカル絶対パス、Tenant ID、顧客名、個人メールを含む skill は、一般化できないなら除外する。一般化済みの自作 skill でも license / metadata.author / LICENSE.txt の provenance が揃うまでは public へ出さない
 - 既定ブラックリスト例: `docx,pptx,xlsx,expense-report,loop,excalidraw`（①②）＋ `.github/skills` と重複する skill（②）。新規 skill が増えたら上 3 観点で再判定してリストを更新する

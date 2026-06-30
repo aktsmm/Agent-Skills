@@ -1,6 +1,6 @@
 ---
-name: receipt-ocr
-description: "個人事業・副業・確定申告専用。日本の勘定科目（印刷費 / 事業主借 等）で領収書画像を OCR してリネームし、月次メモを整える。D365 / 出張経費は d365-expense-sorter を使う。Use when: 領収書, レシート, receipt, OCR, リネーム, 確定申告, 勘定科目, 経費, rename."
+name: receipt-tax-ocr
+description: "個人事業・副業・確定申告専用。日本の勘定科目（印刷費 / 事業主借 等）で領収書画像を OCR してリネームし、月次メモを整える。会社経費 / D365 / 出張精算は receipt-expense-workflow を使う。Use when: 領収書, レシート, receipt, OCR, リネーム, 確定申告, 勘定科目, 経費, rename."
 argument-hint: "OCRしたい画像やリネーム指示"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -8,7 +8,7 @@ metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
 
-# Receipt OCR & Rename Skill
+# Receipt Tax OCR
 
 ## When To Use
 
