@@ -103,7 +103,6 @@ For article-facing concept diagrams that explain a repeated workflow:
 For complex diagrams (>15 nodes) with many-to-one or fan-out edges:
 
 - **Align source and target y** — place each agent/processor at the same y as its output node. Lines stay horizontal, crossing drops to near zero.
-- **Do not route decision outcomes back to earlier nodes or a distant shared sink** — use terminal result nodes near each branch, or make one clean vertical path. Long return/merge lines often pass validation while still being hard to edit and visually tangled.
 - **Reorder sibling nodes before drawing detours** — if a connector from one item in a stacked group must jump around another item, first swap or move the related item closer to its target/callout. A short straight connector is usually clearer than a routed line that skirts sibling boxes.
 - **Avoid swimlane-relative coordinates** — when edges cross swimlane boundaries, `exitX`/`entryY` resolve to group-relative positions that are hard to predict. Use absolute positioning (`parent="1"`) for all nodes instead.
 - **Spread entryY on shared targets** — when multiple edges enter the same node, enlarge the node height and assign distinct `entryY` values (e.g., 0.1 / 0.5 / 0.9) so lines arrive at different vertical points.
@@ -164,7 +163,6 @@ Always shrink-wrap: set page width/height to tightest bounding box + 20px margin
 
 - Treat `.drawio` as the editable source of truth for documentation diagrams.
 - Treat `.drawio.svg` as the delivery/render artifact for Markdown and web embedding.
-- When the user explicitly needs to edit the diagram, ship and link the `.drawio` first; preview SVG/PNG is optional and must not replace the editable source.
 - Do not label a plain SVG as `.drawio.svg`. That suffix is reserved for metadata-embedded SVG exports that Draw.io can reopen.
 - If a diagram required manual SVG-level cleanup, recreate or preserve the equivalent `.drawio` source before calling it done.
 - Do not leave a documentation diagram as SVG-only unless the user explicitly asked for a disposable one-off artifact.
