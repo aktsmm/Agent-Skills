@@ -1,0 +1,59 @@
+# Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+
+## English
+
+Copyright (c) 2025 yamapan (aktsmm)
+
+This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International License.
+
+You are free to:
+
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material
+
+Under the following terms:
+
+- **Attribution** — You must give appropriate credit, provide a link to the
+  license, and indicate if changes were made. You may do so in any reasonable manner,
+  but not in any way that suggests the licensor endorses you or your use.
+
+- **NonCommercial** — You may not use the material for commercial purposes.
+  *(Please contact the author if you wish to use this material for commercial purposes.)*
+
+- **ShareAlike** — If you remix, transform, or build upon the material, you must
+  distribute your contributions under the same license as the original.
+
+No additional restrictions — You may not apply legal terms or technological
+measures that legally restrict others from doing anything the license permits.
+
+**AI/ML Training Restriction** — Use of this content for AI/ML training, data
+mining, or other analytical purposes is prohibited without explicit permission.
+
+Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+---
+
+## 日本語
+
+Copyright (c) 2025 yamapan (aktsmm)
+
+この著作物は Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+International License のもとで提供されます。
+
+あなたは以下を行うことができます。
+
+- **共有** — あらゆる媒体または形式で複製し、再配布する
+- **翻案** — リミックス、改変し、それをもとに別の作品を作る
+
+ただし、以下の条件に従う必要があります。
+
+- **表示** — 適切なクレジットを表示し、ライセンスへのリンクを提供し、変更した場合はその旨を示すこと
+- **非営利** — 営利目的で利用しないこと
+- **継承** — 改変した場合は同じライセンスで頒布すること
+
+追加の法的条件または技術的制限を課してはなりません。
+
+**AI/ML 学習制限** — 明示的な許可なく、この内容を AI/ML 学習、データマイニング、その他の分析目的に使用してはなりません。
+
+完全なライセンス本文: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode

@@ -1,0 +1,43 @@
+# License / ライセンス
+This repository contains multiple skills, each with its own license.
+Please refer to the `LICENSE.txt` file in each skill folder.
+このリポジトリには複数のスキルが含まれており、それぞれ個別のライセンスが適用されます。
+各スキルフォルダ内の `LICENSE.txt` を参照してください。
+## License Summary / ライセンス一覧
+| Skill | License |
+|-------|---------|
+| agentic-workflow-guide | CC BY-NC-SA 4.0 |
+| azure-advisor-report | CC BY-NC-SA 4.0 |
+| azure-env-builder | CC BY-NC-SA 4.0 |
+| azure-infra-validation | CC BY-NC-SA 4.0 |
+| azure-screenshot-mask | CC BY-NC-SA 4.0 |
+| azure-troubleshooting | CC BY-NC-SA 4.0 |
+| biz-ops-setup | CC BY-NC-SA 4.0 |
+| book-writing-workspace | CC BY-NC-SA 4.0 |
+| browser-max-automation | CC BY-NC-SA 4.0 |
+| chrome-extension-dev | CC BY-NC-SA 4.0 |
+| code-simplifier | CC BY-NC-SA 4.0 |
+| customer-workspace | CC BY-NC-SA 4.0 |
+| drawio-diagram-forge | CC BY-NC-SA 4.0 |
+| excel-plus | Proprietary. LICENSE.txt has complete terms |
+| humanize-writing | CC BY-NC-SA 4.0 |
+| local-media-transcription | CC BY-NC-SA 4.0 |
+| microsoft-graph-gateway | CC BY-NC-SA 4.0 |
+| ocr-super-surya | CC BY-NC-SA 4.0 |
+| packet-capture-analysis | CC BY-NC-SA 4.0 |
+| peer-feedback | CC BY-NC-SA 4.0 |
+| powerpoint-automation | CC BY-NC-SA 4.0 |
+| powerpoint-planning | CC BY-NC-SA 4.0 |
+| project-workspace | CC BY-NC-SA 4.0 |
+| receipt-ocr-sorter | CC BY-NC-SA 4.0 |
+| retro-copilot | CC BY-NC-SA 4.0 |
+| review-security-structure | CC BY-NC-SA 4.0 |
+| skill-creator-plus | CC BY-NC-SA 4.0 |
+| skill-finder | CC BY-NC-SA 4.0 |
+| sync-copilot-skills | CC BY-NC-SA 4.0 |
+| vscode-extension-guide | CC BY-NC-SA 4.0 |
+| web-accessibility | CC BY-NC-SA 4.0 |
+| x-hashtag-research | CC BY-NC-SA 4.0 |
+---
+Copyright (c) 2025-2026 yamapan (aktsmm)
+https://github.com/aktsmm

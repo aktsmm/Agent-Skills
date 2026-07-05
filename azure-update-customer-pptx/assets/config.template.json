@@ -1,0 +1,61 @@
+{
+  "description": "Azure Update PowerPoint workspace configuration template",
+  "template": {
+    "fileName": "azure-update-template.pptx",
+    "folder": "template"
+  },
+  "output": {
+    "fileNamePattern": "Customer-System_AzureUpdate_{year}{date}.pptx",
+    "year": "2026"
+  },
+  "regionStamp": {
+    "width": 180,
+    "height": 30,
+    "marginRight": 20,
+    "marginBottom": 20,
+    "fontSize": 14,
+    "fontBold": true,
+    "fontColorRGB": "0xFFFFFF",
+    "styles": {
+      "グローバル": {
+        "text": "グローバル",
+        "bgColorRGB": "0x50B000",
+        "description": "全リージョン共通（廃止通知など）"
+      },
+      "日本リージョン未対応": {
+        "text": "日本リージョン未対応",
+        "bgColorRGB": "0xB85E00",
+        "description": "Japan East/West どちらも未対応"
+      },
+      "Japan East のみ": {
+        "text": "Japan East のみ対応",
+        "bgColorRGB": "0xD47800",
+        "description": "Japan East のみ対応"
+      },
+      "Japan West のみ": {
+        "text": "Japan West のみ対応",
+        "bgColorRGB": "0xD47800",
+        "description": "Japan West のみ対応"
+      },
+      "Japan East / West 対応": {
+        "text": "Japan East / West 対応",
+        "bgColorRGB": "0xF0B000",
+        "description": "Japan East / West 両方対応"
+      }
+    }
+  },
+  "slideSettings": {
+    "slideWidth": 960,
+    "slideHeight": 540
+  },
+  "sections": {
+    "order": [
+      "表紙",
+      "サマリ",
+      "Weekly New Topics",
+      "UPDATE Points",
+      "Appendix",
+      "Ending"
+    ]
+  }
+}

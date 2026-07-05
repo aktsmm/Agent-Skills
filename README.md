@@ -1,0 +1,98 @@
+# Agent Skills
+
+A collection of Agent Skills for GitHub Copilot and Claude.
+
+GitHub Copilot と Claude 向けの Agent Skills コレクションです。
+
+## Demo
+
+### OCR Super Surya
+
+![OCR Demo](assets/image.png)
+
+### draw.io Diagram Forge
+
+![draw.io Demo](assets/drawio-demo.gif)
+
+## Skills
+
+| Skill                                                   | Description / 説明                                                                                                  |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| [agentic-workflow-guide](agentic-workflow-guide/)       | Design agentic workflows and choose the right primitive first / エージェントワークフロー設計と primitive 選定       |
+| [azure-advisor-report](azure-advisor-report/)           | Generate Azure monthly reports from Advisor and Cost Management / Azure Advisor・コスト管理の簡易月次レポート       |
+| [azure-troubleshooting](azure-troubleshooting/)         | Read-only Azure incident troubleshooting / Azure 障害調査・切り分け                                                 |
+| [azure-env-builder](azure-env-builder/)                 | ⚠️ **Alpha** - Azure environment builder with Bicep / Azure 環境構築支援                                            |
+| [biz-ops-setup](biz-ops-setup/)                         | Business operations workspace setup / 業務管理ワークスペース構築                                                    |
+| [book-writing-workspace](book-writing-workspace/)       | Book writing workspace / 書籍執筆ワークスペース                                                                     |
+| [browser-max-automation](browser-max-automation/)       | Browser automation via Playwright MCP / ブラウザ自動操作                                                            |
+| [chrome-extension-dev](chrome-extension-dev/)           | Chrome extension development guide / Chrome 拡張機能開発ガイド                                                      |
+| [code-simplifier](code-simplifier/)                     | Simplify and refactor complex code / コード簡略化・リファクタリング                                                 |
+| [customer-workspace](customer-workspace/)               | Customer workspace initialization / 顧客ワークスペース初期化                                                        |
+| [drawio-diagram-forge](drawio-diagram-forge/)           | Create draw.io diagrams from text / テキストから draw.io 図を生成                                                   |
+| [excel-plus](excel-plus/)                               | Unified Excel workflow for spreadsheet work and update troubleshooting / Excel 汎用操作と更新トラブル対応を統合     |
+| [humanize-writing](humanize-writing/)                   | Humanize AI-sounding drafts and preserve author voice / AIっぽい原稿を人間らしく整え、書き手の癖を残す              |
+| [local-media-transcription](local-media-transcription/) | Transcribe local audio/video and prepare minutes / ローカル音声・動画の文字起こしと議事録化                         |
+| [microsoft-graph-gateway](microsoft-graph-gateway/)     | Route Microsoft Graph read and write workflows with safe execution scaffolds / Microsoft Graph 操作の安全な gateway |
+| [ocr-super-surya](ocr-super-surya/)                     | GPU-optimized OCR using Surya (90+ languages) / GPU 最適化 OCR                                                      |
+| [packet-capture-analysis](packet-capture-analysis/)     | Packet capture analysis workflow with labeling and visualization / パケットキャプチャ解析とラベル付け・可視化       |
+| [powerpoint-automation](powerpoint-automation/)         | Create PPTX from web articles / Web記事からPowerPoint自動生成                                                       |
+| [powerpoint-planning](powerpoint-planning/)             | Plan PowerPoint structure and storyline before automation / PowerPoint資料の構成・ストーリーライン設計              |
+| [receipt-expense-workflow](receipt-expense-workflow/)   | Company expense receipt workflow with OCR and D365 mapping / 会社経費レシート整理と D365 経費精算準備               |
+| [receipt-tax-ocr](receipt-tax-ocr/)                     | Tax receipt OCR rename workflow / 確定申告・個人経費向け領収書 OCR リネーム                                         |
+| [retro-copilot](retro-copilot/)                         | Reflect session learnings into ~/.copilot assets / `.copilot` 資産へのレトロ反映                                    |
+| [skill-creator-plus](skill-creator-plus/)               | Design, review, and fix Agent Skills with better triggering / スキル設計・レビュー・発火改善                        |
+| [skill-finder](skill-finder/)                           | Search skills and route to the right customization primitive / スキル検索と customization 振り分け                  |
+| [visualize-as-infographic](visualize-as-infographic/)   | Create infographic HTML/PNG variants from context / 文脈からインフォグラフィック画像を複数案生成                    |
+| [web-accessibility](web-accessibility/)                 | Build and review accessible web products with WCAG 2.2 AA / Web アクセシビリティ実装・レビュー                      |
+| [vscode-extension-guide](vscode-extension-guide/)       | VS Code extension development guide / VS Code 拡張機能開発ガイド                                                    |
+
+## Usage / 使い方
+
+### 🚀 Recommended: Agent Skill Ninja (VS Code Extension)
+
+Install the **Agent Skill Ninja** extension for easy skill management:
+
+**Agent Skill Ninja** 拡張機能でスキル管理が簡単に：
+
+**[📦 Agent Skill Ninja - VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=yamapan.agent-skill-ninja)**
+
+- 🔍 Browse and search skills / スキルの検索・閲覧
+- 📥 One-click install to your project / ワンクリックでプロジェクトにインストール
+- 🔄 Auto-update installed skills / インストール済みスキルの自動更新
+- 📋 View skill details and documentation / スキル詳細とドキュメントの表示
+
+### Manual Installation / 手動インストール
+
+Copy the desired skill folder to your project's `.github/skills/` or `.claude/skills/` directory.
+
+使いたいスキルフォルダをプロジェクトの `.github/skills/` または `.claude/skills/` にコピーしてください。
+
+```bash
+# Example / 例
+cp -r skill-finder /path/to/your/project/.github/skills/
+```
+
+## Structure / 構成
+
+Each skill follows this structure / 各スキルは以下の構成です：
+
+```
+skill-name/
+├── SKILL.md          # Skill definition / スキル定義
+├── LICENSE.txt       # License / ライセンス
+├── references/       # Reference files / 参照ファイル
+└── scripts/          # Helper scripts / ヘルパースクリプト
+```
+
+## License / ライセンス
+
+Each skill has its own license in `LICENSE.txt`. Please refer to the license file in each skill folder.
+
+各スキルは個別のライセンスを持ちます。各スキルフォルダ内の `LICENSE.txt` を参照してください。
+
+- **Self-created skills / 自作スキル**: CC BY-NC-SA 4.0
+- **External skills / 外部由来**: Original license retained (MIT, Apache 2.0, etc.)
+
+## Author / 作者
+
+yamapan ([@aktsmm](https://github.com/aktsmm))

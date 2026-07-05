@@ -1,0 +1,114 @@
+---
+name: azure-env-builder
+description: "[Alpha] Experimental Azure environment builder for infrastructure and deployment design. Use when building Azure infrastructure, generating Bicep with AVM modules, deploying apps to App Service/AKS/Container Apps, designing Hub-Spoke/AKS/AI Foundry architectures, or creating low-cost Azure operations demos."
+argument-hint: "構築したい Azure 構成、アプリ、制約条件"
+user-invocable: true
+license: CC BY-NC-SA 4.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
+---
+
+# Azure Environment Builder
+
+Enterprise Azure environment builder skill.
+
+## When to Use
+
+- **Azure**, **Bicep**, **infrastructure**, **deploy app**
+- Building enterprise Azure environments
+- Deploying apps to App Service, AKS, or Container Apps
+- Designing Hub-Spoke, AKS, or AI Foundry architectures
+- Creating low-cost Azure operations demos with alerts, logs, portal steps, and minimal always-on resources
+
+## When NOT to Use
+
+- 使い捨ての検証 lab を作って機能・制約・route 挙動を試し、cleanup まで回したいとき
+  - → `azure-infra-validation`
+- 本番障害を read-only で切り分けたいとき
+  - → `azure-troubleshooting`
+
+## Features
+
+| Category       | Capabilities                       |
+| -------------- | ---------------------------------- |
+| Architecture   | Hub-Spoke, Web+DB, AKS, AI Foundry |
+| AVM Modules    | 200+ Azure Verified Modules        |
+| VM Init        | Squid, Nginx, Docker, IIS setup    |
+| Config Linking | SQL/Storage/Redis, Managed ID RBAC |
+| CI/CD          | GitHub Actions / Azure Pipelines   |
+| Ops Demo       | Low-cost app, alert, log, and control-plane failure patterns |
+
+## Workflow
+
+1. **Interview** - Gather requirements + select architecture pattern
+2. **MCP Tools** - Fetch latest AVM/schema info
+3. **Scaffold** - Generate environment folder via `scripts/scaffold_environment.ps1`
+4. **Implement** - Write Bicep with AVM modules + VM init
+5. **CI/CD** - Generate pipeline templates
+6. **Deploy** - what-if → execute
+
+## Required: MCP Tools
+
+**Run before generating Bicep code:**
+
+```
+mcp_bicep_experim_get_bicep_best_practices
+mcp_bicep_experim_list_avm_metadata
+mcp_bicep_experim_get_az_resource_type_schema(azResourceType, apiVersion)
+microsoft_docs_search(query: "Private Endpoint Bicep")
+```
+
+## Interview Checklist
+
+→ **[references/hearing-checklist.md](references/hearing-checklist.md)**
+
+| Item         | Details                 |
+| ------------ | ----------------------- |
+| Subscription | ID or `az account show` |
+| Environment  | dev / staging / prod    |
+| Region       | japaneast / japanwest   |
+| Deploy Type  | Azure CLI / Bicep       |
+
+## Architecture Patterns
+
+→ **[references/architecture-patterns.md](references/architecture-patterns.md)**
+
+| Pattern    | Use Case                       |
+| ---------- | ------------------------------ |
+| Hub-Spoke  | Large enterprise               |
+| Web + DB   | Standard web applications      |
+| AKS        | Container microservices        |
+| AI Foundry | AI/ML workloads                |
+| Proxy VM   | Private network egress control |
+
+## Commands
+
+```powershell
+# Scaffold environment folder
+pwsh scripts/scaffold_environment.ps1 -Environment <env> -Location <region>
+
+# Validate
+az deployment group what-if --resource-group <rg> --template-file main.bicep
+
+# Deploy
+az deployment group create --resource-group <rg> --template-file main.bicep
+```
+
+## Key References
+
+| File                                                                  | Purpose                |
+| --------------------------------------------------------------------- | ---------------------- |
+| [architecture-patterns.md](references/architecture-patterns.md)       | Architecture patterns  |
+| [avm-modules.md](references/avm-modules.md)                           | AVM module catalog     |
+| [vm-app-scripts.md](references/vm-app-scripts.md)                     | VM init scripts        |
+| [app-deploy-patterns.md](references/app-deploy-patterns.md)           | App deploy patterns    |
+| [low-cost-ops-demo.md](references/low-cost-ops-demo.md)               | Low-cost operations demos |
+| [service-config-templates.md](references/service-config-templates.md) | Service config linking |
+| [cicd-templates/](references/cicd-templates/)                         | CI/CD templates        |
+
+## Done Criteria
+
+- [ ] Interview checklist completed
+- [ ] MCP tools fetched latest info
+- [ ] Bicep files generated
+- [ ] `az deployment group what-if` succeeded

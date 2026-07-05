@@ -1,0 +1,19 @@
+{
+  "description": "Customer-specific Azure Update priority keywords. Fill for each customer workspace.",
+  "priorityKeywords": {
+    "廃止": { "Category": "Breaking", "Priority": 1 },
+    "Retirement": { "Category": "Breaking", "Priority": 1 },
+    "Virtual Machine": { "Category": "IaaS", "Priority": 2 },
+    "VM": { "Category": "IaaS", "Priority": 2 },
+    "VNet": { "Category": "Network", "Priority": 3 },
+    "ExpressRoute": { "Category": "Network", "Priority": 3 },
+    "Firewall": { "Category": "Network", "Priority": 3 },
+    "Storage": { "Category": "Storage", "Priority": 4 },
+    "Backup": { "Category": "Backup", "Priority": 5 },
+    "Key Vault": { "Category": "Security", "Priority": 6 },
+    "Monitor": { "Category": "Monitoring", "Priority": 7 },
+    "Log Analytics": { "Category": "Monitoring", "Priority": 7 },
+    "Azure Arc": { "Category": "Hybrid", "Priority": 8 },
+    "AI": { "Category": "AI", "Priority": 9 }
+  }
+}

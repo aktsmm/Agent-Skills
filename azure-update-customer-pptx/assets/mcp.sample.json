@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "microsoft-learn": {
+      "type": "stdio",
+      "command": "<microsoft-learn-mcp-command>",
+      "args": []
+    },
+    "azure-updates": {
+      "type": "stdio",
+      "command": "<azure-updates-mcp-command>",
+      "args": []
+    }
+  }
+}

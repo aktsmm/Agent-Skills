@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/me/events/{event-id}/tentativelyAccept",
+  "apiVersion": "v1.0",
+  "permissionProfile": "calendar-write",
+  "intentSummary": "Tentatively accept a meeting request",
+  "body": {
+    "comment": "Tentative.",
+    "sendResponse": true
+  }
+}

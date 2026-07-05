@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/me/events/{event-id}/decline",
+  "apiVersion": "v1.0",
+  "permissionProfile": "calendar-write",
+  "intentSummary": "Decline a meeting request",
+  "body": {
+    "comment": "Declined.",
+    "sendResponse": true
+  }
+}

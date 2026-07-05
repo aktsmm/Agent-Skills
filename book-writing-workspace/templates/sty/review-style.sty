@@ -1,0 +1,22 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{review-style}[2021/01/06]
+\RequirePackage{fancyhdr}
+\RequirePackage{graphicx}
+\RequirePackage{truncate}
+\newcommand{\reviewcurrentsection}{}
+\newcommand{\reviewtopsection}{\gtfamily\sffamily\bfseries\upshape\small \nouppercase{\truncate{.78\textwidth}{\reviewcurrentsection}}}
+\newcommand{\reviewtopchapter}{\gtfamily\sffamily\bfseries\upshape\small \nouppercase{\truncate{.78\textwidth}{\leftmark}}}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[CE]{\reviewtopchapter}
+\fancyhead[CO]{\reviewtopsection}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\sectionmark}[1]{\gdef\reviewcurrentsection{\thesection~#1}\markright{}}
+\renewcommand{\chaptermark}[1]{\markboth{\prechaptername\ \thechapter\ \postchaptername~#1}{}}
+\renewcommand{\headfont}{\gtfamily\sffamily\bfseries}
+\hypersetup{hidelinks}
+\floatplacement{figure}{H}
+\floatplacement{table}{H}
+\usepackage{xurl}
+\emergencystretch=3em

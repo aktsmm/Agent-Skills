@@ -1,0 +1,240 @@
+# Troubleshooting
+
+Common issues and solutions for VS Code extension development.
+
+## Extension Not Loading
+
+| Symptom                     | Cause                      | Solution                                                         |
+| --------------------------- | -------------------------- | ---------------------------------------------------------------- |
+| Extension never activates   | Missing `activationEvents` | Add to package.json: `"activationEvents": ["onStartupFinished"]` |
+| "Extension is not active"   | Wrong activation trigger   | Use `"*"` to always activate (dev only) or specific event        |
+| Works in dev, not installed | Build output not included  | Check `.vscodeignore`, ensure `out/` is included                 |
+
+### Debug Activation
+
+```typescript
+// Add at top of activate() while debugging, or route this through your logger.
+const output = vscode.window.createOutputChannel("My Extension");
+output.appendLine("Extension activating...");
+output.show(true);
+```
+
+Prefer Output Channel logs for extension diagnostics. Use **Help** → **Toggle Developer Tools** → **Console** only for temporary investigation or webview/runtime errors that are not reaching your logger.
+
+## Command Not Found
+
+| Symptom                   | Cause                        | Solution                                             |
+| ------------------------- | ---------------------------- | ---------------------------------------------------- |
+| "command not found"       | ID mismatch                  | Ensure same ID in package.json and registerCommand() |
+| Command not in palette    | Missing contributes.commands | Add command definition to package.json               |
+| Command defined but fails | Extension not activated      | Check activationEvents includes the command          |
+
+### Verify Command Registration
+
+```typescript
+// In activate()
+const output = vscode.window.createOutputChannel("My Extension");
+const commands = await vscode.commands.getCommands();
+output.appendLine(
+  `Registered: ${commands.filter((c) => c.includes("myExt")).join(", ")}`,
+);
+```
+
+## Keyboard Shortcuts Not Working
+
+| Symptom               | Cause                             | Solution                           |
+| --------------------- | --------------------------------- | ---------------------------------- |
+| Shortcut does nothing | `when` clause too restrictive     | Remove or broaden `when` condition |
+| Works sometimes       | Context-dependent `when`          | Check active editor, focus state   |
+| Conflict with other   | Another extension/VS Code uses it | Use unique key combination         |
+
+### Check for Conflicts
+
+1. **Ctrl+K Ctrl+S** → Open Keyboard Shortcuts
+2. Search for your key combination
+3. Look for conflicts (multiple entries)
+
+### Common `when` Issues
+
+```json
+// ❌ Doesn't work in editor
+"when": "!inputFocus"
+
+// ✅ Works everywhere
+"when": ""  // or omit entirely
+
+// ✅ Only in editor with text focus
+"when": "editorTextFocus"
+```
+
+## Packaging Issues
+
+| Symptom                                                          | Cause                                               | Solution                                                                                                |
+| ---------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| VSIX too large (100MB+)                                          | `node_modules` shipped, incl. a huge transitive dep | Exclude `node_modules/**` in `.vscodeignore` when `out/` needs no external runtime packages (see below) |
+| Files missing in VSIX                                            | Over-aggressive ignore                              | Use `npx @vscode/vsce ls` to check                                                                      |
+| Icon not showing                                                 | Wrong path or format                                | Use 128x128 PNG, check path in package.json                                                             |
+| `End of central directory record signature not found` on install | Truncated / corrupt VSIX (build interrupted)        | Re-run `vsce package`; verify with `code --install-extension <vsix> --force` before publish             |
+
+### Inspect VSIX Contents
+
+```bash
+# List what will be packaged
+npx @vscode/vsce ls
+
+# Extract and inspect VSIX
+unzip -l my-extension-1.0.0.vsix
+```
+
+### When it is safe to exclude `node_modules/**` entirely
+
+A bundled extension (esbuild/webpack) needs no `node_modules` in the VSIX. An
+unbundled extension only needs the packages its compiled `out/` actually
+`require`s at runtime. Check before trusting `dependencies`:
+
+```powershell
+# What does the compiled output actually require at runtime?
+Select-String -Path out\*.js -Pattern 'require\("([^.][^"]+)"\)' -AllMatches |
+  ForEach-Object { $_.Matches } | ForEach-Object { $_.Groups[1].Value } |
+  Sort-Object -Unique
+# Also scan for dynamic import("pkg")
+```
+
+If the only externals are `vscode` (provided by the host) and Node built-ins
+(`fs`, `path`, `http`, `child_process`, ...), add `node_modules/**` to
+`.vscodeignore` and ship none of it. A dependency that is only reached through a
+**guarded dynamic `import()` disabled inside the extension host** is dead weight
+— e.g. `@github/copilot-sdk` pulls a ~285MB `@github/copilot` tree that kept one
+VSIX at 181MB; excluding `node_modules` produced an identical-functioning ~45KB
+build.
+
+### Always list every entry, not just the size
+
+```powershell
+# Enumerate all VSIX entries and flag leaked temp files
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$z = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path my-extension-1.0.0.vsix))
+$z.Entries | Sort-Object FullName | ForEach-Object { '{0,8}  {1}' -f $_.Length, $_.FullName }
+$z.Dispose()
+```
+
+Block the build if temp runner scripts (`_*.ps1`), logs, or stray `*.vsix`
+leaked in, and add the matching ignore patterns (`*.ps1`, `*.log`, `*.vsix`) to
+`.vscodeignore`. Compare the new VSIX size against the previous version: an
+unexpectedly large or unchanged-huge size means `.vscodeignore` is not excluding
+`node_modules`.
+
+## Publishing Errors
+
+| Symptom             | Cause                  | Solution                                 |
+| ------------------- | ---------------------- | ---------------------------------------- |
+| PAT invalid         | Wrong scope or expired | Regenerate with Marketplace Manage scope |
+| Publisher not found | ID mismatch            | Verify publisher ID matches exactly      |
+| Version exists      | Already published      | Increment version number                 |
+| README not showing  | Wrong filename case    | Must be `README.md` not `README.MD`      |
+
+## Runtime Errors
+
+| Symptom              | Cause                  | Solution                                            |
+| -------------------- | ---------------------- | --------------------------------------------------- |
+| "Cannot find module" | Dependency not bundled | Add to dependencies (not devDependencies) or bundle |
+| API undefined        | Wrong VS Code version  | Check `engines.vscode` matches API used             |
+| Permission denied    | Restricted API         | Check extension permissions/capabilities            |
+
+### Check VS Code API Version
+
+```json
+// package.json - specify minimum VS Code version
+"engines": {
+  "vscode": "^1.80.0"
+}
+```
+
+## Debug Tips
+
+### Enable Verbose Logging
+
+```typescript
+const outputChannel = vscode.window.createOutputChannel("My Extension");
+outputChannel.appendLine("Debug message");
+outputChannel.show();
+```
+
+Keep runtime diagnostics behind a small logger wrapper so tests can assert the logging route and production code does not accumulate stray `console.log` calls.
+
+### Extension Host Logs
+
+1. **Help** → **Toggle Developer Tools**
+2. **Console** tab
+3. Filter by your extension name
+
+### Reload Without Restart
+
+- **Ctrl+Shift+P** → "Developer: Reload Window"
+
+## Driving Copilot Chat From an Extension
+
+Extensions that launch chat via the internal `workbench.action.chat.open` command (passing `mode`, `modelSelector`, or a settings-based reasoning effort) hit a recurring confusion: **writing the setting correctly is not the same as the host honoring it.**
+
+- Separate the two failure surfaces: (1) does your extension pass the right argument / write the right config, and (2) does the host act on it. Confirm (1) from your own Output Channel logs, then judge (2) from host behavior — do not conclude (1) is broken from a (2) symptom.
+- Inspect host runtime logs (and the VS Code source for the internal command) **early**. Do not theorize about model-specific differences (e.g. "Opus ignores it") before verifying the same `mode`/`reasoningEffort` is actually sent for every model. In practice the arguments are identical across models and the difference is host-side handling.
+- Reasoning effort applied through the settings path (e.g. an experimental `chatLanguageModels.json` entry in global storage) is written by the extension but honored by the platform. If the chosen depth is not reflected, the extension can still be correct — surface a short UI note ("applied depending on platform support") instead of chasing a non-existent bug.
+- These internal commands are undocumented and version-sensitive. Guard the argument shape and add fallback tiers (e.g. retry without reasoning effort before a legacy fallback); never let a fallback silently drop **both** the agent and the reasoning effort.
+
+### Discovering `.agent.md` Custom Agents
+
+If your extension lists custom agents in a picker, exclude agents whose frontmatter sets `user-invocable: false` — those cannot be directly invoked and only confuse users when shown. A surprising "agent can't be selected" report is usually this flag, not a model or API limitation.
+
+- Cache agent discovery and invalidate it from a file watcher on `**/*.agent.md` (and `**/AGENTS.md`); raise any scan cap well above a handful of files, and warm the cache on activation so the first picker open is not empty.
+
+## Quick Fixes Summary
+
+```bash
+# Clean rebuild
+rm -rf out/ node_modules/
+npm install
+npm run compile
+
+# Reset installed extension
+code --uninstall-extension publisher.extension-id
+npx @vscode/vsce package
+code --install-extension ./extension-1.0.0.vsix
+
+# Check what's in your VSIX
+npx @vscode/vsce ls
+```
+
+## Webview 真っ白 / SyntaxError
+
+| 症状                               | 原因                               | 解決策                                        |
+| ---------------------------------- | ---------------------------------- | --------------------------------------------- |
+| 画面真っ白                         | JavaScript SyntaxError             | Webview DevTools Console でエラー確認         |
+| `Invalid regular expression: /^*/` | 正規表現のバックスラッシュが消えた | テンプレート内で二重エスケープ (`\\d`, `\\s`) |
+| `Unexpected token`                 | minify時にクォートが崩れた         | `data-action` + イベント委譲パターンに変更    |
+| ボタンが反応しない                 | innerHTML後の onclick が効かない   | `document.addEventListener` で委譲            |
+
+### デバッグ手順
+
+1. **Developer: Open Webview Developer Tools** を実行
+2. Console タブでエラーを確認
+3. ビルド出力 `out/extension.js` で該当行を検索
+4. ソースの正規表現/クォートを修正し再ビルド
+
+## 命名の不一致
+
+| 症状                   | 原因                             | 解決策                                    |
+| ---------------------- | -------------------------------- | ----------------------------------------- |
+| 設定が効かない         | 設定キーがコードと不一致         | package.json と getConfiguration() を統一 |
+| コマンドが見つからない | コマンドIDがpackage.jsonと不一致 | 全箇所で同じIDを使用                      |
+
+### 命名一貫性チェック
+
+```bash
+# package.json のコマンド/設定キーを抽出
+grep -E '"myExt\.' package.json
+
+# ソースコードの使用箇所を検索
+grep -r "myExt\." src/
+```
+
+公開前に統一することを強く推奨（公開後は既存ユーザーの設定が壊れる）。

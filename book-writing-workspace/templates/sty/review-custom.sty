@@ -1,0 +1,71 @@
+\RequirePackage{xcolor}
+\RequirePackage{caption}
+\renewcommand{\kanjifamilydefault}{\gtdefault}
+\renewcommand{\familydefault}{\sfdefault}
+\definecolor{ReviewChapterRule}{HTML}{326450}
+\definecolor{ReviewSectionRule}{HTML}{326450}
+\setlength{\parindent}{0pt}
+\DeclareCaptionFont{reviewfigurecaption}{\fontsize{6pt}{8pt}\selectfont}
+\captionsetup[figure]{font=reviewfigurecaption}
+\DeclareRobustCommand{\reviewincludegraphics}[2][]{%
+  \includegraphics[width=0.6\linewidth,height=0.6\textheight,keepaspectratio,#1]{#2}}
+\makeatletter
+\def\@makechapterhead#1{%
+  \vspace*{12\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    {\color{ReviewChapterRule}\hrule height 1.2pt\relax}\par
+    \vspace{1.2\baselineskip}%
+    \ifnum \c@secnumdepth >\m@ne
+      {\headfont\fontsize{11pt}{14pt}\selectfont \@chapapp\thechapter\@chappos\par\nobreak}%
+      \vspace{0.5\baselineskip}%
+    \fi
+    {\headfont\fontsize{20pt}{24pt}\selectfont #1\par\nobreak}%
+    \vspace{1.8\baselineskip}}}
+\makeatother
+\RequirePackage{tcolorbox}
+\RequirePackage{etoolbox}
+\tcbuselibrary{skins,breakable}
+\definecolor{ReviewColumnPageBg}{HTML}{FFF6EA}
+\definecolor{ReviewColumnFrame}{HTML}{C98B3A}
+\AtBeginEnvironment{tabular}{%
+  \ifnum\value{chapter}=4
+    \fontsize{6.4pt}{9.6pt}\selectfont
+  \else
+    \fontsize{7.2pt}{10.8pt}\selectfont
+  \fi
+}
+\AtBeginEnvironment{longtable}{%
+  \ifnum\value{chapter}=4
+    \fontsize{6.4pt}{9.6pt}\selectfont
+  \else
+    \fontsize{7.2pt}{10.8pt}\selectfont
+  \fi
+}
+\renewenvironment{reviewcolumn}[1][]{%
+  \clearpage
+  \pagecolor{ReviewColumnPageBg}
+  \thispagestyle{plainhead}
+  \fontsize{5.6pt}{8.4pt}\selectfont
+  \begin{tcolorbox}[
+    enhanced jigsaw,
+    breakable,
+    sharp corners,
+    boxrule=0mm,
+    colback=ReviewColumnPageBg,
+    borderline west={0.9mm}{0mm}{ReviewColumnFrame},
+    left=4mm,
+    right=3mm,
+    top=4mm,
+    bottom=3mm,
+    pad at break=0mm,
+    before skip=0pt,
+    after skip=0pt
+  ]
+  \reviewcolumnhead{}{#1}
+}{%
+  \end{tcolorbox}
+  \clearpage
+  \nopagecolor
+}
+\renewcommand{\reviewcolumnhead}[2]{%
+  {\noindent\color{ReviewColumnFrame}\headfont\fontsize{11pt}{14pt}\selectfont コラム: #2\par\vspace{0.6\baselineskip}}}

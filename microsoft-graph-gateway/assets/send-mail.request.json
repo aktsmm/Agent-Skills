@@ -1,0 +1,16 @@
+{
+  "method": "POST",
+  "path": "/me/sendMail",
+  "apiVersion": "v1.0",
+  "permissionProfile": "mail-write",
+  "intentSummary": "Send a short status email to the project group",
+  "body": {
+    "message": {
+      "subject": "Status update",
+      "body": {
+        "contentType": "Text",
+        "content": "All checks passed."
+      }
+    }
+  }
+}

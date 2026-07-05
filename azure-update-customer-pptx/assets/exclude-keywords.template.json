@@ -1,0 +1,12 @@
+{
+  "description": "Customer-specific exclusion keywords. Matching updates are Appendix candidates unless overridden.",
+  "excludeKeywords": {
+    "Unused developer tools": ["sample unused service"],
+    "Non-target regions": ["Government", "China only"]
+  },
+  "overrideToWeekly": {
+    "description": "Labels that can restore excluded updates to Weekly when customer impact is high.",
+    "labels": ["廃止"],
+    "excludeCategories": []
+  }
+}
