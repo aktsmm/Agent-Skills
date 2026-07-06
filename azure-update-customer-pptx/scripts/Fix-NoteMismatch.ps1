@@ -4,7 +4,7 @@
 .DESCRIPTION
     notes.json のタイトルとスライドタイトルを正規化して正確にマッチさせ、
     正しいノート内容を書き込む。
-
+    
     根本原因: Find-ByPartialTitle の -match がサブストリングマッチを行い、
     "Application Gateway" を含む複数タイトルで誤マッチが発生した。
 .PARAMETER DateFolder
@@ -15,7 +15,7 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$DateFolder,
-
+    
     [int[]]$TargetSlides = @(7, 10, 12)
 )
 
@@ -86,9 +86,9 @@ function Find-ExactNoteEntry {
         [string]$SlideTitle,
         [array]$NotesArray
     )
-
+    
     $normalizedSlide = Get-NormalizedTitle $SlideTitle
-
+    
     # Phase 1: 完全一致
     foreach ($entry in $NotesArray) {
         $normalizedEntry = Get-NormalizedTitle $entry.title
@@ -96,7 +96,7 @@ function Find-ExactNoteEntry {
             return $entry
         }
     }
-
+    
     # Phase 2: 先頭30文字プレフィックス一致（先頭のみ、サブストリングではない）
     foreach ($entry in $NotesArray) {
         $normalizedEntry = Get-NormalizedTitle $entry.title
@@ -105,7 +105,7 @@ function Find-ExactNoteEntry {
             return $entry
         }
     }
-
+    
     return $null
 }
 
@@ -114,16 +114,16 @@ function Find-ExactClassificationEntry {
         [string]$SlideTitle,
         [array]$ClassificationArray
     )
-
+    
     $normalizedSlide = Get-NormalizedTitle $SlideTitle
-
+    
     foreach ($entry in $ClassificationArray) {
         $normalizedEntry = Get-NormalizedTitle $entry.title
         if ($normalizedSlide -eq $normalizedEntry) {
             return $entry
         }
     }
-
+    
     foreach ($entry in $ClassificationArray) {
         $normalizedEntry = Get-NormalizedTitle $entry.title
         $len = [Math]::Min(30, [Math]::Min($normalizedSlide.Length, $normalizedEntry.Length))
@@ -131,7 +131,7 @@ function Find-ExactClassificationEntry {
             return $entry
         }
     }
-
+    
     return $null
 }
 
@@ -140,16 +140,16 @@ function Find-ExactRegionEntry {
         [string]$SlideTitle,
         [hashtable]$RegionMap
     )
-
+    
     $normalizedSlide = Get-NormalizedTitle $SlideTitle
-
+    
     foreach ($key in $RegionMap.Keys) {
         $normalizedKey = Get-NormalizedTitle $key
         if ($normalizedSlide -eq $normalizedKey) {
             return $RegionMap[$key]
         }
     }
-
+    
     foreach ($key in $RegionMap.Keys) {
         $normalizedKey = Get-NormalizedTitle $key
         $len = [Math]::Min(30, [Math]::Min($normalizedSlide.Length, $normalizedKey.Length))
@@ -157,7 +157,7 @@ function Find-ExactRegionEntry {
             return $RegionMap[$key]
         }
     }
-
+    
     return $null
 }
 
@@ -170,9 +170,9 @@ function Build-WeeklyNote {
         [object]$ClassInfo,
         [object]$RegionEntry
     )
-
+    
     $noteLines = @()
-
+    
     if ($NoteInfo) {
         # basics
         if ($NoteInfo.basics -and $NoteInfo.basics.Count -gt 0) {
@@ -190,13 +190,13 @@ function Build-WeeklyNote {
         $noteLines += ""
         $noteLines += "■ Before/After"
         $noteLines += $NoteInfo.beforeAfter
-
+        
         if ($NoteInfo.systemImpact) {
             $noteLines += ""
             $noteLines += "■ 顧客システムへの影響"
             $noteLines += $NoteInfo.systemImpact
         }
-
+        
         if ($NoteInfo.customerConcerns -and $NoteInfo.customerConcerns.Count -gt 0) {
             $noteLines += ""
             $noteLines += "■ 想定 Q&A"
@@ -209,7 +209,7 @@ function Build-WeeklyNote {
                 }
             }
         }
-
+        
         if ($ClassInfo -and $ClassInfo.keypoint) {
             $noteLines += ""
             $noteLines += "■ キーポイント"
@@ -219,7 +219,7 @@ function Build-WeeklyNote {
             }
         }
     }
-
+    
     # 参考URL
     $url = ""
     if ($NoteInfo -and $NoteInfo.referenceUrl) {
@@ -232,7 +232,7 @@ function Build-WeeklyNote {
         $noteLines += "■ 参考URL"
         $noteLines += $url
     }
-
+    
     return ($noteLines -join "`n")
 }
 
@@ -247,67 +247,67 @@ try {
     Close-OpenPptxPresentation -PptxPath $outputPath -Save | Out-Null
     $ppt = New-PptxSession
     $pres = $ppt.Presentations.Open($outputPath)
-
+    
     Write-Info "スライド数: $($pres.Slides.Count)"
-
+    
     $fixedCount = 0
-
+    
     foreach ($slideNum in $TargetSlides) {
         Write-StepHeader "P$slideNum の修正"
-
+        
         $slide = $pres.Slides.Item($slideNum)
         $rawTitle = Get-SlideTitle -Slide $slide
         $normalizedTitle = Get-NormalizedTitle $rawTitle
-
+        
         Write-Info "タイトル: $rawTitle"
         Write-Info "正規化後: $normalizedTitle"
-
+        
         # notes.json から正確にマッチ
         $nInfo = Find-ExactNoteEntry -SlideTitle $rawTitle -NotesArray $notesData.weekly
         $wInfo = Find-ExactClassificationEntry -SlideTitle $rawTitle -ClassificationArray $classification.weekly
         $rInfo = Find-ExactRegionEntry -SlideTitle $rawTitle -RegionMap $regionInfo
-
+        
         if (-not $nInfo) {
             Write-Warning "P$slideNum : notes.json にマッチするエントリが見つかりません"
             Write-Warning "  正規化タイトル: $normalizedTitle"
             continue
         }
-
+        
         $matchedTitle = Get-NormalizedTitle $nInfo.title
         Write-Info "マッチしたエントリ: $matchedTitle"
-
+        
         # 現在のノート冒頭を表示
         $currentNote = Get-SpeakerNote -Slide $slide
         $currentFirst50 = if ($currentNote.Length -gt 50) { $currentNote.Substring(0, 50) } else { $currentNote }
         Write-Host "  修正前ノート冒頭: $currentFirst50" -ForegroundColor Yellow
-
+        
         # 正しいノートを組み立て
         $newNote = Build-WeeklyNote -NoteInfo $nInfo -ClassInfo $wInfo -RegionEntry $rInfo
-
+        
         # 書き込み
         Set-SpeakerNote -Slide $slide -NoteText $newNote | Out-Null
-
+        
         $newFirst50 = if ($newNote.Length -gt 50) { $newNote.Substring(0, 50) } else { $newNote }
         Write-Host "  修正後ノート冒頭: $newFirst50" -ForegroundColor Green
-
+        
         $fixedCount++
         Write-Success "P$slideNum : ノート修正完了"
     }
-
+    
     # 保存
     $pres.Save()
     Write-Success "保存完了（$fixedCount 件修正）: $outputPath"
-
+    
 } catch {
     Write-Failure "エラー発生: $_"
     Write-Host $_.ScriptStackTrace -ForegroundColor Red
     exit 1
 } finally {
-    if ($pres) {
+    if ($pres) { 
         $pres.Close()
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($pres) | Out-Null
     }
-    if ($ppt) {
+    if ($ppt) { 
         $ppt.Quit()
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
     }

@@ -10,11 +10,17 @@
 Clean PPTX template by removing problematic elements.
 
 Usage:
-    python scripts/clean_template.py <input.pptx> <output.pptx> [--keep-first-master]
+    python scripts/clean_template.py <input.pptx> <output.pptx> [--keep-first-master] [--keep-metadata]
 
-Removes:
+Removes / sanitizes:
     - Background images (PICTURE shapes) from slide masters
     - Blip references from Picture Placeholders in layouts
+    - docProps/custom.xml (MIP labels, tenant IDs, SharePoint columns,
+      colleague identities) and cp:lastModifiedBy / cp:revision in
+      docProps/core.xml, so the check-in artifact does not carry the
+      metadata that PowerPoint attaches when the file is opened from
+      OneDrive/SharePoint. Use --keep-metadata only for tenant-internal
+      private repos where the labels are intentional.
     - Optionally keeps only the first slide master
 
 This prepares external templates (e.g., from Microsoft Ignite) for use
@@ -24,6 +30,7 @@ without decorative background images interfering with generated content.
 from pptx import Presentation
 from lxml import etree
 import sys
+import zipfile
 from pathlib import Path
 import shutil
 
@@ -75,7 +82,70 @@ def remove_placeholder_blips(prs) -> int:
     return removed
 
 
-def clean_template(input_path: str, output_path: str, keep_first_master_only: bool = False) -> dict:
+def sanitize_pptx_metadata(pptx_path: str) -> dict:
+    """Strip PII from docProps in a saved pptx (in-place).
+
+    - docProps/custom.xml -> empty <Properties/> element (removes MIP /
+      MSIP labels, SharePoint columns, tenant IDs, colleague emails).
+    - docProps/core.xml   -> blank cp:lastModifiedBy and cp:revision.
+
+    PowerPoint re-instruments docProps on every save from OneDrive /
+    SharePoint by a labeled account, so this must run on the check-in
+    artifact whenever the template is regenerated, not once per skill.
+    """
+    EMPTY_CUSTOM = (
+        b'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+        b'<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties" '
+        b'xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"/>'
+    )
+    CORE_NS = {
+        'cp': 'http://schemas.openxmlformats.org/package/2006/metadata/core-properties',
+    }
+
+    stats = {'custom_stripped': False, 'core_neutralized': False}
+    src = Path(pptx_path)
+    tmp = src.with_suffix(src.suffix + '.sanitize-tmp')
+
+    try:
+        with zipfile.ZipFile(src, 'r') as zin, zipfile.ZipFile(
+            tmp, 'w', compression=zipfile.ZIP_DEFLATED
+        ) as zout:
+            for item in zin.infolist():
+                data = zin.read(item.filename)
+                if item.filename == 'docProps/custom.xml':
+                    if data.strip() and data != EMPTY_CUSTOM:
+                        stats['custom_stripped'] = True
+                    data = EMPTY_CUSTOM
+                elif item.filename == 'docProps/core.xml':
+                    try:
+                        root = etree.fromstring(data)
+                        changed = False
+                        for xp in ('cp:lastModifiedBy', 'cp:revision'):
+                            el = root.find(xp, CORE_NS)
+                            if el is not None and (el.text or '').strip():
+                                el.text = ''
+                                changed = True
+                        if changed:
+                            stats['core_neutralized'] = True
+                            data = etree.tostring(
+                                root, xml_declaration=True,
+                                encoding='UTF-8', standalone=True
+                            )
+                    except etree.XMLSyntaxError:
+                        pass
+                zout.writestr(item, data)
+        shutil.move(str(tmp), str(src))
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+
+    return stats
+
+
+def clean_template(input_path: str, output_path: str, keep_first_master_only: bool = False, sanitize_metadata: bool = True) -> dict:
     """
     Clean PPTX template and save to output path.
     
@@ -83,6 +153,8 @@ def clean_template(input_path: str, output_path: str, keep_first_master_only: bo
         input_path: Path to input PPTX
         output_path: Path to output PPTX
         keep_first_master_only: If True, remove all but the first slide master
+        sanitize_metadata: If True (default), strip docProps PII (MIP labels,
+            SharePoint fields, cp:lastModifiedBy, cp:revision) after save.
     
     Returns:
         dict with cleaning statistics
@@ -124,21 +196,35 @@ def clean_template(input_path: str, output_path: str, keep_first_master_only: bo
     
     print(f"\n✅ Saved clean template: {output_path}")
     print(f"   Total elements removed: {total_removed}")
-    
+
+    # Strip PII from docProps unless the caller opted out
+    if sanitize_metadata:
+        meta = sanitize_pptx_metadata(output_path)
+        stats['metadata_custom_stripped'] = meta['custom_stripped']
+        stats['metadata_core_neutralized'] = meta['core_neutralized']
+        if meta['custom_stripped'] or meta['core_neutralized']:
+            print(
+                f"   Sanitized docProps: custom.xml={meta['custom_stripped']}, "
+                f"core.xml={meta['core_neutralized']}"
+            )
+
     return stats
 
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python scripts/clean_template.py <input.pptx> <output.pptx> [--keep-first-master]")
+        print("Usage: python scripts/clean_template.py <input.pptx> <output.pptx> [--keep-first-master] [--keep-metadata]")
         print()
         print("Options:")
         print("  --keep-first-master  Remove all but the first slide master (experimental)")
+        print("  --keep-metadata      Keep docProps (MIP labels, cp:lastModifiedBy, etc.).")
+        print("                       Default: strip PII. Use only for tenant-internal repos.")
         sys.exit(1)
     
     input_path = sys.argv[1]
     output_path = sys.argv[2]
     keep_first_master = '--keep-first-master' in sys.argv
+    sanitize_metadata = '--keep-metadata' not in sys.argv
     
     if not Path(input_path).exists():
         print(f"Error: File not found: {input_path}")
@@ -148,7 +234,7 @@ def main():
     output_dir = Path(output_path).parent
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    stats = clean_template(input_path, output_path, keep_first_master)
+    stats = clean_template(input_path, output_path, keep_first_master, sanitize_metadata)
     
     # Exit code: 0 on success
     sys.exit(0)

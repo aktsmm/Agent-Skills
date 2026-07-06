@@ -89,7 +89,7 @@ if ($UpdateScripts) {
 
 if ($CopyMcpSample) {
     $mcpSource = Join-Path $assetsRoot "mcp.sample.json"
-    $mcpTarget = Join-Path $targetRootPath ".vscode\mcp.sample.json"
+    $mcpTarget = Join-Path $targetRootPath ".vscode\mcp.json"
     Copy-StarterFile -Source $mcpSource -Destination $mcpTarget
 }
 

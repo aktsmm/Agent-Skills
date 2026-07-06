@@ -1,6 +1,6 @@
-# Verify-Pptx.ps1 - Gate 3 実機検証スクリプト（拡張版）
+﻿# Verify-Pptx.ps1 - Gate 3 実機検証スクリプト（拡張版）
 # 使用方法: & "scripts\Verify-Pptx.ps1" -PptxPath "path\to\output.pptx"
-#
+# 
 # 検証項目:
 #   1. P2 目次が項番形式
 #   2. UPDATE Points 表のリージョン列
@@ -11,16 +11,25 @@
 #   7. UPDATE Points 位置の検証（Weekly Topics の後）
 #   8. 表内容品質の検証（汎用的な文言禁止）
 #   9. ノート内容整合性チェック（タイトルとノートの対応）★ 2026-02-16 追加
+#   10. テンプレートプレースホルダー残存チェック
+#   11. 敬称重複チェック
+#   12. 表紙以外の表示スライドに顧客固有語が出ていないこと
+#   13. 参照リンク種別と hyperlink
+#   14. Ending variants と空プレースホルダー
+#   15. Appendix hidden/count 整合性
+#   16. リージョン reviewed evidence
 #
 param(
     [Parameter(Mandatory=$true)]
     [string]$PptxPath,
-
+    
     [int]$WeeklyStartSlide = 3,  # P3からWeekly Topics
     [int]$WeeklyCount = 0,  # 0の場合は自動検出
     [int]$AppendixStartSlide = 0,  # 0の場合は自動検出
 
     [object]$Session = $null,
+
+    [switch]$DeliveryMode,
 
     [switch]$NoExit
 )
@@ -43,8 +52,15 @@ $errors = @()
 $warnings = @()
 
 # PowerPoint を開く
-$ownsSession = $null -eq $Session
-$ppt = if ($Session) { $Session } else { New-Object -ComObject PowerPoint.Application }
+$ownsSession = $false
+$ppt = $Session
+if (-not $ppt) {
+    $ppt = Get-ActivePptxApplication
+}
+if (-not $ppt) {
+    $ppt = New-PptxSession
+    $ownsSession = $true
+}
 $pres = $ppt.Presentations.Open($PptxPath, $true, $false, $false)  # ReadOnly
 
 Write-Host "`n総スライド数: $($pres.Slides.Count)"
@@ -55,6 +71,160 @@ if (Test-Path $classificationPath) {
     $classification = Get-Content $classificationPath -Encoding UTF8 | ConvertFrom-Json
 }
 $expectedWeeklyCount = if ($classification -and $classification.weekly) { @($classification.weekly).Count } else { $WeeklyCount }
+
+function Get-CustomerProfileValueForVerify {
+    param(
+        [string]$ProfilePath,
+        [string]$Field
+    )
+
+    if (-not (Test-Path -LiteralPath $ProfilePath)) { return "" }
+
+    $lines = Get-Content -LiteralPath $ProfilePath -Encoding UTF8
+    foreach ($line in $lines) {
+        if ($line -match "^\|\s*$([regex]::Escape($Field))\s*\|\s*(.*?)\s*\|") {
+            return (($Matches[1] -replace '^`|`$', '').Trim())
+        }
+    }
+    return ""
+}
+
+function Get-BaseCustomerNameForVerify {
+    param([string]$CustomerName)
+
+    $trimmed = ($CustomerName -replace '\s+', ' ').Trim()
+    if ($trimmed -match '^(.*?)\s*(御中|様)$') { return $Matches[1].Trim() }
+    return $trimmed
+}
+
+function Get-CustomerSpecificVisibleTerms {
+    param([string]$ProfilePath)
+
+    $terms = New-Object System.Collections.Generic.List[string]
+    $customerName = Get-CustomerProfileValueForVerify -ProfilePath $ProfilePath -Field "Customer name"
+    $customerBaseName = Get-BaseCustomerNameForVerify -CustomerName $customerName
+    $systemName = Get-CustomerProfileValueForVerify -ProfilePath $ProfilePath -Field "System name"
+    $tenantDomain = Get-CustomerProfileValueForVerify -ProfilePath $ProfilePath -Field "Tenant domain"
+    $tenantId = Get-CustomerProfileValueForVerify -ProfilePath $ProfilePath -Field "Tenant id"
+
+    foreach ($term in @($customerName, $customerBaseName, $systemName, $tenantDomain, $tenantId)) {
+        if ($term -and $term.Trim().Length -ge 4 -and -not $terms.Contains($term.Trim())) {
+            $terms.Add($term.Trim())
+        }
+    }
+
+    if (Test-Path -LiteralPath $ProfilePath) {
+        $profileText = Get-Content -LiteralPath $ProfilePath -Raw -Encoding UTF8
+        foreach ($match in [regex]::Matches($profileText, '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')) {
+            $value = $match.Value
+            if (-not $terms.Contains($value)) { $terms.Add($value) }
+        }
+    }
+
+    return @($terms)
+}
+
+function Get-MatchingClassificationItem {
+    param(
+        [string]$Title,
+        [object[]]$Items
+    )
+
+    $cleanTitle = (Get-CleanSlideTitle -Title $Title -replace '\s+', ' ').Trim().ToLower()
+    foreach ($item in @($Items)) {
+        $itemTitle = (Get-CleanSlideTitle -Title $item.title -replace '\s+', ' ').Trim().ToLower()
+        if ($cleanTitle -eq $itemTitle) { return $item }
+    }
+    foreach ($item in @($Items)) {
+        $itemTitle = (Get-CleanSlideTitle -Title $item.title -replace '\s+', ' ').Trim().ToLower()
+        $prefixLength = [Math]::Min(25, [Math]::Min($cleanTitle.Length, $itemTitle.Length))
+        if ($prefixLength -gt 0 -and $cleanTitle.Substring(0, $prefixLength) -eq $itemTitle.Substring(0, $prefixLength)) { return $item }
+    }
+    return $null
+}
+
+function Get-SlideText {
+    param([object]$Slide, [switch]$IncludeLayout)
+
+    $parts = @()
+    foreach ($shape in $Slide.Shapes) {
+        if ($shape.HasTextFrame -ne -1) { continue }
+        try {
+            if ($shape.TextFrame.HasText) { $parts += $shape.TextFrame.TextRange.Text }
+        } catch {}
+    }
+    if ($IncludeLayout) {
+        try {
+            foreach ($shape in $Slide.CustomLayout.Shapes) {
+                if ($shape.HasTextFrame -ne -1) { continue }
+                try {
+                    if ($shape.TextFrame.HasText) { $parts += $shape.TextFrame.TextRange.Text }
+                } catch {}
+            }
+        } catch {}
+    }
+    return ($parts -join "`n")
+}
+
+function Get-HyperlinkAddressForLabel {
+    param(
+        [object]$Slide,
+        [string]$Label
+    )
+
+    foreach ($shape in $Slide.Shapes) {
+        if ($shape.HasTextFrame -ne -1) { continue }
+        try {
+            $range = $shape.TextFrame.TextRange
+            $text = $range.Text
+            $idx = $text.IndexOf($Label)
+            if ($idx -lt 0) { continue }
+            $address = $range.Characters($idx + 1, $Label.Length).ActionSettings(1).Hyperlink.Address
+            if ($address) { return $address }
+        } catch {}
+    }
+    return ""
+}
+
+function Get-ComparableUrlForVerify {
+    param([string]$Url)
+
+    if (-not $Url) { return "" }
+    $withoutFragment = ($Url -replace '#.*$', '')
+    return $withoutFragment.TrimEnd('/')
+}
+
+function Test-AzureUpdateEndingSlideForVerify {
+    param([object]$Slide)
+
+    try { if ($Slide.CustomLayout.Name -like 'Azure Update Ending*') { return $true } } catch {}
+    foreach ($shape in $Slide.Shapes) { if ($shape.Name -like 'Ending-*') { return $true } }
+    return $false
+}
+
+function Test-AzureUpdateCoverSlideForVerify {
+    param([object]$Slide)
+
+    try { if ($Slide.CustomLayout.Name -like 'Azure Update Cover*') { return $true } } catch {}
+    foreach ($shape in $Slide.Shapes) { if ($shape.Name -eq 'CoverPanel') { return $true } }
+    return $false
+}
+
+function Get-EndingVariantNameForVerify {
+    param([object]$Slide)
+
+    foreach ($shape in $Slide.Shapes) {
+        if ($shape.Name -match 'Indigo') { return 'Indigo Amber' }
+        if ($shape.Name -match 'Azure') { return 'Azure Blue' }
+        if ($shape.Name -match 'Teal') { return 'Teal Fresh' }
+    }
+    try {
+        if ($Slide.CustomLayout.Name -match 'Indigo') { return 'Indigo Amber' }
+        if ($Slide.CustomLayout.Name -match 'Azure') { return 'Azure Blue' }
+        if ($Slide.CustomLayout.Name -match 'Teal') { return 'Teal Fresh' }
+    } catch {}
+    return ''
+}
 
 function Test-HasRedundantStatusPrefix {
     param(
@@ -247,7 +417,7 @@ if ($WeeklyCount -eq 0) {
         $slide = $pres.Slides.Item($i)
         $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
         $hidden = $slide.SlideShowTransition.Hidden -eq -1
-
+        
         if ($title -match "UPDATE.*Points" -or $title -match "Appendix" -or $hidden) {
             $WeeklyCount = $i - $WeeklyStartSlide
             $AppendixStartSlide = $i
@@ -267,7 +437,7 @@ $missingStamps = @()
 for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
     $slide = $pres.Slides.Item($i)
     $hasStamp = $false
-
+    
     foreach ($shape in $slide.Shapes) {
         # スタンプ名または内容で検索
         if ($shape.Name -match "RegionStamp" -or $shape.Name -match "Stamp") {
@@ -285,7 +455,7 @@ for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
             }
         }
     }
-
+    
     if (-not $hasStamp) {
         $missingStamps += $i
     }
@@ -309,13 +479,16 @@ $missingNotes = @()
 for ($i = $WeeklyStartSlide; $i -lt $pres.Slides.Count; $i++) {
     $slide = $pres.Slides.Item($i)
     $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
+    
+    # Ending スライドはノート不要
+    if (Test-AzureUpdateEndingSlideForVerify -Slide $slide) { continue }
 
-    # Ending スライド（空白）はスキップ
-    if ($title -eq "" -and $i -eq $pres.Slides.Count) { continue }
-
+    # 非表示の表紙バリエーションはノート不要
+    if ($slide.SlideShowTransition.Hidden -eq -1 -and (Test-AzureUpdateCoverSlideForVerify -Slide $slide)) { continue }
+    
     # UPDATE Points スライド（表スライド）はノート不要
     if ($title -match "UPDATE.*Points") { continue }
-
+    
     $hasNotes = $false
     try {
         $notesText = $slide.NotesPage.Shapes.Placeholders.Item(2).TextFrame.TextRange.Text
@@ -324,7 +497,7 @@ for ($i = $WeeklyStartSlide; $i -lt $pres.Slides.Count; $i++) {
             $hasNotes = $true
         }
     } catch {}
-
+    
     if (-not $hasNotes) {
         $missingNotes += $i
     }
@@ -408,7 +581,7 @@ $slideOrder = @()
 for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
     $slide = $pres.Slides.Item($i)
     $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
-
+    
     $label = "【更新】"
     # 🔴 classification.json があればそこからラベルを取得（最優先）
     if ($classLabelMap.Count -gt 0) {
@@ -442,7 +615,7 @@ for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
         elseif ($title -match "プレビュー|Preview|Public Preview|Private Preview") { $label = "【Preview】" }
         elseif ($title -match "アナウンス|Announcement") { $label = "【アナウンス】" }
     }
-
+    
     $slideOrder += @{ Slide = $i; Label = $label; Title = $title }
 }
 
@@ -510,7 +683,7 @@ if ($updatePointTables.Count -gt 0) {
             $content = $table.Rows.Item($r).Cells(3).Shape.TextFrame.TextRange.Text
             $keypoint = $table.Rows.Item($r).Cells(4).Shape.TextFrame.TextRange.Text
             $updateText = $content
-
+        
             # コンテンツが汎用的すぎないかチェック（定数から取得）
             foreach ($pattern in $global:FORBIDDEN_CONTENT_PATTERNS) {
                 if ($content -match $pattern) {
@@ -589,15 +762,15 @@ for ($i = $WeeklyStartSlide; $i -lt $pres.Slides.Count; $i++) {
     $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
     if ($title -eq "" -or $title -match "UPDATE.*Points|Appendix") { continue }
     if ($slide.SlideShowTransition.Hidden -eq -1 -and $i -gt $UpdatePointsSlideNum) { continue }
-
+    
     try {
         $notesText = $slide.NotesPage.Shapes.Placeholders.Item(2).TextFrame.TextRange.Text
         if ($notesText.Length -lt $global:MIN_NOTE_LENGTH) { continue }
-
+        
         # basics の最初のキーワードがタイトルのトピックと関連しているか確認
         # ノートの basics セクション（最初の200文字）を取得
         $notesHead = $notesText.Substring(0, [Math]::Min(200, $notesText.Length)).ToLower()
-
+        
         # タイトルの主要サービス名（最初の英単語 or サービス名）がノートに含まれるか
         $titleWords = $title -split '[\s　、。「」のはがをにでともやへから]+' | Where-Object { $_.Length -ge 3 }
         $matchFound = $false
@@ -623,12 +796,317 @@ if ($noteMismatch.Count -eq 0) {
 }
 
 # ========================================
+# 検証 10: テンプレートプレースホルダー残存チェック
+# ========================================
+Write-Host "`n[検証10] テンプレートプレースホルダー残存チェック..." -ForegroundColor Yellow
+
+$placeholderHits = @()
+for ($i = 1; $i -le $pres.Slides.Count; $i++) {
+    $slide = $pres.Slides.Item($i)
+    foreach ($shape in $slide.Shapes) {
+        if ($shape.HasTextFrame -ne -1) { continue }
+        try {
+            $text = $shape.TextFrame.TextRange.Text
+            if ($text -match '\{\{[^}]+\}\}') {
+                $sample = ($text -replace "`r|`n", ' ').Trim()
+                if ($sample.Length -gt 80) { $sample = $sample.Substring(0, 80) + '...' }
+                $placeholderHits += "P${i} $($shape.Name): $sample"
+            }
+        } catch {}
+    }
+}
+
+if ($placeholderHits.Count -eq 0) {
+    Write-Host "  ✅ テンプレートプレースホルダーは残っていません" -ForegroundColor Green
+} else {
+    foreach ($hit in $placeholderHits) {
+        Write-Host "  ❌ $hit" -ForegroundColor Red
+        $errors += "プレースホルダー残存: $hit"
+    }
+}
+
+# ========================================
+# 検証 11: 敬称重複チェック
+# ========================================
+Write-Host "`n[検証11] 敬称重複チェック..." -ForegroundColor Yellow
+
+$honorificHits = @()
+for ($i = 1; $i -le $pres.Slides.Count; $i++) {
+    $slide = $pres.Slides.Item($i)
+    foreach ($shape in $slide.Shapes) {
+        if ($shape.HasTextFrame -ne -1) { continue }
+        try {
+            $text = $shape.TextFrame.TextRange.Text
+            if ($text -match '(御中\s*御中|様\s*様|御中\s*様|様\s*御中)') {
+                $sample = ($text -replace "`r|`n", ' ').Trim()
+                if ($sample.Length -gt 80) { $sample = $sample.Substring(0, 80) + '...' }
+                $honorificHits += "P${i} $($shape.Name): $sample"
+            }
+        } catch {}
+    }
+}
+
+if ($honorificHits.Count -eq 0) {
+    Write-Host "  ✅ 敬称重複はありません" -ForegroundColor Green
+} else {
+    foreach ($hit in $honorificHits) {
+        Write-Host "  ❌ $hit" -ForegroundColor Red
+        $errors += "敬称重複: $hit"
+    }
+}
+
+# ========================================
+# 検証 12: 表紙以外の表示スライドに顧客固有語が出ていないか
+# ========================================
+Write-Host "`n[検証12] 表示スライドの顧客固有語チェック..." -ForegroundColor Yellow
+
+$workspaceRoot = Split-Path (Split-Path $PptxPath -Parent) -Parent
+$profilePath = Join-Path $workspaceRoot ".config\customer-profile.md"
+$customerSpecificTerms = Get-CustomerSpecificVisibleTerms -ProfilePath $profilePath
+$customerTermHits = @()
+
+if ($customerSpecificTerms.Count -eq 0) {
+    Write-Host "  ⚠️ 顧客固有語の検出条件を作成できませんでした" -ForegroundColor Yellow
+    $warnings += "顧客固有語チェック条件なし: $profilePath"
+} else {
+    for ($i = 2; $i -le $pres.Slides.Count; $i++) {
+        $slide = $pres.Slides.Item($i)
+        if ($slide.SlideShowTransition.Hidden -eq -1) { continue }
+
+        foreach ($shape in $slide.Shapes) {
+            if ($shape.HasTextFrame -ne -1) { continue }
+            try {
+                $text = $shape.TextFrame.TextRange.Text
+                foreach ($term in $customerSpecificTerms) {
+                    if ($text -and $text.IndexOf($term, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+                        $sample = ($text -replace "`r|`n", ' ').Trim()
+                        if ($sample.Length -gt 80) { $sample = $sample.Substring(0, 80) + '...' }
+                        $customerTermHits += "P${i} $($shape.Name): '$term' in $sample"
+                    }
+                }
+            } catch {}
+        }
+    }
+
+    if ($customerTermHits.Count -eq 0) {
+        Write-Host "  ✅ 表紙以外の表示スライドに顧客固有語はありません" -ForegroundColor Green
+    } else {
+        foreach ($hit in $customerTermHits) {
+            Write-Host "  ❌ $hit" -ForegroundColor Red
+            $errors += "顧客固有語が表示スライド本文に残存: $hit"
+        }
+    }
+}
+
+# ========================================
+# 検証 13: 参照リンク種別と hyperlink
+# ========================================
+Write-Host "`n[検証13] 参照リンク種別と hyperlink..." -ForegroundColor Yellow
+
+$referenceIssues = @()
+if ($classification -and $classification.weekly) {
+    for ($i = $WeeklyStartSlide; $i -lt $UpdatePointsSlideNum; $i++) {
+        $slide = $pres.Slides.Item($i)
+        if ($slide.SlideShowTransition.Hidden -eq -1) { continue }
+        $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
+        $item = Get-MatchingClassificationItem -Title $title -Items @($classification.weekly)
+        if (-not $item) { continue }
+
+        $slideText = Get-SlideText -Slide $slide
+        if ($item.learnUrl -and $slideText -notmatch 'Microsoft Learn') {
+            $referenceIssues += "P${i}: Microsoft Learn 詳細ラベルがありません"
+        }
+        if ($item.sourceUrl -and $slideText -notmatch 'Azure Updates') {
+            $referenceIssues += "P${i}: Azure Updates 発表ラベルがありません"
+        }
+
+        if ($item.learnUrl) {
+            $learnAddress = Get-HyperlinkAddressForLabel -Slide $slide -Label 'Microsoft Learn'
+            if (-not $learnAddress) { $referenceIssues += "P${i}: Microsoft Learn ラベルに hyperlink がありません" }
+            elseif ((Get-ComparableUrlForVerify $learnAddress) -ne (Get-ComparableUrlForVerify $item.learnUrl)) { $referenceIssues += "P${i}: Microsoft Learn hyperlink 不一致 ($learnAddress)" }
+        }
+        if ($item.sourceUrl) {
+            $sourceAddress = Get-HyperlinkAddressForLabel -Slide $slide -Label 'Azure Updates'
+            if (-not $sourceAddress) { $referenceIssues += "P${i}: Azure Updates ラベルに hyperlink がありません" }
+            elseif ((Get-ComparableUrlForVerify $sourceAddress) -ne (Get-ComparableUrlForVerify $item.sourceUrl)) { $referenceIssues += "P${i}: Azure Updates hyperlink 不一致 ($sourceAddress)" }
+        }
+    }
+}
+
+if ($referenceIssues.Count -eq 0) {
+    Write-Host "  ✅ 参照リンク種別と hyperlink は明確です" -ForegroundColor Green
+} else {
+    foreach ($issue in $referenceIssues) {
+        Write-Host "  ❌ $issue" -ForegroundColor Red
+        $errors += "参照リンク: $issue"
+    }
+}
+
+# ========================================
+# 検証 14: Ending variants と空プレースホルダー
+# ========================================
+Write-Host "`n[検証14] Ending variants と空プレースホルダー..." -ForegroundColor Yellow
+
+$endingIssues = @()
+$endingSlides = @()
+$visibleEndingSlides = @()
+for ($i = 1; $i -le $pres.Slides.Count; $i++) {
+    $slide = $pres.Slides.Item($i)
+    if (-not (Test-AzureUpdateEndingSlideForVerify -Slide $slide)) { continue }
+    $endingSlides += [pscustomobject]@{ Index = $i; Slide = $slide; Hidden = ($slide.SlideShowTransition.Hidden -eq -1); Variant = (Get-EndingVariantNameForVerify -Slide $slide) }
+    if ($slide.SlideShowTransition.Hidden -ne -1) { $visibleEndingSlides += $endingSlides[-1] }
+}
+
+if ($visibleEndingSlides.Count -ne 1) {
+    $endingIssues += "表示 Ending は 1 枚である必要があります（現在 $($visibleEndingSlides.Count) 枚）"
+}
+if ($endingSlides.Count -lt 3) {
+    $endingIssues += "Ending variants が 3 枚未満です（現在 $($endingSlides.Count) 枚）"
+}
+
+foreach ($ending in $endingSlides) {
+    $slide = $ending.Slide
+    # 結び見出し・ヘッダーは layout 側に配置されているため、layout の text も含めて検査する
+    $text = (Get-SlideText -Slide $slide -IncludeLayout).Trim()
+    if (-not $ending.Hidden) {
+        # 新デザイン：結び見出し 'AZURE UPDATE 情報 END' と、底部ヘッダー 'Microsoft Azure' のいずれかを確認。
+        # 旧デザイン：'Azure アップデート情報' を受入れ。
+        if ($text -notmatch 'AZURE\s*UPDATE\s*情報|Azure\s*アップデート情報') { $endingIssues += "P$($ending.Index): 結び見出し（AZURE UPDATE 情報 または Azure アップデート情報）がありません" }
+        if ($text -match 'Next Steps|TBD|\[EDIT ME\]|Click here') { $endingIssues += "P$($ending.Index): テンプレート scaffolding 文言が残っています" }
+    }
+    # Ending-Title / Ending-Subtitle オーバーレイ shape は layout 内容と重複していたため撤去済み。
+    # 現在は layout 自体が結び見出しとヘッダーを提供するので、shape 存在チェックは行わない。
+}
+
+$visibleCoverVariant = ''
+for ($i = 1; $i -le $pres.Slides.Count; $i++) {
+    $slide = $pres.Slides.Item($i)
+    if ($slide.SlideShowTransition.Hidden -eq -1) { continue }
+    try {
+        if ($slide.CustomLayout.Name -like 'Azure Update Cover*') {
+            if ($slide.CustomLayout.Name -match 'Indigo') { $visibleCoverVariant = 'Indigo Amber' }
+            elseif ($slide.CustomLayout.Name -match 'Azure') { $visibleCoverVariant = 'Azure Blue' }
+            elseif ($slide.CustomLayout.Name -match 'Teal') { $visibleCoverVariant = 'Teal Fresh' }
+            break
+        }
+    } catch {}
+}
+# Cover と表示 Ending のカラーバリアント一致を確認（layout 名ベース）。
+if ($visibleCoverVariant -and $visibleEndingSlides.Count -eq 1) {
+    $visibleEndingLayoutName = ''
+    try { $visibleEndingLayoutName = $visibleEndingSlides[0].Slide.CustomLayout.Name } catch {}
+    $expectedSuffix = $visibleCoverVariant
+    if ($visibleEndingLayoutName -and ($visibleEndingLayoutName -notmatch [regex]::Escape($expectedSuffix))) {
+        $endingIssues += "表示 Cover ($visibleCoverVariant) と表示 Ending ($visibleEndingLayoutName) のカラーバリアントが一致しません"
+    }
+}
+
+if ($endingIssues.Count -eq 0) {
+    Write-Host "  ✅ Ending variants は formal closure として整っています" -ForegroundColor Green
+} else {
+    foreach ($issue in $endingIssues) {
+        Write-Host "  ❌ $issue" -ForegroundColor Red
+        $errors += "Ending: $issue"
+    }
+}
+
+# ========================================
+# 検証 15: Appendix hidden/count 整合性
+# ========================================
+Write-Host "`n[検証15] Appendix hidden/count 整合性..." -ForegroundColor Yellow
+
+$appendixIssues = @()
+$expectedAppendixCount = if ($classification -and $classification.appendix) { @($classification.appendix).Count } else { 0 }
+$hiddenAppendixSlides = @()
+
+if ($updatePointsSlideNum -gt 0) {
+    for ($i = $updatePointsSlideNum + 1; $i -le $pres.Slides.Count; $i++) {
+        $slide = $pres.Slides.Item($i)
+        if ($slide.SlideShowTransition.Hidden -ne -1) { continue }
+        if (Test-AzureUpdateCoverSlideForVerify -Slide $slide) { continue }
+        if (Test-AzureUpdateEndingSlideForVerify -Slide $slide) { continue }
+        $hiddenAppendixSlides += $i
+    }
+}
+
+if ($expectedAppendixCount -ne $hiddenAppendixSlides.Count) {
+    $appendixIssues += "classification Appendix 件数 ($expectedAppendixCount) と hidden Appendix slide 数 ($($hiddenAppendixSlides.Count)) が一致しません"
+}
+
+if ($classification -and $classification.appendix) {
+    for ($i = 1; $i -le $pres.Slides.Count; $i++) {
+        $slide = $pres.Slides.Item($i)
+        if ($slide.SlideShowTransition.Hidden -eq -1) { continue }
+        $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
+        if (-not $title) { continue }
+        $appendixItem = Get-MatchingClassificationItem -Title $title -Items @($classification.appendix)
+        if ($appendixItem) { $appendixIssues += "P${i}: Appendix item が表示スライドに残っています ($title)" }
+    }
+}
+
+if ($appendixIssues.Count -eq 0) {
+    Write-Host "  ✅ Appendix slides は hidden で classification と整合しています" -ForegroundColor Green
+} else {
+    foreach ($issue in $appendixIssues) {
+        Write-Host "  ❌ $issue" -ForegroundColor Red
+        $errors += "Appendix: $issue"
+    }
+}
+
+# ========================================
+# 検証 16: リージョン reviewed evidence
+# ========================================
+Write-Host "`n[検証16] リージョン reviewed evidence..." -ForegroundColor Yellow
+
+$dateFolder = Split-Path $PptxPath -Parent
+$regionReviewedPath = Join-Path $dateFolder 'manifest\region_info_reviewed.json'
+$regionReviewedIssues = @()
+
+if (Test-Path -LiteralPath $regionReviewedPath) {
+    try {
+        $reviewed = Get-Content -LiteralPath $regionReviewedPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $regionsObject = if ($reviewed.PSObject.Properties['regions']) { $reviewed.regions } elseif ($reviewed.PSObject.Properties['services']) { $reviewed.services } else { $reviewed }
+        $missingEvidence = @()
+        foreach ($prop in $regionsObject.PSObject.Properties) {
+            $info = $prop.Value
+            if (-not $info.PSObject.Properties['verified'] -or $info.verified -ne $true -or -not $info.evidence -or -not $info.source) {
+                $missingEvidence += $prop.Name
+            }
+        }
+        if ($missingEvidence.Count -gt 0) {
+            $regionReviewedIssues += "region_info_reviewed.json に verified/evidence/source 不足があります: $($missingEvidence -join ', ')"
+        }
+    } catch {
+        $regionReviewedIssues += "region_info_reviewed.json を解析できません: $($_.Exception.Message)"
+    }
+} elseif ($DeliveryMode) {
+    $regionReviewedIssues += "DeliveryMode では region_info_reviewed.json が必須です"
+} else {
+    $warnings += "region_info_reviewed.json がありません。リージョンスタンプは初期 region_info.json 判定です。顧客提出前に Review-agent MCP 検証を実施してください。"
+}
+
+if ($regionReviewedIssues.Count -eq 0) {
+    if (Test-Path -LiteralPath $regionReviewedPath) {
+        Write-Host "  ✅ region_info_reviewed.json の reviewed evidence を確認しました" -ForegroundColor Green
+    } else {
+        Write-Host "  ⚠️ reviewed region evidence は未作成です（draft warning）" -ForegroundColor Yellow
+    }
+} else {
+    foreach ($issue in $regionReviewedIssues) {
+        Write-Host "  ❌ $issue" -ForegroundColor Red
+        $errors += "Region reviewed: $issue"
+    }
+}
+
+# ========================================
 # 結果サマリ
 # ========================================
 $pres.Close()
 try { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($pres) | Out-Null } catch {}
 if ($ownsSession) {
-    # Quit しない: ユーザーが同じ PowerPoint プロセスでファイルを開いている可能性がある
+    try { $ppt.Quit() } catch {}
+    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
+} elseif (-not $Session -and $ppt) {
     [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
 }
 

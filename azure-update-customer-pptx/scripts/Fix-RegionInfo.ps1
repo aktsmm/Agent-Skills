@@ -1,110 +1,143 @@
 <#
 .SYNOPSIS
-    UPDATE Points表のリージョン列を修正
+    UPDATE Points 表のリージョン列を manifest の region 情報から再反映する。
+.DESCRIPTION
+    one-off のタイトル固定補正は行わず、manifest/region_info_reviewed.json を優先し、
+    無ければ manifest/region_info.json を使う。対象 PPTX が開いていれば再利用し、
+    このスクリプトが開いた Presentation だけを閉じる。
 #>
 param(
-    [string]$PptxPath
+    [Parameter(Mandatory = $true)]
+    [string]$PptxPath,
+
+    [string]$RegionInfoPath = ""
 )
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "=== リージョン情報修正 ===" -ForegroundColor Cyan
-Write-Host "対象: $PptxPath"
+Import-Module "$PSScriptRoot\PptxCommon.psm1" -Force
 
-$ppt = New-Object -ComObject PowerPoint.Application
-$ppt.Visible = [Microsoft.Office.Core.MsoTriState]::msoTrue
+Write-StepHeader "Fix-RegionInfo.ps1"
 
-# 開いているプレゼンを取得
+$fullPptxPath = Get-PptxFullPath -PptxPath $PptxPath
+if (-not (Test-Path -LiteralPath $fullPptxPath)) {
+    Write-Failure "PPTX が見つかりません: $fullPptxPath"
+    exit 1
+}
+
+$dateFolder = Split-Path $fullPptxPath -Parent
+$manifestFolder = Join-Path $dateFolder "manifest"
+$resolvedRegionInfoPath = if ($RegionInfoPath) {
+    (Resolve-Path -LiteralPath $RegionInfoPath).Path
+} elseif (Test-Path -LiteralPath (Join-Path $manifestFolder "region_info_reviewed.json")) {
+    Join-Path $manifestFolder "region_info_reviewed.json"
+} else {
+    Join-Path $manifestFolder "region_info.json"
+}
+
+if (-not (Test-Path -LiteralPath $resolvedRegionInfoPath)) {
+    Write-Failure "リージョン情報 JSON が見つかりません: $resolvedRegionInfoPath"
+    exit 1
+}
+
+$regionData = Get-Content -LiteralPath $resolvedRegionInfoPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$regionInfo = ConvertTo-RegionInfoMap -RegionData $regionData
+if ($regionInfo.Count -eq 0) {
+    Write-Failure "リージョン情報が空です: $resolvedRegionInfoPath"
+    exit 1
+}
+
+Write-Info "対象 PPTX: $fullPptxPath"
+Write-Info "リージョン情報: $resolvedRegionInfoPath ($($regionInfo.Count) 件)"
+
+$ppt = $null
 $presentation = $null
-foreach ($p in $ppt.Presentations) {
-    if ($p.FullName -eq $PptxPath) {
-        $presentation = $p
-        Write-Host "既存のプレゼンテーションを使用"
-        break
+$openedHere = $false
+$ownsSession = $false
+
+try {
+    $ppt = Get-ActivePptxApplication
+    if (-not $ppt) {
+        $ppt = New-PptxSession
+        $ownsSession = $true
     }
-}
 
-if (-not $presentation) {
-    Write-Host "ファイルを開きます..."
-    $presentation = $ppt.Presentations.Open($PptxPath)
-}
+    $presentation = Find-OpenPptxPresentation -Application $ppt -PptxPath $fullPptxPath
+    if ($presentation) {
+        Write-Info "開いている PPTX を再利用します"
+    } else {
+        Write-Info "PPTX を開きます"
+        $presentation = $ppt.Presentations.Open($fullPptxPath)
+        $openedHere = $true
+    }
 
-# UPDATE Pointsスライドを探す
-$updatePointsSlide = $null
-for ($i = 1; $i -le $presentation.Slides.Count; $i++) {
-    $slide = $presentation.Slides.Item($i)
-    for ($j = 1; $j -le $slide.Shapes.Count; $j++) {
-        $shape = $slide.Shapes.Item($j)
-        try {
-            if ($shape.HasTextFrame -eq -1) {
-                if ($shape.TextFrame.HasText -eq -1) {
-                    $text = $shape.TextFrame.TextRange.Text
-                    if ($text -match "UPDATE.*Points|今週のUPDATE") {
-                        $updatePointsSlide = $slide
-                        Write-Host "UPDATE Pointsスライド発見: P$i"
-                        break
-                    }
-                }
+    $updatePointsIndices = @(Get-UpdatePointsSlideIndices -Presentation $presentation)
+    if ($updatePointsIndices.Count -eq 0) {
+        throw "UPDATE Points スライドが見つかりません"
+    }
+
+    $fixed = 0
+    foreach ($updatePointsSlideNumber in $updatePointsIndices) {
+        $updatePointsSlide = $presentation.Slides.Item($updatePointsSlideNumber)
+        $table = $null
+
+        foreach ($shape in $updatePointsSlide.Shapes) {
+            if ($shape.HasTable -eq -1) {
+                $table = $shape.Table
+                break
             }
-        } catch { }
-    }
-    if ($updatePointsSlide) { break }
-}
+        }
 
-if (-not $updatePointsSlide) {
-    Write-Host "❌ UPDATE Pointsスライドが見つかりません" -ForegroundColor Red
-    exit 1
-}
+        if (-not $table) {
+            throw "P$updatePointsSlideNumber に UPDATE Points 表が見つかりません"
+        }
 
-# 表を探す
-$table = $null
-for ($j = 1; $j -le $updatePointsSlide.Shapes.Count; $j++) {
-    $shape = $updatePointsSlide.Shapes.Item($j)
-    if ($shape.HasTable -eq -1) {
-        $table = $shape.Table
-        Write-Host "表発見: $($table.Rows.Count) 行"
-        break
-    }
-}
+        for ($row = 2; $row -le $table.Rows.Count; $row++) {
+            $titleText = $table.Cell($row, 3).Shape.TextFrame.TextRange.Text
+            $cleanTitle = Get-CleanSlideTitle -Title $titleText
+            $newValue = Find-RegionStatus -Title $cleanTitle -RegionInfo $regionInfo
+            $currentValue = $table.Cell($row, 5).Shape.TextFrame.TextRange.Text
 
-if (-not $table) {
-    Write-Host "❌ 表が見つかりません" -ForegroundColor Red
-    exit 1
-}
-
-# 修正対象
-$corrections = @{
-    "ランサムウェア" = "Japan East のみ"
-    "SRE Agent" = "日本未対応"
-}
-
-$fixed = 0
-for ($row = 2; $row -le $table.Rows.Count; $row++) {
-    try {
-        $titleText = $table.Cell($row, 3).Shape.TextFrame.TextRange.Text
-
-        foreach ($pattern in $corrections.Keys) {
-            if ($titleText -match $pattern) {
-                $newValue = $corrections[$pattern]
+            if ($newValue -and $newValue -ne $currentValue) {
                 $table.Cell($row, 5).Shape.TextFrame.TextRange.Text = $newValue
-                Write-Host "✅ 行${row}: $pattern → $newValue" -ForegroundColor Green
+                Write-Host "  P$updatePointsSlideNumber 行$($row - 1): $currentValue -> $newValue"
                 $fixed++
             }
         }
-    } catch {
-        Write-Host "行${row}: スキップ（エラー）"
     }
+
+    $presentation.Save()
+    Write-Success "リージョン列を再反映しました（$fixed 件更新）"
+} catch {
+    Write-Failure "リージョン情報修正エラー: $_"
+    exit 1
+} finally {
+    try {
+        if ($presentation -and $openedHere) {
+            $presentation.Close()
+        }
+    } catch {}
+
+    try {
+        if ($presentation) {
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($presentation) | Out-Null
+        }
+    } catch {}
+
+    try {
+        if ($ppt -and $ownsSession) {
+            $ppt.Quit()
+        }
+    } catch {}
+
+    try {
+        if ($ppt) {
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
+        }
+    } catch {}
+
+    [System.GC]::Collect()
+    [System.GC]::WaitForPendingFinalizers()
 }
-
-$presentation.Save()
-Write-Host "`n✅ 修正完了: ${fixed} 件修正・保存しました" -ForegroundColor Green
-
-# COM解放
-try {
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($table) | Out-Null
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($updatePointsSlide) | Out-Null
-} catch { }
-[GC]::Collect()
-[GC]::WaitForPendingFinalizers()
 
 exit 0

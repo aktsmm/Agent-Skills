@@ -125,21 +125,25 @@ $ownsSession = $null -eq $Session
 try {
     $ppt = if ($Session) { $Session } else { New-PptxSession }
     $output = $ppt.Presentations.Open($outputPath)
-
+    $placeholderValues = Get-TemplatePlaceholderValues -WorkspaceRoot $basePath -DateFolder $DateFolder
+    $placeholderCount = Replace-TemplatePlaceholders -Presentation $output -Placeholders $placeholderValues
+    Write-Info "テンプレートプレースホルダー置換: $placeholderCount 件"
+    
     Write-Info "テンプレート: $($output.Slides.Count) スライド"
-
+    
     # ----------------------------------------------------------
     # Phase 1: テンプレート分析
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 1: テンプレート分析"
-
+    
     $templateInfo = @{
         CoverSlide = 1
         CoverSlides = @()
         SummarySlide = 2
         UpdatePointsSlide = 0
         EndingSlide = $output.Slides.Count
+        EndingSlides = @()
         SamplesToDelete = @()
     }
 
@@ -147,6 +151,13 @@ try {
         param([object]$Slide)
         try { if ($Slide.CustomLayout.Name -like 'Azure Update Cover*') { return $true } } catch {}
         foreach ($shape in $Slide.Shapes) { if ($shape.Name -eq 'CoverPanel') { return $true } }
+        return $false
+    }
+
+    function Test-AzureUpdateEndingSlide {
+        param([object]$Slide)
+        try { if ($Slide.CustomLayout.Name -like 'Azure Update Ending*') { return $true } } catch {}
+        foreach ($shape in $Slide.Shapes) { if ($shape.Name -like 'Ending-*') { return $true } }
         return $false
     }
 
@@ -169,11 +180,11 @@ try {
     if ($templateInfo.CoverSlides.Count -eq 0) { $templateInfo.CoverSlides = @(1) }  # 後方互換
     $templateInfo.CoverSlide = $templateInfo.CoverSlides[0]
     $templateInfo.SummarySlide = $templateInfo.CoverSlides[-1] + 1
-
+    
     for ($i = 1; $i -le $output.Slides.Count; $i++) {
         $slide = $output.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
-
+        
         # 🔴 「ポイント」だけでマッチすると「エンドポイント」等を誤検出
         if ($title -match "UPDATE\s*Points|UPDATE.*ポイント|今週の.*ポイント") {
             $templateInfo.UpdatePointsSlide = $i
@@ -186,7 +197,8 @@ try {
         elseif ($i -eq $templateInfo.SummarySlide) {
             Write-Host "  P$i : サマリ（$title）"
         }
-        elseif ($i -eq $output.Slides.Count) {
+        elseif (Test-AzureUpdateEndingSlide -Slide $slide) {
+            $hidden = if ($slide.SlideShowTransition.Hidden) { '非表示' } else { '表示' }
             Write-Host "  P$i : Ending"
         }
         else {
@@ -198,23 +210,24 @@ try {
         throw "テンプレート内に UPDATE Points スライドが見つかりません"
     }
 
-    # テンプレートが過去生成物で汚染されている場合でも、UPDATE Points 後の最初の空/Ending スライドを Ending として扱う
-    $detectedEndingSlide = 0
+    # Ending variants を検出。新テンプレートでは複数 Ending sample slides を許容する。
+    $detectedEndingSlides = @()
     for ($i = $templateInfo.UpdatePointsSlide + 1; $i -le $output.Slides.Count; $i++) {
+        $slide = $output.Slides.Item($i)
         $title = Get-SlideTitle -Slide $output.Slides.Item($i)
-        if ([string]::IsNullOrWhiteSpace($title) -or $title -match "^Ending$|^End$|おわり|ご清聴") {
-            $detectedEndingSlide = $i
-            break
+        if ((Test-AzureUpdateEndingSlide -Slide $slide) -or [string]::IsNullOrWhiteSpace($title) -or $title -match "^Ending$|^End$|おわり|ご清聴|以上") {
+            $detectedEndingSlides += $i
         }
     }
-    if ($detectedEndingSlide -gt 0) {
-        $templateInfo.EndingSlide = $detectedEndingSlide
-        Write-Info "Ending 候補を検出: P$detectedEndingSlide"
+    if ($detectedEndingSlides.Count -gt 0) {
+        $templateInfo.EndingSlides = @($detectedEndingSlides)
+        $templateInfo.EndingSlide = @($detectedEndingSlides)[0]
+        Write-Info "Ending 候補を検出: $(@($detectedEndingSlides) -join ', ')"
     }
 
     # 表紙・サマリ・UPDATE Points・Ending 以外は、前回生成物やサンプルが混入していても全削除する
     # 表紙は複数枚のことがある（C 表示 + A/B 非表示）ので CoverSlides を全て保持
-    $keepSlides = @($templateInfo.CoverSlides) + @($templateInfo.SummarySlide, $templateInfo.UpdatePointsSlide, $templateInfo.EndingSlide)
+    $keepSlides = @($templateInfo.CoverSlides) + @($templateInfo.EndingSlides) + @($templateInfo.SummarySlide, $templateInfo.UpdatePointsSlide, $templateInfo.EndingSlide)
 
     Write-Info "本文レイアウト: $($bodyLayout.Name)"
 
@@ -224,35 +237,35 @@ try {
             $templateInfo.SamplesToDelete += $i
         }
     }
-
+    
     # ----------------------------------------------------------
     # Phase 2: サンプルスライド削除
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 2: サンプルスライド削除"
-
+    
     # 後ろから削除
     $templateInfo.SamplesToDelete | Sort-Object -Descending | ForEach-Object {
         Write-Host "  削除: P$_"
         $output.Slides.Item($_).Delete()
         Start-Sleep -Milliseconds 50
     }
-
+    
     Write-Success "現在 $($output.Slides.Count) スライド"
-
+    
     # ----------------------------------------------------------
     # Phase 3: MCP fetched mode
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 3: MCP fetched mode"
     Write-Info "MCP 取得データから本文レイアウトでスライドを生成します。"
-
+    
     # ----------------------------------------------------------
     # Phase 4: Weekly スライド挿入（P3 から）
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 4: Weekly Topics 挿入"
-
+    
     # 挿入位置（サマリの後。表紙複数枚ありでも動的に決定）
     # Phase 2 でサンプルを削除した後の最新 SummarySlide 位置を取り直す
     # 🔴 表紙群にも 'Weekly New Topics' バッジが入っているため、表紙は除外して検索する
@@ -268,15 +281,18 @@ try {
     if ($summaryPosNow -eq 0) { $summaryPosNow = $templateInfo.SummarySlide }
     $insertPos = $summaryPosNow + 1
     Write-Info "本文挿入位置: P$insertPos（サマリ P$summaryPosNow の直後）"
-
+    
     # classification.json の weekly は既にソート済み（Prepare で labelPriority, title 順）
     foreach ($w in $classification.weekly) {
         # 本文レイアウトから新規スライドを追加 → 挿入位置へ移動 → 内容流し込み
         $output.Slides.AddSlide($output.Slides.Count + 1, $bodyLayout) | Out-Null
         $output.Slides.Item($output.Slides.Count).MoveTo($insertPos)
         $newSlide = $output.Slides.Item($insertPos)
-        Set-BodySlideContent -Slide $newSlide -Title $w.title -TargetService $w.targetService `
+        # タイトルは titleJa を優先（日本語表示）、なければ title にフォールバック
+        $wDisplayTitle = if ($w.titleJa) { $w.titleJa } else { $w.title }
+        Set-BodySlideContent -Slide $newSlide -Title $wDisplayTitle -TargetService $w.targetService `
             -Background $w.background -Before $w.before -After $w.after -CustomerImpact $w.customerImpact -Pricing $w.pricing -JapanRegion $w.japanRegion `
+            -JapanRegionUrl $w.japanRegionUrl `
             -BodyContent $w.bodyContent -LearnUrl $w.learnUrl -SourceUrl $w.sourceUrl | Out-Null
         Set-StatusBadge -Slide $newSlide -Label $w.label | Out-Null
         $newSlide.SlideShowTransition.Hidden = 0  # Weekly は表示
@@ -284,17 +300,17 @@ try {
         Write-Host "  P$insertPos : $($currentTitle.Substring(0, [Math]::Min(60, $currentTitle.Length)))..."
         $insertPos++
     }
-
+    
     $weeklyEndPos = $insertPos - 1
     Write-Success "Weekly Topics: $($classification.weekly.Count) 件 (P3〜P$weeklyEndPos)"
-
+    
     # ----------------------------------------------------------
     # 🔴 スライド数チェック（重複コピー防止）
     # ----------------------------------------------------------
-
+    
     $expectedSlides = 2 + $classification.weekly.Count + 2  # 表紙+サマリ + Weekly + UPDATE Points + Ending
     $actualSlides = $output.Slides.Count
-
+    
     # 許容範囲: 期待値の ±20% まで（サンプル削除分の誤差を考慮）
     $tolerance = [Math]::Ceiling($expectedSlides * 0.5)
     if ($actualSlides -gt ($expectedSlides + $tolerance)) {
@@ -302,15 +318,15 @@ try {
         Write-Failure "   重複コピーの可能性があります。処理を中断します。"
         throw "スライド重複エラー: 期待 ~$expectedSlides 枚、実際 $actualSlides 枚"
     }
-
+    
     Write-Info "スライド数チェック OK: $actualSlides 枚（期待: ~$expectedSlides 枚）"
-
+    
     # ----------------------------------------------------------
     # Phase 5: UPDATE Points を Weekly の直後に移動
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 5: UPDATE Points 位置調整"
-
+    
     # UPDATE Points の現在位置を検出
     # 🔴 「ポイント」だけでマッチすると「エンドポイント」等を誤検出するため、
     #    「UPDATE Points」または「UPDATE.*ポイント」で厳密にマッチ
@@ -322,50 +338,53 @@ try {
             break
         }
     }
-
+    
     # 正しい位置は Weekly の直後（$weeklyEndPos + 1）
     $updatePointsTargetPos = $weeklyEndPos + 1
-
+    
     if ($updatePointsCurrentPos -ne $updatePointsTargetPos -and $updatePointsCurrentPos -gt 0) {
         Write-Info "UPDATE Points を P$updatePointsCurrentPos から P$updatePointsTargetPos へ移動"
-
+        
         # スライドを移動（MoveTo メソッドを使用）
         $output.Slides.Item($updatePointsCurrentPos).MoveTo($updatePointsTargetPos)
         Start-Sleep -Milliseconds 200
-
+        
         $updatePointsPos = $updatePointsTargetPos
     } else {
         $updatePointsPos = $updatePointsCurrentPos
     }
-
+    
     Write-Success "UPDATE Points: P$updatePointsPos"
-
+    
     # ----------------------------------------------------------
     # Phase 6: Appendix 挿入
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 6: Appendix 挿入"
-
+    
     # Appendix 挿入位置（UPDATE Points の後）
     # 注: Appendixヘッダースライドは追加しない（ユーザー要件: 17枚構成）
     $appendixInsertPos = $updatePointsPos + 1
-
+    
     # Appendix スライド挿入
     foreach ($a in $classification.appendix) {
         $output.Slides.AddSlide($output.Slides.Count + 1, $bodyLayout) | Out-Null
         $output.Slides.Item($output.Slides.Count).MoveTo($appendixInsertPos)
         $newSlide = $output.Slides.Item($appendixInsertPos)
-        Set-BodySlideContent -Slide $newSlide -Title $a.title -TargetService $a.targetService `
+        # タイトルは titleJa を優先（日本語表示）、なければ title にフォールバック
+        $aDisplayTitle = if ($a.titleJa) { $a.titleJa } else { $a.title }
+        Set-BodySlideContent -Slide $newSlide -Title $aDisplayTitle -TargetService $a.targetService `
             -Background $a.background -Before $a.before -After $a.after -CustomerImpact $a.customerImpact -Pricing $a.pricing -JapanRegion $a.japanRegion `
+            -JapanRegionUrl $a.japanRegionUrl `
             -BodyContent $a.bodyContent -LearnUrl $a.learnUrl -SourceUrl $a.sourceUrl | Out-Null
         Set-StatusBadge -Slide $newSlide -Label $a.label | Out-Null
         $newSlide.SlideShowTransition.Hidden = -1
-        Write-Host "  P$appendixInsertPos : [非表示] $($a.title.Substring(0, [Math]::Min(40, $a.title.Length)))..."
+        Write-Host "  P$appendixInsertPos : [非表示] $($aDisplayTitle.Substring(0, [Math]::Min(40, $aDisplayTitle.Length)))..."
         $appendixInsertPos++
     }
-
+    
     Write-Success "Appendix: $($classification.appendix.Count) 件"
-
+    
     # ----------------------------------------------------------
     # 🔴 表紙バリエーション（非表示）を末尾へ移動
     #    既定表示の表紙C のみ先頭、非表示の表紙A/B は Ending の後ろに退避する
@@ -389,24 +408,25 @@ try {
     # ----------------------------------------------------------
     # 🔴 最終スライド数チェック
     # ----------------------------------------------------------
-
+    
     $coverCount = if ($templateInfo.CoverSlides) { $templateInfo.CoverSlides.Count } else { 1 }
-    $finalExpected = $coverCount + 1 + $classification.weekly.Count + 1 + $classification.appendix.Count + 1  # 表紙群 + サマリ + Weekly + UPDATE Points + Appendix + Ending
+    $endingCount = if ($templateInfo.EndingSlides) { @($templateInfo.EndingSlides).Count } else { 1 }
+    $finalExpected = $coverCount + 1 + $classification.weekly.Count + 1 + $classification.appendix.Count + $endingCount  # 表紙群 + サマリ + Weekly + UPDATE Points + Appendix + Ending variants
     $finalActual = $output.Slides.Count
-
+    
     if ($finalActual -gt ($finalExpected + 5)) {
         Write-Warning "⚠️ スライド数が期待値より多い: 期待 $finalExpected 枚、実際 $finalActual 枚"
         Write-Warning "   重複や余分なスライドがある可能性があります。"
     } else {
         Write-Success "最終スライド数: $finalActual 枚（期待: $finalExpected 枚）"
     }
-
+    
     # ----------------------------------------------------------
     # Phase 7: セクション構成
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 7: セクション構成"
-
+    
     # 表紙群 / サマリ / Weekly 開始 / UPDATE Points / Appendix(最初の非表示本文) / Ending を動的検出
     $visibleCoverEnd = 0
     $variantCoverStart = 0
@@ -441,14 +461,21 @@ try {
             $updatePointsPos = $i
         }
         if ($appendixStart -eq 0 -and $i -gt $updatePointsPos -and $updatePointsPos -gt 0 -and $output.Slides.Item($i).SlideShowTransition.Hidden -eq -1) {
-            # 表紙バリエーションは Appendix にしない
+            # 表紙/Ending バリエーションは Appendix にしない
             $sl = $output.Slides.Item($i)
             $isCover = Test-AzureUpdateCoverSlide -Slide $sl
-            if (-not $isCover) { $appendixStart = $i }
+            $isEnding = Test-AzureUpdateEndingSlide -Slide $sl
+            if (-not $isCover -and -not $isEnding) { $appendixStart = $i }
         }
     }
-    # Ending = Topics_Theme End Slide Blue レイアウト or 最後の非表紙スライド
+    # Ending = 最初の表示 Ending variant。なければ最後の非表紙スライド。
+    $endingPos = 0
+    for ($i = 1; $i -le $output.Slides.Count; $i++) {
+        $sl = $output.Slides.Item($i)
+        if ((Test-AzureUpdateEndingSlide -Slide $sl) -and $sl.SlideShowTransition.Hidden -ne -1) { $endingPos = $i; break }
+    }
     for ($i = $output.Slides.Count; $i -ge 1; $i--) {
+        if ($endingPos -gt 0) { break }
         $sl = $output.Slides.Item($i)
         $isCover = Test-AzureUpdateCoverSlide -Slide $sl
         if (-not $isCover) { $endingPos = $i; break }
@@ -478,13 +505,13 @@ try {
     }
 
     Write-Success "セクション構成完了"
-
+    
     # ----------------------------------------------------------
     # 最終確認
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "最終確認"
-
+    
     Write-Host "--- スライド一覧 ---"
     for ($i = 1; $i -le $output.Slides.Count; $i++) {
         $slide = $output.Slides.Item($i)
@@ -493,11 +520,11 @@ try {
         $displayTitle = if ($title.Length -gt 60) { $title.Substring(0, 60) + "..." } else { $title }
         Write-Host "  P$i$hidden : $displayTitle"
     }
-
+    
     # ----------------------------------------------------------
     # 保存
     # ----------------------------------------------------------
-
+    
     $output.Save()
     Write-Success "保存完了: $outputPath"
     Write-Host ""
@@ -506,6 +533,7 @@ try {
 } catch {
     Write-Failure "エラー発生: $_"
     Write-Host $_.ScriptStackTrace -ForegroundColor Red
+    throw
 } finally {
     if ($ClosePresentation -and $output) {
         try { $output.Close() } catch {}
@@ -522,4 +550,3 @@ try {
         Write-Info "PowerPoint は開いたままです。確認後、手動で閉じてください。"
     }
 }
-

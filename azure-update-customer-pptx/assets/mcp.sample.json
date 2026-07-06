@@ -1,14 +1,12 @@
 {
   "servers": {
-    "microsoft-learn": {
-      "type": "stdio",
-      "command": "<microsoft-learn-mcp-command>",
-      "args": []
+    "MicrosoftDocs": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
     },
-    "azure-updates": {
-      "type": "stdio",
-      "command": "<azure-updates-mcp-command>",
-      "args": []
+    "mrc-mcp": {
+      "type": "http",
+      "url": "https://www.microsoft.com/releasecommunications/mcp"
     }
   }
 }

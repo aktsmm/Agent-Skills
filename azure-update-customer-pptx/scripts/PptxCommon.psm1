@@ -1,4 +1,4 @@
-# PptxCommon.psm1 - PowerPoint COM 操作の共通関数モジュール
+﻿# PptxCommon.psm1 - PowerPoint COM 操作の共通関数モジュール
 # 使用方法: Import-Module "$PSScriptRoot\PptxCommon.psm1"
 
 # ============================================================
@@ -31,7 +31,7 @@ $global:CLIPBOARD_WAIT_MS = 500
 # 有効なリージョンパターン
 $global:VALID_REGION_PATTERNS = @(
     "Japan East",
-    "Japan West",
+    "Japan West", 
     "グローバル",
     "日本リージョン未対応",
     "日本未対応",
@@ -64,6 +64,21 @@ function New-PptxSession {
     #>
     $ppt = New-Object -ComObject PowerPoint.Application
     $ppt.GetType().InvokeMember("Visible", [System.Reflection.BindingFlags]::SetProperty, $null, $ppt, @([int]-1)) | Out-Null
+    # PowerPoint は Visible 化だけで空の無名 Presentation を作ることがある。
+    # この関数が作った新規 Application 内だけで掃除し、ユーザー既存資料は触らない。
+    for ($i = $ppt.Presentations.Count; $i -ge 1; $i--) {
+        $presentation = $ppt.Presentations.Item($i)
+        $name = ""
+        $fullName = ""
+        $slideCount = 0
+        try { $name = [string]$presentation.Name } catch {}
+        try { $fullName = [string]$presentation.FullName } catch {}
+        try { $slideCount = [int]$presentation.Slides.Count } catch {}
+        if ([string]::IsNullOrWhiteSpace($name) -and [string]::IsNullOrWhiteSpace($fullName) -and $slideCount -eq 0) {
+            try { $presentation.Close() } catch {}
+            try { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($presentation) | Out-Null } catch {}
+        }
+    }
     return $ppt
 }
 
@@ -75,7 +90,12 @@ function Get-ActivePptxApplication {
     try {
         return [System.Runtime.InteropServices.Marshal]::GetActiveObject("PowerPoint.Application")
     } catch {
-        return $null
+        try {
+            Add-Type -AssemblyName Microsoft.VisualBasic -ErrorAction SilentlyContinue
+            return [Microsoft.VisualBasic.Interaction]::GetObject($null, "PowerPoint.Application")
+        } catch {
+            return $null
+        }
     }
 }
 
@@ -162,7 +182,7 @@ function Close-PptxSession {
         [object]$Application,
         [switch]$Save
     )
-
+    
     try {
         if ($Presentation) {
             if ($Save) { $Presentation.Save() }
@@ -172,7 +192,7 @@ function Close-PptxSession {
     } catch {
         Write-Warning "Presentation 解放エラー: $_"
     }
-
+    
     try {
         if ($Application) {
             $Application.Quit()
@@ -181,7 +201,7 @@ function Close-PptxSession {
     } catch {
         Write-Warning "Application 解放エラー: $_"
     }
-
+    
     [System.GC]::Collect()
     [System.GC]::WaitForPendingFinalizers()
 }
@@ -198,7 +218,7 @@ function Get-SlideTitle {
     param(
         [object]$Slide
     )
-
+    
     $title = ""
     try {
         $title = $Slide.Shapes.Title.TextFrame.TextRange.Text -replace "`r`n", " "
@@ -323,10 +343,10 @@ function Get-SlideLabel {
         [string]$Title,
         [string]$Body = ""
     )
-
+    
     # 本文は先頭800文字を使用（「参考:」行の英語タイトルを拾うため拡大）
     $bodySnippet = if ($Body.Length -gt 800) { $Body.Substring(0, 800) } else { $Body }
-
+    
     # 元スライドのステータス語句を優先して判定
     if ($Title -match "サービス終了|提供終了|廃止|Retirement|Deprecated|End\s*of\s*(Support|Life)|EOL") {
         return @{ Label = "廃止"; Priority = 1 }
@@ -340,7 +360,7 @@ function Get-SlideLabel {
     elseif ($Title -match "^\s*(Update|アップデート)\s*[:：]" -or $Title -match "アナウンス|Announcement") {
         return @{ Label = "アナウンス"; Priority = 4 }
     }
-
+    
     # タイトルで判定できなかった場合、本文でフォールバック判定
     if ($bodySnippet) {
         if ($bodySnippet -match "サービス終了|提供終了|廃止|Retirement|Deprecated|End\s*of\s*(Support|Life)|EOL") {
@@ -356,7 +376,7 @@ function Get-SlideLabel {
             return @{ Label = "アナウンス"; Priority = 4 }
         }
     }
-
+    
     return @{ Label = "更新"; Priority = 4 }
 }
 
@@ -375,9 +395,9 @@ function New-PrefixMap {
         [hashtable]$Map,
         [int]$MatchLength = 15
     )
-
+    
     if (-not $Map -or $Map.Count -eq 0) { return @{} }
-
+    
     $prefixMap = @{}
     foreach ($key in $Map.Keys) {
         $cleanKey = Get-CleanSlideTitle -Title $key
@@ -413,21 +433,21 @@ function Find-ByPartialTitle {
         [hashtable]$PrefixMap = $null,
         [int]$MatchLength = 15
     )
-
+    
     if (-not $Map -or $Map.Count -eq 0) { return $null }
-
+    
     $cleanTitle = Get-CleanSlideTitle -Title $Title
     $titlePrefix = $cleanTitle.Substring(0, [Math]::Min($MatchLength, $cleanTitle.Length)).ToLower()
-
+    
     # 高速パス: PrefixMap がある場合は O(1) で検索
     if ($PrefixMap -and $PrefixMap.ContainsKey($titlePrefix)) {
         return $PrefixMap[$titlePrefix].Value
     }
-
+    
     # フォールバック: 正規化完全一致 → プレフィックス一致の 2 段階
     # ★ 2026-02-16 修正: -match のサブストリングマッチを廃止
     #   原因: "Application Gateway" を含む複数タイトルが全て同じエントリに誤マッチ
-
+    
     # Step 1: 正規化完全一致（スペース・ケース無視）
     $normalizedTitle = ($cleanTitle -replace '\s+', ' ').Trim().ToLower()
     foreach ($key in $Map.Keys) {
@@ -436,7 +456,7 @@ function Find-ByPartialTitle {
             return $Map[$key]
         }
     }
-
+    
     # Step 2: プレフィックス一致（先頭N文字の完全一致）
     foreach ($key in $Map.Keys) {
         $keyPrefix = (Get-CleanSlideTitle -Title $key -replace '\s+', ' ').Trim().ToLower()
@@ -463,7 +483,7 @@ function Find-RegionStatus {
         [string]$Title,
         [hashtable]$RegionInfo
     )
-
+    
     $info = Find-ByPartialTitle -Title $Title -Map $RegionInfo -MatchLength 25
     if ($info -and $info.regionStatus) {
         return $info.regionStatus
@@ -532,12 +552,12 @@ function Get-RegionInfo {
     param(
         [string]$Title
     )
-
+    
     # 廃止系は常にグローバル
     if ($Title -match "廃止|Retirement|サポート終了|EOL") {
         return "グローバル"
     }
-
+    
     # 🔴 フォールバック: region_info.json になければ「要確認」を返す
     # 本来は Prepare エージェントが #microsoft.docs.mcp で調査して region_info.json に記録する
     # 安全側に倒す: 不明な場合は「対応」と仮定せず、明示的に確認を促す
@@ -546,7 +566,110 @@ function Get-RegionInfo {
 }
 
 # ============================================================
-# セクション操作
+# テンプレートプレースホルダー
+# ============================================================
+
+function Get-CustomerProfileValue {
+    param(
+        [string]$ProfilePath,
+        [string]$Field
+    )
+
+    if (-not (Test-Path -LiteralPath $ProfilePath)) { return "" }
+
+    $lines = Get-Content -LiteralPath $ProfilePath -Encoding UTF8
+    foreach ($line in $lines) {
+        if ($line -match "^\|\s*$([regex]::Escape($Field))\s*\|\s*(.*?)\s*\|") {
+            return (($Matches[1] -replace '^`|`$', '').Trim())
+        }
+    }
+    return ""
+}
+
+function Get-NormalizedCustomerNameParts {
+    param(
+        [string]$CustomerName
+    )
+
+    $trimmed = ($CustomerName -replace '\s+', ' ').Trim()
+    if (-not $trimmed) {
+        return @{ BaseName = ""; Honorific = ""; DisplayName = "" }
+    }
+
+    $honorific = ""
+    $baseName = $trimmed
+    if ($trimmed -match '^(.*?)\s*(御中|様)$') {
+        $baseName = $Matches[1].Trim()
+        $honorific = $Matches[2]
+    }
+
+    $displayName = if ($honorific) { "$baseName $honorific" } else { $baseName }
+    return @{ BaseName = $baseName; Honorific = $honorific; DisplayName = $displayName }
+}
+
+function Get-TemplatePlaceholderValues {
+    param(
+        [string]$WorkspaceRoot,
+        [string]$DateFolder
+    )
+
+    $profilePath = Join-Path $WorkspaceRoot ".config\customer-profile.md"
+    $customerName = Get-CustomerProfileValue -ProfilePath $profilePath -Field "Customer name"
+    $systemName = Get-CustomerProfileValue -ProfilePath $profilePath -Field "System name"
+    $speakerName = Get-CustomerProfileValue -ProfilePath $profilePath -Field "Speaker"
+
+    $dateLeaf = Split-Path $DateFolder -Leaf
+    $year = ""
+    try {
+        $config = Get-Content (Join-Path $WorkspaceRoot ".config\config.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+        $year = [string]$config.output.year
+    } catch {}
+    $displayDate = $dateLeaf
+    if ($year -and $dateLeaf -match '^\d{4}$') {
+        $displayDate = "$year/$($dateLeaf.Substring(0, 2))/$($dateLeaf.Substring(2, 2))"
+    }
+
+    $values = [ordered]@{}
+    if ($customerName) {
+        $customerParts = Get-NormalizedCustomerNameParts -CustomerName $customerName
+        $values['{{CUSTOMER}} 御中'] = "$($customerParts.BaseName) 御中"
+        $values['{{CUSTOMER}}御中'] = "$($customerParts.BaseName)御中"
+        $values['{{CUSTOMER}}'] = $customerParts.DisplayName
+    }
+    if ($systemName) {
+        $values['{{SYSTEM}}向け'] = "$systemName向け"
+        $values['{{SYSTEM}}'] = $systemName
+    }
+    if ($displayDate) { $values['{{DATE}}'] = $displayDate }
+    $values['{{SPEAKER}}'] = $speakerName
+    return $values
+}
+
+function Replace-TemplatePlaceholders {
+    param(
+        [object]$Presentation,
+        [hashtable]$Placeholders
+    )
+
+    if (-not $Presentation -or -not $Placeholders) { return 0 }
+    $replaceCount = 0
+    for ($slideIndex = 1; $slideIndex -le $Presentation.Slides.Count; $slideIndex++) {
+        $slide = $Presentation.Slides.Item($slideIndex)
+        foreach ($shape in $slide.Shapes) {
+            if ($shape.HasTextFrame -ne -1) { continue }
+            try {
+                $textRange = $shape.TextFrame.TextRange
+                foreach ($key in $Placeholders.Keys) {
+                    if ($textRange.Text -like "*$key*") {
+                        $textRange.Replace($key, [string]$Placeholders[$key], 0, 0, 0) | Out-Null
+                        $replaceCount++
+                    }
+                }
+            } catch {}
+        }
+    }
+    return $replaceCount
+}
 # ============================================================
 
 function Set-PptxSections {
@@ -558,12 +681,12 @@ function Set-PptxSections {
         [object]$Presentation,
         [hashtable]$Sections  # @{ "セクション名" = 開始スライド番号 }
     )
-
+    
     # 既存セクションを削除（後ろから）
     for ($i = $Presentation.SectionProperties.Count; $i -ge 1; $i--) {
         $Presentation.SectionProperties.Delete($i, $false)
     }
-
+    
     # 新しいセクションを追加（順番に）
     foreach ($section in $Sections.GetEnumerator() | Sort-Object Value) {
         $Presentation.SectionProperties.AddSection($section.Value, $section.Key)
@@ -653,7 +776,7 @@ function Add-RegionStamp {
         [object]$Slide,
         [string]$RegionText
     )
-
+    
     # 既存スタンプがあれば削除（Shape.Nameで識別）
     # 🔴 "RegionStamp" だけでなく、テンプレ由来の "RegionStamp_JapanBoth" 等の
     #    名前付きサンプルスタンプ（RegionStamp_*）も消す。これを消さないと、
@@ -664,16 +787,16 @@ function Add-RegionStamp {
             $shape.Delete()
         }
     }
-
+    
     # 定数から値を取得（スライドサイズ: 960pt x 540pt）
     $stampWidth = $global:STAMP_WIDTH
     $stampHeight = $global:STAMP_HEIGHT
     $marginRight = $global:STAMP_MARGIN_RIGHT
     $marginBottom = $global:STAMP_MARGIN_BOTTOM
-
+    
     $left = 960 - $marginRight - $stampWidth
     $top = 540 - $marginBottom - $stampHeight
-
+    
     $textBox = $Slide.Shapes.AddTextbox(1, $left, $top, $stampWidth, $stampHeight)
     $textBox.Name = "RegionStamp"
     $textBox.TextFrame.TextRange.Text = $RegionText
@@ -685,7 +808,7 @@ function Add-RegionStamp {
     $textBox.TextFrame.MarginRight = 10
     $textBox.TextFrame.MarginTop = 5
     $textBox.TextFrame.MarginBottom = 5
-
+    
     # 背景色（定数から取得）
     if ($RegionText -match "グローバル") {
         $textBox.Fill.ForeColor.RGB = $global:STAMP_COLOR_GLOBAL
@@ -697,10 +820,10 @@ function Add-RegionStamp {
         $textBox.Fill.ForeColor.RGB = $global:STAMP_COLOR_BOTH
     }
     $textBox.Fill.Solid()
-
+    
     # 枠線なし
     try { $textBox.Line.Visible = 0 } catch {}
-
+    
     return $textBox
 }
 
@@ -713,7 +836,7 @@ function Set-SpeakerNote {
         [object]$Slide,
         [string]$NoteText
     )
-
+    
     try {
         $safeNote = ConvertTo-PptxSafeText -Text $NoteText
         $Slide.NotesPage.Shapes.Placeholders.Item(2).TextFrame.TextRange.Text = $safeNote
@@ -732,7 +855,7 @@ function Get-SpeakerNote {
     param(
         [object]$Slide
     )
-
+    
     try {
         return $Slide.NotesPage.Shapes.Placeholders.Item(2).TextFrame.TextRange.Text
     } catch {
@@ -754,7 +877,7 @@ function Update-TableRow {
         [int]$RowIndex,
         [string[]]$Values
     )
-
+    
     for ($col = 1; $col -le [Math]::Min($Values.Count, $Table.Columns.Count); $col++) {
         $Table.Cell($RowIndex, $col).Shape.TextFrame.TextRange.Text = $Values[$col - 1]
     }
@@ -945,10 +1068,24 @@ function Update-SummarySlideContent {
         $num++
     }
 
-    $tocHeader = "■ 今週の Weekly New Topics（$($Classification.weekly.Count) 件）"
-    $tocContent = $tocHeader + "`n`n" + ($tocItems -join "`n")
+    $tocHeader = "今週の Weekly New Topics（$($Classification.weekly.Count) 件）"
+    $tocContent = $tocHeader + "`n" + ($tocItems -join "`n")
 
-    $p2 = $Presentation.Slides.Item($global:PPTX_SUMMARY_SLIDE)
+    $summarySlideIndex = 0
+    for ($si = 1; $si -le $Presentation.Slides.Count; $si++) {
+        $sl = $Presentation.Slides.Item($si)
+        $isCover = $false
+        try { if ($sl.CustomLayout.Name -like 'Azure Update Cover*') { $isCover = $true } } catch {}
+        if (-not $isCover) {
+            foreach ($sh in $sl.Shapes) {
+                if ($sh.Name -eq 'CoverPanel') { $isCover = $true; break }
+            }
+        }
+        if (-not $isCover) { $summarySlideIndex = $si; break }
+    }
+    if ($summarySlideIndex -eq 0) { $summarySlideIndex = $global:PPTX_SUMMARY_SLIDE }
+
+    $p2 = $Presentation.Slides.Item($summarySlideIndex)
     $tocShape = $null
     $maxArea = 0
     $contentBoxes = @()
@@ -1088,11 +1225,14 @@ function Update-UpdatePointsTableContent {
         for ($dataRow = 2; $dataRow -le $requiredRows; $dataRow++) {
             $wIdx = $globalRowOffset + ($dataRow - 2)
             $w = $Classification.weekly[$wIdx]
-            $cleanTitle = Get-CleanSlideTitle -Title $w.title
+            # 表示用タイトルは titleJa を優先し、リージョン紐付けは英語 SSOT (w.title) を使う
+            $wTitleForDisplay = if ($w.titleJa) { $w.titleJa } else { $w.title }
+            $cleanTitle = Get-CleanSlideTitle -Title $wTitleForDisplay
+            $cleanTitleEn = Get-CleanSlideTitle -Title $w.title
             $keyword = Get-DisplayCategory -Category $w.category -Title $cleanTitle
             $update = "【$($w.label)】$cleanTitle"
             $keypoint = if ($w.keypoint -and $w.keypoint.Length -gt 5) { $w.keypoint } else { "既存環境への適用可否を確認" }
-            $region = Find-RegionStatus -Title $cleanTitle -RegionInfo $RegionInfo
+            $region = Find-RegionStatus -Title $cleanTitleEn -RegionInfo $RegionInfo
 
             $numberCellShape = $table.Cell($dataRow, 1).Shape
             $numberCellShape.TextFrame.TextRange.Text = [string]($wIdx + 1)
@@ -1132,7 +1272,7 @@ function Find-SlideIndexById {
 function Set-BodySlideContent {
     <#
     .SYNOPSIS
-        MCP 由来の本文スライド（テンプレ複製）に 対象 / これまで / 今後 /
+        MCP 由来の本文スライド（テンプレ複製）に 対象 / これまで / これから /
         お客様にとっての価値 / 課金 / 日本リージョン / 詳細リンク / 参考リンク を流し込む。
     .DESCRIPTION
         本文雛形スライド（コンテンツ プレースホルダーを持つ）を前提に、
@@ -1141,7 +1281,7 @@ function Set-BodySlideContent {
           2. {TargetService}
           3. これまで：
           4. {Before}
-          5. 今後：
+          5. これから：
           6. {After}
           7. お客様にとっての価値：
           8. {CustomerImpact}
@@ -1161,6 +1301,7 @@ function Set-BodySlideContent {
         [string]$CustomerImpact,
         [string]$Pricing,
         [string]$JapanRegion,
+        [string]$JapanRegionUrl,
         [string]$BodyContent,
         [string]$LearnUrl,
         [string]$SourceUrl
@@ -1227,7 +1368,16 @@ function Set-BodySlideContent {
 
     # --- 段落を再構築 ---
     $tr = $contentShape.TextFrame.TextRange
-    $detailText = '詳細はこちらをご参照ください。'
+    $learnLabel = 'Microsoft Learn'
+    $sourceLabel = 'Azure Updates'
+    $referenceLine = ''
+    if ($LearnUrl -and $SourceUrl) {
+        $referenceLine = "詳細：$learnLabel | 発表：$sourceLabel"
+    } elseif ($LearnUrl) {
+        $referenceLine = "詳細：$learnLabel"
+    } elseif ($SourceUrl) {
+        $referenceLine = "発表：$sourceLabel"
+    }
 
     if ($useFiveField) {
         # 5 項目モード: ラベル段落を太字 Indigo にし、値段落はインデント lvl2
@@ -1245,17 +1395,17 @@ function Set-BodySlideContent {
             "対象：$TargetService",
             "仕組み：$Background",
             "これまで：$Before",
-            "今後：$After",
+            "これから：$After",
             "お客様にとっての価値：$CustomerImpact",
             $pricingLine,
-            "$detailText（参考：$SourceUrl）"
-        )
+            $referenceLine
+        ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
         $tr.Text = ($lines -join "`r")
 
-        # ラベル「対象：」「仕組み：」「これまで：」「今後：」「お客様にとっての価値：」を Indigo 太字に
+        # ラベル「対象：」「仕組み：」「これまで：」「これから：」「お客様にとっての価値：」を Indigo 太字に
         # (段落全体ではなく、行頭の「ラベル：」部分のみ色付け)
-        $indigo = ($0x8A) -bor (0x4C -shl 8) -bor (0x3B -shl 16)
-        $labelPatterns = @('対象：', '仕組み：', 'これまで：', '今後：', 'お客様にとっての価値：')
+        $indigo = 0x8A -bor (0x4C -shl 8) -bor (0x3B -shl 16)
+        $labelPatterns = @('対象：', '仕組み：', 'これまで：', 'これから：', 'お客様にとっての価値：', '課金：', '詳細：', '発表：')
         $fullText = $contentShape.TextFrame.TextRange.Text
         foreach ($lbl in $labelPatterns) {
             $pos = $fullText.IndexOf($lbl)
@@ -1270,7 +1420,7 @@ function Set-BodySlideContent {
     }
     else {
         # 後方互換モード（旧 bodyContent 単段落）
-        $lines = @('対象：', $TargetService, '内容：', $BodyContent, $detailText, '参考：', $SourceUrl)
+        $lines = @('対象：', $TargetService, '内容：', $BodyContent, $referenceLine) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
         $tr.Text = ($lines -join "`r")
         try { $tr.Paragraphs(2, 1).IndentLevel = 2 } catch {}
         try { $tr.Paragraphs(4, 1).IndentLevel = 2 } catch {}
@@ -1279,15 +1429,22 @@ function Set-BodySlideContent {
     # --- ハイパーリンク付与 ---
     $full = $contentShape.TextFrame.TextRange.Text
     if ($LearnUrl) {
-        $idx = $full.IndexOf('こちら')
+        $idx = $full.IndexOf($learnLabel)
         if ($idx -ge 0) {
-            try { $contentShape.TextFrame.TextRange.Characters($idx + 1, 3).ActionSettings(1).Hyperlink.Address = $LearnUrl } catch {}
+            try { $contentShape.TextFrame.TextRange.Characters($idx + 1, $learnLabel.Length).ActionSettings(1).Hyperlink.Address = $LearnUrl } catch {}
         }
     }
     if ($SourceUrl) {
-        $idx2 = $full.IndexOf($SourceUrl)
+        $idx2 = $full.IndexOf($sourceLabel)
         if ($idx2 -ge 0) {
-            try { $contentShape.TextFrame.TextRange.Characters($idx2 + 1, $SourceUrl.Length).ActionSettings(1).Hyperlink.Address = $SourceUrl } catch {}
+            try { $contentShape.TextFrame.TextRange.Characters($idx2 + 1, $sourceLabel.Length).ActionSettings(1).Hyperlink.Address = $SourceUrl } catch {}
+        }
+    }
+    if ($JapanRegionUrl) {
+        $regionLabel = '関連 MS Learn'
+        $idx3 = $full.IndexOf($regionLabel)
+        if ($idx3 -ge 0) {
+            try { $contentShape.TextFrame.TextRange.Characters($idx3 + 1, $regionLabel.Length).ActionSettings(1).Hyperlink.Address = $JapanRegionUrl } catch {}
         }
     }
 
@@ -1306,7 +1463,7 @@ function Write-StepHeader {
     param(
         [string]$Message
     )
-
+    
     Write-Host ""
     Write-Host ("=" * 60) -ForegroundColor Cyan
     Write-Host " $Message" -ForegroundColor Cyan

@@ -30,7 +30,8 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 | **Auto-Routing**      | Route input based on pattern detection               |
 | **Customer Profile**  | Centralized customer information                     |
 | **Workspace Summary** | Handoff summary with related file paths              |
-| **Next Actions**      | Per-MTG homework workspace with bidirectional links  |
+| **Next Actions**      | Per-MTG homework workspace with traceable tasks       |
+| **Knowledge Ledger**  | Reusable generic learnings extracted on request       |
 | **Research Reports**  | Store generated research/report Markdown away from root |
 | **Material Split**    | Optional split for customer originals, working copies, and customer-facing files |
 
@@ -45,12 +46,23 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 # Full options
 .\scripts\Initialize-CustomerWorkspace.ps1 `
   -CustomerName "Contoso Inc" `
-  -ContractType "MACC" `
+  -ContractType "Ongoing support" `
   -ContractPeriod "2025/04 - 2028/03" `
   -KeyContacts "John Doe (Infra Lead)"
 ```
 
 If PowerShell is unavailable, manually create the same folders, copy the prompt/template files from `assets/`, and create `README.md` plus `workspace-summary.md` from the workspace root templates.
+
+## Setup Intake
+
+Keep setup questions lightweight. Capture only facts that change routing, sharing, or follow-up behavior; leave detailed technical inventory to inbox and later notes.
+
+- Workspace purpose and scope: customer-wide, project-specific, proposal, PoC, or ongoing support.
+- Sharing boundary: customer-shareable, internal-only, or mixed. This controls what can appear in meeting notes.
+- Own team names and aliases: used to split action items into own-team vs customer follow-up.
+- Key contacts and roles: decision maker, technical owner, coordinator, or other routing-relevant roles.
+- Meeting cadence and next date when known: used to create `next-actions/to-YYYY-MM-DD/`.
+- Primary information sources: meetings, chat, email, shared files, received materials, or service portals.
 
 ## Generated Structure
 
@@ -63,6 +75,9 @@ If PowerShell is unavailable, manually create the same folders, copy the prompt/
 │   └── prompts/                   ← Inbox, meeting notes, questions
 ├── _inbox/{YYYY-MM}.md            ← Inbox files
 ├── _questions/{YYYY-MM}.md        ← Accumulated questions (optional)
+├── _knowledge/                    ← Reusable generic learnings (opt-in extraction)
+│   ├── README.md                   ← Rules, taxonomy, and safety gates
+│   └── general.md                  ← Initial ledger; split later only when useful
 ├── _customer/profile.md           ← Customer profile
 ├── _templates/                    ← Templates
 ├── research-reports/              ← Generated research/report Markdown
@@ -79,6 +94,16 @@ If PowerShell is unavailable, manually create the same folders, copy the prompt/
 ## Research Reports
 
 Use `research-reports/` for Markdown deliverables created by the agent or team, such as research notes, comparison memos, report drafts, and demo specification notes. Do not leave these generated artifacts at the workspace root; root should stay reserved for entry files and customer workspace controls.
+
+## Knowledge Ledger
+
+Use `_knowledge/` for compact, reusable learnings extracted from meetings, incidents, or research when the user explicitly asks for knowledge extraction, generalization, or lessons learned.
+
+- Start with `_knowledge/general.md`; create category files only after entries accumulate enough to justify a split.
+- Store short patterns, gotchas, decision criteria, and validation checklists. Long analysis belongs in `research-reports/`.
+- Strip customer names, person names, ticket IDs, local paths, and unpublished/confidential specifics before writing reusable knowledge.
+- Mark Microsoft product, pricing, support, or roadmap claims as needing official confirmation unless backed by a checked source URL.
+- Link back to source meeting notes or reports; do not copy long transcripts.
 
 ## Optional Material Folders
 
@@ -103,6 +128,7 @@ _provided/                       ← customer-facing copies, send-out decks, pro
 - Use `_provided/` only for versions safe to show or send to the customer.
 - Use `overall-architecture/` when the material stays relevant across multiple meetings.
 - Use `mtg-YYYY-MM-DD-name/` only when the material is truly scoped to one meeting.
+- When screenshots or images are shared in a meeting context, save them as meeting artifacts with stable names and add an `attachments.md` manifest.
 - When a user says files were placed at the workspace root, inspect all root files first; treat PDFs, decks, spreadsheets, documents, images, and diagrams as possible received materials.
 - Rename received originals with a date-prefixed stable name before classification. Leave only unclassified items in `_received/incoming/`.
 - Check actual file signatures as well as extensions. For example, a `.pptx` file with an OLE/legacy Office signature should be handled as `.ppt`, and COM may be needed for content inspection.
@@ -131,12 +157,22 @@ _provided/                       ← customer-facing copies, send-out decks, pro
 Carve homework, proposal prep, and supplementary research out of meeting notes into a date-scoped `next-actions/to-YYYY-MM-DD/` folder.
 
 - **Folders**: `homework/` (customer-agreed), `proposals/` (self-initiated), `research/` (supplementary)
-- **Bidirectional links**:
-  - In meeting notes, every decision/homework row links to the corresponding `next-actions/to-YYYY-MM-DD/.../xxx.md`.
+- **Traceability**:
+  - Keep meeting-note decision and homework tables copy-friendly: content, owner, due date, and status only. Do not put local `next-actions/...` paths in rows intended for sharing.
+  - Track local work links in `next-actions/to-YYYY-MM-DD/README.md` and each task file instead.
   - In each task file, the header records `出どころ:` pointing back to the meeting note (or `自主提案` / `自主検証`).
 - **Progress states**: `not-started` / `in-progress` / `blocked` / `done` / `dropped`. Only the state table lives in `to-YYYY-MM-DD/README.md`; details stay in each task file.
-- **Why split by type**: mixing `proposals` into homework breaks the link to meeting notes and turns self-initiated ideas into apparent customer commitments.
+- **Why split by type**: mixing `proposals` into homework turns self-initiated ideas into apparent customer commitments.
 - Full rules and templates: see `Next Actions Workspace` section in [assets/copilot-instructions.md](assets/copilot-instructions.md).
+
+## Meeting Notes Quality Gate
+
+Before calling meeting notes done:
+
+- Mark uncertain names, times, product names, model names, prices, or support boundaries as `要確認` instead of overclaiming.
+- Extract open questions and action items into `_questions/{YYYY-MM}.md`; create `next-actions/` tasks only for work that needs follow-up outside the meeting note.
+- Ensure shareable meeting-note tables contain no local file paths or internal-only work links.
+- Keep internal speculation in an internal memo or clearly marked internal section.
 
 ---
 
@@ -147,6 +183,7 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 - [ ] `workspace-summary.md` exists at workspace root
 - [ ] `_inbox/{YYYY-MM}.md` exists
 - [ ] `_questions/{YYYY-MM}.md` exists
+- [ ] `_knowledge/README.md` and `_knowledge/general.md` exist
 - [ ] `_customer/profile.md` configured
 - [ ] `research-reports/` exists for generated Markdown deliverables
 - [ ] Auto-routing rules working
@@ -164,6 +201,9 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 - `assets/_templates/` - Template files
 - `assets/_templates/next-actions-readme.md` - Per-MTG progress board template
 - `assets/_templates/next-actions-task.md` - Single task file template (homework / proposal / research)
+- `assets/_templates/knowledge-readme.md` - Reusable knowledge ledger rules and index
+- `assets/_templates/knowledge-general.md` - Initial generic knowledge ledger
+- `assets/_templates/attachments.md` - Meeting artifact manifest template
 - `assets/inbox.prompt.md` - Inbox prompt
 - `assets/convert-meeting-minutes.prompt.md` - Meeting notes prompt
 - `assets/extract-questions.prompt.md` - Question extraction prompt

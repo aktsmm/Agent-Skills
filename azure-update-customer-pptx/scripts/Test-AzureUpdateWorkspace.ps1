@@ -122,6 +122,7 @@ if ($CheckPowerPoint) {
         Add-Check "PowerPoint COM available" $false "Error" $_.Exception.Message
     } finally {
         if ($ppt) {
+            try { $ppt.Quit() } catch {}
             [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
         }
     }
@@ -142,4 +143,3 @@ if ($errors.Count -gt 0) {
 }
 
 exit 0
-

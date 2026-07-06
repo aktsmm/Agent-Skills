@@ -30,7 +30,7 @@ guide when:
 ## Microsoft docs / Azure Updates MCP
 
 Two MCP servers are used. Tool name prefixes vary by host (e.g. `mcp_releasecommun_*`,
-`mcp_microsoft_le2_*`); match against your host's registered tools.
+`mcp_microsoft_lea_*`); match against your host's registered tools.
 
 | MCP server                                             | Endpoint URL                                          | Tools                                                                                      | Use                                                               |
 | ------------------------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |

@@ -359,7 +359,7 @@ foreach ($u in $fetched) {
         $bodySegments = @()
         if ($backgroundVal)     { $bodySegments += "仕組み：`n$backgroundVal" }
         if ($beforeVal)         { $bodySegments += "これまで：`n$beforeVal" }
-        if ($afterVal)          { $bodySegments += "今後：`n$afterVal" }
+        if ($afterVal)          { $bodySegments += "これから：`n$afterVal" }
         if ($customerImpactVal) { $bodySegments += "お客様にとっての価値：`n$customerImpactVal" }
         $pricingLine = ''
         if ($pricingVal -and $japanRegionVal) { $pricingLine = "課金：$pricingVal　/　日本リージョン：$japanRegionVal" }
@@ -379,9 +379,11 @@ foreach ($u in $fetched) {
             customerImpact = $customerImpactVal
             pricing        = $pricingVal
             japanRegion    = $japanRegionVal
+            japanRegionUrl = if ($u.PSObject.Properties.Name -contains 'japanRegionUrl') { $u.japanRegionUrl } else { '' }
             bodyContent    = $bodyContentVal
             regionStatus   = $u.regionNote
             title          = $u.title
+            titleJa        = if ($u.PSObject.Properties.Name -contains 'titleJa') { $u.titleJa } else { '' }
             label          = $u.label
             labelPriority  = (Get-LabelSortRank -Label $u.label)
             matchedKeyword = $c.matchedKeyword

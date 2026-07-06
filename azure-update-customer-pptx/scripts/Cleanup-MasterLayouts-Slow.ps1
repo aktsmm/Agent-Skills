@@ -8,6 +8,8 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
+Import-Module "$PSScriptRoot\PptxCommon.psm1" -Force
+
 $keepLayouts = @(
     'Topics_Theme Title',
     'Topics_Theme Normal Content',
@@ -17,8 +19,7 @@ $keepLayouts = @(
     'Topics_Theme Section Header'
 )
 
-Get-Process POWERPNT -EA SilentlyContinue | Stop-Process -Force
-Start-Sleep 3
+Close-OpenPptxPresentation -PptxPath $TemplatePath -Save | Out-Null
 
 $ppt = New-Object -ComObject PowerPoint.Application
 $p = $ppt.Presentations.Open($TemplatePath, $false, $false, $false)

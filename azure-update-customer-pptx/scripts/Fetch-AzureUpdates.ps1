@@ -35,10 +35,25 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path -Parent $PSScriptRoot
-$configDir = Join-Path $repoRoot 'config'
+
+$scriptParent = Split-Path -Parent $PSScriptRoot
+$skillsDir = Split-Path -Parent $scriptParent
+$githubDir = Split-Path -Parent $skillsDir
+$workspaceRoot = if ((Split-Path -Leaf $skillsDir) -eq 'skills' -and (Split-Path -Leaf $githubDir) -eq '.github') {
+    Split-Path -Parent $githubDir
+} else {
+    $scriptParent
+}
+
+$dateFolderPath = if ([System.IO.Path]::IsPathRooted($DateFolder)) {
+    [System.IO.Path]::GetFullPath($DateFolder)
+} else {
+    [System.IO.Path]::GetFullPath((Join-Path $workspaceRoot $DateFolder))
+}
+$workspaceDir = Split-Path -Parent $dateFolderPath
+$configDir = Join-Path $workspaceDir '.config'
 $statePath = Join-Path $configDir 'processed-updates.json'
-$manifestDir = Join-Path $repoRoot (Join-Path $DateFolder 'manifest')
+$manifestDir = Join-Path $dateFolderPath 'manifest'
 $fetchedPath = Join-Path $manifestDir 'fetched-updates.json'
 
 if (-not (Test-Path $configDir)) { New-Item -ItemType Directory -Path $configDir -Force | Out-Null }

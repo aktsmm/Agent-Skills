@@ -112,7 +112,7 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - **Customer-facing surface only**: 顧客向け deck のスライド面には内部向け話法、避ける表現、作業メモ、検証メモ、ファイル用途ラベルを混ぜない。話者向け情報は speaker notes へ分離する
 - **Template means template**: ユーザー指定テンプレートがある場合、特に表紙はテンプレートの既存プレースホルダー/レイアウトを使い、上から別図形を重ねて隠さない
 - **Reusable template means slide master**: 「テンプレートを作る」と言われたら、表紙・本文・Ending の再利用デザインはスライド直置きではなく `SlideMaster.CustomLayouts` に置き、編集する文字は placeholder / text shape として残す
-- **PPTX asset metadata gate**: テンプレートや配布用 PPTX を skill asset / public artifact に含める前に、ZIP 内部の `docProps/custom.xml` / `docProps/core.xml` / slides / notes を scan し、MIP ラベル、個人メール、author 名、tenant / local path を削除または中立化する。スライド本文検索だけで安全判定しない
+- **PPTX asset metadata gate**: テンプレートや配布用 PPTX を skill asset / public artifact に含める前に `scripts/clean_template.py` で `docProps/custom.xml`（MIP ラベル、tenant、SharePoint フィールド、同僚メール）と `docProps/core.xml`（`cp:lastModifiedBy` / `cp:revision`）を sanitize する。PowerPoint は OneDrive / SharePoint から開くたびに MIP を再付与するので、check-in 直前に毎回実行する。詳細は [references/instructions/template.instructions.md](references/instructions/template.instructions.md#template-metadata-hygiene)。スライド本文検索だけで安全判定しない
 - **JP template font default**: 日本語の再利用テンプレートでは master/layout の既定和文フォントを `BIZ UDPゴシック` に揃え、生成スライド側の後処理で毎回フォントを直す設計にしない
 - **Rendered QA before handoff**: COM で開いている deck を直接 touch-up した後も、対象 deck から実レンダー画像を書き出し、重なり・フォントばらつき・表の可読性を個別 slide で確認する
 - **Review like a critic, not a generator**: ユーザーに見せる前に、レンダー画像で「スカスカ・文字が小さい・アイコンが雑・テンプレ踏襲不足・旧文言残り」を自分で探して直す。詳しくは [references/instructions/deck-iteration-review.instructions.md](references/instructions/deck-iteration-review.instructions.md)

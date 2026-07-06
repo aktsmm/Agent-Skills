@@ -52,8 +52,9 @@ try {
     }
 
     Write-StepHeader "Verify"
-    # COM セッション解放（Quit しない: ユーザーが開いている PowerPoint を閉じないため）
+    # このスクリプトが作成した COM セッションなので、検証前に終了して空の PowerPoint を残さない。
     if ($ppt) {
+        $ppt.Quit()
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
         $ppt = $null
     }
@@ -82,6 +83,7 @@ try {
     exit 1
 } finally {
     if ($ppt) {
+        try { $ppt.Quit() } catch {}
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
     }
     [System.GC]::Collect()

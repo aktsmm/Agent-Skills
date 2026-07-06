@@ -12,7 +12,7 @@
     顧客名（必須）
 
 .PARAMETER ContractType
-    契約形態（EA/CSP/MACC）
+    契約または支援形態（任意。公開テンプレートでは組織固有の契約コードや社内用語を前提にしない）
 
 .PARAMETER ContractPeriod
     契約期間（例: 2025/04 - 2028/03）
@@ -24,7 +24,7 @@
     .\Initialize-CustomerWorkspace.ps1 -CustomerName "ABC株式会社様"
     
 .EXAMPLE
-    .\Initialize-CustomerWorkspace.ps1 -CustomerName "ABC株式会社様" -ContractType "MACC" -ContractPeriod "2025/04 - 2028/03"
+    .\Initialize-CustomerWorkspace.ps1 -CustomerName "ABC株式会社様" -ContractType "年間支援" -ContractPeriod "2025/04 - 2028/03"
 #>
 
 param(
@@ -32,7 +32,6 @@ param(
     [string]$CustomerName,
 
     [Parameter(Mandatory = $false)]
-    [ValidateSet("EA", "CSP", "MACC", "")]
     [string]$ContractType = "",
 
     [Parameter(Mandatory = $false)]
@@ -68,6 +67,7 @@ function Expand-TemplateContent {
     $content = $content -replace '\{\{YEAR_MONTH\}\}', (Get-Date -Format "yyyy-MM")
     $content = $content -replace '\{\{START_DATE\}\}', (Get-Date -Format "yyyy-MM-dd")
     $content = $content -replace '\{\{TODAY\}\}', (Get-Date -Format "yyyy-MM-dd")
+    $content = $content -replace '\{\{MEETING_TITLE\}\}', "YYYY-MM-DD topic"
 
     return $content
 }
@@ -82,6 +82,7 @@ $folders = @(
     ".github\prompts",
     "_inbox",
     "_questions",
+    "_knowledge",
     "_customer",
     "_templates",
     "research-reports"
@@ -139,7 +140,7 @@ foreach ($prompt in $prompts) {
 }
 
 # テンプレートのコピー
-$templates = @("meeting-minutes.md", "internal-memo.md", "customer-profile.md")
+$templates = @("meeting-minutes.md", "internal-memo.md", "customer-profile.md", "attachments.md")
 foreach ($template in $templates) {
     $src = Join-Path $TemplatesPath $template
     $dst = Join-Path $WorkspacePath "_templates\$template"
@@ -201,6 +202,27 @@ if (-not (Test-Path $questionsPath)) {
     Write-Host "   📝 作成: _questions/$currentYearMonth.md" -ForegroundColor Green
 }
 
+# ナレッジ台帳初期ファイル作成
+$knowledgeReadmePath = Join-Path $WorkspacePath "_knowledge\README.md"
+if (-not (Test-Path $knowledgeReadmePath)) {
+    $knowledgeReadmeTemplate = Join-Path $TemplatesPath "knowledge-readme.md"
+    if (Test-Path $knowledgeReadmeTemplate) {
+        $content = Expand-TemplateContent -TemplatePath $knowledgeReadmeTemplate
+        Set-Content -Path $knowledgeReadmePath -Value $content -Encoding UTF8
+        Write-Host "   📝 作成: _knowledge/README.md" -ForegroundColor Green
+    }
+}
+
+$knowledgeGeneralPath = Join-Path $WorkspacePath "_knowledge\general.md"
+if (-not (Test-Path $knowledgeGeneralPath)) {
+    $knowledgeGeneralTemplate = Join-Path $TemplatesPath "knowledge-general.md"
+    if (Test-Path $knowledgeGeneralTemplate) {
+        $content = Expand-TemplateContent -TemplatePath $knowledgeGeneralTemplate
+        Set-Content -Path $knowledgeGeneralPath -Value $content -Encoding UTF8
+        Write-Host "   📝 作成: _knowledge/general.md" -ForegroundColor Green
+    }
+}
+
 # 顧客プロファイル作成
 $profilePath = Join-Path $WorkspacePath "_customer\profile.md"
 if (-not (Test-Path $profilePath)) {
@@ -224,6 +246,7 @@ Write-Host "   - README.md（開始案内）"
 Write-Host "   - workspace-summary.md（引き継ぎサマリ）"
 Write-Host "   - _inbox/$currentYearMonth.md（インボックス）"
 Write-Host "   - _questions/$currentYearMonth.md（質問・アクション）"
+Write-Host "   - _knowledge/（汎用知見台帳）"
 Write-Host "   - _customer/profile.md（顧客プロファイル）"
 Write-Host "   - _templates/（テンプレート）"
 Write-Host "   - research-reports/（調査・レポート成果物）"

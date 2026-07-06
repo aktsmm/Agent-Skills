@@ -66,26 +66,39 @@ Write-Info "対象ファイル: $outputPath"
 $classification = Get-Content $classificationPath -Encoding UTF8 | ConvertFrom-Json
 Write-Info "Weekly: $($classification.weekly.Count) 件"
 
+# titleAliasMap: 日本語 slide タイトル（cleanTitle 済）→ 英語 canonical（cleanTitle 済）の逆引き
+# Build が titleJa を優先して slide title を日本語で書くため、
+# region_info / notes lookup 時に日本語 slide タイトルを英語 SSOT に戻すのに使う。
+$titleAliasMap = @{}
+foreach ($item in @($classification.weekly) + @($classification.appendix)) {
+    $enClean = Get-CleanSlideTitle -Title $item.title
+    if ($enClean) { $titleAliasMap[$enClean] = $enClean }
+    if ($item.titleJa) {
+        $jaClean = Get-CleanSlideTitle -Title $item.titleJa
+        if ($jaClean) { $titleAliasMap[$jaClean] = $enClean }
+    }
+}
+
 # region_info.json / region_info_reviewed.json を読み込み（リージョン情報を正確に取得）
 # 📌 SSOT: スキーマ定義は .github/skills/azure-update-customer-pptx/references/region-stamp.md を参照
 # 形式: { "regions": { "タイトル": { "japanEast": bool, "japanWest": bool, "status": "...", ... } } }
 $regionInfo = @{}
 if (Test-Path $regionInfoPath) {
     $regionData = Get-Content $regionInfoPath -Encoding UTF8 | ConvertFrom-Json
-
+    
     # region_info_reviewed.json は services または regions プロパティ内にネスト
-    $regionsObject = if ($regionData.PSObject.Properties["services"]) {
-        $regionData.services
-    } elseif ($regionData.PSObject.Properties["regions"]) {
-        $regionData.regions
-    } else {
-        $regionData
+    $regionsObject = if ($regionData.PSObject.Properties["services"]) { 
+        $regionData.services 
+    } elseif ($regionData.PSObject.Properties["regions"]) { 
+        $regionData.regions 
+    } else { 
+        $regionData 
     }
-
+    
     foreach ($prop in $regionsObject.PSObject.Properties) {
         $title = $prop.Name
         $info = $prop.Value
-
+        
         # stamp フィールドがあれば優先使用（reviewed.json）、なければ生成
         # 🔴 テンプレート準拠の文字列形式（絵文字なし、日本語表記）
         # 🔴 status フィールドを優先チェック（グローバルサービスの正しい判定）
@@ -109,7 +122,7 @@ if (Test-Path $regionInfoPath) {
             # Japan East/West 両方 false → 日本未対応
             $regionStatus = "日本リージョン未対応"
         }
-
+        
         $regionInfo[$title] = @{
             regionStatus = $regionStatus
             japanEast = $info.japanEast
@@ -128,7 +141,7 @@ $weeklyNotes = @{}
 $appendixNotes = @{}
 if (Test-Path $notesPath) {
     $notesData = Get-Content $notesPath -Encoding UTF8 | ConvertFrom-Json
-
+    
     # タイトルをキーにマップ化
     foreach ($n in $notesData.weekly) {
         $weeklyNotes[$n.title] = $n
@@ -155,15 +168,15 @@ try {
     }
     $ppt = if ($Session) { $Session } else { New-PptxSession }
     $pres = $ppt.Presentations.Open($outputPath)
-
+    
     Write-Info "スライド数: $($pres.Slides.Count)"
-
+    
     # ----------------------------------------------------------
     # Phase 1: スライド構造分析
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 1: スライド構造分析"
-
+    
     $structure = @{
         WeeklyStart = 3
         WeeklyEnd = 0
@@ -183,11 +196,11 @@ try {
         try { if ($Slide.CustomLayout.Name -like 'Azure Update Ending*') { return $true } } catch {}
         return $false
     }
-
+    
     for ($i = 1; $i -le $pres.Slides.Count; $i++) {
         $slide = $pres.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
-
+        
         # 🔴 修正: "UPDATE Points" または "今週のUPDATE" で完全一致に近いマッチング
         # "プライベート エンドポイント" などの誤検知を防止
         if ($title -match "^(UPDATE Points|今週のUPDATE)" -and $structure.UpdatePointsSlide -eq 0) {
@@ -201,31 +214,35 @@ try {
             }
         }
     }
-
+    
     Write-Host "  Weekly: P$($structure.WeeklyStart)〜P$($structure.WeeklyEnd)"
     Write-Host "  UPDATE Points: P$($structure.UpdatePointsSlide)"
     Write-Host "  Appendix: P$($structure.AppendixStart)〜"
-
+    
     # ----------------------------------------------------------
     # Phase 2: P2 目次更新
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 2: P2 目次更新"
-
+    
     # 目次内容を構築（classification.json から）
     # 🔴 改善: スクリプトでは文字詰めしない（インストラクションで制御）
     $tocItems = @()
     $num = 1
     foreach ($w in $classification.weekly) {
-        $cleanTitle = Get-CleanSlideTitle -Title $w.title
+        # タイトルは titleJa を優先（日本語表示）、なければ title にフォールバック
+        $wDisplayTitle = if ($w.titleJa) { $w.titleJa } else { $w.title }
+        $cleanTitle = Get-CleanSlideTitle -Title $wDisplayTitle
         # タイトルをそのまま使用（文字数はインストラクションで制御）
         $tocItems += "$num. 【$($w.label)】$cleanTitle"
         $num++
     }
-
+    
+    # ヘッダー行だけテキストに "■ " を付与し、プレースホルダ側の段落ビュレット（■）は
+    # 全段落 Off にして番号行の二重 ■ を防ぐ。行区切りは段落区切り (`r) を使う。
     $tocHeader = "■ 今週の Weekly New Topics（$($classification.weekly.Count) 件）"
-    $tocContent = $tocHeader + "`n`n" + ($tocItems -join "`n")
-
+    $tocContent = $tocHeader + "`r" + ($tocItems -join "`r")
+    
     # P2 のテキストボックスを更新
     # 再実行耐性: Shape.Name で識別し、タイトル以外の全テキストボックスを
     # 先にクリアしてから最大のものに書き込む（2回実行で重複書き込みを防止）
@@ -244,7 +261,7 @@ try {
     $tocShape = $null
     $maxArea = 0
     $contentBoxes = @()
-
+    
     foreach ($shape in $p2.Shapes) {
         if ($shape.HasTextFrame -eq -1 -and $shape.Name -ne "Title 1") {
             $contentBoxes += $shape
@@ -260,14 +277,14 @@ try {
             }
         }
     }
-
+    
     # タイトル以外の全テキストボックスをクリア（再実行時の重複防止）
     foreach ($box in $contentBoxes) {
         if ($box.Name -ne $tocShape.Name) {
             try { $box.TextFrame.TextRange.Text = "" } catch {}
         }
     }
-
+    
     if ($tocShape) {
         $tocShape.TextFrame.TextRange.Text = $tocContent
         $tocShape.TextFrame.TextRange.Font.Size = 24
@@ -275,17 +292,22 @@ try {
             $tocShape.TextFrame.TextRange.Font.NameFarEast = 'BIZ UDPゴシック'
             $tocShape.TextFrame.TextRange.Font.Name = 'BIZ UDPゴシック'
         } catch {}
+        # プレースホルダ由来の段落ビュレット（■）を全段落 OFF にして、
+        # ヘッダー行だけテキスト直書きの ■ を残す（番号行に ■ が付かないように）
+        try {
+            $tocShape.TextFrame.TextRange.ParagraphFormat.Bullet.Visible = 0
+        } catch {}
         Write-Success "目次更新完了（$($tocShape.Name) / 24pt / BIZ UDPゴシック）"
     } else {
         Write-Warning "目次テキストボックスが見つかりません"
     }
-
+    
     # ----------------------------------------------------------
     # Phase 3: UPDATE Points 表更新
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 3: UPDATE Points 表更新"
-
+    
     $updatePointsSlide = $pres.Slides.Item($structure.UpdatePointsSlide)
     $tableShape = $null
 
@@ -308,77 +330,89 @@ try {
     } else {
         Write-Warning "UPDATE Points 表が見つかりません"
     }
-
+    
     # ----------------------------------------------------------
     # Phase 4: リージョンスタンプ追加（Weekly + Appendix）
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 4: リージョンスタンプ追加"
-
+    
     $stampCount = 0
-
+    
     # Weekly スライドにスタンプ追加
     for ($i = $structure.WeeklyStart; $i -le $structure.WeeklyEnd; $i++) {
         $slide = $pres.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
-
+        
+        # 日本語 slide タイトルなら英語 canonical に翻訳して region_info の key と合わせる
+        $titleClean = $title -replace "^【[^】]+】\s*", ""
+        $titleForLookup = if ($titleClean -and $titleAliasMap.ContainsKey($titleClean)) { $titleAliasMap[$titleClean] } else { $title }
+        
         # 共通関数でリージョン情報を取得
-        $region = Find-RegionStatus -Title $title -RegionInfo $regionInfo
-
+        $region = Find-RegionStatus -Title $titleForLookup -RegionInfo $regionInfo
+        
         Add-RegionStamp -Slide $slide -RegionText $region | Out-Null
         Write-Host "  P$i (Weekly): $region"
         $stampCount++
     }
-
+    
     # Appendix スライドにスタンプ追加（Appendix ヘッダーと Ending は除く）
     if ($structure.AppendixStart -gt 0) {
         for ($i = $structure.AppendixStart; $i -lt $pres.Slides.Count; $i++) {
             $slide = $pres.Slides.Item($i)
             $title = Get-SlideTitle -Slide $slide
-
+            
             # Ending/空白スライドは除外
             if ([string]::IsNullOrWhiteSpace($title)) { continue }
             if (Test-AzureUpdateCoverSlide -Slide $slide) { continue }
             if (Test-AzureUpdateEndingSlide -Slide $slide) { continue }
-
+            
+            # 日本語 slide タイトルなら英語 canonical に翻訳して region_info の key と合わせる
+            $titleClean = $title -replace "^【[^】]+】\s*", ""
+            $titleForLookup = if ($titleClean -and $titleAliasMap.ContainsKey($titleClean)) { $titleAliasMap[$titleClean] } else { $title }
+            
             # 共通関数でリージョン情報を取得
-            $region = Find-RegionStatus -Title $title -RegionInfo $regionInfo
-
+            $region = Find-RegionStatus -Title $titleForLookup -RegionInfo $regionInfo
+            
             Add-RegionStamp -Slide $slide -RegionText $region | Out-Null
             Write-Host "  P$i (Appendix): $region"
             $stampCount++
         }
     }
-
+    
     Write-Success "リージョンスタンプ追加完了（$stampCount 件）"
-
+    
     # ----------------------------------------------------------
     # Phase 5: スピーカーノート追加
     # 🔴 notes.json + classification.json + region_info.json から機械的に書き込み
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "Phase 5: スピーカーノート追加"
-
+    
     $noteCount = 0
-
+    
     # classification.json から各スライドの情報マップを作成
     $weeklyInfoMap = @{}
     foreach ($w in $classification.weekly) {
         $weeklyInfoMap[$w.title] = $w
     }
-
+    
     $appendixInfoMap = @{}
     foreach ($a in $classification.appendix) {
         $appendixInfoMap[$a.title] = $a
     }
-
+    
     for ($i = 1; $i -le $pres.Slides.Count; $i++) {
         $slide = $pres.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
         $cleanTitle = $title -replace "^【[^】]+】\s*", ""
-
+        # 日本語 slide タイトルなら英語 canonical に翻訳して lookup key に使う
+        if ($cleanTitle -and $titleAliasMap.ContainsKey($cleanTitle)) {
+            $cleanTitle = $titleAliasMap[$cleanTitle]
+        }
+        
         $note = ""
-
+        
         if ($i -eq 1) {
             # 表紙スライド
             $note = "Weekly Topics: $($classification.weekly.Count) 件"
@@ -388,7 +422,9 @@ try {
             $summaryItems = @()
             $num = 1
             foreach ($w in $classification.weekly) {
-                $wTitle = Get-CleanSlideTitle -Title $w.title
+                # スピーカーノートも slide と同じ titleJa を優先する
+                $wDisplayTitle = if ($w.titleJa) { $w.titleJa } else { $w.title }
+                $wTitle = Get-CleanSlideTitle -Title $wDisplayTitle
                 $summaryItems += "$num. 【$($w.label)】$wTitle"
                 $num++
             }
@@ -399,16 +435,14 @@ try {
             # 共通関数で classification.json と notes.json から情報を取得
             $wInfo = Find-ByPartialTitle -Title $cleanTitle -Map $weeklyInfoMap -MatchLength 20
             $nInfo = Find-ByPartialTitle -Title $cleanTitle -Map $weeklyNotes -MatchLength 15
-
-            # リージョン情報を取得（参考URL用）
-            $regionEntry = Find-ByPartialTitle -Title $cleanTitle -Map $regionInfo -MatchLength 15
-            $regionUrl = if ($regionEntry) { $regionEntry.url } else { "" }
-            $referenceUrl = if ($nInfo -and $nInfo.PSObject.Properties['referenceUrl'] -and $nInfo.referenceUrl) { $nInfo.referenceUrl } else { $regionUrl }
-
+            
+            $learnUrl = if ($wInfo -and $wInfo.learnUrl) { $wInfo.learnUrl } else { "" }
+            $sourceUrl = if ($wInfo -and $wInfo.sourceUrl) { $wInfo.sourceUrl } else { "" }
+            
             # 🔴 ノート組み立て（notes.json の 5 観点のみ）
             # スライド上で確認できる情報（概要・ラベル・リージョン）は記載しない
             $noteLines = @()
-
+            
             # notes.json から 5 観点を追加
             if ($nInfo) {
                 # 🆕 basics（基礎知識・キーワード解説）を先頭に追加
@@ -461,21 +495,22 @@ try {
                     }
                 }
             }
-
-            # 参考URLを追加
-            if ($referenceUrl) {
+            
+            # 参考情報を追加（スライド面のラベルと同じ意味づけ）
+            if ($learnUrl -or $sourceUrl) {
                 $noteLines += ""
-                $noteLines += "■ 参考URL"
-                $noteLines += $referenceUrl
+                $noteLines += "■ 参考情報"
+                if ($learnUrl) { $noteLines += "Microsoft Learn 詳細: $learnUrl" }
+                if ($sourceUrl) { $noteLines += "Azure Updates 発表: $sourceUrl" }
             }
-
+            
             $note = $noteLines -join "`n"
         }
         elseif ($title -match "UPDATE Points") {
             # UPDATE Points スライド - ★印の項目を詳しく解説するガイドを生成
             $noteLines = @()
             $noteLines += "■ 今週のポイント（$($classification.weekly.Count) 件）"
-
+            
             # ラベル別に集計
             $labelCounts = @{}
             $starDetails = @()
@@ -484,23 +519,23 @@ try {
                 $label = $w.label
                 if (-not $labelCounts.ContainsKey($label)) { $labelCounts[$label] = 0 }
                 $labelCounts[$label]++
-
+                
                 # ★印の項目を詳しく解説
                 if ($w.keypoint -match "^★") {
                     $shortTitle = $w.title
                     if ($shortTitle.Length -gt 30) { $shortTitle = $shortTitle.Substring(0, 30) + "…" }
-
+                    
                     # キーポイントから★を除去
                     $keypointContent = $w.keypoint -replace "^★\s*", ""
-
+                    
                     # 共通関数で notes.json から詳細情報を取得
                     $nInfo = Find-ByPartialTitle -Title $w.title -Map $weeklyNotes -MatchLength 15
-
+                    
                     $starDetails += ""
                     $starDetails += "【$($w.label)】$shortTitle"
                     $starDetails += "  ポイント: $keypointContent"
                     $starDetails += "  選定理由: $($w.justification)"
-
+                    
                     # notes.json からの詳細
                     if ($nInfo) {
                         if ($nInfo.userValue) {
@@ -520,11 +555,11 @@ try {
                     $nonStarItems += "・$shortTitle（$($w.keypoint)）"
                 }
             }
-
+            
             # ラベル別件数
             $labelSummary = ($labelCounts.GetEnumerator() | ForEach-Object { "$($_.Key): $($_.Value)件" }) -join "、"
             $noteLines += $labelSummary
-
+            
             # ★印の項目（特に丁寧に説明）
             if ($starDetails.Count -gt 0) {
                 $starCount = ($starDetails | Where-Object { $_ -match "^【" }).Count
@@ -534,28 +569,28 @@ try {
                 $noteLines += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                 $noteLines += $starDetails
             }
-
+            
             # ★なしの項目（参考情報）
             if ($nonStarItems.Count -gt 0) {
                 $noteLines += ""
                 $noteLines += "■ 参考情報（時間があれば）"
                 $noteLines += $nonStarItems
             }
-
+            
             # 説明の流れ
             $noteLines += ""
             $noteLines += "■ 説明の流れ"
             $noteLines += "1. 廃止情報から先に（影響有無を明確に）"
             $noteLines += "2. ★印の活用推奨機能を紹介"
             $noteLines += "3. 参考情報は時間があれば"
-
+            
             $note = $noteLines -join "`n"
         }
         elseif ($i -ge $structure.AppendixStart -and $structure.AppendixStart -gt 0 -and -not [string]::IsNullOrWhiteSpace($title) -and -not (Test-AzureUpdateCoverSlide -Slide $slide) -and -not (Test-AzureUpdateEndingSlide -Slide $slide)) {
             # Appendix コンテンツスライド - 共通関数で情報を取得
             $aInfo = Find-ByPartialTitle -Title $cleanTitle -Map $appendixInfoMap -MatchLength 20
             $nInfo = Find-ByPartialTitle -Title $cleanTitle -Map $appendixNotes -MatchLength 15
-
+            
             # 🔴 修正: classification.json では justification を使用、notes.json では excludeReason を使用
             $excludeReason = ""
             if ($nInfo -and $nInfo.excludeReason) {
@@ -567,12 +602,14 @@ try {
             } else {
                 $excludeReason = "優先度判定による"
             }
-
+            
             # 🔴 ノート組み立て（Appendix 配置理由 + notes.json の 5 観点）
             $noteLines = @()
             $noteLines += "■ Appendix 配置理由"
             $noteLines += $excludeReason
-
+            $learnUrl = if ($aInfo -and $aInfo.learnUrl) { $aInfo.learnUrl } else { "" }
+            $sourceUrl = if ($aInfo -and $aInfo.sourceUrl) { $aInfo.sourceUrl } else { "" }
+            
             # notes.json から 5 観点を追加
             if ($nInfo) {
                 # 🆕 basics（基礎知識・キーワード解説）を追加
@@ -618,14 +655,20 @@ try {
                     }
                 }
             }
-
+            if ($learnUrl -or $sourceUrl) {
+                $noteLines += ""
+                $noteLines += "■ 参考情報"
+                if ($learnUrl) { $noteLines += "Microsoft Learn 詳細: $learnUrl" }
+                if ($sourceUrl) { $noteLines += "Azure Updates 発表: $sourceUrl" }
+            }
+            
             $note = $noteLines -join "`n"
         }
         elseif ($i -eq $pres.Slides.Count) {
             # Ending スライド - ノート不要
             $note = ""
         }
-
+        
         if ($note.Length -gt 10) {
             Set-SpeakerNote -Slide $slide -NoteText $note | Out-Null
             Write-Host "  P$i : ノート更新"
@@ -635,24 +678,24 @@ try {
             Write-Host "  P$i : スキップ（$dispTitle）"
         }
     }
-
+    
     Write-Success "スピーカーノート更新完了（$noteCount 件）"
-
+    
     # ----------------------------------------------------------
     # 保存
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "保存"
-
+    
     $pres.Save()
     Write-Success "保存完了: $outputPath"
-
+    
     # ----------------------------------------------------------
     # 最終確認
     # ----------------------------------------------------------
-
+    
     Write-StepHeader "最終スライド構成"
-
+    
     for ($i = 1; $i -le $pres.Slides.Count; $i++) {
         $slide = $pres.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
@@ -660,13 +703,14 @@ try {
         $displayTitle = if ($title.Length -gt 50) { $title.Substring(0, 50) + "..." } else { $title }
         Write-Host "  P$i$hidden : $displayTitle"
     }
-
+    
     Write-Host ""
     Write-Host "次のステップ: Verify-Pptx.ps1 -PptxPath `"$outputPath`"" -ForegroundColor Cyan
 
 } catch {
     Write-Failure "エラー発生: $_"
     Write-Host $_.ScriptStackTrace -ForegroundColor Red
+    throw
 } finally {
     if ($ClosePresentation -and $pres) {
         try { $pres.Close() } catch {}
@@ -683,4 +727,3 @@ try {
         Write-Info "PowerPoint は開いたままです。確認後、手動で閉じてください。"
     }
 }
-

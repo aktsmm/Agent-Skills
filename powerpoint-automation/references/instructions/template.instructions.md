@@ -393,6 +393,20 @@ When a template lives in OneDrive or has been opened by the user, PowerPoint COM
 5. Re-verify after every open/save cycle. PowerPoint may convert the file shape again after a read-only review or conflict resolution.
 6. For final user review, open read-only copies when possible and do not save them. If PowerPoint changes timestamps or package format during review, restore from the last validated OpenXML artifact before continuing automation.
 
+### Template Metadata Hygiene
+
+`.pptx` is a zip. `docProps/custom.xml`, `docProps/core.xml`, and `docProps/app.xml` keep information that slide-body search does not catch:
+
+- MIP / MSIP sensitivity labels, tenant IDs, SharePoint columns (custom.xml)
+- `cp:lastModifiedBy`, `cp:revision`, and creator identity (core.xml)
+- Deck section titles and heading pairs from the source deck (app.xml)
+
+PowerPoint re-instruments these every time the template is opened from OneDrive / SharePoint or saved by a labeled account, so sanitize is a check-in step, not a one-time deed.
+
+- Run `scripts/clean_template.py <in> <out>` on the check-in artifact. It strips `docProps/custom.xml` to an empty `<Properties/>` element and blanks `cp:lastModifiedBy` and `cp:revision` in `core.xml`. Use `--keep-metadata` only when the template is for a tenant-internal private repo where the labels are intentional.
+- Do not save-over a check-in template from an open PowerPoint window without re-running the sanitize step; MIP will re-add the label on save.
+- To audit an existing pptx quickly: `python -c "import zipfile;print(zipfile.ZipFile('t.pptx').read('docProps/custom.xml').decode('utf-8'))"`.
+
 ### Recommended Requirements
 
 | Requirement      | Description                               |
