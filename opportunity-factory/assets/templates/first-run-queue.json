@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
+  "tasks": [
+    {
+      "id": "t-YYYYMMDD-001",
+      "kind": "discover",
+      "assignee": null,
+      "priority": "high",
+      "status": "pending",
+      "domain": "<domain>",
+      "opportunityId": null,
+      "topic": "first demand scan",
+      "instruction": "Find 5 repeated pains or unmet needs for <audience> in <domain>. Use diverse sources and record evidence provenance. Produce one artifact only.",
+      "successMetric": "<primary metric>",
+      "constraints": [
+        "use public/free sources only",
+        "no login or account creation",
+        "no payment or paid API usage",
+        "no personal data collection",
+        "no external publishing"
+      ],
+      "claimedBy": null,
+      "claimedAt": null,
+      "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "outputs": {
+        "artifact": "artifacts/t-YYYYMMDD-001.md",
+        "paths": []
+      },
+      "summary": null,
+      "error": null
+    },
+    {
+      "id": "t-YYYYMMDD-002",
+      "kind": "review",
+      "assignee": null,
+      "priority": "high",
+      "status": "pending",
+      "domain": "<domain>",
+      "opportunityId": null,
+      "topic": "runtime setup preflight",
+      "instruction": "Review the selected surface adapter, state store, approval policy, schedule, runtime limits, and artifact persistence. Use setup-preflight.md as the checklist and produce one artifact with PASS/FAIL/BLOCKED.",
+      "successMetric": "preflight result recorded",
+      "constraints": [
+        "review only; do not mutate external systems",
+        "no login or account creation",
+        "no payment or paid API usage",
+        "no personal data collection",
+        "no external publishing"
+      ],
+      "claimedBy": null,
+      "claimedAt": null,
+      "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "outputs": {
+        "artifact": "artifacts/t-YYYYMMDD-002.md",
+        "paths": []
+      },
+      "summary": null,
+      "error": null
+    },
+    {
+      "id": "t-YYYYMMDD-003",
+      "kind": "learn",
+      "assignee": null,
+      "priority": "medium",
+      "status": "pending",
+      "domain": "<domain>",
+      "opportunityId": null,
+      "topic": "first-cycle learning plan",
+      "instruction": "After at least one discovery or preflight artifact exists, summarize what to seek next, what to avoid, and which cadence/profile to use for the next cycle. Produce one artifact only.",
+      "successMetric": "next-cycle focus selected",
+      "constraints": [
+        "summarize existing artifacts only",
+        "no login or account creation",
+        "no payment or paid API usage",
+        "no personal data collection",
+        "no external publishing"
+      ],
+      "claimedBy": null,
+      "claimedAt": null,
+      "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "outputs": {
+        "artifact": "artifacts/t-YYYYMMDD-003.md",
+        "paths": []
+      },
+      "summary": null,
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "frame": {
+    "domain": "<domain>",
+    "artifactType": "<artifact type>",
+    "audience": "<specific audience>",
+    "successMetric": "<primary metric>",
+    "constraints": []
+  },
+  "runtime": {
+    "mode": "hosted-agent-scheduler|openclaw|vscode-manual|cli-scheduler|github-actions|windows-task-scheduler|other",
+    "adapter": {
+      "primarySurface": "<surface name>",
+      "secondarySurfaces": [],
+      "skillLocation": "<workspace or personal skill location>",
+      "promptRunner": "<how prompts are invoked>",
+      "stateStore": "<repo files|platform memory|artifact storage|database|other>",
+      "scheduleMechanism": "<built-in scheduler|cron|task scheduler|manual|other>",
+      "approvalPolicy": "<approval policy summary>",
+      "verifiedDocs": [],
+      "lastSetupCheckAt": null
+    },
+    "cadence": {
+      "commander": "15-60m",
+      "worker": "15-120m",
+      "reporterLearner": "6-24h"
+    },
+    "queueTargets": {
+      "discover": 2,
+      "research": 1,
+      "evaluate": 1,
+      "design": 1,
+      "build": 1,
+      "review": 1,
+      "track": 1
+    },
+    "limits": {
+      "maxPendingTasks": 20,
+      "maxDailyWorkerRuns": 12,
+      "maxDailyCostEstimate": "<set by user>",
+      "lockTtlMinutes": 180,
+      "staleTaskTtlHours": 48,
+      "blockerThreshold": 3
+    },
+    "notifications": {
+      "quietHours": "<local quiet hours>",
+      "notifyOnlyOn": [
+        "reporter-summary",
+        "repeated-blocker",
+        "human-approval-required",
+        "high-value-decision"
+      ]
+    }
+  },
+  "learning": {
+    "seekNext": [],
+    "avoid": [],
+    "buildBias": [],
+    "reviewEmphasis": [],
+    "metricCaveats": []
+  },
+  "updatedAt": "YYYY-MM-DDTHH:mm:ssZ"
+}

@@ -1,0 +1,104 @@
+---
+name: opportunity-factory
+description: "Run a reusable opportunity-to-artifact workflow: discover unmet needs, set up workspace factories, schedule recurring commander/worker/reporter prompts, batch-refine many items, optionally use SQLite state, build small artifacts, review quality, and track outcomes. Use when the user wants to repeatedly create apps, games, products, content, or experiments from market/user needs."
+argument-hint: "対象ドメイン、成果物タイプ、制約、今回の入力"
+user-invocable: true
+license: Apache-2.0
+metadata:
+  author: yamapan (https://github.com/aktsmm)
+---
+
+# Opportunity Factory
+
+ニーズ発見から小さな成果物、レビュー、計測、学習までを回す汎用ワークフロー。
+
+## When to Use
+
+- 「ニーズを探して、レビューして、作る」を継続的に回したい
+- スマホアプリ、Steam ゲーム、SaaS、教材、社内改善などを量産したい
+- アイデアをラバーダックで壁打ちし、実行可能な queue に分解したい
+- 単発回答ではなく、反復可能な workspace factory を設計・運用したい
+- 2〜3 個の定期プロンプトで状態を見ながら継続改善したい
+- `/Refine-Product-100 all` のように多数の対象を複数passで改善したい
+
+## When Not to Use
+
+- 1 回だけの実装、調査、レビューなら通常対応でよい
+- 常時守るコーディング規約なら instruction にする
+- 特定 persona や tool 制限が主目的なら custom agent にする
+- deterministic な同期、変換、検証だけなら script / hook にする
+
+## Core Idea
+
+抽象ループは次の通り。
+
+```text
+discover -> research -> evaluate -> design -> build -> review -> launch/track -> learn
+```
+
+各ループは「次に作るもの」ではなく「どの痛み・需要を検証するか」から始める。
+
+## Workflow
+
+1. **Frame the factory**
+   対象ドメイン、成果物タイプ、成功指標、禁止事項を 5 行以内で定義する。
+2. **Rubber-duck the intent**
+   前提、誰の痛みか、既存代替、最小検証、失敗条件を質問で露出させる。
+3. **Create the queue**
+   作業を `discover|research|evaluate|design|build|review|track|learn` に分ける。
+4. **Produce artifacts**
+   各 task は 1 つの evidence artifact を残す。判断、根拠、次アクションを分離する。
+5. **Run review gates**
+   UX、技術、法務/規約、配布、収益/成果指標をドメインに合わせて確認する。
+6. **Track outcomes**
+   実測、推定、未確認を区別し、当たりだけを次サイクルで厚くする。
+
+## Operating Rules
+
+- 先に「誰のどんな未充足ニーズか」を固定してから解決策を作る。
+- 1 task は 1 artifact に収まる粒度にする。
+- 複数 worker で回す場合は、worker は artifact だけを書き、state 更新は reducer/orchestrator に集約する。
+- 指標は実測、推定、仮説を明示して混ぜない。
+- 課金、ログイン、外部公開、個人情報、法的リスクは人間承認の境界にする。
+- ワークスペース固有パスや秘密情報を skill 本体へ埋め込まない。
+
+## Output Modes
+
+- **Rubber Duck**: 質問と仮説の穴を返す。
+- **Factory Plan**: roles、queue、artifact contract、review gates を設計する。
+- **Workspace Setup**: target surface、state store、prompt runner、schedule、approval policy を決める。
+- **Run Slice**: 直近 1 サイクル分の task と artifact 雛形を作る。
+- **Periodic Runtime**: commander / worker / reporter prompts で状態を見て回し続ける。
+- **Review**: 既存 factory の詰まり、過剰設計、欠けた gate を指摘する。
+
+## References
+
+- Detailed workflow: [references/workflow.md](references/workflow.md)
+- Battle-tested patterns: [references/battle-tested-patterns.md](references/battle-tested-patterns.md)
+- Workspace setup: `references/workspace-setup.md`
+- Runtime modes and scheduler presets: `references/runtime-modes.md`
+- Batch refinement: `references/batch-refinement.md`
+- Optional SQLite state store: `references/sqlite-state-store.md`
+- Rubber-duck review: [references/rubber-duck-review.md](references/rubber-duck-review.md)
+- Periodic prompts: `assets/prompts/commander.md`, `assets/prompts/worker.md`, `assets/prompts/reporter-learner.md`
+- Preflight checklist: `assets/templates/setup-preflight.md`
+- Validation script: `scripts/validate_factory_skill.py`
+- Workspace initializer: `scripts/init_factory_workspace.py`
+- SQLite initializer: `scripts/init_factory_sqlite.py`
+- Initializer smoke test: `scripts/smoke_test_initializers.py`
+- Setup packet examples: `assets/examples/setup-packets.md`
+- Factory plan template: [assets/templates/factory-plan.md](assets/templates/factory-plan.md)
+- State template: `assets/templates/factory-state.json`
+- SQLite schema template: `assets/templates/factory-state.sqlite.sql`
+- First-run queue template: `assets/templates/first-run-queue.json`
+- Task template: [assets/templates/task.json](assets/templates/task.json)
+- Artifact template: [assets/templates/artifact.md](assets/templates/artifact.md)
+
+## Done Criteria
+
+- Primitive choice is still Skill, not prompt/instruction/agent/hook
+- Domain, artifact type, success metric, and constraints are explicit
+- Target surfaces, state store, prompt runner, schedule capability, and approval boundaries are explicit
+- Queue has at least one next executable task
+- Every task has an artifact contract and review gate
+- Human approval boundaries are named

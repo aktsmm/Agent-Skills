@@ -1,0 +1,23 @@
+{
+  "id": "t-YYYYMMDD-NNN",
+  "kind": "discover|research|evaluate|design|build|review|track|learn",
+  "assignee": null,
+  "priority": "high|medium|low",
+  "status": "pending",
+  "domain": "<domain>",
+  "opportunityId": null,
+  "topic": "<short topic>",
+  "instruction": "<one-cycle task instruction>",
+  "successMetric": "<metric>",
+  "constraints": [],
+  "claimedBy": null,
+  "claimedAt": null,
+  "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
+  "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
+  "outputs": {
+    "artifact": "artifacts/t-YYYYMMDD-NNN.md",
+    "paths": []
+  },
+  "summary": null,
+  "error": null
+}
