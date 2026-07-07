@@ -57,7 +57,9 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 
 - 先に「誰のどんな未充足ニーズか」を固定してから解決策を作る。
 - 1 task は 1 artifact に収まる粒度にする。
-- 複数 worker で回す場合は、worker は artifact だけを書き、state 更新は reducer/orchestrator に集約する。
+- Advisory-only schedules are safe but too slow for a real factory; if the user expects progress, add at least one bounded mutating worker that writes one artifact and updates local state.
+- 複数 worker で回す場合は、discovery/research worker、build/decision worker、reporter-learner など役割を分け、各 run は 1 task / 1 artifact / 明示的 state 更新に制限する。
+- Mutating workers need duplicate-run prevention such as a short-lived lock file before they update queue or outcome state.
 - 指標は実測、推定、仮説を明示して混ぜない。
 - 課金、ログイン、外部公開、個人情報、法的リスクは人間承認の境界にする。
 - ワークスペース固有パスや秘密情報を skill 本体へ埋め込まない。
@@ -69,6 +71,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - **Workspace Setup**: target surface、state store、prompt runner、schedule、approval policy を決める。
 - **Run Slice**: 直近 1 サイクル分の task と artifact 雛形を作る。
 - **Periodic Runtime**: commander / worker / reporter prompts で状態を見て回し続ける。
+- **Throughput Setup**: commander、research worker、build/decision worker、weekly reporter のように安全境界付きで分業し、進捗速度を調整する。
 - **Review**: 既存 factory の詰まり、過剰設計、欠けた gate を指摘する。
 
 ## References
@@ -102,3 +105,4 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - Queue has at least one next executable task
 - Every task has an artifact contract and review gate
 - Human approval boundaries are named
+- If scheduled progress is expected, at least one safe mutating worker exists; advisory-only automation is called out as intentionally slow

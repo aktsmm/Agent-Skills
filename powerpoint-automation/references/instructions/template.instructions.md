@@ -393,6 +393,34 @@ When a template lives in OneDrive or has been opened by the user, PowerPoint COM
 5. Re-verify after every open/save cycle. PowerPoint may convert the file shape again after a read-only review or conflict resolution.
 6. For final user review, open read-only copies when possible and do not save them. If PowerPoint changes timestamps or package format during review, restore from the last validated OpenXML artifact before continuing automation.
 
+### JP Font in OpenXML Path — `<a:latin>` Alone Is Not Enough
+
+COM's `Font.NameFarEast` sets Japanese fallback in one call. The **OpenXML / python-pptx path does not**: setting only `<a:latin typeface="BIZ UDPGothic"/>` in txStyles leaves JP glyphs falling back to the theme's East Asian slot, which defaults to `游ゴシック Light` (thin, gray).
+
+Both files below must carry an explicit JP typeface:
+
+- `ppt/theme/theme1.xml`
+  - `a:themeElements/a:fontScheme/a:majorFont/a:ea @typeface` → JP font
+  - `a:themeElements/a:fontScheme/a:minorFont/a:ea @typeface` → JP font
+  - `a:font[@script="Jpan"] @typeface` under both majorFont/minorFont → JP font. The Jpan script entry overrides `<a:ea/>` at render time, so both must agree.
+- `ppt/slideMasters/slideMaster1.xml`
+  - Every `<a:defRPr>` under `<p:txStyles>` (titleStyle / bodyStyle / otherStyle × all `<a:lvlNpPr>`) needs `<a:ea typeface="BIZ UDPGothic" panose="020B0400000000000000" pitchFamily="50" charset="-128"/>` inserted immediately before `<a:latin/>`. Missing this makes each generated slide need per-run font correction — the exact anti-pattern the JP template font default rule tries to prevent.
+
+Quick audit:
+
+```powershell
+python -c "import zipfile,re; x=zipfile.ZipFile('t.pptx').read('ppt/theme/theme1.xml').decode('utf-8'); print('ea:', re.findall(r'<a:ea typeface=\"[^\"]*\"', x)); print('Jpan:', re.findall(r'<a:font script=\"Jpan\" typeface=\"[^\"]*\"', x))"
+```
+
+### Lift Duplicated Brand Shapes to Slide Master
+
+If the same background art / brand block / accent bar appears on every custom layout with identical geometry, that is a template smell — layouts are being used as a copy-paste medium instead of inheriting from the master.
+
+- Detection: iterate `SlideMaster.CustomLayouts` (COM) or `master.slide_layouts` (python-pptx) and group shapes by `Name`. Any name that appears on ≥ 2 layouts with the same `left/top/width/height` is a lift candidate.
+- Placement: insert the shape into the master's `spTree` **immediately after `<p:grpSpPr>`** so it sits behind placeholders (background layer). Then delete the copy from every layout.
+- Ordering: keep layout-specific chrome (e.g. an accent line only on section-header layouts) on the layout. Only shapes shared by *all* layouts belong on the master.
+- Verify: a new blank slide from any layout still shows the brand shape; every layout's XML no longer contains the lifted shape name. Render each layout to PNG via COM (`Slide.Export("out.png", "PNG", 1280, 720)` with `WithWindow=False`) to confirm.
+
 ### Template Metadata Hygiene
 
 `.pptx` is a zip. `docProps/custom.xml`, `docProps/core.xml`, and `docProps/app.xml` keep information that slide-body search does not catch:

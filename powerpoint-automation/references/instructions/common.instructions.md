@@ -153,6 +153,84 @@ When extracting from web sources, explicitly list and retrieve all these element
 
 ## python-pptx Placeholder Manipulation Rules
 
+### Placeholder idx Varies per Template — Inspect First
+
+Custom templates do **not** always use the standard `idx=0` (title) / `idx=1` (body) mapping. Some templates assign `idx=10` / `11` / other numbers per layout, or move the title into a non-placeholder text box entirely. Hard-coding `idx=0` for title will silently write into a wrong shape (subtitle, footer, image caption).
+
+Before any idx-based placeholder code, run `scripts/analyze_template.py <template.pptx>` and confirm the actual `idx / type / name` per layout. If a layout has no `idx=0`, either use the correct idx from the analyzer output, or add a plain text box at a fixed position instead of relying on a placeholder.
+
+Applies to: hand-rolled generators, `apply_content.py` custom mappings, and any inherited-value pattern like the xfrm 4-attribute rule below.
+
+### Master / Layout Decorations Are Not Placeholders — Do Not Delete
+
+Custom templates often include intentional **decorative shapes** on the Slide Master or SlideLayout (color bands, side rails, empty boxes, accent stripes). These are regular shapes with `is_placeholder=False`, inherited into every slide. They look "empty" but are part of the design language — never strip them just because they seem redundant.
+
+Before writing a "clean up empty shapes" helper, classify each shape:
+
+- Appears in `slide.slide_layout.shapes` (same name/position) → **Layout decoration**, keep
+- Appears in `slide.slide_layout.slide_master.shapes` → **Master decoration**, keep
+- Not in either → slide-owned shape (candidate for removal)
+
+Any `strip_empty_placeholders(slide, ...)` helper must filter on `is_placeholder=True` and additionally on `placeholder_format.idx`. Never iterate over all `slide.shapes` blindly to remove empty ones.
+
+### strip_empty_placeholders: `keep_idx` should still drop when empty
+
+When you hand-roll all body content via `add_textbox()` (not via placeholder insertion), the layout's body/subtitle placeholders (typically `idx=11` on custom templates) stay behind on every slide as visible empty rectangles. A naive `keep_idx=(10, 11)` will protect these empties and leave them floating.
+
+**Correct policy**: `keep_idx` guards against structural removal, but a placeholder with empty `text_frame.text.strip()` should still be dropped. This lets the same helper handle both:
+
+- Cover slide: subtitle written into `idx=11` → text present → kept
+- Body slides: nothing written into `idx=11` → text empty → dropped
+
+```python
+def strip_empty_placeholders(slide, keep_idx=(10,)):
+    for shape in list(slide.shapes):
+        if not shape.is_placeholder:
+            continue
+        idx = shape.placeholder_format.idx
+        # keep if in keep list AND has content
+        if idx in keep_idx and shape.has_text_frame and shape.text_frame.text.strip():
+            continue
+        # otherwise: drop empty placeholders regardless of keep_idx
+        if shape.has_text_frame and not shape.text_frame.text.strip():
+            sp = shape._element
+            sp.getparent().remove(sp)
+```
+
+Default `keep_idx=(10,)` protects the title. Everything else auto-classifies: written = kept, empty = removed. No per-slide branching needed.
+
+Verification: after build, count `[sh for sh in s.shapes if sh.is_placeholder and sh.has_text_frame and not sh.text_frame.text.strip()]` should equal 0 across all slides.
+
+### Placeholder Font Size: `clear()` + `add_run()` is required
+
+Assigning `text_frame.text = "..."` to a placeholder does **not** reset the inherited font size from the slide layout / master. Iterating `text_frame.paragraphs → paragraph.runs` and setting `run.font.size = Pt(N)` afterward often has no visible effect for the subtitle / body placeholder, because python-pptx keeps the layout-owned run's rPr in some templates.
+
+**Correct pattern for cover subtitle or any placeholder where explicit font size is required**:
+
+```python
+tf = shape.text_frame
+tf.clear()  # remove inherited runs
+for i, (txt, size, bold) in enumerate(lines):
+    p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+    r = p.add_run()
+    r.text = txt
+    r.font.name = FONT_JA
+    r.font.size = Pt(size)
+    r.font.bold = bold
+```
+
+Symptom of the bug: cover subtitle renders at ~12pt even when the code sets `Pt(20)`. Cause: the shape still has the layout's original run with its own rPr, and the new setter appends without overriding.
+
+### MSO_AUTO_SIZE enum: only `NONE` / `SHAPE_TO_FIT_TEXT` are supported
+
+python-pptx が公開している `MSO_AUTO_SIZE` は **`NONE` と `SHAPE_TO_FIT_TEXT`** の 2 値のみ。PowerPoint COM 由来の名前 `TEXT_TO_SHAPE_ON_OVERFLOW` (テキストを枠に合わせて縮小) は **存在しない**。誤って使うと `AttributeError: type object 'MSO_AUTO_SIZE' has no attribute 'TEXT_TO_SHAPE_ON_OVERFLOW'` で build 失敗。
+
+使い分け:
+
+- `tf.auto_size = MSO_AUTO_SIZE.SHAPE_TO_FIT_TEXT`: 枠の height を text 量に合わせて伸ばす。テキスト増減が読めない slide 向け
+- `tf.auto_size = MSO_AUTO_SIZE.NONE` (default): 枠固定、はみ出し時はクリップ
+- 「テキストを枠内に自動縮小」は python-pptx では未実装。必要なら pywin32 経由で `TextFrame.AutoSize = 2` (msoAutoSizeTextToFitShape) を build 後に COM で設定する
+
 ### xfrm 4-Attribute Rule
 
 When modifying a placeholder's position or size, **always set all 4 attributes** (`left`, `top`, `width`, `height`). Setting only some attributes causes python-pptx to create a new `xfrm` element, resetting unset attributes to **0** (width=0 → text wraps per character → appears vertical).

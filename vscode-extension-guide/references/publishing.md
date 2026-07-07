@@ -145,6 +145,12 @@ If a release test asserts the extension version inside docs or spec files (READM
 - Prefer `npx vsce package --out <file>` over ambiguous `npm exec -- vsce package --out <file>` forms. If `vsce` reports `Invalid version <path>`, the package path was parsed as a version argument; switch runner syntax rather than changing the version.
 - Run `git status --short` after packaging and `vsce ls`, not only before committing. Repository prepublish scripts can regenerate tracked metadata or JSON formatting; if that happens after the release commit/tag, either commit the mutation before packaging or restore and rebuild the VSIX so the artifact matches the tagged commit.
 
+## Post-publish Verification
+
+- Treat Marketplace listing metadata and `vsce show` as eventually consistent. If publish logs, the pushed tag, and GitHub Release are successful but the listing still shows the previous version, do not republish immediately; verify the version-specific VSIX endpoint first.
+- Use the version-specific package URL pattern `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<extension>/<version>/vspackage`. Some Marketplace endpoints return `405` for `HEAD`, so use a small `GET` download to a temp file and confirm HTTP 200 plus a plausible size before declaring the version missing.
+- Compare the downloaded VSIX size with the locally packaged artifact or GitHub Release asset. Matching size is stronger evidence than a stale human-facing Marketplace page.
+
 ## Local VSIX Artifact Hygiene
 
 Store generated `.vsix` files under `artifacts/vsix/` rather than the repository root. This keeps the root readable, makes cleanup scriptable, and reduces the chance of attaching or inspecting the wrong local file.

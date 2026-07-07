@@ -45,6 +45,49 @@ Pricing, billing, deadline, supportability, and regional availability claims are
 - ラベルが外に出る
 - 絶対値だけで配置して再利用できない
 
+## Tool Selection: python-pptx (create) vs COM (edit)
+
+pptx を扱う 2 系統のツールを、フェーズで明確に使い分ける。混ぜると版番爆発とユーザー手修正の上書きが発生する。
+
+| Phase                                                                                                 | Tool                       | 理由                                                                                              |
+| ----------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------- |
+| **ゼロから新規作成 / 大量 slide 一括生成**                                                            | python-pptx (build script) | 20-30 slide 一括、レイアウト / SECTIONS / refurl 定型パターンをコード管理できる                   |
+| **既存 pptx の微修正 (agenda 直し / textbox 差し替え / 非表示 flag / ノート追記 / セクション再配置)** | PowerPoint COM (pywin32)   | 版番増えない、ユーザー手修正と両立、開いてる状態で編集可、非表示 / セクション / ノートの API 網羅 |
+
+### Rationale
+
+- python-pptx で「既存 pptx を読んで一部書き換えて保存」をするとフォントサイズ・placeholder 継承・run rPr の gotcha が発動して意図しない見た目劣化が起きやすい
+- COM は Windows 限定・並列不可・起動 3-5 秒の overhead があるが、微修正では十分速い
+- 「build_deck.py で全 slide 再生成 → 手修正が消える」というアンチパターンを防げる
+
+### File Lifecycle (SSOT を守る)
+
+1. **生成段階**: build script の OUTPUT は `..._v01.pptx`〜`..._vNN.pptx` の版番付きで、build のたびに新規保存
+2. **顧客提示 or 会議で使った瞬間**: 版番付きファイルを **無版番の canonical name** (例: `..._overview.pptx`) にリネームして SSOT 化
+3. **同時に build script の OUTPUT を `..._draft.pptx` サフィックスに変更** して SSOT の上書き衝突を防ぐ
+4. **build script + 素材フォルダ (画像等)** は `archive/` 配下に退避。ゼロ作り直しになったときのみ復活
+5. **以降の微修正は SSOT を COM で直接編集**。SSOT はディスク上に 1 個だけ、版番増えない
+
+### COM 編集のミニ helper 例
+
+再利用可能な helper module を 1 個持つと、微修正のたびに ad hoc script を書かずに済む。
+
+```python
+def open_ssot(pptx_path):
+    """既に開いてれば掴む、なければ open (WithWindow=True)"""
+
+def find_textbox_by_content(slide, contains):
+    """テキスト部分一致で shape 特定 (idx 番号に依存しない)"""
+
+def replace_textbox_text(shape, new_text, preserve_font=True):
+    """フォント維持で本文差し替え"""
+
+def set_slide_hidden(slide, hidden=True):
+    """会議で見せなかった slide の非表示化"""
+```
+
+Ad hoc の `_update_agenda.py` を毎回書くのはあり (1 回で捨てる想定)。3 回以上パターンが出たら helper module に昇格。
+
 ## Template-Based Slide Editing Order
 
 既存 PPTX をテンプレートとして使うときは、構造編集と内容編集を混ぜない。
@@ -111,6 +154,109 @@ Use COM inspection before handoff:
 - Body slides can be created from the body layout without copying a hidden sample slide.
 - A generated deck passes the normal build/enrich/verify path.
 - Temporary validation decks, rendered images, and helper scripts are removed after validation.
+
+### Visual Verification Loop (build → PNG → view → fix)
+
+python-pptx で組んだ pptx は、フォント幅による改行位置 / shape 重なり / 余白バランス / Master 装飾との衝突 が実際に開くまで分からない。build 後は必ず PowerPoint COM で PNG エクスポートして目視する。
+
+Loop:
+
+1. `python build_deck.py` で pptx 出力
+2. pywin32 経由で `Presentation.Export("<out_dir>", "PNG")` を呼び、各 slide を PNG 化 (会議想定なら 1600x900 以上)
+3. AI (view_image tool) または人間で全枚数を目視。判定観点は下記
+4. 問題があれば build script を修正し 1 に戻る
+
+**目視判定観点** (毎回全てチェック):
+
+- 本文フォント ≥14pt (会議画面共有想定)
+- refurl / footer と本文の間隔 ≥0.15in、重なりゼロ
+- 空 textbox は残さない、**ただし Master/Layout 装飾は残す** (common.instructions.md 参照)
+- Title 折り返しで 2 行以上にならない
+- 色付きバンド内テキストは背景色とコントラスト十分
+- Appendix 埋め込み画像は 800px 幅以上で読める
+
+**効率化のコツ**:
+
+- view_image は並列で複数枚同時に見る (1 turn で 3-5 枚)。ただし 20 枚上限に注意
+- 「Explore」系サブエージェントに view_image + 監査ファイル書き出しを丸投げすると、audit ファイル書き出しに失敗する事例あり。**メインで view_image する方が確実**
+- 「画像が入ってない」と判定する前に、その slide の `shape_type` を数えるスクリプトで確認 (見た目 vs 構造の乖離を防ぐ)
+- 修正ループは build_deck.py への最小差分 + 全 slide 再スクショで行う。1 slide だけ差し替えるより早い
+- 出力ファイル名は `_v01.pptx` `_v02.pptx` のように版番付けし、export dir も `v01-screenshots/` `v02-screenshots/` にすると diff が取りやすい
+- **PowerPoint 開きっぱなしでロック衝突**: user が開いたままにする前提なら、次版は必ずファイル名を bump (v07→v08) して新規保存。同名保存は permission denied で build 失敗しがち
+- **解析時のロック回避**: 開かれた pptx を python-pptx で読むと `Permission denied`。`Copy-Item -Force` で `_analyze.pptx` を作って解析し、終わったら削除するのがロックフリー
+- **空 placeholder の検出は 1 行スクリプト**で: `[sh for sh in s.shapes if sh.is_placeholder and sh.has_text_frame and not sh.text_frame.text.strip()]` を全 slide で 0 になるまで詰める。view_image より速く確実
+- **shape 差分 diff**: v01 と v02 で `[(sh.name, sh.left, sh.top) for sh in s.shapes]` を比較すると、何が消えた/追加されたかが構造レベルで分かる。目視ミスの二重チェックに有効
+- **build script / 素材フォルダ は intermediate ではなく infrastructure**。cleanup 時に `_v0N_analyze.pptx` / スクショフォルダ / analyze スクリプトは消してよいが、`build_deck.py` と `appendix-images/` (または同等の素材フォルダ) は再ビルドに必須なので削除対象から除外する。user から「中間生成物を消して」指示が来ても、これらは infrastructure として保護する
+- **PowerPoint COM の PNG export は `slide.Export(path, "PNG", W, H)` を優先**。`Presentation.Export(dir, "PNG", W, H)` は環境によって出力ファイル形式が想定と異なる (Slide1.PNG などにならず失敗するケース)。特定 slide だけ抽出するときも、prs.Slides(idx).Export(path, "PNG", 1600, 900) の per-slide 呼び出しの方が安定
+- **builder リストの重複検出**: `builders = [s01, s02, ..., sNN]` のような slide builder 関数の list で、同じ関数が 2 回登場すると slide が重複生成される。build 直前に `assert len(set(builders)) == len(builders)` する。手動編集で関数追加した後に重複しやすい (symptom: 想定より 1 slide 多い、参考リンクが 2 枚並ぶ 等)
+- **refurl / footer と本文の衝突を機械的に検出**: RefURL box の top を定数化 (例: `REFURL_TOP = Inches(6.15)`) し、各 slide の add_body_textbox() 呼び出し引数で `top + height <= REFURL_TOP - Inches(0.15)` を assert する。python-pptx は auto shrink しないので、本文が 6.15in を超えると refurl と物理的に重なる。symptom は開いた時に「参考 URL の上に本文が被る / 本文の中に URL が食い込む」
+- **PowerPoint COM crash 後の pptx は viewProps に masterView が残る** → 次に開いた時にスライドマスタービューで開いてしまう。python-pptx で save する build script では、save 直前に `viewProps.xml` を Normal View (sldView) + slide 1 に強制する `force_normal_view(prs)` helper を必ず呼ぶ:
+
+  ```python
+  VIEWPROPS_NORMAL = b'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <p:viewPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+            xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" lastView="sldView">
+    <p:normalViewPr showOutlineIcons="0"/>
+    <p:slideViewPr><p:cSldViewPr snapToGrid="0"><p:cViewPr varScale="1"><p:scale><a:sx n="72" d="100"/><a:sy n="72" d="100"/></p:scale><p:origin x="0" y="0"/></p:cViewPr><p:guideLst/></p:cSldViewPr></p:slideViewPr>
+  </p:viewPr>'''
+
+  def force_normal_view(prs):
+      for rel in prs.part.rels.values():
+          if rel.reltype.endswith("viewProps"):
+              rel.target_part._blob = VIEWPROPS_NORMAL
+              return
+  ```
+
+  viewProps part が無いテンプレでも問題なし (PowerPoint が既定で Normal を選ぶ)。symptom: 生成した pptx を PowerPoint で開くと最初にスライドマスター編集画面が出る。原因の pptx 履歴は前 build で COM が中断した場合や、外部ツールが view state を書き換えた場合に発生する
+
+## Section Headers (Slide Sorter Groups)
+
+python-pptx は Slide Sorter 用の Section (章) 追加 API を持たない。Section 分けが必要な deck は、build 後に PowerPoint COM 経由で `Presentation.SectionProperties.AddBeforeSlide(idx, name)` を呼ぶ。build script 内で完結させ、build 完了 → COM open → Section 付与 → Save → Close をワンパスで実行する。
+
+Section 定義は `SECTIONS = [(slide_idx, name), ...]` の SSOT 定数にまとめる。スライド構成変更時はここだけ書き換える。
+
+```python
+def apply_sections_via_com(pptx_path, sections):
+    import win32com.client
+    app = win32com.client.Dispatch("PowerPoint.Application")
+    prs = None
+    for p in app.Presentations:
+        if p.FullName.lower() == str(pptx_path).lower():
+            prs = p
+            break
+    if prs is None:
+        prs = app.Presentations.Open(str(pptx_path), WithWindow=True)
+    sp = prs.SectionProperties
+    while sp.Count > 0:
+        sp.Delete(1, False)  # False = keep slides
+    for idx, name in sections:
+        sp.AddBeforeSlide(idx, name)
+    try:
+        prs.Windows(1).ViewType = 9  # ppViewNormal
+        prs.Windows(1).View.GotoSlide(1)
+    except Exception:
+        pass
+    prs.Save()
+```
+
+Notes:
+
+- 既に PowerPoint で開かれている pptx なら Presentations コレクションから掴む。掴めれば Save だけで反映され、COM open のオーバーヘッドが不要
+- `Delete(index, keepSlides=False)` の 2 番目は必ず False。True にするとスライドごと消える (Gotcha: pywin32 の VARIANT_BOOL では第 2 引数の型ミスで挙動が変わることがある)
+- Section 付与後に ViewType を Normal に戻さないと、直後の view state が Slide Sorter で保存されてしまう
+- `p.FullName` アクセスで `pywintypes.com_error: (-2147352567, 'この操作を実行するアクセス許可がありません')` / `オートメーションからは実行できません` が返る場合、**他 pptx が保護ビュー / 変更中 / OneDrive 同期中**が原因。Presentations コレクション反復で 1 つでも FullName 取得失敗すると try/except で skip して次に進む。全 slide が section 付与できなかった場合は build 後の次回 build で解消する (idempotent なので毎回上書きで OK)。build script 自体は成功扱いにする (pptx は生成できているので main flow は破綻させない)
+
+## Layout Choice: Section Header vs Title and Content
+
+Custom templates often ship a **Section Header** layout with a large centered decorative title (or watermark-like inherited text) placed over the body area. This layout is designed for chapter divider slides (title only, no body content). If you use it for a slide that also contains body text or reference URL boxes, the layout's centered decoration overlaps every self-added textbox.
+
+Rule:
+
+- **Section Header layout**: 章の区切り slide のみ (タイトルだけで本文なし)
+- **Title and Content layout**: 本文 / URL / チャート / 表 が入る全 slide
+
+Symptom: 生成した slide を PowerPoint で開くと、本文のテキストボックスとレイアウトの装飾テキスト (「Section」等の大字) が重なって読めない。fix は該当 slide の layout を Section Header → Title and Content に変えるだけ。
 
 ## Hyperlink Batch Processing
 

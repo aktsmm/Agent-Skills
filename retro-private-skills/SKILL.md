@@ -87,6 +87,7 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 3. Inspect existing private skills before creating anything.
 4. Route to the most specific existing skill when one clearly owns the behavior.
 4b. **Multi-target case**: when a learning is a cross-cutting principle that several skills must own independently to stay Self-Contained (for example: tool-platform constraints, push-threshold rules, gate items that each skill verifies locally), apply it to every affected skill as a 1-line gate. Each copy must be a tiny independent SSOT, not a hard reference to a primary; same wording across files is allowed when portability requires it. Do not copy the same long block — keep each insertion to one line of judgment.
+4c. **Multi-learning case**: when one incident produces several independent learnings with different owning skills, split them and update each owning skill in the same retro turn. Do not force all learnings into the first plausible skill. Example: deck artifact folder design belongs to planning/workspace skills, while generation/editing mechanics belong to automation skills.
 5. If no existing skill owns the behavior and the learning is reusable as a workflow, create a new private skill folder.
 6. If the learning is workspace/customer/project-specific, abstract it before writing; if it cannot be safely abstracted, stop with `scope 不一致` and suggest a workspace-scoped record or workflow instead.
 

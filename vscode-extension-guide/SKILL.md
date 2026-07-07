@@ -98,6 +98,12 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 - Marketplace 表示や設定説明をローカライズしている拡張では、`package.nls.json` と対象言語の `package.nls.*.json` を同じ変更で更新する。
 - 設定の並び順や説明を変えたら README の設定表、manifest consistency test、release notes の必要有無までまとめて見る。
 
+### Language Model Tools
+
+- Extension-provided LM Tools need strong `modelDescription` intent phrases. Prefer `Use when the user asks to ...` plus natural-language verbs for create/update/delete/toggle paths, and add a manifest/doc guard so future wording changes do not silently weaken agent-mode tool selection.
+- Treat `prepareInvocation().confirmationMessages` as extension custom confirmation text, not a complete approval bypass. VS Code / Copilot Chat can still show generic approval or Always Allow UI, so docs/settings should say they control custom confirmations only.
+- Before publishing an extension with LM Tools, inspect the packaged VSIX rather than trusting source files: confirm `extension/package.json` has the intended version, expected `contributes.languageModelTools` count, and no `src/`, test payloads, or sourcemaps unless intentionally shipped.
+
 ### Generated Sections
 
 - `START` / `END` marker で囲む generated section は単一の SSOT として扱う。

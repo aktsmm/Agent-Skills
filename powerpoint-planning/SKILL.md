@@ -44,6 +44,8 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 5. **Prompt / Brief Output**: ローカル PowerPoint、手作業制作、Copilot Chat、Edit with Copilot、または別の制作実行フローで使える制作ブリーフを出す。
 6. **Review / Revision**: 生成後は章立て、主張、視線誘導、文字サイズ、カード余白、AI っぽさ、事実性をレビューし、slide-specific revision prompt を作る。
 
+ゼロから起こす資料、多論点の資料、顧客レビューや意思決定を挟む資料では、Workflow 2-4 の中間成果物を 1 つのメモに混ぜず、planning 用フォルダに 4 ファイルへ分けて保存する。詳細は [references/structure-and-storyline.md](references/structure-and-storyline.md) の Planning Artifacts を参照する。
+
 ## Output Patterns
 
 - Clarifying questions and missing inputs
