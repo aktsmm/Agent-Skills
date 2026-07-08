@@ -39,6 +39,19 @@ Suggested files:
 
 If the user already has a state layout, adapt to it instead of renaming everything.
 
+## Single-Cycle Automation
+
+When the queue is small and tasks are safe/local, prefer one scheduled automation that performs `commander -> one worker task -> reducer` in a single run instead of separate commander and worker automations. This reduces state drift and halves scheduled runs, but only works when the cycle can safely update state.
+
+Rules:
+
+- Pick at most one auto-eligible task per run.
+- Auto-skip tasks that require manual play, GUI-only judgment, legal/risk acceptance, publishing, payment, account creation, secrets, personal data, or long-running work.
+- Before rewriting JSON array state files, create backups, parse the original, rewrite the full array, parse the result, and restore backup on failure.
+- Use an append-only JSONL pipeline log for audit records.
+- Use a short-lived lock file or equivalent lease; if the lock is still valid, skip and log a no-op.
+- Mark a task done only when its artifact contains evidence that the success metric was met; otherwise leave it pending or blocked.
+
 ## Cadence Defaults
 
 Start conservative and tune after the first few cycles:
@@ -46,6 +59,7 @@ Start conservative and tune after the first few cycles:
 - commander: every 15-60 minutes
 - worker: every 15-120 minutes, depending on task cost
 - reporter-learner: every 6-24 hours
+- workflow-review: weekly, or after 10-20 artifacts if the factory is moving quickly
 
 For manual operation, run one commander, one worker, then one reporter-learner after a few artifacts exist.
 
@@ -64,6 +78,7 @@ Use this first for a new factory or expensive model/tool stack.
 | commander        | every 60m  | import artifacts, refill queue to low targets, aggregate blockers |
 | worker           | every 120m | run one pending task and write one artifact                       |
 | reporter-learner | every 24h  | summarize, update learning, choose next focus                     |
+| workflow-review  | weekly     | review cadence, queue quality, state drift, and missing gates     |
 
 ### OpenClaw / Cron
 
@@ -74,6 +89,7 @@ Best for unattended operation with isolated sessions and shared state.
 | commander        | every 15-30m            | single writer for queue/state/logs                           |
 | worker           | every 30-60m per worker | each worker runs one task only; parallel workers are allowed |
 | reporter-learner | every 6-8h              | compress notifications and update learning                   |
+| workflow-review  | weekly or every 20 artifacts | rubber-duck the factory itself and propose prompt/cadence changes |
 
 Rules:
 
@@ -90,6 +106,7 @@ Use this for scheduler-capable hosted agent environments. Examples might include
 | commander        | every 30-60m  | inspect platform-persisted state, import artifacts, refill queue |
 | worker           | every 60-180m | run one task; use platform tools only within the approved scope  |
 | reporter-learner | every 8-24h   | publish a compact report and update learning                     |
+| workflow-review  | weekly        | check scheduler drift, dashboard freshness, and unsafe autonomy  |
 
 Rules:
 
@@ -98,6 +115,7 @@ Rules:
 - Prefer platform-native approvals for publish, payment, account, secret, personal-data, and policy-risk actions.
 - If the platform cannot write durable artifacts, have workers return artifact text and let commander persist or propose persistence.
 - Do not assume product-specific feature names; map whatever the platform offers to `commander`, `worker`, and `reporter-learner`.
+- For small queues, a single-cycle hosted automation can replace separate commander/worker jobs if JSON state updates are backed up, validated, and locked.
 
 ### Copilot Scheduler (VS Code Extension)
 
@@ -174,12 +192,12 @@ Run the reporter after two or more artifacts exist, or when a blocker appears.
 
 ## Operating Profiles
 
-| Profile    | Commander | Worker  | Reporter | Use when                                       |
-| ---------- | --------- | ------- | -------- | ---------------------------------------------- |
-| low-cost   | daily     | daily   | weekly   | exploration is cheap but not urgent            |
-| supervised | manual    | manual  | manual   | new factory or high-risk domain                |
-| standard   | 30-60m    | 60-120m | 8-24h    | normal unattended improvement                  |
-| burst      | 15m       | 15-30m  | 6h       | short sprint with explicit budget and approval |
+| Profile    | Commander | Worker  | Reporter | Workflow review | Use when                                       |
+| ---------- | --------- | ------- | -------- | --------------- | ---------------------------------------------- |
+| low-cost   | daily     | daily   | weekly   | monthly/weekly  | exploration is cheap but not urgent            |
+| supervised | manual    | manual  | manual   | manual          | new factory or high-risk domain                |
+| standard   | 30-60m    | 60-120m | 8-24h    | weekly          | normal unattended improvement                  |
+| burst      | 15m       | 15-30m  | 6h       | after sprint/day | short sprint with explicit budget and approval |
 
 Do not use burst mode without daily run limits and a clear stop condition.
 

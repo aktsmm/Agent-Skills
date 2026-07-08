@@ -34,11 +34,15 @@ The reducer should:
 
 If parsing fails, keep the task open and retry after the artifact is fixed.
 
+For JSON array queues, never append raw fragments. Read, parse, update the in-memory array, rewrite the full file, parse it again, and restore a backup if validation fails.
+
 ## 4. One Pulse, One Task
 
 Limit each worker run to one task.
 
 Why: this prevents runaway loops, keeps costs bounded, and makes outputs auditable. If a task wants to do five things, split it into five tasks.
+
+For small, low-risk queues, a single scheduled pulse may run commander, one worker task, and reducer together. Do this only when tasks have explicit auto-eligibility and the pulse has locking/idempotency.
 
 ## 5. Pain-First Scouting
 

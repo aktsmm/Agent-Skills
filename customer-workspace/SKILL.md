@@ -170,9 +170,12 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 Before calling meeting notes done:
 
 - Mark uncertain names, times, product names, model names, prices, or support boundaries as `要確認` instead of overclaiming.
+- Speech-to-text transcripts especially mishear short technical acronyms, time codes, and engagement names (e.g. `2H` heard from `EDE 時間`, `Entra ID` from `エントラ ID`). If a short token looks off in context, verify with the user or keep it as `要確認`.
+- AI-generated follow-up tasks (Teams AI / Otter etc.) tend to be too literal or too generic. Cross-check with the body transcript and refine owner, deadline, and concrete deliverable. Do not leave ambiguous phrasing as-is.
 - Extract open questions and action items into `_questions/{YYYY-MM}.md`; create `next-actions/` tasks only for work that needs follow-up outside the meeting note.
 - Ensure shareable meeting-note tables contain no local file paths or internal-only work links.
 - Keep internal speculation in an internal memo or clearly marked internal section.
+- When the note will be shared with the customer, produce a copy-paste highlight block (`## お客様共有用ハイライト (コピペ用)`) with 3-5 confirmed bullets + next actions split into `お客様側 / 自社側 / 双方 (両者で調整)`. Cross-side coordination (schedule, joint review) goes in `双方` only — do not duplicate. See [references/meeting-minutes-rules.md](references/meeting-minutes-rules.md).
 
 ---
 

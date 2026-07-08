@@ -23,11 +23,14 @@ REQUIRED_FILES = [
     "references/sqlite-state-store.md",
     "references/workspace-setup.md",
     "references/rubber-duck-review.md",
+    "references/self-designing-factory.md",
+    "references/dashboard-state.md",
     "assets/prompts/commander.md",
     "assets/prompts/worker.md",
     "assets/prompts/reporter-learner.md",
     "assets/templates/factory-plan.md",
     "assets/templates/factory-state.json",
+    "assets/templates/dashboard-state.json",
     "assets/templates/factory-state.sqlite.sql",
     "assets/templates/first-run-queue.json",
     "assets/templates/task.json",
@@ -95,6 +98,7 @@ def main() -> int:
     runtime = read_text(root / "references/runtime-modes.md")
     for phrase in ["Hosted Agent Scheduler", "Copilot Scheduler (VS Code Extension)", "OpenClaw / Cron", "GitHub Actions", "Windows Task Scheduler"]:
         check(phrase in runtime, f"runtime-modes.md missing scheduler preset: {phrase}", failures)
+    check("workflow-review" in runtime, "runtime-modes.md missing workflow-review cadence", failures)
 
     batch = read_text(root / "references/batch-refinement.md")
     for phrase in ["Three-Pass Rubber-Duck Loop", "passCount", "SQLite", "Stop Conditions"]:
@@ -129,6 +133,7 @@ def main() -> int:
         check(phrase in setup, f"workspace-setup.md missing setup evidence field: {phrase}", failures)
 
     state = validate_json(root, "assets/templates/factory-state.json", failures)
+    dashboard_state = validate_json(root, "assets/templates/dashboard-state.json", failures)
     first_run_queue = validate_json(root, "assets/templates/first-run-queue.json", failures)
     task = validate_json(root, "assets/templates/task.json", failures)
     runtime_state = state.get("runtime", {}) if isinstance(state, dict) else {}
@@ -148,6 +153,10 @@ def main() -> int:
     ]:
         check(field in adapter, f"factory-state.json missing runtime.adapter.{field}", failures)
     check("outputs" in task, "task.json missing outputs", failures)
+    answering_policy = dashboard_state.get("answeringPolicy", {}) if isinstance(dashboard_state, dict) else {}
+    check(answering_policy.get("useDashboardFirst") is True, "dashboard-state.json missing answeringPolicy.useDashboardFirst=true", failures)
+    for field in ["executiveSummary", "workflows", "queues", "risksAndBlockers", "nextActions"]:
+        check(field in dashboard_state, f"dashboard-state.json missing {field}", failures)
     first_tasks = first_run_queue.get("tasks", []) if isinstance(first_run_queue, dict) else []
     check(len(first_tasks) >= 3, "first-run-queue.json should include at least three starter tasks", failures)
     first_kinds = {task_item.get("kind") for task_item in first_tasks if isinstance(task_item, dict)}

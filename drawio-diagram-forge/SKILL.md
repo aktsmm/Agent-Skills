@@ -26,6 +26,10 @@ Choose this skill when the result will need later **GUI editing** in draw.io, cl
 
 - Quick inline diagrams that are easier to keep as Mermaid in README or Markdown
 - One-off text-native diagrams where manual GUI adjustment is not expected
+- **Bar chart / scatter plot / metrics 可視化**: 目盛り・軸ラベル・凡例が正確に必要なら matplotlib / seaborn / Chart.js の方が高速で綿麗
+- **Hero / OG / インフォグラフィック**: font ・色 ・レイアウトを緻密に制御したい場合は Python (matplotlib + PIL) または SVG 手書きの方が適する
+- **日本語 label が大量にあるケース**: draw.io の日本語フォント描画は環境依存 (Windows / Mac / Linux で fallback が違う)。matplotlib の `font_manager.findfont` 経由で必須フォント (`Yu Gothic UI` / `Meiryo` / `Noto Sans CJK JP`) を確保した方が確実
+- **数値を埋め込む chart**: research.md など SSOT がある場合、drawio の手入力だと実データと drift しやすい。script で read して chart 化する方が fact-check gate を通しやすい
 
 ## Prerequisites
 

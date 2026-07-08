@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "lastUpdated": "YYYY-MM-DDTHH:mm:ssZ",
+  "executiveSummary": {
+    "status": "operational",
+    "summary": "<compact factory status>",
+    "sourceOfTruthForStatusAnswers": true
+  },
+  "activeCandidate": {
+    "id": "<candidate-id>",
+    "name": "<candidate name>",
+    "phase": "<phase>",
+    "gate": "GO|PIVOT|PARK|UNKNOWN",
+    "gateConfidence": "observed|degraded|estimated|unknown",
+    "status": "<compact status>",
+    "latestEvidence": [],
+    "nextGate": "<next gate>",
+    "mustNot": []
+  },
+  "portfolio": {
+    "topNLimit": 10,
+    "activeTopNCount": 0,
+    "watchlistCount": 0,
+    "rejectedCount": 0,
+    "statePath": "<portfolio-state-path>",
+    "status": "<portfolio status>"
+  },
+  "workflows": [],
+  "promptAssets": {
+    "dashboardContract": "<path>",
+    "workflowReview": "<path>",
+    "promptSelfImprovement": "<path>",
+    "status": "not_configured|configured|needs_review"
+  },
+  "prototypeLane": {
+    "status": "not_configured|configured_gated|active|blocked",
+    "wipLimit": 1,
+    "currentWip": null,
+    "verification": "<platform verification status>",
+    "blockedReason": null
+  },
+  "automationPolicy": {
+    "approvedUnattendedAutomations": [],
+    "approvalRequiredFor": [
+      "new unattended schedules",
+      "higher frequency",
+      "production code generation",
+      "prototype creation",
+      "public assets",
+      "paid services or account creation",
+      "legal-risk acceptance",
+      "schedule frequency increase",
+      "approval gate weakening"
+    ]
+  },
+  "queues": {
+    "pending": [],
+    "doneCount": 0,
+    "pendingCount": 0
+  },
+  "decisions": [],
+  "risksAndBlockers": [],
+  "nextActions": [],
+  "answeringPolicy": {
+    "useDashboardFirst": true,
+    "thenVerifyWith": [
+      "factory-state/tasks-pending.json",
+      "factory-state/tasks-done.json",
+      "factory-state/outcome-log.json",
+      "factory-state/pipeline-log.jsonl",
+      "factory-state/artifacts/*.md"
+    ],
+    "ifConflict": "Prefer newest durable artifact/log, update dashboard, then answer."
+  }
+}

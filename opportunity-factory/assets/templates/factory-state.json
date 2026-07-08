@@ -23,7 +23,8 @@
     "cadence": {
       "commander": "15-60m",
       "worker": "15-120m",
-      "reporterLearner": "6-24h"
+      "reporterLearner": "6-24h",
+      "workflowReview": "weekly or after fixed artifact count"
     },
     "queueTargets": {
       "discover": 2,
@@ -31,12 +32,18 @@
       "evaluate": 1,
       "design": 1,
       "build": 1,
+      "prototypePlan": 1,
+      "prototypeBuild": 1,
+      "prototypeReview": 1,
+      "prototypeTest": 1,
       "review": 1,
+      "workflowReview": 1,
       "track": 1
     },
     "limits": {
       "maxPendingTasks": 20,
       "maxDailyWorkerRuns": 12,
+      "maxPrototypeWip": 1,
       "maxDailyCostEstimate": "<set by user>",
       "lockTtlMinutes": 180,
       "staleTaskTtlHours": 48,
