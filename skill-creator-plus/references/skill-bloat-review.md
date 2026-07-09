@@ -64,6 +64,18 @@ Some skills ship a validator that hard-enforces the SKILL.md line count (see `op
 - Keep row ordering aligned with the load order the reader will follow (approval → autonomy → fallback → blocker gate → persistence, etc.)
 - Reserve a small buffer (5–10 lines) for future rows so the next reflection does not require another restructure
 
+## SSOT Externalization
+
+When a section that lists hard rules, invariant items, or blocking gates keeps growing, expanding it inline pushes SKILL.md over the cap and creates duplication risk. Prefer externalization:
+
+- Move the authoritative list to a `references/*.md` file (typically the same file that defines the domain, e.g. `references/rubber-duck-review.md` for blocking gates, `references/tunable-defaults.md` for hard rules)
+- Leave one short paragraph in SKILL.md that names the concept and points to the reference. Two or three sentences is enough
+- Never duplicate the list in both places; other references consume the SSOT via a see-also link, not a copy
+- When the SSOT changes, only one file needs updating; consumers stay valid automatically
+- This trades SKILL.md surface visibility for durability. Only externalize items the reader can safely follow a link for. Keep 5–7 core row concepts inline as the operating table
+
+Example applied in opportunity-factory: hard rule list, Layer 3 blocking gate list, and reference default catalog are each SSOT in one references file. SKILL.md keeps a 3-line pointer instead of a 14-line bullet expansion, protecting the 150-line cap
+
 ## Keep vs Move
 
 | Keep in SKILL.md                  | Move to references/     |

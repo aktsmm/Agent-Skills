@@ -26,3 +26,5 @@ if result.get("final_status") != "passed":
 
 - CDP helpers often spawn Node/browser child trees. `proc.kill()` may leave grandchildren.
 - Use tree kill only for the owned helper PID: `taskkill /F /T /PID <pid>`.
+- For helpers that use a per-CDP lock file, treat a stuck lock as evidence, not as an automatic retry signal. Check whether the recorded PID still exists and whether it matches the current helper command. Delete only stale locks whose owner process is gone; if duplicate helpers are alive on the same CDP endpoint, stop the duplicate owned helper before retrying.
+- If the terminal exits ambiguously but the JSON artifact shows the intended final state, use a fresh read-only verification pass before rerunning the mutating step. Avoid replaying upload/publish just because stdout or exit reporting was incomplete.

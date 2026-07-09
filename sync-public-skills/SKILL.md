@@ -89,6 +89,12 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
    - GIM internal: `Sync-AndPush.ps1 -SyncInternal [-InternalDryRun]`
 5. private repo の current branch を remote へ push し、public / EMU / GIM 各 repo で想定した skill だけが更新されたことを確認する
 
+## Gotchas
+
+- **Formatter drift**: VS Code / editor formatter が既存 markdown table を再整形して意味のない whitespace / column-align 差分を残すことがある。skill authoring commit に混ぜず、`chore(<skill>): normalize table whitespace after formatter run` として **必ず別 commit** で分離する。混ぜると後で revert しづらい
+- **Push rejected → rebase**: sync 前後に remote が別セッションで進んでいて `git push` が rejected になる場合、`git pull --rebase origin master` で **`HEAD.lock` rename failure** の無限プロンプト (y/n 応答無効) に陥ることがある。対処: (1) `git rebase --abort` (2) `git reset --hard HEAD` で index / worktree を HEAD に一致させる (3) `Get-ChildItem .git\*.lock -Force | Remove-Item -Force` で残 lock を除去 (4) `git merge --no-ff -m 'merge: ...' origin/master` で rebase を諦めて merge に切替。merge commit 1 個追加のコストで確実に前進できる
+- **Cross-cutting git operations**: この 2 点は sync だけでなく `retro-private-skills` / 大 skill 育成の直後にも同じ症状で再発する。skill 側で cross-cutting reminder として持つ
+
 ## Report
 
 - Summary / Primary / Path Chosen / Audit / Private Sync / EMU Private Sync / GIM Internal Sync / Public Sync / Verify / Not Done
