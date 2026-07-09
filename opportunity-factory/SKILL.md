@@ -77,57 +77,34 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 
 ## AI-Autonomous Operation
 
-AUTO 既定。人間承認は `security-approve` バケットのみ。詳細は各 references。
+AUTO 既定、承認は `security-approve` のみ。Skill には **hard rule (変更不可)** と **reference default (workspace が実運用で改善可)** が混在、詳細は §Tunable vs Hard Rules。詳細は各 references。
 
 | # | 章 | 骨子 | 詳細 |
 | --- | --- | --- | --- |
 | A | Approval Policy | 2 バケット (`auto` / `security-approve`)。金銭発生は後者の 1 例。AI usage は skill 対象外。Backup-First で reversible は auto。 | `references/approval-policy.md` |
-| B | Autonomy Mode | Normal / **AUTO 既定** / FULL / ALL の 4 段階。setup で mode 未指定なら Phase 1 で聞く。secret 露出等は全 mode で対象外。 | `references/runtime-modes.md` (`ai-autonomous` preset) |
+| B | Autonomy Mode | Normal / **AUTO 既定** / FULL / ALL の 4 段階。setup Phase 0 で mode 未指定なら AUTO 提案 + 確認。secret 露出等は全 mode で対象外。 | `references/runtime-modes.md` (`ai-autonomous` preset) |
 | C | Fallback Lane | blocked/stall/idle 時 10 lane 順次 auto-dequeue (1 Portfolio → 2 Prompt review → 3 Advisory Critic → 4 Anti-pattern → 5 Discovery → 6 Small-Bet → 7 Learning → 8 Cleanup → 9 Real-surface RO → 10 Digest)。Discovery Floor 5 サイクル。browser 書込みは defer。 | `references/fallback-lane.md` |
 | D | Genuine Blocker Test | failed/stall で即 blocker 認定せず 4 問 gate (外部 signal 確認 / 別 approach N / replan / 制御不能)。4/4 Yes のみ HITL、以外は fallback へ。 | `references/fallback-lane.md` |
 | E | Persistence Profile | Standard / **Persistent (既定)** / Exhaustive。task class 別マッピング。cost/quota は skill 対象外 (adapter 任せ)。worker は自分で approach 増やさず commander が replan。 | `references/persistence-profile.md` |
+| F | Cadence + Adapter | worker=hourly / workflow-review=weekly + ad-hoc trigger / digest=daily。per-hour override 可。Adapter は環境依存 (Copilot Scheduler / Scout / OpenClaw / Copilot App / GH Actions / Task Scheduler / cron)。Push cadence は setup で 1 度質問、既定 manual。 | `references/runtime-modes.md` |
+| G | Goal + Focus Theme | 無限稼働、停止は user 明示のみ。Setup で north-star + focus theme (3 ヶ月、workspace override 可) の 2 段合意。Theme apply は Layer 3 blocking critic gate (hard rule)。Candidate 完了 = Top-N 自然消滅 + shipped 明示。 | `references/workspace-setup.md` + `references/rubber-duck-review.md` |
+
+### Tunable vs Hard Rules
+
+Skill は hard rule (変更不可) と reference default (AI/workspace が実運用で改善可) の 2 層。**Hard rules**: approval bucket 構造 (auto/security-approve)、backup-first 原則、blocker test 4 問 gate、critic 3 layer、layer 3 blocking gate 対象 5 種、fallback lane auto-refill、north-star + focus theme 合意事実、independence 契約。詳細と reference default 一覧: `references/tunable-defaults.md`
 
 ## Output Modes
 
-- **Rubber Duck**: 質問と仮説の穴を返す。
-- **Factory Plan**: roles、queue、artifact contract、review gates を設計する。
-- **Workspace Setup**: target surface、state store、prompt runner、schedule、approval policy を決める。
-- **Self-Designing Workspace Setup**: ユーザーのテーマから workspace layout、dashboard state、portfolio/Top-N、candidate advancement、idea discovery、workflow review の各ループを設計する。
-- **Run Slice**: 直近 1 サイクル分の task と artifact 雛形を作る。
-- **Periodic Runtime**: commander / worker / reporter prompts で状態を見て回し続ける。
-- **Throughput Setup**: commander、research worker、build/decision worker、weekly reporter のように安全境界付きで分業し、進捗速度を調整する。
-- **Prototype Lane**: validated candidates only; create prototype plans, dummy-data source, review/test artifacts, and platform-verification notes under the same workspace.
-- **Review**: 既存 factory の詰まり、過剰設計、欠けた gate を指摘する。
+Rubber Duck / Factory Plan / Workspace Setup / Self-Designing Workspace Setup / Run Slice / Periodic Runtime / Throughput Setup / Prototype Lane / Review — 用途別に責務を切替。Prototype Lane は validated candidates only + dummy data + WIP 制限 + platform-verification 必須。
 
 ## References
 
-- Detailed workflow: [references/workflow.md](references/workflow.md)
-- Battle-tested patterns: [references/battle-tested-patterns.md](references/battle-tested-patterns.md)
-- Workspace setup: `references/workspace-setup.md`
-- Self-designing factory loop: `references/self-designing-factory.md`
-- Canonical dashboard state: `references/dashboard-state.md`
-- Prompt self-improvement loop: `references/prompt-self-improvement.md`
-- Runtime modes and scheduler presets: `references/runtime-modes.md`
-- Batch refinement: `references/batch-refinement.md`
-- Optional SQLite state store: `references/sqlite-state-store.md`
-- Rubber-duck + role-level critic (Layer 1/2/3): [references/rubber-duck-review.md](references/rubber-duck-review.md)
-- Approval policy: `references/approval-policy.md`
-- Fallback lane + anti-pattern registry: `references/fallback-lane.md`
-- Persistence profile: `references/persistence-profile.md`
-- Periodic prompts: `assets/prompts/commander.md`, `assets/prompts/worker.md`, `assets/prompts/reporter-learner.md`
-- Preflight checklist: `assets/templates/setup-preflight.md`
-- Validation script: `scripts/validate_factory_skill.py`
-- Workspace initializer: `scripts/init_factory_workspace.py`
-- SQLite initializer: `scripts/init_factory_sqlite.py`
-- Initializer smoke test: `scripts/smoke_test_initializers.py`
-- Setup packet examples: `assets/examples/setup-packets.md`
-- Factory plan template: [assets/templates/factory-plan.md](assets/templates/factory-plan.md)
-- State template: `assets/templates/factory-state.json`
-- Dashboard state template: `assets/templates/dashboard-state.json`
-- SQLite schema template: `assets/templates/factory-state.sqlite.sql`
-- First-run queue template: `assets/templates/first-run-queue.json`
-- Task template: [assets/templates/task.json](assets/templates/task.json)
-- Artifact template: [assets/templates/artifact.md](assets/templates/artifact.md)
+- **AI-Autonomous 基盤**: [rubber-duck-review.md](references/rubber-duck-review.md) (Layer 1/2/3 + Layer 3 SSOT) / `approval-policy.md` / `fallback-lane.md` / `persistence-profile.md` / `tunable-defaults.md` / `runtime-modes.md` (ai-autonomous preset)
+- **Workflow / Setup**: [workflow.md](references/workflow.md) / `workspace-setup.md` / `self-designing-factory.md` / `battle-tested-patterns.md` / `prompt-self-improvement.md` / `batch-refinement.md` / `sqlite-state-store.md`
+- **State**: `dashboard-state.md` / `assets/templates/dashboard-state.json` / `assets/templates/factory-state.json` / `assets/templates/factory-state.sqlite.sql` / `assets/templates/first-run-queue.json` / `assets/templates/task.json` / `assets/templates/artifact.md`
+- **Prompts**: `assets/prompts/commander.md` / `assets/prompts/worker.md` / `assets/prompts/reporter-learner.md`
+- **Scripts**: `scripts/validate_factory_skill.py` / `scripts/init_factory_workspace.py` / `scripts/init_factory_sqlite.py` / `scripts/smoke_test_initializers.py`
+- **Templates / Examples**: `assets/templates/factory-plan.md` / `assets/templates/setup-preflight.md` / `assets/examples/setup-packets.md`
 
 ## Done Criteria
 

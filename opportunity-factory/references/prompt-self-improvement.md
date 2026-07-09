@@ -32,17 +32,38 @@ Safe automatic edits may:
 - reduce duplicate/noisy work,
 - add missing blocker reporting.
 
-## Approval Required
+## Approval Required (Autonomy Mode 参照)
 
-Fresh human approval is required before:
+承認要否は **workspace の Autonomy Mode に従う**。SSOT: `references/runtime-modes.md` の `ai-autonomous` preset "Tune Apply by Autonomy Mode" table。Prompt self-improvement は tune の一種として同 table 適用。
 
-- increasing schedule frequency,
-- creating new unattended schedules,
-- weakening approval gates,
-- enabling external publishing, payment, account creation, login, personal data, network services, analytics, telemetry, entitlements, automated sending, or public release work,
-- adding external dependencies,
-- committing or pushing outside the workspace policy,
-- changing global/personal instructions.
+**Hard rule 変更**:
+- 全 Autonomy Mode で `security-approve` バケット必須 (user 明示承認まで proceed 不可)
+- 対象: approval gate 弱化、hard rule list (SKILL.md §Tunable vs Hard Rules) の直接変更、external publish / payment / account 作成 / login / personal data / network service / broadcast 等
+
+**Reference default (tunable) 変更**:
+- Normal / AUTO: workflow-review propose → user 承認 → apply
+- FULL / ALL: workflow-review propose → 自動 apply (reporter-learner が 3 サイクル追跡、悪化で自動 revert)
+- 対象: schedule frequency 増加、新規 unattended schedule 作成、外部依存追加、workspace policy 外の commit / push、global/personal instructions 変更
+
+## Commit Gate (Layer 3 Blocking Critic)
+
+Prompt 変更の commit は **Layer 3 blocking critic gate を必ず経由**。SSOT: `references/rubber-duck-review.md` の "Layer 3 Blocking Critic (重要 gate) — SSOT"。
+
+### Commit 手順 (Small-Bet-First)
+
+Worker が prompt を自動編集した場合:
+
+1. **Diff 生成**: 対象 prompt file の変更内容を diff artifact に出力
+2. **Apply**: worker が変更を working tree に適用 (未 commit)
+3. **Layer 3 Critic dispatch**: 別 context で critic role を起動、diff artifact を input に verdict 取得
+4. **Smoke test**: `python scripts/smoke_test_initializers.py` 相当を必ず走らせる (プラス `python scripts/validate_factory_skill.py <skill-root>`)
+5. **判定分岐**:
+   - Critic verdict = `pass` AND smoke test PASS → commit 実施
+   - Critic verdict = `conditional` → critic 提示条件で worker が修正、再 (3)
+   - Critic verdict = `reject` OR smoke test FAIL → **自動 revert** (`git checkout -- <prompt-path>`、既に stash してある場合は clean up)、`dashboard-state.tuningLog` に "reverted-by-commit-gate" 記録
+   - `stash` は使わない (未 commit 状態で smoke test 走らせるため、stash すると変更が消える)
+
+Rule: **critic pass + smoke test pass の両方**が commit 条件。片方でも fail なら revert。
 
 ## Workflow-Review Contract
 

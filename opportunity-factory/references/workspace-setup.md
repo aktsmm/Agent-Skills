@@ -41,6 +41,13 @@ If any answer is unknown, start in supervised mode and do not schedule workers y
 
 ## Setup Steps
 
+0. **Confirm Autonomy Mode (Phase 0)**
+   Autonomy Mode 未指定なら Phase 0 で必ず user に確認。既定は **AUTO**。選択肢: Normal / AUTO (推奨) / FULL / ALL。詳細と Autonomy Mode 別 tune 動作は `references/runtime-modes.md` の `ai-autonomous` preset 参照。Setup 中に以下 4 質問を合意する:
+   - **Autonomy Mode** (未指定なら AUTO 提案 + 確認)
+   - **North-star** (workspace の方向性、抽象で可)
+   - **Focus theme** (3 ヶ月単位の具体テーマ、期間は workspace override 可 — apply gate は Layer 3 blocking critic で **hard rule**)
+   - **Push cadence** (既定 manual、必要なら auto or scheduled)
+
 1. **Pick target surfaces**
    Choose one primary runtime and optional secondary surfaces for manual review or reporting.
 2. **Install or expose the skill**
@@ -54,14 +61,28 @@ If any answer is unknown, start in supervised mode and do not schedule workers y
    Map `assets/prompts/commander.md`, `worker.md`, and `reporter-learner.md` to the surface's prompt, job, or wrapper mechanism.
 5. **Select schedule profile**
    Start with conservative or supervised mode. Move to standard or burst only after persistence and approvals are verified.
-6. **Configure approval policy**
-   Require human approval for external publishing, payment, account creation, secrets, personal data, destructive commands, and legal/platform risk.
+6. **Configure approval policy (delegated to Autonomy Mode)**
+   Approval bucket 構造 (auto / security-approve) は `references/approval-policy.md`、Autonomy Mode 別動作は `references/runtime-modes.md` の `ai-autonomous` preset の "Tune Apply by Autonomy Mode" table を SSOT として参照。ここでは重複記載しない。Setup では Phase 0 の Autonomy Mode 確認で決まる (改めての質問不要)。
 7. **Run preflight**
    Confirm state is writable, no duplicate schedule exists, limits are present, and a test artifact can be created and imported.
    If file and shell access are available, run `python scripts/validate_factory_skill.py <skill-root>` before registering recurring jobs.
 8. **Start the loop**
    Run commander once, worker once, commander again, then reporter-learner after at least two artifacts or one blocker.
    The starter queue should cover one demand-discovery task, one setup/preflight task, and one review/learning task so the first cycle tests both product fit and runtime health.
+
+## Tunable vs Hard Rules (Setup 時の合意事項)
+
+Setup で決めた **north-star / focus theme / autonomy mode** は workspace の運用 SSOT。以下は変えられない (hard rule):
+
+- Approval bucket 構造 (auto / security-approve)
+- Focus theme apply gate = Layer 3 blocking critic (期間だけ tunable)
+- Backup-first 原則、blocker test 4 問 gate、critic 3 layer、fallback lane auto-refill、north-star + focus theme の合意事実、independence 契約
+
+以下は tunable (workflow-review が propose、Autonomy Mode に応じて apply):
+
+- Cadence (worker / workflow-review / digest)、fallback lane 順序、Discovery Floor cycles、persistence profile 数値、rubric 判定基準、critic 質問セット、anti-pattern K/retention、adapter 選択、push cadence
+
+詳細一覧: `references/tunable-defaults.md`
 
 ## Product-Specific Caution
 
@@ -76,6 +97,10 @@ When asked to set up a workspace, return or write this summary:
 ```markdown
 ## Opportunity Factory Workspace Setup
 
+- Autonomy Mode:
+- North-star:
+- Focus theme (期間):
+- Push cadence:
 - Primary surface:
 - Secondary surfaces:
 - Skill location:

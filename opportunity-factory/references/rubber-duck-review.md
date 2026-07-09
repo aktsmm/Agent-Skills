@@ -72,11 +72,11 @@ For <specific audience> who struggle with <repeated pain>, create <small artifac
 
 ## Layer 位置付け
 
-| Layer | 実行者 | 起動タイミング | 出力 | 詳細 |
-| --- | --- | --- | --- | --- |
-| **Layer 1 Light Self-Critic** | 各 role 自身 (context 内で観点切替) | 各 role の final decision 前、常時 | 内部 log (dashboard-state.critic-log に summary) | 本ページ |
-| **Layer 2 Advisory Critic** | Critic role invocation (rubber-duck 深掘り) | Fallback lane #3、Persistence Exhaustive の task | `critic-report.md` (advisory) | Fallback-lane.md #3 参照 |
-| **Layer 3 Blocking Critic** | Critic role invocation (blocking) | 重要 gate: portfolio promote / focus theme apply / prompt-self-improvement commit / external publish | `critic-report.md` (blocking, verdict=pass 必須) | 本ページ末尾 + prompt-self-improvement.md 参照 |
+| Layer                         | 実行者                                      | 起動タイミング                                                                                       | 出力                                             | 詳細                                           |
+| ----------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- |
+| **Layer 1 Light Self-Critic** | 各 role 自身 (context 内で観点切替)         | 各 role の final decision 前、常時                                                                   | 内部 log (dashboard-state.critic-log に summary) | 本ページ                                       |
+| **Layer 2 Advisory Critic**   | Critic role invocation (rubber-duck 深掘り) | Fallback lane #3、Persistence Exhaustive の task                                                     | `critic-report.md` (advisory)                    | Fallback-lane.md #3 参照                       |
+| **Layer 3 Blocking Critic**   | Critic role invocation (blocking)           | 重要 gate: portfolio promote / focus theme apply / prompt-self-improvement commit / external publish | `critic-report.md` (blocking, verdict=pass 必須) | 本ページ末尾 + prompt-self-improvement.md 参照 |
 
 - Advisory は verdict = reject でも proceed 可、log 化必須
 - Blocking は verdict = pass 以外は proceed 不可、user 明示 override は security-approve 経由
@@ -144,15 +144,19 @@ Cadence / prompt / gate 変更提案前に自問:
 - Verdict = `revise`: role 内で 1 回だけ再検討、再 checkpoint
 - Verdict = `escalate-to-layer2`: fallback lane #3 (Critic Role invocation) を明示 request
 
-## Layer 3 Blocking Critic (重要 gate)
+## Layer 3 Blocking Critic (重要 gate) — SSOT
+
+**このリストが Layer 3 blocking gate の SSOT**。他 references (tunable-defaults.md, prompt-self-improvement.md, workspace-setup.md, SKILL.md) はこの節を参照する。gate 追加/変更は本節でのみ行う。
 
 以下の task は Layer 3 を **必ず経由** させる (Layer 1 だけでは不十分):
 
 - Portfolio candidate の **promote** (Top-N 昇格)
-- **Focus theme apply** (3 ヶ月更新の確定)
+- **Focus theme apply** (3 ヶ月更新の確定 — 期間は tunable、apply gate は **hard rule**)
 - **Prompt self-improvement の commit** (壊れた prompt 抑止)
 - **External publish** 承認直前 (Marketplace / npm / SNS 等)
 - **Small-Bet Pilot → 本実装 昇格**
+
+上記 5 種は **hard rule** (変更禁止)。詳細: `references/tunable-defaults.md` の Hard Rule 一覧。
 
 ### Layer 3 契約
 
@@ -165,13 +169,15 @@ Cadence / prompt / gate 変更提案前に自問:
 
 ### Rubric (severity 5 段階)
 
-| Severity | 基準 | Verdict 影響 |
-| --- | --- | --- |
-| **info** | 参考情報、改善余地 | pass 可 |
-| **minor** | 軽微、非阻害 | pass 可 |
-| **major** | 修正推奨、非致命 | conditional |
-| **critical** | 修正必須、実害あり | reject |
-| **blocking** | 反対理由あり、進めるべきでない | reject |
+**段階名 (info/minor/major/critical/blocking) は hard rule** (verdict 比較保護のため変更禁止)。各段階の**判定基準**は tunable、workflow-review が調整可。
+
+| Severity     | 基準                           | Verdict 影響 |
+| ------------ | ------------------------------ | ------------ |
+| **info**     | 参考情報、改善余地             | pass 可      |
+| **minor**    | 軽微、非阻害                   | pass 可      |
+| **major**    | 修正推奨、非致命               | conditional  |
+| **critical** | 修正必須、実害あり             | reject       |
+| **blocking** | 反対理由あり、進めるべきでない | reject       |
 
 - Critic は severity 分布を artifact 末尾に必ず出力
 - Workflow-review が critic-log の severity 分布を追跡し、rubric 調整の signal を検出

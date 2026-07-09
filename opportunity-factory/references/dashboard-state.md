@@ -79,3 +79,59 @@ Before rewriting the dashboard:
 - Dashboard overwriting newer state from overlapping scheduled runs.
 - Status answers based on chat memory instead of durable state.
 - Prompt edits that are not reflected in dashboard decisions or pipeline logs.
+
+## Extended Fields (AI-Autonomous Operation)
+
+以下 field は AI-Autonomous 運用時に workflow-review / worker / reporter-learner が append する。既存 workspace で未定義でも動作 (backward compatible)、新 event 発生時点で `[]` 初期化して append される。
+
+```json
+{
+  "approvalLog": [{"ts","operation","requestedBy","decidedBy","verdict","artifactRef","reason","criticVerdict"}],
+  "pendingApprovals": [{"ts","task_id","reason","bucket"}],
+  "fallbackLog": [{"ts","lane","task_id","verdict"}],
+  "blockerGateLog": [{"ts","task_id","questions","verdict"}],
+  "deferredBrowserWrites": [{"ts","task_id","operation"}],
+  "discoveryFloorCounter": 0,
+  "criticLog": [{"ts","layer","role","task_id","questions_passed","questions_failed","verdict","note"}],
+  "persistenceOverrides": [{"ts","task_id","profile","requestedBy"}],
+  "diminishingReturnsLog": [{"ts","task_id","metric","trend"}],
+  "tuningLog": [{
+    "ts": "ISO-8601",
+    "item": "e.g. fallback-lane-order | discovery-floor-cycles | persistence-persistent-max-iter | cadence-worker | rubric-major-threshold",
+    "before": "prior value",
+    "after": "new value",
+    "reason": "short justification",
+    "evidenceRef": "path or hash of supporting artifact",
+    "decidedBy": "workflow-review|user",
+    "autonomyMode": "Normal|AUTO|FULL|ALL",
+    "appliedCycle": 42,
+    "revertThreshold": 3,
+    "revertVerdict": null,
+    "trackedMetrics": ["metric1","metric2"]
+  }],
+  "hardRuleViolationLog": [{
+    "ts": "ISO-8601",
+    "invariant": "e.g. approval-bucket-structure | layer3-gate-count | fallback-auto-refill | persistence-profiles | skill-tunable-vs-hard-section",
+    "detectedIn": "path",
+    "beforeSnapshot": "hash or excerpt",
+    "verdict": "escalated-to-user|reverted"
+  }]
+}
+```
+
+### Field 説明
+
+- **approvalLog / pendingApprovals**: `references/approval-policy.md` の Log Contract 参照
+- **fallbackLog / blockerGateLog / deferredBrowserWrites / discoveryFloorCounter**: `references/fallback-lane.md` 参照
+- **criticLog**: Layer 1/2/3 全部の verdict、`references/rubber-duck-review.md` 参照
+- **persistenceOverrides / diminishingReturnsLog**: `references/persistence-profile.md` 参照
+- **tuningLog**: reference default の変更履歴。3 サイクル追跡 revert (`revertVerdict` を reporter-learner が populate)。`references/tunable-defaults.md` 参照
+- **hardRuleViolationLog**: workflow-review が invariant check で検出した hard rule 誤変更。`references/tunable-defaults.md` の Invariant Check 参照
+
+### Retention
+
+- Log 系 (approvalLog / fallbackLog / blockerGateLog / criticLog): 90 日 rotation、archive に押し出す
+- Layer 1 criticLog: 30 日 (直近だけ意味あり)
+- tuningLog: 恒久 (workflow-review の学習資産)
+- hardRuleViolationLog: 恒久 (audit 用)
+- pendingApprovals / discoveryFloorCounter / deferredBrowserWrites: state 値、rotation なし

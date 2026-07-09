@@ -84,11 +84,11 @@ Use this first for a new factory or expensive model/tool stack.
 
 Best for unattended operation with isolated sessions and shared state.
 
-| Job              | Cadence                 | Notes                                                        |
-| ---------------- | ----------------------- | ------------------------------------------------------------ |
-| commander        | every 15-30m            | single writer for queue/state/logs                           |
-| worker           | every 30-60m per worker | each worker runs one task only; parallel workers are allowed |
-| reporter-learner | every 6-8h              | compress notifications and update learning                   |
+| Job              | Cadence                      | Notes                                                             |
+| ---------------- | ---------------------------- | ----------------------------------------------------------------- |
+| commander        | every 15-30m                 | single writer for queue/state/logs                                |
+| worker           | every 30-60m per worker      | each worker runs one task only; parallel workers are allowed      |
+| reporter-learner | every 6-8h                   | compress notifications and update learning                        |
 | workflow-review  | weekly or every 20 artifacts | rubber-duck the factory itself and propose prompt/cadence changes |
 
 Rules:
@@ -192,14 +192,94 @@ Run the reporter after two or more artifacts exist, or when a blocker appears.
 
 ## Operating Profiles
 
-| Profile    | Commander | Worker  | Reporter | Workflow review | Use when                                       |
-| ---------- | --------- | ------- | -------- | --------------- | ---------------------------------------------- |
-| low-cost   | daily     | daily   | weekly   | monthly/weekly  | exploration is cheap but not urgent            |
-| supervised | manual    | manual  | manual   | manual          | new factory or high-risk domain                |
-| standard   | 30-60m    | 60-120m | 8-24h    | weekly          | normal unattended improvement                  |
+| Profile    | Commander | Worker  | Reporter | Workflow review  | Use when                                       |
+| ---------- | --------- | ------- | -------- | ---------------- | ---------------------------------------------- |
+| low-cost   | daily     | daily   | weekly   | monthly/weekly   | exploration is cheap but not urgent            |
+| supervised | manual    | manual  | manual   | manual           | new factory or high-risk domain                |
+| standard   | 30-60m    | 60-120m | 8-24h    | weekly           | normal unattended improvement                  |
 | burst      | 15m       | 15-30m  | 6h       | after sprint/day | short sprint with explicit budget and approval |
 
 Do not use burst mode without daily run limits and a clear stop condition.
+
+## AI-Autonomous Preset (`ai-autonomous`)
+
+`ai-autonomous` preset は Autonomy Mode 別に skill 全体を自律運用するための SSOT preset。既定は AUTO、setup で mode 未指定なら Phase 1 で必ず user に確認する。
+
+### 既定値 (all reference default, tunable)
+
+| Item                         | Default                                                                                                | Tunable?                            |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------- |
+| Autonomy Mode                | **AUTO**                                                                                               | setup 質問で mode 選択              |
+| Approval buckets             | `auto` / `security-approve` (詳細: `references/approval-policy.md`)                                    | **hard rule** (bucket 構造)         |
+| Fallback lane                | enabled、順序 A、Discovery Floor=5 cycles、Browser-Defer=enabled (詳細: `references/fallback-lane.md`) | tunable (順序/Floor/lane 内容)      |
+| Persistence default          | Persistent、class 別 mapping (詳細: `references/persistence-profile.md`)                               | tunable (数値/mapping)              |
+| Cadence                      | worker=hourly、workflow-review=weekly + ad-hoc trigger、digest=daily                                   | tunable (workspace 目的で override) |
+| Per-hour override            | 可 (workspace ごとに quiet hours / burst 定義可)                                                       | tunable                             |
+| Burst mode                   | AI 自律判定 (新規テーマ 3 日は 15min 昇格可)                                                           | tunable                             |
+| Critic Layer 3 blocking gate | 5 gate (SSOT: `references/rubber-duck-review.md`)                                                      | **hard rule** (5 gate 対象)         |
+| Adapter                      | 環境依存 (下記例示)                                                                                    | 環境変化時 workflow-review propose  |
+| Push cadence                 | manual (setup で 1 度質問)                                                                             | tunable                             |
+| Cost / quota                 | skill 対象外 (adapter throttle 任せ)                                                                   | —                                   |
+
+### Adapter 例示 (実選択は環境依存)
+
+- Copilot Scheduler (VS Code Extension)
+- Microsoft Scout Automation
+- OpenClaw
+- GitHub Copilot App
+- GitHub Actions
+- Windows Task Scheduler
+- cron / Generic CLI Scheduler
+- Manual Supervised Loop
+
+各 adapter の設定例は本ファイル `## Scheduler Presets` セクション参照。
+
+### Tune Apply by Autonomy Mode (SSOT)
+
+**この table が Autonomy Mode 別の tune apply 動作の SSOT**。`references/tunable-defaults.md` はこの table を参照する。
+
+| Mode          | Tune propose               | Tune apply                           | Hard rule 変更疑い          | Revert 追跡                                        |
+| ------------- | -------------------------- | ------------------------------------ | --------------------------- | -------------------------------------------------- |
+| Normal        | workflow-review が propose | user 承認必須 (security-approve)     | 全 rule change が user 承認 | user 判断                                          |
+| **AUTO 既定** | workflow-review が propose | **user 承認必須 (security-approve)** | user 承認必須               | reporter-learner 3 サイクル追跡、悪化で自動 revert |
+| FULL          | workflow-review が propose | 自動 apply                           | security-approve escalate   | 同上                                               |
+| ALL           | workflow-review が propose | 自動 apply + criteria 拡張可         | security-approve escalate   | 同上                                               |
+
+Rule:
+
+- どの mode でも hard rule 変更疑いは security-approve に escalate、user 明示承認まで proceed 不可
+- Reference default 変更は tunable-defaults.md の一覧項目のみ、hard rule 侵食禁止
+- 3 サイクル追跡の baseline / 悪化閾値は tunable-defaults.md 参照
+
+### Workflow-review Dispatch
+
+- 通常: weekly cadence
+- Ad-hoc: 以下 trigger で hourly cycle 内でも dispatch (詳細: `references/tunable-defaults.md` "Workflow-review Dispatch" 節)
+  - Blocker Test 4/4 escalation が 24h で 3 件以上
+  - Anti-pattern registry の同一 fingerprint count が K=3 到達
+  - Discovery Floor trigger が 3 サイクル連続でも新規 candidate 流入ゼロ
+  - Critic-log の Layer 3 reject が 24h で 2 件以上
+
+### Invariant Check (Hard Rule 誤変更抑止)
+
+Workflow-review が weekly + ad-hoc で以下 invariant を check、違反検出時は `dashboard-state.hardRuleViolationLog` に append + user notify + revert 提案:
+
+1. `references/approval-policy.md` に `auto` / `security-approve` 見出し両方 present か
+2. `references/rubber-duck-review.md` の "Layer 3 Blocking Gate List" に 5 gate 全部 present か
+3. `references/fallback-lane.md` の Auto-Refill 契約節 present か
+4. `references/persistence-profile.md` の 3 profile 全部定義 present か
+5. `SKILL.md` の "Tunable vs Hard Rules" 節 present か
+
+詳細と対処: `references/tunable-defaults.md` "Hard Rule 誤変更抑止 (Invariant Check)" 節。
+
+### See Also
+
+- `references/tunable-defaults.md`: reference default 一覧 + hard rules + Autonomy Mode 別動作
+- `references/approval-policy.md`: 2 バケット詳細
+- `references/rubber-duck-review.md`: Layer 3 gate SSOT
+- `references/fallback-lane.md`: fallback lane / Discovery Floor / Auto-Refill
+- `references/persistence-profile.md`: 3 profile / class mapping
+- `references/dashboard-state.md`: tuningLog / hardRuleViolationLog schema
 
 ## Runaway Controls
 
