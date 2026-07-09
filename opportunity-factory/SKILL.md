@@ -75,6 +75,18 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - 課金、ログイン、外部公開、個人情報、法的リスクは人間承認の境界にする。
 - ワークスペース固有パスや秘密情報を skill 本体へ埋め込まない。
 
+## AI-Autonomous Operation
+
+AUTO 既定。人間承認は `security-approve` バケットのみ。詳細は各 references。
+
+| # | 章 | 骨子 | 詳細 |
+| --- | --- | --- | --- |
+| A | Approval Policy | 2 バケット (`auto` / `security-approve`)。金銭発生は後者の 1 例。AI usage は skill 対象外。Backup-First で reversible は auto。 | `references/approval-policy.md` |
+| B | Autonomy Mode | Normal / **AUTO 既定** / FULL / ALL の 4 段階。setup で mode 未指定なら Phase 1 で聞く。secret 露出等は全 mode で対象外。 | `references/runtime-modes.md` (`ai-autonomous` preset) |
+| C | Fallback Lane | blocked/stall/idle 時 10 lane 順次 auto-dequeue (1 Portfolio → 2 Prompt review → 3 Advisory Critic → 4 Anti-pattern → 5 Discovery → 6 Small-Bet → 7 Learning → 8 Cleanup → 9 Real-surface RO → 10 Digest)。Discovery Floor 5 サイクル。browser 書込みは defer。 | `references/fallback-lane.md` |
+| D | Genuine Blocker Test | failed/stall で即 blocker 認定せず 4 問 gate (外部 signal 確認 / 別 approach N / replan / 制御不能)。4/4 Yes のみ HITL、以外は fallback へ。 | `references/fallback-lane.md` |
+| E | Persistence Profile | Standard / **Persistent (既定)** / Exhaustive。task class 別マッピング。cost/quota は skill 対象外 (adapter 任せ)。worker は自分で approach 増やさず commander が replan。 | `references/persistence-profile.md` |
+
 ## Output Modes
 
 - **Rubber Duck**: 質問と仮説の穴を返す。
@@ -98,7 +110,10 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - Runtime modes and scheduler presets: `references/runtime-modes.md`
 - Batch refinement: `references/batch-refinement.md`
 - Optional SQLite state store: `references/sqlite-state-store.md`
-- Rubber-duck review: [references/rubber-duck-review.md](references/rubber-duck-review.md)
+- Rubber-duck + role-level critic (Layer 1/2/3): [references/rubber-duck-review.md](references/rubber-duck-review.md)
+- Approval policy: `references/approval-policy.md`
+- Fallback lane + anti-pattern registry: `references/fallback-lane.md`
+- Persistence profile: `references/persistence-profile.md`
 - Periodic prompts: `assets/prompts/commander.md`, `assets/prompts/worker.md`, `assets/prompts/reporter-learner.md`
 - Preflight checklist: `assets/templates/setup-preflight.md`
 - Validation script: `scripts/validate_factory_skill.py`

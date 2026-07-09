@@ -54,6 +54,16 @@ Use this order every time:
 - Persona rules, routing rules, and domain workflow rules are mixed in one always-loaded file
 - An always-loaded entry file becomes a Markdown-linked directory of rules, agents, or docs
 
+## Hard Line Limits
+
+Some skills ship a validator that hard-enforces the SKILL.md line count (see `opportunity-factory/scripts/validate_factory_skill.py` with a ~150-line cap). When adding several new sections would blow past the cap:
+
+- Do not silently delete existing sections to make room
+- Compress the added block into a single summary table with `references/<detail>.md` pointers, instead of expanding each new subsection inline
+- Run the validator before choosing between subsection expansion and table form; discover the ceiling first, not after writing 200 lines
+- Keep row ordering aligned with the load order the reader will follow (approval → autonomy → fallback → blocker gate → persistence, etc.)
+- Reserve a small buffer (5–10 lines) for future rows so the next reflection does not require another restructure
+
 ## Keep vs Move
 
 | Keep in SKILL.md                  | Move to references/     |
