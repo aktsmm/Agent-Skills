@@ -316,8 +316,10 @@ When OpenClaw is absent, preserve the same contracts and run the prompts through
 
 Stop unattended execution and ask the user when:
 
-- external publishing, payment, account creation, or secret access is required
+- external publishing, payment, account creation, or secret write/issue/delete/external send is required
 - repeated blockers pass the configured threshold
 - the factory cannot persist state or artifacts
 - the next step could create legal, safety, privacy, or platform policy risk
 - the success metric cannot be observed or estimated honestly
+
+Do not stop merely because local/private work needs review. Inside a durable user-approved autonomy envelope, reviewer PASS plus an explicit queue item may advance the next task. On review reject/ambiguity, revise, narrow, re-review, or use a fallback lane before asking; escalate only after bounded retries fail or a `security-approve` boundary is reached.

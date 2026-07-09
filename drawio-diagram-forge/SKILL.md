@@ -26,10 +26,8 @@ Choose this skill when the result will need later **GUI editing** in draw.io, cl
 
 - Quick inline diagrams that are easier to keep as Mermaid in README or Markdown
 - One-off text-native diagrams where manual GUI adjustment is not expected
-- **Bar chart / scatter plot / metrics 可視化**: 目盛り・軸ラベル・凡例が正確に必要なら matplotlib / seaborn / Chart.js の方が高速で綿麗
-- **Hero / OG / インフォグラフィック**: font ・色 ・レイアウトを緻密に制御したい場合は Python (matplotlib + PIL) または SVG 手書きの方が適する
-- **日本語 label が大量にあるケース**: draw.io の日本語フォント描画は環境依存 (Windows / Mac / Linux で fallback が違う)。matplotlib の `font_manager.findfont` 経由で必須フォント (`Yu Gothic UI` / `Meiryo` / `Noto Sans CJK JP`) を確保した方が確実
-- **数値を埋め込む chart**: research.md など SSOT がある場合、drawio の手入力だと実データと drift しやすい。script で read して chart 化する方が fact-check gate を通しやすい
+- Charts or infographics that require exact axes, data binding, typography, or scripted regeneration
+- Large multilingual label sets whose font rendering must be identical across platforms
 
 ## Prerequisites
 
@@ -94,35 +92,7 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 
 ## Cloud Icons
 
-→ **[references/cloud-icons.md](references/cloud-icons.md)**
-
-For Azure-centric diagrams, proactively use the official Azure icon set when a verified Azure2 icon exists. Prefer icon + short label over plain rounded boxes for first-class Azure services. Fall back to generic boxes only when the icon is missing, misleading, or would hurt readability.
-
-### Enable in VS Code
-
-1. Open `.drawio` file
-2. Click **"+ More Shapes"** (bottom-left)
-3. Enable: Azure, AWS
-4. Apply
-
-### Azure Format (Critical)
-
-This format applies to both new diagrams and edits to existing .drawio files. When fixing or replacing Azure icons, always use this format.
-
-```xml
-<!-- WRONG -->
-<mxCell style="shape=mxgraph.azure.front_door;..." />
-
-<!-- CORRECT -->
-<mxCell style="aspect=fixed;image=img/lib/azure2/networking/Front_Doors.svg;..." />
-```
-
-### Azure Icon Preference
-
-- Use Azure service icons aggressively for Azure architecture diagrams when the service has a verified Azure2 path.
-- Keep the service name as a short text label even when the icon is obvious.
-- Do not mix verified Azure2 icons with generic blue boxes for the same diagram layer unless there is a clear reason.
-- If only some services have official icons, use icons for those services and use neutral fallback boxes for the rest.
+Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use verified `img/lib/azure2/**/*.svg` image paths, retain short service labels, and fall back to neutral boxes only when an icon is missing or misleading.
 
 ## References
 

@@ -67,6 +67,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - Maintain a canonical dashboard/status state for future sessions and user status answers; every workflow that changes artifacts, queues, gates, portfolio ranking, blockers, or schedules must update it with backup + stale-write checks.
 - Add a workflow-review loop as a first-class workflow for self-improving factories; it reviews cadence, queue quality, Top-N replacements, dashboard drift, missing gates, and unsafe autonomy at a slower cadence than workers.
 - Portfolio factories need a Top-N state with explicit replacement rules; do not grow candidate lists forever, and do not replace an incumbent without comparative evidence and reviewer critique.
+- Separate reviewer, queue-eligibility, and human-approval gates: once the user approves an autonomy envelope, local/private work inside it may advance on reviewer PASS without repeatedly asking the user.
 - When a selected task hits an approval boundary, record it as blocked with the exact approval needed, then run or create one safe fallback task instead of stalling the factory.
 - Do not rely on chat history for factory state; write a README/resume contract that tells future sessions which state, queue, outcome, log, and artifact files to read first.
 - Keep prototype/build lanes in the same factory when the user wants end-to-end production, but gate source generation on a structured candidate-level `continue` decision plus an MVP boundary artifact.
@@ -114,6 +115,7 @@ Rubber Duck / Factory Plan / Workspace Setup / Self-Designing Workspace Setup / 
 - Queue has at least one next executable task
 - Every task has an artifact contract and review gate
 - Human approval boundaries are named
+- Reviewer PASS can advance local/private work inside the approved autonomy envelope; human approval is reserved for boundaries explicitly listed in policy
 - A canonical status dashboard or equivalent resume contract exists, and status answers use it first
 - Self-improving factories include a scheduled or manual workflow-review loop
 - Prompt self-improvements are workspace-local, evidenced by an artifact, reversible, and dashboard-recorded

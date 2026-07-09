@@ -1,6 +1,7 @@
 ---
 name: retro-workspace
 description: Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Use when running a workspace/repo retro from CLI or Scout. Detects whether a project folder exists and, if not, asks before creating one. Triggers on "retro workspace", "repo retro", "workspace cleanup", "ワークスペース知見反映".
+argument-hint: "反映したい学び、エラーログ/git diff/会話要約、対象 workspace、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:

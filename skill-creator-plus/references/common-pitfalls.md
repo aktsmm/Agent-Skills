@@ -77,8 +77,17 @@ Use relative links and keep referenced files shallow and predictable.
 
 Good:
 
-- `[references/creation-process.md](creation-process.md)` from inside `references/`
-- `[references/creation-process.md](references/creation-process.md)` from `SKILL.md`
+```markdown
+<!-- From inside references/ -->
+
+[Creation process](creation-process.md)
+
+<!-- From SKILL.md -->
+
+[Creation process](references/creation-process.md)
+```
+
+These are fenced code examples, not links from this page. Link validation should ignore fenced code blocks.
 
 Avoid absolute paths or workspace-specific locations.
 

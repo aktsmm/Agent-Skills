@@ -82,6 +82,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 | Testing             | [references/testing.md](references/testing.md)                                                                      |
 | Publishing          | [references/publishing.md](references/publishing.md)                                                                |
 | Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)                                                      |
+| Notifications       | [references/notification-normalization.md](references/notification-normalization.md)                               |
 
 ## Best Practices
 
@@ -122,56 +123,4 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 ### 通知の一元管理
 
-```typescript
-type NotificationMode = "sound" | "silentToast" | "silentStatus";
-
-function normalizeNotificationMode(mode: unknown): NotificationMode {
-  switch (mode) {
-    case "sound":
-    case "silentToast":
-    case "silentStatus":
-      return mode;
-    default:
-      return "sound";
-  }
-}
-
-function getNotificationMode(): NotificationMode {
-  const config = vscode.workspace.getConfiguration("myExtension");
-  if (config.get<boolean>("showNotifications", true) === false) {
-    return "silentStatus";
-  }
-  return normalizeNotificationMode(
-    config.get<NotificationMode>("notificationMode", "sound"),
-  );
-}
-
-function notifyInfo(message: string, timeoutMs = 4000): void {
-  const mode = getNotificationMode();
-  switch (mode) {
-    case "silentStatus":
-      vscode.window.setStatusBarMessage(message, timeoutMs);
-      break;
-    case "silentToast":
-      void vscode.window.withProgress(
-        { location: vscode.ProgressLocation.Notification, title: message },
-        async () => {},
-      );
-      break;
-    default:
-      void vscode.window.showInformationMessage(message);
-  }
-}
-
-function notifyError(message: string, timeoutMs = 6000): void {
-  const mode = getNotificationMode();
-  if (mode === "silentStatus") {
-    vscode.window.setStatusBarMessage(`⚠ ${message}`, timeoutMs);
-    console.error(message);
-    return;
-  }
-  void vscode.window.showErrorMessage(message);
-}
-```
-
-設定値は型注釈だけで信用せず、runtime で既知 enum へ正規化してください。設定ファイルの手編集や migration ずれで無効値が入っても通知経路を壊さないようにします。
+通知は共通helperへ集約し、設定値をruntimeで既知enumへ正規化する。重複抑止、ログとの分離、action、securityの設計は [Notification Normalization](references/notification-normalization.md) を参照する。

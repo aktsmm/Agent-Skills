@@ -41,13 +41,19 @@
   },
   "automationPolicy": {
     "approvedUnattendedAutomations": [],
+    "allowedWithReviewerAndQueueGate": [
+      "local private research",
+      "local private design",
+      "local private prototype/code work explicitly authorized by the user"
+    ],
     "approvalRequiredFor": [
       "new unattended schedules",
       "higher frequency",
-      "production code generation",
-      "prototype creation",
       "public assets",
       "paid services or account creation",
+      "secret write, issue, delete, or external send",
+      "personal data external send",
+      "backup-impossible destructive changes",
       "legal-risk acceptance",
       "schedule frequency increase",
       "approval gate weakening"

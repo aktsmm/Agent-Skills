@@ -67,34 +67,14 @@ API と DOM の状態が一時的にずれるケースがある。API が stale 
 
 ## Decision Patterns
 
-### MCP で続けるか、CLI に切り替えるか
-
-- **MCP**: 1 件ずつ画面を見ながら UI フロー、セレクタ、待機時間を確立する
-- **Python CLI**: 手順が固まった後に N 件一括処理する
-
-切り替え基準は単純で、**操作手順をまだ探っているなら MCP、手順が固まったら CLI**。
-
-### snapshot で取れない要素をどう扱うか
-
-- `browser_snapshot` で ref が取れるなら通常操作する
-- 画面には見えるのに ref が取れないなら `browser_evaluate` で DOM 直接操作する
-- 画面にも見えていないなら、待機かページ再読込を優先する
-
-```text
-snapshot で ref 取得
-  ├─ 取れた → click / type
-  └─ 取れない → screenshot で可視確認
-      ├─ 見えている → evaluate で直接操作
-      └─ 見えていない → wait / reload
-```
-
-### read-only データ抽出を高速化する
-
-一覧表、残高、ステータス確認など、**読み取りだけ** の fallback では、巨大な `browser_snapshot` を何度も解析しない。手順が分かっている画面は `browser_evaluate` で DOM から必要な行だけを JSON 化して返す。
-
-- ページ到達やログイン状態の判定: `browser_snapshot` で証跡を残す
-- 表・明細・残高などの定型抽出: `browser_evaluate` で `document.querySelectorAll("tr")` や `document.body.innerText` を処理して JSON を返す
-- 不可逆操作の直前・直後: snapshot または screenshot を残す
+| Situation | Action |
+| --- | --- |
+| Flow or selectors are still unknown | Use MCP interactively |
+| Flow is stable and must run for many items | Switch to a CLI/API helper |
+| Snapshot returns a ref | Use normal click/type |
+| Element is visible but has no ref | Confirm visually, then use evaluate or the relevant UI fallback |
+| Element is not visible | Wait or reload before forcing interaction |
+| Read-only tabular extraction | Keep navigation evidence, then return compact JSON from DOM evaluation |
 
 ### unsaved editor / draft タブを壊さない
 
@@ -103,19 +83,7 @@ snapshot で ref 取得
 Azure Portal iframe / OOPIF / trusted event の注意は [references/instructions/azure-portal.md](references/instructions/azure-portal.md) を参照する。
 Angular Material / `mat-select` / `cdk-overlay` / disabled save の注意は [references/instructions/angular-material.md](references/instructions/angular-material.md) を参照する。
 
-### iframe と force click
-
-- iframe が多段なら `contentFrame()` を順に辿る
-- SVG オーバーレイなどで塞がれているだけなら `force: true` を検討する
-- ただし `force: true` は最後の手段で、まず要素の実在確認と可視確認を優先する
-
-### file chooser が残ったとき
-
-- `browser_file_upload(paths=[])` で空送信して閉じる
-- ダメなら別ページへ移動する
-- CDP 競合が疑わしいなら Python プロセスや MCP 接続を整理する
-
-hidden file input、evaluate + fetch、API write の UI fallback は [references/instructions/ui-fallbacks.md](references/instructions/ui-fallbacks.md) を参照する。
+iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallbacks](references/instructions/ui-fallbacks.md) を参照する。`force: true` は要素の実在と可視性を確認した後の最終手段とする。
 
 ## Safety Rules
 

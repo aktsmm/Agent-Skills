@@ -74,36 +74,15 @@ If any workspace contract file is missing, do not build. Run Bootstrap first, th
 
 ## Japan Region Rendering (可視スライド)
 
-`item.japanRegion` は可視スライド本文の「日本リージョン：」に直接表示される。判定は必ず以下 3 分類に分けてから書く。
+`item.japanRegion` は可視スライド本文へ直接表示される。判定は [Region Stamp Definition](references/region-stamp.md) を SSOT とし、必ず次の3分類を通す。
 
 ### 判定フロー（必須）
 
-1. **クライアント／IDE／CLI／SDK／PowerShell モジュールなど、リージョン概念が適用されないもの** → `japanEast=true, japanWest=true`, `status="グローバル（クライアント／IDE ベース）"`。`japanRegion` は「本機能はクライアント／IDE ベースのためリージョン非依存です（東日本／西日本を含む全リージョンから利用可）。」等。`japanRegionUrl` は付けない。
-2. **公式 Docs (overview / whats-new / reliability / regions) にリージョン表または列挙がある** → grep して Japan East / Japan West が **含まれるか否か** を確認する:
-   - 含まれる → `japanEast/West=true`, 従来文言
-   - 含まれない → `supportedRegions` に近隣 3 件を日本語で埋め、`supportedRegionsTotal` に総数、`supportedRegionsSource` に該当ページ URL
-3. **公式 Docs にリージョン表が本当に無い場合のみ** → `supportedRegions=[]`, `supportedRegionsSource` は overview URL に fallback (E1)。**判定は overview / reliability / whats-new / regions ページを最低 2 種類確認したうえで下す**（1 ページで見つからないだけで空判定にしない）。
+1. クライアント／IDE／CLI／SDKなどリージョン非依存のものはグローバルとして扱う。
+2. 公式Docsにdeploy regionの表・列挙があれば、Japan East / Westの有無と近隣regionを確認する。
+3. 表がない判定はoverview / reliability / whats-new / regionsのうち最低2種類を確認してから行う。
 
-**アンチパターン**:
-
-- overview を fetch せずに「対応リージョン未確認」と保守判定 → **禁止**。必ず fetch してリージョン表の有無を目視する。
-- クライアント／IDE ツール（`Az.*` PowerShell モジュール、GitHub Copilot 拡張、CLI、SDK など）を「日本未対応」判定 → **禁止**。リージョン非依存として扱う。
-
-### フォーマット
-
-- 対応リージョン明示あり: `現時点で日本未対応（Preview）。対応リージョン：<A> / <B> / <C>[ 他]。GA 時点で日本リージョン提供が予定されています（関連 MS Learn）。`
-- 対応リージョン明示なし: `現時点で日本未対応（Preview）。対応リージョンは順次拡大中です。GA 時点で日本リージョン提供が予定されています（関連 MS Learn）。`
-- クライアント／IDE ベース: `本機能はクライアント／IDE ベースのためリージョン非依存です（東日本／西日本を含む全リージョンから利用可）。`
-
-### ルール
-
-- 対応リージョンは**日本語表記**（例: `米国中西部` / `東南アジア` / `韓国中部`）、最大 3 件。総数 > 3 件なら末尾に「他」を付ける。
-- 近隣 3 件を選ぶ優先順位: **アジア > オセアニア > 米国 > 欧州**。日本の顧客資料なので、地理的に近いリージョンを優先して並べる。
-- 「関連 MS Learn」の 11 文字に `item.japanRegionUrl` の URL を run-level hyperlink で貼る（Build 側の `Set-BodySlideContent` が自動で貼る）。
-- URL 優先順位: `region_info_reviewed.regions[topic].supportedRegionsSource` > `source` > `learnUrl`。どれも無ければ hyperlink は貼らない。
-- `region_info_reviewed.regions[topic]` に SSOT として保存: `supportedRegions` / `supportedRegionsTotal` / `supportedRegionsSource`。
-- 日本対応済み (`japanEast=true` or `japanWest=true`) の item には `japanRegionUrl` を付けない。
-- `fetched-updates.json` の item schema にも `japanRegionUrl` を追加し、Prepare → classification.json 経由で Build まで伝搬させる。
+overview未確認の保守判定と、クライアントツールの日本未対応判定は禁止する。可視文言、近隣regionの優先順、URL伝搬、reviewed JSON schemaは [Region Stamp Definition](references/region-stamp.md) に従う。
 
 ## Bootstrap
 
@@ -151,24 +130,11 @@ Final script success is `scripts/Verify-Pptx.ps1` exit code `0`. Do not report f
 
 ## Quality Review Loop
 
-After every build or re-apply, inspect the generated deck, not only script logs.
-
-- Check unresolved placeholders on visible and hidden slides: `{{CUSTOMER}}`, `{{SYSTEM}}`, `{{DATE}}`, `{{SPEAKER}}`, or any `{{...}}`.
-- Check customer honorifics: cover text must not duplicate suffixes such as `御中 御中` or `様 様`.
-- Check visible-slide neutrality: outside the cover/metadata slide, visible slides must not contain customer name, system name, tenant domain, subscription IDs, or other customer-specific identifiers.
-- Check reference affordance: visible update slides distinguish `Microsoft Learn` detail links from `Azure Updates` announcement links, and speaker notes carry the full source trail.
-- Check P2 formatting: readable numbering, no placeholder text, and no duplicated bullet glyphs.
-- Check classification intent: Weekly for customer-relevant or explicitly requested items; low-relevance items may be hidden Appendix.
-- Check notes quality: customer profile context, in-use / not-in-use services, and concrete impact or no-impact rationale. Generic summaries are not enough.
-- Check Ending quality: the visible Ending is a simple formal closure paired with the visible cover variant; it must not be blank, action-heavy, or a leftover `Next Steps` placeholder.
-- For nontrivial decks, repeated gate failures, or customer delivery, run a rubber-duck style read-only critic review; reconcile blocking findings yourself and rerun the relevant validation.
+After every build or re-apply, inspect the generated deck rather than trusting logs. Apply all script and visual checks in [Validation Rules](references/validation-rules.md), including placeholders, customer neutrality, links, notes, Ending, Appendix visibility, region evidence, and critic review for nontrivial delivery decks.
 
 ## SSOT And Runtime Copies
 
-- Skill `scripts/` is the portable source for newly bootstrapped workspaces.
-- Root `scripts/` is the runtime copy used by a customer workspace.
-- Refresh runtime scripts only through `Initialize-AzureUpdateWorkspace.ps1 -UpdateScripts` or an intentional manual sync.
-- Customer-specific values belong in workspace `config*` files and date-folder manifests, never in skill references.
+Skill/runtime ownership and refresh rules are defined in [Dependencies](references/dependencies.md). Customer-specific values belong in workspace config and manifests, never in skill references.
 
 ## Agent Registry
 

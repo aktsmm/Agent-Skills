@@ -46,17 +46,7 @@ If the best target appears to be an instruction, prompt, memory, or agent, stop 
 
 ## Intake Pre-Step (optional)
 
-Intake は `~/.copilot/skills` と `~/.copilot/m-skills` を private repo の `copilot-skills/{skills,m-skills}/` へ機械的にミラーする前段。retro 育成本体とは別操作で、ユーザーが明示的に「取り込む / intake / 最新化」を求めたときだけ走る。retro 単発の既定は育成のみで、intake は実行しない（未育成の生コピー混入を防ぐ）。
-
-- intake あり育成あり: 「`.copilot` から取り込んで育てて」-> intake -> 通常の retro 育成
-- intake のみ: 「取り込むだけ」-> intake を実行し育成はスキップ
-- 既定 (retro 単発): intake skip、育成のみ
-
-実行は private repo の `scripts/Sync-CopilotSkillsToPrivateRepo.ps1`。出自別に `copilot-skills/skills/` と `copilot-skills/m-skills/` へ分離コピーし、README を自動生成する。
-
-この pre-step に限り、機械的ミラー先として `<private-repo>/copilot-skills/**` への書き込みを許可する。育成（authoring）部分は引き続き Hard Scope Gate（`.github/skills/<skill>/`）に従う。intake は copilot-skills へ、育成は .github/skills へ、で書き込み先を混在させない。
-
-Intake 対象と同名の curated private skill が `<private-repo>/.github/skills/<skill>/` に存在する場合は、`copilot-skills/**` へのミラー前に停止する。curated skill と raw mirror の同名併存は、意図的に扱う場合だけユーザー確認後に別方針を決める。
+Intake is a separate, explicit pre-step for mirroring local Copilot skills. Skip it for a normal retro. When requested, follow [Private Skill Intake Workflow](references/intake-workflow.md); only that pre-step may write under `<private-repo>/copilot-skills/**`, while curated authoring remains under `.github/skills/<skill>/`.
 
 ## Private Repo Resolution
 

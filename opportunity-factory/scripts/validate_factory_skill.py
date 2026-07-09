@@ -99,6 +99,7 @@ def main() -> int:
     for phrase in ["Hosted Agent Scheduler", "Copilot Scheduler (VS Code Extension)", "OpenClaw / Cron", "GitHub Actions", "Windows Task Scheduler"]:
         check(phrase in runtime, f"runtime-modes.md missing scheduler preset: {phrase}", failures)
     check("workflow-review" in runtime, "runtime-modes.md missing workflow-review cadence", failures)
+    check("user-approved autonomy envelope" in runtime, "runtime-modes.md missing autonomy-envelope gate rule", failures)
 
     batch = read_text(root / "references/batch-refinement.md")
     for phrase in ["Three-Pass Rubber-Duck Loop", "passCount", "SQLite", "Stop Conditions"]:
@@ -157,6 +158,8 @@ def main() -> int:
     check(answering_policy.get("useDashboardFirst") is True, "dashboard-state.json missing answeringPolicy.useDashboardFirst=true", failures)
     for field in ["executiveSummary", "workflows", "queues", "risksAndBlockers", "nextActions"]:
         check(field in dashboard_state, f"dashboard-state.json missing {field}", failures)
+    automation_policy = dashboard_state.get("automationPolicy", {}) if isinstance(dashboard_state, dict) else {}
+    check("allowedWithReviewerAndQueueGate" in automation_policy, "dashboard-state.json missing reviewer/queue autonomy policy", failures)
     first_tasks = first_run_queue.get("tasks", []) if isinstance(first_run_queue, dict) else []
     check(len(first_tasks) >= 3, "first-run-queue.json should include at least three starter tasks", failures)
     first_kinds = {task_item.get("kind") for task_item in first_tasks if isinstance(task_item, dict)}

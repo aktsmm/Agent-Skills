@@ -124,10 +124,29 @@ Every self-designing factory needs:
 - prompt-change artifact and rollback note for self-improvement edits,
 - stop conditions for repeated blockers and low-value churn.
 
+## Gate Taxonomy
+
+Do not use "approval" as one ambiguous gate. Record three separate gates:
+
+1. **Reviewer gate**: an independent evaluator checks evidence, scope, risks, and success criteria. PASS can advance work inside the approved autonomy envelope.
+2. **Queue-eligibility gate**: the next task must explicitly name candidate/scope, success metric, verification, WIP limit, and forbidden actions before a worker can pick it.
+3. **Human-approval gate**: required only for the `security-approve` bucket, such as public release, payment/account creation, secret write/issue/delete/external send, personal-data external send, backup-impossible destructive actions, legal-risk acceptance, or expanding the approved automation envelope.
+
+When the user has already authorized local/private prototype or code work:
+
+- do not block every implementation task on another user confirmation,
+- use reviewer PASS to create the next explicit queued task,
+- keep public/external/paid/legal actions blocked,
+- on reviewer reject/ambiguity, revise, narrow, re-queue, or use a fallback lane before escalating,
+- surface the user only when bounded retries cannot resolve the review or a `security-approve` boundary is reached.
+
+Store the autonomy envelope and human-only boundaries in durable dashboard/state so future sessions do not reintroduce artificial blockers.
+
 ## Done Criteria
 
 - The workspace can answer "what is going on?" from dashboard state without chat history.
 - Every scheduled workflow has a role, cadence, WIP limit, artifact contract, and dashboard update duty.
 - The factory can keep improving its own workflow without silently increasing risk.
 - Candidate promotion, phase advancement, and portfolio replacement all require review evidence.
+- Work inside the approved autonomy envelope does not repeatedly ask for human approval; reviewer and queue gates provide bounded progression.
 - Prompt self-improvements are local, evidenced, reversible, and dashboard-recorded.

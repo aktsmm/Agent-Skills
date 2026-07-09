@@ -137,26 +137,11 @@ Full checklist: [references/review-checklist.md](references/review-checklist.md)
 
 ## Reference Map
 
-| Topic                  | Reference                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Primitive decision     | [references/customization-decision.md](references/customization-decision.md)                                                               |
-| Design principles      | [references/design-principles.md](references/design-principles.md)                                                                         |
-| Workflow patterns      | [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)                                                       |
-| Splitting criteria     | [references/splitting-criteria.md](references/splitting-criteria.md)                                                                       |
-| Review checklist       | [references/review-checklist.md](references/review-checklist.md)                                                                           |
-| Context management     | [references/context-engineering.md](references/context-engineering.md)                                                                     |
-| External links         | [references/external-resources.md](references/external-resources.md)                                                                       |
+Core references: [primitive decision](references/customization-decision.md), [design principles](references/design-principles.md), [workflow patterns](references/workflow-patterns/overview.md), [splitting criteria](references/splitting-criteria.md), [review checklist](references/review-checklist.md), and [context management](references/context-engineering.md).
 
 ## agent Quick Fix
 
-**Problem:** Orchestrator says "I'll delegate" but does work directly.
-
-**Solution:** Use MUST/MANDATORY language. See [agent-guide.md](references/agent-guide.md).
-
-```yaml
-## MANDATORY: Sub-agent Delegation
-You MUST use agent for each file. Do NOT read files directly.
-```
+When an orchestrator promises delegation but works directly, make the delegation requirement explicit and verifiable. See [agent-guide.md](references/agent-guide.md).
 
 ## Tools Reference
 

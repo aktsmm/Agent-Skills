@@ -61,6 +61,8 @@
 
 ## Human Approval Boundaries
 
+- Approved autonomy envelope:
+- Reviewer PASS may advance:
 - Cost:
 - Login/account:
 - External publish:

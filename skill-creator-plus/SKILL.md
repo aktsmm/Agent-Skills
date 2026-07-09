@@ -64,31 +64,11 @@ Before adding a new section, ask whether it can replace an existing rule, move t
 
 ## Skill Structure
 
-→ **[references/skill-structure.md](references/skill-structure.md)** for locations, frontmatter, and bundled resource rules
-
-```
-skill-name/
-├── SKILL.md (required)        # Lean overview + decision points
-├── scripts/                   # Deterministic helpers
-├── references/                # Load on demand
-└── assets/                    # Templates and reusable outputs
-```
-
-→ See [skill-structure.md > What NOT to Include](references/skill-structure.md#what-not-to-include) for excluded files.
+Keep routing and decisions in `SKILL.md`; put deterministic helpers in `scripts/`, on-demand detail in `references/`, and reusable outputs in `assets/`. See [Skill Structure](references/skill-structure.md), including excluded files.
 
 ## Creation Process
 
-→ **[references/creation-process.md](references/creation-process.md)** for the end-to-end workflow
-
-| Step | Action                                                |
-| ---- | ----------------------------------------------------- |
-| 0    | Choose primitive + scope (skill vs prompt/agent/etc.) |
-| 1    | Extract the workflow from the conversation or examples |
-| 2    | Plan reusable contents (scripts/references/assets)    |
-| 3    | Initialize or refactor the skill folder               |
-| 4    | Write SKILL.md and implement resources                |
-| 5    | Validate frontmatter, structure, and trigger quality  |
-| 6    | Test on real prompt patterns and iterate              |
+Use [Creation Process](references/creation-process.md): choose primitive and scope, extract the reusable workflow, plan resources, implement, validate, and test real trigger prompts.
 
 ## Clarify if Needed
 
@@ -129,17 +109,7 @@ Use [references/skill-review-checklist.md](references/skill-review-checklist.md)
 
 ## Key References
 
-| Topic             | Reference                                                                        |
-| ----------------- | -------------------------------------------------------------------------------- |
-| Primitive Choice  | [references/customization-primitives.md](references/customization-primitives.md) |
-| Skill Structure   | [references/skill-structure.md](references/skill-structure.md)                   |
-| Structure Gallery | [references/skill-structure-gallery.md](references/skill-structure-gallery.md)   |
-| Creation Process  | [references/creation-process.md](references/creation-process.md)                 |
-| Review Checklist  | [references/skill-review-checklist.md](references/skill-review-checklist.md)     |
-| Bloat Review      | [references/skill-bloat-review.md](references/skill-bloat-review.md)             |
-| Common Pitfalls   | [references/common-pitfalls.md](references/common-pitfalls.md)                   |
-| Workflows         | [references/workflows.md](references/workflows.md)                               |
-| Output Patterns   | [references/output-patterns.md](references/output-patterns.md)                   |
+Use [primitive choice](references/customization-primitives.md), [structure](references/skill-structure.md), [creation](references/creation-process.md), [review checklist](references/skill-review-checklist.md), [bloat review](references/skill-bloat-review.md), and [common pitfalls](references/common-pitfalls.md). The [structure gallery](references/skill-structure-gallery.md), [workflows](references/workflows.md), and [output patterns](references/output-patterns.md) are optional examples.
 
 ## Done Criteria
 

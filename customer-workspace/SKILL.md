@@ -93,47 +93,15 @@ Keep setup questions lightweight. Capture only facts that change routing, sharin
 
 ## Research Reports
 
-Use `research-reports/` for Markdown deliverables created by the agent or team, such as research notes, comparison memos, report drafts, and demo specification notes. Do not leave these generated artifacts at the workspace root; root should stay reserved for entry files and customer workspace controls.
+Use `research-reports/` for generated Markdown deliverables; keep the workspace root for entry files and controls. Detailed placement and sanitization rules are in [Knowledge Ledger Rules](references/knowledge-ledger-rules.md).
 
 ## Knowledge Ledger
 
-Use `_knowledge/` for compact, reusable learnings extracted from meetings, incidents, or research when the user explicitly asks for knowledge extraction, generalization, or lessons learned.
-
-- Start with `_knowledge/general.md`; create category files only after entries accumulate enough to justify a split.
-- Store short patterns, gotchas, decision criteria, and validation checklists. Long analysis belongs in `research-reports/`.
-- Strip customer names, person names, ticket IDs, local paths, and unpublished/confidential specifics before writing reusable knowledge.
-- Mark Microsoft product, pricing, support, or roadmap claims as needing official confirmation unless backed by a checked source URL.
-- Link back to source meeting notes or reports; do not copy long transcripts.
+Use `_knowledge/` only for compact, reusable learnings when the user explicitly requests extraction or generalization. Apply [Knowledge Ledger Rules](references/knowledge-ledger-rules.md) before writing.
 
 ## Optional Material Folders
 
-When customer-shared diagrams, decks, tables, or schedules start to accumulate, split by lifecycle first and scope second.
-
-```text
-_received/                       ← customer originals only
-  overall-architecture/          ← cross-meeting baseline material
-  mtg-YYYY-MM-DD-name/           ← meeting-specific material
-
-_working/                        ← internal edited / annotated / draft copies
-  overall-architecture/
-  mtg-YYYY-MM-DD-name/
-
-_provided/                       ← customer-facing copies, send-out decks, projection versions
-  overall-architecture/
-  mtg-YYYY-MM-DD-name/
-```
-
-- Use `_received/` for customer originals and avoid editing files in place.
-- Use `_working/` for annotated copies, extracted pages, redlines, and draft comparisons.
-- Use `_provided/` only for versions safe to show or send to the customer.
-- Use `overall-architecture/` when the material stays relevant across multiple meetings.
-- Use `mtg-YYYY-MM-DD-name/` only when the material is truly scoped to one meeting.
-- When screenshots or images are shared in a meeting context, save them as meeting artifacts with stable names and add an `attachments.md` manifest.
-- When a user says files were placed at the workspace root, inspect all root files first; treat PDFs, decks, spreadsheets, documents, images, and diagrams as possible received materials.
-- Rename received originals with a date-prefixed stable name before classification. Leave only unclassified items in `_received/incoming/`.
-- Check actual file signatures as well as extensions. For example, a `.pptx` file with an OLE/legacy Office signature should be handled as `.ppt`, and COM may be needed for content inspection.
-- Review PDFs by all pages and decks by all slides before updating working summaries; do not summarize only the first pages or the first matching file.
-- Read-only root audits can use `scripts/Test-ReceivedMaterialPlacement.ps1` from this skill.
+When customer-shared files accumulate, split them by lifecycle: `_received/` for immutable originals, `_working/` for internal edits, and `_provided/` for customer-safe copies. Apply [Customer Material Lifecycle](references/material-lifecycle.md) before moving or renaming files.
 
 ---
 
@@ -196,19 +164,14 @@ Before calling meeting notes done:
 - [Inbox Rules](references/inbox-rules.md)
 - [Meeting Minutes Rules](references/meeting-minutes-rules.md)
 - [Workspace Summary Rules](references/workspace-summary-rules.md)
+- [Knowledge Ledger Rules](references/knowledge-ledger-rules.md)
+- [Customer Material Lifecycle](references/material-lifecycle.md)
 
 ## Assets
 
 > **Note**: `assets/` 配下の prompt / instruction / template は、新しい顧客ワークスペースを初期化するときの **コピー元** として使う scaffolding 用ファイル。ホスト workspace の `.github/prompts/` や `.github/copilot-instructions.md` とは独立に進化させてよい（同期は必須ではない）。ホスト側で機能追加した場合に scaffolding にも反映したいときは、明示的にこのフォルダへ back-port する。
 
-- `assets/_templates/` - Template files
-- `assets/_templates/next-actions-readme.md` - Per-MTG progress board template
-- `assets/_templates/next-actions-task.md` - Single task file template (homework / proposal / research)
-- `assets/_templates/knowledge-readme.md` - Reusable knowledge ledger rules and index
-- `assets/_templates/knowledge-general.md` - Initial generic knowledge ledger
-- `assets/_templates/attachments.md` - Meeting artifact manifest template
-- `assets/inbox.prompt.md` - Inbox prompt
-- `assets/convert-meeting-minutes.prompt.md` - Meeting notes prompt
-- `assets/extract-questions.prompt.md` - Question extraction prompt
-- `assets/copilot-instructions.md` - Auto-routing rules
+- `assets/_templates/`: next-actions, knowledge ledger, attachments, and workspace templates
+- `assets/*.prompt.md`: inbox, meeting-note conversion, and question extraction prompts
+- `assets/copilot-instructions.md`: generated workspace auto-routing rules
 - `scripts/Test-ReceivedMaterialPlacement.ps1` - Read-only root audit for unclassified received-material candidates

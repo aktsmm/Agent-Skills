@@ -56,15 +56,7 @@ TRIAGE → PLAN → PREPARE_TEMPLATE → EXTRACT → TRANSLATE → BUILD → REV
 
 ### Scripts
 
-| Script                    | Purpose                                           |
-| ------------------------- | ------------------------------------------------- |
-| `create_from_template.py` | content.json から PPTX を生成するメインスクリプト |
-| `reconstruct_analyzer.py` | 既存 PPTX を content.json に戻す                  |
-| `extract_images.py`       | PPTX / Web から画像を抽出する                     |
-| `validate_content.py`     | content.json のスキーマ検証                       |
-| `validate_pptx.py`        | overflow などの検証                               |
-
-詳細は [references/SCRIPTS.md](references/SCRIPTS.md) を参照。
+Script selection, arguments, and validation entry points are defined in [references/SCRIPTS.md](references/SCRIPTS.md).
 
 ### content.json
 
@@ -91,13 +83,7 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 
 ### Agents
 
-| Agent         | Purpose                 |
-| ------------- | ----------------------- |
-| Orchestrator  | Pipeline coordination   |
-| Localizer     | Translation (EN <-> JA) |
-| PPTX Reviewer | Final quality check     |
-
-定義詳細は [references/agents/](references/agents/) を参照。
+Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md) and [references/agents/](references/agents/).
 
 ## Operating Rules
 
@@ -134,25 +120,7 @@ python scripts/create_from_template.py assets/template.pptx content.json output.
 - [references/instructions/customer-facing-deck.instructions.md](references/instructions/customer-facing-deck.instructions.md)
 - [references/instructions/deck-iteration-review.instructions.md](references/instructions/deck-iteration-review.instructions.md)
 
-### Go to Implementation Patterns For
-
-- technical content verification workflow
-- shape-based architecture diagrams
-- template-based slide XML editing order
-- COM SlideMaster / CustomLayouts edits for reusable templates
-- rendered-slide visual QA loop
-- PptxGenJS hardening pitfalls
-- hyperlink batch processing
-- customer-facing deck surface / notes separation
-- font theme token resolution
-- section / layout XML manipulation
-- hidden slide cleanup
-- COM Automation editing rules
-- RefURL placement and hyperlink auditing
-- file-lock workaround and post-processing
-- 16:9 centering issues
-- template corruption recovery
-- video embedding via ZIP direct manipulation
+Use [Implementation Patterns](references/IMPLEMENTATION_PATTERNS.md) for shape diagrams, template XML, SlideMaster edits, visual QA, hyperlinks, RefURL, locks, centering, corruption recovery, and media embedding.
 
 ## Done Criteria
 
