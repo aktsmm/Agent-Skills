@@ -35,6 +35,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## All Mode（`all` 指定時の dirty 取り込み）
 
+- まず `scripts/Commit-DirtySkills.ps1` をdry-runし、skill contentとNot Doneを確認する。意味・scopeが明確な場合だけ `-Apply`でskill単位にcommitする
 - 対象は skill content のみ: `.github/skills/<skill>/**` と `copilot-skills/skills/<skill>/**`。`copilot-skills/m-skills/<skill>/**` は legacy/手動 opt-in 時だけ対象にする。`.skill-meta.json` と shared file（README / assets）は除外する
 - `.skill-meta.json` が未追跡で dirty に出たら local-only metadata とみなし、stage せず削除してよい。tracked なら自動削除せず停止する
 - skill 以外の dirty（scripts、設定、無関係ファイル、`/memories/**`）はコミットしない。混在すれば stage せず Not Done に列挙する
@@ -45,6 +46,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 ## Gates（公開前に必ず確認）
 
+- public / internal / denied / copilot-public / copilot-deniedの分類SSOTは `scripts/skill-distribution.json`。promptやSKILL本文へ現在の一覧を複製しない
 - `dirty` は sync 必要性ではなく、未確定 authoring の gate として扱う。通常 sync の要否は private source path と public / EMU / GIM destination path の content diff で判定する
 - primary が明示されている場合、既定の確認範囲は primary とその同期経路に限定する。全 skill 棚卸し、全 duplicate、全 copilot-skills license audit は `all` / `broad` / `audit` / `棚卸し` が明示された場合だけ行う
 - private-only / internal-only / MS 社内向け skill は public sync から除外する。社内限定は EMU private repo や GIM internal repo 経路へ逃がす
@@ -59,7 +61,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 ## Destination Audits and Gates
 
 Destination 別の判定（公開可否 / 除外リスト / repo visibility / sensitive scan）はこの SKILL が決める。詳細手順と既定リストは [references/instructions/audits-and-gates.md](references/instructions/audits-and-gates.md)。
-- **New Skill Classification Gate**: `$KnownPublicSkills` / `$DefaultInternalSkills` / `$HardDeniedSkills` のどこにもない skill が private repo にある限り sync を強制停止する（`Sync-AndPush.ps1` の Step 0.5、incident 2026-06-24 の再発防止）。未分類 skill は public-safe / internal-only / public-denied へ分類してから再実行
+- **New Skill Classification Gate**: `skill-distribution.json` のpublic / internal / deniedのどこにもない skill がprivate repoにある限りsyncを強制停止する。未分類skillは分類をconfigへ保存してから再実行
 - **Agent Discovery Gate**: script の停止に頼らず、実行前に未分類 skill を検出したら必ずユーザーへ分類を確認する。内容から推測して分類せず、明示回答なしに `-AllowUnknownSkills` を使わない
 - **Copilot-Skills Public Audit**: license / DUP / secret の 3 観点で broad sync 除外を確定
 - **EMU Private Sync Gate**: visibility `PRIVATE`/`INTERNAL` 確認、secret 連を placeholder 化
@@ -81,19 +83,23 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 
 1. private / public / script、必要なら EMU / GIM repo を解決し、`primary`・branch / remote・ahead/behind・dirty 状態を確認する
 2. `primary` の readiness と source/destination content diff を確認し、未分類 skill があれば先にユーザーへ分類確認する。`shared-dirty` / `private-only-dirty` / `unselected-dirty` が public / EMU / GIM sync に漏れるかを判定する。broad sync で `copilot-skills/` を含む場合だけ Public Audit の 3 観点でブラックリストを確定する
-3. `all` 指定時は、All Mode に従い未コミットの skill 差分を skill 単位でコミットする（skill 以外の dirty は除外し Not Done へ回す）。コミット後に各 skill の public / EMU / GIM 振り分けを監査する
+3. `all` 指定時は、`Commit-DirtySkills.ps1`のdry-run→`-Apply`でskill単位にcommitする。skill以外のdirtyはNot Doneに残し、同期scriptはprivate dirtyを暗黙commitしない
 4. safe path を選ぶ
    - 直接実行: 漏れ込みが無い場合は `Sync-AndPush.ps1 -Message "sync: <skill summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
    - isolated 実行: current HEAD の clean source で public repo の `<primary>/` だけを mirror する
    - EMU private: `Sync-AndPush.ps1 -SyncEmu [-EmuDryRun]`
    - GIM internal: `Sync-AndPush.ps1 -SyncInternal [-InternalDryRun]`
 5. private repo の current branch を remote へ push し、public / EMU / GIM 各 repo で想定した skill だけが更新されたことを確認する
+6. publicはlocal source/destination hashとremote到達を確認し、GIM/EMUはremote treeのpath集合とblob SHAを確認する。`Missing / Mismatch / Extra = 0`になるまで完了扱いにしない
 
 ## Gotchas
 
 - **Formatter drift**: VS Code / editor formatter が既存 markdown table を再整形して意味のない whitespace / column-align 差分を残すことがある。skill authoring commit に混ぜず、`chore(<skill>): normalize table whitespace after formatter run` として **必ず別 commit** で分離する。混ぜると後で revert しづらい
 - **Push rejected → rebase**: sync 前後に remote が別セッションで進んでいて `git push` が rejected になる場合、`git pull --rebase origin master` で **`HEAD.lock` rename failure** の無限プロンプト (y/n 応答無効) に陥ることがある。対処: (1) `git rebase --abort` (2) `git reset --hard HEAD` で index / worktree を HEAD に一致させる (3) `Get-ChildItem .git\*.lock -Force | Remove-Item -Force` で残 lock を除去 (4) `git merge --no-ff -m 'merge: ...' origin/master` で rebase を諦めて merge に切替。merge commit 1 個追加のコストで確実に前進できる
 - **Cross-cutting git operations**: この 2 点は sync だけでなく `retro-private-skills` / 大 skill 育成の直後にも同じ症状で再発する。skill 側で cross-cutting reminder として持つ
+- **Git Data API transient failure**: blob/tree/commit/ref APIは共通retryと空SHA fail-fastを通す。ref更新後にremote treeを再取得し、stale path削除と完全一致を確認する
+- **Internal full mirror only**: internal subset指定は未選択Skillを削除し得るため拒否する。distribution configの全集合だけをdesired setとして使う
+- **All Mode rollback**: tracked metadata、cross-root rename、commit失敗で停止する。commit途中の失敗は元HEADへ戻し、差分をunstagedで保持する
 
 ## Report
 
