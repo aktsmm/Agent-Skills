@@ -1,6 +1,6 @@
 ---
 name: sync-public-skills
-description: Sync curated skills from the private skill repo to public, EMU private, and GIM internal repos, then push or mirror as needed. Use when publishing/updating public skills, syncing private→public, or running internal/private skill sync for EMU and GIM. Audits license, duplication, visibility, and secrets before publishing. Triggers on "sync public skills", "publish skills", "public 公開", "private を public に同期", "EMU internal skill sync", "GIM internal skill sync".
+description: Synchronize curated Agent Skills across approved repositories with policy checks and verification. Use when publishing or updating managed skills, validating a repository mirror, or selecting a safe sync scope. Triggers on "sync public skills", "publish skills", "public 公開", "skill sync", "repository mirror".
 argument-hint: "対象 skill 名、private/public/EMU/GIM repo path（任意）、mode（safe-auto / review-only / dry-run / all）"
 user-invocable: true
 license: CC BY-NC-SA 4.0

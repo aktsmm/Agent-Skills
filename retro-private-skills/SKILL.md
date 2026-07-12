@@ -1,6 +1,6 @@
 ---
 name: "retro-private-skills"
-description: "Reflect reusable learnings into the private skill repository under .github/skills only, with safe-auto local commit and conditional push when the private repo is 3+ commits ahead. Use when: private skill retro, private skill repo authoring, private skill fix, create/update private SKILL.md, or converting the retro-private-skills prompt into Scout skill behavior."
+description: "Reflect reusable learnings into a managed Agent Skills repository with scope gates, safe local commits, and conditional push. Use when: skill retro, managed skill authoring, skill repository fix, create or update SKILL.md."
 argument-hint: "反映したい学び、対象 skill 名、private repo path、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
