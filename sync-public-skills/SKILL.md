@@ -48,6 +48,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 
 - public / internal / denied / copilot-public / copilot-deniedの分類SSOTは `scripts/skill-distribution.json`。promptやSKILL本文へ現在の一覧を複製しない
 - `dirty` は sync 必要性ではなく、未確定 authoring の gate として扱う。通常 sync の要否は private source path と public / EMU / GIM destination path の content diff で判定する
+- 実行前に `Mode / Selected Skills / 選択外の public diff` を示す。対象が明示されていれば `primary-only`、`all` / `broad` なら broad とし、会話の流れだけで primary を推測しない
 - primary が明示されている場合、既定の確認範囲は primary とその同期経路に限定する。全 skill 棚卸し、全 duplicate、全 copilot-skills license audit は `all` / `broad` / `audit` / `棚卸し` が明示された場合だけ行う
 - private-only / internal-only / MS 社内向け skill は public sync から除外する。社内限定は EMU private repo や GIM internal repo 経路へ逃がす
 - `.skill-meta.json` は local-only metadata として、dirty 判定 / stage / push / public diff から除外する
@@ -55,7 +56,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 - sync-only 実行中は README / assets / index / SKILL 本文を編集しない
 - public safety audit: 想定外の skill 漏れ込みや、想定外の削除が出たら停止して原因を確認する
 - branch / remote ambiguity、unexpected deletion、audit failure、content authoring 必要時は停止する
-- 手動コピーで public / EMU repo を直接触らず、script（または一時 script variant）で完結させる
+- 手動コピーや一時 sync script を作らず、正式 runner の `Sync-AndPush.ps1` とその scope parameter を使う
 - secret / 顧客情報 / 個人メール / 具体 TPID / ローカル絶対パスを public にも EMU にも入れない。例は placeholder にする
 
 ## Destination Audits and Gates
@@ -71,12 +72,12 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 ## Sync Strategy
 
 - 今回同期する明示 skill を `primary` とする
+- primary-only は `Sync-AndPush.ps1 -PrimarySkills <skill-name...>` を使う。選択外 skill、README、LICENSE index、assets、copilot-skills、orphan deletion は変更しない
 - 対象 skill が明示されている場合は、その skill の readiness、source/destination diff、漏れ込みだけを先に確認する。既定は `primary-only` とする
 - `primary` が clean かつ commit 済みなら、unselected dirty があっても即停止しない。dirty が primary path にある場合は未確定 authoring とみなし、`all` 指定がない限り `retro-private-skills` へ戻す
 - private repo が clean で ahead の場合は、sync 前に remote private へ push してよい。private repo が clean かつ remote と同期済みでも、destination と content diff があれば sync 対象にする
 - `all` 指定時は unselected dirty を放置せず、All Mode で skill 単位にコミットしてから sync する
-- unselected dirty が public sync に漏れ得る場合は、main repo で直接実行せず isolated path を使う
-- isolated path: current HEAD の一時 clean worktree（同等の clean source）で public repo の `<primary>/` だけを更新する
+- unselected dirty が primary path に無ければ `-PrimarySkills` の scope gate で選択外 path を commit しない。primary path 自体が dirty なら authoring 未確定として停止する
 - `primary-only` では他 skill directory の削除、shared file 更新、broad 一括削除ロジックを使わない。public / internal diff が selected primary destination path だけであることを検証する
 
 ## Workflow
@@ -85,12 +86,12 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 2. `primary` の readiness と source/destination content diff を確認し、未分類 skill があれば先にユーザーへ分類確認する。`shared-dirty` / `private-only-dirty` / `unselected-dirty` が public / EMU / GIM sync に漏れるかを判定する。broad sync で `copilot-skills/` を含む場合だけ Public Audit の 3 観点でブラックリストを確定する
 3. `all` 指定時は、`Commit-DirtySkills.ps1`のdry-run→`-Apply`でskill単位にcommitする。skill以外のdirtyはNot Doneに残し、同期scriptはprivate dirtyを暗黙commitしない
 4. safe path を選ぶ
-   - 直接実行: 漏れ込みが無い場合は `Sync-AndPush.ps1 -Message "sync: <skill summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
-   - isolated 実行: current HEAD の clean source で public repo の `<primary>/` だけを mirror する
+  - primary-only: `Sync-AndPush.ps1 -PrimarySkills <skill-name...> -Message "sync: <skill summary>" -SkipDevPush`
+  - broad: `Sync-AndPush.ps1 -Message "sync: <summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
    - EMU private: `Sync-AndPush.ps1 -SyncEmu [-EmuDryRun]`
    - GIM internal: `Sync-AndPush.ps1 -SyncInternal [-InternalDryRun]`
 5. private repo の current branch を remote へ push し、public / EMU / GIM 各 repo で想定した skill だけが更新されたことを確認する
-6. publicはlocal source/destination hashとremote到達を確認し、GIM/EMUはremote treeのpath集合とblob SHAを確認する。`Missing / Mismatch / Extra = 0`になるまで完了扱いにしない
+6. Git の `master = origin/master` だけで完了としない。publicはlocal source/destination hashとremote到達を確認し、GIM/EMUはremote treeのpath集合とblob SHAを確認する。`Missing / Mismatch / Extra = 0`になるまで完了扱いにしない
 
 ## Gotchas
 

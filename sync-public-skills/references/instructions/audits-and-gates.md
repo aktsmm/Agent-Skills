@@ -44,11 +44,13 @@ org-owned internal repo（env `SYNC_INTERNAL_SKILLS_GIM_REPO`、例: `<internal-
 - `internalSkills` はruntimeでpublic除外集合へ自動統合される。public mirror後もinternal skill pathが存在しないことを確認する
 - README は script が各 SKILL.md の `description` + audience map から自動生成する。手書き編集しない
 - push 前に sensitive scan を実行する（script がヒットで停止）。誤検知確認済みのときだけ `-AllowSensitive`
+- sensitive scan の keyword hit は該当行を読んで判定する。実 credential / 個人メール / tenant・TPID 実値 / ローカル絶対パスは blocker。「secret を保存しない」という guardrail、redaction test fixture、明示的 placeholder は review 済み false positive として記録できる。`-AllowSensitive` を一括 bypass に使わない
 - script は `finally` で `RestoreAccount`（既定 `aktsmm`）へ復帰する。実行後に active アカウントを確認する
 
 ## Script CLI
 
 - `Sync-AndPush.ps1` はcleanな確定済みcommitの機械適用のみ。dirty intakeは `Commit-DirtySkills.ps1` のdry-run / `-Apply`へ分離する。internal mirrorは `-SyncEmu` / `-SyncInternal`（各DryRunあり）を明示する
+- native public の狭い同期は `-PrimarySkills <skill-name...>` を使う。temporary copy script を作らず、正式 runner の classification / staging / rollback / path scope / hash gate を再利用する
 - internal API syncはretry＋空SHA fail-fastを使い、stale skill pathを削除する。ref更新後のremote treeでMissing / Mismatch / Extraが0にならなければ失敗とする
 - internal同期はdistribution configの全集合をfull mirrorする。subset指定は他Skill削除につながるため拒否する
 - 公開可否・internal振り分けの判断基準はSKILL（と同名prompt）が持ち、確定結果はdistribution configへ保存する。scriptはconfigを機械適用する
