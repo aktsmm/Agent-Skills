@@ -51,6 +51,11 @@ description: "Use when: reviewing skills"
 
 Do not add `argument-hint`, `user-invocable`, or `disable-model-invocation` unless they change behavior.
 
+Keep local validators aligned with the current Agent Skills fields. Validate
+field types, UTF-8 input, and folder/name equality. Require author metadata only
+for locally authored license profiles; imported third-party skills can have a
+different metadata contract.
+
 ### Accidental Prompt Tool Restrictions
 
 In VS Code prompt files, `tools:` is not harmless metadata. It overrides the default agent's enabled tools for that prompt run and can appear in the tools picker as a current-session-only configuration.
@@ -106,6 +111,12 @@ Prefer:
 - headings or schema checks
 - tool-usage checks
 - stable identifiers such as file basenames or declared section names
+
+### Dirty Skill Packages
+
+Tests can leave `__pycache__`, `.pyc`, `.pyo`, `.DS_Store`, or `Thumbs.db` inside
+a skill folder. Exclude them in the packager itself and inspect archive entries;
+manual pre-package cleanup is not a reliable distribution contract.
 
 ## Review Smells
 

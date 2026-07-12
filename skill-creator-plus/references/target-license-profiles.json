@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "title": "Target Skill License Profiles",
+  "profiles": {
+    "cc-by-nc-sa-4.0": {
+      "spdxId": "CC-BY-NC-SA-4.0",
+      "frontmatterLicense": "CC BY-NC-SA 4.0",
+      "evidenceFile": "LICENSE.txt",
+      "template": "license-templates/cc-by-nc-sa-4.0.txt",
+      "requiresAuthorAttribution": true
+    },
+    "mit": {
+      "spdxId": "MIT",
+      "frontmatterLicense": "MIT",
+      "evidenceFile": "LICENSE.txt",
+      "template": "license-templates/mit.txt",
+      "requiresAuthorAttribution": true
+    },
+    "apache-2.0": {
+      "spdxId": "Apache-2.0",
+      "frontmatterLicense": "Apache-2.0",
+      "evidenceFile": "LICENSE.txt",
+      "template": "license-templates/apache-2.0.txt",
+      "requiresAuthorAttribution": true
+    }
+  }
+}

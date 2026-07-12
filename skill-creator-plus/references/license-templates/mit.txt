@@ -1,0 +1,13 @@
+# MIT License
+
+Copyright (c) {author}
+
+This Skill is licensed under the MIT License.
+
+Full license text: https://opensource.org/license/mit/# MIT License
+
+Copyright (c) {author}
+
+This Skill is licensed under the MIT License.
+
+Full license text: https://opensource.org/license/mit/

@@ -1,95 +1,160 @@
 #!/usr/bin/env python3
-"""
-Quick validation script for skills - minimal version
-"""
 
-import sys
-import os
+import json
 import re
-import yaml
+import sys
 from pathlib import Path
 
-def validate_skill(skill_path):
-    """Basic validation of a skill"""
-    skill_path = Path(skill_path)
+try:
+    import yaml
+except ModuleNotFoundError:
+    yaml = None
 
-    # Check SKILL.md exists
-    skill_md = skill_path / 'SKILL.md'
-    if not skill_md.exists():
-        return False, "SKILL.md not found"
+from license_metadata import load_profiles, profile_snapshot, render_license, resolve_evidence_path, sha256_file
 
-    # Read and validate frontmatter
-    content = skill_md.read_text()
-    if not content.startswith('---'):
-        return False, "No YAML frontmatter found"
 
-    # Extract frontmatter
-    match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
+ALLOWED_PROPERTIES = {
+    "name",
+    "description",
+    "argument-hint",
+    "user-invocable",
+    "disable-model-invocation",
+    "context",
+    "license",
+    "allowed-tools",
+    "metadata",
+}
+LEGACY_EVIDENCE_FILES = ("LICENSE.txt", "LICENSE", "COPYING", "NOTICE")
+
+
+def validate_frontmatter(skill_path: Path) -> tuple[dict | None, str | None]:
+    if yaml is None:
+        return None, "Optional Python validator dependency is missing. Install scripts/requirements.txt in an isolated environment before using this helper."
+    skill_md = skill_path / "SKILL.md"
+    if skill_md.is_symlink() or not skill_md.is_file():
+        return None, "SKILL.md must be a regular file inside the Skill root"
+    content = skill_md.read_text(encoding="utf-8")
+    match = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
     if not match:
-        return False, "Invalid frontmatter format"
-
-    frontmatter_text = match.group(1)
-
-    # Parse YAML frontmatter
+        return None, "No valid YAML frontmatter found"
     try:
-        frontmatter = yaml.safe_load(frontmatter_text)
-        if not isinstance(frontmatter, dict):
-            return False, "Frontmatter must be a YAML dictionary"
-    except yaml.YAMLError as e:
-        return False, f"Invalid YAML in frontmatter: {e}"
+        frontmatter = yaml.safe_load(match.group(1))
+    except yaml.YAMLError as error:
+        return None, f"Invalid YAML in frontmatter: {error}"
+    if not isinstance(frontmatter, dict):
+        return None, "Frontmatter must be a YAML dictionary"
+    return frontmatter, None
 
-    # Define allowed properties
-    ALLOWED_PROPERTIES = {'name', 'description', 'license', 'allowed-tools', 'metadata'}
 
-    # Check for unexpected properties (excluding nested keys under metadata)
-    unexpected_keys = set(frontmatter.keys()) - ALLOWED_PROPERTIES
-    if unexpected_keys:
-        return False, (
-            f"Unexpected key(s) in SKILL.md frontmatter: {', '.join(sorted(unexpected_keys))}. "
-            f"Allowed properties are: {', '.join(sorted(ALLOWED_PROPERTIES))}"
-        )
-
-    # Check required fields
-    if 'name' not in frontmatter:
-        return False, "Missing 'name' in frontmatter"
-    if 'description' not in frontmatter:
-        return False, "Missing 'description' in frontmatter"
-
-    # Extract name for validation
-    name = frontmatter.get('name', '')
-    if not isinstance(name, str):
-        return False, f"Name must be a string, got {type(name).__name__}"
+def validate_common_fields(skill_path: Path, frontmatter: dict) -> str | None:
+    unexpected = set(frontmatter) - ALLOWED_PROPERTIES
+    if unexpected:
+        return f"Unexpected key(s) in SKILL.md frontmatter: {', '.join(sorted(unexpected))}"
+    name = frontmatter.get("name")
+    if not isinstance(name, str) or not name.strip():
+        return "Missing or invalid 'name' in frontmatter"
     name = name.strip()
-    if name:
-        # Check naming convention (hyphen-case: lowercase with hyphens)
-        if not re.match(r'^[a-z0-9-]+$', name):
-            return False, f"Name '{name}' should be hyphen-case (lowercase letters, digits, and hyphens only)"
-        if name.startswith('-') or name.endswith('-') or '--' in name:
-            return False, f"Name '{name}' cannot start/end with hyphen or contain consecutive hyphens"
-        # Check name length (max 64 characters per spec)
-        if len(name) > 64:
-            return False, f"Name is too long ({len(name)} characters). Maximum is 64 characters."
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name) or len(name) > 64:
+        return f"Name '{name}' must be hyphen-case and no longer than 64 characters"
+    if name != skill_path.name:
+        return f"Name '{name}' must match parent directory '{skill_path.name}'"
+    description = frontmatter.get("description")
+    if not isinstance(description, str) or not description.strip() or len(description) > 1024:
+        return "Missing or invalid 'description' in frontmatter"
+    if "<" in description or ">" in description:
+        return "Description cannot contain angle brackets (< or >)"
+    for field in ("user-invocable", "disable-model-invocation"):
+        if field in frontmatter and not isinstance(frontmatter[field], bool):
+            return f"{field} must be a boolean"
+    if frontmatter.get("context") is not None and frontmatter["context"] not in {"inline", "fork"}:
+        return "context must be 'inline' or 'fork'"
+    if not isinstance(frontmatter.get("license"), str) or not frontmatter["license"].strip():
+        return "Missing 'license' in frontmatter"
+    return None
 
-    # Extract and validate description
-    description = frontmatter.get('description', '')
-    if not isinstance(description, str):
-        return False, f"Description must be a string, got {type(description).__name__}"
-    description = description.strip()
-    if description:
-        # Check for angle brackets
-        if '<' in description or '>' in description:
-            return False, "Description cannot contain angle brackets (< or >)"
-        # Check description length (max 1024 characters per spec)
-        if len(description) > 1024:
-            return False, f"Description is too long ({len(description)} characters). Maximum is 1024 characters."
 
+def validate_manifest(skill_path: Path, frontmatter: dict) -> tuple[bool, str]:
+    manifest_path = skill_path / "skill-license.json"
+    if not manifest_path.is_file():
+        if any((skill_path / file_name).is_file() for file_name in LEGACY_EVIDENCE_FILES):
+            return True, "Skill is valid! Warning [legacy-missing-manifest]: license metadata was not generated by this tool."
+        return False, "License evidence not found"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        return False, f"Invalid skill-license.json: {error}"
+    if manifest.get("schemaVersion") != 1:
+        return False, "Unsupported skill-license.json schemaVersion"
+    provenance = manifest.get("provenance")
+    if provenance == "draft":
+        return False, "Draft Skills cannot be validated or packaged"
+    if provenance not in {"self-authored", "third-party", "derivative"}:
+        return False, "Invalid skill-license.json provenance"
+    if manifest.get("frontmatterLicense") != frontmatter["license"]:
+        return False, "skill-license.json frontmatterLicense does not match SKILL.md"
+
+    author = manifest.get("authorAttribution", {}).get("value")
+    metadata = frontmatter.get("metadata") if isinstance(frontmatter.get("metadata"), dict) else {}
+    if not isinstance(author, str) or not author.strip() or metadata.get("author") != author:
+        return False, "metadata.author must exactly match skill-license.json authorAttribution.value"
+
+    profile = manifest.get("profile")
+    if not isinstance(profile, dict) or not isinstance(profile.get("spdxId"), str):
+        return False, "skill-license.json profile snapshot is missing"
+    if profile.get("frontmatterLicense") != frontmatter["license"] or manifest.get("spdxId") != profile.get("spdxId"):
+        return False, "skill-license.json profile does not match the declared license"
+    if profile.get("id") != "custom":
+        if profile.get("id") not in load_profiles()["profiles"]:
+            return False, "Unknown target license profile"
+        expected_profile = profile_snapshot(profile["id"])
+        if profile != expected_profile:
+            return False, "skill-license.json profile snapshot disagrees with the target profile"
+    elif provenance == "self-authored":
+        return False, "Self-authored Skills require a registered target license profile"
+
+    evidence = manifest.get("evidence")
+    if not isinstance(evidence, list) or not evidence:
+        return False, "skill-license.json evidence is required"
+    for item in evidence:
+        if not isinstance(item, dict):
+            return False, "Invalid license evidence entry"
+        path = resolve_evidence_path(skill_path, item.get("path"))
+        if path is None:
+            return False, "License evidence path must be a regular file inside the Skill root"
+        if item.get("sha256") != sha256_file(path):
+            return False, f"License evidence hash does not match: {item.get('path')}"
+
+    if provenance == "self-authored":
+        evidence_file, expected_content, _ = render_license(profile["id"], author)
+        if len(evidence) != 1 or evidence[0].get("path") != evidence_file:
+            return False, "Self-authored Skill license evidence does not match the selected profile"
+        evidence_path = resolve_evidence_path(skill_path, evidence_file)
+        if evidence_path is None or evidence_path.read_text(encoding="utf-8") != expected_content:
+            return False, "Self-authored Skill license evidence does not match the selected profile"
+
+    if provenance in {"third-party", "derivative"}:
+        provenance_file = skill_path / "PROVENANCE.md"
+        upstream = manifest.get("upstreamAttributions")
+        if not provenance_file.is_file() or not isinstance(upstream, list) or not upstream:
+            return False, "Third-party or derivative Skills require PROVENANCE.md and upstreamAttributions"
     return True, "Skill is valid!"
+
+
+def validate_skill(skill_path: str | Path) -> tuple[bool, str]:
+    skill_path = Path(skill_path)
+    frontmatter, error = validate_frontmatter(skill_path)
+    if error:
+        return False, error
+    error = validate_common_fields(skill_path, frontmatter)
+    if error:
+        return False, error
+    return validate_manifest(skill_path, frontmatter)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python quick_validate.py <skill_directory>")
-        sys.exit(1)
-    
+        raise SystemExit(1)
     valid, message = validate_skill(sys.argv[1])
     print(message)
-    sys.exit(0 if valid else 1)
+    raise SystemExit(0 if valid else 1)

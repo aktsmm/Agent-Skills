@@ -7,7 +7,7 @@ Detailed guide for each step of skill creation.
 0. Route by skill archetype
 1. Understand the skill with concrete examples
 2. Plan reusable skill contents (scripts, references, assets)
-3. Initialize the skill (run init_skill.py)
+3. Initialize the skill when a starter is useful (run init_skill.py)
 4. Edit the skill (implement resources and write SKILL.md)
 5. Package the skill (run package_skill.py)
 6. Iterate based on real usage
@@ -73,17 +73,28 @@ Prefer code or structured files when they reduce repeated reasoning:
 
 ## Step 3: Initializing the Skill
 
+Before creating a self-authored Skill, confirm the target license profile and
+display attribution. `CC BY-NC-SA 4.0` is a candidate, not an implicit CLI
+default. Preserve upstream license and notice evidence for third-party or
+derivative work.
+
 Run `init_skill.py` for new skills:
 
 ```bash
-scripts/init_skill.py <skill-name> --path <output-directory>
+scripts/init_skill.py <skill-name> --path <output-directory> \
+	--license-profile cc-by-nc-sa-4.0 --author-attribution "Example Author"
 ```
 
-The script:
+The script creates a minimal self-authored target:
 
-- Creates the skill directory
-- Generates SKILL.md template with frontmatter
-- Creates example `scripts/`, `references/`, `assets/` directories
+- Generates `SKILL.md`, `LICENSE.txt`, and `skill-license.json`
+- Requires an explicit target profile and display attribution
+- Creates no Python or placeholder resource files unless requested
+
+Use `--with-python-helper` only when the target needs a Python helper. Use
+`--with-resources` only when starter reference and asset folders are useful.
+The initializer does not import third-party or derivative material; preserve
+its provenance and notices manually before packaging.
 
 ## Step 4: Edit the Skill
 
@@ -120,6 +131,9 @@ scripts/package_skill.py <path/to/skill-folder>
 # Optional: specify output directory
 scripts/package_skill.py <path/to/skill-folder> ./dist
 ```
+
+Use packaging only when producing a distributable `.skill` archive. It is not
+required for a natural-language-only Skill authoring pass.
 
 The script:
 

@@ -7,7 +7,7 @@ Checklist for reviewing and improving SKILL.md files.
 ```markdown
 - [ ] SKILL.md is under 150 lines? (GitHub guideline: "2 pages or less")
 - [ ] Frontmatter has name + description?
-- [ ] Self-authored skills have license + metadata.author?
+- [ ] Self-authored skills have confirmed license + `metadata.author`?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
 - [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere?
@@ -222,6 +222,7 @@ Good examples:
 - [ ] Examples minimal but sufficient
 - [ ] Gotchas are specific and actionable
 - [ ] Verification path is explicit
+- [ ] Baseline validation record is complete; helper/package commands ran only when relevant
 
 ### Action Items
 

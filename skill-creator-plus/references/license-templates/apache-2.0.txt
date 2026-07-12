@@ -1,0 +1,13 @@
+# Apache License 2.0
+
+Copyright (c) {author}
+
+This Skill is licensed under the Apache License, Version 2.0.
+
+Full license text: https://www.apache.org/licenses/LICENSE-2.0# Apache License 2.0
+
+Copyright (c) {author}
+
+This Skill is licensed under the Apache License, Version 2.0.
+
+Full license text: https://www.apache.org/licenses/LICENSE-2.0

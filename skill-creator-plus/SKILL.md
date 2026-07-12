@@ -3,9 +3,9 @@ name: skill-creator-plus
 description: Create or review a reusable skill (SKILL.md) that packages a workflow, and decide whether the request should be a skill instead of a prompt, instruction, agent, or hook. Use when creating a new skill, extracting a workflow from a conversation, updating an existing skill, reviewing SKILL.md quality, or fixing weak skill triggering. Triggers on "create skill", "/create-skill", "new skill", "review skill", "fix skill trigger", "SKILL.md", "スキル作成".
 argument-hint: "作りたい skill の目的、trigger、入れたい resources"
 user-invocable: true
-license: CC BY-NC-SA 4.0
+license: Apache-2.0
 metadata:
-  author: yamapan (based on Anthropic)
+  author: yamapan
 ---
 
 # Skill Creator+
@@ -44,6 +44,22 @@ If the answer is not **Skill**, stop and create the right primitive instead.
 1. Extract the workflow you want to package.
 2. Clarify only the missing dimensions: target outcome, personal vs workspace scope, checklist vs full workflow.
 3. Draft the smallest useful SKILL.md, then move detail into references.
+
+## License And Validation Gate
+
+Classify the target before creating or changing it: **self-authored**,
+**third-party**, or **derivative**. A self-authored target uses independent
+content; copying this Skill's prose, code, templates, or notices makes it a
+derivative and requires preserved upstream evidence.
+
+For a new self-authored Skill, propose `CC BY-NC-SA 4.0` as a candidate, show
+the exact display attribution, and get confirmation. Do not silently copy this
+Skill's Apache-2.0 license into the target. Preserve an existing or upstream
+license when updating or importing.
+
+Use the [target license profiles](references/target-license-profiles.json) and
+[validation lanes](references/validation-lanes.md). Baseline review is always
+required; Python helpers and packaging are conditional.
 
 ## Core Principles
 
