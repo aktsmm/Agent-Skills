@@ -24,6 +24,7 @@ REQUIRED_FILES = [
     "references/workspace-setup.md",
     "references/rubber-duck-review.md",
     "references/self-designing-factory.md",
+    "references/lifecycle-and-health.md",
     "references/dashboard-state.md",
     "assets/prompts/commander.md",
     "assets/prompts/worker.md",
@@ -45,7 +46,9 @@ REQUIRED_FILES = [
 ABSOLUTE_PATH_PATTERN = re.compile(
     "|".join(
         [
-            r"[A-Za-z]:\\",
+            r"(?<![A-Za-z0-9])[A-Za-z]:\\",
+            r"(?<![A-Za-z0-9])[A-Za-z]:/",
+            r"\\\\[^\\\r\n]+\\",
             "/" + "home/",
             "/" + "Users/",
             "~/" + ".openclaw",
@@ -100,6 +103,22 @@ def main() -> int:
         check(phrase in runtime, f"runtime-modes.md missing scheduler preset: {phrase}", failures)
     check("workflow-review" in runtime, "runtime-modes.md missing workflow-review cadence", failures)
     check("user-approved autonomy envelope" in runtime, "runtime-modes.md missing autonomy-envelope gate rule", failures)
+    check("create-new/O_EXCL" in runtime and "never test-then-create" in runtime, "runtime-modes.md missing atomic lock rule", failures)
+    lifecycle = read_text(root / "references/lifecycle-and-health.md")
+    for phrase in [
+        "Portfolio Promotion Lane",
+        "Product Maturation Lane",
+        "Independent Review",
+        "Health Reconciler",
+        "private release-readiness",
+        "persisted slice/revision counters",
+        "deterministic selection order",
+        "Never delete a lock from TTL alone",
+    ]:
+        check(phrase in lifecycle, f"lifecycle-and-health.md missing: {phrase}", failures)
+    approval_policy = read_text(root / "references/approval-policy.md")
+    check("private/internal remote" in approval_policy, "approval-policy.md missing qualified private/internal push rule", failures)
+    check("Public remote" in approval_policy, "approval-policy.md missing public remote security-approve rule", failures)
 
     batch = read_text(root / "references/batch-refinement.md")
     for phrase in ["Three-Pass Rubber-Duck Loop", "passCount", "SQLite", "Stop Conditions"]:
@@ -118,6 +137,8 @@ def main() -> int:
         failures.append(f"factory-state.sqlite.sql invalid SQLite schema: {exc}")
     for table_name in ["runs", "items", "tasks", "claims", "reviews", "artifacts", "outcomes", "pipeline_log"]:
         check(f"CREATE TABLE IF NOT EXISTS {table_name}" in sqlite_schema, f"SQLite schema missing table: {table_name}", failures)
+    for claim_field in ["run_id", "heartbeat_at", "expires_at"]:
+        check(claim_field in sqlite_schema, f"SQLite claims missing field: {claim_field}", failures)
 
     setup = read_text(root / "references/workspace-setup.md")
     for surface in [
@@ -154,9 +175,19 @@ def main() -> int:
     ]:
         check(field in adapter, f"factory-state.json missing runtime.adapter.{field}", failures)
     check("outputs" in task, "task.json missing outputs", failures)
+    for claim_field in ["claimRunId", "claimHeartbeatAt", "claimExpiresAt"]:
+        check(claim_field in task, f"task.json missing claim field: {claim_field}", failures)
     answering_policy = dashboard_state.get("answeringPolicy", {}) if isinstance(dashboard_state, dict) else {}
     check(answering_policy.get("useDashboardFirst") is True, "dashboard-state.json missing answeringPolicy.useDashboardFirst=true", failures)
-    for field in ["executiveSummary", "workflows", "queues", "risksAndBlockers", "nextActions"]:
+    for field in [
+        "executiveSummary",
+        "workflows",
+        "queues",
+        "risksAndBlockers",
+        "nextActions",
+        "portfolioPromotion",
+        "productMaturation",
+    ]:
         check(field in dashboard_state, f"dashboard-state.json missing {field}", failures)
     automation_policy = dashboard_state.get("automationPolicy", {}) if isinstance(dashboard_state, dict) else {}
     check("allowedWithReviewerAndQueueGate" in automation_policy, "dashboard-state.json missing reviewer/queue autonomy policy", failures)
@@ -173,6 +204,8 @@ def main() -> int:
             if isinstance(task_id, str):
                 first_ids.add(task_id)
             check(task_item.get("assignee") is None, f"first-run task {task_id} should keep assignee null for surface portability", failures)
+            for claim_field in ["claimRunId", "claimHeartbeatAt", "claimExpiresAt"]:
+                check(claim_field in task_item, f"first-run task {task_id} missing claim field: {claim_field}", failures)
             constraints = task_item.get("constraints")
             check(isinstance(constraints, list) and len(constraints) >= 3, f"first-run task {task_id} should include safety constraints", failures)
             for required_constraint in ["no login", "no payment", "no personal data", "no external publishing"]:
@@ -238,6 +271,8 @@ def main() -> int:
 
     for path in root.rglob("*"):
         if path.is_file() and path.suffix.lower() in {".md", ".json", ".py"}:
+            if path.resolve() == Path(__file__).resolve():
+                continue
             text = read_text(path)
             if ABSOLUTE_PATH_PATTERN.search(text):
                 failures.append(f"machine-specific absolute path in {path.relative_to(root)}")

@@ -49,7 +49,7 @@ Rules:
 - Auto-skip tasks that require manual play, GUI-only judgment, legal/risk acceptance, publishing, payment, account creation, secrets, personal data, or long-running work.
 - Before rewriting JSON array state files, create backups, parse the original, rewrite the full array, parse the result, and restore backup on failure.
 - Use an append-only JSONL pipeline log for audit records.
-- Use a short-lived lock file or equivalent lease; if the lock is still valid, skip and log a no-op.
+- Acquire a short-lived lock atomically with create-new/O_EXCL semantics, or use a transactional equivalent lease; never test-then-create. If the lock is still valid, skip and log a no-op.
 - Mark a task done only when its artifact contains evidence that the success metric was met; otherwise leave it pending or blocked.
 
 ## Cadence Defaults

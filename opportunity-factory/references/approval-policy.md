@@ -9,7 +9,7 @@ Opportunity-factory は AUTO 既定。AI が自律で回し、人間承認は **
 以下は AUTO / FULL / ALL いずれでも承認不要:
 
 - Workspace 内 file 読取・作成・編集
-- Workspace 内 git commit / push (visibility 問わない)
+- Workspace 内 git commit、および setup で承認済みの既存 private/internal remote への push
 - Secret / `.env` / `secrets/` / OS keyring / env var の **読取と使用**
 - Reversible な操作 (git branch 追加、backup 済み削除、cache clear、tmp 削除)
 - LLM 呼び出し・prompt 実行・skill 呼び出し
@@ -25,6 +25,7 @@ Opportunity-factory は AUTO 既定。AI が自律で回し、人間承認は **
 - 新規サービスへの login / account 作成 (paid / free 問わず)
 - 有料 subscription 申込・課金契約 (金銭発生シナリオはここに集約)
 - External publish: Marketplace / npm / PyPI / SNS post / blog 公開 / public issue 起票 / public PR 作成
+- Public remote への git push、または remote visibility / destination が未確認の push
 - Personal data の外部送信
 - 法的リスク (他人の著作物 upload、規約違反 scraping 等)
 - 不可逆 broadcast (一斉メール、public 通知)

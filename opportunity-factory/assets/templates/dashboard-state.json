@@ -39,6 +39,24 @@
     "verification": "<platform verification status>",
     "blockedReason": null
   },
+  "portfolioPromotion": {
+    "status": "not_configured|waiting|active|blocked",
+    "wipLimit": 1,
+    "currentWip": null,
+    "stage": null,
+    "pendingQueuePath": "<path>",
+    "doneQueuePath": "<path>"
+  },
+  "productMaturation": {
+    "status": "not_configured|waiting_for_go|active|private_release_ready|blocked",
+    "wipLimit": 1,
+    "currentWip": null,
+    "stage": null,
+    "implementationSlicesCompleted": 0,
+    "maxImplementationSlices": 0,
+    "pendingQueuePath": "<path>",
+    "doneQueuePath": "<path>"
+  },
   "automationPolicy": {
     "approvedUnattendedAutomations": [],
     "allowedWithReviewerAndQueueGate": [
@@ -73,6 +91,12 @@
       "factory-state/tasks-pending.json",
       "factory-state/tasks-done.json",
       "factory-state/outcome-log.json",
+      "factory-state/portfolio-promotion-state.json",
+      "factory-state/portfolio-tasks-pending.json",
+      "factory-state/portfolio-tasks-done.json",
+      "factory-state/product-maturation-state.json",
+      "factory-state/product-tasks-pending.json",
+      "factory-state/product-tasks-done.json",
       "factory-state/pipeline-log.jsonl",
       "factory-state/artifacts/*.md"
     ],

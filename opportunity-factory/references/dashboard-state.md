@@ -31,6 +31,8 @@ Update the dashboard when a workflow:
 - changes schedule, cadence, limits, or workflow policy.
 - changes local prompt files or dashboard update contracts,
 - changes prototype/build verification state.
+- changes portfolio-promotion or product-maturation stage/WIP/counters,
+- changes private release-readiness status,
 
 ## Suggested Schema
 
@@ -48,6 +50,8 @@ Update the dashboard when a workflow:
   "workflows": [],
   "promptAssets": {},
   "prototypeLane": {},
+  "portfolioPromotion": {},
+  "productMaturation": {},
   "automationPolicy": {},
   "queues": {},
   "decisions": [],

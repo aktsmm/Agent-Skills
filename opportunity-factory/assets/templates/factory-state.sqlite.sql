@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS tasks (
 CREATE TABLE IF NOT EXISTS claims (
   task_id TEXT PRIMARY KEY REFERENCES tasks(id) ON DELETE CASCADE,
   claimed_by TEXT NOT NULL,
+  run_id TEXT REFERENCES runs(id) ON DELETE SET NULL,
   claimed_at TEXT NOT NULL,
+  heartbeat_at TEXT NOT NULL,
   expires_at TEXT NOT NULL,
   attempt_count INTEGER NOT NULL DEFAULT 1
 );

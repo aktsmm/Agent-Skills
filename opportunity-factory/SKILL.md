@@ -46,7 +46,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 2. **Rubber-duck the intent**
    前提、誰の痛みか、既存代替、最小検証、失敗条件を質問で露出させる。
 3. **Design the workspace loop**
-   ユーザーがテーマだけを与えた場合は、状態ファイル、dashboard、Top-N/portfolio、候補深掘り、週次 workflow review まで含む自走ループを設計する。
+   ユーザーがテーマだけを与えた場合は、状態ファイル、dashboard、Top-N/portfolio、候補深掘り、GO 後の product maturation、週次 workflow review、health reconciler まで含む自走ループを設計する。
 4. **Create the queue**
    作業を `discover|research|evaluate|design|build|review|track|learn` に分ける。
 5. **Produce artifacts**
@@ -63,7 +63,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - Advisory-only schedules are safe but too slow for a real factory; if the user expects progress, add at least one bounded mutating worker that writes one artifact and updates local state.
 - 複数 worker で回す場合は、discovery/research worker、build/decision worker、reporter-learner など役割を分け、各 run は 1 task / 1 artifact / 明示的 state 更新に制限する。
 - 小さい queue では commander/worker を別々にスケジュールせず、1本の single-cycle automation で `commander -> 1 worker -> reducer` を回してよい。ただし auto-eligible task、lock、JSON backup/parse validation が必須。
-- Mutating workers need duplicate-run prevention such as a short-lived lock file before they update queue or outcome state.
+- Mutating workers need atomic duplicate-run prevention using create-new/O_EXCL lock acquisition or a transactional lease; never use check-then-create before shared state updates.
 - Maintain a canonical dashboard/status state for future sessions and user status answers; every workflow that changes artifacts, queues, gates, portfolio ranking, blockers, or schedules must update it with backup + stale-write checks.
 - Add a workflow-review loop as a first-class workflow for self-improving factories; it reviews cadence, queue quality, Top-N replacements, dashboard drift, missing gates, and unsafe autonomy at a slower cadence than workers.
 - Portfolio factories need a Top-N state with explicit replacement rules; do not grow candidate lists forever, and do not replace an incumbent without comparative evidence and reviewer critique.
@@ -71,6 +71,8 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - When a selected task hits an approval boundary, record it as blocked with the exact approval needed, then run or create one safe fallback task instead of stalling the factory.
 - Do not rely on chat history for factory state; write a README/resume contract that tells future sessions which state, queue, outcome, log, and artifact files to read first.
 - Keep prototype/build lanes in the same factory when the user wants end-to-end production, but gate source generation on a structured candidate-level `continue` decision plus an MVP boundary artifact.
+- End-to-end factories need an explicit post-GO maturation lane to private release-readiness; do not let automation stop at graybox GO or silently cross into public release.
+- Add a bounded health reconciler for JSON/dashboard/prompt/schedule/lock drift; it may auto-repair reversible local drift but must not change criteria, decisions, approval boundaries, or cadence.
 - If the current host cannot build-verify the target platform, mark generated code as compile-oriented and verification-blocked; never report it as built, running, or tested without a platform verification artifact.
 - 指標は実測、推定、仮説を明示して混ぜない。
 - 課金、ログイン、外部公開、個人情報、法的リスクは人間承認の境界にする。
@@ -101,7 +103,7 @@ Rubber Duck / Factory Plan / Workspace Setup / Self-Designing Workspace Setup / 
 ## References
 
 - **AI-Autonomous 基盤**: [rubber-duck-review.md](references/rubber-duck-review.md) (Layer 1/2/3 + Layer 3 SSOT) / `approval-policy.md` / `fallback-lane.md` / `persistence-profile.md` / `tunable-defaults.md` / `runtime-modes.md` (ai-autonomous preset)
-- **Workflow / Setup**: [workflow.md](references/workflow.md) / `workspace-setup.md` / `self-designing-factory.md` / `battle-tested-patterns.md` / `prompt-self-improvement.md` / `batch-refinement.md` / `sqlite-state-store.md`
+- **Workflow / Setup**: [workflow.md](references/workflow.md) / `workspace-setup.md` / `self-designing-factory.md` / `lifecycle-and-health.md` / `battle-tested-patterns.md` / `prompt-self-improvement.md` / `batch-refinement.md` / `sqlite-state-store.md`
 - **State**: `dashboard-state.md` / `assets/templates/dashboard-state.json` / `assets/templates/factory-state.json` / `assets/templates/factory-state.sqlite.sql` / `assets/templates/first-run-queue.json` / `assets/templates/task.json` / `assets/templates/artifact.md`
 - **Prompts**: `assets/prompts/commander.md` / `assets/prompts/worker.md` / `assets/prompts/reporter-learner.md`
 - **Scripts**: `scripts/validate_factory_skill.py` / `scripts/init_factory_workspace.py` / `scripts/init_factory_sqlite.py` / `scripts/smoke_test_initializers.py`
@@ -120,6 +122,8 @@ Rubber Duck / Factory Plan / Workspace Setup / Self-Designing Workspace Setup / 
 - Self-improving factories include a scheduled or manual workflow-review loop
 - Prompt self-improvements are workspace-local, evidenced by an artifact, reversible, and dashboard-recorded
 - Portfolio factories define Top-N capacity, replacement criteria, and demotion/watchlist/rejected states
+- End-to-end factories define promotion and post-GO maturation stages through private release-readiness, with WIP/slice/retry caps and independent review
+- A health reconciler detects state/prompt/schedule drift and repairs only reversible local inconsistencies
 - If scheduled progress is expected, at least one safe mutating worker exists; advisory-only automation is called out as intentionally slow
 - Approval-boundary blockers do not empty the run: the runtime records the blocker and keeps at least one safe fallback lane available
 - Future sessions can resume from durable state files without reading the original chat transcript

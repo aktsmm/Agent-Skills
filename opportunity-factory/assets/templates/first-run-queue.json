@@ -21,7 +21,10 @@
         "no external publishing"
       ],
       "claimedBy": null,
+      "claimRunId": null,
       "claimedAt": null,
+      "claimHeartbeatAt": null,
+      "claimExpiresAt": null,
       "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
       "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
       "outputs": {
@@ -50,7 +53,10 @@
         "no external publishing"
       ],
       "claimedBy": null,
+      "claimRunId": null,
       "claimedAt": null,
+      "claimHeartbeatAt": null,
+      "claimExpiresAt": null,
       "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
       "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
       "outputs": {
@@ -79,7 +85,10 @@
         "no external publishing"
       ],
       "claimedBy": null,
+      "claimRunId": null,
       "claimedAt": null,
+      "claimHeartbeatAt": null,
+      "claimExpiresAt": null,
       "createdAt": "YYYY-MM-DDTHH:mm:ssZ",
       "updatedAt": "YYYY-MM-DDTHH:mm:ssZ",
       "outputs": {
