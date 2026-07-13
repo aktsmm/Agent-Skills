@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "provenance": "derivative",
+  "spdxId": "CC-BY-NC-SA-4.0",
+  "frontmatterLicense": "CC BY-NC-SA 4.0",
+  "profile": {
+    "id": "cc-by-nc-sa-4.0",
+    "registryVersion": 1,
+    "spdxId": "CC-BY-NC-SA-4.0",
+    "frontmatterLicense": "CC BY-NC-SA 4.0",
+    "evidenceFile": "LICENSE.txt",
+    "templateSha256": "478789e7e4f6ca3584853509692d5a9334c7cb2bb0c2e8b89d81d18223d7554a",
+    "requiresAuthorAttribution": true
+  },
+  "authorAttribution": {
+    "value": "aktsmm"
+  },
+  "evidence": [
+    {
+      "path": "LICENSE.txt",
+      "sha256": "bf86839d4e7934ed73bf9e8dc86e469ffe49a4ac73f4579011cdbfba8e273a4a"
+    }
+  ],
+  "upstreamAttributions": [
+    {
+      "artifact": "export-session-log.prompt.md",
+      "author": "aktsmm",
+      "license": "CC-BY-NC-SA-4.0"
+    }
+  ],
+  "confirmationMode": "preserved-upstream"
+}
