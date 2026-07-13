@@ -27,7 +27,7 @@ if ($conn) {
 
 - Treat "port is open" and "right profile is logged in" as separate checks.
 - Do not trust an endpoint value from an environment variable or previous run without `/json/version` and process command-line verification.
-- When several CDP ports respond, do not pick the first open port blindly. Query `/json` on each candidate and prefer an endpoint that already has the target domain's admin/manage tab. If no endpoint is clearly tied to the target app, require an explicit `--cdp-url` / env override instead of guessing.
+- Before launching a new, `Default`, or copied profile, enumerate active CDP endpoints and known dedicated profiles. Query `/json` on each candidate; prefer one explicitly tied to the target workload or already showing the target domain, then verify its login state. Do not pick the first open port or assume `Default` is the right profile. If no candidate is verified, require an explicit profile choice or manual login before using a temporary copy.
 - If Chrome owns the intended Edge port, use another port or close Chrome before starting Edge.
 - If the same Edge user-data-dir already has a CDP port, launch another profile without `--remote-debugging-port`; the window joins the existing process and remains visible through the existing CDP endpoint.
 - If Edge is already running **without** any debug port, a new `--remote-debugging-port` launch joins the existing portless process and the port never opens (`/json/version` keeps failing). Close all Edge processes first, then relaunch with the port. Closing all Edge is destructive (drops every open tab), so confirm with the user before `Stop-Process -Name msedge`.
