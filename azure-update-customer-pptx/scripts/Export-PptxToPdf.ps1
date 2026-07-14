@@ -2,8 +2,8 @@
 .SYNOPSIS
     Export-PptxToPdf.ps1 - 既存 PPTX を PDF に変換
 .DESCRIPTION
-    対象 PPTX が既に PowerPoint で開かれていればその Presentation を再利用し、
-    開かれていなければ read-only で開いて PDF を出力する。
+    入力PPTXをローカル一時コピーへ複製し、そのコピーをread-onlyで開いてPDFを出力する。
+    正規PPTXをPowerPointへ渡さず、出力前後にOpenXML形式とSHA-256不変を検証する。
 .PARAMETER PptxPath
     入力 PPTX パス
 .PARAMETER PdfPath
@@ -43,10 +43,28 @@ $fullPdfPath = if ($PdfPath) {
     [System.IO.Path]::ChangeExtension($fullPptxPath, ".pdf")
 }
 
+$canonicalHash = $null
+$tempPptxPath = $null
 $app = $null
 $pres = $null
-$ownsSession = $false
-$openedHere = $false
+
+function Test-OpenXmlPptx {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $stream = [System.IO.File]::Open($Path, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+    try {
+        $archive = [System.IO.Compression.ZipArchive]::new($stream, [System.IO.Compression.ZipArchiveMode]::Read, $false)
+        $archive.Dispose()
+        return $true
+    } catch {
+        return $false
+    } finally {
+        $stream.Dispose()
+    }
+}
 
 function Test-PdfEncryption {
     param(
@@ -59,23 +77,25 @@ function Test-PdfEncryption {
 }
 
 try {
-    $app = Get-ActivePptxApplication
-    if (-not $app) {
-        $app = New-PptxSession
-        $ownsSession = $true
+    if (-not (Test-OpenXmlPptx -Path $fullPptxPath)) {
+        throw "正規PPTXが有効なOpenXML ZIPではありません: $fullPptxPath"
     }
+    $canonicalHash = (Get-FileHash -LiteralPath $fullPptxPath -Algorithm SHA256).Hash
 
-    $pres = Find-OpenPptxPresentation -Application $app -PptxPath $fullPptxPath
-    if ($pres) {
-        Write-Info "開いている PPTX を再利用して PDF 出力します"
-    } else {
-        Write-Info "PPTX を read-only で開いて PDF 出力します"
-        $pres = $app.Presentations.Open($fullPptxPath, $true, $false, $false)
-        $openedHere = $true
+    $tempDirectory = Join-Path ([System.IO.Path]::GetTempPath()) "azure-update-pdf"
+    New-Item -ItemType Directory -Force -Path $tempDirectory | Out-Null
+    $tempPptxPath = Join-Path $tempDirectory ("$([System.IO.Path]::GetFileNameWithoutExtension($fullPptxPath))-$([guid]::NewGuid().ToString())$([System.IO.Path]::GetExtension($fullPptxPath))")
+    Copy-Item -LiteralPath $fullPptxPath -Destination $tempPptxPath -Force
+    if (-not (Test-OpenXmlPptx -Path $tempPptxPath)) {
+        throw "ローカルPDF出力コピーが有効なOpenXML ZIPではありません: $tempPptxPath"
     }
+    Write-Info "ローカル一時コピーをread-onlyで開いて PDF 出力します"
 
-    if (Test-Path $fullPdfPath) {
-        Remove-Item $fullPdfPath -Force
+    $app = New-PptxSession
+    $pres = $app.Presentations.Open($tempPptxPath, $true, $false, $false)
+
+    if (Test-Path -LiteralPath $fullPdfPath) {
+        Remove-Item -LiteralPath $fullPdfPath -Force
     }
 
     $pres.SaveAs($fullPdfPath, 32)
@@ -97,6 +117,12 @@ try {
         }
         Write-Warning $message
     }
+    if ((Get-FileHash -LiteralPath $fullPptxPath -Algorithm SHA256).Hash -ne $canonicalHash) {
+        throw "PDF出力中に正規PPTXが変更されました: $fullPptxPath"
+    }
+    if (-not (Test-OpenXmlPptx -Path $fullPptxPath)) {
+        throw "PDF出力後の正規PPTXが有効なOpenXML ZIPではありません: $fullPptxPath"
+    }
 
     Write-Success "PDF 出力完了: $fullPdfPath ($($pdfFile.Length) bytes)"
 
@@ -108,7 +134,7 @@ try {
     exit 1
 } finally {
     try {
-        if ($pres -and $openedHere) {
+        if ($pres) {
             $pres.Close()
         }
     } catch {}
@@ -120,8 +146,14 @@ try {
     } catch {}
 
     try {
-        if ($app -and $ownsSession) {
+        if ($app) {
             $app.Quit()
+        }
+    } catch {}
+
+    try {
+        if ($tempPptxPath -and (Test-Path -LiteralPath $tempPptxPath)) {
+            Remove-Item -LiteralPath $tempPptxPath -Force
         }
     } catch {}
 
