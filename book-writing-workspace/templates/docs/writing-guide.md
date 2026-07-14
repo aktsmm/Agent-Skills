@@ -34,11 +34,12 @@ scripts/            # Utility scripts
 
 ## Reference Documents
 
-| File                                                                                                 | Content           |
-| ---------------------------------------------------------------------------------------------------- | ----------------- |
-| [writing.instructions.md](../.github/instructions/writing/writing.instructions.md)                   | Style rules       |
-| [writing-notation.instructions.md](../.github/instructions/writing/writing-notation.instructions.md) | Notation rules    |
-| [writing-heading.instructions.md](../.github/instructions/writing/writing-heading.instructions.md)   | Heading levels    |
-| [naming-conventions.md](naming-conventions.md)                                                       | File naming       |
-| [page-allocation.md](page-allocation.md)                                                             | Word counts       |
-| [AGENTS.md](../AGENTS.md)                                                                            | Agent definitions |
+| File                                                                                                 | Content              |
+| ---------------------------------------------------------------------------------------------------- | -------------------- |
+| [writing.instructions.md](../.github/instructions/writing/writing.instructions.md)                   | Style rules          |
+| [writing-notation.instructions.md](../.github/instructions/writing/writing-notation.instructions.md) | Notation rules       |
+| [writing-heading.instructions.md](../.github/instructions/writing/writing-heading.instructions.md)   | Heading levels       |
+| [reader-personas.md](reader-personas.md)                                                             | Default persona SSOT |
+| [naming-conventions.md](naming-conventions.md)                                                       | File naming          |
+| [page-allocation.md](page-allocation.md)                                                             | Word counts          |
+| [AGENTS.md](../AGENTS.md)                                                                            | Agent definitions    |

@@ -6,13 +6,13 @@ Source: `region-stamp.instructions.md`. **SSOT** — this definition must match 
 
 ## Stamp types and colors
 
-| Type | Text | Background (RGB) | Use |
-| --- | --- | --- | --- |
-| グローバル | `グローバル` | green `#00B050` | all regions (retirements etc.) |
-| 日本リージョン未対応 | `日本リージョン未対応` | blue `#005EB8` | neither Japan East nor West |
-| Japan East のみ | `Japan East のみ対応` | light blue `#0078D4` | Japan East only |
-| Japan West のみ | `Japan West のみ対応` | light blue `#0078D4` | Japan West only |
-| Japan East / West 対応 | `Japan East / West 対応` | cyan `#00B0F0` | both |
+| Type                   | Text                     | Background (RGB)     | Use                            |
+| ---------------------- | ------------------------ | -------------------- | ------------------------------ |
+| グローバル             | `グローバル`             | green `#00B050`      | all regions (retirements etc.) |
+| 日本リージョン未対応   | `日本リージョン未対応`   | blue `#005EB8`       | neither Japan East nor West    |
+| Japan East のみ        | `Japan East のみ対応`    | light blue `#0078D4` | Japan East only                |
+| Japan West のみ        | `Japan West のみ対応`    | light blue `#0078D4` | Japan West only                |
+| Japan East / West 対応 | `Japan East / West 対応` | cyan `#00B0F0`       | both                           |
 
 ## Placement
 
@@ -27,10 +27,10 @@ Source: `region-stamp.instructions.md`. **SSOT** — this definition must match 
 
 ## 🔴 Offer Availability vs Deploy Region (critical)
 
-| Concept | Meaning | Use for region? |
-| --- | --- | --- |
-| Offer Availability (purchasable countries) | where you can buy/contract the service | ❌ never |
-| Deploy Region | where the resource is actually deployed | ✅ judge by this |
+| Concept                                    | Meaning                                 | Use for region?  |
+| ------------------------------------------ | --------------------------------------- | ---------------- |
+| Offer Availability (purchasable countries) | where you can buy/contract the service  | ❌ never         |
+| Deploy Region                              | where the resource is actually deployed | ✅ judge by this |
 
 Watch: Azure AI Foundry / Azure OpenAI (judge by Hub/Project deploy region), Marketplace services
 (availability ≠ deploy region), Global Standard deployments (broad offer, limited deploy), Hybrid /
@@ -68,7 +68,8 @@ regions are listed (e.g. East US 2, Sweden Central), judge by those.
   "generatedBy": "Prepare Agent (初期判定)",
   "regions": {
     "スライドタイトル": {
-      "japanEast": true, "japanWest": false,
+      "japanEast": true,
+      "japanWest": false,
       "status": "Japan East のみ対応",
       "source": "https://learn.microsoft.com/...",
       "note": "Review Agent で再検証必要"
@@ -87,11 +88,17 @@ regions are listed (e.g. East US 2, Sweden Central), judge by those.
   "generatedBy": "Review Agent (MCP再検証)",
   "reviewNote": "全エントリをMCPで検証完了",
   "corrections": [
-    { "topic": "...", "originalStatus": "...", "correctedStatus": "...", "reason": "..." }
+    {
+      "topic": "...",
+      "originalStatus": "...",
+      "correctedStatus": "...",
+      "reason": "..."
+    }
   ],
   "regions": {
     "スライドタイトル（完全一致キー）": {
-      "japanEast": true, "japanWest": false,
+      "japanEast": true,
+      "japanWest": false,
       "status": "Japan East のみ対応",
       "source": "https://learn.microsoft.com/...",
       "evidence": "Supported regions list: Japan East only",
@@ -116,4 +123,5 @@ Canonical `status` values: `グローバル` / `Japan East / West 対応` / `Jap
 4. Record `source` URL in `region_info_reviewed.json`.
 5. `evidence` required (concrete wording of the basis).
 6. No guessing — if unconfirmed in docs, use 日本リージョン未対応 (fail-safe).
-
+7. A delivery fallback is a completed review, not a guess: inspect the feature overview plus one region, limitations, or what's-new source; record the checked URLs and the absent Japan evidence in `evidence`, then set `verified: true`. `verified: false` is interim and cannot ship.
+8. Keep the raw slide title as the JSON key. At the COM boundary, normalize line breaks, vertical tabs, and whitespace only to resolve one unique key; reject ambiguous matches rather than silently using a partial title.

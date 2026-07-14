@@ -120,6 +120,7 @@ Ad hoc の `_update_agenda.py` を毎回書くのはあり (1 回で捨てる想
 - Before rebuilding a deck, pick one canonical output filename. Do not keep producing `backup`, `clean`, `formatted`, `final`, and PDF variants in parallel.
 - Keep source content in a separate Markdown/JSON draft until the story is stable. Then generate one working PPTX and iterate on that file only.
 - If a template-derived output becomes visually corrupt, create one new template-based working copy and retire the failed variant. Do not stack more fixes on multiple partially failed decks.
+- For COM builds that copy a template to a temporary PPTX, use a unique GUID/timestamp filename per run. A fixed working filename can be reopened from stale Office state and append a second body-slide set. Before copying the validated build to its canonical path, count `ppt/slides/slide*.xml` in the ZIP and require the expected count.
 - Rendered QA artifacts such as PDF, PNG contact sheets, and temporary scripts are transient. Delete them before handoff unless the user explicitly asks to keep evidence.
 - When COM hangs while setting hyperlink `ActionSettings`, keep visible URLs in the deck and apply hyperlinks in a separate small post-processing pass.
 
@@ -188,27 +189,31 @@ Loop:
 - **shape 差分 diff**: v01 と v02 で `[(sh.name, sh.left, sh.top) for sh in s.shapes]` を比較すると、何が消えた/追加されたかが構造レベルで分かる。目視ミスの二重チェックに有効
 - **build script / 素材フォルダ は intermediate ではなく infrastructure**。cleanup 時に `_v0N_analyze.pptx` / スクショフォルダ / analyze スクリプトは消してよいが、`build_deck.py` と `appendix-images/` (または同等の素材フォルダ) は再ビルドに必須なので削除対象から除外する。user から「中間生成物を消して」指示が来ても、これらは infrastructure として保護する
 - **PowerPoint COM の PNG export は `slide.Export(path, "PNG", W, H)` を優先**。`Presentation.Export(dir, "PNG", W, H)` は環境によって出力ファイル形式が想定と異なる (Slide1.PNG などにならず失敗するケース)。特定 slide だけ抽出するときも、prs.Slides(idx).Export(path, "PNG", 1600, 900) の per-slide 呼び出しの方が安定
+- **レンダー鮮度と構造を先に確定**: render directory は各buildで新規作成または空にしてから使う。古いPNGを再利用すると、修正前の見た目で判断してしまう。PNG export前に ZIP内の `ppt/slides/slide*.xml` 数を期待枚数と比較し、重複/欠落を止める
 - **builder リストの重複検出**: `builders = [s01, s02, ..., sNN]` のような slide builder 関数の list で、同じ関数が 2 回登場すると slide が重複生成される。build 直前に `assert len(set(builders)) == len(builders)` する。手動編集で関数追加した後に重複しやすい (symptom: 想定より 1 slide 多い、参考リンクが 2 枚並ぶ 等)
 - **refurl / footer と本文の衝突を機械的に検出**: RefURL box の top を定数化 (例: `REFURL_TOP = Inches(6.15)`) し、各 slide の add_body_textbox() 呼び出し引数で `top + height <= REFURL_TOP - Inches(0.15)` を assert する。python-pptx は auto shrink しないので、本文が 6.15in を超えると refurl と物理的に重なる。symptom は開いた時に「参考 URL の上に本文が被る / 本文の中に URL が食い込む」
-- **PowerPoint COM crash 後の pptx は viewProps に masterView が残る** → 次に開いた時にスライドマスタービューで開いてしまう。python-pptx で save する build script では、save 直前に `viewProps.xml` を Normal View (sldView) + slide 1 に強制する `force_normal_view(prs)` helper を必ず呼ぶ:
+- **PowerPoint COM crash 後の pptx は `viewProps.xml` に `lastView="sldMasterView"` が残る** → 次に開いた時にスライドマスター表示で開く。`viewProps.xml` 全体を既定XMLで置き換えると、既存の notes / grid / namespace 情報を壊し、PowerPoint の修復ダイアログを出すことがある。既存XMLを保持し、`lastView` 属性だけを `sldView` に変更する:
 
   ```python
-  VIEWPROPS_NORMAL = b'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  <p:viewPr xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-            xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" lastView="sldView">
-    <p:normalViewPr showOutlineIcons="0"/>
-    <p:slideViewPr><p:cSldViewPr snapToGrid="0"><p:cViewPr varScale="1"><p:scale><a:sx n="72" d="100"/><a:sy n="72" d="100"/></p:scale><p:origin x="0" y="0"/></p:cViewPr><p:guideLst/></p:cSldViewPr></p:slideViewPr>
-  </p:viewPr>'''
+  import re
 
   def force_normal_view(prs):
       for rel in prs.part.rels.values():
-          if rel.reltype.endswith("viewProps"):
-              rel.target_part._blob = VIEWPROPS_NORMAL
-              return
+          if not rel.reltype.endswith("viewProps"):
+              continue
+          original = rel.target_part.blob.decode("utf-8")
+          updated, count = re.subn(
+              r'lastView="[^"]*"', 'lastView="sldView"', original, count=1
+          )
+          if count == 0:
+              updated = re.sub(
+                  r'(<p:viewPr\b)', r'\1 lastView="sldView"', original, count=1
+              )
+          rel.target_part._blob = updated.encode("utf-8")
+          return
   ```
 
-  viewProps part が無いテンプレでも問題なし (PowerPoint が既定で Normal を選ぶ)。symptom: 生成した pptx を PowerPoint で開くと最初にスライドマスター編集画面が出る。原因の pptx 履歴は前 build で COM が中断した場合や、外部ツールが view state を書き換えた場合に発生する
+  `viewProps` part が無ければ追加せず、そのままにする。更新後は ZIP として読めること、`lastView="sldView"` が残ること、PowerPoint が修復なしで read-only open できることを確認してから handoff する。COM で表示状態を保存しても、テンプレートやクラッシュ由来の view state を確実に直せない場合がある。
 
 ## Section Headers (Slide Sorter Groups)
 

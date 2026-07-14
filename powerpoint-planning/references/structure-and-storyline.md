@@ -17,6 +17,14 @@ Use this reference when shaping the deck before writing slide details.
 
 If the request is vague, propose 2-3 storyline options and help the user choose.
 
+## Experience-Based Narrative Gate
+
+For a deck built around an experience, incident, or failure, confirm whether the case itself is the primary narrative before leading with concepts. If it is, preserve this causal flow and prioritize a user-specified form such as `起承転結`:
+
+- Normal context -> event or turning point -> response and decisions -> outcome -> reusable practice
+- Before detailed slide planning, rubber-duck whether the audience can follow what happened, who responded, why the response mattered, and what to do differently next time.
+- When details must be anonymized, retain enough context and causality for the lesson to remain credible; label or omit unsupported specifics.
+
 ## Source Classification
 
 Classify each input as one of:

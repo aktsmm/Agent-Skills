@@ -15,6 +15,7 @@ Usage:
 
 import argparse
 import shutil
+import sys
 from pathlib import Path
 from typing import List
 
@@ -23,6 +24,58 @@ SCRIPT_DIR = Path(__file__).parent
 SKILL_DIR = SCRIPT_DIR.parent
 TEMPLATES_DIR = SKILL_DIR / "templates"
 ASSETS_DIR = SKILL_DIR / "assets"
+
+CORE_TEMPLATE_SOURCES = (
+    "agents/writing.agent.md",
+    "agents/writing-reviewer.agent.md",
+    "instructions/writing.instructions.md",
+    "instructions/writing-heading.instructions.md",
+    "instructions/writing-notation.instructions.md",
+    "docs/writing-guide.md",
+    "docs/reader-personas.md",
+    "docs/naming-conventions.md",
+    "docs/page-allocation.md",
+    "docs/schedule.md",
+    "docs/templates/template-chapter-intro.md",
+    "docs/templates/template-section.md",
+    "copilot-instructions.md",
+    "AGENTS.md",
+    "README.md",
+)
+REVIEW_TEMPLATE_SOURCES = (
+    "agents/converter.agent.md",
+    "custom-titlepage.tex",
+    "review-ext.rb",
+    "sty/review-custom.sty",
+    "sty/review-style.sty",
+    "review-metadata/common.yml",
+    "review-metadata/project.yml",
+)
+CORE_SCRIPT_SOURCES = ("count_chars.py",)
+REVIEW_SCRIPT_SOURCES = (
+    "convert_md_to_review.py",
+    "build_review_pdf.py",
+    "inspect_pdf.py",
+    "review_metadata.py",
+)
+ASSET_SOURCES = (".gitignore",)
+
+
+def configure_console_output() -> None:
+    """Avoid UnicodeEncodeError when the Windows console uses cp932."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="backslashreplace")
+
+
+def missing_sources(include_review: bool) -> list[Path]:
+    """Return required source assets that are missing before any mutation."""
+    template_sources = CORE_TEMPLATE_SOURCES + (REVIEW_TEMPLATE_SOURCES if include_review else ())
+    script_sources = CORE_SCRIPT_SOURCES + (REVIEW_SCRIPT_SOURCES if include_review else ())
+    required = [*(TEMPLATES_DIR / source for source in template_sources)]
+    required.extend(TEMPLATES_DIR / "scripts" / source for source in script_sources)
+    required.extend(ASSETS_DIR / source for source in ASSET_SOURCES)
+    return [path for path in required if not path.is_file()]
 
 
 def create_directory_structure(
@@ -67,7 +120,7 @@ def create_directory_structure(
     # Create all directories
     for dir_path in dirs:
         (base_path / dir_path).mkdir(parents=True, exist_ok=True)
-        print(f"  ✅ Created: {dir_path}")
+        print(f"  [OK] Created: {dir_path}")
 
 
 def copy_template_files(base_path: Path, book_title: str, include_review: bool = False) -> None:
@@ -81,6 +134,7 @@ def copy_template_files(base_path: Path, book_title: str, include_review: bool =
         "instructions/writing-heading.instructions.md": ".github/instructions/writing/writing-heading.instructions.md",
         "instructions/writing-notation.instructions.md": ".github/instructions/writing/writing-notation.instructions.md",
         "docs/writing-guide.md": "docs/writing-guide.md",
+        "docs/reader-personas.md": "docs/reader-personas.md",
         "docs/naming-conventions.md": "docs/naming-conventions.md",
         "docs/page-allocation.md": "docs/page-allocation.md",
         "docs/schedule.md": "docs/schedule.md",
@@ -102,9 +156,9 @@ def copy_template_files(base_path: Path, book_title: str, include_review: bool =
             content = content.replace("{{BOOK_TITLE}}", book_title)
             content = content.replace("{{PROJECT_PATH}}", str(base_path))
             dst_path.write_text(content, encoding="utf-8")
-            print(f"  ✅ Created: {dst}")
+            print(f"  [OK] Created: {dst}")
         else:
-            print(f"  ⚠️ Template not found: {src}")
+            print(f"  [WARN] Template not found: {src}")
 
     review_templates = {}
     if include_review:
@@ -126,9 +180,9 @@ def copy_template_files(base_path: Path, book_title: str, include_review: bool =
             content = src_path.read_text(encoding="utf-8")
             content = content.replace("{{BOOK_TITLE}}", book_title)
             dst_path.write_text(content, encoding="utf-8")
-            print(f"  ✅ Created: {dst}")
+            print(f"  [OK] Created: {dst}")
         else:
-            print(f"  ⚠️ Template not found: {src}")
+            print(f"  [WARN] Template not found: {src}")
 
 
 def copy_scripts(base_path: Path, include_review: bool = False) -> None:
@@ -151,9 +205,9 @@ def copy_scripts(base_path: Path, include_review: bool = False) -> None:
         
         if src_path.exists():
             shutil.copy2(src_path, dst_path)
-            print(f"  ✅ Copied: scripts/{script}")
+            print(f"  [OK] Copied: scripts/{script}")
         else:
-            print(f"  ⚠️ Script not found: {script}")
+            print(f"  [WARN] Script not found: {script}")
 
 
 def copy_assets(base_path: Path) -> None:
@@ -169,9 +223,9 @@ def copy_assets(base_path: Path) -> None:
         
         if src_path.exists():
             shutil.copy2(src_path, dst_path)
-            print(f"  ✅ Copied: {dst}")
+            print(f"  [OK] Copied: {dst}")
         else:
-            print(f"  ⚠️ Asset not found: {src}")
+            print(f"  [WARN] Asset not found: {src}")
 
 
 def create_chapter_intro_files(
@@ -214,10 +268,11 @@ def create_chapter_intro_files(
 """
         contents_file.write_text(contents_content, encoding="utf-8")
     
-    print(f"  ✅ Created chapter intro files for {len(chapters)} chapters")
+    print(f"  [OK] Created chapter intro files for {len(chapters)} chapters")
 
 
 def main():
+    configure_console_output()
     parser = argparse.ArgumentParser(
         description="Set up a book writing workspace"
     )
@@ -293,11 +348,18 @@ def main():
     # Resolve options
     include_review = args.include_review
     include_materials = args.include_materials
+
+    missing = missing_sources(include_review)
+    if missing:
+        print("[ERROR] Required setup sources are missing:")
+        for path in missing:
+            print(f"  - {path}")
+        return 1
     
     # Create base path
     base_path = Path(args.path) / args.name
     
-    print(f"\n📚 Setting up Book Writing Workspace")
+    print(f"\nSetting up Book Writing Workspace")
     print(f"   Project: {args.name}")
     print(f"   Title: {args.title}")
     print(f"   Location: {base_path}")
@@ -308,32 +370,33 @@ def main():
     
     # Check if directory exists
     if base_path.exists():
-        print(f"❌ Error: Directory already exists: {base_path}")
+        print(f"[ERROR] Directory already exists: {base_path}")
         return 1
     
     # Create workspace
-    print("📁 Creating directory structure...")
+    print("Creating directory structure...")
     create_directory_structure(base_path, chapters, include_review, include_materials)
     
-    print("\n📄 Creating template files...")
+    print("\nCreating template files...")
     copy_template_files(base_path, args.title, include_review)
     
-    print("\n📜 Copying utility scripts...")
+    print("\nCopying utility scripts...")
     copy_scripts(base_path, include_review)
     
-    print("\n📦 Copying asset files...")
+    print("\nCopying asset files...")
     copy_assets(base_path)
     
-    print("\n✏️ Creating chapter intro files...")
+    print("\nCreating chapter intro files...")
     create_chapter_intro_files(base_path, chapters)
     
-    print(f"\n✅ Workspace created successfully at: {base_path}")
-    print("\n📋 Next steps:")
+    print(f"\n[OK] Workspace created successfully at: {base_path}")
+    print("\nNext steps:")
     print(f"   1. cd \"{base_path}\"")
     print(f"   2. code \"{base_path}\"")
-    print("   3. Edit docs/page-allocation.md to set word count targets")
-    print("   4. Start writing in keypoints/")
-    print("   5. Follow your repository's existing Git workflow when saving changes")
+    print("   3. Replace placeholders in docs/reader-personas.md")
+    print("   4. Edit docs/page-allocation.md to set word count targets")
+    print("   5. Start writing in keypoints/")
+    print("   6. Follow your repository's existing Git workflow when saving changes")
     
     return 0
 

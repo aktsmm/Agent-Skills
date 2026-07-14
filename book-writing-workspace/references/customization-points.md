@@ -7,7 +7,8 @@ These files are expected to be edited immediately after workspace creation.
 | File                                 | Why edit it                                                                                    |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------- |
 | `README.md`                          | Describe the book scope, workflow, and repository usage                                        |
-| `.github/copilot-instructions.md`    | Define readers, goals, and project-specific constraints                                        |
+| `docs/reader-personas.md`            | Define the default primary reader, secondary readers, prior knowledge, and completion outcomes |
+| `.github/copilot-instructions.md`    | Define project goals, constraints, and the selected persona SSOT location                      |
 | `config/review-metadata/common.yml`  | Tune stable shared defaults such as cover palette and colophon defaults                        |
 | `config/review-metadata/project.yml` | Set project-specific metadata such as author list, publisher, title, subtitle, and cover badge |
 
@@ -15,6 +16,7 @@ These files are expected to be edited immediately after workspace creation.
 
 | File                                                            | Why edit it                                                         |
 | --------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `docs/reader-personas.md`                                       | Keep audience assumptions and review lenses book-specific           |
 | `docs/page-allocation.md`                                       | Set chapter and file-level character targets                        |
 | `docs/schedule.md`                                              | Replace placeholder milestones and track progress                   |
 | `docs/naming-conventions.md`                                    | Adjust file and image naming if the team uses a different scheme    |

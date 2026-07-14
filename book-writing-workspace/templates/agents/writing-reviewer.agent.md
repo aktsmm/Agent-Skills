@@ -94,6 +94,9 @@ Review Markdown files in `sections/` and provide prioritized improvement suggest
 
 ### Content
 
+- [ ] The selected persona SSOT's primary reader, prior knowledge, and completion outcome are reflected
+- [ ] Explanation depth matches the chapter's role for the primary persona
+- [ ] Advanced details are deferred instead of interrupting the main flow
 - [ ] Technical accuracy verified
 - [ ] Terms explained on first use
 - [ ] Sources cited where needed
@@ -114,5 +117,6 @@ Review Markdown files in `sections/` and provide prioritized improvement suggest
 | File                                                   | Content            |
 | ------------------------------------------------------ | ------------------ |
 | `.github/instructions/writing/writing.instructions.md` | Style guide        |
+| `docs/reader-personas.md`                              | Default persona SSOT |
 | `docs/page-allocation.md`                              | Word count targets |
 | `docs/naming-conventions.md`                           | File naming        |

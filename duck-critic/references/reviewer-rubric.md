@@ -56,6 +56,11 @@ Ignore these unless they affect the outcome:
 - If files were not inspected, do not invent file references.
 - If the critic is uncertain, state what evidence would resolve the uncertainty.
 - Only report findings the critic is confident are real issues. Speculative "might be a problem" notes without concrete evidence should be omitted or downgraded to a Suggestion that names the open question.
+- Treat an explicit user statement about an action they performed as user-provided evidence and label that provenance; do not reject it only because the current harness log omits the action.
+- A search miss proves only that evidence was not found in the searched scope. Report that scope and check referenced workspaces, private artifacts, or user-provided evidence before classifying a claim as contradicted or nonexistent.
+- For multiple trials or collectors, preserve the run, method, unit, and marked symptom window; do not present cross-run values as one continuous experiment or as directly comparable metrics.
+- Require a candidate cause to align with symptom onset and duration. A later or isolated spike cannot explain an earlier, sustained failure without additional evidence.
+- Treat collection overhead as a confounder. Require a smoke test, baseline, or equivalent evidence before trusting measurements from a new collector.
 
 ## Output Discipline
 

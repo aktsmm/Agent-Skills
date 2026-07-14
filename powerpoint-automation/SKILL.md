@@ -103,6 +103,7 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 - **Rendered QA before handoff**: COM で開いている deck を直接 touch-up した後も、対象 deck から実レンダー画像を書き出し、重なり・フォントばらつき・表の可読性を個別 slide で確認する
 - **Review like a critic, not a generator**: ユーザーに見せる前に、レンダー画像で「スカスカ・文字が小さい・アイコンが雑・テンプレ踏襲不足・旧文言残り」を自分で探して直す。詳しくは [references/instructions/deck-iteration-review.instructions.md](references/instructions/deck-iteration-review.instructions.md)
 - **Media restore gate**: slide insertion/deletion/recovery after a user review must re-check expected slide count and embedded video/media positions before continuing
+- **Template base-slide gate**: テンプレートを複製して生成する場合は、保持する sample slide を先に明示し、不要な contact / next-event 等を構造編集で削除する。完了前に content manifest から導いた期待枚数、残存 placeholder、slide order を検証する
 - **Architecture diagrams use shapes**: ASCII art ではなく図形で組む
 - **Appendix URLs use Title - URL**: 参考 URL の表示形式は統一する
 - **Review content and visuals separately**: 生成後は見た目レビューだけでなく、公式情報との正確性レビュー、URL hyperlink 数、notes 数、placeholder/internal wording を確認する
@@ -130,6 +131,7 @@ Use [Implementation Patterns](references/IMPLEMENTATION_PATTERNS.md) for shape d
 - technical content は一次情報確認が済んでいる
 - operational text がスライド面に出ていない
 - template 利用時は単調な同一レイアウト反復と余剰 placeholder を確認している
+- テンプレートの保持/削除対象を含む期待スライド数と実際の slide set が一致している
 - visual QA はレンダー画像で行い、修正後に該当スライドを再確認している
 - 表は本文 16pt 以上を原則とし、header は中央揃え・中段揃えで視認性を確認している
 - build 後に overflow / consistency / hyperlink をレビューできている

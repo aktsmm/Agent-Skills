@@ -6,6 +6,14 @@ applyTo: "sections/**/*.md"
 
 Guidelines for manuscript writing style and quality.
 
+## Reader Persona
+
+- Read the workspace's declared reader-persona SSOT before drafting or reviewing a section. New workspaces use `docs/reader-personas.md`.
+- Optimize the main flow for the primary persona's prior knowledge, use context, and completion outcome.
+- Keep advanced settings, exceptions, and alternate procedures in the chapter where that persona actually needs them.
+- Secondary-persona examples may support the main flow but must not displace it.
+- If the selected persona SSOT still contains placeholders, define it before expanding manuscript prose.
+
 ## Style Rules
 
 ### Tone
@@ -18,8 +26,9 @@ Guidelines for manuscript writing style and quality.
 ### Terminology
 
 - Explain technical terms on first use
-- Format: Japanese (English) - e.g., 機密性（Confidentiality）
+- Format: Japanese（English） - e.g., 機密性（Confidentiality）
 - Use consistent terminology throughout
+- Establish the parent concept before introducing a subtype, exception, or limitation.
 
 ### Structure
 
@@ -65,6 +74,7 @@ Guidelines for manuscript writing style and quality.
 - If a section explains flow, direction, lifecycle, source/target movement, or hierarchy, plan a figure before expanding the prose.
 - Keep diagram intent explicit in the outline: note both the visual type and the reader takeaway.
 - Use tables for comparison and figures for flow; do not overload a table with process steps that belong in a diagram.
+- Keep one conceptual axis per table. Separate hierarchy or management units from account, membership, or role subtypes, then connect the two axes in prose.
 - When using a figure, add 1 to 2 sentences before or after it to tell the reader what to look at.
 
 ## Word Count Targets

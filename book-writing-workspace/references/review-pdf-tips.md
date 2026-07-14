@@ -59,8 +59,6 @@ printf '%s\n' \
   >> /work/sty/review-style.sty
 ```
 
-## Header/Footer Customization
-
 ## Chapter Number Duplication and Partial Build Renumbering
 
 ### Problem 1: Chapter Number Appears Twice
@@ -96,6 +94,8 @@ This is correct for the temporary partial catalog, but misleading for final numb
 
 Partial build output is useful for speed, but it can make a later chapter look like `Chapter 1`
 simply because the catalog was narrowed for debugging. Without an explicit rule, reviewers often misdiagnose the problem as a heading bug instead of a catalog-range effect.
+
+## Header/Footer Customization
 
 Custom headers and footers can be injected into `review-style.sty` using `fancyhdr`:
 
@@ -335,6 +335,7 @@ back into a space inside list items, causing long URLs to run across the page an
 - Put the title on the first line
 - Put the URL itself as a link on the next indented line
 - In the converter, emit an explicit line break before link-only continuation lines
+- Group multiple reader-facing references as separate Markdown list items; do not rely on adjacent prose lines to create visual separation
 
 Example manuscript form:
 
@@ -344,6 +345,10 @@ Example manuscript form:
 ```
 
 This keeps the title readable and prevents long URLs from relying on implicit line wrapping alone.
+
+### Verification
+
+After building the PDF, inspect the page where grouped references appear. A successful conversion does not prove that separate references remain visually distinct at the target page width and font size.
 
 ## Footnote ID Collisions Across Combined Markdown Files
 

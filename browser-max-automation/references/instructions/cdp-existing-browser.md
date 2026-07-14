@@ -23,10 +23,13 @@ if ($conn) {
   ConvertFrom-Json | Select-Object Browser
 ```
 
+If CDP startup may already be automated, inspect its owner before adding another startup path. On Windows, read the existing scheduled task's `Actions`, `Triggers`, principal, and settings first. For a time-only change, update only the trigger with `Set-ScheduledTask`, preserve the action/profile flags, then read the task back and verify `StartBoundary` and `Actions`.
+
 ## Rules
 
 - Treat "port is open" and "right profile is logged in" as separate checks.
 - Do not trust an endpoint value from an environment variable or previous run without `/json/version` and process command-line verification.
+- Treat a task-update command's success as provisional until `Get-ScheduledTask` read-back confirms the trigger and browser action. Distinguish retiming an existing owner from creating a new task.
 - Before launching a new, `Default`, or copied profile, enumerate active CDP endpoints and known dedicated profiles. Query `/json` on each candidate; prefer one explicitly tied to the target workload or already showing the target domain, then verify its login state. Do not pick the first open port or assume `Default` is the right profile. If no candidate is verified, require an explicit profile choice or manual login before using a temporary copy.
 - If Chrome owns the intended Edge port, use another port or close Chrome before starting Edge.
 - If the same Edge user-data-dir already has a CDP port, launch another profile without `--remote-debugging-port`; the window joins the existing process and remains visible through the existing CDP endpoint.

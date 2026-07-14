@@ -85,6 +85,7 @@ Pattern details: [references/workflow-patterns/overview.md](references/workflow-
 - 汎用的な workflow 設計原則は、この SKILL と `references/` を SSOT にする。
 - repo local の `.instructions.md` には workspace 固有の差分だけを残す。差分が無い generic instruction は merge back して削除候補にする。
 - IR は原則 in-memory で扱う。validator、script、deterministic handoff が必要な場合だけ中間 file を materialize し、不要になったら片付ける。
+- scheduler / service / config など決定論的な state mutation は、AI/UI loop ではなく direct script / API で現状確認 -> 最小変更 -> live read-back まで行う。LLM は scope と整合対象の判断に限定する。
 
 ## Escalation Rules
 
@@ -131,7 +132,7 @@ Lightweight inputs such as greetings, short Q&A, and numeric-only replies should
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early
 - [ ] Results are verifiable at each step
-- [ ] Deterministic parts are offloaded to scripts / IR / hooks (not LLM loops)
+- [ ] Deterministic parts are offloaded to scripts / IR / hooks, and state changes are confirmed by reading authoritative live state back (not LLM/UI loops)
 
 Full checklist: [references/review-checklist.md](references/review-checklist.md)
 

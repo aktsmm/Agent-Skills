@@ -20,7 +20,9 @@ Each `fetched-updates.json` item should carry both reference layers when possibl
 
 - `sourceUrl`: Azure Updates / Release Communications announcement URL.
 - `learnUrl`: closest Microsoft Learn or official Docs page for the underlying service feature, found through Microsoft Learn Docs MCP. Leave `null` only when no relevant first-party documentation exists after a targeted search.
-- Visible slides must label these roles explicitly: `詳細：Microsoft Learn` for `learnUrl`, and `発表：Azure Updates` for `sourceUrl`.
+- Visible slides must label these roles explicitly: `参考：Microsoft Learn（詳細）` for `learnUrl`, and `参考：Azure Updates（発表）` for `sourceUrl`. Never put `スピーカーノート参照` or a similar notes pointer on a visible slide.
+- Put the visible label in one dedicated reference shape (for example, `OfficialReference`) and set its shape-level `ActionSettings.Item(1).Hyperlink.Address`. Do not rely only on a text-range hyperlink because PowerPoint COM saves can drop it.
+- Saved-deck QA must inspect every visible Weekly reference shape for a nonempty hyperlink URL and compare its page URL (ignoring an optional `#fragment`) with the manifest URL.
 - Speaker notes should carry the full source trail: `Microsoft Learn 詳細: <url>` and `Azure Updates 発表: <url>`.
 - If `learnUrl` is `null`, add a review note such as `learnUrl_note` explaining whether no first-party page was found or the page is still unverified.
 

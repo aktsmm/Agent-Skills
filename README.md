@@ -28,7 +28,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [azure-troubleshooting](azure-troubleshooting/) | Investigate Azure incidents and service degradations with a read-only workflow using Azure CLI, Resource Health, Activity Log, and official Microsoft docs |
 | [azure-update-customer-pptx](azure-update-customer-pptx/) | Build a customer-facing Azure Update PowerPoint from Azure Updates MCP results, including customer classification, Japan region stamps, UPDATE Points, speaker notes, and Verify-... |
 | [biz-ops-setup](biz-ops-setup/) | Business operations workspace setup with workIQ integration. Creates report generation, task management, and customer management system |
-| [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, review rules, and optional Markdown to Re:VIEW/PDF support |
+| [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support |
 | [browser-max-automation](browser-max-automation/) | Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation |
 | [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script'... |
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |
@@ -36,6 +36,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [customer-workspace](customer-workspace/) | Customer workspace initialization skill. Provides inbox (information accumulation), meeting minutes management, and auto-classification rules. Use for "setup customer workspace"... |
 | [drawio-diagram-forge](drawio-diagram-forge/) | Generate draw.io editable diagrams (.drawio, .drawio.svg) from text, images, or Excel. Orchestrates 3-agent workflow (Analysis → Manifest → SVG generation) with quality gates |
 | [duck-critic](duck-critic/) | Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes |
+| [export-session-log](export-session-log/) | Export the current chat session as a structured Markdown work timeline or blog-draft seed |
 | [goal-loop](goal-loop/) | Run an explicit end-to-end goal loop with frozen Scope/criteria, worker delegation, external verification, evaluator review, and bounded retries |
 | [humanize-writing](humanize-writing/) | Remove AI-generated tone and make writing sound more human in Japanese and English |
 | [local-media-transcription](local-media-transcription/) | Transcribe local audio/video files to text, then optionally produce meeting minutes, action items, speaker separation, and PPT-ready summaries |

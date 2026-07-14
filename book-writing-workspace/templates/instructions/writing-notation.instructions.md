@@ -38,6 +38,12 @@ Examples:
 - 多層防御（Defense in Depth）
 - データ損失防止（Data Loss Prevention、DLP）
 
+### Parallel Terms
+
+When introducing parallel terms together, apply the same Japanese（English） format to every item. Do not introduce English for only part of a role, type, or mode series.
+
+- 所有者（Owner）、メンバー（Member）、チーム（Team）
+
 ### Subsequent Occurrences
 
 Use Japanese only, or the acronym if already introduced.

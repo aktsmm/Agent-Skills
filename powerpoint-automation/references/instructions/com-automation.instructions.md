@@ -35,6 +35,7 @@ Use this reference when editing existing PPTX files, especially files that may a
 ## Text and Paragraph Editing
 
 - Paragraph separators should be `\r` / `chr(13)`. `\n` may not create real PowerPoint paragraphs.
+- For a multi-paragraph card/text box, set the base font, color, and size on the full `TextRange` first; then override heading paragraphs. Formatting only `Paragraphs(2)` can leave later paragraphs with inherited white/default text and make a wrapped card unreadable.
 - Avoid `TextRange.Text = "..."` for append operations because it resets formatting.
 - Use `Paragraphs(n).InsertAfter(chr(13) + text)` for append operations, then immediately set the new paragraph font.
 - Add a trailing `chr(13)` when needed to prevent newly inserted text from merging with the next paragraph.

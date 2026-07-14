@@ -4,25 +4,26 @@ This repository contains the manuscript workspace for "{{BOOK_TITLE}}".
 
 ## Quick Start
 
-1. Review `docs/page-allocation.md` and set character targets
-2. Review `docs/schedule.md` and replace placeholder dates
-3. Edit `.github/copilot-instructions.md` for audience and goals
-4. Start outlining in `keypoints/`
-5. Write drafts in `sections/`
+1. Define the primary and secondary readers in `docs/reader-personas.md`
+2. Review `docs/page-allocation.md` and set character targets
+3. Review `docs/schedule.md` and replace placeholder dates
+4. Edit `.github/copilot-instructions.md` for project goals and constraints
+5. Start outlining in `keypoints/`
+6. Write drafts in `sections/`
 
 ## Repository Structure
 
-| Path                    | Purpose                                  |
-| ----------------------- | ---------------------------------------- |
-| `keypoints/`            | Outline and key-point drafts             |
-| `sections/`             | Main manuscript files                    |
-| `re-view-output/`       | Optional Re:VIEW source and PDF output   |
-| `images/`               | Figures and screenshots                  |
-| `materials/`            | Reference sources                        |
-| `.github/agents/`       | Writing workflow agents                  |
-| `.github/instructions/` | Writing conventions                      |
-| `docs/`                 | Schedule, naming rules, and writing docs |
-| `scripts/`              | Counting and conversion helpers          |
+| Path                    | Purpose                                                   |
+| ----------------------- | --------------------------------------------------------- |
+| `keypoints/`            | Outline and key-point drafts                              |
+| `sections/`             | Main manuscript files                                     |
+| `re-view-output/`       | Optional Re:VIEW source and PDF output                    |
+| `images/`               | Figures and screenshots                                   |
+| `materials/`            | Reference sources                                         |
+| `.github/agents/`       | Writing workflow agents                                   |
+| `.github/instructions/` | Writing conventions                                       |
+| `docs/`                 | Reader personas, schedule, naming rules, and writing docs |
+| `scripts/`              | Counting and conversion helpers                           |
 
 ## Common Commands
 

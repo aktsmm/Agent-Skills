@@ -6,7 +6,9 @@ This is the book writing workspace for "{{BOOK_TITLE}}".
 
 ### Target Readers
 
-- (Define your target audience here)
+- `docs/reader-personas.md` is the default source of truth for the primary reader, secondary readers, prerequisites, and expected outcomes.
+- If an existing workspace already declares a persona SSOT elsewhere, preserve that location and use only one owner.
+- Do not expand the manuscript while the selected persona SSOT still contains placeholders.
 
 ### Goals
 

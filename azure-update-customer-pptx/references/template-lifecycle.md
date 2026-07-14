@@ -53,6 +53,10 @@ Once the template contract passes, regular runs should be boring:
 
 This is where deterministic scripts provide the most value.
 
+### Source Layout Normalization
+
+`Slides.InsertFromFile` preserves source slide masters and layouts. When multiple source decks use different body designs, do not ship mixed Weekly Topic layouts. Rebuild every Weekly Topic from one named customer body layout/prototype and manifest content, then reapply region stamps, dedicated official-reference shapes, and speaker notes. Run Verify and visual QA again, then regenerate any delivery PDF after the final PPTX mutation.
+
 ## Phase 4: Maintenance and Repair
 
 Maintenance scripts are recovery tools, not the default route.

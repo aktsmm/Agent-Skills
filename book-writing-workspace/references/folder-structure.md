@@ -4,15 +4,15 @@ Generated projects use the following top-level layout.
 
 ## Required Folders
 
-| Folder                  | Purpose                                                |
-| ----------------------- | ------------------------------------------------------ |
-| `.github/agents/`       | Writing and review agents                              |
-| `.github/instructions/` | Writing instructions used by the agents                |
-| `keypoints/`            | Outline and section key points                         |
-| `sections/`             | Draft and final manuscript files                       |
-| `images/`               | Figures and image assets by chapter                    |
-| `docs/`                 | Page allocation, schedule, naming rules, workflow docs |
-| `scripts/`              | Helper scripts for manuscript checks                   |
+| Folder                  | Purpose                                                                 |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `.github/agents/`       | Writing and review agents                                               |
+| `.github/instructions/` | Writing instructions used by the agents                                 |
+| `keypoints/`            | Outline and section key points                                          |
+| `sections/`             | Draft and final manuscript files                                        |
+| `images/`               | Figures and image assets by chapter                                     |
+| `docs/`                 | Reader personas, page allocation, schedule, naming rules, workflow docs |
+| `scripts/`              | Helper scripts for manuscript checks                                    |
 
 ## Optional Folders
 
