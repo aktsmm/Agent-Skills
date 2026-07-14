@@ -32,9 +32,16 @@ Use this reference when editing existing PPTX files, especially files that may a
 - If the user asks for a direct touch-up on an already-open deck, do not rebuild-and-reopen by default. Locate the active presentation, apply the minimal edits with COM, call `pres.Save()`, and leave it open.
 - For direct touch-ups, keep edit and verification in the same COM session and audit the active `Presentation` object. Do not verify a stale copied file or a separate read-only presentation unless the task is explicitly read-only.
 
+## Read-Only PDF Export
+
+- Do not export a user-visible or OneDrive-synced canonical PPTX in place. Copy it to a unique local temp PPTX, open that copy read-only, and write the PDF to a separate output path; delete the temp source only after the PDF is validated.
+- In PowerShell COM, `Presentation.SaveAs($pdfPath, 32)` is a practical PDF fallback when `ExportAsFixedFormat()` fails because of parameter/type marshalling. Never call `SaveAs` with the source PPTX path during PDF export.
+- Verify that the PDF exists, is nonempty, and has the expected exported page count. Compare against the selected/visible slide count, accounting for hidden-slide export settings; a page count alone does not validate notes, hyperlinks, animations, or master fidelity.
+
 ## Text and Paragraph Editing
 
 - Paragraph separators should be `\r` / `chr(13)`. `\n` may not create real PowerPoint paragraphs.
+- In PowerShell, escape sequences such as `` `r `` / `` `n `` expand only in double-quoted strings. Do not write `'text`rtext'` for card bodies: it stores literal backtick characters in the PPTX. Use `"text`rtext"`, `[char]13`, or a here-string; before adding generated non-code text, reject literal backtick-plus-`r`/`n` tokens.
 - For a multi-paragraph card/text box, set the base font, color, and size on the full `TextRange` first; then override heading paragraphs. Formatting only `Paragraphs(2)` can leave later paragraphs with inherited white/default text and make a wrapped card unreadable.
 - Avoid `TextRange.Text = "..."` for append operations because it resets formatting.
 - Use `Paragraphs(n).InsertAfter(chr(13) + text)` for append operations, then immediately set the new paragraph font.

@@ -25,6 +25,9 @@
 | REVIEW(JSON)   | Translation error    | TRANSLATE        | Re-run Localizer                 |
 | REVIEW(PPTX)   | Slide count mismatch | BUILD            | Re-run `create_from_template.py` |
 | REVIEW(PPTX)   | Layout issues        | PREPARE_TEMPLATE | Re-diagnose template             |
+| REVIEW(PPTX)   | Literal escape text in user-facing text | BUILD | Fix source quoting and rebuild from a fresh temp PPTX; if COM is unavailable, repair exact `<a:t>` nodes only on a temp copy, then validate ZIP and slide count before canonical replacement |
+| EXPORT(PDF)    | `ExportAsFixedFormat` COM type error | EXPORT | Copy source to local temp and use `SaveAs(pdfPath, 32)` |
+| EXPORT(PDF)    | Page count mismatch  | REVIEW(PPTX)     | Check hidden-slide/export settings, then re-export from a fresh temp copy |
 | BUILD          | Template load error  | PREPARE_TEMPLATE | Run `diagnose_template.py`       |
 | BUILD          | Slide paste fails (all) | BUILD         | Switch to `Slides.InsertFromFile` (clipboard-independent) |
 | **3 failures** | Any                  | **ESCALATE**     | Wait for human intervention      |

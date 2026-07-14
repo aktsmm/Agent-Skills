@@ -10,6 +10,8 @@
     出力 PDF パス。省略時は PPTX と同名の .pdf
 .PARAMETER OpenPdf
     出力後に PDF を開く
+.PARAMETER RequireUnencrypted
+    PDF に暗号化が検出された場合、出力を失敗として扱う
 #>
 
 param(
@@ -18,7 +20,9 @@ param(
 
     [string]$PdfPath,
 
-    [switch]$OpenPdf
+    [switch]$OpenPdf,
+
+    [switch]$RequireUnencrypted
 )
 
 $ErrorActionPreference = "Stop"
@@ -43,6 +47,16 @@ $app = $null
 $pres = $null
 $ownsSession = $false
 $openedHere = $false
+
+function Test-PdfEncryption {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $content = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes($Path))
+    return $content -match '(?m)/Encrypt\s+\d+\s+\d+\s+R\b'
+}
 
 try {
     $app = Get-ActivePptxApplication
@@ -73,6 +87,15 @@ try {
     $pdfFile = Get-Item $fullPdfPath
     if ($pdfFile.Length -le 0) {
         throw "PDF サイズが 0 byte です: $fullPdfPath"
+    }
+
+    $isEncrypted = Test-PdfEncryption -Path $fullPdfPath
+    if ($isEncrypted) {
+        $message = "PDF に暗号化が検出されました。PowerPoint の感度ラベルと配布要件を確認してください: $fullPdfPath"
+        if ($RequireUnencrypted) {
+            throw $message
+        }
+        Write-Warning $message
     }
 
     Write-Success "PDF 出力完了: $fullPdfPath ($($pdfFile.Length) bytes)"

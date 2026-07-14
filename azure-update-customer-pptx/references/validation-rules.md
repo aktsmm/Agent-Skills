@@ -32,5 +32,6 @@ Quality review checks that must also pass before final done:
 23. Visible references never point readers to speaker notes. Each Weekly Topic has a dedicated hyperlink shape whose label distinguishes Microsoft Learn detail from Azure Updates announcement; inspect the saved PPTX to prove the shape-level URL persisted.
 24. Every visible Weekly region entry has `verified: true`, a first-party `source`, and concrete `evidence`. A fail-safe 日本リージョン未対応 result records the sources checked and why no explicit Japan availability was found.
 25. When PDF is a delivery artifact, export it after the final PPTX mutation and verify its page count equals the final slide count.
+26. When the delivery requirement is an unprotected PDF, export with `Export-PptxToPdf.ps1 -RequireUnencrypted`; it must not detect a PDF `/Encrypt` reference. If encryption is expected, record that the protection is intentional before delivery.
 
 Done means `Verify-Pptx.ps1` exits `0` and the quality review checks above pass or any exception is explicitly reported.
