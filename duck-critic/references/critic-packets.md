@@ -23,6 +23,17 @@ Rubber duck this plan before implementation. Use a different-model critic if ava
 
 If a different-model critic is not available, say so in the output and note that the second opinion came from the same model family.
 
+### Scope Drift Recovery
+
+If a native critic reports on files or worktree changes outside the packet target, discard that feedback as out of scope. Retry through a fallback reviewer with this boundary:
+
+```text
+Review only: <explicit target paths>
+Do not inspect git diff, git status, or unrelated worktree changes.
+```
+
+Do not retry native Rubber Duck under the same conditions.
+
 ## Fallback Reviewer Packet
 
 Use this shape when the harness does not expose native Rubber Duck:

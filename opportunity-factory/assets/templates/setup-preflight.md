@@ -18,6 +18,8 @@
 - [ ] `commander`, `worker`, and `reporter-learner` prompts are callable
 - [ ] State, queue, artifact, outcome, and audit-log storage are durable
 - [ ] The runtime can prevent duplicate or overlapping runs
+- [ ] Lock acquisition is atomic and long runs refresh a heartbeat
+- [ ] A stale-lock recovery path reconciles partial target changes against required artifacts and verification
 - [ ] Runtime limits are configured
 - [ ] Human approval boundaries are configured
 - [ ] A test artifact can be created and imported
@@ -43,6 +45,7 @@
 - [ ] Max daily worker runs:
 - [ ] Max daily cost estimate:
 - [ ] Lock TTL:
+- [ ] Stale-lock recovery threshold (recommended >= 2x TTL):
 - [ ] Stale task TTL:
 - [ ] Quiet hours / notification policy:
 

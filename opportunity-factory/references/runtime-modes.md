@@ -50,6 +50,9 @@ Rules:
 - Before rewriting JSON array state files, create backups, parse the original, rewrite the full array, parse the result, and restore backup on failure.
 - Use an append-only JSONL pipeline log for audit records.
 - Acquire a short-lived lock atomically with create-new/O_EXCL semantics, or use a transactional equivalent lease; never test-then-create. If the lock is still valid, skip and log a no-op.
+- Refresh lock heartbeat during long work and remove the lock in a `finally`/guaranteed-cleanup path when the adapter supports it.
+- If the heartbeat is expired beyond the recovery threshold, reconcile the selected task, expected artifact, target files, done history, and pipeline log before the next run. A stale `in_progress` string is not proof that a worker is still alive.
+- When target files changed but the required artifact/verification is missing, preserve the partial files, return the task to `pending` (or a dedicated recovery state), and require bounded re-verification; never mark it done from side effects alone.
 - Mark a task done only when its artifact contains evidence that the success metric was met; otherwise leave it pending or blocked.
 
 ## Cadence Defaults

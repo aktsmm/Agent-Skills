@@ -180,14 +180,23 @@ cdp(ws, 'DOM.setFileInputFiles', {
   'nodeId': node_id,
   'files': [image_path],  # absolute local path resolved by the caller
 })
-cdp(ws, 'Runtime.evaluate', {
-  'expression': '''(() => {
-    const input = document.querySelector('input[type="file"]');
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-  })()''',
-  'awaitPromise': True,
-})
+
+# Poll editor surfaces first. DOM.setFileInputFiles normally emits the events.
+after_urls = cdp(ws, 'Runtime.evaluate', {
+  'expression': '(document.documentElement.outerHTML.match(/https://qiita-image-store\\.s3[^"\'\\s)]+/g) || [])',
+  'returnByValue': True,
+})['result']['result']['value']
+
+# Only when no new URL appears, dispatch one fallback event pair.
+if not [url for url in after_urls if url not in before_urls]:
+    cdp(ws, 'Runtime.evaluate', {
+      'expression': '''(() => {
+        const input = document.querySelector('input[type="file"]');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      })()''',
+      'awaitPromise': True,
+    })
 ```
 
 Rules:

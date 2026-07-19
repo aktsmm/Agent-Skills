@@ -7,7 +7,8 @@ Use these patterns after the normal MCP snapshot/click flow has established the 
 - If `connectOverCDP()` times out but `/json/list` exposes a page WebSocket URL, use raw CDP.
 - For editors with hidden `input[type=file]`, target the existing editor tab and use `DOM.setFileInputFiles`.
 - Do not navigate an unsaved draft tab to a new URL. Open a separate new tab for a fresh draft if needed.
-- Verify upload by checking the new file URL in page HTML or editor text.
+- Capture existing asset URLs from every active editor surface (textarea, CodeMirror/contenteditable, rendered HTML), call `DOM.setFileInputFiles` once, then require a newly inserted URL. Do not dispatch duplicate `input` / `change` events unless the first upload produced no URL; double dispatch can upload the same file twice.
+- If upload creates a persistent temporary draft/entity, return its exact URL or ID as cleanup evidence. Delete only that entity after the downstream article/save is verified; never infer a cleanup target from title or recency alone.
 
 ## Native File Chooser (button opens OS picker, no reachable input)
 

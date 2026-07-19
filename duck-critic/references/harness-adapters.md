@@ -23,6 +23,8 @@ If native Rubber Duck is unavailable or does not trigger:
 - Use the fallback critic packet from [critic packets](./critic-packets.md).
 - State `Route Used` with a route value from [output format](./output-format.md).
 
+If native Rubber Duck returns findings about unrelated worktree changes despite a scoped packet, treat that consultation as scope-drifted rather than valid feedback. Do not reconcile those findings. Use a read-only fallback critic with an explicit target file list and a prohibition on inspecting `git diff`, `git status`, or unrelated changes.
+
 Do not present fallback output as built-in Rubber Duck output.
 
 ## VS Code

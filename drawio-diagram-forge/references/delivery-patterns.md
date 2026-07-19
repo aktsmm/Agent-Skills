@@ -9,6 +9,10 @@ Reserve `*.drawio.svg` for SVG files that actually contain draw.io metadata. If 
 
 If the visible asset started from manual SVG cleanup or hand-authored layout tweaks, still keep a matching `name.drawio` as the editable SSOT. Do not leave documentation diagrams as SVG-only when future edits are expected.
 
+After any `.drawio` layout or label edit, regenerate the paired `.drawio.svg` from its source and verify both rendering and re-opening as an editable draw.io SVG. Do not treat manual `content` metadata edits as the normal sync path; exporter formatting is implementation-specific.
+
+For draw.io Desktop CLI exports on Windows, use absolute source/output paths and wait for the spawned process. A running GUI instance can make a direct CLI call return before the files appear. Gate delivery on exit code `0`, output existence, and an output timestamp newer than the source edit. If source and delivery timestamps are ambiguous, re-export to a temporary file and compare hashes before upload or publication.
+
 ## Recommended Markdown Pattern
 
 ```markdown

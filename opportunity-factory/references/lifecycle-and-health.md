@@ -111,10 +111,22 @@ Auto-repair only reversible local drift:
 - dashboard reconciliation,
 - count/path/status fixes,
 - stale lock removal only after heartbeat expiry plus no matching live/in-progress state,
+- interrupted-run reconciliation across lock, task claim, expected artifact, changed targets, done history, and pipeline log,
 - prompt reference drift,
 - missing compact no-op/error records.
 
-Never delete a lock from TTL alone. Require an expired heartbeat plus no matching live/in-progress state update; use at least 2x TTL before automatic removal.
+Never delete a lock from TTL alone. Require an expired heartbeat (use at least 2x TTL), no live process/lease or fresh heartbeat, and reconciliation of the claimed task. A persisted `in_progress` status without a fresh heartbeat is evidence of an interrupted run, not a live run.
+
+For an interrupted mutating run:
+
+1. Read the lock's task ID and timestamps.
+2. Check expected artifact, target-file timestamps/diff, done history, outcome log, and pipeline log.
+3. If artifact and success evidence are complete, import/reduce idempotently.
+4. If side effects exist but artifact or verification is missing, preserve the side effects, return the task to `pending` or `recovery`, and require bounded verification.
+5. If nothing changed, return the task to `pending`.
+6. Record the recovery in dashboard/outcome/pipeline state, then remove the stale lock.
+
+Never infer task completion from a modified target file alone.
 
 Never auto-change:
 
@@ -145,3 +157,4 @@ Exact cadence is a reference default and should be tuned from observed artifact 
 - Every lane has WIP/retry/slice caps and an independent reviewer.
 - Dashboard state can explain the complete lifecycle and current bottleneck.
 - Health reconciliation repairs reversible drift without changing product decisions or safety policy.
+- Interrupted runs recover through artifact/side-effect reconciliation and cannot remain permanently blocked by stale `in_progress` state.

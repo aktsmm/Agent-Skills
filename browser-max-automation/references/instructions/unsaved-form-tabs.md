@@ -8,6 +8,7 @@ Qiita、CMS、SPA admin など **未保存 form** を持つタブを壊さない
 - 新しい draft が必要でも、**既存タブを別 URL へ飛ばさず、新しいタブを開く**
 - `dialog.accept()` で `beforeunload` を強制吸収する設計を通常フローにしない。race で失敗しやすい
 - file upload の前に、現在タブが本当に editor 本体かを **URL と title** で確認する
+- upload 専用の一時 editor を作った場合は、その exact URL / ID をログに残す。下流の保存・公開・画像表示を確認してからその ID だけ削除し、無題や最新時刻だけで対象を推測しない
 - dirty な form / SPA では `page.reload()`、`location.reload()`、API 捕捉目的の reload trigger を使わない
 - まず保存・キャンセル・画面上の status 読み取りで clean にする
 - reload 確認や unsaved alert が出たら、追加自動化を止めて手動 Cancel / Stay を優先する

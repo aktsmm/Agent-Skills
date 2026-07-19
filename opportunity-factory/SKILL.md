@@ -64,6 +64,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - 複数 worker で回す場合は、discovery/research worker、build/decision worker、reporter-learner など役割を分け、各 run は 1 task / 1 artifact / 明示的 state 更新に制限する。
 - 小さい queue では commander/worker を別々にスケジュールせず、1本の single-cycle automation で `commander -> 1 worker -> reducer` を回してよい。ただし auto-eligible task、lock、JSON backup/parse validation が必須。
 - Mutating workers need atomic duplicate-run prevention using create-new/O_EXCL lock acquisition or a transactional lease; never use check-then-create before shared state updates.
+- Lock handling needs a partial-run recovery path: expired heartbeat plus no live process/lease triggers artifact and target reconciliation, not permanent trust in a stale `in_progress` label.
 - Maintain a canonical dashboard/status state for future sessions and user status answers; every workflow that changes artifacts, queues, gates, portfolio ranking, blockers, or schedules must update it with backup + stale-write checks.
 - Add a workflow-review loop as a first-class workflow for self-improving factories; it reviews cadence, queue quality, Top-N replacements, dashboard drift, missing gates, and unsafe autonomy at a slower cadence than workers.
 - Portfolio factories need a Top-N state with explicit replacement rules; do not grow candidate lists forever, and do not replace an incumbent without comparative evidence and reviewer critique.
@@ -124,6 +125,7 @@ Rubber Duck / Factory Plan / Workspace Setup / Self-Designing Workspace Setup / 
 - Portfolio factories define Top-N capacity, replacement criteria, and demotion/watchlist/rejected states
 - End-to-end factories define promotion and post-GO maturation stages through private release-readiness, with WIP/slice/retry caps and independent review
 - A health reconciler detects state/prompt/schedule drift and repairs only reversible local inconsistencies
+- Interrupted mutating runs can recover stale locks and partial outputs without self-certifying missing verification evidence
 - If scheduled progress is expected, at least one safe mutating worker exists; advisory-only automation is called out as intentionally slow
 - Approval-boundary blockers do not empty the run: the runtime records the blocker and keeps at least one safe fallback lane available
 - Future sessions can resume from durable state files without reading the original chat transcript
