@@ -34,6 +34,18 @@ When imported source slides predate `sourceUrl`, recover the Azure Updates recor
 
 Visible slide body fields must be reusable across decks. Keep `background`, `before`, `after`, `customerImpact`, `pricing`, `japanRegion`, and `keypoint` customer-neutral.
 
+### Per-Item Layout Mode
+
+Write `layoutMode` to every classified Weekly item; presentation logic must use this field rather than infer a layout from whether a topic is AI.
+
+| Mode        | Use when                                                                           | Lower third panel                                | Keypoint band                       |
+| ----------- | ---------------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------- |
+| `action`    | Retirement, deadline, or migration action                                          | `対応の要点` from the action text                | omit to avoid duplicate action text |
+| `technical` | AI, security, operations, storage, or other technical concepts affect the decision | `技術の要点` from the first two `basics` entries | show                                |
+| `change`    | General update without a specialized technical/action need                         | `基礎知識` from the first two `basics` entries   | show                                |
+
+`layoutMode` must be reviewable manifest data written during classification, not an implicit renderer heuristic. A renderer may deterministically default retirement items to `action`, but it must preserve an explicit `technical` or `change` value and never use `isAI` alone as the presentation decision. Use a full-width upper summary and a lower `Before / After / third panel` layout with 16pt panel headings.
+
 Do not put customer name, system name, tenant domain, subscription IDs, or internal environment labels in visible body fields. Put customer-specific impact or applicability in `notes.json` speaker notes or a review-only artifact.
 
 Examples:

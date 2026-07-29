@@ -42,5 +42,6 @@ Quality review checks that must also pass before final done:
 33. Positive Japan East / West availability claims in visible body or notes agree with `region_info_reviewed.json`; ignore a claim only when the same sentence explicitly says the region is unsupported.
 34. For multi-output hosts, retain one `verify_status.json.results` entry per output filename and aggregate a top-level pass state. Never let the last verified deck overwrite an earlier deck's result.
 35. Render representative saved Weekly slides from a temporary local copy. Confirm long titles remain readable and do not overlap the status badge; do not treat a successful COM save as visual proof.
+36. Every Weekly item has classification-authored `layoutMode=action|technical|change`, a nonempty lower third panel at the lower-right position, and a 16pt heading. `action` omits the duplicate `KeypointBand`; `technical` and `change` retain it. Render validation must use the canonical local PPTX, not a same-named SharePoint/OneDrive presentation with a different slide count or empty representative note.
 
 Done means `Verify-Pptx.ps1` exits `0` and the quality review checks above pass or any exception is explicitly reported.

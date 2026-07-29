@@ -25,6 +25,8 @@ metadata:
 - **Filename format** → Use `YYYY-MM-DD-content-vendor-note-amount-勘定科目[-メモ].ext`
 - **Date** → Use the service date, not screenshot date or settlement date
 - **Private card payment** → The receipt itself uses the real expense account (e.g. 印刷費); the reimbursement transfer uses 事業主借
+- **Personal withdrawal from booked business account** → Use `借方: 事業主貸 / 貸方: 普通預金`, never `対象外`; include the source account and journal entry in the monthly memo.
+- **Cash withdrawal source or use unclear** → Ask whether the source is a booked business `普通預金` and whether the cash was for private or business use before renaming or updating the memo.
 - **Amount** → Use the displayed amount as-is (tax-inclusive)
 - **Multiple categories** → Use the primary one, hint at others in note
 - **Only surviving evidence is non-expense** → Cart screens, canceled bookings, and other non-expense screenshots should not be treated as 補助画像 when they are the only remaining evidence. Record them in the monthly memo table as `対象外` with amount and reason.
