@@ -25,7 +25,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [azure-env-builder](azure-env-builder/) | [Alpha] Experimental Azure environment builder for infrastructure and deployment design |
 | [azure-infra-validation](azure-infra-validation/) | Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs |
 | [azure-screenshot-mask](azure-screenshot-mask/) | Mosaic environment-sensitive areas (tenant name, user avatar, subscription name / ID, resource group, internal hostnames) on Azure Portal screenshots before publishing to blogs,... |
-| [azure-troubleshooting](azure-troubleshooting/) | Investigate Azure incidents and service degradations with a read-only workflow using Azure CLI, Resource Health, Activity Log, and official Microsoft docs |
+| [azure-troubleshooting](azure-troubleshooting/) | Investigate Azure incidents and service degradations with a read-only workflow using Azure CLI, Resource Health, Activity Log, metrics, resource logs, and official Microsoft docs |
 | [azure-update-customer-pptx](azure-update-customer-pptx/) | Build a customer-facing Azure Update PowerPoint from Azure Updates MCP results, including customer classification, Japan region stamps, UPDATE Points, speaker notes, and Verify-... |
 | [biz-ops-setup](biz-ops-setup/) | Business operations workspace setup with workIQ integration. Creates report generation, task management, and customer management system |
 | [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support |

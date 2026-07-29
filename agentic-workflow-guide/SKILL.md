@@ -140,6 +140,8 @@ Full checklist: [references/review-checklist.md](references/review-checklist.md)
 
 Core references: [primitive decision](references/customization-decision.md), [design principles](references/design-principles.md), [workflow patterns](references/workflow-patterns/overview.md), [splitting criteria](references/splitting-criteria.md), [review checklist](references/review-checklist.md), and [context management](references/context-engineering.md).
 
+For scheduled workflows, use [scheduled runtime bindings](references/scheduled-runtime-bindings.md). For delegated evidence and append-only current-state extraction, see [orchestrator-workers](references/workflow-patterns/4-orchestrator-workers.md) and [IR architecture](references/workflow-patterns/ir-architecture.md).
+
 ## agent Quick Fix
 
 When an orchestrator promises delegation but works directly, make the delegation requirement explicit and verifiable. See [agent-guide.md](references/agent-guide.md).

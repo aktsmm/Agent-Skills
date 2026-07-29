@@ -41,6 +41,9 @@ Minimum items to verify:
 - [ ] Are deterministic steps offloaded to scripts / IR / hooks instead of LLM loops? (Deterministic Offload)
 - [ ] Are frontmatter fields checked against the current file-type support matrix, not just repo-local convention? (Frontmatter Hygiene)
 - [ ] Are sub-review / sub-agent findings (file sizes, line ranges, duplication claims, missing sections) verified against the actual code by grep / read before being acted on? (Sub-Review Verification)
+- [ ] Do delegated workers distinguish `executed with 0 results` from `not run`, `blocked`, and `failed`?
+- [ ] If scheduled execution references a local runtime asset, are the live binding and fallback snapshot both checked for drift?
+- [ ] If current state shares a file with history, is current state parsed from explicit schema boundaries rather than whole-file keyword search?
 ```
 
 ---

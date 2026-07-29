@@ -1,6 +1,6 @@
 ---
 name: azure-troubleshooting
-description: "Investigate Azure incidents and service degradations with a read-only workflow using Azure CLI, Resource Health, Activity Log, and official Microsoft docs. Use when troubleshooting Azure outages, Resource Health alerts, AKS incidents, App Service failures, database connectivity issues, Entra ID sign-in problems, load balancer issues, VPN Gateway or BGP instability, VM availability problems, platform-vs-workload cutover, or drafting a troubleshooting report. Triggers on 'Azure トラブルシューティング', '障害調査', '切り分け', 'Resource Health', '復旧確認', 'AKS', 'App Service', 'SQL', 'PostgreSQL', 'Cosmos DB', 'Entra ID', 'VPN Gateway', 'BGP', 'flap', 'incident', 'degraded', 'unavailable'."
+description: "Investigate Azure incidents and service degradations with a read-only workflow using Azure CLI, Resource Health, Activity Log, metrics, resource logs, and official Microsoft docs. Use when troubleshooting Azure outages, Resource Health alerts, Azure Firewall or DNS failures, ExpressRoute or BGP instability, VM availability problems, AKS incidents, App Service failures, database connectivity issues, Entra ID sign-in problems, load balancer issues, platform-vs-workload cutover, or drafting a troubleshooting report. Triggers on 'Azure トラブルシューティング', '障害調査', '切り分け', 'Resource Health', '復旧確認', 'Azure Firewall', 'DNS', 'ExpressRoute', 'VPN Gateway', 'BGP', 'AKS', 'App Service', 'SQL', 'PostgreSQL', 'Cosmos DB', 'Entra ID', 'incident', 'degraded', 'unavailable'."
 argument-hint: "subscription ID, resource ID(s), symptom, occurrence time, and current user impact"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -58,7 +58,7 @@ Azure の障害調査、切り分け、初動確認、復旧確認を read-only 
 1. Scope Fix: affected resource, time window, resource ID, and current user impact.
 2. Live Fact Collection: auth/subscription, current resource state, Activity Log, Resource Health, and dependent resources.
 3. Platform vs Workload Split: decide active Azure platform impact, recovered Azure event, or customer-side continuing issue.
-4. Service Branch: use [references/service-branches.md](references/service-branches.md) for AKS, App Service, Database, Entra ID, Load Balancer, VPN/BGP.
+4. Service Branch: use [references/service-branches.md](references/service-branches.md) for shared network/DNS, Azure Firewall, ExpressRoute, AKS, App Service, Database, Entra ID, Load Balancer, VPN/BGP.
 5. Official Grounding: verify Resource Health, diagnostic limits, and service-specific claims with Microsoft Learn URLs.
 6. Report Synthesis: primary conclusion, facts, current state, interpretation, next checks, and SR identifiers if needed.
 7. Save: troubleshooting records go to `Troubleshooting/`; ordinary Q&A answers go to `Answer/`.

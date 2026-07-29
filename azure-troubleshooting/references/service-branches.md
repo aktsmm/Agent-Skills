@@ -33,6 +33,41 @@ Azure インシデント調査で、共通の live fact collection の後に分�
 - `10.186.80.198:59502` のような直接値として書かず、「別次元の集計値」と明記する
 - 会話メタではなく、「本事象は〜と評価する」のような判断文へ落とす
 
+## Shared Network / DNS / Azure Firewall / ExpressRoute
+
+### First Checks
+
+- 発生時刻を UTC に正規化し、事象前後を含む固定 window で全リソースを比較する
+- private IP は Resource Graph で NIC、VM、subnet、resource group へ逆引きし、複数 VNet / subnet にまたがるか確認する
+- VM の current power state だけで過去の停止を否定せず、`VmAvailabilityMetric` を 1 分粒度で確認し、利用可能なら guest `Heartbeat` も照合する
+- Azure Firewall は current provisioning state に加え、`FirewallHealth`、latency、throughput、SNAT utilization、diagnostic settings、対象 window の policy / network resource Activity Log を確認する
+- Firewall structured logs は最初に `getschema` で列名を確認し、全体 deny 件数ではなく対象 IP / FQDN / port / rule と時系列へ絞る
+- ExpressRoute は current peering state に加え、回線ごとの Primary / Secondary `BgpAvailability` と `ArpAvailability`、gateway route-change frequency、traffic continuity、QoS drop を確認する
+- DNS 疑いでは、対象 query の response code / latency、内部 DNS への通信、外部 UDP/53 への fallback、DNS / identity host の可用性を同じ window で比較する
+
+### Split
+
+- `VmAvailabilityMetric=1` が全分継続し guest Heartbeat も残る: VM 停止より、監視経路、DNS、proxy、application dependency を優先する
+- Resource Health の latest record が `Unknown -> Available`: `Unknown` は platform が health を判定できなかった状態であり、VM 停止の証拠にしない
+- Firewall health が 100%、capacity / latency に異常がなく、対象 flow が `Allow`: Firewall 障害や rule deny より、次 hop、戻り経路、宛先 service を優先する
+- ICMP echo request が Firewall で `Allow`: Firewall 通過までは言えるが、宛先応答や reply 到達の証明にはしない
+- 全体 deny が増えていても対象 flow に deny がない: 背景 traffic と分離し、増加元、宛先、port、開始時刻が事象と一致するか確認する
+- DNS host が通常の forwarder ではなく root DNS へ急増: forwarder / upstream resolution failure の fallback 仮説として扱い、単独で根本原因と断定しない
+- Azure Firewall DNS query log に対象 query がない: DNS Proxy 未経由の可能性を確認し、内部 DNS への Network Rule log と DNS server log を優先する
+- ExpressRoute の Primary / Secondary BGP・ARP が全分 100%、route change 0、traffic 継続、drop 0: Azure 側回線断の可能性を下げ、オンプレミス側の監視経路や appliance を確認する
+
+### Gotchas
+
+- Log Analytics query の schema error 後に以前の terminal output を結果として採用しない。`getschema` 後に `Invoke-RestMethod -ErrorAction Stop` で再実行し、成功した response だけを整形する
+- 複数 metric の共通 time grain が合わない場合は、エラーに示された最小共通粒度へそろえ、短時間 flap を見逃す制約を報告する
+- effective route / effective NSG / Network Watcher の action API は通常の read 権限だけでは `AuthorizationFailed` になりうる。未確認を正常判定に置き換えず、必要な RBAC と未検証範囲を明示する
+- Activity Log が空でも dataplane 正常とは言えない。metrics、resource logs、flow evidence を別に確認する
+
+### Report Notes
+
+- `current Succeeded`、`発生 window の metric`、`対象 flow の Allow/Deny` を別の事実として書く
+- 観測した相関は「有力候補」または「整合する」とし、DNS server / proxy / appliance 側ログがない段階で根本原因と断定しない
+
 ## AKS
 
 ### First Checks

@@ -125,3 +125,4 @@ Canonical `status` values: `グローバル` / `Japan East / West 対応` / `Jap
 6. No guessing — if unconfirmed in docs, use 日本リージョン未対応 (fail-safe).
 7. A delivery fallback is a completed review, not a guess: inspect the feature overview plus one region, limitations, or what's-new source; record the checked URLs and the absent Japan evidence in `evidence`, then set `verified: true`. `verified: false` is interim and cannot ship.
 8. Keep the raw slide title as the JSON key. At the COM boundary, normalize line breaks, vertical tabs, and whitespace only to resolve one unique key; reject ambiguous matches rather than silently using a partial title.
+9. Never let a fallback downgrade an entry that already has `verified: true` evidence. When evidence and stored status conflict, preserve the evidence, derive `japanEast` / `japanWest` / `status` from it, append a correction record, then verify the saved stamp and any positive Japan-region claim in body or notes.

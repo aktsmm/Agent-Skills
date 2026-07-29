@@ -118,6 +118,13 @@ Fast re-apply after manifest-only changes:
 
 Template setup is intentionally separate from regular generation. See `references/template-lifecycle.md` before automating a new customer template.
 
+## Gotchas
+
+- **Close the target deck before any COM write.** A deck left open in PowerPoint plus cloud-sync AutoSave produces a conflict-merge that duplicates the whole Weekly slice, drops the section list, and leaves `<name> (N).pptx` copies. `Run-CustomerPptxPipeline.ps1` closes it via `Close-OpenPptxPresentation`; any other script that mutates the deck must do the same instead of asking the user to close it. Delete stray `(N)` copies before reporting done.
+- **Isolate COM sessions per output file.** When a host produces general/AI or other separate decks, release the PowerPoint session after each saved output. A post-save RPC cleanup failure can otherwise prevent later outputs even though the earlier `SaveCopyAs` succeeded; verify every saved deck independently.
+- **Rebuilding the Weekly slice destroys section membership.** Deleting and re-adding Weekly slides empties the Weekly section, and the preceding summary section silently absorbs every slide. `Verify-Pptx.ps1` only checks section *order*, so this passes the gate. Re-apply all sections from actual slide positions at the end of any rebuild step, anchoring the Weekly start on the first body-layout slide.
+- **Re-sort manifest arrays after appending items.** Adding entries to `classification.json` Weekly/Appendix arrays without re-sorting by label priority then title fails the slide-order gate, because the build sorts slides but the manifest keeps insertion order.
+
 ## Validation
 
 Run preflight before build/re-apply:

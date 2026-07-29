@@ -74,3 +74,31 @@ Timestamp cutoffs cannot remove an event whose operation started before the
 cutoff but was appended to the log afterward. For reproducibility, treat AIU,
 LLM calls, and LLM duration as the primary boundary checks; report small tool
 call differences as cutoff-boundary drift.
+
+## Live Session Snapshots
+
+An active debug session directory is mutable. Log compaction or replacement can
+remove earlier events, so later extractions can report fewer calls, lower AIU,
+or a shorter `session_observed_seconds` without reversing prior usage.
+
+- Persist timestamped metrics snapshots outside the debug directory when
+  monitoring a long-running session.
+- For a conservative cumulative lower bound, group `usage[]` by
+  `(role, model, reasoning_effort)`, take each bucket's maximum `nano_aiu`
+  across snapshots, then sum those maxima.
+- Do not add every positive bucket delta to a previous total. A compacted bucket
+  can rise while remaining below its earlier maximum, which would double count
+  retained usage.
+- If any call lacks `copilotUsageNanoAiu`, state the missing-call count and
+  describe the result as a lower bound. The extractor cannot reconstruct usage
+  removed before the first saved snapshot.
+
+For wall time, prefer explicit workflow timestamps or session-store
+`created_at`/`updated_at`. Use the latest log modification time only as evidence
+of recent activity.
+
+`total_aiu` is local telemetry derived from `copilotUsageNanoAiu / 1e9`, not an
+authoritative billing ledger. It may reproduce GitHub AI Credits under current
+model and cache pricing, but any conversion must be dated, validated for every
+observed pricing category, and labeled as an estimate. Use the GitHub billing
+usage report for the authoritative credit total.

@@ -33,6 +33,15 @@ Visible update slides must distinguish reference types. Use short, linked labels
 - `Azure Updates` links to `sourceUrl` and means the official announcement/release communication.
 - Speaker notes carry the full URLs with the same labels.
 
+## Weekly body composition
+
+Use the service name, not the customer category, in `対象：`. The visible body is `対象：`, `仕組み：`, `用語：`, `価値：`, `影響：`, and optional `課金：`; `影響：` begins with exactly one of `【要対応】`, `【評価】`, `【情報】`, or `【活用候補】`.
+
+- Render Before / After in separate left/right panels, not a combined `変更：` sentence.
+- Render `keypoint` in a distinct one-line emphasis band.
+- Keep body fill ratio (`BoundHeight / shape.Height`) within 0.55-0.92.
+- Reserve the title space before the status badge. If a title is too long, wrap it inside the title region (up to two lines) and validate a rendered saved slide; never clip into the badge or hide the text by over-shrinking it.
+
 ## Ending slide
 
 Ending is a simple formal closure, not a next-action or summary slide by default. Use the visible ending variant that matches the visible cover variant.
@@ -173,14 +182,13 @@ match). Display the Japanese category name in UPDATE Points (normalize per
 **Do NOT note** what's visible on-slide: 概要 (from title/content), label (top-right badge), region
 (bottom-right stamp).
 
-**DO note** what the slide alone can't show — the 5 axes:
+**DO note** what the slide alone can't show:
 
 - **basics**: 基礎知識・キーワード解説 (bulleted "what even is this?")
-- **userValue**: customer-view benefit/impact
 - **technical**: technical補足・注意点 (base technology)
-- **beforeAfter**: before → after comparison
-- **systemImpact**: impact on the current お客様システム (presence + reason)
-- plus optional `customerConcerns` (Q/A) and 参考 URL
+- `customerConcerns` (Q/A) and full Learn / Azure Updates / region evidence URLs
+
+Do not repeat visible value, impact, Before/After, or keypoint lines verbatim in notes.
 
 ### notes.json (Notes Generator output → `{dateFolder}/manifest/notes.json`)
 
@@ -216,7 +224,7 @@ match). Display the Japanese category name in UPDATE Points (normalize per
 ```
 
 `Enrich-CustomerPptx.ps1` writes facts only: 表紙 = count; サマリ = Weekly list (number+label+title);
-Weekly/Appendix = the 5 axes + 参考 URL (+ Appendix placement reason); UPDATE Points = nothing (table is
+Weekly = basics + technical + Q/A + full reference URLs; Appendix = placement reason + its detailed notes; UPDATE Points = nothing (table is
 self-evident).
 
 ## After output

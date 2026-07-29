@@ -35,6 +35,7 @@ Use a log troubleshooting workflow instead when the only goal is to explain one 
 3. **Extract**
    - Stream large logs with the script; do not load full transcripts into context.
    - Prefer explicit session paths or IDs. Use `--recent` only to select candidates.
+   - Treat an active session directory as mutable. Save timestamped metrics snapshots before later log compaction can remove earlier events.
 4. **Analyze**
    - Use [analyze_session_metrics.py](scripts/analyze_session_metrics.py) to summarize model configuration, agent roles, AIU, time, errors, quality evidence, and missing data.
    - For two or more runs, also emit per-unit normalization, median/IQR, purpose-specific winners, Pareto frontier, and comparability confidence.
@@ -72,6 +73,8 @@ Pass metrics JSON as positional inputs when no quality manifest is needed. Add `
 - For multiple runs, treat an identical workload fingerprint as the strongest comparison.
 - Treat the same task/unit with different fingerprints as `MEDIUM`; scope mismatch or missing metadata is `LOW`.
 - Never treat missing AIU calls as zero cost. Mark cost unmeasured when coverage is incomplete.
+- Never treat a decreasing live-log total as negative usage or replace a higher prior snapshot. Report a snapshot-derived lower bound and direct the user to the billing dashboard for an authoritative credit total.
+- Keep AIU and GitHub AI Credits distinct unless current official token prices reproduce representative per-call values for every observed model and cache category. Even then, label the conversion as environment- and date-specific rather than official billing evidence.
 - Exclude quality-unmeasured runs from quality winners and quality-aware Pareto results.
 - Do not infer absolute model performance from one run, a small sample, or different workflows.
 - Do not create a weighted overall score unless the user supplies weights.

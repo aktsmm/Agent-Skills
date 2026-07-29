@@ -35,5 +35,12 @@ Quality review checks that must also pass before final done:
 26. When the delivery requirement is an unprotected PDF, export with `Export-PptxToPdf.ps1 -RequireUnencrypted`; it must not detect a PDF `/Encrypt` reference. If encryption is expected, record that the protection is intentional before delivery.
 27. Validate the **saved PPTX**, not only `notes.json`: each topic note must include a presenter-ready summary, customer impact, recommended action, Azure Updates source, Microsoft Learn source where available, and region evidence for visible Weekly topics. Every visible slide has purpose or transition notes.
 28. Export customer PDFs from a unique local copy. Before and after export, verify the canonical PPTX remains an OpenXML ZIP and has the same SHA-256 hash; do not reuse an open canonical presentation for PDF export.
+29. Section membership is valid, not only section order. Gate check 5 passes even when a section is empty, so inspect the saved PPTX and confirm every declared section owns the expected slide range and no section holds zero slides. An empty Weekly section absorbed by the preceding summary section is the usual symptom after a Weekly rebuild.
+30. Visible Weekly slide count matches the `classification.json` Weekly item count. A mismatch that is an exact duplication of the Weekly slice indicates a cloud-sync conflict merge, not a manifest error.
+31. Visible Weekly body has `targetService` rather than category-only `対象：`, an approved impact label (`【要対応】` / `【評価】` / `【情報】` / `【活用候補】`), matching `KeypointBand`, and fill ratio 0.55-0.92.
+32. Visible body and speaker notes do not repeat two or more substantive lines. Notes retain technical context, Q&A, and complete Learn / Azure Updates / region source trails.
+33. Positive Japan East / West availability claims in visible body or notes agree with `region_info_reviewed.json`; ignore a claim only when the same sentence explicitly says the region is unsupported.
+34. For multi-output hosts, retain one `verify_status.json.results` entry per output filename and aggregate a top-level pass state. Never let the last verified deck overwrite an earlier deck's result.
+35. Render representative saved Weekly slides from a temporary local copy. Confirm long titles remain readable and do not overlap the status badge; do not treat a successful COM save as visual proof.
 
 Done means `Verify-Pptx.ps1` exits `0` and the quality review checks above pass or any exception is explicitly reported.

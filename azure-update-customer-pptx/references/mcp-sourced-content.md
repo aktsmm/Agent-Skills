@@ -26,6 +26,10 @@ Each `fetched-updates.json` item should carry both reference layers when possibl
 - Speaker notes should carry the full source trail: `Microsoft Learn 詳細: <url>` and `Azure Updates 発表: <url>`.
 - If `learnUrl` is `null`, add a review note such as `learnUrl_note` explaining whether no first-party page was found or the page is still unverified.
 
+### Historical Source URL Recovery
+
+When imported source slides predate `sourceUrl`, recover the Azure Updates record by normalized title, then confirm product/service and announcement window. Accept only one unique candidate. Record `azureUpdateId`, `sourceUrl`, `targetService`, `matchMethod`, and `confidence` in `manifest/url-recovery.json`; leave ambiguous matches unresolved for review instead of guessing. Merge recovered metadata without replacing an already verified `learnUrl`.
+
 ## Visible Content Boundary
 
 Visible slide body fields must be reusable across decks. Keep `background`, `before`, `after`, `customerImpact`, `pricing`, `japanRegion`, and `keypoint` customer-neutral.

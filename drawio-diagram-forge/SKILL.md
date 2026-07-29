@@ -131,3 +131,4 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 - [ ] Quality gate score ≥ 85
 - [ ] If diagram is referenced from documentation, both editable source and embeddable image are provided
 - [ ] Render review completed at the target embed width with no text overlap, clipping, or border collisions
+- [ ] After any edge or label layout change, re-export and inspect the target PNG; structural validation alone does not prove visual routing quality

@@ -27,6 +27,26 @@ graph TD
 | **Benefits**  | Works even when task count is not predetermined |
 | **Use Cases** | Code changes (multiple files), research         |
 
+## Delegated Evidence Contract
+
+Do not treat `0 results` as proof that a worker ran successfully. Every delegated data-collection step should return:
+
+```json
+{
+  "execution_state": "executed|not_run|blocked",
+  "status": "success|partial|failed",
+  "result_count": 0,
+  "prerequisite_state": "ready|missing|unknown",
+  "evidence_at": "ISO-8601 timestamp",
+  "executed_by": "worker-name",
+  "failure_reason": ""
+}
+```
+
+- `result_count=0` is valid only when the worker executed and its prerequisite was ready.
+- A missing tool, unmet prerequisite, timeout, or unavailable worker is `not_run` / `blocked`, never an empty success.
+- The synthesizer preserves partial and failed states instead of collapsing them into a clean result.
+
 ## When to Use
 
 - Number of subtasks depends on input

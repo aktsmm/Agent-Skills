@@ -57,7 +57,9 @@ not a stable model baseline. Call out outliers rather than deleting them.
 3. State comparability confidence and reasons.
 4. Separate observed evidence from interpretation.
 5. Name missing AIU or quality data explicitly.
-6. End with the recommended use case for each non-dominated configuration.
+6. For live sessions, label snapshot-derived cumulative values as lower bounds
+   and state the snapshot time and missing-call count.
+7. End with the recommended use case for each non-dominated configuration.
 
 Never describe AIU as USD or another currency. Never infer accuracy from final
 assistant wording, error rate, retry count, or fixes found without external

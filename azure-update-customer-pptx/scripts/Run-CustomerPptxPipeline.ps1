@@ -36,6 +36,20 @@ $manifestFolder = "$DateFolder\manifest"
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 $ppt = $null
 
+# 対象 PPTX が PowerPoint で開いたままだと、COM 上書きとクラウド同期の自動保存が競合し、
+# 競合マージで Weekly スライドの二重化やセクション消失を起こす。開いていれば保存せず閉じる。
+$existingApp = Get-ActivePptxApplication
+if ($existingApp) {
+    try {
+        if (Close-OpenPptxPresentation -Application $existingApp -PptxPath $outputPath) {
+            Write-Info "開いていた対象 PPTX を閉じました: $outputPath"
+        }
+    }
+    finally {
+        [System.Runtime.InteropServices.Marshal]::ReleaseComObject($existingApp) | Out-Null
+    }
+}
+
 try {
     $ppt = New-PptxSession
 

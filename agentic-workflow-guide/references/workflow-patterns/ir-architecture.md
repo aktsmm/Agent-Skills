@@ -47,6 +47,17 @@ graph LR
 3. **No inference** - Missing data = error, not auto-completion
 4. **Version control** - IR schema should be versioned
 
+## Current State In Append-Only Documents
+
+When one document contains both current state and history, do not search the entire body for status keywords.
+
+1. Define explicit start and end boundaries for the current-state region.
+2. Parse only that region with an exact header/schema.
+3. Reject missing columns, wrong cell counts, and duplicate logical keys.
+4. Exclude the history region by construction, not with a growing list of old statuses.
+
+This prevents an old `pending` record from being revived as current work.
+
 ## When to Use
 
 - Document generation (specs → documentation)
