@@ -44,7 +44,9 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 4. Applying reviewer fixes without leaving outlines, chapter maps, question digests, and progress trackers out of sync.
 5. Reviewing each chapter against the book-specific reader persona and expected outcome.
 6. Checking word count targets and source confidence before finalizing text.
-7. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
+7. Measuring the built page count before treating a page-budget overrun as a structural problem; character-count estimates run high.
+8. Ruling on external issues and pull requests point by point, verifying each factual claim against its source of truth.
+9. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
 
 ## Bootstrap Workflow
 
@@ -112,6 +114,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 | Folder structure     | [references/folder-structure.md](references/folder-structure.md)         |
 | Setup workflow       | [references/setup-workflow.md](references/setup-workflow.md)             |
 | Customization points | [references/customization-points.md](references/customization-points.md) |
+| External review      | [references/external-review-handling.md](references/external-review-handling.md) |
 | Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)           |
 
 ## Optional Build Pipeline

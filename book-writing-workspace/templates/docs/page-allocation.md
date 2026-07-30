@@ -36,6 +36,14 @@ Customize this table for your book:
 | Slightly off | ±30%      | Review             |
 | Out of range | >30%      | P1 issue, must fix |
 
+## Estimated vs Actual Pages
+
+Character-count estimates run high. Do not decide chapter splits or large cuts from an estimate alone.
+
+- A rough conversion such as 1,000 chars = 1 page overstated a real B5 build by roughly 11 percent in one project: 223 estimated pages against 198 actual.
+- That gap moved one chapter from "P1, over budget by 61 percent" to "within tolerance at 25 percent", and dropped the whole-book overrun from 25 percent to 8 percent. The structural rework it implied was never needed.
+- Build the PDF and measure before escalating a page-budget overrun. Treat the estimate as an early-draft signal only, and note in the review record which number is which.
+
 ## Word Count Check
 
 ```bash

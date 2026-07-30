@@ -2,6 +2,18 @@
 
 Practical tips for customizing PDF output with Re:VIEW 5.x and the `vvakame/review` Docker image.
 
+## Measuring Actual Page Counts
+
+Page budgets are usually planned from character counts, but only the built PDF settles the question. Measure it before acting on a budget overrun.
+
+Generated books often carry no bookmarks, so a table-of-contents API returns an empty list. Detect chapter starts from page text instead.
+
+- Scan the first few lines of each page for the chapter-heading pattern and keep the first page seen per chapter number
+- Derive each chapter's length from the gap to the next detected start
+- Front matter and the table of contents inflate the first entry, so verify that block visually before quoting it
+
+Report the measured total alongside the estimate and label both. Reviewers act on whichever number they read first.
+
 ## Font Selection
 
 Add `jafont=<preset>` to `texdocumentclass` options in `config.yml`:

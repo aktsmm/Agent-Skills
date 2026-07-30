@@ -56,6 +56,23 @@ Use Japanese only, or the acronym if already introduced.
   - Azure Active Directory
   - GitHub Copilot
 
+## Loanword vs Original-Language Terms
+
+Decide per term, not per surface. A rule that switches by surface (prose vs table vs list vs heading) cannot rule on headings, quiz options, or parallel enumerations, so the same word drifts inside one paragraph.
+
+Count actual usage across the whole manuscript before writing the rule. The rule should describe what the book already does; one invented from first principles fights the existing text and loses.
+
+Apply in order and stop at the first match.
+
+1. Shown as a command or code: original form in inline code
+2. Official name, setting name, UI label, or target-type name: original form
+3. Listed or contrasted as operation names: keep the whole list in one form so the row does not split
+4. Explained on its own as a concept: localized form, when the manuscript already favors it
+
+Terms with no established localized form stay original even in prose. A mixed pair such as `コミットと push` reflects how established each word is, not an inconsistency; write that into the rule so reviewers stop reporting it.
+
+State the policy once for readers, in the chapter where the terms first appear, rather than leaving them to infer it.
+
 ## Diagram Labels
 
 - Default diagram labels, box titles, and helper text to the main manuscript language.

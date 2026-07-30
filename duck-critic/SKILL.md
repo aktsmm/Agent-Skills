@@ -39,6 +39,8 @@ This is **not** "hand the whole task to a reviewer subagent". You stay the **pro
 - Do not hardcode model names in portable skill instructions. Verify exact local model names before storing them in harness-specific config or handoffs.
 - Ignore style-only, formatting-only, naming-preference, and generic best-practice comments unless they affect the task outcome.
 - Focus on issues that could break requested behavior, security, data integrity, runtime behavior, deployment, or verification.
+- When the target is a rule, convention, or style decision, put **measured reality** in the packet: counts across the affected corpus, the history of the rule, and where its source of truth lives. Without that, the critic answers with generic best practice and proposes something that collides with the existing assets.
+- Rejecting a critic recommendation is a legitimate move, but it needs its own evidence. State the rejection and the data behind it in the next round's packet, and ask the critic to rule on **the rejection itself**. A recommendation that sounds right in the abstract can still lose to a measurement the critic could not see.
 
 ## Procedure
 
