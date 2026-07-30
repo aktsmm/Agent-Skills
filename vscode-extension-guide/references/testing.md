@@ -166,6 +166,8 @@ Run a full compile first, then add targeted checks based on what changed.
 | Installer / updater / index merge logic       | Run focused regression scripts plus a broader smoke test because these paths often cross manifest, filesystem, and network boundaries                                                                                                                |
 | Generated marker sections                     | Test duplicate marker handling and confirm the final file contains exactly one generated section pair                                                                                                                                                |
 
+Filesystem and realpath behavior can classify the same missing resource differently across developer machines and hosted runners. Assert the user-facing contract first (for example, fallback source/status/payload), and only pin an internal error reason when the test controls the exact failure branch. If multiple reasons are specification-equivalent, use an explicit allowed set instead of one environment-dependent value.
+
 For small fixes, a good baseline is `npm run compile` plus the smallest script or test file that exercises the changed behavior. For shared manifest, installer, updater, or scanner code, prefer adding one regression test over relying only on manual verification.
 
 ## Common Test Patterns

@@ -144,12 +144,15 @@ If a release test asserts the extension version inside docs or spec files (READM
 - If prepublish already passed separately, still let `vsce package` run its configured prepublish unless the local `vsce package --help` explicitly documents a supported skip flag. Unsupported flags such as guessed `--no-prepublish` are a sign to check local help rather than continue by trial and error.
 - Prefer `npx vsce package --out <file>` over ambiguous `npm exec -- vsce package --out <file>` forms. If `vsce` reports `Invalid version <path>`, the package path was parsed as a version argument; switch runner syntax rather than changing the version.
 - Run `git status --short` after packaging and `vsce ls`, not only before committing. Repository prepublish scripts can regenerate tracked metadata or JSON formatting; if that happens after the release commit/tag, either commit the mutation before packaging or restore and rebuild the VSIX so the artifact matches the tagged commit.
+- Do not use interactive `gh run watch` output as the only completion signal in terminals that may switch to an alternate screen or truncate output. Redirect it to a temporary log, then confirm the final run through the Actions API and expected release artifacts.
+- After `npm install` or `npm audit fix`, scan every `package-lock.json` `resolved` URL before committing. Public repositories should reject non-public registry hosts and prove a clean `npm ci --registry=https://registry.npmjs.org` succeeds; passing `--registry` does not always rewrite existing resolved URLs.
 
 ## Post-publish Verification
 
 - Treat Marketplace listing metadata and `vsce show` as eventually consistent. If publish logs, the pushed tag, and GitHub Release are successful but the listing still shows the previous version, do not republish immediately; verify the version-specific VSIX endpoint first.
 - Use the version-specific package URL pattern `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<extension>/<version>/vspackage`. Some Marketplace endpoints return `405` for `HEAD`, so use a small `GET` download to a temp file and confirm HTTP 200 plus a plausible size before declaring the version missing.
-- Compare the downloaded VSIX size with the locally packaged artifact or GitHub Release asset. Matching size is stronger evidence than a stale human-facing Marketplace page.
+- Compare the downloaded VSIX size and SHA256 with the locally packaged artifact or GitHub Release asset. A matching hash is stronger evidence than a stale human-facing Marketplace page.
+- If a pushed release tag fails CI before publication, keep the failed tag as provenance. Fix the issue, bump to a new patch version, synchronize package/lock/changelog/spec files, and publish a new tag; do not move or reuse the pushed tag.
 
 ## Local VSIX Artifact Hygiene
 

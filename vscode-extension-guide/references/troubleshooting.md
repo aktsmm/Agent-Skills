@@ -141,6 +141,18 @@ unexpectedly large or unchanged-huge size means `.vscodeignore` is not excluding
 | API undefined        | Wrong VS Code version  | Check `engines.vscode` matches API used             |
 | Permission denied    | Restricted API         | Check extension permissions/capabilities            |
 
+### Persistent State Across Windows
+
+When an extension mirrors state between a file and `globalState`, treat persistence as one invariant rather than separate patches:
+
+- replace file snapshots atomically with same-directory temporary write/sync/rename;
+- write payload before revision metadata and serialize foreground saves with mirrors per destination;
+- use a proven heartbeat/stale-aware cross-process lock, then re-read revision inside the lock before writing;
+- on revision conflict, reload the winning snapshot and ask the user to retry instead of merging deletes heuristically;
+- do not timeout an uncancellable `globalState.update()` and release the lock while that write can still land later.
+
+Test empty/corrupt/meta-less snapshots, valid revision-backed empty deletes, mirror failure ordering, stale-window conflicts, lock recovery, and failed atomic replacement preserving the previous target.
+
 ### Check VS Code API Version
 
 ```json
