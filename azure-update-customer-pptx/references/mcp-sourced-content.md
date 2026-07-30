@@ -20,6 +20,7 @@ Each `fetched-updates.json` item should carry both reference layers when possibl
 
 - `sourceUrl`: Azure Updates / Release Communications announcement URL.
 - `learnUrl`: closest Microsoft Learn or official Docs page for the underlying service feature, found through Microsoft Learn Docs MCP. Leave `null` only when no relevant first-party documentation exists after a targeted search.
+- `relatedLearnReferences`: optional array of at most two additional Learn pages. Add one only when it has a distinct role (implementation, feature reference, region/availability); reject duplicate URLs and generic overview duplication.
 - Visible slides must label these roles explicitly: `参考：Microsoft Learn（詳細）` for `learnUrl`, and `参考：Azure Updates（発表）` for `sourceUrl`. Never put `スピーカーノート参照` or a similar notes pointer on a visible slide.
 - Put the visible label in one dedicated reference shape (for example, `OfficialReference`) and set its shape-level `ActionSettings.Item(1).Hyperlink.Address`. Do not rely only on a text-range hyperlink because PowerPoint COM saves can drop it.
 - Saved-deck QA must inspect every visible Weekly reference shape for a nonempty hyperlink URL and compare its page URL (ignoring an optional `#fragment`) with the manifest URL.
@@ -32,19 +33,21 @@ When imported source slides predate `sourceUrl`, recover the Azure Updates recor
 
 ## Visible Content Boundary
 
-Visible slide body fields must be reusable across decks. Keep `background`, `before`, `after`, `customerImpact`, `pricing`, `japanRegion`, and `keypoint` customer-neutral.
+Visible slide body fields must be reusable across decks. The customer-facing contract is `targetService`, `updateSummary`, `userValue`, `displayImpact`, optional `pricing`, `beforeAfter`, and the mode-specific lower-row content. Keep `impactType` as internal classification only; never render `【…】` inside `displayImpact`. `updateSummary` must explain what was added, changed, or retired instead of repeating the title. Reviewed region `status` governs region wording in `displayImpact`.
 
 ### Per-Item Layout Mode
 
 Write `layoutMode` to every classified Weekly item; presentation logic must use this field rather than infer a layout from whether a topic is AI.
 
-| Mode        | Use when                                                                           | Lower third panel                                | Keypoint band                       |
-| ----------- | ---------------------------------------------------------------------------------- | ------------------------------------------------ | ----------------------------------- |
-| `action`    | Retirement, deadline, or migration action                                          | `対応の要点` from the action text                | omit to avoid duplicate action text |
-| `technical` | AI, security, operations, storage, or other technical concepts affect the decision | `技術の要点` from the first two `basics` entries | show                                |
-| `change`    | General update without a specialized technical/action need                         | `基礎知識` from the first two `basics` entries   | show                                |
+| Mode        | Use when                                                                           | Full-width lower row                             |
+| ----------- | ---------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `action`    | Retirement, deadline, or migration action                                          | `対応の要点` from the action text                |
+| `technical` | AI, security, operations, storage, or other technical concepts affect the decision | `技術の要点` from the first two `basics` entries |
+| `change`    | General update without a specialized technical/action need                         | `基礎知識` from the first two `basics` entries   |
 
-`layoutMode` must be reviewable manifest data written during classification, not an implicit renderer heuristic. A renderer may deterministically default retirement items to `action`, but it must preserve an explicit `technical` or `change` value and never use `isAI` alone as the presentation decision. Use a full-width upper summary and a lower `Before / After / third panel` layout with 16pt panel headings.
+`layoutMode` must be reviewable manifest data written during classification, not an implicit renderer heuristic. A renderer may deterministically default retirement items to `action`, but it must preserve an explicit `technical` or `change` value and never use `isAI` alone as the presentation decision. Use a text-first upper block, graphical `Before / After`, and a full-width left-aligned mode row. Do not render a duplicate keypoint band.
+
+Use the Azure Updates `created` value as the common visible publication date (`掲載: YYYY/MM/DD`). Keep GA/Preview availability and retirement timing as separate timeline facts in notes and action text.
 
 Do not put customer name, system name, tenant domain, subscription IDs, or internal environment labels in visible body fields. Put customer-specific impact or applicability in `notes.json` speaker notes or a review-only artifact.
 

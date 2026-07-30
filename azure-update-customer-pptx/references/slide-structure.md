@@ -35,12 +35,12 @@ Visible update slides must distinguish reference types. Use short, linked labels
 
 ## Weekly body composition
 
-Use the service name, not the customer category, in `対象：`. The full-width upper body is `対象：`, `価値：`, `影響：`, and optional `課金：`; `影響：` begins with exactly one of `【要対応】`, `【評価】`, `【情報】`, or `【活用候補】`. Keep detailed mechanisms and terminology in notes unless they are surfaced by the mode-driven lower third panel.
+Use the service name, not the customer category, in `対象：`. The full-width upper body is one ordinary left-aligned text frame: `対象：`, `更新内容：`, `価値：`, `影響：`, and optional `課金：`. Do not turn those lines into separate cards. `更新内容` explains the actual change in one or two lines; `価値` explains the benefit; `影響` shows constraints or action without internal `【…】` tokens.
 
 - Render Before / After in the first two lower panels, not a combined `変更：` sentence.
-- Render the third lower panel from `layoutMode`: `対応の要点` / `技術の要点` / `基礎知識`. Each lower-panel heading is 16pt.
-- Omit the `keypoint` band for `action`; its action sentence already appears in `対応の要点`.
-- Render `keypoint` in a distinct one-line emphasis band for `technical` and `change`.
+- Render the mode content below Before / After as one full-width, left-aligned row: `対応の要点` / `技術の要点` / `基礎知識`. Heading is 16pt; body is 13-15pt.
+- Do not render `keypoint` as a separate band in any mode; use it as source text for `updateSummary` or `対応の要点`.
+- Keep graphical containers for comparison and the mode row, but keep ordinary descriptive text unboxed.
 - Keep body fill ratio (`BoundHeight / shape.Height`) within 0.55-0.92.
 - Reserve the title space before the status badge. If a title is too long, wrap it inside the title region (up to two lines) and validate a rendered saved slide; never clip into the badge or hide the text by over-shrinking it.
 
