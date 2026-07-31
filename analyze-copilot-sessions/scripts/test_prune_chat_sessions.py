@@ -1,6 +1,8 @@
+import base64
 import importlib.util
 import json
 import os
+import sqlite3
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -39,6 +41,55 @@ class PruneChatSessionsTests(unittest.TestCase):
         os.utime(path, (timestamp, timestamp))
         return path
 
+    def local_resource(self, session_id: str) -> str:
+        encoded = base64.urlsafe_b64encode(session_id.encode("utf-8")).decode("ascii").rstrip("=")
+        return f"vscode-chat-session://local/{encoded}"
+
+    def create_state_database(
+        self,
+        storage: Path,
+        index_entries: dict,
+        states: list[dict],
+    ) -> Path:
+        database = storage / "state.vscdb"
+        connection = sqlite3.connect(database)
+        try:
+            connection.execute("CREATE TABLE ItemTable (key TEXT PRIMARY KEY, value TEXT)")
+            connection.executemany(
+                "INSERT INTO ItemTable (key, value) VALUES (?, ?)",
+                (
+                    (MODULE.INDEX_KEY, json.dumps({"version": 1, "entries": index_entries})),
+                    (MODULE.STATE_KEY, json.dumps(states)),
+                ),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+        return database
+
+    def create_chronicle_database(self, storage: Path, session_id: str) -> Path:
+        database = MODULE.chronicle_database(storage)
+        database.parent.mkdir(parents=True)
+        connection = sqlite3.connect(database)
+        try:
+            connection.executescript(
+                """
+                CREATE TABLE sessions (id TEXT PRIMARY KEY);
+                CREATE TABLE turns (session_id TEXT);
+                CREATE TABLE checkpoints (session_id TEXT);
+                CREATE TABLE session_files (session_id TEXT);
+                CREATE TABLE session_refs (session_id TEXT);
+                CREATE TABLE search_index (session_id TEXT);
+                """
+            )
+            for table in ("turns", "checkpoints", "session_files", "session_refs", "search_index"):
+                connection.execute(f"INSERT INTO {table} (session_id) VALUES (?)", (session_id,))
+            connection.execute("INSERT INTO sessions (id) VALUES (?)", (session_id,))
+            connection.commit()
+        finally:
+            connection.close()
+        return database
+
     def test_plan_retains_latest_and_explicitly_protected_sessions(self):
         now = datetime(2026, 7, 31, tzinfo=timezone.utc)
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -59,6 +110,27 @@ class PruneChatSessionsTests(unittest.TestCase):
             self.assertEqual(plan["protected_ids"], {protected_id, recent_id})
             self.assertTrue((storage / "chatSessions" / f"{old_id}.jsonl").exists())
 
+    def test_plan_automatically_protects_pinned_session(self):
+        now = datetime(2026, 7, 31, tzinfo=timezone.utc)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            workspace = root / "repo"
+            workspace.mkdir()
+            storage = self.create_storage(root, workspace)
+            pinned_id = "11111111-1111-4111-8111-111111111111"
+            self.create_session(storage, pinned_id, now - timedelta(hours=72))
+            self.create_state_database(
+                storage,
+                {pinned_id: {"lastMessageDate": (now - timedelta(hours=72)).timestamp() * 1000}},
+                [{"resource": self.local_resource(pinned_id), "pinned": True}],
+            )
+
+            plan = MODULE.build_plan(storage, 36, set(), keep_latest=0, now=now)
+
+            self.assertEqual(plan["session_files"], [])
+            self.assertEqual(plan["pinned_ids"], {pinned_id})
+            self.assertIn(pinned_id, plan["protected_ids"])
+
     def test_apply_deletes_exact_session_auxiliary_and_old_uuid_orphan_only(self):
         now = datetime(2026, 7, 31, tzinfo=timezone.utc)
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -74,13 +146,32 @@ class PruneChatSessionsTests(unittest.TestCase):
             old_editing = self.create_auxiliary(storage, "chatEditingSessions", old_id, now)
             orphan_resource = self.create_auxiliary(storage, "chat-session-resources", orphan_id, now - timedelta(hours=72))
             non_uuid = self.create_auxiliary(storage, "chatEditingSessions", "not-a-session-id", now - timedelta(hours=72))
+            state_database = self.create_state_database(
+                storage,
+                {
+                    old_id: {"lastMessageDate": (now - timedelta(hours=72)).timestamp() * 1000},
+                    orphan_id: {"lastMessageDate": (now - timedelta(hours=72)).timestamp() * 1000},
+                    recent_id: {"lastMessageDate": (now - timedelta(hours=1)).timestamp() * 1000},
+                },
+                [
+                    {"resource": self.local_resource(old_id), "read": 1},
+                    {"resource": self.local_resource(orphan_id), "read": 1},
+                    {"resource": self.local_resource(recent_id), "read": 2},
+                ],
+            )
+            chronicle_database = self.create_chronicle_database(storage, old_id)
 
             plan = MODULE.build_plan(storage, 36, set(), keep_latest=1, now=now)
             deleted = MODULE.apply_plan(plan)
             result = MODULE.report(plan, "apply", deleted)
 
-            self.assertEqual(deleted, {"session_files": 1, "auxiliary_dirs": 2})
+            self.assertEqual(deleted["session_files"], 1)
+            self.assertEqual(deleted["auxiliary_dirs"], 2)
+            self.assertEqual(deleted["index_entries"], 2)
+            self.assertEqual(deleted["state_entries"], 2)
+            self.assertEqual(deleted["chronicle_rows"], 6)
             self.assertEqual(result["workspace_storage_id"], "storage-id")
+            self.assertTrue(result["reload_window_required"])
             self.assertEqual(result["remaining_candidate_session_count"], 0)
             self.assertEqual(result["remaining_candidate_auxiliary_count"], 0)
             self.assertFalse(old_session.exists())
@@ -88,6 +179,26 @@ class PruneChatSessionsTests(unittest.TestCase):
             self.assertFalse(orphan_resource.exists())
             self.assertTrue(recent_session.exists())
             self.assertTrue(non_uuid.exists())
+            state_connection = sqlite3.connect(state_database)
+            try:
+                rows = dict(state_connection.execute("SELECT key, value FROM ItemTable"))
+            finally:
+                state_connection.close()
+            self.assertNotIn(old_id, json.loads(rows[MODULE.INDEX_KEY])["entries"])
+            self.assertNotIn(orphan_id, json.loads(rows[MODULE.INDEX_KEY])["entries"])
+            self.assertIn(recent_id, json.loads(rows[MODULE.INDEX_KEY])["entries"])
+            self.assertEqual(
+                [state["resource"] for state in json.loads(rows[MODULE.STATE_KEY])],
+                [self.local_resource(recent_id)],
+            )
+            chronicle_connection = sqlite3.connect(chronicle_database)
+            try:
+                remaining = chronicle_connection.execute(
+                    "SELECT COUNT(*) FROM sessions WHERE id = ?", (old_id,)
+                ).fetchone()[0]
+            finally:
+                chronicle_connection.close()
+            self.assertEqual(remaining, 0)
 
     def test_resolves_workspace_root_for_code_workspace_metadata(self):
         with tempfile.TemporaryDirectory() as tmpdir:

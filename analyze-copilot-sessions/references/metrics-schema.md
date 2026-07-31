@@ -94,8 +94,9 @@ or a shorter `session_observed_seconds` without reversing prior usage.
   removed before the first saved snapshot.
 
 For wall time, prefer explicit workflow timestamps or session-store
-`created_at`/`updated_at`. Use the latest log modification time only as evidence
-of recent activity.
+`created_at`/`updated_at`. Use log modification time only to discover candidates:
+customization discovery or resolution events can continue after execution-bearing
+events stop and do not establish target identity or execution activity.
 
 `total_aiu` is local telemetry derived from `copilotUsageNanoAiu / 1e9`, not an
 authoritative billing ledger. It may reproduce GitHub AI Credits under current

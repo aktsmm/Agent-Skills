@@ -7,6 +7,25 @@ AIU and time, LLM/tool errors, quality evidence, and missing-data warnings.
 Describe observed concentration or failure signals without claiming they caused
 the outcome. Do not produce winners, Pareto results, or model rankings.
 
+## Session State
+
+Classify the verified target run and latest request, not the mutable session
+directory. Treat user, LLM, agent-response, tool, and child-subagent execution
+as execution-bearing; ignore customization discovery and resolution events for
+liveness.
+
+- `ACTIVE`: execution-bearing events continue within the declared observation
+  window, or direct evidence shows a target operation is still in flight.
+- `COMPLETED`: the latest request has a correlated terminal response or external
+  workflow completion artifact, with no unresolved in-flight operation.
+- `STALLED`: the latest request lacks completion evidence and task-bearing
+  progress beyond the observation window.
+- `UNKNOWN`: target identity, request correlation, or terminal state cannot be
+  established from available evidence.
+
+Do not classify state from the active chat, directory recency, UI spinner, or
+log modification time alone.
+
 ## Confidence
 
 | Confidence | Conditions                                                                   |

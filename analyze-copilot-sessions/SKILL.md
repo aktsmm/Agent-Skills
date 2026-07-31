@@ -29,13 +29,16 @@ Use [prune_chat_sessions.py](scripts/prune_chat_sessions.py) for workspace-scope
 
 - Run without `--apply` first. Deletion always requires an explicit second run with `--apply`.
 - Use `chatSessions/*.jsonl` modification time as the conservative activity boundary. A session index can be partial or remain stale after files are removed, so never use its count as deletion authority.
-- The newest session is protected by default. Also pass the active session ID with `--protect-session-id` when known.
-- Delete only matching UUID session files and auxiliary directories. Do not modify `state.vscdb`, debug logs, or unrelated workspace storage.
+- Read `agentSessions.state.cache` from `state.vscdb` and protect every pinned local session automatically. The newest session is also protected by default; pass the active session ID with `--protect-session-id` when known.
+- On apply, remove exact candidate IDs from session files, auxiliary directories, `chat.ChatSessionStore.index`, session state, and the local Chronicle index. Never delete debug logs, cloud data, or unrelated workspace storage.
+- Reload the VS Code window immediately after metadata cleanup. A live workbench can otherwise write its stale in-memory session index back to `state.vscdb`.
+- Cloud-synced copies require the **Delete Session Sync Data** command; local cleanup does not imply cloud deletion.
 
 ## Workflow
 
 1. **Fix the analysis objective**
    - Identify the sessions, analysis focus, task kind, and workload unit.
+   - Bind each target to an explicit session ID or path and verify at least two independent anchors, such as workspace, creation window, or first-request task marker. Treat the current chat, `--recent`, and log modification time as candidate discovery only.
    - For comparisons, also identify revision and workflow/rubric versions.
    - Ask only for missing values that could change the result.
 2. **Choose input**

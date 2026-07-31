@@ -3,6 +3,12 @@
 Logs measure activity, not correctness. Bind quality through an analysis
 manifest and external persisted artifacts.
 
+Report observed execution state separately from durable outcome state. A
+canceled or stalled UI/parent request does not make persisted artifacts fail,
+and successful child activity does not make the workflow pass without declared
+artifact identity and gate evidence. Leave retry and partition reconciliation
+to the owning workflow rather than inferring it from session lifecycle.
+
 ## Levels
 
 | Level            | Requirement                                                      | Interpretation                |
