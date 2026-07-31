@@ -66,6 +66,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [web-accessibility](web-accessibility/) | Build and review accessible web products using WCAG 2.2 AA |
 | [x-hashtag-research](x-hashtag-research/) | Collect and analyze public X posts from hashtags to discover primary sources, official docs, related GitHub repos, and reusable images |
 | [x-twitter-browser-ops](x-twitter-browser-ops/) | Read-only X/Twitter browser data workflow |
+| [xquik-x-data](xquik-x-data/) | Use Xquik REST API or MCP workflows for X/Twitter search, lookup, export, monitoring, webhooks, SDK setup, and confirmation-gated posting |
 <!-- public-skills-table:end -->
 
 ## Usage / 使い方
@@ -118,3 +119,5 @@ Each skill has its own license in `LICENSE.txt`. Please refer to the license fil
 ## Author / 作者
 
 yamapan ([@aktsmm](https://github.com/aktsmm))
+
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
