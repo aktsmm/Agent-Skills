@@ -30,6 +30,7 @@ metadata:
 - Freeze scope, AC, verifier, out-of-scope, must NOT, autonomy, and persistence before execution.
 - Keep a compact ledger: AC status, evidence, attempts, gaps, and next action.
 - Delegate broad research, mutation, and primary verification when workers are available; workers return evidence only.
+- Before parallel durable dispatch, checkpoint each partition identity, expected evidence, and wait deadline. After cancellation, retry, or a missing parent completion, reconcile durable evidence first and rerun only unresolved partitions.
 - Judge by external signals first. Never PASS from self-evaluation, supporting checks alone, skipped tests, TODOs, or weakened criteria.
 - On failure, update the ledger from the failed signal, change approach, and avoid repeating attempts.
 - Use Small-Bet-First for broad, irreversible, dependency, schema, deployment, or user-facing changes.
@@ -48,7 +49,9 @@ Use [criteria-agreement.md](./references/criteria-agreement.md).
 Use [steering-and-final-gates.md](./references/steering-and-final-gates.md) and [ledger-templates.md](./references/ledger-templates.md).
 
 - Pick the lightest effort level that still protects the goal; downgrade trivial work.
-- Split into verifiable subgoals, record status, parallelize only independent read-only work.
+- Split into verifiable subgoals and record status. Parallelize read-only work,
+  or independently partitioned mutations with durable identity, idempotency,
+  expected evidence, and conflict-free ownership.
 
 ## Phase 3: Delegate Workers
 
@@ -56,6 +59,7 @@ Use [loop-control.md](./references/loop-control.md).
 
 - Start broad or risky changes with a pilot; never expand a failed pilot.
 - Give workers only the subgoal, AC, boundaries, must NOT, relevant attempt lessons, and expected evidence.
+- Treat parent tool receipt, UI state, and `turn_end` as delivery evidence, not completion authority; use terminal child state plus verified durable artifacts.
 - If no subagent tool exists, record degraded mode; only downgraded small work may run in main context.
 
 ## Phase 4: External Verification

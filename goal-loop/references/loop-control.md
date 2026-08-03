@@ -6,27 +6,43 @@ Phase 6 の詳細。ループが「必ず止まる」「同じ失敗を繰り返
 
 max iteration だけに頼らない。次のどれか 1 つでも該当したらループを止める/分岐する。
 
-| 種類                | 判定                                          | アクション      |
-| ------------------- | --------------------------------------------- | --------------- |
-| 収束                | 全 must 基準 PASS かつ confidence ≥ 閾値      | 完了（Phase 7） |
+| 種類                | 判定                                                    | アクション      |
+| ------------------- | ------------------------------------------------------- | --------------- |
+| 収束                | 全 must 基準 PASS かつ confidence ≥ 閾値                | 完了（Phase 7） |
 | stall               | `stall_counter` が profile の `stall→replan` 閾値に到達 | replan          |
-| oscillation         | 同一 `(action, target)` を繰り返している      | replan か HITL  |
-| diminishing returns | 改善幅が ε 未満で連続                         | HITL            |
-| budget              | max iteration / 時間 / コスト 上限超過        | HITL            |
-| confidence 低迷     | 改善しても閾値に届かない見込み                | HITL            |
+| oscillation         | 同一 `(action, target)` を繰り返している                | replan か HITL  |
+| diminishing returns | 改善幅が ε 未満で連続                                   | HITL            |
+| budget              | max iteration / 時間 / コスト 上限超過                  | HITL            |
+| confidence 低迷     | 改善しても閾値に届かない見込み                          | HITL            |
 
 `stall_counter` の更新: そのループで「PASS した基準が 1 つも増えず、gap も縮まなかった」なら +1、
 前進があれば 0 にリセット。
+
+## Parallel Dispatch Recovery
+
+A missing parent tool result or turn completion is an unknown delivery state,
+not proof that a worker failed. Wait only until the dispatch deadline, then
+reconcile terminal child state with declared durable artifacts and gate
+readbacks. Checkpoint verified partitions, record delivery loss separately from
+task failure, and retry only unresolved partitions with the original
+idempotency key where supported.
+
+Do not wait indefinitely or relaunch the whole batch. After repeated delivery
+loss reaches the persistence budget, cancel the stale parent request and hand
+off or resume in a new turn from the frozen brief and reconciled ledger. Stop
+automatic resume when criteria changed, artifact identity is ambiguous,
+artifacts conflict, or an irreversible mutation may have completed without a
+verifiable readback.
 
 ## Persistence Profile（粘り強さ）
 
 Phase 1 で retry budget を明示する。どの profile でも同じ approach の反復、criteria の弱体化、検証の甘化は禁止。
 
-| profile    | 用途                         | max iteration | stall→replan | replan→HITL | blocker 判定前の別 approach | diminishing returns |
-| ---------- | ---------------------------- | ------------- | ------------ | ----------- | ---------------------------- | ------------------- |
-| Standard   | 通常の中規模作業             | 12            | 4            | 4           | 4                            | 2 連続              |
-| Persistent | なるべく何度も試したい作業   | 20            | 5            | 5           | 6                            | 3 連続              |
-| Exhaustive | 長期・重要・難所のやり切り   | 30            | 6            | 6           | 8                            | 4 連続              |
+| profile    | 用途                       | max iteration | stall→replan | replan→HITL | blocker 判定前の別 approach | diminishing returns |
+| ---------- | -------------------------- | ------------- | ------------ | ----------- | --------------------------- | ------------------- |
+| Standard   | 通常の中規模作業           | 12            | 4            | 4           | 4                           | 2 連続              |
+| Persistent | なるべく何度も試したい作業 | 20            | 5            | 5           | 6                           | 3 連続              |
+| Exhaustive | 長期・重要・難所のやり切り | 30            | 6            | 6           | 8                           | 4 連続              |
 
 既定は **Persistent**。些末・低リスクは Standard へ下げてよい。Exhaustive は durable ledger 推奨。
 時間・コスト・外部操作の budget が先に尽きた場合は profile より budget を優先する。

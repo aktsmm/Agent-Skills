@@ -103,6 +103,23 @@ JSONL 等の append-only log にする場合の event 名。
 - `steering_rejected`
 - `final_review_failed`
 - `subgoal_review_blocked`
+- `dispatch_registered`
+- `worker_terminal_observed`
+- `evidence_reconciled`
+- `dispatch_delivery_lost`
+- `recovery_started`
+
+For parallel durable work, register `dispatch_id`, `partition_id`,
+`idempotency_key`, expected artifact paths and revision/hash, gate paths,
+launch time, deadline, and attempt before launch. Recovery events reference the
+original dispatch and never overwrite or duplicate completed evidence.
+
+On resume, read back each partition and classify it `valid`, `missing`, or
+`invalid`. A partition is `valid` only when terminal child state is successful,
+the declared artifacts match identity/revision, and required gates pass. Preserve
+valid partitions and rerun only missing or invalid ones; UI state, cancellation,
+parent tool receipt, and conversation status are not authoritative outcome
+evidence.
 
 ## Final Quality Gate Evidence
 

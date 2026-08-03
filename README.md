@@ -20,7 +20,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | Skill | Description / 説明 |
 | --- | --- |
 | [agentic-workflow-guide](agentic-workflow-guide/) | Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for .ag... |
-| [analyze-copilot-sessions](analyze-copilot-sessions/) | Analyze historical VS Code GitHub Copilot Chat sessions by model, reasoning effort, AIU, time, reliability, workflow behavior, and external quality evidence; compare sessions wh... |
+| [analyze-copilot-sessions](analyze-copilot-sessions/) | Analyze historical VS Code GitHub Copilot Chat sessions by model, reasoning effort, AIU, time, reliability, workflow behavior, and external quality evidence, or safely prune wor... |
 | [azure-advisor-report](azure-advisor-report/) | Generate Azure environment monthly report (Markdown + PowerPoint) from Azure Advisor and Cost Management API |
 | [azure-env-builder](azure-env-builder/) | [Alpha] Experimental Azure environment builder for infrastructure and deployment design |
 | [azure-infra-validation](azure-infra-validation/) | Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs |

@@ -120,6 +120,17 @@ report-level receipt から紐付ける場合だけ、以下を行う。
 
 既存 receipt 一覧には古い同名・近似名・別案件の候補が混在することがある。ファイル名、金額、用途が一致する1件だけを選び、同じ receipt を複数行へ誤って残さない。
 
+### Clean Up Report-Level Duplicates
+
+upload再試行後は、line-level添付が見えなくてもreport-level cardだけが永続化され、同名receiptが重複することがある。全lineの正しい添付を確定してから整理する。
+
+1. `Receipts` tabで全cardの `File name` とattachment statusを取得する
+2. 正しいfile nameで `Attached to expense` のcardを各lineにつき1件だけ保持し、status空・旧名・同名重複を削除候補にする
+3. `Remove` 前に選択集合を再読取し、保持対象が未選択、削除対象がstatus空であることを確認する
+4. 削除後、report-level card数が期待件数と一致し、全cardが `Attached to expense`、全lineが `Receipts attached = Yes` であることを確認する
+
+attachment statusが曖昧、または1つのreceiptを複数lineで共有している場合は自動削除しない。
+
 ## Mandatory Matching Checks
 
 添付や差し替えの前に、以下を必ず照合する。
@@ -176,6 +187,10 @@ Expense line の Description は、右ペインの inline edit ではなく **Ed
 - 1 report に往復がある場合: `新幹線移動（往路）` / `新幹線移動（復路）`
 - 同額の新幹線 receipt が複数ある場合: receipt file name の `outbound` / `return` などと line の Description を対応させる
 - 列車名、細かい駅名、発車時刻は、ユーザーが必要と明示した場合だけ書く。通常は receipt で後追いできるため Description へ過剰に入れない
+
+### Submit Gate
+
+Submit前にreport番号、合計、approver、全lineのCategory / Description / policy compliant / `Receipts attached = Yes`、report-level receiptの重複なしを確認する。明示許可後にSubmitし、確認dialogの追加必須項目を満たしてから確定する。完了条件はDraft表示の消失と、一覧上の対象reportが `In review` など送信後statusへ遷移したこと。
 
 ## Browser Automation Note
 
