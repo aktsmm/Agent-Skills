@@ -105,7 +105,8 @@ python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming\unas
 
 ## Script Reference
 
-→ **[references/receipt_sorter.py](references/receipt_sorter.py)**
+- OCR sorter: **[references/receipt_sorter.py](references/receipt_sorter.py)**
+- D365 read-only report checker: **[scripts/inspect-d365-expense.mjs](scripts/inspect-d365-expense.mjs)**
 
 ## D365 Expense Integration
 
@@ -114,6 +115,7 @@ OCR 後のファイルを D365 Expense に添付する運用はこの skill の�
 - Report 作成 / metadata 編集
 - Expense line の Category / Description / Country / tax group 編集
 - line-level receipt upload / 差し替え / 照合
+- report / line / receipt card のread-only JSON検証
 - D365 UI の stale 表示や active row ずれの回避
 
 詳細は [references/d365-expense-guide.md](references/d365-expense-guide.md) を参照。

@@ -192,6 +192,17 @@ Expense line の Description は、右ペインの inline edit ではなく **Ed
 
 Submit前にreport番号、合計、approver、全lineのCategory / Description / policy compliant / `Receipts attached = Yes`、report-level receiptの重複なしを確認する。明示許可後にSubmitし、確認dialogの追加必須項目を満たしてから確定する。完了条件はDraft表示の消失と、一覧上の対象reportが `In review` など送信後statusへ遷移したこと。
 
+### Read-Only Report Checker
+
+Node.js 18+ と Playwright を利用できる環境では、bundle済みcheckerでreport / line / receipt cardをJSON検証できる。
+
+```powershell
+$env:D365_CDP_URL = 'http://localhost:9222' # 既定値。必要な場合だけ変更
+node scripts/inspect-d365-expense.mjs --report <REPORT_NUMBER>
+```
+
+出力はreport status、全lineのcategory / amount / receipt / policy、全receipt cardのfile name / attachment status / 選択状態、重複候補を含む。`safeDuplicateCandidates` は正規のattached cardと完全同名かつstatus空のcardだけ、旧名などは `reviewCandidates` として分離する。checkerは画面遷移とtab切替以外の書き込みを行わず、候補を自動削除しない。
+
 ## Browser Automation Note
 
 D365 のブラウザ操作は MCP Playwright tools (`browser_type` / `browser_click` / `browser_snapshot`) が安定しやすい。Playwright 直接スクリプトは動的 DOM で壊れやすい。
