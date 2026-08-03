@@ -66,7 +66,9 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - In `safe-auto`, edit directly when scope is clear, the safety gate passes, and the change is small or medium
 - Ask for confirmation only for broad rewrites, deletion, ambiguous private/public boundaries, or possible secret/customer/private data handling
 - In `safe-auto`, create a focused local commit by default. If the private repo is 3 or more commits ahead of origin after the commit, push without an additional explicit user instruction. If it is 1-2 commits ahead, do not push.
-- Before any automatic push, verify the remote is the private repo, the working tree is clean, and the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
+- Before any automatic push, verify the remote is the private repo and the working tree is clean, then `git fetch origin` and recompute ahead/behind. If behind, inspect overlapping paths and use a normal merge when changes are disjoint; do not push stale tracking refs.
+- If Git repeats a `HEAD.lock` / `couldn't set HEAD` rename failure twice, answer `n` and stop retrying. Preserve uncommitted work; inspect HEAD, status, diffs, rebase metadata, and lock ownership. Restore index/worktree only when HEAD is unchanged and the half-applied tree is proven to match the fetched remote, then use a verified merge path that does not detach HEAD. Never `reset --hard`, force push, or delete locks blindly.
+- Verify the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
 - Treat dirty primary skill changes as authoring or intake material. In safe-auto, stage and commit only the target skill changes, and leave unrelated dirty paths untouched.
 - Do not run public, internal, or EMU sync from this skill. If distribution is needed, hand off the primary to `sync-public-skills` in the completion report.
 

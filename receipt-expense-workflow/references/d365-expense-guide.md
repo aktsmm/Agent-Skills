@@ -183,6 +183,14 @@ D365 のブラウザ操作は MCP Playwright tools (`browser_type` / `browser_cl
 
 繰り返し操作は、手順が固まった後に UI automation helper へ切り出す。安全な自動化対象は、open expenses の抽出、対象行の選択、新規 report 作成、line-level receipt upload、カテゴリ / Country / tax group / Description 入力、`Save and continue` 後の検証まで。D365 書き込み API は entity / attachment contract / 認証境界が確認できるまで既定にせず、UI automation を正本にする。
 
+### Failure Budget
+
+- 1操作は通常UI 1回と、state再取得・対象line再特定後に同じ通常UI操作を1回だけ再実行する復旧までにする。waitは1操作につき1回・5秒以内とし、同じ永続stateが2回続くか5分間進展がなければ対象lineを停止する
+- receipt uploadは成功通知、`Receipts -> Edit` の対象file name、gridの `Receipts attached = Yes` をすべて確認して完了とする
+- `$dyn`、ViewModel callback、BlueimpなどD365 frontend内部へ迂回しない。通常UIで進まなければreport ID・line・file・確認済みstateを残して停止する
+- `Session ended` またはlogin画面ではstale DOMを操作しない。再認証後はDraftを開き直し、永続stateを再取得して未完了lineだけを再開する
+- 検証は `browser_find`、対象element snapshot、必要項目だけのread-only抽出を使い、full-page deep snapshotや同一queryを反復しない
+
 ### Async UI Gotchas
 
 - checkbox 選択と右ペインの active row は別物。編集前に Amount / Merchant / date-category が対象行と一致することを screenshot または DOM で確認する

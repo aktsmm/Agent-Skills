@@ -87,6 +87,13 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 
 ## Safety Rules
 
+### Failure Budget
+
+- Write操作の前に、成功を示す永続stateと復旧経路を決める。既定は通常UI 1回と、state再取得・対象再特定後に同じ通常UI操作を1回だけ再実行する復旧までにする
+- 同じ永続stateが2回続いたら停止し、対象・試行回数・最終state・再開条件をcompactに返す。固定waitやfull-page snapshotを重ねない
+- UI clickからDOM mutation、keyboard、private frontend internalsへ連続的にfallbackしない。公開されていないViewModelやupload実装の操作は、明示承認のある単発incident以外では使わない
+- `Session ended`、login redirect、別contextを検出したらstale DOMを操作しない。再認証後は永続stateを再取得し、未完了操作だけを再開する
+
 ### CDP 排他制御
 
 MCP Playwright と Python スクリプトは **同じ CDP ポートへ同時接続しない**。

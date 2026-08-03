@@ -96,8 +96,8 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 ## Gotchas
 
 - **Formatter drift**: VS Code / editor formatter が既存 markdown table を再整形して意味のない whitespace / column-align 差分を残すことがある。skill authoring commit に混ぜず、`chore(<skill>): normalize table whitespace after formatter run` として **必ず別 commit** で分離する。混ぜると後で revert しづらい
-- **Push rejected → rebase**: sync 前後に remote が別セッションで進んでいて `git push` が rejected になる場合、`git pull --rebase origin master` で **`HEAD.lock` rename failure** の無限プロンプト (y/n 応答無効) に陥ることがある。対処: (1) `git rebase --abort` (2) `git reset --hard HEAD` で index / worktree を HEAD に一致させる (3) `Get-ChildItem .git\*.lock -Force | Remove-Item -Force` で残 lock を除去 (4) `git merge --no-ff -m 'merge: ...' origin/master` で rebase を諦めて merge に切替。merge commit 1 個追加のコストで確実に前進できる
-- **Cross-cutting git operations**: この 2 点は sync だけでなく `retro-private-skills` / 大 skill 育成の直後にも同じ症状で再発する。skill 側で cross-cutting reminder として持つ
+- **Push rejected / divergence**: push前にfetchしてahead/behindを再計算する。双方にcommitがあれば変更pathの重複を調べ、競合がなければnormal mergeで同期する。stale tracking refのままrebaseやpushへ進まない
+- **`HEAD.lock` rename failure**: 同じ失敗が2回続いたら`n`で停止し、HEAD・status・diff・rebase metadata・lock所有を確認する。未commit変更を保護し、`reset --hard`やlock一括削除はしない。HEADが不変でindex/worktreeだけがfetched remoteと一致すると証明できる場合だけ対象をHEADへ戻し、HEADをdetachしないverified mergeへ切り替える
 - **Git Data API transient failure**: blob/tree/commit/ref APIは共通retryと空SHA fail-fastを通す。ref更新後にremote treeを再取得し、stale path削除と完全一致を確認する
 - **Internal full mirror only**: internal subset指定は未選択Skillを削除し得るため拒否する。distribution configの全集合だけをdesired setとして使う
 - **All Mode rollback**: tracked metadata、cross-root rename、commit失敗で停止する。commit途中の失敗は元HEADへ戻し、差分をunstagedで保持する

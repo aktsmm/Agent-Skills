@@ -94,6 +94,9 @@ python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming\unas
 - 未分類の生ファイルは、workspace root ではなく専用の intake folder に集約する
 - 例: `incoming/unassigned/`
 - 案件が確定しているファイルは、intake folder を経由せず project folder へ直接入れてよい
+- 案件が不明な出張明細は、移動前に read-only の承認記録、予定表、予約記録を日付・区間・目的で照合する。一致しなければ `--project` を推測せず、未分類に残して確認する
+- システム発行の交通領収書は表示日や購入日ではなくサービス日・乗車日を使う。出発地と到着地が両方確認できる場合だけ、分類末尾へ `origin-to-destination` を付けて往復を区別する
+- 実行対象を専用 intake に限定し、dry-run の結果を確認してから本実行する
 - dry-run 用のコピーや検証入力は一時フォルダで扱い、完了後に削除する
 
 ## Setup

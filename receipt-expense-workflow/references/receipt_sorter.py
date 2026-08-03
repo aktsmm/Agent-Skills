@@ -81,7 +81,7 @@ FOOD_ITEM_KEYWORDS = [
     "GRATUITY", "SERVER", "TABLE", "DINE IN", "TAKE OUT", "TO GO",
     "CHOWDER", "CALAMARI", "OYSTER", "CLAM", "LOBSTER", "CRAB",
     # 日本語: 食品
-    "弁当", "おにぎり", "サンドイッチ", "ハンバーガー", "カレー", "定食",
+    "弁当", "おにぎり", "サンドイッチ", "ハンバーガー", "カレー", "定食", "フレンチトースト",
     "ドリンク", "ビール", "コーラ", "お茶", "水",
 ]
 
@@ -256,6 +256,24 @@ def ocr_pdf(path: Path) -> str:
 # ── 情報抽出 ──────────────────────────────────────────────────────────────────
 
 def extract_date(text: str):
+    # Smart EX lists purchase and departure dates; use the actual departure date.
+    smart_ex_match = re.search(
+        r"(?:スマート\s*EX|SMART\s*EX).*?購入日.*?乗車日.*?"
+        r"(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日.*?"
+        r"(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日",
+        text,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if smart_ex_match:
+        try:
+            return datetime(
+                int(smart_ex_match.group(4)),
+                int(smart_ex_match.group(5)),
+                int(smart_ex_match.group(6)),
+            )
+        except ValueError:
+            pass
+
     for pattern, extractor in DATE_PATTERNS:
         m = re.search(pattern, text, re.IGNORECASE)
         if m:
