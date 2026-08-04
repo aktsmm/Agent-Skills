@@ -150,6 +150,7 @@ Training Pikachu to level 25 in Route 1
 - Complex research requiring deep exploration
 - Parallel exploration of multiple paths
 - Need to isolate detailed work from main context
+- Read-only work likely to return about 100 lines or more, such as broad searches, long logs, or multi-page research
 
 #### Architecture
 
@@ -166,11 +167,13 @@ graph TD
 
 #### Key Pattern
 
-| Sub-agent Work          | Return to Main Agent      |
-| ----------------------- | ------------------------- |
-| 50,000+ tokens explored | 1,000-2,000 token summary |
-| Deep file reading       | Key findings only         |
-| Multiple tool calls     | Synthesized conclusions   |
+| Sub-agent Work          | Return to Main Agent                         |
+| ----------------------- | -------------------------------------------- |
+| 50,000+ tokens explored | Decision, key evidence, and next action      |
+| Deep file reading       | Key findings only                            |
+| Multiple tool calls     | Synthesized conclusion and optional raw path |
+
+Persist raw output only when later audit or re-reading is necessary. Return its relative path instead of its contents.
 
 #### Benefits
 
@@ -183,6 +186,8 @@ graph TD
 ## Just-in-Time Context Retrieval
 
 **Load context dynamically at runtime instead of pre-loading everything.**
+
+For narrow checks, constrain the target, fields, count, and range before each command or tool call, then filter, limit, or summarize at the source. Run these checks directly instead of delegating them.
 
 ### Pattern
 
