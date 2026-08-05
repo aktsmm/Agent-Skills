@@ -16,7 +16,7 @@ description: 会議ログから質問事項・確認事項・宿題を抽出し�
 
 | モード | 保存先 | 用途 |
 | --- | --- | --- |
-| **per-meeting** | `{日付}/{日付}_質問事項.md` | 会議ごとに分けて管理したい |
+| **per-meeting** | `meeting-notes/{YYYY-MM-DD}_{topic}_questions.md` | 会議ごとに分けて管理したい |
 | **accumulate** | `_questions/{YYYY-MM}.md` | 月単位で一括蓄積したい |
 
 ---

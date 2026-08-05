@@ -43,7 +43,7 @@ graph TD
     A[ユーザー入力] --> B{明確なコマンド/質問?}
     B -->|Yes| C[通常応答]
     B -->|No| D{Teams AI議事録?}
-    D -->|Yes| E[議事録変換 + フォルダ作成]
+    D -->|Yes| E[議事録変換 + meeting-notes 作成]
     D -->|No| F{会議メモ/議事録素材?}
     F -->|Yes| G[meeting-notes 作成 + 質問抽出]
     F -->|No| H{情報の断片?}
@@ -77,12 +77,11 @@ graph TD
 ### 議事録検出時の動作
 
 1. 日付を抽出（入力から or 今日の日付）
-2. 日付フォルダを作成（なければ）
-   - `{日付}/`
-   - `{日付}/{日付}_議事録.md`
-   - `{日付}/{日付}_内部メモ.md`
-3. Teams AI議事録をテンプレート形式に変換
-4. **確認メッセージ**: 「📝 議事録を作成しました: {日付}」
+2. `meeting-notes/{YYYY-MM-DD}_{topic}.md` を作成または更新する（日付フォルダは作らない）
+   - 内部限定の内容は `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md` に分ける
+3. Teams AI議事録を `_templates/meeting-minutes.md` の形式に変換する
+4. 同じ入力から宿題・確認事項を `_questions/{YYYY-MM}.md` へ抽出する
+5. **確認メッセージ**: 「📝 議事録を作成しました: {日付}」
 
 ### 会議メモ検出時の動作
 

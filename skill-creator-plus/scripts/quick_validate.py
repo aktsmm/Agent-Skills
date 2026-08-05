@@ -20,6 +20,7 @@ ALLOWED_PROPERTIES = {
     "user-invocable",
     "disable-model-invocation",
     "context",
+    "compatibility",
     "license",
     "allowed-tools",
     "metadata",
@@ -68,6 +69,13 @@ def validate_common_fields(skill_path: Path, frontmatter: dict) -> str | None:
             return f"{field} must be a boolean"
     if frontmatter.get("context") is not None and frontmatter["context"] not in {"inline", "fork"}:
         return "context must be 'inline' or 'fork'"
+    compatibility = frontmatter.get("compatibility")
+    if compatibility is not None and (
+        not isinstance(compatibility, str)
+        or not compatibility.strip()
+        or len(compatibility) > 500
+    ):
+        return "compatibility must be a non-empty string no longer than 500 characters"
     if not isinstance(frontmatter.get("license"), str) or not frontmatter["license"].strip():
         return "Missing 'license' in frontmatter"
     return None

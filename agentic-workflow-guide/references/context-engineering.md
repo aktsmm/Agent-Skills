@@ -152,6 +152,15 @@ Training Pikachu to level 25 in Route 1
 - Need to isolate detailed work from main context
 - Read-only work likely to return about 100 lines or more, such as broad searches, long logs, or multi-page research
 
+#### Choose the Isolation Primitive
+
+- Use ordinary sub-agent delegation for a one-off investigation or parallel analysis.
+- Use a forked Skill for a repeated high-volume workflow when the host supports it.
+- On unsupported hosts, fall back to ordinary sub-agent delegation; run inline only when isolation is unavailable and source output has been constrained.
+
+Context isolation separates conversation history. It is not a security boundary
+for file, network, or tool permissions; configure those controls separately.
+
 #### Architecture
 
 ```mermaid

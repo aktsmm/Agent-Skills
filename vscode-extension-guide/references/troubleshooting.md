@@ -162,6 +162,8 @@ Test empty/corrupt/meta-less snapshots, valid revision-backed empty deletes, mir
 }
 ```
 
+Do not assume the installed editor version exists as an `@types/vscode` package. Stable/preview editor builds can be ahead of the npm type release and `npm install` then fails with `ETARGET`. Check `npm view @types/vscode version`, use the newest published types that contain the APIs you need, and set `engines.vscode` to the **lowest supported API version**, not automatically to the developer's current editor version.
+
 ## Debug Tips
 
 ### Enable Verbose Logging

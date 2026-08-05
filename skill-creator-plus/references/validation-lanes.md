@@ -21,6 +21,11 @@ commands skipped: <command> - <why it is not relevant>
 
 For a no-helper Skill, this lane is sufficient when the record passes.
 
+When host-specific frontmatter is present, record the target hosts and fallback
+in the baseline review. A local host-aware validator can accept extensions such
+as `context`, but strict common-spec compliance requires a separate validator
+that rejects or explicitly excludes those extensions.
+
 ## Tool-Assisted Lane: Conditional
 
 Run a bundled helper only when its behavior changed or is needed to prove the

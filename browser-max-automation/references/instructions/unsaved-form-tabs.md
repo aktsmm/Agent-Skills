@@ -12,6 +12,7 @@ Qiita、CMS、SPA admin など **未保存 form** を持つタブを壊さない
 - dirty な form / SPA では `page.reload()`、`location.reload()`、API 捕捉目的の reload trigger を使わない
 - まず保存・キャンセル・画面上の status 読み取りで clean にする
 - reload 確認や unsaved alert が出たら、追加自動化を止めて手動 Cancel / Stay を優先する
+- native `beforeunload` prompt は browser chrome UI として window 全体を塞ぎ、通常の page dialog 操作で閉じられない場合がある。表示後に新しいタブを開いても解消しないため、先にユーザーが Cancel / Stay で閉じてから clean な新規タブへ進む
 
 ## 典型ケース
 

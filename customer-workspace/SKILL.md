@@ -91,6 +91,8 @@ Keep setup questions lightweight. Capture only facts that change routing, sharin
     └── ongoing/                    ← Continuing items without a deadline
 ```
 
+`Initialize-CustomerWorkspace.ps1` creates only `.github/`, `_inbox/`, `_questions/`, `_knowledge/`, `_customer/`, `_templates/`, `research-reports/`, and copies four templates (`meeting-minutes`, `internal-memo`, `customer-profile`, `attachments`). Create `meeting-notes/`, `next-actions/`, and the material folders on demand, and read `next-actions-*` / `knowledge-*` / `workspace-*` templates directly from `assets/_templates/`.
+
 ## Research Reports
 
 Use `research-reports/` for generated Markdown deliverables; keep the workspace root for entry files and controls. Detailed placement and sanitization rules are in [Knowledge Ledger Rules](references/knowledge-ledger-rules.md).
@@ -142,7 +144,7 @@ Before calling meeting notes done:
 - AI-generated follow-up tasks (Teams AI / Otter etc.) tend to be too literal or too generic. Cross-check with the body transcript and refine owner, deadline, and concrete deliverable. Do not leave ambiguous phrasing as-is.
 - Extract open questions and action items into `_questions/{YYYY-MM}.md`; create `next-actions/` tasks only for work that needs follow-up outside the meeting note.
 - Ensure shareable meeting-note tables contain no local file paths or internal-only work links.
-- Keep internal speculation in an internal memo or clearly marked internal section.
+- Keep internal speculation and commercial engagement terms (tier, contracted hours, SKU, paid-menu composition, effort burn) in an internal memo or clearly marked internal section; hold the engagement ledger inside `_customer/profile.md` as internal-only.
 - When the note will be shared with the customer, produce a copy-paste highlight block (`## お客様共有用ハイライト (コピペ用)`) with 3-5 confirmed bullets + next actions split into `お客様側 / 自社側 / 双方 (両者で調整)`. Cross-side coordination (schedule, joint review) goes in `双方` only — do not duplicate. See [references/meeting-minutes-rules.md](references/meeting-minutes-rules.md).
 
 ---

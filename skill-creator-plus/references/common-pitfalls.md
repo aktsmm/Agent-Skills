@@ -56,6 +56,14 @@ field types, UTF-8 input, and folder/name equality. Require author metadata only
 for locally authored license profiles; imported third-party skills can have a
 different metadata contract.
 
+### Host-Specific Frontmatter
+
+Fields such as `context: fork` can be supported by a host without belonging to
+the Agent Skills common specification. Keep the body, references, and scripts
+portable, declare the supported hosts in `compatibility`, and document the
+fallback for hosts that ignore the extension. A host-aware validator does not
+prove strict common-spec compliance.
+
 ### Accidental Prompt Tool Restrictions
 
 In VS Code prompt files, `tools:` is not harmless metadata. It overrides the default agent's enabled tools for that prompt run and can appear in the tools picker as a current-session-only configuration.

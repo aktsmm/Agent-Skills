@@ -21,4 +21,5 @@ _provided/                       <- customer-safe send-out or projection copies
 - Rename received originals with a stable date prefix; leave only unclassified items in `_received/incoming/`.
 - Check file signatures as well as extensions. A `.pptx` with an OLE signature must be handled as legacy Office content.
 - Review every PDF page and deck slide before updating summaries.
+- When PDF text extraction is unavailable, do not claim a full review. Record the unreviewed status in `attachments.md` and state where the summarized points actually came from (transcript, prior deck, etc.).
 - Use `scripts/Test-ReceivedMaterialPlacement.ps1` for a read-only root audit.

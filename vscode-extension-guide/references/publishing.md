@@ -136,8 +136,27 @@ If the project has a repository-specific release hygiene test, treat that test a
 
 If a release test asserts the extension version inside docs or spec files (README, CHANGELOG, a `FULL_SPECIFICATION`-style file), bump **every** one of them together with `package.json`. A single doc lagging the package version fails the release gate even when the build itself is correct, so update the version in all asserted files before tagging.
 
+### Local Preview Packages
+
+An unpublished local VSIX often has no repository URL or license file yet. If its README uses relative links (for example, a language switch or local image), `vsce` can reject packaging because it cannot rewrite those links. For a local-only preview:
+
+```powershell
+New-Item -ItemType Directory -Force artifacts/vsix | Out-Null
+npx --yes @vscode/vsce package `
+  --allow-missing-repository `
+  --skip-license `
+  --no-rewrite-relative-links `
+  --out artifacts/vsix/my-extension-0.0.1.vsix
+```
+
+Use the exact options reported by the pinned `vsce package --help`; do not guess similar names. `--no-rewrite-relative-links` is safe only when every relative target is included in the VSIX. Inspect the archive and verify the README language target and each relative image exist at those exact paths; an image excluded by `.vscodeignore` cannot fall back to GitHub in a local preview.
+
+Do not add Marketplace/version/install badges that imply publication before the extension exists there. Local previews can use factual static badges such as `Local Preview`, the declared minimum VS Code version, local-only privacy, and available languages. Once published, replace these with real Marketplace and repository links.
+
 ## Packaging Runner Gotchas
 
+- Create the parent directory passed to `--out` before invoking `vsce`; the CLI can enumerate a valid package and still fail at the final write with `ENOENT`.
+- On Windows, spawning `npx.cmd` directly from Node can fail with `EINVAL`. In an **npm-managed** project, invoke `process.env.npm_execpath` through `process.execPath` and use `npm exec --package=@vscode/vsce@<version-from-one-project-constant> -- vsce ...`; validate `npm_execpath` exists and is npm's CLI before spawning. For pnpm/yarn projects, use that manager's native exec command instead of forcing npm.
 - Treat the VSIX file as the completion source of truth. A quiet or truncated terminal is not success; confirm the artifact exists, has a fresh timestamp, and has a plausible size before moving to publish.
 - If `vsce package` appears to hang inside a shared VS Code terminal during `vscode:prepublish`, check for active `node` processes and the expected artifact before retrying. Do not stack repeated `npx vsce package` attempts against the same output path.
 - When terminal capture is unreliable, redirect package output to a log file or run the package command as a dedicated VS Code task, then remove any temporary task entries before committing.
@@ -146,12 +165,55 @@ If a release test asserts the extension version inside docs or spec files (READM
 - Run `git status --short` after packaging and `vsce ls`, not only before committing. Repository prepublish scripts can regenerate tracked metadata or JSON formatting; if that happens after the release commit/tag, either commit the mutation before packaging or restore and rebuild the VSIX so the artifact matches the tagged commit.
 - Do not use interactive `gh run watch` output as the only completion signal in terminals that may switch to an alternate screen or truncate output. Redirect it to a temporary log, then confirm the final run through the Actions API and expected release artifacts.
 - After `npm install` or `npm audit fix`, scan every `package-lock.json` `resolved` URL before committing. Public repositories should reject non-public registry hosts and prove a clean `npm ci --registry=https://registry.npmjs.org` succeeds; passing `--registry` does not always rewrite existing resolved URLs.
+- Prefer an exact archive allowlist for small extensions, not only forbidden-pattern checks, and run it automatically after every package. Verify `extension/package.json`, compiled entry points, locale bundles, icon, license, and every linked README are present while `src/`, tests, sourcemaps, debug logs, private storage snapshots, and generator scripts are absent. Account for `vsce` normalizing `README.md` to `readme.md` and extension `LICENSE` to `LICENSE.txt`; pin the observed archive names.
+
+```javascript
+const expected = new Set([
+  "extension/package.json",
+  "extension/out/extension.js",
+]);
+const actual = new Set(zipEntries);
+const missing = [...expected].filter((name) => !actual.has(name));
+const unexpected = [...actual].filter((name) => !expected.has(name));
+if (missing.length || unexpected.length) {
+  throw new Error(
+    `VSIX payload mismatch: missing=${missing}; unexpected=${unexpected}`,
+  );
+}
+```
+
+Build the full expected set from the extension's actual runtime contract (manifest-derived entrypoint plus intentionally packaged assets); do not weaken the comparison to a size check or forbidden glob alone.
+
+## Isolated Install Gate
+
+Do not treat a development-host launch as proof that the VSIX installs. After exact payload verification, install the **same artifact** into an isolated test profile and list extensions with versions:
+
+```typescript
+await runVSCodeCommand(["--install-extension", vsix, "--force"], {
+  version: minimumVscodeVersion,
+  cachePath: testCache,
+  reuseMachineInstall: false,
+});
+const { stdout } = await runVSCodeCommand(
+  ["--list-extensions", "--show-versions"],
+  {
+    version: minimumVscodeVersion,
+    cachePath: testCache,
+    reuseMachineInstall: false,
+  },
+);
+```
+
+Require the exact lowercase `<publisher>.<name>@<version>` line. A strong local release gate is: dependency audit → unit/Extension Host tests → package → exact ZIP verification → isolated install. Derive the VSIX filename from manifest name/version so version bumps cannot leave scripts or docs pointing to a stale artifact.
+
+`runVSCodeCommand` adds isolated `--user-data-dir` and `--extensions-dir` arguments when `reuseMachineInstall` is `false` (the default). Resolve `cachePath` from a repository-owned disposable test root, not user input. If you bypass that helper and invoke the CLI yourself, provide both directories explicitly under that root before using `--install-extension`.
 
 ## Post-publish Verification
 
 - Treat Marketplace listing metadata and `vsce show` as eventually consistent. If publish logs, the pushed tag, and GitHub Release are successful but the listing still shows the previous version, do not republish immediately; verify the version-specific VSIX endpoint first.
 - Use the version-specific package URL pattern `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<extension>/<version>/vspackage`. Some Marketplace endpoints return `405` for `HEAD`, so use a small `GET` download to a temp file and confirm HTTP 200 plus a plausible size before declaring the version missing.
 - Compare the downloaded VSIX size and SHA256 with the locally packaged artifact or GitHub Release asset. A matching hash is stronger evidence than a stale human-facing Marketplace page.
+- Verify the same artifact through both independent channels: download the version-specific Marketplace package and the GitHub Release asset, then require both SHA256 hashes and byte sizes to match the local VSIX. Also confirm the release tag resolves to the release commit and branch ahead/behind is zero.
 - If a pushed release tag fails CI before publication, keep the failed tag as provenance. Fix the issue, bump to a new patch version, synchronize package/lock/changelog/spec files, and publish a new tag; do not move or reuse the pushed tag.
 
 ## Local VSIX Artifact Hygiene
@@ -241,12 +303,13 @@ are done or explicitly blocked:
 
 1. Package the VSIX under `artifacts/vsix/`.
 2. Inspect the VSIX contents or run the repo-specific package integrity test.
-3. Install the generated VSIX locally with `code --install-extension ... --force`.
+3. Run the **Isolated Install Gate** above against the generated VSIX; do not modify the normal user profile.
 4. Publish the exact VSIX to Marketplace.
 5. Create and push the release tag.
 6. Create the GitHub Release with the VSIX attached.
-7. Verify through at least two non-stale channels, such as publish success output,
-   `gh release view`, and `git ls-remote --tags`.
+7. Download the version-specific Marketplace package and GitHub Release asset;
+   require both byte sizes and SHA256 hashes to match the local VSIX. Also verify
+   `gh release view`, the remote tag target, and branch ahead/behind state.
 
 Marketplace metadata commands such as `vsce show --json` and the public item page
 can lag immediately after a successful publish. If publish output, remote tag,
@@ -280,8 +343,8 @@ After publishing, `vsce show` output can lag or sort versions unexpectedly. If y
 
 Marketplace metadata can be stale immediately after a successful publish. If
 `vsce show --json` or the public Marketplace page still shows the previous
-version, do not republish or bump the version just from that signal. First verify
-the GitHub Release and remote tag:
+version, do not republish or bump the version just from that signal. Verify the
+GitHub Release and remote tag while the Marketplace package endpoint propagates:
 
 ```powershell
 gh release view vX.Y.Z --json "tagName,name,url,isDraft,isPrerelease,publishedAt"
@@ -289,7 +352,9 @@ git ls-remote --tags origin vX.Y.Z
 ```
 
 If `vsce publish` reported success and GitHub Release plus remote tag are present,
-treat the Marketplace mismatch as propagation delay and recheck later.
+record Marketplace verification as pending propagation. Complete the release
+only after the version-specific Marketplace VSIX and GitHub Release asset both
+match the local artifact's byte size and SHA256.
 
 ## Marketplace URLs
 
@@ -421,16 +486,10 @@ with no visible difference in Marketplace rendering.
 
 `vsce ls` validates `.vscodeignore` filtering, but it cannot detect a truncated
 or zip-corrupt VSIX (which can happen when the package step is interrupted by
-build watchers or transient I/O). Always do a local install round-trip before
-`vsce publish`:
-
-```powershell
-$cli = "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd"
-& $cli --install-extension artifacts\vsix\my-extension-1.0.0.vsix --force
-# If you see:
-#   Error: End of central directory record signature not found.
-# the VSIX is truncated; rebuild it with `vsce package` and re-test.
-```
+build watchers or transient I/O). Run the exact ZIP verifier and the **Isolated
+Install Gate** above before `vsce publish`; never install release-test artifacts
+into the normal user profile. A ZIP parser error such as `End of central directory
+record signature not found` means the artifact is truncated and must be rebuilt.
 
 Also treat `vsce package` completion based on the **output file** (size +
 mtime), not on console messages — terminal capture sometimes drops the
@@ -449,14 +508,8 @@ If the extension manifest references icons such as `icon.png` for the Marketplac
 tile and `icon.svg` for activity bar or command UI, add a release check that
 asserts the referenced files physically exist before packaging.
 
-## Post-publish Verification
+## Marketplace Propagation Notes
 
-`vsce show --json` is useful, but its metadata can lag right after publish.
-Treat the publish command's result as the first source of truth and use at least
-one more independent check.
-
-- Run duplicate-safe publish against the exact VSIX and confirm `already published`
-- If you use Git tags or GitHub Releases, verify the release/tag exists too
-- If the Marketplace listing lags, do not republish a new version just because
-  `vsce show` still returns the previous metadata snapshot
-- If publish is paused by review, auth, duplicate, or permissions, report version, artifact, checksum, commit, tag, push, and publish state separately so the same VSIX can be resumed without guessing.
+- `vsce show --json` and the human listing can lag; do not republish solely from stale metadata.
+- Use the version-specific Marketplace package endpoint and exact hash contract defined above. If that endpoint is not yet available, record publish/tag/release state as pending verification rather than weakening the gate.
+- If publish is paused by review, auth, duplicate, or permissions, report version, artifact checksum, commit, tag, push, and publish state separately so the same VSIX can be resumed without guessing.

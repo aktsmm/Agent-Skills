@@ -30,6 +30,7 @@ class QuickValidateTests(unittest.TestCase):
                     "user-invocable: true",
                     "disable-model-invocation: false",
                     "context: fork",
+                    'compatibility: "VS Code and Claude Code; use ordinary subagent delegation elsewhere."',
                     "license: CC BY-NC-SA 4.0",
                     "metadata:",
                     "  author: Example Author",
@@ -39,6 +40,27 @@ class QuickValidateTests(unittest.TestCase):
             valid, message = validate_skill(skill_dir)
 
             self.assertTrue(valid, message)
+
+    def test_rejects_non_string_compatibility(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            skill_dir = self.write_skill(
+                Path(tmpdir),
+                "bad-compatibility",
+                "\n".join([
+                    "name: bad-compatibility",
+                    'description: "Test compatibility validation. Use when reviewing Skill frontmatter."',
+                    "compatibility:",
+                    "  - VS Code",
+                    "license: CC BY-NC-SA 4.0",
+                    "metadata:",
+                    "  author: Example Author",
+                ]),
+            )
+
+            valid, message = validate_skill(skill_dir)
+
+            self.assertFalse(valid)
+            self.assertIn("compatibility", message)
 
     def test_rejects_name_that_does_not_match_folder(self):
         with tempfile.TemporaryDirectory() as tmpdir:
