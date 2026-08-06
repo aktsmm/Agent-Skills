@@ -31,11 +31,12 @@ metadata:
 1. Confirm the user is asking to create a handoff note, not asking this agent to consume an existing handoff-like instruction and continue work now. If ambiguous, ask one short clarification before drafting.
 2. Identify the resume target: current goal, requested outcome, and the nearest concrete artifact.
 3. Capture only state needed to continue: touched files, commands already run, validation results, blockers, assumptions, and pending decisions.
-4. Separate facts from guesses. Mark uncertain items as `未確認` or `仮説`.
-5. Preserve user constraints that still matter, including wording, scope limits, and prohibited actions.
-6. Write a paste-ready handoff using [references/handoff-template.md](references/handoff-template.md).
-7. Review the handoff before finalizing: remove secrets, private account identifiers, sensitive URLs, absolute personal paths unless necessary for local continuation, duplicate logs, and stale TODOs.
-8. If the user asked for rubber-duck review, or the handoff is non-trivial, run a second-pass review against the checklist below.
+4. If the repo has uncommitted changes from more than one actor, say which dirty paths are yours and which must not be staged. Otherwise the next session commits someone else's half-finished edits.
+5. Separate facts from guesses. Mark uncertain items as `未確認` or `仮説`.
+6. Preserve user constraints that still matter, including wording, scope limits, and prohibited actions.
+7. Write a paste-ready handoff using [references/handoff-template.md](references/handoff-template.md).
+8. Review the handoff before finalizing: remove secrets, private account identifiers, sensitive URLs, absolute personal paths unless necessary for local continuation, duplicate logs, and stale TODOs.
+9. If the user asked for rubber-duck review, or the handoff is non-trivial, run a second-pass review against the checklist below.
 
 ## Rubber-Duck Review Checklist
 

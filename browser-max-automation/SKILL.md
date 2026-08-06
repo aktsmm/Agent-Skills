@@ -24,6 +24,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 
 - **API / CLI を先に検討**: 公式 API（YouTube Data API、Microsoft Graph、GitHub API 等）や CLI で read/write が完結するならそちらを優先し、UI が脆い兆候（native file chooser / shadow DOM / 多段ウィザード / レンダラーを止める modal）で固執せず切り替える（例: YouTube Studio UI → `captions.insert`）
 - API / CLI だけで完結するなら、該当 domain skill / script を使う
+- **URL の生存確認は HTTP client で行うが、dead 判定だけはブラウザまでエスカレートする**。確実な消失の証拠は HTTP 404 / 410 だけ。403 は bot ブロック、timeout は一過性、SSL の `unable to get local issuer certificate` は中間 CA を返さないサーバーで起きる（ブラウザと .NET/schannel は AIA で自動補完するが Python `ssl` はしない）。`Invoke-WebRequest -Uri <url> -Method Get` またはブラウザで裏取りしてから結論を出す
 - PowerPoint / Loop / Dynamics 365 の expense entry 画面など専用 skill がある UI は、該当 skill の操作ルールを優先する
 - 認証情報、秘密情報、MFA 応答をチャットで受け取らない。必要な入力はブラウザ上でユーザーに処理してもらう
 - 例外: 対象サイトが passkey / FIDO2 / WebAuthn 対応なら、CDP 仮想認証機で完全無人化できる。優先順位は **passkey (仮想認証機) > メール OTP > SMS > 物理キー / 生体**。詳細は [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) を参照する
@@ -86,6 +87,17 @@ Angular Material / `mat-select` / `cdk-overlay` / disabled save の注意は [re
 iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallbacks](references/instructions/ui-fallbacks.md) を参照する。`force: true` は要素の実在と可視性を確認した後の最終手段とする。
 
 ## Safety Rules
+
+### Content-Filter Preflight
+
+外部プラットフォームは、認証や前後の書き込みが正常でも、送信内容が攻撃 payload に似ているという理由で 403 を返したり書き込みを拒否したりする。技術・セキュリティ内容を繰り返し／一括送信する前に:
+
+- run a deterministic checker for platform-known blocked signatures across **every field included in the request body**, not only the visible field being edited;
+- on rejection, compare same-session successful controls that vary one feature at a time (for example sensitive path alone vs traversal chain alone vs their adjacent combination) before changing content;
+- preserve the user-visible meaning and never use invisible characters as a filter bypass;
+- keep one-item rejection isolated so independent later items still run, but keep the overall result non-PASS until the rejected item is fixed or explicitly waived;
+
+信頼できる preflight がない場合は、使い捨て draft / canary target または可逆な 1 件 pilot を使う。成功した probe を同じ経路で復元できない production target 上で mutation の binary search をしない。
 
 ### Failure Budget
 

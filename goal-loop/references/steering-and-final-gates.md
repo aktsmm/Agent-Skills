@@ -71,7 +71,7 @@ Record accepted and rejected steering attempts in the ledger. Rejected attempts 
 
 ## Durable Ledger Mode
 
-Use durable mode only for long-running, multi-stage, or resumable goals.
+Use durable mode only for long-running, multi-stage, or resumable goals. Duration is not the only trigger: a short run over many independent units also needs it when redo cost is high, because a design that writes results only at the end loses every completed unit if the process or terminal dies mid-run.
 
 Suggested artifacts:
 
@@ -125,6 +125,20 @@ Record:
 Do not silently replace a needed real-surface verifier with a weaker check. If worker / verifier cannot access the real surface,
 record the capability gap and hand off the exact manual test and required evidence to the user. Do not attempt broad real-surface
 verification yourself as orchestrator.
+
+## Async Artifact Readback
+
+This section covers general background processes; delegated worker delivery remains governed by [Parallel Dispatch Recovery](./loop-control.md#parallel-dispatch-recovery). Watcher or task-completion notifications are delivery hints, not completion authority, and some hosts do not deliver them reliably. Do not promise periodic proactive reports unless the runtime guarantees callbacks.
+
+For long or resumable work, define an artifact readback contract before launch:
+
+- process identity and durable artifact path;
+- incremental write cadence and freshness field;
+- parse rule and completion predicate;
+- stale / missing / malformed artifact timeout;
+- external readback that distinguishes `process exited` from `goal complete`.
+
+When asked for status, answer from the artifact and real process state, not terminal silence. If the notification is lost, the work remains queryable and resumable; if the artifact is stale beyond the budget, mark it blocked or failed rather than inferring success.
 
 ## Worker Boundary
 

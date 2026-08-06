@@ -16,6 +16,15 @@ Consult the critic at high-leverage moments, the same ones the native Rubber Duc
 
 Small, obvious changes need zero consultations. Skipping the critic is a valid outcome — report it as `0 rounds`.
 
+## What the Critic Cannot Catch
+
+The critic's field of view is exactly the packet you send, so checkpoint choice decides what the second model can possibly find.
+
+- A **diff-scoped** packet answers "is this change correct?". It cannot answer "what did we fail to detect?" — defects that were never raised as findings stay invisible, and stay invisible across repeated runs of the same gate.
+- A packet that shows a safety mechanism **exists** cannot show that it **executes**. When the artifact's argument is "X gets checked at runtime", state the exact invocation in the packet and ask the critic to confirm X actually runs on the real path — caches, flags, early returns, and short-circuits routinely make present-in-source code never execute. This class survives an early PASS, so do not stop at round 1 for gate-severity or safety-critical changes.
+- A **plan-scoped** packet is where a second model changes outcomes most, because scope, assumptions, and the rule design are still open.
+- If the same class of defect keeps surviving reviews, the fix is upstream (producer instructions, detection checklist, deterministic gate), not more critic rounds.
+
 ## One Round
 
 1. **Produce**: the producer advances the artifact to the next checkpoint.

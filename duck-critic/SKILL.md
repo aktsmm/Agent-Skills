@@ -40,6 +40,7 @@ This is **not** "hand the whole task to a reviewer subagent". You stay the **pro
 - Ignore style-only, formatting-only, naming-preference, and generic best-practice comments unless they affect the task outcome.
 - Focus on issues that could break requested behavior, security, data integrity, runtime behavior, deployment, or verification.
 - When the target is a rule, convention, or style decision, put **measured reality** in the packet: counts across the affected corpus, the history of the rule, and where its source of truth lives. Without that, the critic answers with generic best practice and proposes something that collides with the existing assets.
+- The critic only sees the packet you send, so it can confirm what you produced but cannot surface what nobody detected. Never make the critic the last line of defense for detection: when a class of defect survives reviews, fix the upstream producer, checklist, or deterministic gate instead of adding critic rounds.
 - Rejecting a critic recommendation is a legitimate move, but it needs its own evidence. State the rejection and the data behind it in the next round's packet, and ask the critic to rule on **the rejection itself**. A recommendation that sounds right in the abstract can still lose to a measurement the critic could not see.
 
 ## Procedure

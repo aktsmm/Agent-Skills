@@ -4,18 +4,19 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 
 ## Anti-Pattern Quick Reference
 
-| Anti-Pattern         | Problem                            | Solution                        |
-| -------------------- | ---------------------------------- | ------------------------------- |
-| God Agent            | All responsibilities in 1 agent    | Split with SRP                  |
-| Context Overload     | Passing excessive unnecessary info | Minimize with ISP               |
-| Silent Failure       | Ignoring errors and continuing     | Stop immediately with Fail Fast |
-| Infinite Loop        | Loops without termination          | Set maximum iterations          |
-| Big Bang             | Building everything at once        | Build small with Iterative      |
-| Premature Complexity | Complex design from the start      | Simplicity First                |
-| Black Box            | Internal state invisible           | Transparency                    |
-| Tight Coupling       | Tight coupling between agents      | Loose Coupling                  |
-| Hallucination        | Fabricating unverified info        | No Hallucination principle      |
-| False Negative       | Treating "no results" as "empty"   | Re-query with explicit params   |
+| Anti-Pattern         | Problem                                                            | Solution                                                                           |
+| -------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| God Agent            | All responsibilities in 1 agent                                    | Split with SRP                                                                     |
+| Context Overload     | Passing excessive unnecessary info                                 | Minimize with ISP                                                                  |
+| Silent Failure       | Ignoring errors and continuing                                     | Stop immediately with Fail Fast                                                    |
+| Infinite Loop        | Loops without termination                                          | Set maximum iterations                                                             |
+| Big Bang             | Building everything at once                                        | Build small with Iterative                                                         |
+| Premature Complexity | Complex design from the start                                      | Simplicity First                                                                   |
+| Black Box            | Internal state invisible                                           | Transparency                                                                       |
+| Tight Coupling       | Tight coupling between agents                                      | Loose Coupling                                                                     |
+| Hallucination        | Fabricating unverified info                                        | No Hallucination principle                                                         |
+| False Negative       | Treating "no results" as "empty"                                   | Re-query with explicit params                                                      |
+| Unmeasured Gate      | Promoting a detection rule to a blocking gate without measuring it | Measure precision on the real corpus first; keep low-precision signals report-only |
 
 ## How to Use
 
@@ -42,6 +43,7 @@ Minimum items to verify:
 - [ ] Are frontmatter fields checked against the current file-type support matrix, not just repo-local convention? (Frontmatter Hygiene)
 - [ ] Are sub-review / sub-agent findings (file sizes, line ranges, duplication claims, missing sections) verified against the actual code by grep / read before being acted on? (Sub-Review Verification)
 - [ ] Do delegated workers distinguish `executed with 0 results` from `not run`, `blocked`, and `failed`?
+- [ ] Before a new detection rule becomes a blocking gate, was its precision measured against the real corpus, and were low-precision signals demoted to a report-only lane? (Measured Gate)
 - [ ] If scheduled execution references a local runtime asset, are the live binding and fallback snapshot both checked for drift?
 - [ ] If current state shares a file with history, is current state parsed from explicit schema boundaries rather than whole-file keyword search?
 ```

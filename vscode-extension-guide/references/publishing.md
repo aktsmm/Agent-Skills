@@ -155,6 +155,7 @@ Do not add Marketplace/version/install badges that imply publication before the 
 
 ## Packaging Runner Gotchas
 
+- If packaging rejects versions that already have a release tag, keep its tests independent of the repository's current release state. Test the untagged-success path in a temporary Git work tree, and test tagged-version rejection separately. A test that expects the manifest's current version to be untagged passes before release and fails immediately after the tag is created.
 - Create the parent directory passed to `--out` before invoking `vsce`; the CLI can enumerate a valid package and still fail at the final write with `ENOENT`.
 - On Windows, spawning `npx.cmd` directly from Node can fail with `EINVAL`. In an **npm-managed** project, invoke `process.env.npm_execpath` through `process.execPath` and use `npm exec --package=@vscode/vsce@<version-from-one-project-constant> -- vsce ...`; validate `npm_execpath` exists and is npm's CLI before spawning. For pnpm/yarn projects, use that manager's native exec command instead of forcing npm.
 - Treat the VSIX file as the completion source of truth. A quiet or truncated terminal is not success; confirm the artifact exists, has a fresh timestamp, and has a plausible size before moving to publish.

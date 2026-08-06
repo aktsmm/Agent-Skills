@@ -76,6 +76,15 @@ Worker agents may not read or follow central rules unless they are **explicitly 
 | **Violation Example**    | Ignoring errors and continuing to the end         |
 | **Solution**             | Set up Gates/Checkpoints                          |
 
+**Contract Binding Liveness:**
+
+Paths, schema fields, CLI flags, IDs, and state keys referenced by policies, orchestrators, validators, and tests are executable contracts. A rename or deletion is incomplete until every live binding is updated.
+
+- Before deleting or renaming an artifact, search policy/config, runtime code, tests, and generated-current-state definitions for references.
+- Add a deterministic liveness check at the workflow entry or CI boundary; tests alone are insufficient if operators may not run them before production.
+- Compare canonical path spelling against the source of truth. Git path case remains significant even on case-insensitive filesystems and can turn history/readback into a silent `not found`.
+- Structural faults such as unmapped inputs, missing artifacts, and case mismatches must fail before freshness or scheduling filters. Ordinary pending work must remain allowed.
+
 ### 5. Iterative Refinement
 
 **Build small, improve repeatedly**

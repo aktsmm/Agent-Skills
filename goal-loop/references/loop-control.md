@@ -34,6 +34,16 @@ automatic resume when criteria changed, artifact identity is ambiguous,
 artifacts conflict, or an irreversible mutation may have completed without a
 verifiable readback.
 
+## Batch Coverage Contract
+
+A batch can finish successfully while silently excluding most intended items. Before dispatch, materialize the expected item set and every exclusion reason. Report `selected / excluded / total` with reason counts; never accept only `0 targets` or a success exit code as coverage evidence.
+
+Persist each item result as it completes. The durable record needs item identity, input fingerprint, attempt, status, evidence path, and completion time. A final-only summary loses all completed work when the parent process or terminal dies.
+
+One item failure must not abort the remaining independent items unless the failed condition invalidates the whole batch. Record the item failure, continue independent work, and keep the batch non-PASS until every expected item is `complete`, explicitly excluded with an accepted reason, or blocked with evidence.
+
+On resume, recompute the expected set from the authoritative source, reconcile it against the per-item ledger, and rerun only unresolved items. This is item-level coverage recovery; parent/worker delivery recovery remains governed by `Parallel Dispatch Recovery`. Content fingerprints outrank timestamps when deciding whether an item is already applied; a later revision with an identical content fingerprint is not new work.
+
 ## Persistence Profile（粘り強さ）
 
 Phase 1 で retry budget を明示する。どの profile でも同じ approach の反復、criteria の弱体化、検証の甘化は禁止。
