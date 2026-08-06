@@ -5,6 +5,13 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 ```markdown
 これは前セッションから貼り付けた状況共有メモです。現在のセッションの agent は、まず内容を読み取り、理解した作業状態・未完了事項・次に確認すべきことを短く返してください。ユーザーが明示的に「進めて」「実行して」と言うまでは、ファイル編集・コマンド実行・外部サービス操作を開始しないでください。
 
+## Session Reference
+
+- 前セッション ID:
+- 作成日:
+- ワークスペース / repo:
+- branch / HEAD:
+
 ## Initial Response Expected
 
 - まず「了解しました」と返す。

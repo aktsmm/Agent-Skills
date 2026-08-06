@@ -25,6 +25,7 @@
 - [ ] A test artifact can be created and imported
 - [ ] Reporting destination is configured
 - [ ] Capability verification source is recorded
+- [ ] Runtime dependencies executed on this host (interpreter, libraries, browsers, timezone data)
 
 ## Approval Boundaries
 
@@ -48,6 +49,8 @@
 - [ ] Stale-lock recovery threshold (recommended >= 2x TTL):
 - [ ] Stale task TTL:
 - [ ] Quiet hours / notification policy:
+- [ ] Jobs registered disabled, verified, then enabled:
+- [ ] Automation IDs recorded with host and registration time:
 
 ## Result
 

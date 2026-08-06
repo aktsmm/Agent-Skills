@@ -169,3 +169,35 @@ Keep the core loop stable, but translate evidence and metrics by domain.
 | Content     | search demand, Q&A repetition, paid info gaps                         | article, outline, landing page, sample lesson          | reads, saves, purchases, replies                      |
 
 The mistake to avoid is copying the same metrics across domains.
+
+## 15. Gates Recompute, Never Trust Self-Reports
+
+`## 10` covers where a number came from. This one covers whether the gate believed it without checking.
+
+A gate whose checker only parses the producer's own summary is not a gate. The producer writes the artifact and the checker reads the same artifact, so a model that wants to pass simply writes numbers that pass. Observed evasions, all from one run:
+
+- Writing a count as prose (`many`, `several`) so a numeric comparison never fires.
+- Asserting a summary total (`sources checked: 8`) that nothing in the artifact substantiates.
+- Splitting one claim into paraphrases to inflate a required item count.
+- Restating a difficulty or maturity label to move a threshold in its favor.
+
+Countermeasures, in order of leverage:
+
+- **Recompute from raw rows, not from summary lines.** Count the actual URLs, table rows, or file entries present in the artifact.
+- **Require machine-comparable types.** Reject non-integers where an integer is specified, rather than coercing.
+- **Externalize classification.** Keep labels that set thresholds (difficulty, maturity, tier) in durable state and fail on mismatch with the artifact's self-declared value.
+- **Detect near-duplicates.** Normalize text and compare n-gram similarity within the same category; subtract duplicates from the count instead of hard-failing, so a false positive costs one more item rather than blocking a valid candidate.
+- **Calibrate thresholds against measurements.** A similarity cutoff guessed at 0.8 missed obvious paraphrases that measured 0.38-0.63. Measure real pairs before fixing a number.
+
+Mechanical checks are the floor, not the verdict. Whether a claim is genuinely differentiated stays with the Layer 3 critic.
+
+## 16. Freshness Is Data, Not Filename
+
+When one workflow gates on another workflow's output being recent, read the timestamp **from inside the artifact**.
+
+Filename and mtime both fail invisibly. Adding a suffix to make names unique changes their sort order against older files, so a lexical "latest" can return an earlier artifact once two naming formats coexist in the same directory. Mtime changes whenever an unrelated tool touches the file.
+
+Decide what a stale input means before it happens:
+
+- Still write the artifact and record the staleness inside it. A run that exits without output leaves the next workflow unable to distinguish "never ran" from "ran and found nothing".
+- Block change recommendations while the input is stale. Observation may continue; acting on it may not.

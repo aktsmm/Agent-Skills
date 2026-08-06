@@ -587,6 +587,8 @@ When referencing shared definitions across multiple files, use this standard for
 > **SSOT**: See [file](path) section "Section Name" for details
 ```
 
+The referenced heading MUST exist in the target file, and the target MUST hold the definition itself. A pointer to a section that only forwards elsewhere leaves the rule undefined while every checker still reports the link as valid.
+
 **Anti-pattern (Before):**
 
 - Same logic duplicated in 3+ files (e.g., holiday check, validation rules)

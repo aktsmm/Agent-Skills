@@ -1,6 +1,6 @@
 ---
 name: book-writing-workspace
-description: "Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support. Use when organizing a book manuscript repo, defining or reviewing target readers, standardizing chapter/section files, setting writing/review agents, or assessing an existing writing workspace. Triggers on book writing workspace, reader persona, reader audience, 読者ペルソナ, persona SSOT, technical book project, 執筆ワークスペース, manuscript workflow, and Re:VIEW workspace."
+description: "Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support. Use when organizing a book manuscript repo, defining or reviewing target readers, standardizing chapter/section files, setting writing/review agents, handling publisher proof comments, or assessing an existing writing workspace. Triggers on book writing workspace, reader persona, reader audience, 読者ペルソナ, persona SSOT, technical book project, 執筆ワークスペース, manuscript workflow, Re:VIEW workspace, proof PDF, annotated proof, publisher proof comments, 校正, 校正注釈, and 初校."
 argument-hint: "本のテーマ、原稿リポジトリ名、使いたい執筆フロー"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -45,7 +45,7 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 5. Reviewing each chapter against the book-specific reader persona and expected outcome.
 6. Checking word count targets and source confidence before finalizing text.
 7. Measuring the built page count before treating a page-budget overrun as a structural problem; character-count estimates run high.
-8. Ruling on external issues and pull requests point by point, verifying each factual claim against its source of truth.
+8. Ruling on external issues, pull requests, and publisher proof comments point by point, first confirming which revision the proof was typeset from, then verifying each factual claim against its source of truth.
 9. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
 
 ## Bootstrap Workflow

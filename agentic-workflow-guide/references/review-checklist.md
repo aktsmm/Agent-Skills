@@ -99,6 +99,7 @@ Minimum items to verify:
 
 - [ ] Does every claim have a verifiable source?
 - [ ] Are all URLs real and accessible?
+- [ ] Is a mechanical `PASS` claimed only at the granularity the gate actually inspected, naming the gate that produced it?
 - [ ] Are dates, numbers, and statistics from official sources?
 - [ ] Is the agent using "probably", "likely", or "possibly" as facts?
 
@@ -190,7 +191,9 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Are central rules (AGENTS.md, shared config) propagated to each worker `.agent.md`?
 - [ ] When a central rule is added/changed, are all referencing files updated simultaneously?
 - [ ] Do customization files keep file-type-appropriate frontmatter, without missing required fields or using unsupported properties?
-- [ ] Do relative Markdown links resolve to existing local files?
+- [ ] Do relative links, `#anchor`s, and prose pointers (`section N` / `セクション N` / `§N`) resolve to an existing file **and an existing heading in it**?
+- [ ] Does each `SSOT is X` chain terminate at a file that holds the definition, instead of forwarding back to the caller?
+- [ ] When an entry delegates its rubric, is the fix applied to the binding rubric rather than to the entry's own fallback checklist?
 
 ## SRP (Single Responsibility Principle)
 

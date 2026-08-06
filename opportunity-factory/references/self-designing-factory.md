@@ -109,6 +109,8 @@ When Top-N is full, a new idea can replace an incumbent only if the artifact inc
 
 If the evidence is not strong enough, put the idea in watchlist or rejected.
 
+Design the scoring axes so they **cannot be filled in without measuring**. An axis like "competition is thin" invites a guess, and a guessed axis keeps undifferentiated candidates at the top of the portfolio. Replace judgement labels with counted quantities (competitors actually found, distinct claims that survived a coverage check, evidence entries collected) so an unmeasured axis stays empty and visibly blocks promotion. This scoring axis ranks candidates; the blocking differentiation gate in `workflow.md` decides whether a candidate may proceed at all. Keep the two separate or they turn into duplicate bookkeeping.
+
 ## Runaway Controls
 
 Every self-designing factory needs:

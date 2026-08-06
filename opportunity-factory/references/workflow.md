@@ -18,6 +18,21 @@ Define these fields before running the loop:
 
 Keep the frame short. It is a steering constraint, not a strategy essay.
 
+## Throughput KPI
+
+A fixed output quota and a strict quality gate cannot both be hard constraints. One of them breaks, and it is the gate, because missing a visible number feels like failure while a quietly lowered bar does not.
+
+Split the target:
+
+- **attempt** — how many candidates the factory starts on. The workload dial.
+- **publish** — how many cleared every gate. This is a **forecast, not a commitment**.
+
+**Make the gate and the attempt budget hard; leave publish soft.** A hard publish floor recreates the exact pressure this section exists to remove: when the count is short, the only lever left is the bar. If a stakeholder needs a committed number, commit to attempt volume and gate pass rate, not to output.
+
+Manage on **gate pass rate**. Raise the attempt target after the pass rate is stable, never before. When output is short, that deficit means candidate selection is weak, so the response is more discovery and differentiation work.
+
+Per-lane or per-category quotas are **caps, not targets**. Their sum may exceed the attempt target on purpose, which leaves room to shift emphasis while still preventing one category from taking everything. State which meaning a number carries; a cap read as a target silently becomes a quota to fill.
+
 ## Generic Roles
 
 | Role         | Responsibility                                                                      |
@@ -97,6 +112,15 @@ Use only gates that change the decision. Suggested gates:
 | Legal           | Any privacy, copyright, regulated activity, or misleading claim risk?   |
 | Outcome         | What metric will decide hot, stale, or rejected?                        |
 
+### Gate Placement
+
+Which gate runs is only half the design. **When it runs decides how much work gets thrown away.**
+
+- **Differentiation is a blocking gate placed before the expensive lanes**, not part of the final review. A factory that only checks differentiation at the end discovers "this is not better than the existing substitute" after paying for research and production.
+- The boundary is **full evidence collection and build**, not all evidence. A **light probe is allowed and expected**: two or three pieces of evidence, enough to enumerate claims. Fully separating the gate from evidence creates a chicken-and-egg problem, because you cannot name what is distinctive about a candidate without touching it.
+- Judge **per claim, not per topic**. An incumbent covering the subject does not cover every claim about it. Failure conditions, side effects, applicability limits, and operational judgement are frequently absent from official sources even when the topic is documented.
+- Failing the gate means reject or re-angle, never proceed to the expensive lanes. Cap re-angle attempts so a doomed candidate cannot loop.
+
 ## Domain Examples
 
 ### Mobile App Factory
@@ -123,5 +147,6 @@ Use only gates that change the decision. Suggested gates:
 
 - Stop a loop when the next action needs human approval.
 - Stop an opportunity when the core need is unproven after two independent evidence passes.
+- Stop an opportunity when the differentiation gate fails and the re-angle cap is reached.
 - Stop building when the artifact already tests the riskiest assumption.
 - Stop expanding roles when one role would be idle for multiple cycles.

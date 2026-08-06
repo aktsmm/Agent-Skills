@@ -62,9 +62,10 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - 1 task は 1 artifact に収まる粒度にする。
 - Advisory-only schedules are safe but too slow for a real factory; if the user expects progress, add at least one bounded mutating worker that writes one artifact and updates local state.
 - 複数 worker で回す場合は、discovery/research worker、build/decision worker、reporter-learner など役割を分け、各 run は 1 task / 1 artifact / 明示的 state 更新に制限する。
-- 小さい queue では commander/worker を別々にスケジュールせず、1本の single-cycle automation で `commander -> 1 worker -> reducer` を回してよい。ただし auto-eligible task、lock、JSON backup/parse validation が必須。
-- Mutating workers need atomic duplicate-run prevention using create-new/O_EXCL lock acquisition or a transactional lease; never use check-then-create before shared state updates.
-- Lock handling needs a partial-run recovery path: expired heartbeat plus no live process/lease triggers artifact and target reconciliation, not permanent trust in a stale `in_progress` label.
+- 小さい queue では commander/worker を別々にスケジュールせず、1本の single-cycle automation で回してよい (`references/runtime-modes.md` `## Single-Cycle Automation`)。
+- Mutating workers need atomic duplicate-run prevention (create-new/O_EXCL or a transactional lease, never check-then-create), a **worker-wide singleton lock in addition to per-task locks**, and a partial-run recovery path that reconciles artifacts instead of trusting a stale `in_progress` label; see `references/lifecycle-and-health.md` `## Lock Scopes`.
+- Run the differentiation gate **before full evidence collection and build**, not as part of the final review; a light probe is allowed, but a candidate that cannot beat existing substitutes must be rejected or re-angled before it consumes the expensive lanes.
+- Gates must recompute from raw artifact data, not parse the producer's own summary; require machine-comparable types, externalize threshold-setting labels to durable state, and detect near-duplicate items.
 - Maintain a canonical dashboard/status state for future sessions and user status answers; every workflow that changes artifacts, queues, gates, portfolio ranking, blockers, or schedules must update it with backup + stale-write checks.
 - Add a workflow-review loop as a first-class workflow for self-improving factories; it reviews cadence, queue quality, Top-N replacements, dashboard drift, missing gates, and unsafe autonomy at a slower cadence than workers.
 - Portfolio factories need a Top-N state with explicit replacement rules; do not grow candidate lists forever, and do not replace an incumbent without comparative evidence and reviewer critique.
@@ -74,6 +75,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - Keep prototype/build lanes in the same factory when the user wants end-to-end production, but gate source generation on a structured candidate-level `continue` decision plus an MVP boundary artifact.
 - End-to-end factories need an explicit post-GO maturation lane to private release-readiness; do not let automation stop at graybox GO or silently cross into public release.
 - Add a bounded health reconciler for JSON/dashboard/prompt/schedule/lock drift; it may auto-repair reversible local drift but must not change criteria, decisions, approval boundaries, or cadence.
+- If workflows may edit their own prompts or state, enforce the improvement invariants in a guard **outside** the editable file set, with hash-bound candidates, a critic receipt, change-rate caps, an audit log, and a halt a human must clear; a rule written only inside an editable file is removed by one apply (`references/prompt-self-improvement.md`).
 - If the current host cannot build-verify the target platform, mark generated code as compile-oriented and verification-blocked; never report it as built, running, or tested without a platform verification artifact.
 - 指標は実測、推定、仮説を明示して混ぜない。
 - 課金、ログイン、外部公開、個人情報、法的リスクは人間承認の境界にする。
@@ -122,6 +124,7 @@ Rubber Duck / Factory Plan / Workspace Setup / Self-Designing Workspace Setup / 
 - A canonical status dashboard or equivalent resume contract exists, and status answers use it first
 - Self-improving factories include a scheduled or manual workflow-review loop
 - Prompt self-improvements are workspace-local, evidenced by an artifact, reversible, and dashboard-recorded
+- Self-editing factories enforce those invariants outside the editable file set, and a scheduled job is registered disabled, verified, then enabled with durable state already true
 - Portfolio factories define Top-N capacity, replacement criteria, and demotion/watchlist/rejected states
 - End-to-end factories define promotion and post-GO maturation stages through private release-readiness, with WIP/slice/retry caps and independent review
 - A health reconciler detects state/prompt/schedule drift and repairs only reversible local inconsistencies

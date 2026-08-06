@@ -72,6 +72,17 @@ Use these as starting points when the environment can run scheduled prompts or j
 
 For surface-specific setup across GitHub Copilot App, GitHub Copilot CLI, Microsoft Scout, VS Code GitHub Copilot Chat, OpenClaw, and GitHub Actions, first use `references/workspace-setup.md` to verify capabilities and state persistence.
 
+### Registration and Migration
+
+Applies to every preset below.
+
+- **Register disabled, verify, then enable.** Re-read each job back from the scheduler and compare name, cadence, scope, and prompt path against the intended values. Enable outside the window where a job is about to fire, so the first run does not start mid-setup.
+- **Make durable state true before enabling, not after.** The first scheduled run reads that state, and a post-enable edit races with it.
+- **Job IDs are host-bound.** Record host, registration time, and enabled/disabled status beside each job in dashboard state. On a new host, re-register and re-verify instead of trusting recorded IDs, and confirm the scheduler entry actually exists rather than believing the dashboard's claim.
+- **A scheduler may keep its own copy of the prompt** even when configured to point at a prompt file. Editing the file then leaves the scheduled copy stale, so update the job too whenever the prompt's invoked commands or contract change.
+- **Expect optimistic concurrency.** A create/update can be rejected because another window changed the task list. That rejection means nothing was written, so reload and retry once instead of assuming a partial apply.
+- **Verify runtime dependencies by executing them on this host** before enabling anything unattended: interpreter version, required libraries, browser/driver binaries, and the timezone database when day-boundary logic uses IANA zone names. A missing dependency turns every unattended run into a silent failure.
+
 ### Conservative Default
 
 Use this first for a new factory or expensive model/tool stack.
@@ -87,12 +98,12 @@ Use this first for a new factory or expensive model/tool stack.
 
 Best for unattended operation with isolated sessions and shared state.
 
-| Job              | Cadence                      | Notes                                                             |
-| ---------------- | ---------------------------- | ----------------------------------------------------------------- |
-| commander        | every 15-30m                 | single writer for queue/state/logs                                |
-| worker           | every 30-60m per worker      | each worker runs one task only; parallel workers are allowed      |
-| reporter-learner | every 6-8h                   | compress notifications and update learning                        |
-| workflow-review  | weekly or every 20 artifacts | rubber-duck the factory itself and propose prompt/cadence changes |
+| Job              | Cadence                      | Notes                                                                                                                                                                 |
+| ---------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| commander        | every 15-30m                 | single writer for queue/state/logs                                                                                                                                    |
+| worker           | every 30-60m per worker      | each worker runs one task only; parallel workers are allowed **only when their state and resource domains are disjoint** (`lifecycle-and-health.md` `## Lock Scopes`) |
+| reporter-learner | every 6-8h                   | compress notifications and update learning                                                                                                                            |
+| workflow-review  | weekly or every 20 artifacts | rubber-duck the factory itself and propose prompt/cadence changes                                                                                                     |
 
 Rules:
 
@@ -134,13 +145,15 @@ Settings and task options to verify:
 
 - Task scope is workspace, not global, unless intentionally shared.
 - Prompt templates point to local `.github/prompts/*.md`, the configured global prompts folder, or inline prompt text.
-- Agent/model selection works for the selected Copilot Chat mode.
+- **Do not assume per-task model selection exists.** Verify the task schema. In at least one observed extension version it is absent, so scheduled runs resolve the model from the editor's current default and model choice has to happen inside the prompt by launching subagents with an explicit model. Record the adapter version and the observed model-resolution behavior in the setup output rather than trusting this note.
 - `Max Runs/Day`, allowed time window, jitter, and minimum interval warnings are configured.
 - Notification mode and execution history are configured for low noise.
 - `auto-mode` or autonomous-execution hints are enabled only after preflight passes.
 - Copilot usage and acceptable-use limits are respected; avoid excessive automated bulk activity.
 
 Treat Copilot Scheduler as a VS Code adapter. It schedules prompt execution; the factory still needs durable state, artifacts, approval boundaries, and validation.
+
+**An editor-hosted scheduler only fires while the editor is running.** For unattended cadences, add an OS-level pre-stage job that opens the workspace before the first scheduled prompt, and make its "already open" detection fail-open: a false positive silently kills every downstream run, while a false negative only reopens a window the editor already reuses. Duplicate work from reopening is absorbed by the worker singleton lock, not by the detection heuristic (see `lifecycle-and-health.md` `## Lock Scopes`).
 
 ### Generic Cron / CLI Scheduler
 
@@ -288,16 +301,16 @@ Workflow-review が weekly + ad-hoc で以下 invariant を check、違反検出
 
 Every scheduled setup should define these controls in state or scheduler configuration:
 
-| Control                | Purpose                                     | Suggested default                               |
-| ---------------------- | ------------------------------------------- | ----------------------------------------------- |
-| `maxPendingTasks`      | prevents queue inflation                    | 10-30                                           |
-| `maxDailyWorkerRuns`   | bounds cost and tool usage                  | 6-24                                            |
-| `maxDailyCostEstimate` | makes model/API spend visible               | user-defined                                    |
-| `lockTtlMinutes`       | prevents stuck claims                       | 120-240                                         |
-| `staleTaskTtlHours`    | forces old tasks to be reviewed or replaced | 24-72                                           |
-| `blockerThreshold`     | avoids interrupting humans too early        | 3 similar blockers                              |
-| `quietHours`           | reduces noise                               | local non-working hours                         |
-| `notifyOnlyOn`         | compresses notifications                    | reporter, repeated-blocker, high-value-decision |
+| Control                | Purpose                                     | Suggested default                                                                                                                                                                     |
+| ---------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `maxPendingTasks`      | prevents queue inflation                    | 10-30                                                                                                                                                                                 |
+| `maxDailyWorkerRuns`   | bounds cost and tool usage                  | 6-24                                                                                                                                                                                  |
+| `maxDailyCostEstimate` | makes model/API spend visible               | user-defined                                                                                                                                                                          |
+| `lockTtlMinutes`       | prevents stuck claims                       | size so that `2 x TTL < worker cadence` when a crashed run must recover before the next one; otherwise state that a cycle may be skipped (`lifecycle-and-health.md` `## Lock Scopes`) |
+| `staleTaskTtlHours`    | forces old tasks to be reviewed or replaced | 24-72                                                                                                                                                                                 |
+| `blockerThreshold`     | avoids interrupting humans too early        | 3 similar blockers                                                                                                                                                                    |
+| `quietHours`           | reduces noise                               | local non-working hours                                                                                                                                                               |
+| `notifyOnlyOn`         | compresses notifications                    | reporter, repeated-blocker, high-value-decision                                                                                                                                       |
 
 Commander must not add work when limits are exceeded. Reporter-learner should surface limit hits and recommend lowering cadence, increasing budget, or pruning stale work.
 

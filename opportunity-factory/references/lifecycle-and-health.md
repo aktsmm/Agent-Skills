@@ -92,6 +92,25 @@ Use a separate scheduled reviewer or separate agent context that:
 - applies one deterministic transition,
 - does not implement in the review run.
 
+## Lock Scopes
+
+SSOT for locking. `SKILL.md` and `runtime-modes.md` state the acquisition primitive; this section defines **what** must be locked.
+
+Three scopes, all acquired with create-new/O_EXCL semantics, never test-then-create:
+
+- **Task lock** (`locks/<task-id>`) — prevents two runs from processing the same task.
+- **Worker singleton lock** (`locks/_worker`) — scoped to a **shared-state or exclusive-resource domain**. Prevents two worker runs from executing against the same domain at all. **A task lock alone is not enough**: two concurrent workers each claim a _different_ task and run in parallel, which corrupts shared state writes and breaks single-instance external resources (desktop automation, a browser profile, an exclusive database handle). Acquire it before selecting a task and hold it through the fallback lane, which also mutates state.
+- **Exclusive-resource lock** — only when a lane touches a resource not already covered by its worker singleton.
+
+Parallel workers stay allowed **only when their state and resources are disjoint**. Same-domain parallelism is not a tuning knob.
+
+TTL rules:
+
+- Reaping only happens after the recovery window in `## Health Reconciler` (2x TTL with no heartbeat), so the quantity to size against is **2x TTL, not TTL**. If a crashed run must be recoverable before the next scheduled run, set `2 x TTL < cadence`. Otherwise accept that one cycle may be skipped and say so explicitly rather than discovering it as an outage.
+- Provide a heartbeat command so a legitimately long run can extend its own TTL instead of being preempted.
+- Release must be explicit and verified. A release that silently fails to remove the lock is worse than no release, so report a non-zero result when the owner check fails.
+- Reaping an expired lock belongs to the commander, and only after artifact reconciliation. Never reap a lock still inside its recovery window.
+
 ## Health Reconciler
 
 Add a slower read/repair loop when multiple workflows share durable state.

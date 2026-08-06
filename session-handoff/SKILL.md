@@ -48,6 +48,7 @@ metadata:
 - Are verification results stated with command names and outcomes?
 - Are secrets, credentials, and irrelevant transcript details omitted?
 - Is the message concise enough to paste as a new-session prompt?
+- Can the next session locate the original log and the exact repository revision this note describes?
 
 ## Output Rules
 
@@ -57,6 +58,7 @@ metadata:
 - Avoid wording that sounds like a request to create another handoff, such as starting only with `次のセッションでは...`.
 - Prefer bullets over narrative history.
 - Include exact commands only when they are safe and likely to be rerun.
+- Record the originating session identifier, the date, and the repository state near the top. Without them the next session cannot pull the original log when the summary turns out to be thin, and cannot tell which revision the described state belongs to. The identifier is a log key, not a credential, so it is safe to carry; the log path is not, and stays out.
 - Include no more than one `Next action` section.
 - Include prohibited actions and stop conditions near the top when user safety or external systems are involved.
 - End with the expected stop condition or done criteria.
