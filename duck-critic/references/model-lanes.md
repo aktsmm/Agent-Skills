@@ -14,32 +14,48 @@ Use lanes to choose the kind of critic. Do not hardcode exact model names in por
 
 Use one lane by default. Use multiple lanes only when the work is broad, risky, security-sensitive, architecture-heavy, or has already failed repeatedly.
 
-## Model Diversity
+## Critic Model Selection
 
 The producer and the critic must be different model families whenever the harness allows it. A second opinion from the same model as the producer mostly echoes the producer's own blind spots, so a same-family critic is a last resort to note explicitly, not the default.
 
-Examples:
+Never hardcode model IDs. Model names churn faster than this skill does, so resolve the critic at run time from the harness's own model list, using signals that outlive individual names.
 
-- Work produced by a GPT/OpenAI-family model: ask a Claude Opus-class or Claude Sonnet-class reviewer when available.
-- Work produced by a Claude-family model: ask a GPT/OpenAI top-reasoning-class reviewer when available.
-- Work produced by an unknown model: choose the strongest available read-only reviewer and state the uncertainty.
+### 1. Discover
 
-These are role lanes, not fixed model IDs. Exact local names vary by product, license, and rollout. Verify the model picker or CLI configuration before storing a `model` value in handoffs or harness-specific configuration.
+Read the harness's current model list at run time; see [harness adapters](./harness-adapters.md) for how each harness exposes it. Never assume a name from memory or from an earlier session. Discover once per session and reuse the result.
+
+### 2. Exclude
+
+Prefer any capability metadata the harness exposes. When only names are available, drop models whose name carries a lightweight or specialized signal — `mini`, `nano`, `lite`, `small`, `flash`, `haiku`, `fast`, `turbo`, `code` / `codex`, `embed` — and drop any auto-router entry whose family cannot be determined. Compare against whole tokens after splitting the name on spaces, hyphens, dots, and parentheses, so a future flagship is not dropped for merely containing those letters. This is a conservative filter, not a capability test: a weak model carrying no signal will survive it, so never read a surviving name as proof of frontier tier.
+
+### 3. Rank
+
+**Preferred critic families.** This list is the only thing to revisit when new frontier families ship:
+
+- OpenAI GPT family
+- Anthropic Claude flagship line — the top general tier, not the mid or small tier
+
+Fall back in this order and stop at the first step that works:
+
+1. Frontier model from a preferred family that is a **different family** than the producer.
+2. Same family as the producer, fresh instance — report as `same-family`, so the weaker second opinion is visible.
+3. Self-critique — report as `self-review` and run the [reviewer rubric](./reviewer-rubric.md) against your own artifact as an explicit critic pass.
+
+Never auto-select a family outside the preferred list; use one only when the user names it explicitly. A same-family critic from a preferred family beats an unvetted family.
+
+### 4. Resolve the tier
+
+Within the chosen family, take the highest generation available. Prefer a stable entry over one marked `preview` or `experimental` at the same generation. Same-generation variants that nothing distinguishes are equivalent for this purpose: pick one deterministically — the first in the harness's own ordering — and report the exact name, so a choice that depends on list order stays auditable.
+
+### 5. Report
+
+Report the exact resolved model string, its family, and `different-family | same-family | self-review`. If you did not pass an explicit model to the harness, you inherited the producer's model: report that as `same-family`. If selection itself failed — the model list could not be read, or the resolved name was rejected — say so and name the fallback step you landed on.
+
+Never block the loop on model choice. If the user gave no model instruction, resolve and proceed instead of stopping to ask. Pause only when the choice is genuinely ambiguous or costly, such as a deep multi-lane review on expensive models.
 
 ## Context Independence
 
 Model diversity is only one axis of independence. The other is instruction independence: the critic must not inherit the producer's custom agent instructions, `AGENTS.md`, or full system prompt. Native Rubber Duck enforces this by running without the producer's custom agent instructions; reproduce it in other harnesses by handing the critic only the artifact, goal, constraints, and evidence. A critic that shares both the producer's model family and its project instructions stops being a second opinion at all. See `references/critic-packets.md` for what to include in the handoff.
-
-## Model Fallback
-
-A different-family critic is preferred, not required. When one cannot be selected, fall back in this order and never block the loop on model choice:
-
-1. **Different family, explicitly chosen** — the user named a model/family, or a different family is available. Use it.
-2. **Different family, auto-selected** — no model was specified, but the harness exposes a different family than the producer. Pick the strongest available read-only one.
-3. **Same family, different instance/session** — only the producer's family is available. Use a fresh read-only critic on it and **state in the output that the critic is same-family**, so the second opinion is known to be weaker.
-4. **Self-critique** — no separate critic is available at all. Run the [reviewer rubric](./reviewer-rubric.md) against your own artifact as an explicit critic pass, and clearly label it self-review, not an independent second opinion.
-
-If the user gave no model instruction, default to step 2: do not stop and ask — auto-select a different-family critic and report which route was used. Only pause for the user when the choice is genuinely ambiguous or costly (for example, a deep multi-lane review on expensive models).
 
 ## Reviewer Depth
 

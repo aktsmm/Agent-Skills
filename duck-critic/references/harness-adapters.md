@@ -40,9 +40,19 @@ Keep companion `.agent.md` files outside this skill. If the user later asks for 
 Recommended VS Code loop:
 
 1. Run `/duck-critic <target>` and keep producing the artifact yourself up to the first checkpoint from [loop protocol](./loop-protocol.md).
-2. Pick the critic route and reviewer lane. For the subagent critic, prefer a different model family than the producer; pass the `model` parameter to `runSubagent` to pin a different-family reviewer when one is available, and verify the exact model name first.
+2. Pick the critic route and reviewer lane, then resolve the critic model with the selection rules in [model lanes](./model-lanes.md) and pass it explicitly.
 3. Send the critic packet to a read-only `runSubagent` reviewer (or an existing read-only reviewer agent / separate model session). The subagent only reviews — it must not edit files or run mutating commands.
 4. Reconcile the findings in the main conversation, revise the artifact yourself, and re-consult the critic. Repeat until a stop condition in [loop protocol](./loop-protocol.md) is met.
+
+### Resolving the critic model
+
+`runSubagent` inherits the producer's model when `model` is omitted, so leaving it out silently produces a same-family critic. Always pass `model` explicitly, copying the model string exactly as the harness lists it, including the vendor suffix.
+
+To read the live model list, call `runSubagent` once with an obviously invalid `model` value that cannot collide with a real name. The rejection normally names every selectable model (`Requested model '...' not found. Available models: ...`). Apply the [model lanes](./model-lanes.md) selection rules to that list, then run the real critic with the resolved name. Probe once per session and reuse the result; do not probe before every round.
+
+Proceed only when the rejection actually returns a list. If it does not, or the resolved name is itself rejected, treat model selection as failed: never invent or half-remember a name, fall back per [model lanes](./model-lanes.md), and report the step you landed on. The list reflects current entitlement and rollout, so treat it as this session's answer rather than a durable fact.
+
+Subagent choice is separate from model choice. A read-only exploration subagent cannot write files, so ask that kind of critic to return its findings in its reply rather than to a review file.
 
 ## Claude Code
 

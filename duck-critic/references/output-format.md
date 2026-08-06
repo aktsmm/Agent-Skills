@@ -19,7 +19,7 @@ Use these route values as the SSOT for `Route Used`.
 `native-rubber-duck | fallback-custom-agent | fallback-subagent | fallback-separate-model | manual-critic-packet`
 
 **Critic Model**
-`different-family | same-family | self-review` — name the critic model/family when known.
+`<exact model string>` — `<family>` — `different-family | same-family | self-review`
 
 **Rounds**
 `<N> round(s)` — `stopped on PASS | accepted PASS_WITH_NOTES | max-rounds fail-safe | 0 rounds (critic skipped)`
@@ -56,7 +56,7 @@ Use these route values as the SSOT for `Route Used`.
 - Put blocking issues first.
 - Use `None found` when a section has no items.
 - Mention model or harness uncertainty when relevant.
-- State the critic model family. If the critic ended up `same-family` or `self-review` because a different family was unavailable, say so explicitly so the second opinion's strength is clear. See the model fallback chain in [model lanes](./model-lanes.md).
+- Report the exact model string the critic actually ran on, plus its family. If the critic ended up `same-family` or `self-review` because a different family was unavailable, say so explicitly so the second opinion's strength is clear. If no model was passed to the harness, the producer's model was inherited: report `same-family`. See the selection rules in [model lanes](./model-lanes.md).
 - Include file paths only when the reviewer actually inspected those files.
 - For fallback routes, explicitly say the output is Rubber Duck-equivalent, not native Rubber Duck.
 
