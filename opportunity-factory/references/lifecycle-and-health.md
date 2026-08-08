@@ -119,7 +119,7 @@ Check:
 
 - JSON/JSONL parse validity,
 - dashboard vs durable queue/portfolio/product counts,
-- prompt-file vs embedded scheduler drift,
+- scheduler prompt source/path/fallback-snapshot drift,
 - stale locks and claims,
 - automation enabled/schedule mismatches,
 - WIP/retry/slice limits,
@@ -131,7 +131,7 @@ Auto-repair only reversible local drift:
 - count/path/status fixes,
 - stale lock removal only after heartbeat expiry plus no matching live/in-progress state,
 - interrupted-run reconciliation across lock, task claim, expected artifact, changed targets, done history, and pipeline log,
-- prompt reference drift,
+- scheduler prompt-binding repair only when source, resolved path, and normalized fallback snapshot (BOM, line endings, trailing newline) can be read back together; preserve cadence and enabled state, re-read and retry once on a concurrency conflict, otherwise record a blocker,
 - missing compact no-op/error records.
 
 Never delete a lock from TTL alone. Require an expired heartbeat (use at least 2x TTL), no live process/lease or fresh heartbeat, and reconciliation of the claimed task. A persisted `in_progress` status without a fresh heartbeat is evidence of an interrupted run, not a live run.
@@ -144,6 +144,8 @@ For an interrupted mutating run:
 4. If side effects exist but artifact or verification is missing, preserve the side effects, return the task to `pending` or `recovery`, and require bounded verification.
 5. If nothing changed, return the task to `pending`.
 6. Record the recovery in dashboard/outcome/pipeline state, then remove the stale lock.
+
+For a suspected scheduled failure, require command exit/output and the expected artifact to agree. Scheduler history and terminal/PTY warnings are corroborating signals; a host warning alone is not a task failure.
 
 Never infer task completion from a modified target file alone.
 

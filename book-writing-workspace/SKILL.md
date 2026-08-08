@@ -46,7 +46,9 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 6. Checking word count targets and source confidence before finalizing text.
 7. Measuring the built page count before treating a page-budget overrun as a structural problem; character-count estimates run high.
 8. Ruling on external issues, pull requests, and publisher proof comments point by point, first confirming which revision the proof was typeset from, then verifying each factual claim against its source of truth.
-9. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
+9. Giving typeset-only elements such as chapter frontispieces a source of truth in the manuscript, marked so the converter can emit them, once it is settled that the author writes them.
+10. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
+11. Freezing a release candidate and running the release-readiness gates before delivery or publication.
 
 ## Bootstrap Workflow
 
@@ -81,7 +83,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 
 - Manuscript folders under `keypoints/`, `sections/`, and `images/`
 - AI workflow files under `.github/agents/` and `.github/instructions/`
-- Project docs such as `README.md`, `docs/reader-personas.md`, `docs/page-allocation.md`, and `docs/schedule.md`
+- Project docs such as `README.md`, `docs/reader-personas.md`, `docs/page-allocation.md`, `docs/schedule.md`, and `docs/release-readiness-record.md`
 - Helper scripts such as `scripts/count_chars.py`
 - Optional Re:VIEW scripts and metadata when `--with-review` is used
 
@@ -116,6 +118,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 | Customization points | [references/customization-points.md](references/customization-points.md) |
 | External review      | [references/external-review-handling.md](references/external-review-handling.md) |
 | Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)           |
+| Release readiness    | [references/release-readiness-review.md](references/release-readiness-review.md) |
 
 ## Optional Build Pipeline
 
@@ -127,9 +130,11 @@ For workspaces that add conversion or PDF rendering, apply [build pipeline gates
 - [ ] Writing and review agents deployed to `.github/agents/`
 - [ ] One reader-persona SSOT is selected; new workspaces use `docs/reader-personas.md` without placeholders
 - [ ] `docs/page-allocation.md` configured
+- [ ] `docs/release-readiness-record.md` is available for release candidates
 - [ ] `README.md` and `docs/schedule.md` customized
 - [ ] Manuscript files follow the chapter/section naming convention
 - [ ] `scripts/count_chars.py` works for target manuscript files
 - [ ] Setup fails before mutation when a required template, script, or asset is missing
 - [ ] A clean temporary-directory smoke test generates `docs/reader-personas.md` and exits successfully
+- [ ] The smoke test also generates `docs/release-readiness-record.md`, expands the title, and includes the Gate 8 row and manifest lock fields
 - [ ] Re:VIEW/PDF output is either explicitly out of scope or enabled and verified

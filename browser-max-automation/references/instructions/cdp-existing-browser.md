@@ -37,6 +37,15 @@ If CDP startup may already be automated, inspect its owner before adding another
 - When a helper connects from Node, pass `http://127.0.0.1:<port>` rather than `localhost`. `localhost` can resolve to IPv6 `::1` while the CDP endpoint listens on IPv4, so PowerShell reaches it but Node `fetch` fails with `fetch failed`.
 - Pass the verified CDP URL explicitly to helpers so later scripts do not re-guess a different endpoint. If a helper already has a verified CDP URL, disable profile re-resolution and strip stale profile-query environment variables unless you intentionally want the helper to launch/resolve a different browser profile.
 
+## Screenshot Capture
+
+- In `connect_over_cdp()` workflows, `page.screenshot()` can ignore the emulated `deviceScaleFactor` and save at 1x even when the override succeeded. When you need a deterministic DPR, send `Page.captureScreenshot` on a CDP session and pass the scale inside the clip: `{"format": "png", "captureBeyondViewport": True, "clip": {**rect, "scale": dpr}}`. Keep `Emulation.setDeviceMetricsOverride` at `deviceScaleFactor: 1` so layout stays in CSS pixels.
+- Background tabs can capture partially rendered UI. Call `page.bring_to_front()` after navigation, before the settle wait.
+- Lazily rendered or virtualized regions capture as an empty box even with `captureBeyondViewport`. Scroll the target into view, wait, and **verify the saved file** — a blank capture is silent. Retry once; if the second attempt is also blank, keep a known-good capture instead of looping.
+- Injecting a theme attribute (for example `data-color-mode`) does not switch the theme when the matching theme stylesheet was never loaded. Backgrounds may flip while text colors stay from the original theme, producing an unreadable hybrid. Change the account setting instead, record the original value first, and restore it afterwards.
+- Disable animations before capturing: `page.add_style_tag(content="*, *::before, *::after { animation: none !important; transition: none !important; }")`.
+- Prefer selecting the capture region and any highlight frames by CSS selector over hand-counted pixel offsets. Selector-based clipping stays reproducible when the page reflows.
+
 ## Authentication Gotchas
 
 - Prefer headful existing profile + CDP over temporary `--user-data-dir` for sites that rely on cookies or device auth.

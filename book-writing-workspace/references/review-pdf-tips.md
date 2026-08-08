@@ -203,6 +203,43 @@ from the gem defaults on every run.
 - Check `sty/review-style.sty` inside the build directory to verify injected settings
 - Use `grep -rn 'tocdepth' sty/ *.tex` to trace where values are set
 - Use `pdftotext output.pdf -` to verify TOC content without opening a viewer
+- **A failed build leaves the previous PDF in place.** Treat the build exit status and an `ERROR` line in the log as the success criterion, never the existence of the PDF. The `l.<line>` marker in the log names the offending style line. As a cheap cross-check, compare the PDF timestamp against the newest manuscript file; a stale PDF silently re-verifies the previous version.
+
+## Hiding Figure Numbers and Captions
+
+### Problem
+
+A publisher may decide that figure numbers and captions do not appear in print. The converter still emits `//image[id][caption]{`, and Re:VIEW prints `図 1.2: caption` under every figure.
+
+### Recommended Rule
+
+Empty the Re:VIEW macro rather than configuring the `caption` package.
+
+```latex
+% review-custom.sty
+\renewcommand{\reviewimagecaption}[1]{}
+```
+
+`reviewmacro.sty` loads `review-base` before `review-custom`, so the `\renewcommand` resolves. Emptying the macro removes the number, the caption text, and the vertical space in one step.
+
+Do **not** reach for `\captionsetup[figure]{format=empty,labelformat=empty,labelsep=none,skip=0pt}` first. In a Re:VIEW + uplatex toolchain this option combination failed to compile and aborted the build, and emptying the macro is the smaller change either way.
+
+### Notes
+
+- Keep the caption string in the generated `.re`. It never prints, and it tells the editor and the next revision what each figure shows.
+- Attribution lines such as a source URL or a note about where a screenshot came from must be **body paragraphs**, not captions, or they disappear with the caption.
+- Without captions, a figure that floats to the next page loses its only label. Check that every figure still lands near the paragraph that introduces it.
+
+### Verification
+
+Extract the text layer and assert that no figure label survives.
+
+```python
+import fitz, re
+doc = fitz.open(pdf_path)
+labels = [m for page in doc for m in re.findall(r"図\s?\d+\.\d+", page.get_text())]
+assert not labels, labels[:5]
+```
 
 ## Font Size Tuning
 
@@ -261,6 +298,24 @@ The `\clearpage` at the end forces the first `##` (section) to start on the next
 > **Pitfall**: Do not use `\renewcommand{\reviewchapterhead}` — this macro does not exist
 > in Re:VIEW 5.x. Use `\@makechapterhead` (standard jsbook) instead.
 > Also avoid `\\` (line break) in `\@makechapterhead`; use `\par\vskip` for spacing.
+
+## Chapter Lead Blocks
+
+`//lead{ ... //}` is the Re:VIEW block for chapter lead text. In the stock 5.x builders the LaTeX side aliases it to `read`, which emits `\begin{quotation}`, and the HTML side emits `div.lead`. Both targets work without defining anything, so a custom sty with no `lead` environment still builds. A project that swaps in its own builder has to check this again.
+
+Read the builder source before inventing a macro. `alias_method :lead, :read` in `lib/review/latexbuilder.rb` settles in one look what a failed PDF build takes a full round trip to reveal.
+
+A macro defined in the custom sty is not proof the feature is wired. Search the generated `.re` files for the block that would emit it. An environment nothing emits is dead code from an abandoned design, and mistaking it for working support sends you hunting for a configuration switch that was never built.
+
+## Range Markers in the Converter Must Fail Loudly
+
+A converter that turns a marker pair in the Markdown source into a Re:VIEW block has three failure modes that all produce a file rather than an error:
+
+- The closing marker is missing, so the block swallows the rest of the chapter
+- The markers nest, so the first close ends the outer block and the remainder leaks into body text
+- Unsupported markup lands inside the block, so tables or lists pass through as raw source
+
+Raise on all three, naming the file and the line. Conversion appearing to succeed is the whole problem: the damage surfaces pages later in the PDF, far from the point where it could still be traced back. Keep one negative fixture per mode so the guards stay wired after the next converter change.
 
 ## Code Block Auto-Wrapping with review-ext.rb
 

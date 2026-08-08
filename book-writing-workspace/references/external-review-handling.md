@@ -24,6 +24,16 @@ Extract the anchor mechanically. A highlight carries a rectangle, so clipping th
 
 Text pulled out through a shell pipe can arrive mis-decoded when the console encoding differs from the file. Write the extracted text to a file from inside the extractor with an explicit encoding instead of redirecting stdout.
 
+## Treat unfamiliar typeset elements as placeholders until proven otherwise
+
+A proof carries page furniture the manuscript never had: chapter frontispieces, straplines, running heads. Some of it is finished copy the editor wrote and some is filler that only looks finished, and the two are indistinguishable from a summary of the proof. Guessing wrong produces a reply that thanks the editor for text nobody wrote.
+
+Extract those pages as text and compare them against each other. Repetition is the tell: the same paragraph on every chapter opener is a strong signal of filler, and an editor's "to be updated" note on two of them says nothing about the rest. Treat the reading as provisional until the editor confirms it, since a house style that reuses one lead across chapters would look identical.
+
+Once it is filler, settle who writes the replacement before drafting any reply. When it falls to the author, the text also needs a home in the manuscript, marked so the converter can emit it. Otherwise the only copy lives in the typeset page and the two drift apart on the next revision.
+
+Do not size the replacement from the filler. Measuring a placeholder tells you what the designer typed, not what the frame holds. Write to the intent, measure the range you produced, and hand that range back with an explicit offer to cut. Trimming approved prose to hit an inferred number is the worse trade.
+
 ## Map PDF pages to printed folios before quoting any page
 
 PDF page numbers and printed folios do not line up. Front matter uses roman numerals, and a proof is often delivered split into volumes that each restart at PDF page 1.

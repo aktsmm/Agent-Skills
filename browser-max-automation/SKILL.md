@@ -37,7 +37,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 | 既存ブラウザ (CDP) | 普段のブラウザ状態をそのまま使いたい                   | ログイン済み状態を再利用できる | デバッグモード起動が必要   |
 | 直接 CDP WebSocket | Playwright CDP が不安定、または MCP と競合させたくない | 低レベル操作で安定しやすい     | CDP コマンドを自前管理する |
 
-既存ブラウザ CDP の起動、profile 確認、port drift、認証 URL encode は [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) を参照する。
+既存ブラウザ CDP の起動、profile 確認、port drift、認証 URL encode、スクリーンショット取得は [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) を参照する。
 直接 WebSocket CDP の起動フラグ、`websocket-client` 接続、SPA hash navigation、virtual scroll 操作は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
 ## Quick Reference
@@ -139,7 +139,7 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 
 | Need | Reference |
 | --- | --- |
-| Existing browser CDP, profile, port drift | [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) |
+| Existing browser CDP, profile, port drift, screenshot capture | [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) |
 | Raw CDP WebSocket | [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) |
 | WebAuthn virtual authenticator / passkey | [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) |
 | CDP recovery and context selection | [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) |

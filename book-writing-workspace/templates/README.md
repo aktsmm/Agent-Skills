@@ -7,9 +7,10 @@ This repository contains the manuscript workspace for "{{BOOK_TITLE}}".
 1. Define the primary and secondary readers in `docs/reader-personas.md`
 2. Review `docs/page-allocation.md` and set character targets
 3. Review `docs/schedule.md` and replace placeholder dates
-4. Edit `.github/copilot-instructions.md` for project goals and constraints
-5. Start outlining in `keypoints/`
-6. Write drafts in `sections/`
+4. Keep `docs/release-readiness-record.md` unused until a release candidate is frozen
+5. Edit `.github/copilot-instructions.md` for project goals and constraints
+6. Start outlining in `keypoints/`
+7. Write drafts in `sections/`
 
 ## Repository Structure
 
@@ -43,6 +44,7 @@ python scripts/count_chars.py
 3. Review with `@writing-reviewer`
 4. Convert with `scripts/convert_md_to_review.py` if Re:VIEW support is enabled
 5. Build or polish PDF assets only when PDF output is in scope
+6. Freeze the release candidate and complete `docs/release-readiness-record.md` before delivery
 
 ## Metadata Layer
 
