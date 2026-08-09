@@ -8,6 +8,22 @@ A single pull request usually mixes correct fact fixes, wording preferences, and
 
 Record three outcomes only: adopted, adopted with change, rejected. "Adopted with change" needs the reason for the change, or the reviewer reads it as a silent override.
 
+## Land a contributor's pull request without merging it
+
+Merging is the default, because it preserves the contribution in the history for free. The exception is a request whose edits overlap lines the manuscript has already changed: the merge then resolves to a conflict that has to be settled by hand anyway, and settling it inside a merge is harder than applying the intent directly.
+
+On that path the contributor disappears from the history unless you put them back, so every commit carrying their work needs a co-authorship trailer. Read the author name and address off the request's own commits through the forge API instead of guessing at an address.
+
+Fork-based requests that allow maintainer edits offer a third path: review the request, propose the exact change, and apply it yourself, which records both people. Send anything a primary source settles uniquely down that path, and hand anything that needs the contributor's intent back to them.
+
+A truncated or half-finished edit is usually an attempt to replace an empty phrase with something concrete. Recover the intent from the surrounding voice before rewriting it, and count how many times the same empty phrase appears elsewhere.
+
+## A notation complaint may be a defect in the notation rule
+
+Before applying a complaint about terminology or notation, test whether the written rule actually decides the case. When two readings of the rule both pass, the complaint found a gap in the rule rather than a slip in the manuscript.
+
+Rebuild the rule from counted usage across the manuscript instead of from taste, and put that count in the reply. A rule that ranks its own criteria settles the next case without another round.
+
 ## Proof comments arrive as PDF annotations, not as text
 
 Once a book reaches typesetting, review stops arriving as issues and starts arriving as an annotated PDF. Do not read every page. Extract the annotations mechanically into one row per comment, then rule on the rows.

@@ -62,6 +62,7 @@ AI 生成っぽさを検出し、人間が書いた文章として読める形�
    - 書き手の主語と判断が見えるか。
    - 抽象語やつなぎ語で説明しすぎていないか。
    - 構造が均一すぎないか。
+   - 長文生成に混ざる字形崩れが残っていないか（[Generation Artifacts](./references/ai-likeness-signals.md)）。
 4. 詳細 tell が必要な場合は [ai-likeness-signals.md](./references/ai-likeness-signals.md) を使う。
 5. 同じ箇所に複数の tell が重なる場合は `stacking pattern` として 1 件にまとめる。
 6. 変換型では初稿後に「まだ AI っぽく見える理由」を短く洗い出し、必要な箇所だけ最終稿で直す。

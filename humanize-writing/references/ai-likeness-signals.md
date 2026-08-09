@@ -152,6 +152,15 @@ Humanize Writing の検出辞書。検出は厳密に、修正は文脈判断で
 - Preserve specific, hard-to-fabricate details, era-bound phrasing, mixed feelings, and word choices the writer can defend.
 - For technical, legal, reference, or encyclopedic text, neutral and plain may be the right human voice. Do not inject personality where the genre calls for restraint.
 
+## Generation Artifacts
+
+Not every tell is tonal. Long-form Japanese generation occasionally substitutes a visually similar character for the intended one, producing a word no dictionary contains that a reader's eye still slides over.
+
+- Observed substitutions include `覆う` coming out as `覛`, `厄介` as `厨い`, and `食い違い` collapsing into unrelated kana
+- Spellcheckers and structural gates miss it. Each character is individually valid and the surrounding grammar still parses
+- Detect it by grepping a curated list of rare characters that have no business appearing in this text, and grow the list whenever a new one turns up. Reading for it does not work reliably
+- Run the sweep after any long generation pass, not only before publication
+
 ## Experience-writing Signals
 
 - Separate `I did this` from `AI did this` at the subject level.

@@ -44,7 +44,7 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 4. Applying reviewer fixes without leaving outlines, chapter maps, question digests, and progress trackers out of sync.
 5. Reviewing each chapter against the book-specific reader persona and expected outcome.
 6. Checking word count targets and source confidence before finalizing text.
-7. Measuring the built page count before treating a page-budget overrun as a structural problem; character-count estimates run high.
+7. Measuring the built page count before treating a page-budget overrun as a structural problem; character-count estimates run high, and an author-side build is not the publisher's printed page count.
 8. Ruling on external issues, pull requests, and publisher proof comments point by point, first confirming which revision the proof was typeset from, then verifying each factual claim against its source of truth.
 9. Giving typeset-only elements such as chapter frontispieces a source of truth in the manuscript, marked so the converter can emit them, once it is settled that the author writes them.
 10. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
@@ -118,6 +118,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 | Customization points | [references/customization-points.md](references/customization-points.md) |
 | External review      | [references/external-review-handling.md](references/external-review-handling.md) |
 | Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)           |
+| Screenshot capture   | [references/screenshot-capture.md](references/screenshot-capture.md)     |
 | Release readiness    | [references/release-readiness-review.md](references/release-readiness-review.md) |
 
 ## Optional Build Pipeline

@@ -14,6 +14,24 @@ Generated books often carry no bookmarks, so a table-of-contents API returns an 
 
 Report the measured total alongside the estimate and label both. Reviewers act on whichever number they read first.
 
+### Deriving the planning coefficient
+
+A character-to-page coefficient is usable only if it came from a measured build, and it goes stale as soon as the manuscript or the style changes. Quote it with the measurement date and the PDF it came from.
+
+- Measure per chapter, not once for the book. Chapter density spreads much wider than the average suggests; one measured pair of books ran 614-1,326 characters per page around a mean near 1,090
+- Plan with a number below the measured mean. A conservative coefficient surfaces an overrun while there is still room to cut, where the mean hides it until the build
+- Charge each figure against the same budget as a fixed character equivalent, so a figure-heavy chapter does not quietly overrun
+- Give exercise-only or question-only sections their own coefficient. Their layout has nothing in common with body prose, and the body coefficient misprices them by a wide margin
+- Chapter detection keys off body headings, so unheaded back matter lands inside the last chapter. Pass an explicit final body page when that distorts the number
+
+### An author build is not the publisher's page count
+
+A PDF built from the manuscript repository is an author-side proof. The publisher's typesetting uses a different trim size, type size, leading, and figure placement, so the two counts diverge; one measured case ran about 1.5x.
+
+- Treat the publisher's proof as the source of truth for anything described as a printed page
+- Never hand a local page count, or a local page delta, to an editor as a printed figure. If a local number has to be shared, label it as the author-side setting and keep it away from folios
+- Page-impact judgements for a late change belong to the publisher. Report the content change and let them price it
+
 ## Figure Sizing
 
 When the build places body figures at a fixed column width, the printed size of text inside a figure is decided by how much you crop, not by the pixel width of the source image. Cropping tightly to the subject makes a figure's labels _larger_ than the body text, which is the opposite of the usual "too small to read" failure.
@@ -22,6 +40,7 @@ When the build places body figures at a fixed column width, the printed size of 
 - Aspect ratio decides how much of the page a figure eats. At full-width placement a near-square figure takes a large vertical share, so prefer landscape crops
 - Do not trust an assumed column width or a checker's default. Measure it from the publisher's proof: `page.get_image_rects(xref)` returns a list of placements, so pick the occurrence you mean and convert that rectangle with `rect.width * 25.4 / 72` to get millimetres
 - Preview grayscale legibility at the measured width, not only at a conservative default. A reviewer working from the narrower default will produce arithmetic that looks solid and still rejects figures that are fine
+- For a screen capture, what decides the printed text size is how many CSS pixels were packed into that fixed width. Measuring and controlling it is in [Screenshot capture](screenshot-capture.md)
 
 ## Figure Emphasis in Grayscale Print
 

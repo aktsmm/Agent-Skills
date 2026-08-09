@@ -82,6 +82,8 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 | 50-69  | Simplify      |
 | 0-29   | Ask user      |
 
+When the deliverable is headed for print, gate it on the Monochrome Print Profile and the Pre-delivery Geometry Sweep in [style-guide.md](references/style-guide.md) before any visual review.
+
 ### Limits
 
 | Limit             | Value |

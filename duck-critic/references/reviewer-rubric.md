@@ -58,6 +58,8 @@ Ignore these unless they affect the outcome:
 - Only report findings the critic is confident are real issues. Speculative "might be a problem" notes without concrete evidence should be omitted or downgraded to a Suggestion that names the open question.
 - Treat an explicit user statement about an action they performed as user-provided evidence and label that provenance; do not reject it only because the current harness log omits the action.
 - A search miss proves only that evidence was not found in the searched scope. Report that scope and check referenced workspaces, private artifacts, or user-provided evidence before classifying a claim as contradicted or nonexistent.
+- "The documentation does not say this" and "that link is dead" must survive a fresh full fetch of the primary-language edition. Localized editions lag and drop entire sections, and a fetch can return partially without saying so. State the language and the method used, and put this constraint in the packet before the round starts.
+- A claim about implementation state names the file and the line. The producer opens them before acting, because a critic reading from a summary asserts missing capabilities that the cited file already implements.
 - For multiple trials or collectors, preserve the run, method, unit, and marked symptom window; do not present cross-run values as one continuous experiment or as directly comparable metrics.
 - Require a candidate cause to align with symptom onset and duration. A later or isolated spike cannot explain an earlier, sustained failure without additional evidence.
 - Treat collection overhead as a confounder. Require a smoke test, baseline, or equivalent evidence before trusting measurements from a new collector.

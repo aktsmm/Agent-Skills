@@ -257,6 +257,22 @@ Release only when:
 
 Do not use a percentage pass rate for P2. One unresolved P2 can affect a whole edition; require either resolution or a named exception.
 
+### Deterministic gates sit outside this model
+
+A gate a script decides — link reachability, structural validation, terminology sweeps, budget checks — is not a priority-ranked finding. It passes or it fails, and a failing one blocks regardless of how the priorities elsewhere are trending.
+
+Reviewers and critics will argue for waiving one on cost or reader value. Answer with the rule the gate encodes and the measurement it produced rather than with a judgement call. If the rule itself is wrong, change the rule and re-run the gate; do not exempt a case from a rule you intend to keep.
+
+## Reused Review Output Goes Stale
+
+A stored review result is a statement about one revision, not a standing fact.
+
+- Head every stored result with its run date and the candidate revision it examined
+- Before citing an earlier result, check whether the files it covered moved since that revision. If they did, re-run it or narrow the citation to the part that did not move
+- Overwrite in place when one lane re-runs against the same target, and keep cross-cutting reviews as separate dated documents so the older reading stays readable
+- When a measurement later replaces the estimate a finding rested on, re-rank the finding and record both numbers with the method used. An estimate quietly overwritten regenerates the same finding next time
+- Re-derive the overall verdict after any re-ranking. A held verdict left standing after its only blocking finding was withdrawn misleads everything downstream
+
 ## Evidence Record
 
 For each gate, record:

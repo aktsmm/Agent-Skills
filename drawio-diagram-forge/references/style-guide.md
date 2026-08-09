@@ -149,6 +149,18 @@ When a small service icon sits close to a busy connector or arrow:
 - For diagrams that may be published externally, avoid customer-specific or vendor-internal acronyms unless the acronym itself is the subject of the diagram.
 - Prefer generic labels such as `On-premises gateway`, `On-premises router`, or `Edge network` over terms that only make sense in one customer's environment.
 - If an internal acronym must appear somewhere, keep it in the surrounding article text, not as the primary label inside the figure.
+- For commercially published work, resolve a third party's logo or wordmark against the mark owner's own permitted-use page before drawing it. When that page enumerates the media it allows and also says the mark needs prior written permission, treat a medium missing from the list as not covered and escalate rather than assuming. A neutral concept shape with a text label avoids the question entirely and usually costs the figure nothing.
+- An approximation of a mark inherits the same question as the mark. So does redrawn product chrome — header bars, sidebars, tab strips — which carries the exposure of a screenshot without its evidence. Generic pictograms (cloud, folder, machine, key, document) are fine when their licence permits commercial use; keep the outline simple so it survives reduction, and always pair one with a label.
+
+### Monochrome Print Profile
+
+When the destination is a printed page, the figure is reduced, converted to grayscale, and placed at a fixed column width. Design to that first.
+
+- Keep the content to what survives reduction: roughly 4-7 primary nodes (9 at the outside), about six arrows, at most two levels of branching, and code fragments of three to five lines
+- Prefer landscape. Column width is fixed, so a near-square figure eats close to half a page; aim between 1.5:1 and 3:1
+- Never carry meaning in colour alone. Use line style, border weight, and labels, then check the result in grayscale
+- Keep the lead sentence and any summary box out of the figure alongside the title. Confirm whether the destination renders figure captions and numbers at all; where it does not, anything the reader must have has to live in the prose
+- Verify the figure shows what the prose claims about it. A simplified diagram that contradicts its own sentence costs more trust than a missing figure would
 
 ### Diagram Size
 
@@ -157,6 +169,21 @@ When a small service icon sits close to a busy connector or arrow:
 | Simple (≤5 nodes)     | 800–900 × 400–500    |
 | Moderate (6-15 nodes) | 1000–1200 × 500–700  |
 | Complex (>15 nodes)   | 1200–1600 × 700–1000 |
+
+## Pre-delivery Geometry Sweep
+
+A structural validator proves the XML parses and the ids resolve. It says nothing about where the shapes ended up. Sweep the geometry mechanically before looking at the render, so the visual pass spends its attention on meaning.
+
+Scan the `.drawio` source and the exported asset for:
+
+- edges that overlap another edge along a shared span
+- edges left to the router whose endpoints sit in a diagonal relationship
+- edge endpoints that terminate underneath a node instead of at its border
+- labels whose bounding box intersects a node
+- geometry that falls outside the page rectangle
+- measured aspect ratio, read from the exported `width` and `height`, against what the destination allows
+
+Report these rather than blocking on them. They are strong hints, not verdicts, and a deliberate overlap occasionally reads better than the alternative.
 
 Always shrink-wrap: set page width/height to tightest bounding box + 20px margin.
 
