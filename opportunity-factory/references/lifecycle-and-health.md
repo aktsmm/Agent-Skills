@@ -145,6 +145,8 @@ For an interrupted mutating run:
 5. If nothing changed, return the task to `pending`.
 6. Record the recovery in dashboard/outcome/pipeline state, then remove the stale lock.
 
+For an interrupted `repair` child, also reconcile `parentTaskId`, `inputHash`, and `criticLog`. A repair claim without validation is `repair-start-failed` for its already-reserved parent attempt; preserve partial output and requeue only while the repair cap remains. A repair output with validation but no independent receipt resumes the same workflow round. Never silently reset either condition to a fresh pending repair.
+
 For a suspected scheduled failure, require command exit/output and the expected artifact to agree. Scheduler history and terminal/PTY warnings are corroborating signals; a host warning alone is not a task failure.
 
 Never infer task completion from a modified target file alone.

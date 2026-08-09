@@ -20,17 +20,25 @@ Task 単位で「どこまで粘るか」を制御する profile。goal-loop の
 
 Commander が task 起票時に class を判定し、対応する profile を紐付ける。
 
-| Task class                                    | Profile           | 理由                                      |
-| --------------------------------------------- | ----------------- | ----------------------------------------- |
-| Portfolio review / cleanup / digest           | Standard          | 軽い定型 task、粘りすぎ不要               |
-| Worker 本流 (candidate 育成, small-bet pilot) | Persistent (既定) | 通常 dev cycle                            |
-| Prompt / workflow self-improvement            | Exhaustive        | 工場自体の改修は慎重に                    |
-| Anti-pattern 分析                             | Exhaustive        | パターン抽出は深掘り必要                  |
-| Critic Role (harsh critic run)                | Persistent        | verdict は 1 発で確定させる、粘りすぎ抑制 |
-| Discovery                                     | Persistent        | 新規候補探索、深追いは 6 approach まで    |
-| Real-surface verification                     | Standard          | read-only なので短時間                    |
+| Task class                                    | Profile            | 理由                                               |
+| --------------------------------------------- | ------------------ | -------------------------------------------------- |
+| Portfolio review / cleanup / digest           | Standard           | 軽い定型 task、粘りすぎ不要                        |
+| Worker 本流 (candidate 育成, small-bet pilot) | Persistent (既定)  | 通常 dev cycle                                     |
+| Prompt / workflow self-improvement            | Exhaustive         | 工場自体の改修は慎重に                             |
+| Anti-pattern 分析                             | Exhaustive         | パターン抽出は深掘り必要                           |
+| Critic Role (harsh critic run)                | Persistent         | verdict は 1 発で確定させる、粘りすぎ抑制          |
+| Review gate / repair child                    | 親 task の profile | repair は親の iteration を共有し、別予算を持たない |
+| Discovery                                     | Persistent         | 新規候補探索、深追いは 6 approach まで             |
+| Real-surface verification                     | Standard           | read-only なので短時間                             |
 
 class 未指定の task は Persistent 扱い (既定)。
+
+### Review Repair Accounting
+
+- `repair` は `parentTaskId` を持つ child task。repair 自身に profile、独立 attempt-log、独立 max iteration を割り当てない。
+- Commander は repair claim 時に親 task の attempt を1つ予約し、validation pass/fail または `repair-start-failed` として同じ attempt を確定する。SQLite backend ではこの予約を `repair_attempts` に記録する。`blocked-independence` は追加 iteration を消費しない。
+- 使える repair round は `min(reviewRepairRounds, profile.maxIteration - iterationsUsed)`。残りが 0 以下なら `deferred-exhausted` と `reason: persistence-exhausted` を記録し、repair を起票しない。
+- 同じ blocking finding が2 eligible workflow round連続で未解決、または repair に substantive artifact/evidence change がない場合も、stall と同じく Replan Contract を起動する。
 
 ## Cost / Quota との関係
 
@@ -70,7 +78,7 @@ class 未指定の task は Persistent 扱い (既定)。
 
 ## Replan Contract
 
-Stall→replan trigger で:
+Stall または review-repair replan trigger で:
 
 1. Worker は現 approach を停止、attempt-log に `verdict: stall + replan-triggered` 記録
 2. Commander に replan request を返す (worker 増殖ではなく task ledger 再構築)

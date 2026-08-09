@@ -45,7 +45,7 @@ Lane が全消化 (10 個全部 skip か完了) されたら:
 
 - Reporter-learner が次の 3 種類を自動 seed:
   - **Discovery task**: 新規テーマ / 関連分野の探索
-  - **Rubber-duck 対象**: 既存 top-N 候補で最古の critic-log を持つもの
+  - **Rubber-duck 対象**: 既存 top-N 候補で最古の criticLog を持つもの
   - **Top-N replacement 候補**: 直近 learning から promote 候補生成
 - 3 種類全部 seed 失敗なら `workspace-idle` を dashboard-state に記録、workflow-review の cadence 対象に含める
 - Idle 状態でも hourly cadence は継続 (workflow が完全停止しない)

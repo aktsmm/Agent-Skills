@@ -92,6 +92,10 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 - 自分の拡張に同梱したリソースは、ユーザーのホーム配下や VS Code のインストール先を推測せず、`context.extensionUri` と `vscode.Uri.joinPath` など extension context から解決する。
 - 他の installed extension に同梱されたリソースを読む必要がある場合も、`resources/agents|skills|prompts|instructions|hooks|mcp` の既知 root と、manifest の `chatAgents` / `chatPromptFiles` 宣言を優先して見る。built-in resource とは別の read-only resource として扱い、削除や再インストール導線を混ぜない。
 - Runtime の診断ログは `console.log` に散らさず、Output Channel ベースの logger に集約する。ユーザーがログを開ける導線も command / notification / README のどこかに用意する。
+- 大きい入力の parse や集計を Extension Host スレッドで同期実行しない。上限付きの bytes を `node:worker_threads` へ渡し、cancel / opt-out では `await worker.terminate()` と listener 解除を済ませ、世代 ID が一致する結果だけで cache / UI を更新する。
+- transfer するのは専有した非 `SharedArrayBuffer` だけにし、transfer 後は送信側の view を使わない（同じ backing store の view はすべて detach される）。`Buffer` は pool を共有し得るので、offset 付き view や所有が曖昧な buffer は必要範囲だけを別 buffer へ copy して渡す。
+- worker や別プロセスから受け取った結果をそのまま cache / 表示しない。許可キー検査は `Reflect.ownKeys`、必須キーの存在確認は `Object.hasOwn` で行う（`Object.keys` は非列挙の own property を見逃し、`in` や素の property 参照は継承値を通す）。
+- 例外の `Error.name` や `FileSystemError.code` をそのままログ / UI へ出さない。既知 code の allowlist へ正規化し、未知は単一の汎用 code に落とす。path や token が名前に混ざるケースを防げる。
 
 ### Manifest / Docs / Localization
 

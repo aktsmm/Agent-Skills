@@ -108,6 +108,8 @@ Content attribute requires HTML encoding:
 | `"` | `&quot;` |
 | `&` | `&amp;` |
 
+This table is the internal mxCell value layer. When a script writes the raw XML attribute directly and the style has `html=1`, escape one level further (`&amp;lt;word&amp;gt;`); a single `&lt;` is decoded back to `<` by the XML parser and then dropped as an unknown HTML tag.
+
 ## Validation Checklist
 
 - [ ] `mxCell id="0"` and `id="1"` exist

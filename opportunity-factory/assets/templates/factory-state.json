@@ -37,6 +37,8 @@
       "prototypeReview": 1,
       "prototypeTest": 1,
       "review": 1,
+      "repair": 1,
+      "replan": 1,
       "workflowReview": 1,
       "track": 1
     },
@@ -47,7 +49,9 @@
       "maxDailyCostEstimate": "<set by user>",
       "lockTtlMinutes": 180,
       "staleTaskTtlHours": 48,
-      "blockerThreshold": 3
+      "blockerThreshold": 3,
+      "reviewRepairRounds": 10,
+      "independenceBlockLimit": 3
     },
     "notifications": {
       "quietHours": "<local quiet hours>",

@@ -52,16 +52,18 @@ One person or agent can hold several roles. Keep the role names even in a small 
 
 Use these generic task kinds:
 
-| Kind       | Output                                                       |
-| ---------- | ------------------------------------------------------------ |
-| `discover` | candidate opportunities with evidence                        |
-| `research` | evidence summary, risks, alternatives, confidence            |
-| `evaluate` | decision, score, kill criteria, next condition               |
-| `design`   | scope, user flow, mechanics, data model, acceptance criteria |
-| `build`    | runnable artifact, prototype, draft, or packaged output      |
-| `review`   | findings, required fixes, optional improvements              |
-| `track`    | metrics, observed response, hot/stale decision               |
-| `learn`    | pattern update and next-cycle direction                      |
+| Kind       | Output                                                                      |
+| ---------- | --------------------------------------------------------------------------- |
+| `discover` | candidate opportunities with evidence                                       |
+| `research` | evidence summary, risks, alternatives, confidence                           |
+| `evaluate` | decision, score, kill criteria, next condition                              |
+| `design`   | scope, user flow, mechanics, data model, acceptance criteria                |
+| `build`    | runnable artifact, prototype, draft, or packaged output                     |
+| `review`   | findings, required fixes, optional improvements                             |
+| `repair`   | one fixed subset of finding IDs, acceptance checks, and validation evidence |
+| `replan`   | new hypothesis and evidence after a rejected or stalled approach            |
+| `track`    | metrics, observed response, hot/stale decision                              |
+| `learn`    | pattern update and next-cycle direction                                     |
 
 ## Artifact Contract
 
@@ -95,7 +97,14 @@ go|conditional|reject|blocked|needs-more-data
 ```
 ````
 
-For review tasks, add `## required fixes`. For blockers, add `## blocker` with the approval or missing dependency.
+For review tasks, add `## required fixes`: write `none` when there is no blocking finding, otherwise give each required fix a stable finding ID. For blockers, add `## blocker` with the approval or missing dependency.
+
+### Repair and Re-review Queue
+
+- A blocking review or `## required fixes` containing finding IDs creates one `repair` task for a fixed finding subset. `none` never creates repair work. The task names `parentTaskId`, finding IDs, acceptance checks, input artifact hash, and output artifact path. Each acceptance check is `{id, check, expected, actual, result, evidenceRef}` and must be machine-comparable.
+- A repair is one artifact, not an open-ended retry. It validates the changed artifact and hands it to independent re-review; it cannot mark its own findings complete.
+- A rejected approach uses `replan`, not cosmetic repair. The commander records a new hypothesis and new evidence before redispatch.
+- Store workflow round, finding IDs, resolution evidence, hashes, and next state in `dashboard-state.criticLog`. Follow `references/rubber-duck-review.md` for caps and recovery.
 
 ## Review Gates
 

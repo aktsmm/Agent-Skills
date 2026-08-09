@@ -66,6 +66,7 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 - Mutating workers need atomic duplicate-run prevention (create-new/O_EXCL or a transactional lease, never check-then-create), a **worker-wide singleton lock in addition to per-task locks**, and a partial-run recovery path that reconciles artifacts instead of trusting a stale `in_progress` label; see `references/lifecycle-and-health.md` `## Lock Scopes`.
 - Run the differentiation gate **before full evidence collection and build**, not as part of the final review; a light probe is allowed, but a candidate that cannot beat existing substitutes must be rejected or re-angled before it consumes the expensive lanes.
 - Gates must recompute from raw artifact data, not parse the producer's own summary; require machine-comparable types, externalize threshold-setting labels to durable state, and detect near-duplicate items.
+- A blocking or required-fix review starts a durable repair -> validate -> independent re-review loop; repairs never self-certify, consume the existing persistence budget, and retain finding-level evidence (`references/rubber-duck-review.md`).
 - Maintain a canonical dashboard/status state for future sessions and user status answers; every workflow that changes artifacts, queues, gates, portfolio ranking, blockers, or schedules must update it with backup + stale-write checks.
 - Add a workflow-review loop as a first-class workflow for self-improving factories; it reviews cadence, queue quality, Top-N replacements, dashboard drift, missing gates, and unsafe autonomy at a slower cadence than workers.
 - Portfolio factories need a Top-N state with explicit replacement rules; do not grow candidate lists forever, and do not replace an incumbent without comparative evidence and reviewer critique.
@@ -97,7 +98,7 @@ AUTO 既定、承認は `security-approve` のみ。Skill には **hard rule (�
 
 ### Tunable vs Hard Rules
 
-Skill は hard rule (変更不可) と reference default (AI/workspace が実運用で改善可) の 2 層。**Hard rules**: approval bucket 構造 (auto/security-approve)、backup-first 原則、blocker test 4 問 gate、critic 3 layer、layer 3 blocking gate 対象 5 種、fallback lane auto-refill、north-star + focus theme 合意事実、independence 契約。詳細と reference default 一覧: `references/tunable-defaults.md`
+Skill は hard rule (変更不可) と reference default (AI/workspace が実運用で改善可) の 2 層。**Hard rules**: approval bucket 構造 (auto/security-approve)、backup-first 原則、blocker test 4 問 gate、critic 3 layer、layer 3 blocking gate 対象 5 種、substantive repair 後の独立 re-review、fallback lane auto-refill、north-star + focus theme 合意事実、independence 契約。詳細と reference default 一覧: `references/tunable-defaults.md`
 
 ## Output Modes
 

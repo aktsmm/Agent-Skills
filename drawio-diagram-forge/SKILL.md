@@ -102,7 +102,7 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 | [cloud-icons.md](references/cloud-icons.md)           | Azure/AWS icon guide     |
 | [style-guide.md](references/style-guide.md)           | Node colors, edge styles |
 | [delivery-patterns.md](references/delivery-patterns.md) | Editable + embed pair, Qiita, multilingual |
-| [troubleshooting.md](references/troubleshooting.md)   | Full troubleshooting (14 items) |
+| [troubleshooting.md](references/troubleshooting.md)   | Full troubleshooting (21 items) |
 
 ## Scripts
 
@@ -112,7 +112,7 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 
 ## Troubleshooting
 
-頻度高トップ 4 件を下記に掲載。全一覧（フレーム/エッジ/余白/PDF 出力、レジェンド位置 等 14 項目）は [references/troubleshooting.md](references/troubleshooting.md)。
+頻度高トップ 4 件を下記に掲載。全一覧（フレーム/エッジ/余白/PDF 出力、レジェンド位置、エスケープ層、CLI の export オプション 等 21 項目）は [references/troubleshooting.md](references/troubleshooting.md)。
 
 | Issue | Solution |
 | --- | --- |
@@ -125,10 +125,11 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 
 - [ ] `.drawio` or `.drawio.svg` file generated
 - [ ] Diagram opens correctly in VS Code Draw.io extension
+- [ ] If an editable `.drawio.svg` is part of the delivery, it was exported with `--embed-diagram` and contains `mxfile`
 - [ ] All nodes and edges visible
 - [ ] User-facing links point to the editable `.drawio` when editability is expected
 - [ ] Decision flows avoid long return/merge lines that bundle branch outputs back into one sink
 - [ ] Quality gate score ≥ 85
 - [ ] If diagram is referenced from documentation, both editable source and embeddable image are provided
-- [ ] Render review completed at the target embed width with no text overlap, clipping, or border collisions
-- [ ] After any edge or label layout change, re-export and inspect the target PNG; structural validation alone does not prove visual routing quality
+- [ ] Render review completed at the target embed width: no text overlap, clipping, or border collisions, no edges overlapping on one line, no edge endpoint buried inside a filled box, no label riding on a box or another label, no node outside the page
+- [ ] After any edge or label layout change, re-export the delivery asset for the target medium (SVG for web, PNG or the final PDF for print) and inspect it; structural validation alone does not prove visual routing quality

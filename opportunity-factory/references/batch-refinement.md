@@ -29,10 +29,10 @@ Run each item through distinct passes. Do not repeat the same review in differen
 Recommended task kinds for batch refinement:
 
 ```text
-discover/evaluate target set -> review pass 1 -> review pass 2 -> review pass 3 -> fix/guard -> learn
+discover/evaluate target set -> review pass 1 -> review pass 2 -> review pass 3 -> repair -> independent re-review -> learn
 ```
 
-Each pass writes one artifact or one structured review row. Fixes happen after a pass identifies a safe `Fix now`, not after all possible opinions are exhausted.
+Each pass writes one artifact or one structured review row. A pass with no blocking issue writes `## required fixes` as `none`. A pass with findings assigns stable finding IDs and creates one `repair` child task for a fixed subset. The repair records machine-comparable acceptance checks, then must pass independent re-review before the finding can close. Follow `references/rubber-duck-review.md` for parent iteration accounting, different-family checks, and recovery.
 
 ## State Backend Choice
 
@@ -52,7 +52,7 @@ See `references/sqlite-state-store.md` for the optional schema.
 
 ## Stop Conditions
 
-- Stop a batch item when all `Fix now` items are closed and remaining issues are `Guard now` or `Block`.
+- Stop a batch item when independent re-review confirms all blocking finding IDs resolved and remaining issues are `Guard now` or `Block`. A repair worker's own claim that fixes are closed is not completion.
 - Stop the batch when the next action requires approval, missing credentials, external publishing, or product-specific capability confirmation.
 - Stop repeating review passes when two consecutive passes produce no new actionable finding.
 

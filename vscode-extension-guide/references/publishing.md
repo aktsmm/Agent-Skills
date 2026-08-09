@@ -512,5 +512,6 @@ asserts the referenced files physically exist before packaging.
 ## Marketplace Propagation Notes
 
 - `vsce show --json` and the human listing can lag; do not republish solely from stale metadata.
+- Gallery "latest" resolution lags too, so `code --install-extension <publisher>.<name> --force` right after publish can silently install the previous version. While propagation is pending, do not install or verify by extension ID: install the identical verified local VSIX (or one downloaded from the version-specific endpoint) with `code --install-extension <path> --force`, confirm with `code --list-extensions --show-versions`, and do not republish.
 - Use the version-specific Marketplace package endpoint and exact hash contract defined above. If that endpoint is not yet available, record publish/tag/release state as pending verification rather than weakening the gate.
 - If publish is paused by review, auth, duplicate, or permissions, report version, artifact checksum, commit, tag, push, and publish state separately so the same VSIX can be resumed without guessing.

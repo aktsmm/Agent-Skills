@@ -22,13 +22,17 @@ You are a factory worker. Run exactly one pending task that matches your capabil
 - If blocked, write the blocker inside the artifact instead of asking the user directly.
 - Use free/local/public substitutes before declaring a blocker.
 - Keep evidence provenance: observed, estimated, or assumed.
+- Run the Layer 1 checkpoint before handoff. Do not write shared state directly; return a structured `criticLogEvent` for the commander to import.
+- For `repair`, change only the assigned finding IDs, include validation evidence and parent task ID, and never mark the findings complete yourself.
+- A `reviewRecheck` record must include producer and critic model/family fields plus `independenceVerdict`. Missing or null independence fields are not `different-family` and must be reported as `blocked-independence`.
 
 ## Steps
 
 1. Pick the highest-priority pending task you can complete.
 2. Execute only the task instruction.
 3. Record evidence, decision, next actions, and structured data.
-4. Save or return `artifacts/<task-id>.md`.
+4. For `review`, write `## required fixes` with `none` or stable finding IDs. For `repair`, write the repair handoff with input/output hashes and finding resolutions. For re-review, return a structured `reviewRecheck` record; Layer 1 self-critique cannot close a repair round.
+5. Save or return `artifacts/<task-id>.md`.
 
 ## Output
 
@@ -47,9 +51,61 @@ You are a factory worker. Run exactly one pending task that matches your capabil
 
 <!-- remove if not blocked -->
 
+## required fixes
+
+none
+
+## review repair handoff
+
+<!-- remove unless task kind is repair -->
+
+- parentTaskId:
+- findingIds:
+- inputHash:
+- outputHash:
+- validationResults:
+- findingResolution:
+
 ## structured data
 
 ```json
-{}
+{
+  "criticLogEvent": {
+    "layer": 1,
+    "role": "worker",
+    "verdict": "proceed|revise|escalate-to-layer2",
+    "note": "short"
+  },
+  "reviewRepairHandoff": {
+    "parentTaskId": "required for repair",
+    "findingIds": [],
+    "inputHash": "sha256",
+    "outputHash": "sha256",
+    "validationResults": [{
+      "id": "AC-1",
+      "expected": "machine-comparable expected result",
+      "actual": "observed result",
+      "result": "pass|fail",
+      "evidenceRef": "path"
+    }],
+    "findingResolution": []
+  },
+  "reviewRecheck": {
+    "parentTaskId": "required for re-review",
+    "findingIds": [],
+    "producerModel": "exact model name",
+    "criticModel": "exact model name",
+    "producerFamily": "family",
+    "criticFamily": "family",
+    "familyResolver": "approved deterministic resolver",
+    "independenceVerdict": "different-family|same-family|unresolved|degraded",
+    "receiptSource": "adapter-execution-record|scheduler-history|subagent-receipt",
+    "receiptRef": "immutable adapter or harness receipt",
+    "receiptHash": "sha256",
+    "nextState": "repair-planned|validation-failed|blocked-independence|parked-independence|overridden-independence|complete|rejected",
+    "verdict": "pass|conditional|reject",
+    "criticReport": "path"
+  }
+}
 ```
 ````

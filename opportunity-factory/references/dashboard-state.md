@@ -96,7 +96,7 @@ Before rewriting the dashboard:
   "blockerGateLog": [{"ts","task_id","questions","verdict"}],
   "deferredBrowserWrites": [{"ts","task_id","operation"}],
   "discoveryFloorCounter": 0,
-  "criticLog": [{"ts","layer","role","task_id","producerModel","criticModel","producerFamily","criticFamily","familyResolver","independenceVerdict","questions_passed","questions_failed","verdict","note"}],
+  "criticLog": [{"ts","layer","role","task_id","parentTaskId","producerModel","criticModel","producerFamily","criticFamily","familyResolver","receiptSource","receiptRef","receiptHash","independenceVerdict","questions_passed","questions_failed","verdict","note","workflowRound","inputHash","outputHash","findingIds","findingResolution","validationResults","repairTaskId","nextState","reason","evidenceRef"}],
   "persistenceOverrides": [{"ts","task_id","profile","requestedBy"}],
   "diminishingReturnsLog": [{"ts","task_id","metric","trend"}],
   "tuningLog": [{
@@ -127,15 +127,17 @@ Before rewriting the dashboard:
 
 - **approvalLog / pendingApprovals**: `references/approval-policy.md` の Log Contract 参照
 - **fallbackLog / blockerGateLog / deferredBrowserWrites / discoveryFloorCounter**: `references/fallback-lane.md` 参照
-- **criticLog**: Layer 1/2/3 全部の verdict、`references/rubber-duck-review.md` 参照。Layer 3 は model 名と family 判定を必須にし、`independenceVerdict` が `different-family` 以外なら fail-closed (blocked)
+- **criticLog**: Layer 1/2/3 と修正・再レビューの唯一の durable log。別名の critic state を作らない。Layer 3 は model 名と family 判定を必須にし、`independenceVerdict` が `different-family` 以外なら fail-closed (blocked)
+- **criticLog repair fields**: `workflowRound` は durable な修正・再レビューの回数、`findingIds` と `findingResolution` は finding 単位の根拠、`validationResults` は機械比較可能な acceptance check 結果、`receiptSource` / `receiptRef` / `receiptHash` は独立criticの adapter/harness receipt、`inputHash` / `outputHash` は中断回復、`nextState` は repair / replan / defer の遷移を表す。詳細は `references/rubber-duck-review.md` の Repair -> Re-review Contract。
 - **persistenceOverrides / diminishingReturnsLog**: `references/persistence-profile.md` 参照
 - **tuningLog**: reference default の変更履歴。3 サイクル追跡 revert (`revertVerdict` を reporter-learner が populate)。`references/tunable-defaults.md` 参照
 - **hardRuleViolationLog**: workflow-review が invariant check で検出した hard rule 誤変更。`references/tunable-defaults.md` の Invariant Check 参照
 
 ### Retention
 
-- Log 系 (approvalLog / fallbackLog / blockerGateLog / criticLog): 90 日 rotation、archive に押し出す
+- Log 系 (approvalLog / fallbackLog / blockerGateLog / completed criticLog): 90 日 rotation、archive に押し出す
 - Layer 1 criticLog: 30 日 (直近だけ意味あり)
+- Open repair criticLog records are excluded from rotation until terminal state, so finding IDs and hashes remain available for recovery.
 - tuningLog: 恒久 (workflow-review の学習資産)
 - hardRuleViolationLog: 恒久 (audit 用)
 - pendingApprovals / discoveryFloorCounter / deferredBrowserWrites: state 値、rotation なし

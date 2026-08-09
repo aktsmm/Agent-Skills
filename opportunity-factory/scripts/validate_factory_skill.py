@@ -23,6 +23,11 @@ REQUIRED_FILES = [
     "references/sqlite-state-store.md",
     "references/workspace-setup.md",
     "references/rubber-duck-review.md",
+    "references/tunable-defaults.md",
+    "references/persistence-profile.md",
+    "references/fallback-lane.md",
+    "references/approval-policy.md",
+    "references/prompt-self-improvement.md",
     "references/self-designing-factory.md",
     "references/lifecycle-and-health.md",
     "references/dashboard-state.md",
@@ -96,7 +101,16 @@ def main() -> int:
     check("Workspace Setup" in skill, "SKILL.md missing Workspace Setup mode", failures)
     check("Periodic Runtime" in skill, "SKILL.md missing Periodic Runtime mode", failures)
     check("Batch refinement" in skill or "/Refine-Product-100" in skill, "SKILL.md missing batch refinement trigger", failures)
+    check("repair -> validate -> independent re-review" in skill, "SKILL.md missing repair/re-review rule", failures)
     check(len(skill.splitlines()) <= 150, "SKILL.md should stay under 150 lines", failures)
+
+    rubber_duck = read_text(root / "references/rubber-duck-review.md")
+    for phrase in ["Repair -> Re-review Contract", "repair-started", "blocked-independence", "parked-independence", "overridden-independence", "repair-start-failed", "review-exhausted", "persistence-exhausted", "workflow repair round", "never self-certifies", "min(reviewRepairRounds, profile.maxIteration - iterationsUsed)"]:
+        check(phrase in rubber_duck, f"rubber-duck-review.md missing repair contract phrase: {phrase}", failures)
+
+    dashboard_reference = read_text(root / "references/dashboard-state.md")
+    for phrase in ["parentTaskId", "workflowRound", "findingIds", "findingResolution", "validationResults", "repairTaskId", "receiptSource", "receiptRef", "receiptHash", "outputHash", "criticLog", "唯一の durable log", "Open repair"]:
+        check(phrase in dashboard_reference, f"dashboard-state.md missing criticLog repair field: {phrase}", failures)
 
     runtime = read_text(root / "references/runtime-modes.md")
     for phrase in ["Hosted Agent Scheduler", "Copilot Scheduler (VS Code Extension)", "OpenClaw / Cron", "GitHub Actions", "Windows Task Scheduler"]:
@@ -116,13 +130,29 @@ def main() -> int:
         "Never delete a lock from TTL alone",
     ]:
         check(phrase in lifecycle, f"lifecycle-and-health.md missing: {phrase}", failures)
+    check("repair-start-failed" in lifecycle, "lifecycle-and-health.md missing repair-start recovery", failures)
     approval_policy = read_text(root / "references/approval-policy.md")
     check("private/internal remote" in approval_policy, "approval-policy.md missing qualified private/internal push rule", failures)
     check("Public remote" in approval_policy, "approval-policy.md missing public remote security-approve rule", failures)
 
     batch = read_text(root / "references/batch-refinement.md")
-    for phrase in ["Three-Pass Rubber-Duck Loop", "passCount", "SQLite", "Stop Conditions"]:
+    for phrase in ["Three-Pass Rubber-Duck Loop", "passCount", "SQLite", "Stop Conditions", "independent re-review", "stable finding IDs"]:
         check(phrase in batch, f"batch-refinement.md missing: {phrase}", failures)
+
+    tunable = read_text(root / "references/tunable-defaults.md")
+    for phrase in ["Review repair workflow rounds", "下限 3", "上限 20", "Review repair contract", "Repair -> Re-review Contract", "blocked-independence"]:
+        check(phrase in tunable, f"tunable-defaults.md missing repair invariant: {phrase}", failures)
+
+    workflow = read_text(root / "references/workflow.md")
+    for phrase in ["`repair`", "`replan`", "Repair and Re-review Queue"]:
+        check(phrase in workflow, f"workflow.md missing repair queue contract: {phrase}", failures)
+
+    persistence = read_text(root / "references/persistence-profile.md")
+    for phrase in ["Review Repair Accounting", "parentTaskId", "独立 attempt-log", "persistence-exhausted"]:
+        check(phrase in persistence, f"persistence-profile.md missing repair accounting: {phrase}", failures)
+
+    for phrase in ["parked-independence", "overridden-independence"]:
+        check(phrase in approval_policy, f"approval-policy.md missing independence approval rule: {phrase}", failures)
 
     sqlite_reference = read_text(root / "references/sqlite-state-store.md")
     for phrase in ["Use SQLite When", "Avoid SQLite When", "factory-state.sqlite.sql", "Smoke Test"]:
@@ -135,8 +165,15 @@ def main() -> int:
         connection.close()
     except sqlite3.Error as exc:
         failures.append(f"factory-state.sqlite.sql invalid SQLite schema: {exc}")
-    for table_name in ["runs", "items", "tasks", "claims", "reviews", "artifacts", "outcomes", "pipeline_log"]:
+    for table_name in ["runs", "items", "tasks", "claims", "reviews", "critic_log", "repair_attempts", "artifacts", "outcomes", "pipeline_log"]:
         check(f"CREATE TABLE IF NOT EXISTS {table_name}" in sqlite_schema, f"SQLite schema missing table: {table_name}", failures)
+    for task_field in ["parent_task_id", "finding_ids_json", "input_hash", "acceptance_checks_json"]:
+        check(task_field in sqlite_schema, f"SQLite tasks missing repair field: {task_field}", failures)
+    for critic_field in ["workflow_round", "validation_results_json", "repair_task_id", "layer", "role", "receipt_source", "receipt_ref", "receipt_hash", "independence_verdict", "next_state"]:
+        check(critic_field in sqlite_schema, f"SQLite critic_log missing field: {critic_field}", failures)
+    for attempt_field in ["parent_task_id", "repair_task_id", "workflow_round", "repair-start-failed", "validation-failed"]:
+        check(attempt_field in sqlite_schema, f"SQLite repair_attempts missing field or state: {attempt_field}", failures)
+    check("UNIQUE (parent_task_id, workflow_round)" in sqlite_schema, "SQLite repair_attempts missing parent-round uniqueness", failures)
     for claim_field in ["run_id", "heartbeat_at", "expires_at"]:
         check(claim_field in sqlite_schema, f"SQLite claims missing field: {claim_field}", failures)
 
@@ -163,6 +200,14 @@ def main() -> int:
     check("limits" in runtime_state, "factory-state.json missing runtime.limits", failures)
     check("notifications" in runtime_state, "factory-state.json missing runtime.notifications", failures)
     adapter = runtime_state.get("adapter", {}) if isinstance(runtime_state, dict) else {}
+    limits = runtime_state.get("limits", {}) if isinstance(runtime_state, dict) else {}
+    repair_rounds = limits.get("reviewRepairRounds") if isinstance(limits, dict) else None
+    check(isinstance(repair_rounds, int) and 3 <= repair_rounds <= 20, "factory-state.json reviewRepairRounds must be 3-20", failures)
+    independence_limit = limits.get("independenceBlockLimit") if isinstance(limits, dict) else None
+    check(isinstance(independence_limit, int) and 1 <= independence_limit <= 5, "factory-state.json independenceBlockLimit must be 1-5", failures)
+    queue_targets = runtime_state.get("queueTargets", {}) if isinstance(runtime_state, dict) else {}
+    for kind in ["repair", "replan"]:
+        check(kind in queue_targets, f"factory-state.json queueTargets missing: {kind}", failures)
     for field in [
         "primarySurface",
         "skillLocation",
@@ -175,6 +220,16 @@ def main() -> int:
     ]:
         check(field in adapter, f"factory-state.json missing runtime.adapter.{field}", failures)
     check("outputs" in task, "task.json missing outputs", failures)
+    for kind in ["repair", "replan"]:
+        check(kind in str(task.get("kind", "")), f"task.json missing task kind: {kind}", failures)
+    for field in ["parentTaskId", "findingIds", "inputHash", "acceptanceChecks"]:
+        check(field in task, f"task.json missing repair field: {field}", failures)
+    acceptance_checks = task.get("acceptanceChecks") if isinstance(task, dict) else None
+    check(isinstance(acceptance_checks, list) and bool(acceptance_checks), "task.json acceptanceChecks must be a non-empty list", failures)
+    if isinstance(acceptance_checks, list) and acceptance_checks and isinstance(acceptance_checks[0], dict):
+        for field in ["id", "check", "expected", "actual", "result", "evidenceRef"]:
+            check(field in acceptance_checks[0], f"task.json acceptanceChecks entry missing: {field}", failures)
+        check(acceptance_checks[0].get("result") in {"pending", "pass", "fail"}, "task.json acceptanceChecks result is invalid", failures)
     for claim_field in ["claimRunId", "claimHeartbeatAt", "claimExpiresAt"]:
         check(claim_field in task, f"task.json missing claim field: {claim_field}", failures)
     answering_policy = dashboard_state.get("answeringPolicy", {}) if isinstance(dashboard_state, dict) else {}
@@ -187,6 +242,8 @@ def main() -> int:
         "nextActions",
         "portfolioPromotion",
         "productMaturation",
+        "criticLog",
+        "pendingApprovals",
     ]:
         check(field in dashboard_state, f"dashboard-state.json missing {field}", failures)
     automation_policy = dashboard_state.get("automationPolicy", {}) if isinstance(dashboard_state, dict) else {}
@@ -245,14 +302,20 @@ def main() -> int:
     commander = read_text(root / "assets/prompts/commander.md")
     for phrase in ["setup preflight", "adapter selected", "approval policy"]:
         check(phrase in commander, f"commander prompt missing preflight phrase: {phrase}", failures)
+    for phrase in ["criticLogEvent", "one `repair` child task", "repair_attempts", "blocked-independence", "one parent attempt whenever deterministic validation runs"]:
+        check(phrase in commander, f"commander prompt missing repair orchestration: {phrase}", failures)
 
     worker = read_text(root / "assets/prompts/worker.md")
     check("Do not edit shared queues" in worker, "worker prompt missing artifact-only guard", failures)
     check("approved tools" in worker, "worker prompt missing surface adapter permission guard", failures)
+    for phrase in ["criticLogEvent", "## required fixes", "## review repair handoff", "parentTaskId"]:
+        check(phrase in worker, f"worker prompt missing repair handoff: {phrase}", failures)
+    for phrase in ["reviewRecheck", "producerModel", "criticModel", "producerFamily", "criticFamily", "familyResolver", "independenceVerdict", "receiptSource", "receiptRef", "receiptHash", "nextState"]:
+        check(phrase in worker, f"worker prompt missing independent re-review record: {phrase}", failures)
     check("````\n\n```" not in worker, "worker prompt has dangling nested fence", failures)
 
     reporter = read_text(root / "assets/prompts/reporter-learner.md")
-    for phrase in ["Adapter health", "Schedule drift", "Persistence failures"]:
+    for phrase in ["Adapter health", "Schedule drift", "Persistence failures", "criticLog", "parked-independence"]:
         check(phrase in reporter, f"reporter prompt missing operational status: {phrase}", failures)
 
     check(not (root / "scripts" / "__pycache__").exists(), "scripts/__pycache__ should not be packaged", failures)

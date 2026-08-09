@@ -29,8 +29,33 @@ For download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downl
 
 In Angular-Material / web-component UIs (GCP Console, YouTube Studio), many buttons live in shadow DOM and `el.getBoundingClientRect()` returns `{x:0, y:0, width:0}` to page-level JS, so a JS-computed click misses. Click by screenshot pixel coordinates with `Input.dispatchMouseEvent` instead. Also scope element queries to the form region (x/y bounds): a generic `document.querySelector('mat-select,[role=combobox]')` often grabs the page's top search box and opens a search overlay — press Escape to dismiss, then retry within the form area.
 
-## evaluate + fetch
+## Click times out on "visible, enabled and stable"
 
+Playwright's actionability check can never settle when the browser window is backgrounded or minimized, so `click()` times out even though the element resolved. The snapshot and `fill()` still work because they skip that check.
+
+Fall back to a JS click on the resolved node (`el.click()` on the submit button, or submit the form) instead of retrying the same call. Two consecutive timeouts on the same target mean the route is wrong, not the selector. Some widgets only accept trusted input events and ignore a JS click, so verify the resulting state change rather than the call returning.
+
+## Hiding sensitive UI before a capture
+
+When a selector suppresses something that must not appear in a published image (account avatar, notification badge, tenant name), a zero-match must be an error. Helpers that loop over `querySelectorAll` and hide each hit succeed silently on zero elements, so a renamed class ships the very thing you meant to remove. Return the match count and fail the run when it is 0. Split the selectors into must-hide and optional so localization or A/B variants that legitimately lack an element do not fail every run.
+
+Prefer `visibility: hidden` over `display: none` so the surrounding layout does not reflow; neighbouring content you wanted to keep stays where the recorded crop expects it.
+
+## VS Code Web (Codespaces, github.dev)
+
+- Toggle shortcuts such as `Ctrl+Alt+B` for the secondary side bar flip state on every run. Detect whether the pane is actually visible before pressing, otherwise a rerun undoes what the previous run achieved.
+- Shortcuts are swallowed while a preview iframe holds focus. Click the editor area first, then send the key.
+- The workbench renders in the browser's UI language, so consent, workspace-trust, and pane labels differ per machine. Match both the English and the localized label when driving buttons.
+- The color theme follows the signed-in GitHub account's Appearance setting, and the workbench reads the OS preference rather than a page attribute. With `Sync with system` it opens light on a light OS. Emulate `prefers-color-scheme` over CDP (`Emulation.setEmulatedMedia`); attribute injection that works on GitHub.com pages does nothing here.
+- **Browser zoom is per-origin.** A codespace gets a fresh domain on every start, so manual zoom never carries over and cannot be reproduced from a recorded procedure. Drive magnification with the window size instead.
+- `workbench.action.zoomIn` is desktop-only and does nothing on the web build. Substituting CDP `Emulation.setDeviceMetricsOverride` is worse: the page stops filling the window, and `page.mouse` coordinates shift so terminal input lands in the wrong place.
+- `https://github.dev/<owner>/<repo>` answers 302 to `https://vscode.dev/github/<owner>/<repo>`, so the address bar shows `vscode.dev`. Say so in any caption that promises github.dev.
+
+### CLI prerequisite
+
+`gh codespace` subcommands need the `codespace` scope. On a `gh` OAuth login, `gh auth refresh -h github.com -s codespace` adds it, but that opens a browser authorization and widens the saved authorization, so ask the user before running it. A PAT login needs the scope on the token instead. HTTP 403 "Must have admin rights to Repository" is one symptom of the missing scope, not proof of it.
+
+## evaluate + fetch
 When a logged-in session exposes a REST API, prefer `page.evaluate(() => fetch(...))` for bulk read/write. It avoids navigation instability and uses existing cookies with `credentials: 'same-origin'`.
 
 Rules:

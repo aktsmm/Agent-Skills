@@ -33,6 +33,7 @@ Opportunity-factory は AUTO 既定。AI が自律で回し、人間承認は **
 - **Focus theme apply** (3 ヶ月更新の確定)
 - **Backup 不能な破壊的操作** (下記 Backup-First 参照)
 - **Blocking mode の critic reject 済み task の強行**
+- **`parked-independence` の Layer 3 task を independent review なしで進める判断**
 
 ### Money 発生シナリオ (security-approve の 1 例)
 
@@ -69,7 +70,7 @@ Opportunity-factory は AUTO 既定。AI が自律で回し、人間承認は **
 | Third-party account state       | 手段なし                            | security-approve                             |
 | Cloud リソース (課金付き)       | ARM export / Terraform state 保存   | AUTO if export 成功、否なら security-approve |
 
-Rule: **backup 手段が確立できない = AUTO でも security-approve へ escalate**。判断は critic-log にも記録。
+Rule: **backup 手段が確立できない = AUTO でも security-approve へ escalate**。判断は criticLog にも記録。
 
 ## Override / Escalation Flow
 
@@ -79,6 +80,7 @@ Rule: **backup 手段が確立できない = AUTO でも security-approve へ es
 - Approve → 元の worker が resume、approval 事由と operator を log 化
 - Reject → task を `rejected-by-user` に落とし、fallback lane で代替を dispatch
 - Modify → user が修正した条件で worker 再走
+- `overridden-independence` → 元の quality verdict は `pass` に書き換えず、独立 critic が利用可能になった時点の follow-up review を必須にする
 
 ## Autonomy Mode との関係
 
@@ -90,6 +92,8 @@ Rule: **backup 手段が確立できない = AUTO でも security-approve へ es
 | ALL             | FULL 相当 + criteria 自律拡張可                     | Bucket は最小 (broadcast / payment 系のみ) |
 
 Detail: `references/runtime-modes.md` の `ai-autonomous` preset を参照。
+
+**例外（全 mode 共通）**: `parked-independence` の進行、または blocking critic reject の強行は external / broadcast / payment でなくても常に `security-approve` を要する。FULL / ALL でも auto へ降格しない。
 
 ## Log Contract
 

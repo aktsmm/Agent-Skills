@@ -82,6 +82,8 @@
     "doneCount": 0,
     "pendingCount": 0
   },
+  "criticLog": [],
+  "pendingApprovals": [],
   "decisions": [],
   "risksAndBlockers": [],
   "nextActions": [],

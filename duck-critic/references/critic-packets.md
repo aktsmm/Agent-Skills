@@ -49,6 +49,7 @@ Current approach or diff: <summary>
 Assumptions: <assumptions>
 Constraints and must-not rules: <constraints>
 Evidence already collected: <tests/logs/checks or none>
+Measured at: <timestamp, plus the artifact path and its build id, hash, or mtime for any number taken from a generated file>
 Questions for critic: <specific concerns>
 
 Report only real issues you are confident in. Classify each finding as blocking, non-blocking, or suggestion. Ignore style-only comments and pre-existing issues outside this change's scope. Return per-issue findings only — do not give an overall go/no-go recommendation or tell the producer what to do next. If nothing blocking is found, say so explicitly. Do not edit files or run mutating commands.

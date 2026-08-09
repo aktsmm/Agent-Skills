@@ -145,7 +145,7 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 | CDP recovery and context selection | [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) |
 | Azure Portal iframe / OOPIF | [references/instructions/azure-portal.md](references/instructions/azure-portal.md) |
 | Angular Material forms | [references/instructions/angular-material.md](references/instructions/angular-material.md) |
-| Hidden upload, evaluate+fetch, UI fallback | [references/instructions/ui-fallbacks.md](references/instructions/ui-fallbacks.md) |
+| Hidden upload, VS Code Web, evaluate+fetch, UI fallback | [references/instructions/ui-fallbacks.md](references/instructions/ui-fallbacks.md) |
 | Unsaved editor / draft tab safety | [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md) |
 | Windows subprocess stability | [references/instructions/windows-subprocess-cdp.md](references/instructions/windows-subprocess-cdp.md) |
 

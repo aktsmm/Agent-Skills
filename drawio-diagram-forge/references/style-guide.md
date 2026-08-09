@@ -218,7 +218,7 @@ When diagrams are embedded in PDF (via Re:VIEW, LaTeX, Pandoc, etc.):
   ```
 - **Do NOT use browser/Edge `--screenshot` on SVG** — this produces a fixed-viewport capture (e.g., 756×488) regardless of diagram size, causing blurriness and cropping.
 - `--scale 2` produces 2× resolution for crisp text at print DPI.
-- The exported SVG from draw.io CLI is "plain SVG" (not re-editable in the VS Code Draw.io extension). Keep the `.drawio` as the editable source.
+- The SVG exported by the draw.io CLI is plain SVG unless `--embed-diagram` is passed; without it the file is no longer re-editable in the VS Code Draw.io extension. Keep the `.drawio` as the editable source either way.
 - For Markdown preview, reference `*.drawio.svg`. For PDF build, use the PNG export.
 - Render the final PDF page, not only the exported PNG. The publishing layer may scale, float, or move the image.
 - If changing a wrapper macro does not affect image size, inspect generated TeX for per-image options such as `width=\maxwidth`. In that case, enlarge the diagram content and shrink-wrap the canvas instead of assuming the global width rule applies.

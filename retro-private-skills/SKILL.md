@@ -65,8 +65,8 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - `review-only`, `dry-run`, or `プレビュー`: propose target changes and stop before editing
 - In `safe-auto`, edit directly when scope is clear, the safety gate passes, and the change is small or medium
 - Ask for confirmation only for broad rewrites, deletion, ambiguous private/public boundaries, or possible secret/customer/private data handling
-- In `safe-auto`, create a focused local commit by default. If the private repo is 3 or more commits ahead of origin after the commit, push without an additional explicit user instruction. If it is 1-2 commits ahead, do not push.
-- Before any automatic push, verify the remote is the private repo and the working tree is clean, then `git fetch origin` and recompute ahead/behind. If behind, inspect overlapping paths and use a normal merge when changes are disjoint; do not push stale tracking refs.
+- In `safe-auto`, create a focused local commit and push it in the same run. There is no ahead-count threshold: several PCs share this repo, so a local commit left behind means the next machine starts from a stale tree. Invoking this skill counts as the push approval. To keep a draft local instead, use `review-only` or `dry-run`.
+- Before any automatic push, verify the remote is the private repo and the working tree is clean, then `git fetch origin` and recompute ahead/behind. Confirm the commits in `origin/<branch>..HEAD` touch only the target skill; stop and ask when unrelated commits are queued. If behind, inspect overlapping paths and use a normal merge when changes are disjoint; do not push stale tracking refs.
 - If Git repeats a `HEAD.lock` / `couldn't set HEAD` rename failure twice, answer `n` and stop retrying. Preserve uncommitted work; inspect HEAD, status, diffs, rebase metadata, and lock ownership. Restore index/worktree only when HEAD is unchanged and the half-applied tree is proven to match the fetched remote, then use a verified merge path that does not detach HEAD. Never `reset --hard`, force push, or delete locks blindly.
 - Verify the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
 - Treat dirty primary skill changes as authoring or intake material. In safe-auto, stage and commit only the target skill changes, and leave unrelated dirty paths untouched.
@@ -86,6 +86,7 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 ## Edit Rules
 
 - Prefer improving existing text over appending duplicate guidance.
+- Before writing a new rule, check whether the repository already implements the same decision in scripts, generated assets, or another skill. A rule that contradicts working code makes the next run "fix" assets that were already correct.
 - Compaction targets the minimum information the model needs to act; human readability is secondary.
 - Use this refactor order: delete stale text -> merge/compact duplicates -> move long detail to `references/` -> add missing guidance.
 - Keep `SKILL.md` lean; move detailed procedures, command examples, and examples to `references/*`.

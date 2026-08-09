@@ -1,11 +1,24 @@
 {
   "id": "t-YYYYMMDD-NNN",
-  "kind": "discover|research|evaluate|design|build|review|track|learn",
+  "kind": "discover|research|evaluate|design|build|review|repair|replan|track|learn",
   "assignee": null,
   "priority": "high|medium|low",
   "status": "pending",
   "domain": "<domain>",
   "opportunityId": null,
+  "parentTaskId": null,
+  "findingIds": [],
+  "inputHash": null,
+  "acceptanceChecks": [
+    {
+      "id": "AC-1",
+      "check": "<deterministic command or predicate>",
+      "expected": "<machine-comparable expected result>",
+      "actual": null,
+      "result": "pending",
+      "evidenceRef": null
+    }
+  ],
   "topic": "<short topic>",
   "instruction": "<one-cycle task instruction>",
   "successMetric": "<metric>",

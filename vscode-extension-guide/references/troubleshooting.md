@@ -135,11 +135,12 @@ unexpectedly large or unchanged-huge size means `.vscodeignore` is not excluding
 
 ## Runtime Errors
 
-| Symptom              | Cause                  | Solution                                            |
-| -------------------- | ---------------------- | --------------------------------------------------- |
-| "Cannot find module" | Dependency not bundled | Add to dependencies (not devDependencies) or bundle |
-| API undefined        | Wrong VS Code version  | Check `engines.vscode` matches API used             |
-| Permission denied    | Restricted API         | Check extension permissions/capabilities            |
+| Symptom                                 | Cause                   | Solution                                                              |
+| --------------------------------------- | ----------------------- | --------------------------------------------------------------------- |
+| "Cannot find module"                    | Dependency not bundled  | Add to dependencies (not devDependencies) or bundle                   |
+| API undefined                           | Wrong VS Code version   | Check `engines.vscode` matches API used                               |
+| Permission denied                       | Restricted API          | Check extension permissions/capabilities                              |
+| `CancellationToken.None` does not exist | Assumed from other SDKs | Create and dispose a `CancellationTokenSource`, then pass its `token` |
 
 ### Persistent State Across Windows
 

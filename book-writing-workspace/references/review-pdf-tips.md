@@ -14,6 +14,23 @@ Generated books often carry no bookmarks, so a table-of-contents API returns an 
 
 Report the measured total alongside the estimate and label both. Reviewers act on whichever number they read first.
 
+## Figure Sizing
+
+When the build places body figures at a fixed column width, the printed size of text inside a figure is decided by how much you crop, not by the pixel width of the source image. Cropping tightly to the subject makes a figure's labels _larger_ than the body text, which is the opposite of the usual "too small to read" failure.
+
+- Keep the crop width consistent across figures in the same chapter
+- Aspect ratio decides how much of the page a figure eats. At full-width placement a near-square figure takes a large vertical share, so prefer landscape crops
+- Do not trust an assumed column width or a checker's default. Measure it from the publisher's proof: `page.get_image_rects(xref)` returns a list of placements, so pick the occurrence you mean and convert that rectangle with `rect.width * 25.4 / 72` to get millimetres
+- Preview grayscale legibility at the measured width, not only at a conservative default. A reviewer working from the narrower default will produce arithmetic that looks solid and still rejects figures that are fine
+
+## Figure Emphasis in Grayscale Print
+
+A single-stroke frame around the part a figure is meant to prove sinks into the surrounding UI once the page prints in black and white.
+
+- Draw the frame as two strokes: a coloured inner border plus a white outer ring. The ring survives grayscale conversion as a second contour, so the frame still reads as a frame on a dark screenshot
+- Before inventing an emphasis style, check whether the capture tooling already ships one. A repository that captures screenshots with a script usually holds a print-safe highlight constant, and a second hand-rolled style splits the book's visual language
+- Frame only the element the surrounding prose names, and record the frame coordinates beside the image so the emphasis survives a re-capture
+
 ## Font Selection
 
 Add `jafont=<preset>` to `texdocumentclass` options in `config.yml`:

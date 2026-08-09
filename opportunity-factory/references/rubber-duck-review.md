@@ -74,7 +74,7 @@ For <specific audience> who struggle with <repeated pain>, create <small artifac
 
 | Layer                         | 実行者                                      | 起動タイミング                                                                                       | 出力                                             | 詳細                                           |
 | ----------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------- |
-| **Layer 1 Light Self-Critic** | 各 role 自身 (context 内で観点切替)         | 各 role の final decision 前、常時                                                                   | 内部 log (dashboard-state.critic-log に summary) | 本ページ                                       |
+| **Layer 1 Light Self-Critic** | 各 role 自身 (context 内で観点切替)         | 各 role の final decision 前、常時                                                                   | 内部 log (dashboard-state.criticLog に summary)  | 本ページ                                       |
 | **Layer 2 Advisory Critic**   | Critic role invocation (rubber-duck 深掘り) | Fallback lane #3、Persistence Exhaustive の task                                                     | `critic-report.md` (advisory)                    | Fallback-lane.md #3 参照                       |
 | **Layer 3 Blocking Critic**   | Critic role invocation (blocking)           | 重要 gate: portfolio promote / focus theme apply / prompt-self-improvement commit / external publish | `critic-report.md` (blocking, verdict=pass 必須) | 本ページ末尾 + prompt-self-improvement.md 参照 |
 
@@ -120,12 +120,12 @@ Cadence / prompt / gate 変更提案前に自問:
 1. 提案は直近 3 サイクル以上の evidence を持つか? (単発の思いつきではないか)
 2. 外部 evidence (別 workspace / documented pattern / benchmark) を 1 件以上参照したか?
 3. 変更は reversible か? Rollback 手順を pair で用意したか?
-4. Critic-log の verdict 分布を分析したか? (Rubric 調整の signal がないか)
+4. CriticLog の verdict 分布を分析したか? (Rubric 調整の signal がないか)
 5. 変更 apply 後の smoke test / validate script pass を必須にしたか?
 
 ## Layer 1 Output Contract
 
-各 role は checkpoint 完了で `dashboard-state.critic-log` に append:
+各 role は checkpoint 完了で `dashboard-state.criticLog` に append:
 
 ```json
 {
@@ -158,6 +158,8 @@ Cadence / prompt / gate 変更提案前に自問:
 
 上記 5 種は **hard rule** (変更禁止)。詳細: `references/tunable-defaults.md` の Hard Rule 一覧。
 
+Repair re-review is not a sixth Layer 3 gate. It is a separate quality-continuation subgate that starts only after a blocking finding or required fix, and its different-family requirement is governed by the Repair -> Re-review Contract below.
+
 ### Layer 3 契約
 
 - Critic Role を新規 context (chat thread 分離 or subagent) で起動
@@ -166,6 +168,66 @@ Cadence / prompt / gate 変更提案前に自問:
 - Verdict = `pass`: proceed
 - Verdict = `reject`: task 停止、`security-approve` 経由で user override 可
 - Verdict = `conditional`: 修正条件明示、worker が対応してから re-critic
+
+## Repair -> Re-review Contract
+
+This contract starts only for (a) a Layer 3 `conditional` or `reject`, or (b) a queue kind `review` whose `## required fixes` contains at least one stable finding ID. Layer 2 remains advisory: it may suggest a repair but does not make the task blocking.
+
+### Two Separate Counters
+
+- A critic consultation round is the short producer-critic exchange. Its existing 3-round anti-oscillation cap remains local to that consultation.
+- A workflow repair round is durable work that may span scheduled runs: repair one finding subset, validate it, then re-review the changed artifact. The default cap is 10 workflow rounds.
+- When the commander creates and claims a repair atomically, it reserves one parent attempt and writes `nextState: repair-started`. Deterministic validation, whether pass or fail, completes that same reserved attempt. Its effective cap is `min(reviewRepairRounds, profile.maxIteration - iterationsUsed)`.
+- If the repair claim expires or the worker fails before validation, the health reconciler finalizes the same round as `repair-start-failed`, preserves partial artifacts, and consumes the reserved parent attempt. It may requeue only while the effective cap remains; it never silently returns the repair to pending.
+- Ten is a fail-safe, not the primary control. If the same blocking finding remains unresolved for two eligible workflow rounds, or the repair has no substantive artifact and evidence change, use the existing commander replan path before another repair task.
+- If `profile.maxIteration - iterationsUsed <= 0`, do not create a repair. Transition directly to `deferred-exhausted` with `reason: persistence-exhausted`, distinct from `review-exhausted`.
+
+### Durable Round Record
+
+Append one record to `dashboard-state.criticLog` for every review, repair, re-review, and recovery decision. Retain the existing critic fields and add:
+
+```json
+{
+  "parentTaskId": "task that owns persistence",
+  "workflowRound": 1,
+  "inputHash": "sha256",
+  "outputHash": "sha256 or null",
+  "findingIds": ["R1", "R2"],
+  "findingResolution": [
+    {
+      "id": "R1",
+      "state": "resolved|withdrawn|not-reproducible",
+      "evidenceRef": "path"
+    }
+  ],
+  "validationResults": [{"id":"AC-1","expected":"...","actual":"...","result":"pass|fail","evidenceRef":"path"}],
+  "repairTaskId": "optional task id",
+  "receiptSource": "adapter-execution-record|scheduler-history|subagent-receipt",
+  "receiptRef": "immutable adapter or harness receipt",
+  "receiptHash": "sha256",
+  "nextState": "repair-started|repair-start-failed|repair-planned|validation-failed|replan|blocked-independence|parked-independence|overridden-independence|deferred-exhausted|complete|rejected",
+  "reason": "short",
+  "evidenceRef": "path or hash"
+}
+```
+
+Finding IDs remain stable across workflow rounds. A changed hash is necessary but insufficient: each blocking finding needs `resolved`, `withdrawn`, or `not-reproducible` with evidence, and re-review must confirm that resolution before `pass`.
+
+`repair` is a child task, never a separate persistence target. It carries `parentTaskId` but has no independent profile or attempt budget. The parent attempt is reserved at repair claim, then finalized as validation pass/fail/start-failed; `blocked-independence` consumes no additional attempt. Every acceptance check must report a machine-comparable `expected`, `actual`, `result`, and `evidenceRef`; prose alone cannot close a repair round.
+
+`nextState` is one of `repair-started|repair-start-failed|repair-planned|validation-failed|replan|blocked-independence|parked-independence|overridden-independence|deferred-exhausted|complete|rejected`. Terminal states are `repair-start-failed|complete|deferred-exhausted|rejected`; every other state remains open and is excluded from criticLog rotation.
+
+### State Transitions and Recovery
+
+1. `conditional` or `required fixes`: create one `repair` task for a fixed finding subset with acceptance checks. The worker changes the artifact, runs deterministic validation, records its output hash, validation results, and finding resolutions, then dispatches the required independent re-review. A failed or missing acceptance check records `nextState: validation-failed`, consumes the parent attempt, and returns to repair; it cannot be explained away in prose.
+2. `reject`: do not retry the same approach as a repair. The commander may use the existing `replan` path only with a new hypothesis and new evidence; otherwise preserve the rejection.
+3. If re-review confirms every blocking finding ID resolved, mark the task complete. A repair worker never self-certifies its own output.
+4. Repair re-review is a blocking quality gate: it requires a new context and `independenceVerdict: different-family`. The commander derives that verdict from an adapter or harness receipt identified by `receiptSource`, immutable `receiptRef`, and `receiptHash`: producer and critic models must differ, both families must be known and differ, `familyResolver` must identify the resolver, and router / auto models are ineligible. A worker may carry candidate fields but cannot author the receipt. Missing, null, same-family, unresolved, degraded, or self-declared-only evidence is `blocked-independence`.
+5. A `blocked-independence` record does not consume a workflow repair round, but it is not free: count it by `parentTaskId` until a valid independent re-review occurs. The configured `independenceBlockLimit` (default 3, allowed 1-5) transitions the parent to `parked-independence`, appends a `security-approve` decision to `pendingApprovals`, and stops further scheduled re-review dispatch. A user may approve `overridden-independence`, but its quality verdict never becomes `pass`; it queues exactly one follow-up `review` task with the same parent and unresolved finding IDs when an eligible independent critic is available. Override does not reset the independence block counter.
+6. At the effective cap, transition to `deferred-exhausted` with `reason: review-exhausted`, preserve unresolved finding IDs, and continue with a safe fallback task. A human override may advance an approved boundary but never rewrites `conditional` or `reject` into `pass`.
+7. After an interrupted run, reconcile `outputHash` with `criticLog`. If repair output exists without re-review, resume the same workflow round without incrementing it. If the repair never reached validation, finalize `repair-start-failed` for the already-reserved attempt before deciding whether a bounded requeue is allowed. If upstream evidence or the reviewed input hash changed, discard the pending finding set and create a new review record before repairing.
+
+`re-review-after-substantive-repair`, durable workflow-round records, and no self-certification are hard invariants. Only the numeric cap is tunable.
 
 ### Rubric (severity 5 段階)
 
@@ -180,7 +242,7 @@ Cadence / prompt / gate 変更提案前に自問:
 | **blocking** | 反対理由あり、進めるべきでない | reject       |
 
 - Critic は severity 分布を artifact 末尾に必ず出力
-- Workflow-review が critic-log の severity 分布を追跡し、rubric 調整の signal を検出
+- Workflow-review が criticLog の severity 分布を追跡し、rubric 調整の signal を検出
 
 ## Independence 契約 (Layer 2/3)
 
@@ -208,14 +270,15 @@ Layer 1 は毎 role 1 回、Layer 2 は fallback lane #3 経由、Layer 3 は 5 
 Blocking verdict = reject でも user は override 可:
 
 1. User が `override --reason "..."` を dashboard 経由で送る
-2. Approval log と critic-log 両方に reject verdict + override reason を残す
+2. approvalLog と criticLog 両方に reject verdict + override reason を残す
 3. Override 後の task は特別 tag `overridden-critic-reject` で追跡
-4. Workflow-review が override 頻度を監視 (5% 超過で rubric 見直し提案)
+4. Workflow-review が reject override と `overridden-independence` を合わせた override 頻度を監視 (5% 超過で rubric 見直し提案)
 
 ## Log Retention
 
-- Layer 1 log: 30 日で rotation (直近だけ意味あり)
+- Layer 1 criticLog: 30 日で rotation (直近だけ意味あり)
 - Layer 2/3 critic-report: 90 日、archive に押し出す
+- Open repair criticLog records（terminal state 以外）は terminal state になるまで rotation しない
 - Rubric 調整 event: 恒久 (workflow-review 学習資産)
 
 ## See Also

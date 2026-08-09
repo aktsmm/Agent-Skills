@@ -274,17 +274,18 @@ Rule:
   - Blocker Test 4/4 escalation が 24h で 3 件以上
   - Anti-pattern registry の同一 fingerprint count が K=3 到達
   - Discovery Floor trigger が 3 サイクル連続でも新規 candidate 流入ゼロ
-  - Critic-log の Layer 3 reject が 24h で 2 件以上
+  - criticLog の Layer 3 reject が 24h で 2 件以上
 
 ### Invariant Check (Hard Rule 誤変更抑止)
 
 Workflow-review が weekly + ad-hoc で以下 invariant を check、違反検出時は `dashboard-state.hardRuleViolationLog` に append + user notify + revert 提案:
 
 1. `references/approval-policy.md` に `auto` / `security-approve` 見出し両方 present か
-2. `references/rubber-duck-review.md` の "Layer 3 Blocking Gate List" に 5 gate 全部 present か
+2. `references/rubber-duck-review.md` の "Layer 3 Blocking Critic" 節に 5 gate 全部 present か
 3. `references/fallback-lane.md` の Auto-Refill 契約節 present か
 4. `references/persistence-profile.md` の 3 profile 全部定義 present か
 5. `SKILL.md` の "Tunable vs Hard Rules" 節 present か
+6. `references/rubber-duck-review.md` に "Repair -> Re-review Contract" と `blocked-independence` があり、`reviewRepairRounds` が 3〜20、`independenceBlockLimit` が 1〜5 を維持しているか
 
 詳細と対処: `references/tunable-defaults.md` "Hard Rule 誤変更抑止 (Invariant Check)" 節。
 
