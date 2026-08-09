@@ -7,6 +7,8 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 
 ## Session Reference
 
+- 推奨セッション名:
+- 推奨モデル（助言。理由1行 / 検証不能なら unspecified）:
 - 前セッション ID:
 - 作成日:
 - ワークスペース / repo:
