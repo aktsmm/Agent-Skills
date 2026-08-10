@@ -4,7 +4,9 @@ Choose the strongest route available in the current environment. Prefer native R
 
 ## GitHub Copilot CLI
 
-Use native Rubber Duck as the critic step of the loop: you keep producing the work and call Rubber Duck at each checkpoint defined in [loop protocol](./loop-protocol.md), then revise and re-consult until it passes. Native Rubber Duck already runs the critic on a different model family, so it fits the loop directly.
+Use native Rubber Duck for ordinary `standard` checkpoints: you keep producing the work and call Rubber Duck at each checkpoint defined in [loop protocol](./loop-protocol.md), then revise and re-consult until it passes. Native Rubber Duck already runs the critic on a different model family, so it fits the loop directly.
+
+Native Rubber Duck does not expose a tier-pinned model selection. Use it for ordinary `standard` checkpoints and report `tier=uncontrolled`; use a read-only fallback route with an explicitly selected model when a quick deterministic-gate audit or a high-risk / `deep` review needs a pinned tier.
 
 Preferred prompts:
 
@@ -40,13 +42,17 @@ Keep companion `.agent.md` files outside this skill. If the user later asks for 
 Recommended VS Code loop:
 
 1. Run `/duck-critic <target>` and keep producing the artifact yourself up to the first checkpoint from [loop protocol](./loop-protocol.md).
-2. Pick the critic route and reviewer lane, then resolve the critic model with the selection rules in [model lanes](./model-lanes.md) and pass it explicitly.
+2. Pick the critic route, reviewer lane, and `quick` / `standard` / `deep` depth. Resolve the critic family first, then its tier with [model lanes](./model-lanes.md), and pass the exact live picker string explicitly.
 3. Send the critic packet to a read-only `runSubagent` reviewer (or an existing read-only reviewer agent / separate model session). The subagent only reviews — it must not edit files or run mutating commands.
 4. Reconcile the findings in the main conversation, revise the artifact yourself, and re-consult the critic. Repeat until a stop condition in [loop protocol](./loop-protocol.md) is met.
 
 ### Resolving the critic model
 
 `runSubagent` inherits the producer's model when `model` is omitted, so leaving it out silently produces a same-family critic. Always pass `model` explicitly, copying the model string exactly as the harness lists it, including the vendor suffix.
+
+Passing `model` selects a model; it does not override the lane policy. Before dispatch, reject and re-resolve any explicitly selected non-preferred family unless the user explicitly requested that family for an experiment.
+
+After dispatch, apply the family/tier verification and single-retry rule in [model lanes](./model-lanes.md). Do not override it in this harness.
 
 To read the live model list, call `runSubagent` once with an obviously invalid `model` value that cannot collide with a real name. The rejection normally names every selectable model (`Requested model '...' not found. Available models: ...`). Apply the [model lanes](./model-lanes.md) selection rules to that list, then run the real critic with the resolved name. Probe once per session and reuse the result; do not probe before every round.
 
@@ -73,15 +79,15 @@ agent: general-purpose
 model: <different-family-model>
 ```
 
-Use exact model names only after checking the target Claude Code environment. Inheriting the producer's model is a last resort to call out explicitly, since a same-family critic mostly echoes the producer's blind spots.
+Resolve family first and then the `quick` / `standard` / `deep` tier before setting `model`. Use exact model names only after checking the target Claude Code environment. Inheriting the producer's model is a last resort to call out explicitly, since a same-family critic mostly echoes the producer's blind spots.
 
 ## Generic Agent Harnesses
 
 Use the same critic packet with any available reviewer that can stay read-only.
 
-Examples of acceptable fallback patterns:
+Resolve family first and then the `quick` / `standard` / `deep` tier before dispatch. Examples of acceptable fallback patterns:
 
-- Separate model session with a top-reasoning model.
+- Separate model session with the tier resolved from [model lanes](./model-lanes.md).
 - Read-only custom reviewer agent.
 - Forked subagent with no edit or shell mutation permissions.
 - Manual review prompt pasted into another harness.

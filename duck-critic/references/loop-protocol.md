@@ -13,6 +13,7 @@ Consult the critic at high-leverage moments, the same ones the native Rubber Duc
 - **After drafting tests**: the test strategy or test cases exist and you want to confirm they actually cover the requested behavior.
 - **After repeated failures**: the same approach has failed two or more times and a second perspective is needed before retrying.
 - **Before a hard-to-reverse decision**: architecture, deployment, schema, or security choices.
+- **After executing a change to external or shared state**: a repository, service, or published document has already been touched. Deterministic gates confirm the artifact still passes, but they do not compare declared counts, status notes, and plan documents against what was actually produced, so this is where silent drift between the record and reality surfaces.
 
 Small, obvious changes need zero consultations. Skipping the critic is a valid outcome — report it as `0 rounds`.
 
