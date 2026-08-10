@@ -34,9 +34,10 @@ metadata:
 4. If the repo has uncommitted changes from more than one actor, say which dirty paths are yours and which must not be staged. Otherwise the next session commits someone else's half-finished edits.
 5. Separate facts from guesses. Mark uncertain items as `未確認` or `仮説`.
 6. Preserve user constraints that still matter, including wording, scope limits, and prohibited actions.
-7. Write a paste-ready handoff using [references/handoff-template.md](references/handoff-template.md).
-8. Review the handoff before finalizing: remove secrets, private account identifiers, sensitive URLs, absolute personal paths unless necessary for local continuation, duplicate logs, and stale TODOs.
-9. If the user asked for rubber-duck review, or the handoff is non-trivial, run a second-pass review against the checklist below.
+7. When an exact-target direct-entry workflow exists, make its invocation the handoff's primary instruction. Do not restate its phases, lifecycle, acceptance criteria, or operational contract; include only resume state and requirements the workflow does not own.
+8. Write a paste-ready handoff using [references/handoff-template.md](references/handoff-template.md).
+9. Review the handoff before finalizing: remove secrets, private account identifiers, sensitive URLs, absolute personal paths unless necessary for local continuation, duplicate logs, and stale TODOs.
+10. If the user asked for rubber-duck review, or the handoff is non-trivial, run a second-pass review against the checklist below.
 
 ## Recovering a Thin Handoff
 
