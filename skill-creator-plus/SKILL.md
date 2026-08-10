@@ -80,7 +80,7 @@ Before adding a new section, ask whether it can replace an existing rule, move t
 
 ## Skill Structure
 
-Keep routing and decisions in `SKILL.md`; put deterministic helpers in `scripts/`, on-demand detail in `references/`, and reusable outputs in `assets/`. See [Skill Structure](references/skill-structure.md), including excluded files.
+Keep routing and decisions in `SKILL.md`; put deterministic helpers in `scripts/`, on-demand detail in `references/`, and reusable outputs in `assets/`. References load on demand and are often never read, so any constraint that gates an irreversible action — allowlists, forbidden values, safety limits — stays inline in `SKILL.md` even when it reads like detail, with only its rationale in `references/`. See [Skill Structure](references/skill-structure.md), including excluded files.
 
 ## Creation Process
 

@@ -35,8 +35,8 @@ This is **not** "hand the whole task to a reviewer subagent". You stay the **pro
 - Do not claim native Rubber Duck ran unless GitHub Copilot CLI actually used `/rubber-duck` or an explicit Rubber Duck consultation.
 - Keep the critic read-only. Do not edit files, run mutating commands, change settings, install packages, or update state from the critic role.
 - Do not ask fallback critics to append files or write review packets. If durable notes are needed, have the critic return findings in chat/output and let the producer write or update files after reconciliation. If a critic reports it has no write tools, treat the returned findings as valid input rather than a failed review.
-- Use a critic from a **different model family** than the producer whenever the harness allows it, choosing from the preferred critic families in [model lanes](./references/model-lanes.md). If none is available, fall back per that ladder instead of blocking the loop, and report when the critic ended up same-family or self-review.
-- Resolve the critic model at run time from the harness's live model list and pass it explicitly. Never inherit the producer's model by default, never rely on a remembered model name, and never hardcode model IDs in portable instructions — see [model lanes](./references/model-lanes.md).
+- Use a critic from a **different model family** than the producer whenever the harness allows it. The preferred families are **OpenAI GPT** and **Anthropic Claude**; never auto-select a family outside that list, and prefer a stable entry over one marked `preview` or `experimental`. If no different preferred family is available, fall back per [model lanes](./references/model-lanes.md) instead of blocking the loop, and report when the critic ended up same-family or self-review.
+- Resolve the critic model at run time from the harness's live model list and pass it explicitly. Never inherit the producer's model by default, never rely on a remembered model name, and never hardcode model IDs in portable instructions — see [model lanes](./references/model-lanes.md) for the tier ladder and the post-dispatch family check.
 - Ignore style-only, formatting-only, naming-preference, and generic best-practice comments unless they affect the task outcome.
 - Focus on issues that could break requested behavior, security, data integrity, runtime behavior, deployment, or verification.
 - When the target is a rule, convention, or style decision, put **measured reality** in the packet: counts across the affected corpus, the history of the rule, and where its source of truth lives. Without that, the critic answers with generic best practice and proposes something that collides with the existing assets.
@@ -89,7 +89,7 @@ Keep `.agent.md` companion files out of this skill unless the user explicitly as
 
 - The producer kept ownership of the work; the implementation was not delegated wholesale to the critic.
 - The response says which route was used and how many rounds the loop ran.
-- The critic stayed read-only and, where the harness allowed, was a different model family than the producer.
+- The critic stayed read-only and, where the harness allowed, was a preferred family different from the producer's.
 - The loop stopped on a real condition: critic PASS, an explicitly accepted PASS_WITH_NOTES, or the max-rounds fail-safe with unresolved blocking findings reported.
 - Findings are severity-classified and tied to the user goal.
 - Native Rubber Duck and fallback critic are not conflated.
