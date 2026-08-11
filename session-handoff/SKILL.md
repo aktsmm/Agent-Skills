@@ -58,7 +58,7 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 - Are secrets, credentials, and irrelevant transcript details omitted?
 - Is the message concise enough to paste as a new-session prompt?
 - Are the suggested session name and model presented as suggestions, with `unspecified` when the model cannot be verified?
-- Can the next session locate the original log and the exact repository revision this note describes?
+- Can the next session locate the root session, its immediate predecessor, and the exact repository revision this note describes?
 
 ## Output Rules
 
@@ -68,7 +68,8 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 - Avoid wording that sounds like a request to create another handoff, such as starting only with `次のセッションでは...`.
 - Prefer bullets over narrative history.
 - Include exact commands only when they are safe and likely to be rerun.
-- Record the originating session identifier, the date, and the repository state near the top. Without them the next session cannot pull the original log when the summary turns out to be thin, and cannot tell which revision the described state belongs to. The identifier is a log key, not a credential, so it is safe to carry; the log path is not, and stays out.
+- Record the session lineage, the date, and the repository state near the top. Without them the next session cannot pull the original log when the summary turns out to be thin, and cannot tell which revision the described state belongs to. Identifiers are log keys, not credentials, so they are safe to carry; log paths are not, and stay out.
+- Build the lineage by inheriting it from the handoff that started this session and appending the current identifier; the root holds the original request that later summaries drop. Write it as `root: <id> → … → this session: <id>`, keeping the root plus the two most recent non-root entries. Never record how many entries the ellipsis hides — an inherited count cannot be recomputed, so requiring one forces the next session to guess.
 - Suggest a name for the next session near the top so the user can rename in one step. Use the original session title when known; a title can be absent even when session metadata carries a summary, so fall back to a short goal-derived name instead of searching for one.
 - Treat only a trailing ` Re` or ` Re<number>` as a handoff suffix. Replace ` Re` with ` Re2`, increment `<number>` for ` Re<number>`, and otherwise append ` Re`. Present the result as a suggestion, not a unique identifier.
 - Suggest one model display name verified in the current environment plus a one-line reason. Mark it advisory: the next session rechecks availability before selecting it. Write `unspecified` when you cannot verify one.

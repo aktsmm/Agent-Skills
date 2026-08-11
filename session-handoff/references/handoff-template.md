@@ -9,7 +9,7 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 
 - 推奨セッション名:
 - 推奨モデル（助言。理由1行 / 検証不能なら unspecified）:
-- 前セッション ID:
+- セッション系譜（`root: <id> → … → this session: <id>`）:
 - 作成日:
 - ワークスペース / repo:
 - branch / HEAD:
