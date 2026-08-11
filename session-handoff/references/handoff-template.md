@@ -22,6 +22,8 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 
 ## Goal
 
+- 大目的（当初。ユーザー訂正でのみ更新）:
+- 大目的（現在。転換したときだけ書く）:
 - 目的:
 - 完了条件:
 - 明示された制約:
@@ -61,6 +63,8 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 
 ## Compression Rules
 
+- Keep at most two 大目的 lines, 当初 and 現在. A change of direction updates 現在 and leaves 当初 intact; only the user saying the recorded wording itself was wrong rewrites 当初. When you cannot tell the two apart, treat it as a change of direction so nothing is lost. Collapse to one line when they are the same, and never list intermediate versions however many times the direction changed.
+- Give each 大目的 line at most one parenthesized marker: `未確認` until the user confirms that wording, `（<date> 転換）` for a change of direction, or `（<date> ユーザー訂正）` for a corrected record. A confirmation clears `未確認`, a newer marker replaces the older one, and when no wording can be reconstructed at all, write `未確認` alone and name the root session as where to recover it.
 - Keep only continuation-critical facts.
 - Prefer workspace-relative file paths.
 - Include exact error text only when it changes the next action.

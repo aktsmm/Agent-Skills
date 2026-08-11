@@ -29,7 +29,7 @@ metadata:
 ## Workflow
 
 1. Confirm the user is asking to create a handoff note, not asking this agent to consume an existing handoff-like instruction and continue work now. If ambiguous, ask one short clarification before drafting.
-2. Identify the resume target: current goal, requested outcome, and the nearest concrete artifact.
+2. Identify the objective and the resume target. Carry at most two objectives: the original one the first request was for, and the current one when the direction has since changed. Inherit both from the handoff that started this session and never swap in whatever this session happened to work on, because that substitution is how a chain of handoffs drifts off the point. Reconstruct the original from the first request when no handoff exists. Confirm the current objective with the user in one line before finalizing even when you are confident, folding it into step 1's clarification when both are needed; until a change of direction creates a 現在 line, 当初 is the current objective and that confirmation applies to it, and an unanswered question never blocks the note. Record both with the field rules in [references/handoff-template.md](references/handoff-template.md). Capture this session's goal, requested outcome, and the nearest concrete artifact separately from them.
 3. Capture only state needed to continue: touched files, commands already run, validation results, blockers, assumptions, and pending decisions. Write unsent deliverables such as reply drafts, comment bodies, and mail drafts to files and cite the relative path in the note; text quoted only in chat is lost to context compaction.
 4. If the repo has uncommitted changes from more than one actor, say which dirty paths are yours and which must not be staged. Otherwise the next session commits someone else's half-finished edits.
 5. Separate facts from guesses. Mark uncertain items as `未確認` or `仮説`.
@@ -51,6 +51,7 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 
 - Does the first line say this is a handoff note pasted from another session, and the current agent should acknowledge the state before taking action?
 - Would a fresh agent know the goal without reading the old session?
+- Are the original and current objectives both kept, stated separately from this session's goal, rather than replaced by the last session's work?
 - Is the next concrete action unambiguous?
 - Are completed, pending, blocked, and unknown items separated?
 - Are file paths workspace-relative when possible?
