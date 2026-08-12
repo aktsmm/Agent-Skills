@@ -36,6 +36,7 @@ If CDP startup may already be automated, inspect its owner before adding another
 - If Edge is already running **without** any debug port, a new `--remote-debugging-port` launch joins the existing portless process and the port never opens (`/json/version` keeps failing). Close all Edge processes first, then relaunch with the port. Closing all Edge is destructive (drops every open tab), so confirm with the user before `Stop-Process -Name msedge`.
 - When a helper connects from Node, pass `http://127.0.0.1:<port>` rather than `localhost`. `localhost` can resolve to IPv6 `::1` while the CDP endpoint listens on IPv4, so PowerShell reaches it but Node `fetch` fails with `fetch failed`.
 - Pass the verified CDP URL explicitly to helpers so later scripts do not re-guess a different endpoint. If a helper already has a verified CDP URL, disable profile re-resolution and strip stale profile-query environment variables unless you intentionally want the helper to launch/resolve a different browser profile.
+- On a shared authenticated browser, create a dedicated work tab through `/json/new?<encoded-url>`, persist the returned target ID, and address every raw-CDP call by that exact ID. Never keep selecting the first page that matches a domain: user navigation can redirect that tab during a long batch. Re-check URL, route, and query before every write batch, and close only the pinned work-tab ID during cleanup.
 
 ## Screenshot Capture
 

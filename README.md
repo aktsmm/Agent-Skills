@@ -65,7 +65,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [vscode-extension-guide](vscode-extension-guide/) | Guide for creating VS Code extensions and plugins from scratch through Marketplace publication |
 | [web-accessibility](web-accessibility/) | Build and review accessible web products using WCAG 2.2 AA |
 | [x-hashtag-research](x-hashtag-research/) | Collect and analyze public X posts from hashtags to discover primary sources, official docs, related GitHub repos, and reusable images |
-| [x-twitter-browser-ops](x-twitter-browser-ops/) | Read-only X/Twitter browser data workflow |
+| [x-twitter-browser-ops](x-twitter-browser-ops/) | X/Twitter browser operations. Use for X browsing, analysis, bookmark management, content and profile operations, or browser-driven troubleshooting. Require explicit confirmation... |
 <!-- public-skills-table:end -->
 
 ## Usage / 使い方

@@ -1,7 +1,7 @@
 ---
 name: "x-twitter-browser-ops"
-description: "Read-only X/Twitter browser data workflow. Use when collecting X/Twitter followers, following, mutual followers, verified/non-verified splits, rankings, or CSV/HTML outputs via browser automation. Do not use for posting, DM, follow/unfollow, block, mute, or list edits."
-argument-hint: "対象アカウント、取得したい followers/following/mutual/verified 情報、出力形式"
+description: "X/Twitter browser operations. Use for X browsing, analysis, bookmark management, content and profile operations, or browser-driven troubleshooting. Require explicit confirmation for outbound posts, DMs, engagement, follows, blocks, mutes, and list edits."
+argument-hint: "対象のX画面、実行したい操作、対象アカウントまたは投稿"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -10,17 +10,17 @@ metadata:
 
 # X/Twitter Browser Ops
 
-Use this skill for read-only X/Twitter browser data workflows: collecting followers/following lists, finding mutual followers, splitting verified vs non-verified accounts, ranking by follower count, and producing CSV/Markdown/HTML outputs.
+Use this skill for all X/Twitter browser operations: browsing and analysis, follower/following collection, bookmark-folder management, content/profile management, and browser-driven troubleshooting.
 
 ## When to Use
 
 - User asks for X/Twitter follower, following, mutual follower, or verified follower analysis.
 - User asks to rank X/Twitter accounts by followers, export CSV/Markdown/HTML, or build a dashboard from collected X data.
-- Browser automation is allowed and the task is read-only.
+- User asks to organize bookmarks, create/rename/delete bookmark folders, or move bookmarks between folders.
+- User asks to operate X/Twitter in the browser.
 
 ## Do Not Use
 
-- Do not use for posting, replying, liking, reposting, DM, follow/unfollow, block, mute, list edits, or other write actions.
 - Do not use to evade X rate limits, bans, access controls, paywalls, or privacy settings.
 - Do not save or expose login cookies, auth headers, HAR files, tokens, or browser profile data.
 
@@ -30,7 +30,21 @@ Use this skill for read-only X/Twitter browser data workflows: collecting follow
 2. Treat the browser session as sensitive. Never persist cookies, CSRF tokens, Authorization headers, or HAR captures.
 3. Prefer read-only page navigation and response observation over replaying internal API calls.
 4. If screenshots or HTML outputs include notification badges, DMs, private handles, or unrelated personal data, mask or omit them.
-5. If any outbound action is requested, stop and require explicit preview + confirmation; this skill is otherwise read-only.
+5. For any outward-facing or relationship-changing action—post, reply, like, repost, DM, follow/unfollow, block, mute, or list edit—show the exact action and obtain explicit confirmation immediately before execution.
+6. Bookmark folder creation, renaming, deletion, and assignment are permitted after the user explicitly approves the organization plan.
+
+## Bookmark Management
+
+1. Inspect existing folders plus representative unfoldered and folder-specific posts before proposing a minimal taxonomy.
+2. Show the proposed folder names, merges, renames, and classification priority before mutating bookmarks.
+3. Confirm each assignment from the UI before removing a post from its prior folder.
+4. In virtualized infinite-scroll feeds, operate in bounded batches using a post's canonical `/status/` URL; re-resolve the post immediately before each mutation and never retain an element ref across scrolls or mutations.
+5. Process one visible post at a time and re-scan canonical URLs after each folder-picker mutation; do not pre-capture a whole visible candidate batch because X can recycle the sibling articles immediately.
+6. On a shared logged-in browser, create a dedicated work tab, pin its CDP target ID, and assert `/i/bookmarks` plus the active search query before every write batch; close only that work tab afterward.
+7. Folder membership hydrates after the picker shell. Wait for checkmark/icon state before deciding assigned vs unassigned; an immediately missing checkmark is unknown, not safe to click.
+8. X can render duplicate `[role=dialog]` shells. Treat a dialog as actionable only when its bounding rect has both positive width and height, and close it only while the route is `/i/bookmarks/add` to avoid an extra history-back navigation.
+9. Treat missing folder-picker options, modals, or navigations as unverified—not as success. Keep the source assignment until the destination is visibly confirmed.
+10. Scroll through several batches with no new canonical post URLs before declaring the feed complete; deduplicate and report counts by canonical post ID, and report skipped or unverified items separately.
 
 ## X Page Semantics
 

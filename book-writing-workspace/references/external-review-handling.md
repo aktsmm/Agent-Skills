@@ -8,15 +8,23 @@ A single pull request usually mixes correct fact fixes, wording preferences, and
 
 Record three outcomes only: adopted, adopted with change, rejected. "Adopted with change" needs the reason for the change, or the reviewer reads it as a silent override.
 
-## Land a contributor's pull request without merging it
+## Merge a contributor's pull request rather than retyping it
 
-Merging is the default, because it preserves the contribution in the history for free. The exception is a request whose edits overlap lines the manuscript has already changed: the merge then resolves to a conflict that has to be settled by hand anyway, and settling it inside a merge is harder than applying the intent directly.
+Merging is the default, because it preserves the contribution in the history for free: the attribution and the request's own merged state. Retyping the change locally and closing the request leaves the discussion visible but severs that linkage, and it silently drops whatever you failed to copy across.
 
-On that path the contributor disappears from the history unless you put them back, so every commit carrying their work needs a co-authorship trailer. Read the author name and address off the request's own commits through the forge API instead of guessing at an address.
+Overlapping edits are not a reason to skip the merge. When the manuscript has already changed the same lines, the conflict has to be settled by hand either way, so settle it on your side and merge. A fork-based request that does not allow maintainer edits still merges: take it locally, resolve the conflict there, and land it on the base branch with a merge that keeps the request's own commits reachable. A local squash or cherry-pick drops them, and a forge that reads merged state from reachability then stops recognising the request — the forge's own squash merge button is unaffected. When the base branch refuses a direct push, route the resolved work through the workspace's normal request path rather than closing the original.
+
+Merging by request and ruling by point still coexist. When a request mixes adopted and rejected points, merge it and correct the rejected part in the commit that resolves the merge or in the one right after it, then name the points you changed back in the reply.
+
+Keep generated artifacts out of contributor requests. Built output — typeset files, converted sources, rendered pages — widens conflicts and is often binary, so ask for source-only changes and regenerate the output yourself after the merge, unless the workspace's own release rules require the artifacts inside the request.
+
+Close a request without merging when the contributor withdrew it, when none of its points is adopted, or when it carries material that must not enter the history at all for rights or confidentiality reasons. That last case outranks the rule about mixed requests: do not merge such a request for the sake of a useful point elsewhere in it, carry that point by hand instead. Name the reason in the reply. On the rare path where you land a contributor's work by hand, every commit carrying it needs a co-authorship trailer with the name and address the contributor wants used for that purpose. Their existing commits identify them, but a visible address is not consent — ask which one to use.
 
 Fork-based requests that allow maintainer edits offer a third path: review the request, propose the exact change, and apply it yourself, which records both people. Send anything a primary source settles uniquely down that path, and hand anything that needs the contributor's intent back to them.
 
 A truncated or half-finished edit is usually an attempt to replace an empty phrase with something concrete. Recover the intent from the surrounding voice before rewriting it, and count how many times the same empty phrase appears elsewhere.
+
+Where repository-level instructions set a conflicting rule for external review intake, follow them and use this section for what they leave undecided.
 
 ## A notation complaint may be a defect in the notation rule
 

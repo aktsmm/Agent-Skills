@@ -77,6 +77,12 @@ API と DOM の状態が一時的にずれるケースがある。API が stale 
 | Element is not visible | Wait or reload before forcing interaction |
 | Read-only tabular extraction | Keep navigation evidence, then return compact JSON from DOM evaluation |
 
+### Virtualized feeds and per-item mutations
+
+- For infinite-scroll feeds, collect a stable item ID or canonical URL for the current batch, then re-resolve that item immediately before each mutation. Do not retain a locator or accessibility ref across a scroll or another item mutation; virtualized DOM nodes are routinely recycled.
+- Treat a missing picker option, modal, or navigation as **unknown**, not success. Confirm the persistent assignment state (or an equivalent destination-specific DOM state) before recording an item as done; distinguish an already-assigned item from a picker-render failure.
+- Process one bounded batch, persist its completed stable IDs in the active run, then scroll until new IDs appear. End only after several end-of-feed scrolls yield no new stable IDs, and report any unverified items separately.
+
 ### unsaved editor / draft タブを壊さない
 
 未保存 form を持つ editor / SPA タブに別 URL を踏ませると `beforeunload` dialog で upload や遷移が崩れる。既存タブは再利用し、新規作業は別タブで開く。`dialog.accept()` / `page.reload()` / API トリガー目的の reload で dirty を踏み越さない。詳細と Qiita / CMS 例は [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md) を参照する。
@@ -110,6 +116,7 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 
 MCP Playwright と Python スクリプトは **同じ CDP ポートへ同時接続しない**。
 とくに Python 側も `connect_over_cdp()` を使う場合、MCP と Playwright セッションが二重になり、ページ操作が競合して「遷移先が想定外」「フォーム送信が効かない」等の不定失敗が起きる。
+共有ブラウザへ raw CDP で接続する場合は、専用作業タブを作成して返された target ID を固定し、各 write batch 前に URL / route / query を再検証する。ドメイン一致の先頭タブを毎回選ぶと、ユーザー操作中の別タブを誤操作する。
 
 | ルール        | 内容                                                                                                               |
 | ------------- | ------------------------------------------------------------------------------------------------------------------ |

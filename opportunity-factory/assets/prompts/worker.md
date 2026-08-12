@@ -81,13 +81,15 @@ none
     "findingIds": [],
     "inputHash": "sha256",
     "outputHash": "sha256",
-    "validationResults": [{
-      "id": "AC-1",
-      "expected": "machine-comparable expected result",
-      "actual": "observed result",
-      "result": "pass|fail",
-      "evidenceRef": "path"
-    }],
+    "validationResults": [
+      {
+        "id": "AC-1",
+        "expected": "machine-comparable expected result",
+        "actual": "observed result",
+        "result": "pass|fail",
+        "evidenceRef": "path"
+      }
+    ],
     "findingResolution": []
   },
   "reviewRecheck": {

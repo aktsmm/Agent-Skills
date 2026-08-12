@@ -200,7 +200,15 @@ Append one record to `dashboard-state.criticLog` for every review, repair, re-re
       "evidenceRef": "path"
     }
   ],
-  "validationResults": [{"id":"AC-1","expected":"...","actual":"...","result":"pass|fail","evidenceRef":"path"}],
+  "validationResults": [
+    {
+      "id": "AC-1",
+      "expected": "...",
+      "actual": "...",
+      "result": "pass|fail",
+      "evidenceRef": "path"
+    }
+  ],
   "repairTaskId": "optional task id",
   "receiptSource": "adapter-execution-record|scheduler-history|subagent-receipt",
   "receiptRef": "immutable adapter or harness receipt",

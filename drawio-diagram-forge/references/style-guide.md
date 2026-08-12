@@ -126,6 +126,7 @@ When combining diagonal branch/merge lines with annotation boxes (e.g., GitHub F
 - **Place step boxes below the diagonal endpoints** — if a diagonal goes from (x1,y1) to (x2,y2), boxes must have `y > max(y1, y2)` to avoid crossing.
 - **Dashed connectors** starting from a box edge should begin at `y - 2px` (not exactly at the top edge) to avoid false overlap in validators.
 - **Keep horizontal feature branch and step row on separate Y bands** — minimum 40px gap between the branch line Y and the top of step boxes.
+- **Wrap a long linear flow into a serpentine** rather than stretching it across the page. Row 1 runs left to right, row 2 sits under it running right to left, and the only cross-row arrow is a single vertical segment, so the figure lands inside the aspect band and leaves no diagonal for the geometry sweep to flag. A six-step flow measured at 5.3:1 came back to 2.3:1 this way.
 
 ### Icons On Connectors
 
@@ -160,6 +161,8 @@ When the destination is a printed page, the figure is reduced, converted to gray
 - Prefer landscape. Column width is fixed, so a near-square figure eats close to half a page; aim between 1.5:1 and 3:1
 - Never carry meaning in colour alone. Use line style, border weight, and labels, then check the result in grayscale
 - Keep the lead sentence and any summary box out of the figure alongside the title. Confirm whether the destination renders figure captions and numbers at all; where it does not, anything the reader must have has to live in the prose
+- Draw the line by what a string does, not by how long it is. Element labels, the criterion a step is judged by, and a reading-order legend earn their place in the figure; a claim, a conclusion, or a piece of advice belongs to the prose. Grep the surrounding section before deleting one — a note that survived review is usually already stated there, so removing it costs no information
+- Stripping prose out of a figure shortens it and can push the aspect ratio back out of range. Treat that as the tell that the sentence was padding the height. Win the height back with structure, an extra labelled band or a wrapped row, not with another sentence
 - Verify the figure shows what the prose claims about it. A simplified diagram that contradicts its own sentence costs more trust than a missing figure would
 
 ### Diagram Size

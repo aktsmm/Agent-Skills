@@ -201,3 +201,15 @@ Decide what a stale input means before it happens:
 
 - Still write the artifact and record the staleness inside it. A run that exits without output leaves the next workflow unable to distinguish "never ran" from "ran and found nothing".
 - Block change recommendations while the input is stale. Observation may continue; acting on it may not.
+
+## 17. Generated Human-Readable Companions
+
+When recurring structured intake or state must be inspected by humans, pair the canonical source with a generated Markdown, CSV, or equivalent companion.
+
+- Keep the structured source as the only writable SSOT. The companion is derived output and is never hand-edited.
+- Let one synchronizer own generation. Its check-only mode re-renders the expected companion without mutation, then fails when the file is missing or differs. It must also verify that every source ID appears exactly once and in deterministic order.
+- Validate required fields and unique IDs before generation. Write mode must render and validate a temporary output before atomic replacement, and must reject source/output path collisions. On failure, preserve both the source and the previous companion.
+- The reducer calls the synchronizer after normal source updates. A health reconciler detects or repairs reversible companion drift; it does not become a second normal writer.
+- Put human annotations in the source schema or a separate artifact. Use this pattern only when the derived view is deterministic.
+
+Why: structured state is reliable for automation but difficult to inspect. A reproducible companion makes recurring intake reviewable without manual dual maintenance or relying on chat history.
