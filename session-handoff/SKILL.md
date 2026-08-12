@@ -29,12 +29,12 @@ metadata:
 ## Workflow
 
 1. Confirm the user is asking to create a handoff note, not asking this agent to consume an existing handoff-like instruction and continue work now. If ambiguous, ask one short clarification before drafting.
-2. Identify the objective and the resume target. Carry at most two objectives: the original one the first request was for, and the current one when the direction has since changed. Inherit both from the handoff that started this session and never swap in whatever this session happened to work on, because that substitution is how a chain of handoffs drifts off the point. Reconstruct the original from the first request when no handoff exists. Confirm the current objective with the user in one line before finalizing even when you are confident, folding it into step 1's clarification when both are needed; until a change of direction creates a 現在 line, 当初 is the current objective and that confirmation applies to it, and an unanswered question never blocks the note. Record both with the field rules in [references/handoff-template.md](references/handoff-template.md). Capture this session's goal, requested outcome, and the nearest concrete artifact separately from them.
+2. Identify the objective and the resume target. Carry at most two objectives: the original one the first request was for, and the current one when the direction has since changed. Inherit both from the handoff that started this session and never swap in whatever this session happened to work on, because that substitution is how a chain of handoffs drifts off the point. Reconstruct the original from the first request when no handoff exists. Confirm the current overarching objective (大目的・現在) with the user in one line before finalizing even when you are confident, folding it into step 1's clarification when both are needed. Until the answer arrives, do not emit the handoff; the user correction wins. Record both with the field rules in [references/handoff-template.md](references/handoff-template.md). Capture this session's goal, requested outcome, and the nearest concrete artifact separately from them.
 3. Capture only state needed to continue: touched files, commands already run, validation results, blockers, assumptions, and pending decisions. Write unsent deliverables such as reply drafts, comment bodies, and mail drafts to files and cite the relative path in the note; text quoted only in chat is lost to context compaction.
 4. If the repo has uncommitted changes from more than one actor, say which dirty paths are yours and which must not be staged. Otherwise the next session commits someone else's half-finished edits.
 5. Separate facts from guesses. Mark uncertain items as `未確認` or `仮説`.
 6. Preserve user constraints that still matter, including wording, scope limits, and prohibited actions.
-7. When an exact-target direct-entry workflow exists, make its invocation the handoff's primary instruction. Do not restate its phases, lifecycle, acceptance criteria, or operational contract; include only resume state and requirements the workflow does not own.
+7. When a relevant direct-entry workflow exists, make its invocation the primary candidate selected after explicit approval, whether the target is fixed here or selected by the workflow. Do not restate its phases, lifecycle, acceptance criteria, or operational contract; include only resume state and requirements the workflow does not own.
 8. Write a paste-ready handoff using [references/handoff-template.md](references/handoff-template.md).
 9. Review the handoff before finalizing: remove secrets, private account identifiers, sensitive URLs, absolute personal paths unless necessary for local continuation, duplicate logs, and stale TODOs.
 10. If the user asked for rubber-duck review, or the handoff is non-trivial, run a second-pass review against the checklist below.
@@ -49,10 +49,10 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 
 ## Rubber-Duck Review Checklist
 
-- Does the first line say this is a handoff note pasted from another session, and the current agent should acknowledge the state before taking action?
+- Does the first line say this is a handoff note pasted from another session, and the current agent should acknowledge and summarize the state plus present A/B choices before taking action?
 - Would a fresh agent know the goal without reading the old session?
 - Are the original and current objectives both kept, stated separately from this session's goal, rather than replaced by the last session's work?
-- Is the next concrete action unambiguous?
+- Are the A/B candidates and the action after selection unambiguous?
 - Are completed, pending, blocked, and unknown items separated?
 - Are file paths workspace-relative when possible?
 - Are verification results stated with command names and outcomes?
@@ -64,7 +64,7 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 ## Output Rules
 
 - Put the paste-ready handoff itself in one fenced `markdown` block so the user can copy it without surrounding commentary.
-- Start the block with a self-identifying line: it is a handoff note from another session, and the current agent should first acknowledge and summarize the state.
+- Start the block with a self-identifying line: it is a handoff note from another session, and the current agent should first acknowledge and summarize the state plus present A/B next-action choices.
 - Do not instruct the next agent to start work immediately. Tell it to wait for explicit user approval before editing files, running commands, or operating external services.
 - Avoid wording that sounds like a request to create another handoff, such as starting only with `次のセッションでは...`.
 - Prefer bullets over narrative history.
@@ -75,7 +75,7 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 - Treat only a trailing ` Re` or ` Re<number>` as a handoff suffix. Replace ` Re` with ` Re2`, increment `<number>` for ` Re<number>`, and otherwise append ` Re`. Present the result as a suggestion, not a unique identifier.
 - Suggest one model display name verified in the current environment plus a one-line reason. Mark it advisory: the next session rechecks availability before selecting it. Write `unspecified` when you cannot verify one.
 - Do not infer model availability from session history alone; an absent model was not observed in that history, not proven unavailable.
-- Include no more than one `Next action` section.
+- Include no more than one `Next Candidates` section.
 - Include prohibited actions and stop conditions near the top when user safety or external systems are involved.
 - End with the expected stop condition or done criteria.
 

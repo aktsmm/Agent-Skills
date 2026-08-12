@@ -3,7 +3,7 @@
 Use this structure to produce one paste-ready message for a fresh session. Omit sections that do not apply. In the final response, show this entire message in a single fenced `markdown` block.
 
 ```markdown
-これは前セッションから貼り付けた状況共有メモです。現在のセッションの agent は、まず内容を読み取り、理解した作業状態・未完了事項・次に確認すべきことを短く返してください。ユーザーが明示的に「進めて」「実行して」と言うまでは、ファイル編集・コマンド実行・外部サービス操作を開始しないでください。
+これは前セッションから貼り付けた状況共有メモです。現在のセッションの agent は、まず内容を読み取り、理解した作業状態・未完了事項・次に確認すべきことを短く要約し、A/B の次の候補を提示してください。ユーザーが明示的に「進めて」「実行して」または候補名を選ぶまで、ファイル編集・コマンド実行・外部サービス操作を開始しないでください。
 
 ## Session Reference
 
@@ -18,6 +18,9 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 
 - まず「了解しました」と返す。
 - 認識した現在地、未完了、次に確認することを短く要約する。
+- `理解しました。次は A（...）/ B（...）のどちらにしますか？` を優先する。
+- 状態要約への訂正・補足・了承だけでは実行承認とみなさない。
+- 選択は選んだ候補の範囲だけを承認する。既存の禁止事項、stop condition、外部操作・破壊的操作の追加承認を上書きしない。
 - 明示指示があるまで作業を開始しない。
 
 ## Goal
@@ -50,11 +53,11 @@ Use this structure to produce one paste-ready message for a fresh session. Omit 
 - 失敗した確認:
 - まだ実行していない確認:
 
-## Next Action
+## Next Candidates
 
-1. 再開する場合の最初の候補:
-2. 作業開始前に確認すること:
-3. 迷ったらユーザーに確認すること:
+1. A:
+2. B:
+3. 選択前に確認する未解決事項（creator側の大目的確認は再掲しない）:
 
 ## Done Criteria
 
