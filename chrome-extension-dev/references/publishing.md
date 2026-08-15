@@ -114,6 +114,32 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 
 ---
 
+## Microsoft Edge アドオンとの差分
+
+同じ MV3 ZIP をそのまま提出できるが、掲載アセットの仕様がずれている。特に 640 系は**互換ではない**。
+
+| 項目               | Chrome Web Store                       | Edge アドオン                                               |
+| ------------------ | -------------------------------------- | ----------------------------------------------------------- |
+| スクリーンショット | 1280x800 または **640x400**、最大 5 枚 | 1280x800 または **640x480**、最大 6 枚                      |
+| ストアロゴ         | 128x128                                | **300x300 推奨**（最小 128x128、比率 1:1）                  |
+| 詳細な説明         | 上限のみ                               | **最小 250 文字**、最大 10,000                              |
+| 言語ごとの必須     | 説明のみ                               | **説明とロゴが各言語で必須**（名前と短い説明は 1 言語以上） |
+
+1280x800 で撮れば両方を満たす。640 で撮ると片方でしか使えない。ロゴを 128x128 だけで用意すると
+Edge では最小要件ぎりぎりになる。日本語ロケールを足す作業量は、説明だけの Chrome より Edge の方が大きい。
+
+プライバシー申告は**現行の Edge Privacy ページが Chrome とほぼ同型**で、単一目的 / 権限ごとの正当化 /
+リモートコード宣言 / データ種別の開示と証明 / ポリシー URL が揃う。旧 UI は Properties ページ上の
+「個人情報にアクセス・収集・送信するか」の Yes/No + URL だけだったので、**どちらの画面が出るかを実物で確認する**。
+MV3 はリモートコード自体が不可だが、**宣言欄は存在する**（「不可だから欄がない」は誤り）。
+
+旧 UI の Yes/No で「いいえ」を選んでも、後から個人情報を処理すると判断されれば認定に失敗しうると
+公式が明記している。ブックマークや閲覧関連データを読む拡張は、いいえを選ぶ場合でもポリシー URL を併記する。
+
+出典: https://learn.microsoft.com/ja-jp/microsoft-edge/extensions/publish/publish-extension
+
+---
+
 ## 商標セーフな命名 (公開後の takedown 対策)
 
 審査通過後でも、商標権者の代理 (例: Microsoft 代理の Tracer `microsoft@tracer.ai`) が
@@ -182,7 +208,7 @@ export default defineConfig({
 
 ## Artifact Hygiene
 
-- ZIP の中身を列挙し、`src/`, `tests/`, `.github/`, `.vscode/`, `store-assets/`, `*.map`, log が入っていないことを確認する。
+- ZIP の中身を列挙し、`src/`, `tests/`, `.github/`, `.vscode/`, `store-assets/`, `*.map`, log が入っていないことを確認する。ロゴやタイルなどの掲載専用画像も同様で、**パッケージ内に置かない**。manifest が参照しないファイルを弾く readiness checker を使っている場合は、そこで落ちる。
 - `publish-extension` は `.env.submit` を自動読込する。OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可後に再実行する。
 - 再認可時の auth code や refresh token はチャットやログへ貼らず、ターミナルへ直接入力する。更新後は secret を表示せず token exchange の成功だけ確認する。
 - `.env.submit` / `.env*` / token / client secret / auth code を grep や全文検索の対象にしない。存在確認、キー名確認、dry-run 成功、CWS API の `crxVersion` / `itemError` だけを証跡にする。
@@ -191,6 +217,7 @@ export default defineConfig({
 - 審査中、認証、権限、duplicate など外部状態で publish だけ止まる場合は、ZIP / SHA256 / version / commit / tag / upload の状態を分けて記録し、再開条件を明記する。
 - ブロッカー解消後の再開では、**最新タグの ZIP を rollup 提出**する。ブロック時点の古い ZIP を蘇生せず、間に積まれた patch をまとめて出す（実例: v0.1.11→v0.1.15 で 4 版分を一括公開）。
 - `publish-extension` が `400 "Publish condition not met: You may not edit or publish an item that is in review."` で失敗する場合は、前回の draft が審査キュー残留中。先に `?projection=DRAFT` で stuck している `crxVersion` を確認し、Dashboard UI から `more_vert` → 審査をキャンセル → 確認ダイアログで取り下げる。ステータスバッジが「公開済み」に戻り次第 `publish-extension` を再実行できる。
+- 同じ制限は UI 側にも出る。審査中は保存と提出の操作が無効化され、掲載情報を一切編集できない。解除条件は「審査完了」か「審査キャンセル」の 2 つだけ。ロケール追加や文言修正を提出直後にやる前提で計画しない。先に入れるか、次の update に回す。
 - publish 後の CWS API 確認は item endpoint に `?projection=DRAFT` を付ける。`crxVersion` が対象版で `itemError` が 0 件なら API 側の確認は通過扱いにし、`uploadState: NOT_FOUND` だけで失敗判定や再アップロードをしない。
 - API 応答が疎または stale な場合、最終ステータスは Chrome Web Store Developer Dashboard で確認する。
 
