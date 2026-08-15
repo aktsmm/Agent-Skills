@@ -58,7 +58,7 @@ If the resolved tier is unavailable or rejected, use the documented fallback in 
 
 ### Deterministic Gate Audit
 
-Run deterministic checks first; they remain the PASS/FAIL source of truth. Add a `quick` critic audit when a checker is new or changed, returns an unexpected zero or count swing, or its result will drive a mutation or release. Give the critic the check command, bounded input and output, and ask only about input scope, assumptions, exceptions, and a plausible false positive or false negative. The critic raises a concern; it does not override the checker without reproducible evidence.
+Run deterministic checks first; they remain the PASS/FAIL source of truth. Add a `quick` critic audit when a checker is new or changed, returns an unexpected zero or count swing, or its result will drive a mutation or release. Give the critic the check command with its bounded input and output as text to reason about — it does not run them — and ask only about input scope, assumptions, exceptions, and a plausible false positive or false negative. The critic raises a concern; it does not override the checker without reproducible evidence.
 
 ### 5. Report
 
@@ -70,7 +70,7 @@ Never block the loop on model choice. If the user gave no model instruction, res
 
 ## Context Independence
 
-Model diversity is only one axis of independence. The other is instruction independence: the critic must not inherit the producer's custom agent instructions, `AGENTS.md`, or full system prompt. Native Rubber Duck enforces this by running without the producer's custom agent instructions; reproduce it in other harnesses by handing the critic only the artifact, goal, constraints, and evidence. A critic that shares both the producer's model family and its project instructions stops being a second opinion at all. See `references/critic-packets.md` for what to include in the handoff.
+Model diversity is only one axis of independence. The other is instruction independence: a critic that shares both the producer's model family and its project instructions has stopped being a second opinion at all. Hand it only the artifact, goal, constraints, and evidence. See [critic packets](./critic-packets.md) for what that packet contains, and [harness adapters](./harness-adapters.md) for how much isolation each harness actually delivers — withholding instructions is not the same as the critic never seeing any.
 
 ## Reviewer Depth
 

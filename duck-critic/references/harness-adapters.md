@@ -60,6 +60,12 @@ Proceed only when the rejection actually returns a list. If it does not, or the 
 
 Subagent choice is separate from model choice. A read-only exploration subagent cannot write files, so ask that kind of critic to return its findings in its reply rather than to a review file.
 
+### What a subagent still inherits
+
+A `runSubagent` critic does not see the producer's conversation, but it is not a clean room: user- and workspace-level instruction files still apply to it. The visible tell is a critic answering in the language a user instruction file mandates when the packet never asked for it.
+
+Treat the isolation as conversation isolation only. Anything that must bind the critic belongs in the packet, and anything the producer's own instruction files push toward is a bias the critic may quietly share — which is the blind spot a different model family was chosen to avoid.
+
 ## Claude Code
 
 Claude Code supports Agent Skills and has additional fields such as `context: fork`, `agent`, `model`, and `effort`.

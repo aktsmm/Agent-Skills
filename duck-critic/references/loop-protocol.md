@@ -43,7 +43,25 @@ Check these in order after each round:
 2. **PASS_WITH_NOTES** — no blocking findings remain, but the critic left non-blocking findings or suggestions. You may only stop here after the producer **explicitly** decides to accept and defer those notes. Record which notes were accepted and why they are safe to defer. Do not report a plain PASS when accepted notes remain.
    - Optionally, the producer may apply _cheap, low-risk_ notes (typos, wording, obvious omissions) in a **single pass** before stopping, and then report a plain PASS. Do **not** send that single-pass fix back for re-critique — applying cheap notes must not restart the loop.
    - Notes that need judgment or trade-offs (design preference, alternative approaches) are not auto-applied. The producer keeps deciding; defer and record them. Never let "fixing every note" hand control back to the critic.
-3. **Max-rounds fail-safe** — if the loop reaches **3 rounds** without reaching PASS or an accepted PASS_WITH_NOTES, stop anyway and report the remaining blocking findings. This is only a guard against an endless revise/re-critique loop; it is not a target round count. Most loops should stop well before this.
+3. **Max-rounds fail-safe** — if the loop reaches **3 rounds** without reaching PASS or an accepted PASS*WITH_NOTES, stop anyway and report the remaining blocking findings, \_unless the loop is converging* as defined below. This is only a guard against an endless revise/re-critique loop; it is not a target round count. Most loops should stop well before this.
+4. **BLOCKED** — the critic could not evaluate at all: it never got the artifact, the harness could not select a model, or every dispatch came back unusable. Stop and report what is missing. This is not a PASS.
+
+Each stop condition names a verdict, and the report uses that name: conditions 1 and 2 give `PASS` and `PASS_WITH_NOTES`, the max-rounds fail-safe with blocking findings still open gives `NEEDS_CHANGES`, and condition 4 gives `BLOCKED`. See [output format](./output-format.md) for the verdict definitions.
+
+A loop is **converging** when both hold at the round that would otherwise trigger the fail-safe:
+
+- the blocking count strictly decreased from the previous round, and
+- every still-open blocking finding is new — surfaced by the producer's own last revision — rather than one that was already addressed and came back.
+
+A converging loop may take one more round at a time, to a hard cap of **5 rounds**. Anything else is oscillation: a count that held steady or grew, or the same finding returning, stops at 3.
+
+Record the blocking count for every round in the final report, so continuing past 3 is auditable rather than a matter of taste. The extension exists for the case where stopping would knowingly leave a blocking defect in the artifact; it is never a licence to keep polishing. When a fix for a blocking finding is itself capable of creating one — anything touching persistence, rollback, or partial-failure recovery — expect the next round to find it, and budget for that instead of treating the third round as the finish line.
+
+### An Unusable Round Is Not a Round
+
+A dispatch that comes back empty, truncated, off-topic, or lost inside the harness produced no blocking count. Silence is not `blocking: 0` — reading it that way removes the gate rather than passing it, and it looks identical to a clean review in the report.
+
+Discard the dispatch, do not count it toward the fail-safe, and retry once. If the retry is also unusable, fall back per [model lanes](./model-lanes.md); if that fails too, stop the checkpoint as `BLOCKED`. Report how many dispatches were discarded, because a checkpoint that shows one clean round while three came back empty is not the same checkpoint.
 
 The native Rubber Duck has no fixed round count — it consults by judgment at checkpoints. The max-rounds fail-safe exists only because this loop is driven explicitly and could otherwise oscillate. Prefer the result-based stop (PASS) over the count-based one.
 
@@ -51,11 +69,13 @@ Out-of-scope deferred items are not part of `PASS_WITH_NOTES`. They carry no ver
 
 ## When the Loop Does Not Converge
 
-If round 3 still has blocking findings, or the critic keeps raising new blocking issues each round:
+If the round-3 check shows oscillation, or the hard cap is reached with blocking findings still open:
 
 - Stop the loop. Do not silently keep iterating.
-- Report the unresolved blocking findings, what was tried, and the producer's current best artifact.
+- Report the unresolved blocking findings, the per-round blocking counts, what was tried, and the producer's current best artifact.
 - Surface the disagreement to the user with a concrete recommendation, rather than forcing a low-confidence change just to clear the critic.
+
+A loop whose blocking count refuses to fall while new findings keep landing in the same risk class is telling you the design is unsound in that area, not that the critic is noisy. Say that in the report instead of reclassifying findings downward until a stop condition is reached.
 
 ## Multiple Lanes
 
