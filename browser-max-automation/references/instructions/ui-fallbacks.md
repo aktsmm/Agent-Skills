@@ -35,6 +35,14 @@ Playwright's actionability check can never settle when the browser window is bac
 
 Fall back to a JS click on the resolved node (`el.click()` on the submit button, or submit the form) instead of retrying the same call. Two consecutive timeouts on the same target mean the route is wrong, not the selector. Some widgets only accept trusted input events and ignore a JS click, so verify the resulting state change rather than the call returning.
 
+## Radio and checkbox groups that ignore a click
+
+In component frameworks with obfuscated class names, `.click()` on the `<input>` and on its `label[for=<id>]` can both be silent no-ops while a click on the parent control works. Try parent click and synthesized `mousedown`/`mouseup`/`click` as later attempts, and read `input.checked` back: the call returning tells you nothing about which attempt won.
+
+A read-back only proves transient UI state. Re-verify after the form's own save and reload before treating the value as submitted.
+
+Never assume a radio group starts empty. A group can arrive with a non-default option pre-selected, so read the whole group's state before deciding whether you need to change anything.
+
 ## Hiding sensitive UI before a capture
 
 When a selector suppresses something that must not appear in a published image (account avatar, notification badge, tenant name), a zero-match must be an error. Helpers that loop over `querySelectorAll` and hide each hit succeed silently on zero elements, so a renamed class ships the very thing you meant to remove. Return the match count and fail the run when it is 0. Split the selectors into must-hide and optional so localization or A/B variants that legitimately lack an element do not fail every run.
@@ -56,6 +64,7 @@ Prefer `visibility: hidden` over `display: none` so the surrounding layout does 
 `gh codespace` subcommands need the `codespace` scope. On a `gh` OAuth login, `gh auth refresh -h github.com -s codespace` adds it, but that opens a browser authorization and widens the saved authorization, so ask the user before running it. A PAT login needs the scope on the token instead. HTTP 403 "Must have admin rights to Repository" is one symptom of the missing scope, not proof of it.
 
 ## evaluate + fetch
+
 When a logged-in session exposes a REST API, prefer `page.evaluate(() => fetch(...))` for bulk read/write. It avoids navigation instability and uses existing cookies with `credentials: 'same-origin'`.
 
 Rules:

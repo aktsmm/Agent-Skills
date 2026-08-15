@@ -104,6 +104,14 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 | 誤解を招く説明           | 正確な機能説明に修正             |
 | 低品質のUI               | UIを改善                         |
 
+### Dashboard の既定値の罠
+
+- Privacy タブの **remote code ラジオが 「使用している」側に選択済みで到着することがある**。
+  remote code を持たない拡張でも、触らずに submit すると事実と逆の申告になる。
+  意図した値を明示的に選び直し、保存後に読み戻して検証する。他のラジオ群も同様に空とは限らない。
+- 「送信できない理由」系のバナーは、必須項目をすべて埋めた後も残り、ダイアログ本文が空のことがある。
+  実障害と断定する前に一度 draft を保存し直し、それでも残るかで判定する。
+
 ---
 
 ## 商標セーフな命名 (公開後の takedown 対策)
@@ -133,6 +141,13 @@ Google 経由で商標侵害を申し立てると、7 日以内に是正しな�
 - ただし **UI 部品ごとに動作が違う**: Store icon (128×128) は `input[type=file]` への直接
   `set_input_files` が通る。Screenshots だけ drop zone + file chooser 必須。アップロード後は
   必ず thumbnail / preview の有無で反映を検証する (`SCREENS_AFTER_UP` が増えない＝失敗)。
+- 上記は selector ベースの `set_input_files` を使った場合の話。**raw CDP の `DOM.setFileInputFiles`**
+  （`Runtime.evaluate` で Element を `returnByValue: false` で取り、`objectId` → `DOM.requestNode`）
+  では、shadow DOM 内の input に対して icon も screenshots も送れ、保存後も残った実例がある。
+  どちらも確実とは言えないので代替経路として扱い、経路に関係なく「保存後の thumbnail 数」で検証する。
+- Screenshots は `24 ビット PNG（アルファなし）` が要件。生成ごとに PNG の IHDR
+  （bit depth 8 / colour type 2 = RGB、2 以外の 6 = RGBA）を検査し、RGBA なら変換する。
+  不透明なページを `Page.captureScreenshot` した場合は RGB になった実例があるが、常にそうとは限らない。
 - hover overlay を出すときは sticky header が pointer を奪う。`scroll_into_view_if_needed` と
   `window.scrollBy` で対象を viewport 中央 ~300px 下へ移動し、座標ベースの
   `page.mouse.move(cx, cy)` で hover してから click すると安定する。

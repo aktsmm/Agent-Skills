@@ -161,6 +161,8 @@ text = cdp(ws, 'Runtime.evaluate', {
 
 For editors that hide `input[type=file]` behind custom buttons, raw CDP can upload without Playwright `connect_over_cdp()` or a visible file chooser.
 
+When picking the right input needs logic a CSS selector cannot express ("the file input whose surrounding text mentions this label", one of several look-alike slots), skip `DOM.querySelector` and go through a JS handle instead: `DOM.enable` first, evaluate an expression that returns the `Element` itself with `returnByValue: false`, then pass the returned `objectId` to `DOM.requestNode` and use the resulting `nodeId` with `DOM.setFileInputFiles`. The expression must return the element, not an array or a wrapper. This also reaches inputs found by a recursive `shadowRoot` walk.
+
 ```python
 cdp(ws, 'DOM.enable')
 cdp(ws, 'Runtime.enable')
@@ -338,3 +340,4 @@ if sys.stderr.encoding and sys.stderr.encoding.lower() != 'utf-8':
 | `UnicodeEncodeError: cp932`                 | Windows default console encoding           | Set `chcp 65001`, `PYTHONIOENCODING`, and stdout/stderr encoding |
 | CDP connects to wrong tab (e.g. `sw.js`)   | SPA registers service worker tabs          | Filter `/json` results: exclude `sw.js` URLs and `type !== "page"` tabs. Pass verified `webSocketDebuggerUrl` or filter in helper |
 | Date-click or `select_date` fails silently  | SPA updated CSS classes for date buttons   | Do not rely on fixed CSS class selectors (e.g. `.carousel-date-btn`). Match buttons by visible `innerText` with day number + weekday pattern instead |
+| `SyntaxError: Identifier '<x>' has already been declared` on the 2nd evaluate | Repeated `Runtime.evaluate` share one live execution context | Wrap any multi-statement snippet that declares top-level `const` / `let` in an IIFE |
