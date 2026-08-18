@@ -134,9 +134,15 @@ python scripts/search_skills.py --add-source https://github.com/owner/repo
 | `awesome-list` | Curated   | キュレーションリスト       |
 | `community`    | Community | コミュニティ製（自己責任） |
 
+Source policy:
+
+- Install skill sources over HTTPS from `github.com`, `raw.githubusercontent.com`, or `gist.github.com` by default. Any other host needs explicit user approval scoped to the current session.
+- Before install, show the source URL, host, and the tools and network access the fetched `SKILL.md` requires, then wait for explicit approval.
+
 ## Done Criteria
 
 - [ ] Skill vs non-skill fit checked first
 - [ ] Search query returns results
+- [ ] Tool and network requirements surfaced before install
 - [ ] Skill installed to local directory (if requested)
 - [ ] Index updated successfully (if requested)

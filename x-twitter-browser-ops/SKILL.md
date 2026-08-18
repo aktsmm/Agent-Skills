@@ -32,6 +32,7 @@ Use this skill for all X/Twitter browser operations: browsing and analysis, foll
 4. If screenshots or HTML outputs include notification badges, DMs, private handles, or unrelated personal data, mask or omit them.
 5. For any outward-facing or relationship-changing action—post, reply, like, repost, DM, follow/unfollow, block, mute, or list edit—show the exact action and obtain explicit confirmation immediately before execution.
 6. Bookmark folder creation, renaming, deletion, and assignment are permitted after the user explicitly approves the organization plan.
+7. Before any write or relationship-changing action, verify the acting account identity from the account switcher or profile UI and confirm it matches the intended account for this task.
 
 ## Bookmark Management
 
@@ -57,6 +58,8 @@ Use URL path, not translated UI tab labels, to avoid tab mix-ups:
 
 For mutual analysis, collect from `/followers_you_follow` when available, or use `relationship_perspectives.following === true` and `relationship_perspectives.followed_by === true` from follower responses.
 
+X changes DOM structure and GraphQL response shapes without notice. Re-verify these paths and field names against the live page instead of relying on remembered selectors.
+
 ## Collection Workflow
 
 1. Open the profile and confirm the target handle and visible counts.
@@ -64,7 +67,8 @@ For mutual analysis, collect from `/followers_you_follow` when available, or use
 3. Attach browser response observers for GraphQL list responses; parse user objects from responses rather than relying only on visible text.
 4. Scroll slowly in small batches. Suggested baseline: 4-5 scrolls per batch, 4-9 seconds between scrolls, and pause 30-60 seconds after large batches.
 5. If HTTP 429, repeated 403, forced redirects, login prompts, or unusual challenge pages appear, stop collection and report partial results instead of pushing harder.
-6. Deduplicate by `rest_id` / user ID. Keep `screen_name`, `name`, `followers_count`, `url`, and relationship flags.
+6. If stopping early, record a resume checkpoint: last collected `rest_id`, canonical URL of the last processed post, and total collected count.
+7. Deduplicate by `rest_id` / user ID. Keep `screen_name`, `name`, `followers_count`, `url`, and relationship flags.
 
 ## Verified / Non-Verified Split
 
@@ -86,9 +90,11 @@ For mutual analysis, collect from `/followers_you_follow` when available, or use
 
 Before final delivery, check:
 
+- Acting account verified before mutation.
 - Target handle and source paths used.
 - Collected counts for all mutual, verified mutual, and non-verified mutual.
 - Duplicate user IDs removed.
+- Partial-stop output includes the resume checkpoint.
 - Top rows are sorted by follower count descending.
 - CSV/Markdown/HTML files open and contain the expected row counts.
 - For HTML: `JSON.parse` succeeds, stats are not `-`, card/table DOM rows render, and browser console/page errors are zero.
