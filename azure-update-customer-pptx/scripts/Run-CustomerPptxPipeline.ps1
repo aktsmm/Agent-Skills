@@ -16,7 +16,12 @@ param(
     [string]$DateFolder,
 
     [switch]$SkipBuild,
-    [switch]$SkipEnrich
+    [switch]$SkipEnrich,
+
+    [ValidateSet("", "com", "python")]
+    [string]$Engine = "",
+
+    [switch]$NoOpen
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,9 +37,65 @@ $dateString = Split-Path $DateFolder -Leaf
 $outputFileName = $config.output.fileNamePattern -replace '\{year\}', $config.output.year -replace '\{date\}', $dateString
 $outputPath = "$DateFolder\$outputFileName"
 $manifestFolder = "$DateFolder\manifest"
+$logsFolder = "$DateFolder\logs"
+$statusPath = "$manifestFolder\verify_status.json"
+$runId = [guid]::NewGuid().ToString()
+$selectedEngine = if ($Engine) { $Engine } elseif ($config.build -and $config.build.engine) { [string]$config.build.engine } else { "com" }
+$effectiveSkipEnrich = [bool]$SkipEnrich -or $selectedEngine -eq "python"
+$resultKey = [System.IO.Path]::GetRelativePath($basePath, $outputPath).Normalize([Text.NormalizationForm]::FormC).ToLowerInvariant()
+
+New-Item -ItemType Directory -Force -Path $manifestFolder, $logsFolder | Out-Null
+
+function Get-FileSha256OrEmpty {
+    param([string]$Path)
+    if (-not (Test-Path -LiteralPath $Path)) { return "" }
+    return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+}
+
+function Write-PipelineStatus {
+    param(
+        [string]$State,
+        [string]$Phase,
+        [bool]$Passed,
+        [string]$ErrorSummary = "",
+        [int]$VerifyExitCode = -1,
+        [string]$VerifyLogPath = ""
+    )
+    $document = [ordered]@{ schemaVersion = 2; aggregatePassed = $false; results = [ordered]@{} }
+    if (Test-Path -LiteralPath $statusPath) {
+        try {
+            $existing = Get-Content -LiteralPath $statusPath -Raw -Encoding UTF8 | ConvertFrom-Json -AsHashtable
+            if ($existing.schemaVersion -eq 2 -and $existing.results) { $document = $existing }
+        } catch {}
+    }
+    $document.results[$resultKey] = [ordered]@{
+        runId = $runId
+        state = $State
+        phase = $Phase
+        requestedEngine = $selectedEngine
+        actualEngine = $selectedEngine
+        engineVersion = if ($selectedEngine -eq "python") { "1.0.0" } else { "legacy-com" }
+        templateContractVersion = if ($config.build -and $config.build.templateContractVersion) { [int]$config.build.templateContractVersion } else { 1 }
+        passed = $Passed
+        pptxPath = $outputPath
+        outputHash = Get-FileSha256OrEmpty -Path $outputPath
+        generatedAt = (Get-Date).ToString("o")
+        verifyExitCode = $VerifyExitCode
+        verifyLogPath = $VerifyLogPath
+        error = $ErrorSummary
+        skippedBuild = [bool]$SkipBuild
+        skippedEnrich = $effectiveSkipEnrich
+    }
+    $document.aggregatePassed = @($document.results.Values | Where-Object { -not $_.passed }).Count -eq 0
+    $temporaryStatus = "$statusPath.$runId.tmp"
+    $document | ConvertTo-Json -Depth 8 | Out-File $temporaryStatus -Encoding UTF8
+    Move-Item -LiteralPath $temporaryStatus -Destination $statusPath -Force
+}
 
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 $ppt = $null
+$currentPhase = "preflight"
+Write-PipelineStatus -State "started" -Phase $currentPhase -Passed $false
 
 # 対象 PPTX が PowerPoint で開いたままだと、COM 上書きとクラウド同期の自動保存が競合し、
 # 競合マージで Weekly スライドの二重化やセクション消失を起こす。開いていれば保存せず閉じる。
@@ -51,20 +112,34 @@ if ($existingApp) {
 }
 
 try {
-    $ppt = New-PptxSession
-
     if (-not $SkipBuild) {
+        $currentPhase = "build"
+        Write-PipelineStatus -State "started" -Phase $currentPhase -Passed $false
         Write-StepHeader "Build"
-        & "$PSScriptRoot\Build-CustomerPptx.ps1" -DateFolder $DateFolder -Session $ppt -ClosePresentation
-        if (-not $?) { throw "Build-CustomerPptx.ps1 failed" }
+        if ($selectedEngine -eq "python") {
+            & "$PSScriptRoot\Invoke-PythonPptxBuild.ps1" -DateFolder $DateFolder -WorkspaceRoot $basePath -OutputPath $outputPath -RunId $runId
+            if ($LASTEXITCODE -ne 0) { throw "Python PPTX build failed with exit code $LASTEXITCODE" }
+        } else {
+            $ppt = New-PptxSession
+            & "$PSScriptRoot\Build-CustomerPptx.ps1" -DateFolder $DateFolder -Session $ppt -ClosePresentation
+            if (-not $?) { throw "Build-CustomerPptx.ps1 failed" }
+        }
     }
 
-    if (-not $SkipEnrich) {
+    if (-not $effectiveSkipEnrich) {
+        $currentPhase = "enrich"
+        Write-PipelineStatus -State "started" -Phase $currentPhase -Passed $false
         Write-StepHeader "Enrich"
+        if (-not $ppt) { $ppt = New-PptxSession }
         & "$PSScriptRoot\Enrich-CustomerPptx.ps1" -DateFolder $DateFolder -Session $ppt -ClosePresentation
         if (-not $?) { throw "Enrich-CustomerPptx.ps1 failed" }
     }
+    elseif ($selectedEngine -eq "python" -and -not $SkipEnrich) {
+        Write-Info "Python engine already renders Enrich content; COM Enrich was skipped."
+    }
 
+    $currentPhase = "verify"
+    Write-PipelineStatus -State "started" -Phase $currentPhase -Passed $false
     Write-StepHeader "Verify"
     # このスクリプトが作成した COM セッションなので、検証前に終了して空の PowerPoint を残さない。
     if ($ppt) {
@@ -72,27 +147,17 @@ try {
         [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
         $ppt = $null
     }
-    $verifyLogPath = "$DateFolder\pipeline-verify.log"
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\Verify-Pptx.ps1" -PptxPath $outputPath *> $verifyLogPath
+    $verifyLogPath = "$logsFolder\verify-$runId.log"
+    $verifyResultPath = "$logsFolder\verify-$runId.json"
+    & "$PSScriptRoot\Invoke-PptxVerify.ps1" -PptxPath $outputPath -RunId $runId -ResultPath $verifyResultPath -LogPath $verifyLogPath | Out-Null
     $verifyExitCode = $LASTEXITCODE
 
-    $status = @{
-        generatedAt = (Get-Date).ToString("s")
-        script = "Run-CustomerPptxPipeline.ps1"
-        pptxPath = $outputPath
-        passed = ($verifyExitCode -eq 0)
-        verifyExitCode = $verifyExitCode
-        verifyLogPath = $verifyLogPath
-        elapsedSeconds = [Math]::Round($stopwatch.Elapsed.TotalSeconds, 1)
-        skippedBuild = [bool]$SkipBuild
-        skippedEnrich = [bool]$SkipEnrich
-    }
-    $status | ConvertTo-Json -Depth 4 | Out-File "$manifestFolder\verify_status.json" -Encoding UTF8
-
     if ($verifyExitCode -ne 0) { throw "Verify-Pptx.ps1 failed" }
+    Write-PipelineStatus -State "passed" -Phase "complete" -Passed $true -VerifyExitCode $verifyExitCode -VerifyLogPath $verifyLogPath
     $elapsedSeconds = [Math]::Round($stopwatch.Elapsed.TotalSeconds, 1)
     Write-Success "Pipeline 完了 ($elapsedSeconds 秒)"
 } catch {
+    Write-PipelineStatus -State $(if ($currentPhase -eq "verify") { "verify-failed" } else { "build-failed" }) -Phase $currentPhase -Passed $false -ErrorSummary $_.Exception.Message
     Write-Failure "Pipeline エラー: $_"
     exit 1
 } finally {
@@ -104,6 +169,12 @@ try {
     [System.GC]::WaitForPendingFinalizers()
 }
 
-# 完了後に PowerPoint で開く（ユーザー確認用）
-Start-Process $outputPath
+# 完了後は canonical ではなくローカル snapshot を開く（自動化/parityでは -NoOpen）
+if (-not $NoOpen) {
+    $reviewDirectory = Join-Path ([System.IO.Path]::GetTempPath()) "azure-update-review"
+    New-Item -ItemType Directory -Force -Path $reviewDirectory | Out-Null
+    $reviewPath = Join-Path $reviewDirectory ("$([System.IO.Path]::GetFileNameWithoutExtension($outputPath))-review-$runId.pptx")
+    Copy-Item -LiteralPath $outputPath -Destination $reviewPath -Force
+    Start-Process $reviewPath
+}
 exit 0

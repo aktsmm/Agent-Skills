@@ -125,22 +125,8 @@ $ppt.Quit()
 [System.GC]::Collect()
 [System.GC]::WaitForPendingFinalizers()
 
-$verifyLogPath = "$DateFolder\fix-labels-verify.log"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\Verify-Pptx.ps1" -PptxPath $outputPath *> $verifyLogPath
-$verifyExitCode = $LASTEXITCODE
-
-$status = @{
-    generatedAt = (Get-Date).ToString("s")
-    script = "Fix-Labels.ps1"
-    pptxPath = $outputPath
-    passed = ($verifyExitCode -eq 0)
-    verifyExitCode = $verifyExitCode
-    verifyLogPath = $verifyLogPath
-    elapsedSeconds = [Math]::Round($stopwatch.Elapsed.TotalSeconds, 1)
-}
-$status | ConvertTo-Json -Depth 4 | Out-File "$manifestFolder\verify_status.json" -Encoding UTF8
-
-if ($verifyExitCode -ne 0) {
+& "$PSScriptRoot\Run-CustomerPptxPipeline.ps1" -DateFolder $DateFolder -SkipBuild -SkipEnrich -NoOpen
+if ($LASTEXITCODE -ne 0) {
     Write-Warning "ノートやリージョンスタンプの欠落修復には Fix-Labels ではなく Run-CustomerPptxPipeline.ps1 -SkipBuild または Enrich-CustomerPptx.ps1 を使用してください。"
     exit 1
 }

@@ -14,6 +14,10 @@ MCP fetch and research are agent-mediated. PowerShell scripts consume JSON and d
 
 If `fetched-updates.json` is missing, do not start raw PowerShell build. Fetch through the MCP path first.
 
+`verify_status.json` schema v2 owns one NFC-normalized workspace-relative output key per deck under
+`results`. Writers must preserve other entries. Each result records `runId`, state, requested/actual engine,
+contract versions, output hash, verifier exit code, and error state; readers must match both path and hash.
+
 ## Per-Item Reference Rules
 
 Each `fetched-updates.json` item should carry both reference layers when possible:

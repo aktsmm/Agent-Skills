@@ -3,6 +3,7 @@
 - Design the customer template in PowerPoint first. Automation should inspect and enforce the contract; it should not be the primary design tool for a blank customer template.
 - Store the runtime template in workspace `template/`.
 - Set `.config/config.json` `template.folder` and `template.fileName` to the runtime template.
+- Python v1 requires `assets/template-contract.v1.json`; contract role predicates must resolve exactly one supported prototype for each required role before output mutation.
 - Neutral templates may use placeholders such as `{{CUSTOMER}}`, `{{SYSTEM}}`, and `{{DATE}}`.
 - The template must support the configured slide size and expected section order.
 - Customer branding belongs in the workspace template, not in skill references.

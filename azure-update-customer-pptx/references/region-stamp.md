@@ -58,6 +58,11 @@ regions are listed (e.g. East US 2, Sweden Central), judge by those.
 4. GA with no region limit → **グローバル**.
 5. Unknown → **日本リージョン未対応** (default).
 
+An explicit unsupported-region list is complete negative evidence: when Microsoft Learn says the feature
+is unavailable in the listed regions (for example, `RegionNotEnabledForFeature`) and Japan East / West are
+not listed, treat those Japan regions as supported. Do not downgrade the feature to unknown merely because
+the page uses an exclusion list instead of a supported-region list.
+
 > ⚠️ Always go through Review-agent MCP verification. Never ship Prepare's initial judgement as-is.
 
 ## region_info.json (Prepare initial output)

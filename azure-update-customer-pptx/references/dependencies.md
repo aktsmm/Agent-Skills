@@ -16,6 +16,15 @@ General PPTX engineering. Use it for the underlying COM / python-pptx mechanics 
 This skill's scripts already implement the Azure-Update-specific COM operations; when you need to debug
 COM behavior, autofit, or hyperlink mechanics generally, defer to `powerpoint-automation`.
 
+## Python build engine
+
+The optional Python build phase uses `python-pptx` and Pillow from the checked-in
+`scripts/python/requirements.lock`. It requires an existing workspace `.venv`; skill scripts never install
+or mutate global packages. PowerPoint remains required for PDF export, rendering, and final delivery gates.
+Python-engine customer distribution additionally uses pinned `pypdf` to extract the actual PDF text; it is
+not a build dependency, but the distribution gate fails closed when it is unavailable.
+Pipeline and verifier wrappers require PowerShell 7 (`pwsh`); Windows PowerShell 5.1 is not supported.
+
 ## agentic-workflow-guide skill
 
 The SSOT for primitive selection (prompt vs instruction vs skill vs agent vs hook) and multi-agent

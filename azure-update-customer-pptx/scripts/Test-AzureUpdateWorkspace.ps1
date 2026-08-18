@@ -77,6 +77,9 @@ if ($config -and $config.template) {
     Add-Check "template exists" (Test-Path -LiteralPath $templatePath) "Error" $templatePath
 }
 
+$selectedEngine = if ($config -and $config.build -and $config.build.engine) { [string]$config.build.engine } else { "com" }
+Add-Check "build engine valid" ($selectedEngine -in @("com", "python")) "Error" "Selected engine: $selectedEngine"
+
 $requiredScripts = @(
     "Build-CustomerPptx.ps1",
     "Enrich-CustomerPptx.ps1",
@@ -90,6 +93,20 @@ $requiredScripts = @(
 foreach ($scriptName in $requiredScripts) {
     $scriptPath = Join-Path $targetRootPath "scripts\$scriptName"
     Add-Check "scripts\$scriptName exists" (Test-Path -LiteralPath $scriptPath) "Error" $scriptPath
+}
+
+$pythonBuilderPath = Join-Path $targetRootPath "scripts\python\build_customer_pptx.py"
+$pythonLockPath = Join-Path $targetRootPath "scripts\python\requirements.lock"
+$pythonContractPath = Join-Path $targetRootPath "scripts\python\template-contract.v1.json"
+$pythonStylePath = Join-Path $targetRootPath "scripts\python\render-style.v1.json"
+$pythonSeverity = if ($selectedEngine -eq "python") { "Error" } else { "Warning" }
+Add-Check "Python builder exists" (Test-Path -LiteralPath $pythonBuilderPath) $pythonSeverity $pythonBuilderPath
+Add-Check "Python dependency lock exists" (Test-Path -LiteralPath $pythonLockPath) $pythonSeverity $pythonLockPath
+Add-Check "Python template contract exists" (Test-Path -LiteralPath $pythonContractPath) $pythonSeverity $pythonContractPath
+Add-Check "Python render style exists" (Test-Path -LiteralPath $pythonStylePath) $pythonSeverity $pythonStylePath
+if ($selectedEngine -eq "python") {
+    $pythonExecutable = if ($env:AZURE_UPDATE_PYTHON) { $env:AZURE_UPDATE_PYTHON } else { Join-Path $targetRootPath ".venv\Scripts\python.exe" }
+    Add-Check "workspace Python exists" (Test-Path -LiteralPath $pythonExecutable) "Error" "Create with uv venv; dependencies are never installed automatically"
 }
 
 $markerPath = Join-Path $targetRootPath ".azure-update-workspace.json"

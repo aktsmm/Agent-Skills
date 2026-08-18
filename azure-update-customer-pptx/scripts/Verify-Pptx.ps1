@@ -568,12 +568,13 @@ $classLabelMap = @{}
 if (Test-Path $classificationPath) {
     $classData = if ($classification) { $classification } else { Get-Content $classificationPath -Encoding UTF8 | ConvertFrom-Json }
     foreach ($w in $classData.weekly) {
-        $cleanKey = ($w.title -replace "^【[^】]+】\s*", "").Trim()
-        # スマートクォート/ダブルクォートを正規化
-        $cleanKey = $cleanKey -replace '[\u201C\u201D\u201E\u201F\u0022]', '"'
-        # 先頭30文字をキーにする（部分一致用・衝突防止）
-        $prefix = $cleanKey.Substring(0, [Math]::Min(30, $cleanKey.Length)).ToLower()
-        $classLabelMap[$prefix] = "【$($w.label)】"
+        foreach ($candidateTitle in @($w.title, $w.titleJa)) {
+            if (-not $candidateTitle) { continue }
+            $cleanKey = Get-CleanSlideTitle -Title $candidateTitle
+            $cleanKey = $cleanKey -replace '[\u201C\u201D\u201E\u201F\u0022]', '"'
+            $prefix = $cleanKey.Substring(0, [Math]::Min(30, $cleanKey.Length)).ToLower()
+            $classLabelMap[$prefix] = "【$($w.label)】"
+        }
     }
 }
 
@@ -585,7 +586,7 @@ for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
     $label = "【更新】"
     # 🔴 classification.json があればそこからラベルを取得（最優先）
     if ($classLabelMap.Count -gt 0) {
-        $cleanT = ($title -replace "^【[^】]+】\s*", "").Trim()
+        $cleanT = Get-CleanSlideTitle -Title $title
         # スマートクォート/ダブルクォートを正規化
         $cleanT = $cleanT -replace '[\u201C\u201D\u201E\u201F\u0022]', '"'
         $tPrefix = $cleanT.Substring(0, [Math]::Min(30, $cleanT.Length)).ToLower()

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "colorEncoding": "#RRGGBB",
+  "font": {
+    "latin": "Meiryo UI",
+    "eastAsian": "Meiryo UI"
+  },
+  "regionStamp": {
+    "widthPt": 180,
+    "heightPt": 30,
+    "marginRightPt": 20,
+    "marginBottomPt": 20,
+    "fontSizePt": 14,
+    "fontBold": true,
+    "fontColor": "#FFFFFF",
+    "styles": {
+      "グローバル": { "text": "グローバル", "background": "#00B050" },
+      "日本リージョン未対応": {
+        "text": "日本リージョン未対応",
+        "background": "#005EB8"
+      },
+      "リージョン情報要確認": {
+        "text": "リージョン情報要確認",
+        "background": "#666666"
+      },
+      "Japan East のみ対応": {
+        "text": "Japan East のみ対応",
+        "background": "#0078D4"
+      },
+      "Japan West のみ対応": {
+        "text": "Japan West のみ対応",
+        "background": "#0078D4"
+      },
+      "Japan East / West 対応": {
+        "text": "Japan East / West 対応",
+        "background": "#00B0F0"
+      }
+    }
+  },
+  "statusBadge": {
+    "GA": "#107C10",
+    "Preview": "#0078D4",
+    "廃止": "#D13438"
+  }
+}

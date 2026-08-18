@@ -39,6 +39,7 @@ PowerPoint COM で編集完了後、最終検証を行い、対象ファイル�
 - [ ] 表紙（P1）の日付が正しいフォーマット（`YYYY/MM/DD(曜日)`）
 - [ ] ファイルサイズが妥当（1MB〜10MB 程度）
 - [ ] `scripts/Export-PptxToPdf.ps1` で同名 PDF を出力し、0 byte でないことを確認した
+- [ ] `scripts/Test-PptxDistribution.ps1` が exact PPTX/PDF pair で exit 0（Python engineはPDF本文抽出・顧客安全も必須）
 - [ ] 対象 PowerPoint ファイルが開かれていることを COM で確認した
 - [ ] 完了レポート（Weekly/Appendix 件数、ファイルパス）が出力された
 - [ ] 🔴 **exit code をそのまま報告**（偽装禁止）
@@ -67,8 +68,10 @@ PowerPoint COM で編集完了後、最終検証を行い、対象ファイル�
 
 `{日付フォルダ}/manifest/verify_status.json` が存在し、以下を満たす場合は重複検証をスキップしてよい:
 
-- `passed = true`
-- `pptxPath` が今回の出力ファイルと一致
+- `schemaVersion = 2`
+- `results` 内に `pptxPath` が今回の出力ファイルと一致する entry がちょうど1件ある
+- 該当entryの `state = passed` かつ `passed = true`
+- `outputHash` が現在のPPTX SHA-256と一致する
 - `generatedAt` が PPTX の最終更新時刻以降、または同一セッション内の Enrich/Run-CustomerPptxPipeline 直後
 
 スキップした場合も、報告には「verify_status.json により検証済み」と明記する。強制再検証が必要な場合は `Verify-Pptx.ps1` を実行する。
@@ -104,6 +107,16 @@ if ($LASTEXITCODE -ne 0) {
 ```
 
 PDF が存在し、0 byte でないことを確認する。PDF 出力後も PPTX を PowerPoint で開く。
+
+顧客配布の直前に distribution gate を実行する。Python engineでは `-Engine python -WorkspaceRoot <root>`
+を指定し、PDF本文抽出が非空かつ顧客固有語が表紙外にないことまで確認する。
+
+```powershell
+$engine = if ($config.build.engine) { $config.build.engine } else { 'com' }
+$pdfPath = [System.IO.Path]::ChangeExtension($outputPath, '.pdf')
+& "$BasePath\scripts\Test-PptxDistribution.ps1" -PptxPath $outputPath -PdfPath $pdfPath -Engine $engine -WorkspaceRoot $BasePath
+if ($LASTEXITCODE -ne 0) { return }
+```
 
 完成したファイルを PowerPoint で開く：
 

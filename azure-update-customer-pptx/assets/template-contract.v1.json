@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "azure-update-template-v1",
+  "slideSizeEmu": {
+    "width": 12192000,
+    "height": 6858000
+  },
+  "notesMasterRequired": true,
+  "roles": {
+    "cover": {
+      "layoutNameGlob": "Azure Update Cover*",
+      "requiredText": ["Azure New Topics", "{{CUSTOMER}}", "{{SYSTEM}}"]
+    },
+    "summary": {
+      "layoutName": "Azure Update Content",
+      "titleRegex": "Weekly\\s+(?:News|New)\\s+Topics|Summary|サマリ"
+    },
+    "updatePoints": {
+      "layoutName": "Azure Update Content",
+      "titleRegex": "UPDATE\\s*Points|UPDATE.*ポイント|今週の.*ポイント",
+      "requiredTableColumns": 5
+    },
+    "body": {
+      "layoutName": "Azure Update Body",
+      "requiredShapePrefixes": ["RegionStamp_"]
+    },
+    "ending": {
+      "layoutNameGlob": "Azure Update Ending*",
+      "titleFallbackRegex": "^Ending$|^End$|おわり|ご清聴|以上"
+    }
+  },
+  "sections": {
+    "order": [
+      "表紙",
+      "サマリ",
+      "Weekly New Topics",
+      "UPDATE Points",
+      "Appendix",
+      "Ending"
+    ]
+  },
+  "updatePoints": {
+    "columns": [
+      "#",
+      "キーワード",
+      "アップデート内容",
+      "キーポイント",
+      "リージョン対応状況"
+    ],
+    "maxRowsPerSlide": 10
+  },
+  "python": {
+    "maxTitleCharacters": 160,
+    "maxBodyCharacters": 520,
+    "requiresStaticPrototypeFit": true
+  }
+}

@@ -79,9 +79,19 @@ if (Test-Path -LiteralPath $templateSource) {
 }
 
 if ($UpdateScripts) {
-    Get-ChildItem -LiteralPath $sourceScripts -File | Where-Object { $_.Extension -in @(".ps1", ".psm1") } | ForEach-Object {
-        Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $targetRootPath "scripts\$($_.Name)") -Force
-        Write-Info "Updated scripts\$($_.Name)"
+    Get-ChildItem -LiteralPath $sourceScripts -File -Recurse | Where-Object { $_.Extension -in @(".ps1", ".psm1", ".py", ".json", ".lock") -and $_.FullName -notmatch '[\\/]__pycache__[\\/]' } | ForEach-Object {
+        $relativePath = $_.FullName.Substring($sourceScripts.Length).TrimStart('\')
+        $destination = Join-Path $targetRootPath "scripts\$relativePath"
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+        Copy-Item -LiteralPath $_.FullName -Destination $destination -Force
+        Write-Info "Updated scripts\$relativePath"
+    }
+    foreach ($assetName in @("template-contract.v1.json", "render-style.v1.json")) {
+        $assetSource = Join-Path $assetsRoot $assetName
+        $assetDestination = Join-Path $targetRootPath "scripts\python\$assetName"
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $assetDestination) | Out-Null
+        Copy-Item -LiteralPath $assetSource -Destination $assetDestination -Force
+        Write-Info "Updated scripts\python\$assetName"
     }
 } else {
     Write-Skip "Runtime scripts were not updated. Re-run with -UpdateScripts to refresh root scripts."
@@ -101,6 +111,7 @@ $marker = [ordered]@{
     version = $version
     generatedAt = (Get-Date).ToString("s")
     scriptsUpdated = [bool]$UpdateScripts
+    pythonEngineAvailable = [bool](Test-Path -LiteralPath (Join-Path $targetRootPath "scripts\python\build_customer_pptx.py"))
 }
 $marker | ConvertTo-Json -Depth 4 | Out-File (Join-Path $targetRootPath ".azure-update-workspace.json") -Encoding UTF8
 

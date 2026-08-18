@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "fixture": "contract-v1 neutral template with identical reviewed manifests",
+  "runsPerEngine": 5,
+  "coldRun": "report separately and exclude from warm median",
+  "warmStatistic": "median",
+  "powerPointProcessPolicy": "no pre-existing PowerPoint process; each full pipeline owns and closes its sessions",
+  "thresholds": {
+    "pythonBuildVsComBuildMaximumRatio": 0.35,
+    "pythonWholePipelineVsComWholePipelineMaximumRatio": 0.7
+  },
+  "defaultChangeRequiresSeparateApproval": true
+}

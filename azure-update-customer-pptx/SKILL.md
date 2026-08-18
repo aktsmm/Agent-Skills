@@ -41,6 +41,7 @@ This skill is a toolkit, not a standalone runner. It carries scripts, references
 - `.config/config.json`
 - `.config/customer-keywords.json`, `.config/customer-profile.md`, `.config/exclude-keywords.json`
 - `scripts/*.ps1` and `scripts/PptxCommon.psm1`
+- Python engine only: `scripts/python/build_customer_pptx.py`, dependency lock, template contract, and render style
 - `template/*.pptx`
 - `{MMDD}/manifest/` and `{MMDD}/logs/`
 
@@ -54,6 +55,9 @@ If any workspace contract file is missing, do not build. Run Bootstrap first, th
 4. **Fetch/Prepare**: date folder exists but manifests are missing or stale. Use Azure Updates MCP to write `fetched-updates.json`, then run `Prepare-CustomerPptx.ps1`.
 5. **Build/Re-apply**: manifests and template contract are ready. Run `Run-CustomerPptxPipeline.ps1` or `-SkipBuild` for manifest-only changes.
 6. **Repair**: Verify fails. Fix only the failed slice, then rerun the same gate.
+
+Build engine selection: missing `build.engine` means `com`. Use `python` only for contract-v1 templates;
+it fails closed and never silently falls back to COM. See [Python Build Engine](references/python-build-engine.md).
 
 ## MCP Boundary
 
@@ -166,5 +170,6 @@ Skill/runtime ownership and refresh rules are defined in [Dependencies](referenc
 - Visible reference labels and hyperlinks distinguish Microsoft Learn detail pages from Azure Updates announcements
 - The Ending slide says only a concise formal closure such as `以上` / `Azure アップデート情報`, and non-selected ending variants are hidden
 - `Verify-Pptx.ps1` exits `0`
+- Immediately before customer delivery, `Test-PptxDistribution.ps1` passes for the exact PPTX/PDF pair; Python-engine delivery also requires nonempty PDF text extraction and customer-safe body checks.
 - Quality review passes: no unresolved placeholders, duplicate honorifics, visible customer-specific terms outside cover/metadata, malformed bullets, weak notes, or Appendix visibility mismatch
 - Rubber-duck / critic review is completed or explicitly skipped with a reason for nontrivial customer-delivery decks
