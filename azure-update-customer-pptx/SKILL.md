@@ -64,7 +64,7 @@ it fails closed and never silently falls back to COM. See [Python Build Engine](
 - Scripts do not call MCP directly; Copilot / agent steps write MCP-sourced content to `{date}/manifest/*.json`.
 - PowerShell scripts consume manifest JSON and mutate PPTX deterministically. Adapt `assets/mcp.sample.json` to the host MCP server if needed.
 - For each Azure Updates item, store the announcement URL as `sourceUrl` and search Microsoft Learn / Docs MCP for the closest official service document. Put that URL in `learnUrl` when a relevant first-party page exists.
-- Slide-visible manifest fields must stay reusable and customer-neutral. Customer/system-specific impact belongs in `notes.json` or review notes, not in visible body fields such as `customerImpact`, `background`, `before`, `after`, `pricing`, or `keypoint`.
+- Slide-visible manifest fields, including `title` and `titleJa`, must stay reusable and customer-neutral. Customer/system-specific impact belongs in `notes.json` or review notes, not in visible body fields such as `customerImpact`, `background`, `before`, `after`, `pricing`, or `keypoint`.
 
 ## Previous Delivery Diff (必須)
 
@@ -108,6 +108,7 @@ After Bootstrap, ask for missing customer values before generating a deck: custo
 $d = "0704"
 New-Item -ItemType Directory -Force "$d\manifest", "$d\logs" | Out-Null
 # Agent step: write $d/manifest/fetched-updates.json from Azure Updates MCP
+# Agent step: add customer-neutral Japanese `titleJa` for every selected update before Prepare
 & ".\scripts\Prepare-CustomerPptx.ps1" -DateFolder ".\$d"
 # Agent steps: review region info and generate notes JSON
 & ".\scripts\Run-CustomerPptxPipeline.ps1" -DateFolder ".\$d"

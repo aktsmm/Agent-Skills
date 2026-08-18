@@ -114,8 +114,9 @@ the page uses an exclusion list instead of a supported-region list.
 ```
 
 Fields (all required): `japanEast` bool, `japanWest` bool, `status` (one canonical text below),
-`source` URL, `evidence` (concrete wording), `verified` bool. The region key must be the **byte-exact
-slide title** (join key). **Forbidden**: emoji (✅❌) in `status`, the deprecated `stamp` field.
+`source` URL, `evidence` (concrete wording), `verified` bool. The region key must be the **byte-exact raw
+Azure Updates `title`** (join key), not the optional Japanese display alias `titleJa`. **Forbidden**: emoji
+(✅❌) in `status`, the deprecated `stamp` field.
 
 Canonical `status` values: `グローバル` / `Japan East / West 対応` / `Japan East のみ対応` /
 `Japan West のみ対応` / `日本リージョン未対応`.

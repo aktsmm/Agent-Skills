@@ -1,5 +1,8 @@
 {
   "description": "Azure Update PowerPoint workspace configuration template",
+  "content": {
+    "requireTitleJa": true
+  },
   "build": {
     "engine": "com",
     "templateContractVersion": 1,

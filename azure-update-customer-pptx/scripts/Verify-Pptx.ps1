@@ -130,17 +130,7 @@ function Get-MatchingClassificationItem {
         [object[]]$Items
     )
 
-    $cleanTitle = (Get-CleanSlideTitle -Title $Title -replace '\s+', ' ').Trim().ToLower()
-    foreach ($item in @($Items)) {
-        $itemTitle = (Get-CleanSlideTitle -Title $item.title -replace '\s+', ' ').Trim().ToLower()
-        if ($cleanTitle -eq $itemTitle) { return $item }
-    }
-    foreach ($item in @($Items)) {
-        $itemTitle = (Get-CleanSlideTitle -Title $item.title -replace '\s+', ' ').Trim().ToLower()
-        $prefixLength = [Math]::Min(25, [Math]::Min($cleanTitle.Length, $itemTitle.Length))
-        if ($prefixLength -gt 0 -and $cleanTitle.Substring(0, $prefixLength) -eq $itemTitle.Substring(0, $prefixLength)) { return $item }
-    }
-    return $null
+    return Find-ClassificationItemBySlideTitle -SlideTitle $Title -Items $Items -PrefixLength 25
 }
 
 function Get-SlideText {
@@ -563,47 +553,28 @@ if ($sectionOrderOk) {
 # ========================================
 Write-Host "`n[検証6] スライド並び順（【廃止】→【GA】→【Preview】→【アナウンス/更新】）..." -ForegroundColor Yellow
 
-# classification.json からラベルマップを構築（キーワードフォールバックより信頼性が高い）
-$classLabelMap = @{}
-if (Test-Path $classificationPath) {
-    $classData = if ($classification) { $classification } else { Get-Content $classificationPath -Encoding UTF8 | ConvertFrom-Json }
-    foreach ($w in $classData.weekly) {
-        foreach ($candidateTitle in @($w.title, $w.titleJa)) {
-            if (-not $candidateTitle) { continue }
-            $cleanKey = Get-CleanSlideTitle -Title $candidateTitle
-            $cleanKey = $cleanKey -replace '[\u201C\u201D\u201E\u201F\u0022]', '"'
-            $prefix = $cleanKey.Substring(0, [Math]::Min(30, $cleanKey.Length)).ToLower()
-            $classLabelMap[$prefix] = "【$($w.label)】"
-        }
-    }
-}
-
 $slideOrder = @()
+$titleResolutionIssues = @()
 for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
     $slide = $pres.Slides.Item($i)
     $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
     
     $label = "【更新】"
-    # 🔴 classification.json があればそこからラベルを取得（最優先）
-    if ($classLabelMap.Count -gt 0) {
-        $cleanT = Get-CleanSlideTitle -Title $title
-        # スマートクォート/ダブルクォートを正規化
-        $cleanT = $cleanT -replace '[\u201C\u201D\u201E\u201F\u0022]', '"'
-        $tPrefix = $cleanT.Substring(0, [Math]::Min(30, $cleanT.Length)).ToLower()
-        if ($classLabelMap.ContainsKey($tPrefix)) {
-            $label = $classLabelMap[$tPrefix]
-        } else {
-            # フォールバック: 部分一致検索
-            foreach ($key in $classLabelMap.Keys) {
-                if ($cleanT.ToLower().Contains($key) -or $key.Contains($tPrefix.Substring(0, [Math]::Min(10, $tPrefix.Length)))) {
-                    $label = $classLabelMap[$key]
-                    break
-                }
+    # classification.json があれば原題/titleJaの一意解決を必須にする
+    if ($classification -and $classification.weekly) {
+        try {
+            $matchedItem = Get-MatchingClassificationItem -Title $title -Items @($classification.weekly)
+            if ($matchedItem) {
+                $label = "【$($matchedItem.label)】"
+            } else {
+                $titleResolutionIssues += "P${i}: classification item を解決できません ($title)"
             }
+        } catch {
+            $titleResolutionIssues += "P${i}: classification item の解決が曖昧です ($title): $($_.Exception.Message)"
         }
     }
-    # classification.json がない場合のフォールバック
-    if ($label -eq "【更新】" -and $classLabelMap.Count -eq 0) {
+    # classification.json がない場合のみタイトル語句でフォールバック
+    if ($label -eq "【更新】" -and (-not $classification -or -not $classification.weekly)) {
         # 🔴 【ラベル】形式を最優先でチェック（タイトル内の「利用可能」等に誤マッチしないよう）
         if ($title -match "^【廃止】") { $label = "【廃止】" }
         elseif ($title -match "^【GA】") { $label = "【GA】" }
@@ -618,6 +589,11 @@ for ($i = $WeeklyStartSlide; $i -le $weeklyEnd; $i++) {
     }
     
     $slideOrder += @{ Slide = $i; Label = $label; Title = $title }
+}
+
+foreach ($issue in $titleResolutionIssues) {
+    Write-Host "  ❌ $issue" -ForegroundColor Red
+    $errors += "タイトル照合: $issue"
 }
 
 # 優先順位マッピング
@@ -910,8 +886,16 @@ if ($classification -and $classification.weekly) {
         $slide = $pres.Slides.Item($i)
         if ($slide.SlideShowTransition.Hidden -eq -1) { continue }
         $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
-        $item = Get-MatchingClassificationItem -Title $title -Items @($classification.weekly)
-        if (-not $item) { continue }
+        try {
+            $item = Get-MatchingClassificationItem -Title $title -Items @($classification.weekly)
+        } catch {
+            $referenceIssues += "P${i}: classification item の解決が曖昧です ($title): $($_.Exception.Message)"
+            continue
+        }
+        if (-not $item) {
+            $referenceIssues += "P${i}: classification item を解決できません ($title)"
+            continue
+        }
 
         $slideText = Get-SlideText -Slide $slide
         if ($item.learnUrl -and $slideText -notmatch 'Microsoft Learn') {
@@ -1040,7 +1024,12 @@ if ($classification -and $classification.appendix) {
         if ($slide.SlideShowTransition.Hidden -eq -1) { continue }
         $title = try { $slide.Shapes.Title.TextFrame.TextRange.Text } catch { "" }
         if (-not $title) { continue }
-        $appendixItem = Get-MatchingClassificationItem -Title $title -Items @($classification.appendix)
+        try {
+            $appendixItem = Get-MatchingClassificationItem -Title $title -Items @($classification.appendix)
+        } catch {
+            $appendixIssues += "P${i}: Appendix classification item の解決が曖昧です ($title): $($_.Exception.Message)"
+            continue
+        }
         if ($appendixItem) { $appendixIssues += "P${i}: Appendix item が表示スライドに残っています ($title)" }
     }
 }

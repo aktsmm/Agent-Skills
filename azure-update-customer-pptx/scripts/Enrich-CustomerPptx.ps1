@@ -66,17 +66,10 @@ Write-Info "対象ファイル: $outputPath"
 $classification = Get-Content $classificationPath -Encoding UTF8 | ConvertFrom-Json
 Write-Info "Weekly: $($classification.weekly.Count) 件"
 
-# titleAliasMap: 日本語 slide タイトル（cleanTitle 済）→ 英語 canonical（cleanTitle 済）の逆引き
-# Build が titleJa を優先して slide title を日本語で書くため、
-# region_info / notes lookup 時に日本語 slide タイトルを英語 SSOT に戻すのに使う。
-$titleAliasMap = @{}
-foreach ($item in @($classification.weekly) + @($classification.appendix)) {
-    $enClean = Get-CleanSlideTitle -Title $item.title
-    if ($enClean) { $titleAliasMap[$enClean] = $enClean }
-    if ($item.titleJa) {
-        $jaClean = Get-CleanSlideTitle -Title $item.titleJa
-        if ($jaClean) { $titleAliasMap[$jaClean] = $enClean }
-    }
+$allClassificationItems = @($classification.weekly) + @($classification.appendix)
+function Resolve-ClassificationItemForSlide {
+    param([string]$SlideTitle)
+    return Find-ClassificationItemBySlideTitle -SlideTitle $SlideTitle -Items $allClassificationItems -PrefixLength 25
 }
 
 # region_info.json / region_info_reviewed.json を読み込み（リージョン情報を正確に取得）
@@ -344,9 +337,8 @@ try {
         $slide = $pres.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
         
-        # 日本語 slide タイトルなら英語 canonical に翻訳して region_info の key と合わせる
-        $titleClean = $title -replace "^【[^】]+】\s*", ""
-        $titleForLookup = if ($titleClean -and $titleAliasMap.ContainsKey($titleClean)) { $titleAliasMap[$titleClean] } else { $title }
+        $classificationItem = Resolve-ClassificationItemForSlide -SlideTitle $title
+        $titleForLookup = if ($classificationItem) { $classificationItem.title } else { $title }
         
         # 共通関数でリージョン情報を取得
         $region = Find-RegionStatus -Title $titleForLookup -RegionInfo $regionInfo
@@ -367,9 +359,8 @@ try {
             if (Test-AzureUpdateCoverSlide -Slide $slide) { continue }
             if (Test-AzureUpdateEndingSlide -Slide $slide) { continue }
             
-            # 日本語 slide タイトルなら英語 canonical に翻訳して region_info の key と合わせる
-            $titleClean = $title -replace "^【[^】]+】\s*", ""
-            $titleForLookup = if ($titleClean -and $titleAliasMap.ContainsKey($titleClean)) { $titleAliasMap[$titleClean] } else { $title }
+            $classificationItem = Resolve-ClassificationItemForSlide -SlideTitle $title
+            $titleForLookup = if ($classificationItem) { $classificationItem.title } else { $title }
             
             # 共通関数でリージョン情報を取得
             $region = Find-RegionStatus -Title $titleForLookup -RegionInfo $regionInfo
@@ -405,11 +396,8 @@ try {
     for ($i = 1; $i -le $pres.Slides.Count; $i++) {
         $slide = $pres.Slides.Item($i)
         $title = Get-SlideTitle -Slide $slide
-        $cleanTitle = $title -replace "^【[^】]+】\s*", ""
-        # 日本語 slide タイトルなら英語 canonical に翻訳して lookup key に使う
-        if ($cleanTitle -and $titleAliasMap.ContainsKey($cleanTitle)) {
-            $cleanTitle = $titleAliasMap[$cleanTitle]
-        }
+        $classificationItem = Resolve-ClassificationItemForSlide -SlideTitle $title
+        $cleanTitle = if ($classificationItem) { Get-CleanSlideTitle -Title $classificationItem.title } else { Get-CleanSlideTitle -Title $title }
         
         $note = ""
         
@@ -433,7 +421,7 @@ try {
         elseif ($i -ge $structure.WeeklyStart -and $i -le $structure.WeeklyEnd) {
             # Weekly スライド - classification.json + notes.json から情報を取得
             # 共通関数で classification.json と notes.json から情報を取得
-            $wInfo = Find-ByPartialTitle -Title $cleanTitle -Map $weeklyInfoMap -MatchLength 20
+            $wInfo = if ($classificationItem) { $classificationItem } else { Find-ByPartialTitle -Title $cleanTitle -Map $weeklyInfoMap -MatchLength 20 }
             $nInfo = Find-ByPartialTitle -Title $cleanTitle -Map $weeklyNotes -MatchLength 15
             
             $learnUrl = if ($wInfo -and $wInfo.learnUrl) { $wInfo.learnUrl } else { "" }

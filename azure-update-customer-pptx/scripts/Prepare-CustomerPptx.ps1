@@ -74,6 +74,16 @@ try {
 
 $configDir = Join-Path $workspaceRootPath ".config"
 Write-Info "設定フォルダ: $configDir"
+$configPath = Join-Path $configDir "config.json"
+$requireTitleJa = $false
+if (Test-Path -LiteralPath $configPath) {
+    try {
+        $workspaceConfig = Get-Content -LiteralPath $configPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $requireTitleJa = [bool]($workspaceConfig.content -and $workspaceConfig.content.requireTitleJa)
+    } catch {
+        Write-Warning "config.json の titleJa 設定を読み込めないため、既存互換モードを使用します: $($_.Exception.Message)"
+    }
+}
 
 if (-not [System.IO.Path]::IsPathRooted($DateFolder)) {
     $DateFolder = Join-Path $workspaceRootPath $DateFolder
@@ -397,6 +407,30 @@ foreach ($u in $fetched) {
 # ============================================================
 # 分類
 # ============================================================
+
+if ($requireTitleJa) {
+    $missingTitleJa = @($allSlides | Where-Object { [string]::IsNullOrWhiteSpace($_.titleJa) })
+    if ($missingTitleJa.Count -gt 0) {
+        $examples = @($missingTitleJa | Select-Object -First 3 | ForEach-Object { $_.title }) -join '; '
+        throw "titleJa is required by .config/config.json for customer-visible display titles. Missing: $examples"
+    }
+
+    $titleJaConflicts = @()
+    for ($leftIndex = 0; $leftIndex -lt $allSlides.Count; $leftIndex++) {
+        $leftTitle = Get-CleanSlideTitle -Title $allSlides[$leftIndex].titleJa
+        for ($rightIndex = $leftIndex + 1; $rightIndex -lt $allSlides.Count; $rightIndex++) {
+            $rightTitle = Get-CleanSlideTitle -Title $allSlides[$rightIndex].titleJa
+            $matchLength = [Math]::Min($leftTitle.Length, $rightTitle.Length)
+            $sameOrPrefix = $leftTitle -eq $rightTitle -or ($matchLength -ge 12 -and $leftTitle.Substring(0, $matchLength) -eq $rightTitle.Substring(0, $matchLength))
+            if ($sameOrPrefix) {
+                $titleJaConflicts += "'$leftTitle' / '$rightTitle'"
+            }
+        }
+    }
+    if ($titleJaConflicts.Count -gt 0) {
+        throw "titleJa must be unique and not prefix-related after 12 normalized characters. Conflicts: $($titleJaConflicts -join '; ')"
+    }
+}
 
 Write-StepHeader "分類結果"
 

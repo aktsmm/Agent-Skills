@@ -88,24 +88,13 @@ function Find-ExactNoteEntry {
     )
     
     $normalizedSlide = Get-NormalizedTitle $SlideTitle
-    
-    # Phase 1: 完全一致
+
     foreach ($entry in $NotesArray) {
         $normalizedEntry = Get-NormalizedTitle $entry.title
         if ($normalizedSlide -eq $normalizedEntry) {
             return $entry
         }
     }
-    
-    # Phase 2: 先頭30文字プレフィックス一致（先頭のみ、サブストリングではない）
-    foreach ($entry in $NotesArray) {
-        $normalizedEntry = Get-NormalizedTitle $entry.title
-        $len = [Math]::Min(30, [Math]::Min($normalizedSlide.Length, $normalizedEntry.Length))
-        if ($normalizedSlide.Substring(0, $len).ToLower() -eq $normalizedEntry.Substring(0, $len).ToLower()) {
-            return $entry
-        }
-    }
-    
     return $null
 }
 
@@ -115,24 +104,7 @@ function Find-ExactClassificationEntry {
         [array]$ClassificationArray
     )
     
-    $normalizedSlide = Get-NormalizedTitle $SlideTitle
-    
-    foreach ($entry in $ClassificationArray) {
-        $normalizedEntry = Get-NormalizedTitle $entry.title
-        if ($normalizedSlide -eq $normalizedEntry) {
-            return $entry
-        }
-    }
-    
-    foreach ($entry in $ClassificationArray) {
-        $normalizedEntry = Get-NormalizedTitle $entry.title
-        $len = [Math]::Min(30, [Math]::Min($normalizedSlide.Length, $normalizedEntry.Length))
-        if ($normalizedSlide.Substring(0, $len).ToLower() -eq $normalizedEntry.Substring(0, $len).ToLower()) {
-            return $entry
-        }
-    }
-    
-    return $null
+    return Find-ClassificationItemBySlideTitle -SlideTitle $SlideTitle -Items $ClassificationArray -PrefixLength 25
 }
 
 function Find-ExactRegionEntry {
@@ -141,23 +113,13 @@ function Find-ExactRegionEntry {
         [hashtable]$RegionMap
     )
     
-    $normalizedSlide = Get-NormalizedTitle $SlideTitle
-    
     foreach ($key in $RegionMap.Keys) {
+        $normalizedSlide = Get-NormalizedTitle $SlideTitle
         $normalizedKey = Get-NormalizedTitle $key
         if ($normalizedSlide -eq $normalizedKey) {
             return $RegionMap[$key]
         }
     }
-    
-    foreach ($key in $RegionMap.Keys) {
-        $normalizedKey = Get-NormalizedTitle $key
-        $len = [Math]::Min(30, [Math]::Min($normalizedSlide.Length, $normalizedKey.Length))
-        if ($normalizedSlide.Substring(0, $len).ToLower() -eq $normalizedKey.Substring(0, $len).ToLower()) {
-            return $RegionMap[$key]
-        }
-    }
-    
     return $null
 }
 
@@ -262,10 +224,15 @@ try {
         Write-Info "タイトル: $rawTitle"
         Write-Info "正規化後: $normalizedTitle"
         
-        # notes.json から正確にマッチ
-        $nInfo = Find-ExactNoteEntry -SlideTitle $rawTitle -NotesArray $notesData.weekly
+        # 表示タイトルから分類エントリを解決し、raw title を notes / region の join key に使う
         $wInfo = Find-ExactClassificationEntry -SlideTitle $rawTitle -ClassificationArray $classification.weekly
-        $rInfo = Find-ExactRegionEntry -SlideTitle $rawTitle -RegionMap $regionInfo
+        if (-not $wInfo) {
+            Write-Warning "P$slideNum : classification.json にマッチするエントリが見つかりません"
+            Write-Warning "  正規化タイトル: $normalizedTitle"
+            continue
+        }
+        $nInfo = Find-ExactNoteEntry -SlideTitle $wInfo.title -NotesArray $notesData.weekly
+        $rInfo = Find-ExactRegionEntry -SlideTitle $wInfo.title -RegionMap $regionInfo
         
         if (-not $nInfo) {
             Write-Warning "P$slideNum : notes.json にマッチするエントリが見つかりません"

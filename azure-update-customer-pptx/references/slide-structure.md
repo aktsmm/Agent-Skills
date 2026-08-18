@@ -143,16 +143,23 @@ Prefix ★ to topics the customer especially cares about. Rules:
 🔴 **★ cap = 30-40% of Weekly count** (5-8件→2-3 ★; 9-12件→3-5; 13-17件→4-7). All-★ forbidden (loses
 priority signal). Each key point must contain a benefit OR an action (廃止 = required action + deadline).
 
-### Title normalization (remove redundant status wording)
+### Title normalization (Japanese display title, raw join key)
 
-When adding `【label】`, strip the source title's status wording (it duplicates the label) — leading AND
-trailing. Examples: `【Preview】パブリック プレビュー: MSSQL…` → `【Preview】MSSQL…`; `【GA】… 一般提供
-開始` → `【GA】…`. Apply across P2 / UPDATE Points / notes. Use the **shared title-normalization helper**
-(don't re-define the regex locally). `classification.json.title` is the SSOT display title; scripts must
-also reflect it onto the copied slide title so Build doesn't revert to the source title.
+Keep `classification.title` as the byte-exact Azure Updates title and manifest join key. Use
+`classification.titleJa` as the customer-visible display title on P2, Weekly slides, and UPDATE Points.
+The display title should be a concise natural Japanese summary, normally within 36 full-width characters
+and two rendered lines; validate the saved deck when an official name makes it longer.
 
-Plain-language rewrite allowed when the source title is a confusing literal translation, but you MUST read
-the body + Microsoft Learn / Azure Updates and not change the feature's effect.
+Do not place `Generally Available`, `Public Preview`, `Retirement`, `GA`, `Preview`, `廃止`, or
+`一般提供` in `titleJa`; the existing label badge communicates status. Preserve official product, SKU, and
+protocol names, and read the Azure Updates body plus Microsoft Learn before a plain-language rewrite so the
+feature effect does not change. The raw title, status, and announcement URL remain available through
+`title`, `label`, and `sourceUrl` for notes and audit.
+
+If `titleJa` is changed after Prepare, regenerate the classification-derived notes and reviewed-region
+artifacts before Build. Do not replace or freely edit `title`, because scripts use it as the join key.
+Titles must be unique and must not be prefix-related after 12 normalized characters so prefix matching cannot attach
+the wrong slide, note, or region entry.
 
 ### Table splitting
 

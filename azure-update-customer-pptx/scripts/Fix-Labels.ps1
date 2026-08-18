@@ -53,20 +53,22 @@ Write-Info "このスクリプトは P2 目次と UPDATE Points 表のみを更�
 function Find-WeeklySlideIndex {
     param(
         [object]$Presentation,
-        [string]$Title,
+        [object]$Item,
         [int]$Start,
         [int]$End
     )
 
-    $target = Get-CleanSlideTitle -Title $Title
-    $targetPrefix = $target.Substring(0, [Math]::Min(30, $target.Length)).ToLower()
+    $matchedIndices = @()
     for ($i = $Start; $i -le $End; $i++) {
-        $slideTitle = Get-CleanSlideTitle -Title (Get-SlideTitle -Slide $Presentation.Slides.Item($i))
-        $slidePrefix = $slideTitle.Substring(0, [Math]::Min(30, $slideTitle.Length)).ToLower()
-        if ($slidePrefix -eq $targetPrefix -or $slideTitle.ToLower().Contains($targetPrefix)) {
-            return $i
+        $slideTitle = Get-SlideTitle -Slide $Presentation.Slides.Item($i)
+        if (Test-ClassificationTitleMatch -SlideTitle $slideTitle -Item $Item -PrefixLength 25) {
+            $matchedIndices += $i
         }
     }
+    if ($matchedIndices.Count -gt 1) {
+        throw "スライドタイトルの一致が曖昧です: $($Item.title) (P$($matchedIndices -join ', P'))"
+    }
+    if ($matchedIndices.Count -eq 1) { return $matchedIndices[0] }
     return 0
 }
 
@@ -75,55 +77,68 @@ $pres = $null
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
 Close-OpenPptxPresentation -PptxPath $outputPath -Save | Out-Null
-$ppt = New-PptxSession
-$pres = $ppt.Presentations.Open($outputPath)
+$ppt = $null
+$pres = $null
+$exitCode = 0
 
-$weeklyStart = $global:PPTX_WEEKLY_START
-$updatePointsSlide = Find-UpdatePointsSlideIndex -Presentation $pres
-if ($updatePointsSlide -le 0) { Write-Failure "UPDATE Points スライドが見つかりません"; exit 1 }
-$weeklyEnd = $updatePointsSlide - 1
+try {
+    $ppt = New-PptxSession
+    $pres = $ppt.Presentations.Open($outputPath)
 
-Write-Info "Weekly 範囲: P$weeklyStart〜P$weeklyEnd"
+    $weeklyStart = $global:PPTX_WEEKLY_START
+    $updatePointsSlide = Find-UpdatePointsSlideIndex -Presentation $pres
+    if ($updatePointsSlide -le 0) { throw "UPDATE Points スライドが見つかりません" }
+    $weeklyEnd = $updatePointsSlide - 1
 
-for ($idx = 0; $idx -lt $classification.weekly.Count; $idx++) {
-    $targetIndex = $weeklyStart + $idx
-    $wanted = $classification.weekly[$idx]
-    $currentTitle = Get-CleanSlideTitle -Title (Get-SlideTitle -Slide $pres.Slides.Item($targetIndex))
-    $wantedTitle = Get-CleanSlideTitle -Title $wanted.title
-    $wantedPrefix = $wantedTitle.Substring(0, [Math]::Min(30, $wantedTitle.Length)).ToLower()
+    Write-Info "Weekly 範囲: P$weeklyStart〜P$weeklyEnd"
 
-    if ($currentTitle.ToLower().StartsWith($wantedPrefix)) { continue }
+    for ($idx = 0; $idx -lt $classification.weekly.Count; $idx++) {
+        $targetIndex = $weeklyStart + $idx
+        $wanted = $classification.weekly[$idx]
+        $currentTitle = Get-SlideTitle -Slide $pres.Slides.Item($targetIndex)
+        $wantedDisplayTitle = if ($wanted.titleJa) { $wanted.titleJa } else { $wanted.title }
+        $wantedTitle = Get-CleanSlideTitle -Title $wantedDisplayTitle
 
-    $foundIndex = Find-WeeklySlideIndex -Presentation $pres -Title $wanted.title -Start $targetIndex -End $weeklyEnd
-    if ($foundIndex -le 0) { Write-Failure "スライドが見つかりません: $($wanted.title)"; exit 1 }
+        $currentItem = Find-ClassificationItemBySlideTitle -SlideTitle $currentTitle -Items @($classification.weekly) -PrefixLength 25
+        if ($currentItem -and $currentItem.title -eq $wanted.title) { continue }
 
-    Write-Host "  Move P$foundIndex -> P$targetIndex : [$($wanted.label)] $($wantedTitle.Substring(0, [Math]::Min(45, $wantedTitle.Length)))"
-    $pres.Slides.Item($foundIndex).MoveTo($targetIndex)
-    Start-Sleep -Milliseconds 100
-}
+        $foundIndex = Find-WeeklySlideIndex -Presentation $pres -Item $wanted -Start $targetIndex -End $weeklyEnd
+        if ($foundIndex -le 0) { throw "スライドが見つかりません: $($wanted.title)" }
 
-if (Update-SummarySlideContent -Presentation $pres -Classification $classification) {
+        Write-Host "  Move P$foundIndex -> P$targetIndex : [$($wanted.label)] $($wantedTitle.Substring(0, [Math]::Min(45, $wantedTitle.Length)))"
+        $pres.Slides.Item($foundIndex).MoveTo($targetIndex)
+        Start-Sleep -Milliseconds 100
+    }
+
+    if (-not (Update-SummarySlideContent -Presentation $pres -Classification $classification)) {
+        throw "P2 目次の書き込み先が見つかりません"
+    }
     Write-Success "P2 目次更新完了"
-} else {
-    Write-Failure "P2 目次の書き込み先が見つかりません"
-    exit 1
-}
 
-if (Update-UpdatePointsTableContent -Presentation $pres -Classification $classification -RegionInfo $regionInfo) {
+    if (-not (Update-UpdatePointsTableContent -Presentation $pres -Classification $classification -RegionInfo $regionInfo)) {
+        throw "UPDATE Points 表が見つかりません"
+    }
     Write-Success "UPDATE Points 表更新完了"
-} else {
-    Write-Failure "UPDATE Points 表が見つかりません"
-    exit 1
+
+    $pres.Save()
+    Write-Success "保存完了"
+} catch {
+    Write-Failure "Fix-Labels エラー: $($_.Exception.Message)"
+    $exitCode = 1
+} finally {
+    if ($pres) {
+        try { $pres.Close() } catch {}
+        try { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($pres) | Out-Null } catch {}
+    }
+    if ($ppt) {
+        try { $ppt.Quit() } catch {}
+        try { [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null } catch {}
+    }
+    [System.GC]::Collect()
+    [System.GC]::WaitForPendingFinalizers()
 }
 
-$pres.Save()
-Write-Success "保存完了"
-$pres.Close()
-[System.Runtime.InteropServices.Marshal]::ReleaseComObject($pres) | Out-Null
-$ppt.Quit()
-[System.Runtime.InteropServices.Marshal]::ReleaseComObject($ppt) | Out-Null
-[System.GC]::Collect()
-[System.GC]::WaitForPendingFinalizers()
+if ($exitCode -ne 0) { exit $exitCode }
 
 & "$PSScriptRoot\Run-CustomerPptxPipeline.ps1" -DateFolder $DateFolder -SkipBuild -SkipEnrich -NoOpen
 if ($LASTEXITCODE -ne 0) {

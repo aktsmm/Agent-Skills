@@ -105,7 +105,7 @@ if ($Mode -eq 'Plan') {
         odataCreatedTo   = "$($createdTo)T23:59:59Z"
         excludeIds       = $processedIds
         fetchedPath      = (Resolve-Path -Relative $fetchedPath -ErrorAction SilentlyContinue) ?? $fetchedPath
-        instructions     = "mcp_releasecommun_get_recent_azure_updates を created ge '$($createdFrom)T00:00:00Z' and created le '$($createdTo)T23:59:59Z' で取得し、excludeIds を除外。詳細は get_azure_update_by_id。正規化して fetched-updates.json へ。スキーマは .github/skills/azure-update-customer-pptx/references/mcp-sourced-content.md を参照。"
+        instructions     = "mcp_releasecommun_get_recent_azure_updates を created ge '$($createdFrom)T00:00:00Z' and created le '$($createdTo)T23:59:59Z' で取得し、excludeIds を除外。詳細は get_azure_update_by_id。titleはAzure Updates原題のまま保持し、各itemへ顧客向け日本語表示タイトルtitleJaを追加してからfetched-updates.jsonへ書く。スキーマは .github/skills/azure-update-customer-pptx/references/mcp-sourced-content.md を参照。"
     }
     $plan | ConvertTo-Json -Depth 6
     return

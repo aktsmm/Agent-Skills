@@ -282,6 +282,85 @@ function Get-CleanSlideTitle {
     return ($cleanTitle -replace '\s+', ' ').Trim()
 }
 
+function Get-ClassificationTitleCandidates {
+    <#
+    .SYNOPSIS
+        分類エントリの表示タイトルと原題を比較候補として返す
+    #>
+    param([object]$Item)
+
+    $candidates = New-Object System.Collections.Generic.List[string]
+    foreach ($rawTitle in @([string]$Item.titleJa, [string]$Item.title)) {
+        $cleanTitle = Get-CleanSlideTitle -Title $rawTitle
+        if ($cleanTitle -and -not $candidates.Contains($cleanTitle)) {
+            $candidates.Add($cleanTitle)
+        }
+    }
+    return $candidates.ToArray()
+}
+
+function Test-ClassificationTitleMatch {
+    <#
+    .SYNOPSIS
+        保存済みスライドのタイトルが分類エントリの原題または表示タイトルと一致するか判定する
+    #>
+    param(
+        [string]$SlideTitle,
+        [object]$Item,
+        [int]$PrefixLength = 25
+    )
+
+    $cleanSlideTitle = (Get-CleanSlideTitle -Title $SlideTitle).ToLower()
+    if (-not $cleanSlideTitle) { return $false }
+    foreach ($candidate in @(Get-ClassificationTitleCandidates -Item $Item)) {
+        $cleanCandidate = $candidate.ToLower()
+        if ($cleanSlideTitle -eq $cleanCandidate) { return $true }
+        if ($cleanSlideTitle.Length -lt 12 -or $cleanCandidate.Length -lt 12) { continue }
+        $length = [Math]::Min($PrefixLength, [Math]::Min($cleanSlideTitle.Length, $cleanCandidate.Length))
+        if ($length -ge 12 -and $cleanSlideTitle.Substring(0, $length) -eq $cleanCandidate.Substring(0, $length)) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Find-ClassificationItemBySlideTitle {
+    <#
+    .SYNOPSIS
+        保存済みスライドの原題または表示タイトルから、1件だけ分類エントリを解決する
+    #>
+    param(
+        [string]$SlideTitle,
+        [object[]]$Items,
+        [int]$PrefixLength = 25
+    )
+
+    $cleanSlideTitle = (Get-CleanSlideTitle -Title $SlideTitle).ToLower()
+    if (-not $cleanSlideTitle) { return $null }
+
+    $exactMatches = @()
+    foreach ($item in @($Items)) {
+        foreach ($candidate in @(Get-ClassificationTitleCandidates -Item $item)) {
+            if ($cleanSlideTitle -eq $candidate.ToLower()) {
+                $exactMatches += $item
+                break
+            }
+        }
+    }
+    if ($exactMatches.Count -eq 1) { return $exactMatches[0] }
+    if ($exactMatches.Count -gt 1) { throw "分類タイトルの完全一致が曖昧です: $SlideTitle" }
+
+    $prefixMatches = @()
+    foreach ($item in @($Items)) {
+        if (Test-ClassificationTitleMatch -SlideTitle $SlideTitle -Item $item -PrefixLength $PrefixLength) {
+            $prefixMatches += $item
+        }
+    }
+    if ($prefixMatches.Count -eq 1) { return $prefixMatches[0] }
+    if ($prefixMatches.Count -gt 1) { throw "分類タイトルの先頭一致が曖昧です: $SlideTitle" }
+    return $null
+}
+
 function Get-SlideBodyTextForLabel {
     <#
     .SYNOPSIS
@@ -1063,7 +1142,8 @@ function Update-SummarySlideContent {
     $tocItems = @()
     $num = 1
     foreach ($w in $Classification.weekly) {
-        $cleanTitle = Get-CleanSlideTitle -Title $w.title
+        $displayTitle = if ($w.titleJa) { $w.titleJa } else { $w.title }
+        $cleanTitle = Get-CleanSlideTitle -Title $displayTitle
         $tocItems += "$num. 【$($w.label)】$cleanTitle"
         $num++
     }

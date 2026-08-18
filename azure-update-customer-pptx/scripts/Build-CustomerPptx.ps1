@@ -80,28 +80,6 @@ if (-not (Test-Path $fetchedPath)) {
 }
 Write-Info "Build モード: MCP fetched（本文レイアウト生成）"
 
-function Set-ClassifiedSlideTitle {
-    param(
-        [object]$Slide,
-        [object]$Entry
-    )
-
-    if (-not $Slide -or -not $Entry -or -not $Entry.title) { return }
-
-    $currentTitle = Get-SlideTitle -Slide $Slide
-    $currentClean = Get-CleanSlideTitle -Title $currentTitle
-    $desiredTitle = [string]$Entry.title
-    $desiredClean = Get-CleanSlideTitle -Title $desiredTitle
-
-    if ($desiredClean -and $desiredClean -ne $currentClean) {
-        try {
-            $Slide.Shapes.Title.TextFrame.TextRange.Text = $desiredTitle
-        } catch {
-            Write-Warning "スライドタイトル更新に失敗: $desiredTitle"
-        }
-    }
-}
-
 # ============================================================
 # テンプレートコピー
 # ============================================================

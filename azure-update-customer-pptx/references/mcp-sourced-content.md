@@ -20,6 +20,21 @@ contract versions, output hash, verifier exit code, and error state; readers mus
 
 ## Per-Item Reference Rules
 
+### Title fields
+
+- `title`: Azure Updates announcement title retained unchanged as the immutable manifest join key for
+  classification, notes, and reviewed-region data; use it for label, category, exclusion, and fallback
+  keypoint derivation together with `products` / `productCategories`.
+- `titleJa`: customer-visible Japanese display title. For each new customer date folder, write a concise
+  Japanese title in `fetched-updates.json` before running `Prepare-CustomerPptx.ps1`; the starter config
+  sets `content.requireTitleJa=true`, so Prepare fails if it is missing. The script carries it into
+  `classification.json` and the build prefers it on visible slides.
+- Preserve official product, SKU, and protocol names in `titleJa`, but do not copy the raw English
+  announcement title. Keep GA/Preview/Retirement wording in `label`, not in `titleJa`.
+- `titleJa` values must be unique and must not be prefix-related after 12 normalized characters. `notes.json` must use raw `title` as its join key. If `titleJa` changes after Prepare, rerun Prepare,
+  region review, notes generation, and the saved-deck verifier together. Do not edit only one manifest
+  because `title` remains the raw join key.
+
 Each `fetched-updates.json` item should carry both reference layers when possible:
 
 - `sourceUrl`: Azure Updates / Release Communications announcement URL.

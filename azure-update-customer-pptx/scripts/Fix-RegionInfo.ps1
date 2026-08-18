@@ -27,6 +27,7 @@ if (-not (Test-Path -LiteralPath $fullPptxPath)) {
 
 $dateFolder = Split-Path $fullPptxPath -Parent
 $manifestFolder = Join-Path $dateFolder "manifest"
+$classificationPath = Join-Path $manifestFolder "classification.json"
 $resolvedRegionInfoPath = if ($RegionInfoPath) {
     (Resolve-Path -LiteralPath $RegionInfoPath).Path
 } elseif (Test-Path -LiteralPath (Join-Path $manifestFolder "region_info_reviewed.json")) {
@@ -39,9 +40,14 @@ if (-not (Test-Path -LiteralPath $resolvedRegionInfoPath)) {
     Write-Failure "リージョン情報 JSON が見つかりません: $resolvedRegionInfoPath"
     exit 1
 }
+if (-not (Test-Path -LiteralPath $classificationPath)) {
+    Write-Failure "classification.json が見つかりません: $classificationPath"
+    exit 1
+}
 
 $regionData = Get-Content -LiteralPath $resolvedRegionInfoPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $regionInfo = ConvertTo-RegionInfoMap -RegionData $regionData
+$classification = Get-Content -LiteralPath $classificationPath -Raw -Encoding UTF8 | ConvertFrom-Json
 if ($regionInfo.Count -eq 0) {
     Write-Failure "リージョン情報が空です: $resolvedRegionInfoPath"
     exit 1
@@ -94,8 +100,11 @@ try {
 
         for ($row = 2; $row -le $table.Rows.Count; $row++) {
             $titleText = $table.Cell($row, 3).Shape.TextFrame.TextRange.Text
-            $cleanTitle = Get-CleanSlideTitle -Title $titleText
-            $newValue = Find-RegionStatus -Title $cleanTitle -RegionInfo $regionInfo
+            $classificationItem = Find-ClassificationItemBySlideTitle -SlideTitle $titleText -Items @($classification.weekly) -PrefixLength 25
+            if (-not $classificationItem) {
+                throw "P$updatePointsSlideNumber 行$($row - 1) の分類エントリを解決できません: $titleText"
+            }
+            $newValue = Find-RegionStatus -Title $classificationItem.title -RegionInfo $regionInfo
             $currentValue = $table.Cell($row, 5).Shape.TextFrame.TextRange.Text
 
             if ($newValue -and $newValue -ne $currentValue) {

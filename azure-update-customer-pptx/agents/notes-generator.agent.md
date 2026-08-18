@@ -21,6 +21,7 @@ classification.json の全トピックについて **#microsoft.docs.mcp** で�
 - `{日付フォルダ}/manifest/classification.json`（Prepare Agent が生成）
 - `.config/customer-keywords.json（ルーティング詳細は ../references/customer-profile.md）`（顧客利用中サービス判定用）
 - `../references/slide-structure.md`（notes.json スキーマ・品質基準）
+- `../references/mcp-sourced-content.md`（manifest join key・source trail規則）
 
 ## 出力
 
@@ -70,6 +71,7 @@ MCP 調査前に以下を確認し、不足があれば即座にエラー報告�
 - [ ] `classification.json` の `weekly` 配列が 1 件以上ある
 - [ ] references/customer-profile.md を読み込んだ
 - [ ] references/slide-structure.md の notes.json 仕様を確認した
+- [ ] references/mcp-sourced-content.md のraw title join規則を確認した
 
 ---
 
@@ -107,6 +109,8 @@ classification.json の**全トピック**（weekly + appendix）について、
 ### Step 3: notes.json の生成
 
 > 📌 **SSOT**: notes.json のスキーマ・品質基準・フィールド定義は [slide-structure.md](../references/slide-structure.md) の「notes.json の仕様」セクションを参照
+
+`notes.json` の各エントリの `title` は、classificationの**raw `title`**（Azure Updates原題・不変join key）を使う。顧客可視の`titleJa`をnotesのjoin keyに使わない。
 
 各フィールドの生成ルール:
 
