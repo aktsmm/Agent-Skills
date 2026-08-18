@@ -82,16 +82,17 @@ Keep setup questions lightweight. Capture only facts that change routing, sharin
 ├── _templates/                    ← Templates
 ├── research-reports/              ← Generated research/report Markdown
 ├── meeting-notes/                 ← Meeting minutes (one file per MTG)
-└── next-actions/                  ← Per-MTG homework workspace
-    ├── to-YYYY-MM-DD/             ← Tasks for the next MTG
-    │   ├── README.md               ← Progress board
-    │   ├── homework/               ← Customer-agreed homework
-    │   ├── proposals/              ← Self-initiated proposal prep
-    │   └── research/               ← Supplementary research/validation
-    └── ongoing/                    ← Continuing items without a deadline
+├── next-actions/                  ← Per-MTG homework workspace
+│   ├── to-YYYY-MM-DD/             ← Tasks for the next MTG
+│   │   ├── README.md               ← Progress board
+│   │   ├── homework/               ← Customer-agreed homework
+│   │   ├── proposals/              ← Self-initiated proposal prep
+│   │   └── research/               ← Supplementary research/validation
+│   └── ongoing/                    ← Continuing items without a deadline
+└── pj_{topic}/                     ← Topic-scoped thread spanning many meetings
 ```
 
-`Initialize-CustomerWorkspace.ps1` creates only `.github/`, `_inbox/`, `_questions/`, `_knowledge/`, `_customer/`, `_templates/`, `research-reports/`, and copies four templates (`meeting-minutes`, `internal-memo`, `customer-profile`, `attachments`). Create `meeting-notes/`, `next-actions/`, and the material folders on demand, and read `next-actions-*` / `knowledge-*` / `workspace-*` templates directly from `assets/_templates/`.
+`Initialize-CustomerWorkspace.ps1` creates only `.github/`, `_inbox/`, `_questions/`, `_knowledge/`, `_customer/`, `_templates/`, `research-reports/`, and copies four templates (`meeting-minutes`, `internal-memo`, `customer-profile`, `attachments`). Create `meeting-notes/`, `next-actions/`, `pj_{topic}/`, and the material folders on demand, and read `next-actions-*` / `knowledge-*` / `workspace-*` templates directly from `assets/_templates/`.
 
 ## Research Reports
 
@@ -135,6 +136,19 @@ Carve homework, proposal prep, and supplementary research out of meeting notes i
 - **Why split by type**: mixing `proposals` into homework turns self-initiated ideas into apparent customer commitments.
 - Full rules and templates: see `Next Actions Workspace` section in [assets/copilot-instructions.md](assets/copilot-instructions.md).
 
+## Project Threads (topic-scoped work)
+
+`meeting-notes/` and `next-actions/` are both time-scoped, so a topic that outlives the meeting cycle survives as an ever-growing appendix inside one meeting note.
+
+- **Required to split**: the topic spans multiple meeting cycles. Without this, keep it in the meeting note.
+- **Plus at least one**: it already has three or more files, it accumulates its own evidence (logs, vendor replies, an external case ID), or its owners differ from the people who normally attend the recurring meeting. If none hold, use `next-actions/ongoing/`.
+- **Naming**: `pj_{topic}/`, where `{topic}` is kebab-case. No date prefix, because a thread is identified by topic and its start date stops being useful as soon as the thread moves.
+- **Single source of truth**: the thread folder owns current status and history. Meeting notes link to it and never restate it, or the two drift and the reader cannot tell which is current.
+- **README first**: `pj_{topic}/README.md` must answer "who holds the ball right now" without reading anything else.
+- **Migration trigger**: the topic has been appended to the same meeting note across three or more meetings, or its section in that note is longer than all the other sections combined.
+- **Closure**: a thread stays open until closed explicitly. No open actions and no timeline entry for two meeting cycles makes it a closure candidate.
+- Split checklist, README layout, migration steps, and closure rules: [Project Thread Rules](references/project-threads.md)
+
 ## Meeting Notes Quality Gate
 
 Before calling meeting notes done:
@@ -168,6 +182,7 @@ Before calling meeting notes done:
 - [Workspace Summary Rules](references/workspace-summary-rules.md)
 - [Knowledge Ledger Rules](references/knowledge-ledger-rules.md)
 - [Customer Material Lifecycle](references/material-lifecycle.md)
+- [Project Thread Rules](references/project-threads.md)
 
 ## Assets
 
