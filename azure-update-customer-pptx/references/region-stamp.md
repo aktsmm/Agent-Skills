@@ -39,7 +39,9 @@ control/metadata).
 
 MCP verification steps: (1) search `{service} region availability`; (2) identify Offer vs Deploy;
 (3) if only "Available in: Japan", search `{service} supported regions`; (4) if explicit deploy
-regions are listed (e.g. East US 2, Sweden Central), judge by those.
+regions are listed (e.g. East US 2, Sweden Central), judge by those; (5) `microsoft_docs_search` chunks
+rarely carry the region table itself — `microsoft_docs_fetch` the top feature page (overview / deploy /
+limitations) before deciding. A search whose snippets never say "Japan" is not a verdict.
 
 > ⚠️ Past incident: an "Offer Availability includes Japan → グローバル" misjudgement; real Deploy
 > Region was East US 2 / Sweden Central only = 日本リージョン未対応.
@@ -52,11 +54,22 @@ regions are listed (e.g. East US 2, Sweden Central), judge by those.
 1. Retirement / 廃止 / サポート終了 → **グローバル**.
 2. `global: true` → **グローバル**.
 3. Defined in `region_info_reviewed.json` → use that value (Review-verified).
-   4a. Private Preview, no region limit stated → **Japan East / West 対応** (sign-up required).
-   4b. Preview with stated region limit → only the stated regions.
-   4c. Preview, insufficient info → **日本リージョン未対応** (fail-safe).
+   4a. Feature doc exists and states **no** region limit (Preview or GA) → **Japan East / West 対応**;
+   the parent service's Japan availability governs (sign-up may be required).
+   4b. Feature doc lists supported **or** unsupported regions → follow that list exactly.
+   4c. **No feature doc at all** (only the Azure Updates post) → do not stamp 未対応. Record
+   `【判定レベル: 根拠未取得】` in `evidence` and ask the requester how to display it.
 4. GA with no region limit → **グローバル**.
-5. Unknown → **日本リージョン未対応** (default).
+5. Unknown → escalate via 4c; never a silent 日本リージョン未対応.
+
+🔴 **未対応 needs positive evidence.** Stamp 日本リージョン未対応 only when an official region list exists
+and Japan East / West are absent from it. "The page never mentions regions" is evidence of _no restriction_,
+not of _no support_.
+
+> ⚠️ Measured 2026-08-19 (38-item deck): reading "public preview without an explicit Japan mention" as
+> 未対応 produced **11 wrong stamps out of 16**. Learn MCP fetch flipped Azure Firewall IPv6, NSP perimeter
+> link, SQL MI zone redundancy, Key Vault symmetric keys, ANF oplocks, Storage Mover FSx, and Azure
+> Monitor→Fabric mirroring to Japan East / West 対応. A false "unusable" costs more than "not verified".
 
 An explicit unsupported-region list is complete negative evidence: when Microsoft Learn says the feature
 is unavailable in the listed regions (for example, `RegionNotEnabledForFeature`) and Japan East / West are
@@ -128,7 +141,11 @@ Canonical `status` values: `グローバル` / `Japan East / West 対応` / `Jap
 3. Check the "Limitations" section for "limited to".
 4. Record `source` URL in `region_info_reviewed.json`.
 5. `evidence` required (concrete wording of the basis).
-6. No guessing — if unconfirmed in docs, use 日本リージョン未対応 (fail-safe).
+6. No guessing and no reflexive fail-safe: 未対応 requires an official region list that excludes Japan East / West. With no feature doc at all, stop at 4c instead of stamping 未対応.
 7. A delivery fallback is a completed review, not a guess: inspect the feature overview plus one region, limitations, or what's-new source; record the checked URLs and the absent Japan evidence in `evidence`, then set `verified: true`. `verified: false` is interim and cannot ship.
 8. Keep the raw slide title as the JSON key. At the COM boundary, normalize line breaks, vertical tabs, and whitespace only to resolve one unique key; reject ambiguous matches rather than silently using a partial title.
 9. Never let a fallback downgrade an entry that already has `verified: true` evidence. When evidence and stored status conflict, preserve the evidence, derive `japanEast` / `japanWest` / `status` from it, append a correction record, then verify the saved stamp and any positive Japan-region claim in body or notes.
+10. Tag `evidence` with the judgement tier so a later reviewer can tell 未対応 from 未確認: `【判定レベル: 公式リージョン一覧】` / `【判定レベル: リージョン限定記載なし】` / `【判定レベル: 根拠未取得】`.
+11. Region-expansion updates ("GA in {region}") stamped 日本リージョン未対応 read as "the service is unavailable in Japan". State in `evidence` that only this update's target regions exclude Japan and the service itself already ships there.
+12. Per-feature region matrices can split within one service (Azure Databricks `feature-region-support`: `japaneast` ✓ / `japanwest` blank for Unity AI Gateway and Lakeflow Connect managed connectors). Read the exact feature column, not the service row.
+13. `verified` / `source` / `evidence` gates are presence checks only, so a green gate never proves semantic verification. Keep the per-item judgement inputs in an authored map (`status` + `source` + `evidence` per update id) and generate `region_info_reviewed.json` from it; a status-only map forces generic evidence text that hides guesses.

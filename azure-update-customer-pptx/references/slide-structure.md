@@ -35,14 +35,49 @@ Visible update slides must distinguish reference types. Use short, linked labels
 
 ## Weekly body composition
 
-Use the service name, not the customer category, in `対象：`. The full-width upper body is one ordinary left-aligned text frame: `対象：`, `更新内容：`, `価値：`, `影響：`, and optional `課金：`. Do not turn those lines into separate cards. `更新内容` explains the actual change in one or two lines; `価値` explains the benefit; `影響` shows constraints or action without internal `【…】` tokens.
+Use the service name, not the customer category, in `対象：`. The full-width upper body is one ordinary
+left-aligned text frame with six lines. Two of the labels vary, because not every update is good news —
+a retirement or a forced default change cannot honestly be labelled a benefit.
 
+```text
+対象：{targetService}
+更新内容：{what actually changed; include numbers and proper nouns, never a restatement of the title}
+想定シナリオ：{a conditional "if you are doing X" scenario}
+{リスク|メリット|評価観点|変更の意味}：{what it means for this customer}
+アクション：{what to do, or 対応不要（情報提供）}
+{期限|制約|課金|適用条件}：{the one hard fact that governs adoption}
+```
+
+- Line 4 label comes from `impactType`: 要対応 → `リスク`, 活用候補 → `メリット`, 評価 → `評価観点`,
+  情報 → `変更の意味`. Line 6 defaults to 廃止 → `期限`, Preview → `制約`, otherwise `適用条件`, and an
+  authored `conditionLabel` may override it to `課金`.
+- **Never put region wording in the body.** The RegionStamp is the only place it appears; a body sentence
+  such as "Japan East / Japan West の両方で利用できる想定" duplicates the stamp and burns a whole line.
+- Author the body copy as data (`_artifacts/body_meta.json`: `useCase` / `impactStatement` / `action` /
+  `condition` / `conditionLabel` / `glossary`) so the generator stays mechanical. Budget each line to
+  25-60 full-width characters and the body to 280.
 - Render Before / After in the first two lower panels, not a combined `変更：` sentence.
-- Render the mode content below Before / After as one full-width, left-aligned row: `対応の要点` / `技術の要点` / `基礎知識`. Heading is 16pt; body is 13-15pt.
-- Do not render `keypoint` as a separate band in any mode; use it as source text for `updateSummary` or `対応の要点`.
+- Render the mode content below Before / After as one full-width, left-aligned row: `対応の要点` /
+  `技術の要点` / `基礎知識`. Heading is 16pt; body is 13-15pt. **Keep those headings fixed** — Verify
+  matches them by prefix, so changing the wording fails every slide. Change only the content.
+- The mode row must not restate the body. Put slide-specific glossary entries there instead, as
+  `用語：定義` (30-55 full-width characters), one entry by default and two only when both are short.
+  Rebuilding it from `basics` reprints `対象` and `更新内容`, which is why the row can look full and still
+  carry zero new information.
+- In `action` mode Verify matches the panel by **suffix** against `classification.keypoint`, so a glossary
+  line can be prepended as long as the keypoint stays the exact final line.
+- Do not render `keypoint` as a separate band in any mode; use it as source text for `updateSummary` or the
+  action line.
 - Keep graphical containers for comparison and the mode row, but keep ordinary descriptive text unboxed.
-- Keep body fill ratio (`BoundHeight / shape.Height`) within 0.55-0.92.
-- Reserve the title space before the status badge. If a title is too long, wrap it inside the title region (up to two lines) and validate a rendered saved slide; never clip into the badge or hide the text by over-shrinking it.
+- Keep body fill ratio (`BoundHeight / shape.Height`) within 0.55-0.92. Font auto-fit stops at the 13pt
+  floor and does **not** guarantee the range, so measure every slide after changing the line count and cut
+  copy where it overflows.
+- Reserve the title space before the status badge. Enable WordWrap unconditionally and shrink the font until
+  the text fits the title box; a character-count heuristic that disables wrapping lets short titles run under
+  the badge, which renders fine in the file and only shows up in an exported image.
+- References may sit in two columns (Learn on the left, Azure Updates on the right) to free vertical space
+  for the mode row. Keep the shape names (`OfficialReferenceLearn`, `ReferenceLearnN`,
+  `OfficialReferenceAzureUpdates`) — Verify looks them up by name.
 
 ## Ending slide
 
@@ -215,6 +250,18 @@ Do not repeat visible value, impact, Before/After, or keypoint lines verbatim in
       "technical": "VM/VMSS の既定送信は NAT Gateway、Azure Firewall、…",
       "beforeAfter": "Before: 期限 2025/9/30 → After: 2026/3/31 まで延長",
       "systemImpact": "【影響なし】お客様システムは … 構成済み。追加対応不要。",
+      "useCase": "VM / VMSS の送信経路を既定の送信アクセスに任せている場合",
+      "impactLabel": "変更の意味",
+      "impactStatement": "移行準備の期間が 6 か月延び、明示的な送信構成へ切り替える計画を組み直せる",
+      "action": "既定の送信アクセスに依存する VM を棚卸しし、明示構成への移行時期を決める",
+      "conditionLabel": "期限",
+      "condition": "2026/3/31 に既定の送信アクセスが廃止",
+      "glossary": [
+        {
+          "term": "既定の送信アクセス",
+          "definition": "VM が明示的な送信設定なしでインターネットへ接続できる従来の挙動"
+        }
+      ],
       "customerConcerns": ["Q: … → A: …"]
     }
   ],

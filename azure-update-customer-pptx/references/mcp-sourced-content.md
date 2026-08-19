@@ -52,7 +52,7 @@ When imported source slides predate `sourceUrl`, recover the Azure Updates recor
 
 ## Visible Content Boundary
 
-Visible slide body fields must be reusable across decks. The customer-facing contract is `targetService`, `updateSummary`, `userValue`, `displayImpact`, optional `pricing`, `beforeAfter`, and the mode-specific lower-row content. Keep `impactType` as internal classification only; never render `【…】` inside `displayImpact`. `updateSummary` must explain what was added, changed, or retired instead of repeating the title. Reviewed region `status` governs region wording in `displayImpact`.
+Visible slide body fields must be reusable across decks. The customer-facing contract is `targetService`, `updateSummary`, `useCase`, `impactStatement` (rendered under the `impactLabel` derived from `impactType`), `action`, `condition` (rendered under `conditionLabel`), `beforeAfter`, and the mode-specific lower-row content. Keep `impactType` as internal classification only; never render `【…】` inside `impactStatement`. `updateSummary` must explain what was added, changed, or retired instead of repeating the title. Region wording belongs to the RegionStamp only and must not appear in any body line.
 
 ### Per-Item Layout Mode
 
