@@ -1,0 +1,30 @@
+{
+  "browser": "<Chrome|Edge>",
+  "profile": {
+    "displayName": "<profile-name>",
+    "directory": "<profile-directory-if-known>",
+    "syncHealthy": true
+  },
+  "baseline": {
+    "urlCount": 0,
+    "folderCount": 0,
+    "duplicateGroups": 0,
+    "emptyFolders": 0,
+    "maximumFolderDepth": 0,
+    "toolbarBookmarkOrder": ["<bookmark-id-or-title-url-key>"]
+  },
+  "operations": [
+    {
+      "phase": "move",
+      "bookmarkId": "<id-if-available>",
+      "title": "<title>",
+      "url": "<url>",
+      "currentPath": ["<root>", "<folder>"],
+      "destinationPath": ["<root>", "<category>"],
+      "reason": "<classification-reason>",
+      "newTitle": null,
+      "newUrl": null,
+      "status": "planned"
+    }
+  ]
+}

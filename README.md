@@ -29,6 +29,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [azure-update-customer-pptx](azure-update-customer-pptx/) | Build a customer-facing Azure Update PowerPoint from Azure Updates MCP results, including customer classification, Japan region stamps, UPDATE Points, speaker notes, and Verify-... |
 | [biz-ops-setup](biz-ops-setup/) | Business operations workspace setup with workIQ integration. Creates report generation, task management, and customer management system |
 | [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support |
+| [browser-bookmark-organizer](browser-bookmark-organizer/) | Safely audit, classify, deduplicate, and reorganize bookmarks or favorites in Google Chrome and Microsoft Edge while preserving intentional toolbar shortcuts, signed-in profiles... |
 | [browser-max-automation](browser-max-automation/) | Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation |
 | [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script'... |
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |
