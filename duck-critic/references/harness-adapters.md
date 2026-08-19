@@ -64,6 +64,14 @@ Subagent choice is separate from model choice. A read-only exploration subagent 
 
 A `runSubagent` critic does not see the producer's conversation, but it is not a clean room: user- and workspace-level instruction files still apply to it. The visible tell is a critic answering in the language a user instruction file mandates when the packet never asked for it.
 
+### Verify the critic stayed read-only
+
+`read-only` is a packet instruction, not a capability the harness enforces. A write-capable critic subagent will edit files outside the review target and drop scratch files at the workspace root. Fingerprint the artifact set before dispatch and compare after, and include untracked paths: a status listing alone hides mutation of a file that was already modified.
+
+An unexplained delta after dispatch means the round is contaminated. Identify what the critic created or changed, restore only that without clobbering pre-existing edits, and re-run against the original artifact or a write-incapable route before reconciling any finding from that round.
+
+A write-incapable exploration subagent removes the risk but usually cannot reach documentation or web tools, so a fact-checking lane may still need a write-capable critic. Choose per lane, not per session.
+
 Treat the isolation as conversation isolation only. Anything that must bind the critic belongs in the packet, and anything the producer's own instruction files push toward is a bias the critic may quietly share — which is the blind spot a different model family was chosen to avoid.
 
 ## Claude Code

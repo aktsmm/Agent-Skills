@@ -120,6 +120,7 @@ Also search for:
 
 - TODOs, placeholders, authoring notes, unresolved conflict markers, and temporary labels
 - missing or duplicate headings, chapters, figures, tables, notes, and answer keys
+- declared counts that disagree with the enumeration they introduce, including list items, table rows, code lines, and grouping phrases such as "the first two" and "the last three"
 - stale generated digests, indexes, glossaries, counts, and chapter maps
 - secrets, personal data, internal URLs, local absolute paths, and unpublished customer information
 

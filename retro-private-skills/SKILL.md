@@ -87,6 +87,7 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 
 - Prefer improving existing text over appending duplicate guidance.
 - Before writing a new rule, check whether the repository already implements the same decision in scripts, generated assets, or another skill. A rule that contradicts working code makes the next run "fix" assets that were already correct.
+- A single negative observation is not a rule. Before writing "the feature is absent here", rule out authentication state, extension activation, and mode: a half-initialised client renders its surrounding UI while omitting the entries you were looking for. If you cannot rule them out, record the observation with its conditions rather than as an absolute.
 - Compaction targets the minimum information the model needs to act; human readability is secondary.
 - Use this refactor order: delete stale text -> merge/compact duplicates -> move long detail to `references/` -> add missing guidance.
 - Keep `SKILL.md` lean; move detailed procedures, command examples, and examples to `references/*`.

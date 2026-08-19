@@ -69,6 +69,7 @@ When applying reviewer feedback to final manuscript files, treat the cited line 
 - Check the matching outline/key-points file and update it only when structure, terms, or required coverage changed; record "no update needed" when the edit is prose-only
 - Classify each review comment before editing: same-slice fix, synchronized terminology/title fix, or separate follow-up item that should become its own issue/PR instead of widening the current patch
 - If a fix changes a repeated chapter title or representative term, also check synchronized assets such as the chapter map/file map, chapter-end question digest, and progress or page-allocation tracker in the same task
+- When a visual conflicts with the body, decide which case it is: the visual merely omits something, so the sentence that introduces it should state the visual's scope; or the visual asserts an order, scope, or label the body denies, so update the visual source and regenerate the derived output. After regenerating, re-check every label against the whole chapter, not only the introducing paragraph
 - If review fixes arrive through stacked pull requests, inspect commit ancestry and changed files before deciding merge order or judging overlap; when later PRs already include earlier commits, merge the older layer first or restack before review
 
 ### Why This Matters
@@ -132,6 +133,7 @@ do not stop at the first rename.
 - Rename the manuscript heading and every synchronized path together
 - Check that the old folder or file no longer exists physically
 - Grep the old chapter title after the rename to catch leftovers in docs, agents, or instructions
+- Check whether the title's source of truth is a generator script or config module rather than the manuscript; a regenerated artifact that shows no diff after the rename means the generator still holds the old value
 - Rebuild Re:VIEW/PDF output and confirm the old path is not still being converted
 
 ### Why This Matters

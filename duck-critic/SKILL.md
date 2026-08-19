@@ -25,7 +25,7 @@ This is **not** "hand the whole task to a reviewer subagent". You stay the **pro
 ## Producer vs Critic Roles
 
 - **Producer (you, the main agent)**: own and keep producing the artifact — plan, code, tests, design. You never hand the whole job to the critic. You decide checkpoints, send packets, reconcile findings, and apply revisions yourself.
-- **Critic (a different model)**: a read-only reviewer that only inspects the producer's current artifact and returns severity-classified findings. It never writes files or runs mutating commands.
+- **Critic (a different model)**: a read-only reviewer that only inspects the producer's current artifact and returns severity-classified findings. It must not write files or run mutating commands — that is a role contract, not a capability the harness enforces, so the producer verifies it per [harness adapters](./references/harness-adapters.md).
 - This is a **gated checkpoint loop**, not two agents running at the same wall-clock moment. The producer reaches a checkpoint, hands off to the critic, gets findings, revises, and re-consults — that is where the second model's value comes from. Running multiple critic _lanes_ in parallel at a single checkpoint is fine; the producer and critic taking turns is the loop.
 
 ## Core Rules
@@ -90,7 +90,7 @@ Keep `.agent.md` companion files out of this skill unless the user explicitly as
 
 - The producer kept ownership of the work; the implementation was not delegated wholesale to the critic.
 - The response says which route was used and how many rounds the loop ran.
-- The critic stayed read-only and, where the harness allowed, was a preferred family different from the producer's.
+- The critic was verified to have stayed read-only and, where the harness allowed, was a preferred family different from the producer's.
 - The loop stopped on a real condition: critic PASS, an explicitly accepted PASS_WITH_NOTES, the max-rounds fail-safe with unresolved blocking findings reported, or BLOCKED because the critic could not evaluate at all.
 - Findings are severity-classified and tied to the user goal.
 - Native Rubber Duck and fallback critic are not conflated.

@@ -8,6 +8,8 @@ Prefer a real screen wherever one exists. A reader recognises the product from i
 
 The exception is a screen that carries no more information than the prose already does. A list of file names does not beat the table explaining what each file is for. Structure and relationships stay diagrams.
 
+Confirm the element exists in the surface you can actually capture, before building an environment for it. A product often ships different feature sets to its desktop and web clients. Check that the client is fully signed in first: a half-authenticated session renders the surrounding interface while silently omitting the very menu entries you came to photograph, which reads as "the feature is gone" rather than "sign-in is incomplete". When the only surface that shows it differs from the one the chapter's other captures came from, the figures will not sit together on the page, and prose is the cheaper answer.
+
 A policy of "no screenshots" is worth revisiting rather than defending. The usual argument for it is that interfaces change, but that risk is cheaper than the teaching value it costs, and it is disclosed once in the front matter instead of paid for in every chapter.
 
 Do not substitute a diagram that imitates the product's chrome — header bars, sidebars, tab strips. A redrawn interface carries the same trademark exposure as a capture with none of its evidence.
@@ -32,6 +34,8 @@ Capturing while signed in is fine, and your own name and avatar may appear. What
 Cutting the entire top band to achieve that costs the reader the breadcrumb that says which screen this is. Hide the account side of the header instead, with a rule that preserves layout rather than removing the element, so the breadcrumb stays where it was.
 
 Make a hide selector that matches nothing **fail the capture**. Generated class names rotate, and a silently unapplied rule is discovered by a reader, not by you. Where framing cannot exclude a third party, blur or fill the region and record what was altered.
+
+Resize before you frame. A side panel captured at its default width can clip the descriptions beside each entry, which is often the detail the figure was taken to show. Widen it first, then choose the crop.
 
 Public owner names that a signed-out visitor would also see are fine. Private organisation names, customer names, and anything visible only under a specific contract are not.
 
