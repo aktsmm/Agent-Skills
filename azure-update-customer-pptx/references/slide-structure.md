@@ -51,6 +51,22 @@ a retirement or a forced default change cannot honestly be labelled a benefit.
 - Line 4 label comes from `impactType`: 要対応 → `リスク`, 活用候補 → `メリット`, 評価 → `評価観点`,
   情報 → `変更の意味`. Line 6 defaults to 廃止 → `期限`, Preview → `制約`, otherwise `適用条件`, and an
   authored `conditionLabel` may override it to `課金`.
+- **`想定シナリオ` must let the reader decide "is this me?" — never restate the feature.** Require the
+  asset the reader already owns and the operation they perform on it; the structural position (where the
+  thing sits, what it currently replaces) is optional but is what makes an infrastructure update click.
+  Do **not** put the benefit there — line 4 owns that. Updates with no placement (API changes,
+  retirements, policy changes) are exempt from the positional element.
+  - ❌ `仮想ネットワーク間の広帯域ルーティングを、仮想マシン ベースの NVA を並べて構成している場合`
+    — a paraphrase of the feature name; the reader cannot picture where it goes.
+  - ✅ `ハブ VNet でスポーク間通信を集約し、VM ベース NVA を冗長化している場合`
+  - The complaint that triggers this rule sounds like *"I follow it when you explain it, but the slide
+    alone doesn't land."* The fix is vocabulary the reader already uses for their own topology, not more
+    text. Expect one or two offenders per issue rather than a uniformly bad set — the rest of the deck
+    usually reads fine, which is why it survives review.
+- `想定シナリオ` and the Before panel must not converge on the same sentence. `想定シナリオ` states the
+  reader's qualifying condition; Before states the current construction. They are authored in different
+  files (`body_meta.json` vs the fetched item), so nothing mechanical catches a pair that differs only by
+  verb ending. Put both side by side in a review table before approving.
 - **Never put region wording in the body.** The RegionStamp is the only place it appears; a body sentence
   such as "Japan East / Japan West の両方で利用できる想定" duplicates the stamp and burns a whole line.
 - Author the body copy as data (`_artifacts/body_meta.json`: `useCase` / `impactStatement` / `action` /

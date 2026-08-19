@@ -92,8 +92,10 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 - **Fail fast**: 問題が出たら次フェーズへ無理に進めない
 - **Human in loop**: PLAN でユーザー確認を入れる
 - **Technical content is verified content**: Azure / Microsoft の内容は MCP で一次情報確認してから入れる
-- **PowerPoint lock first**: 開いている PPTX に対して python-pptx で上書きしない
+- **PowerPoint lock first**: 開いている PPTX に対して python-pptx で上書きしない。読み取りも `PermissionError` になるので、`Copy-Item` で `%TEMP%` へ複製してから読む。`markitdown` の出力を PowerShell でパイプすると文字化けするため `-o` でファイルへ書かせる
 - **COM for open decks**: 開いている PPTX や既存 deck の直接編集は [references/instructions/com-automation.instructions.md](references/instructions/com-automation.instructions.md) を参照する
+- **Leave it open or close it fully**: COM 作業の最後は「ユーザーに見せるので開いたまま」か「完全に終了」かを必ず決める。中身のない PowerPoint ウィンドウを残さない。内部処理だけなら `Presentation.Close()` の後に `Presentations.Count` が 0 であることを確認して `Application.Quit()` し、それでも残る `POWERPNT` は **MainWindowTitle が空またはファイル名なしのプロセスだけ** 停止する（ファイル名入りはユーザー作業中）
+- **Know how the deck was opened**: `Invoke-Item` / エクスプローラー経由で開いた OneDrive・SharePoint 上の PPTX は `Presentation.FullName` が `https://` になり、**`SaveCopyAs` が %TEMP% へも書かずに例外なしで失敗する**。PDF 書き出し前に `FullName` を確認し、URL なら一度 Close してローカル絶対パスで `Presentations.Open()` し直してから `SaveAs($tmp, 32)` する
 - **Operational text stays in notes**: 運営メモはスライド面に出さない
 - **Customer-facing surface only**: 顧客向け deck のスライド面には内部向け話法、避ける表現、作業メモ、検証メモ、ファイル用途ラベルを混ぜない。話者向け情報は speaker notes へ分離する
 - **Template means template**: ユーザー指定テンプレートがある場合、特に表紙はテンプレートの既存プレースホルダー/レイアウトを使い、上から別図形を重ねて隠さない
