@@ -29,6 +29,7 @@ Guidelines for manuscript writing style and quality.
 - Format: Japanese（English） - e.g., 機密性（Confidentiality）
 - Use consistent terminology throughout
 - Establish the parent concept before introducing a subtype, exception, or limitation.
+- For a feature that is retired or scheduled for retirement, keep the explanation but remove it from tables, figures, and decision lists that present currently selectable options.
 
 ### Structure
 
@@ -88,3 +89,4 @@ See `docs/page-allocation.md` for detailed targets per file type.
 - Translation-style Japanese
 - Sentences over 500 characters
 - Speculative statements presented as facts
+- Editorial rationale addressed to the reader, such as "this book keeps X because..." or "X was excluded from this table", which explains the author's decision instead of what the reader needs to know

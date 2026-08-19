@@ -122,6 +122,8 @@ Also search for:
 - missing or duplicate headings, chapters, figures, tables, notes, and answer keys
 - declared counts that disagree with the enumeration they introduce, including list items, table rows, code lines, and grouping phrases such as "the first two" and "the last three"
 - stale generated digests, indexes, glossaries, counts, and chapter maps
+- separator variants of a term being unified in bulk, such as an inserted space, middle dot, hyphen, or line break, which escape a single-pattern replacement and survive into the built output
+- project style limits that are declared but never measured, such as a per-chapter cap on a phrasing pattern; count them per chapter instead of trusting the rule
 - secrets, personal data, internal URLs, local absolute paths, and unpublished customer information
 
 Machine checks detect known patterns. They do not replace factual, semantic, or visual review.
@@ -163,6 +165,7 @@ Review the full manuscript for release-wide invariants. Review 100% of the chang
 - agreement among body text, summaries, captions, tables, examples, questions, answers, and explanations
 - front matter, acknowledgements, index, glossary, colophon, copyright, edition, author, publisher, ISBN, and dates
 - required disclaimers, safety notices, update cut-off statements, and limitations for the book's subject and market
+- agreement between the declared content cut-off date and the manuscript's own claims, including events dated after that cut-off and completed-tense statements about changes that are only scheduled
 - consistency between source, generated digests, and every published format
 
 For answer-bearing content, compare each answer with its explanation and source. Structural presence checks cannot detect a valid-looking but wrong answer label.
