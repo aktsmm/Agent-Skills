@@ -43,7 +43,7 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
   - エラーログ、diff/commit、会話履歴、ターミナル履歴、既存 `.copilot` 資産
 - 既定の反映スコープ
   - `~/.copilot` 配下の個人グローバルカスタマイズ資産を優先する
-  - workspace / repository や VS Code User Data へ反映すべき知見はこの skill では扱わず、handoff を提案する
+  - workspace / repository や VS Code User Data へ反映すべき知見はこの skill では扱わず、handoff を提案する。workspace handoff は host が提供する active workspace を指定し、外部の新規プロジェクトフォルダを作成・提案しない
   - memory 系スコープは反映先にしない
 - ターミナル観点
   - Exit Code != 0

@@ -25,10 +25,10 @@ metadata:
 
 ## Workspace 検出（反映先決定）
 
-VS Code と違い、CLI / Scout は workspace（プロジェクトフォルダ）外で実行されることがある。知見抽出の前に反映先を決める。
+CLI / Scout は VS Code のアクティブ workspace を常に取得できない。知見抽出の前に反映先を決める。
 
-1. 現在地が workspace 内か判定する: CWD かその親に `.git` / `.github/` / `AGENTS.md` のいずれかがあれば workspace とみなす
-2. workspace あり: その repo ルートを反映先にして通常フローを進める
+1. ユーザーまたは host context が workspace path を明示している場合: repo marker の有無を問わず、その folder を反映先にする。CWD や外部の新規プロジェクト候補で上書きしない
+2. 明示 workspace path がない場合: CWD かその親に `.git` / `.github/` / `AGENTS.md` のいずれかがあれば、その repo ルートを反映先にする
 3. workspace なし: 自動でファイルを作らず、ユーザーに確認する
    - 選択肢を提示: (a) この知見を残すプロジェクトフォルダを新規作成する / (b) 反映せず handoff（知見だけ提示） / (c) 既存の別フォルダを指定する
    - (a) を選んだ場合のみ、最小のプロジェクトフォルダ（kebab-case slug の `README.md` + `.github/` 雛形）を作成し、そこを反映先にする。作成場所は確認する

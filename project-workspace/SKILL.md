@@ -14,9 +14,9 @@ Use this skill when the user asks to create, open, prepare, or organize a projec
 
 ## Default location
 
-- Use the user's configured Clawpilot project root as the default root for project-specific folders.
-- In local installs, this root is commonly a dedicated non-OneDrive project workspace. Treat the concrete local path as environment-specific configuration, not portable skill content.
-- Do not create new project folders under the chat/workspace document folder unless the user explicitly asks for that location.
+- When an active VS Code workspace is provided and the user is adding or organizing assets for the current task, use that workspace as the default target even without repo markers. Do not redirect it to an external project root.
+- Use the configured project root only when the user requests a separate project workspace or no active workspace target is available.
+- In CLI / Scout without active-workspace context, ask for a target folder when CWD does not identify a workspace. Do not infer an external project location.
 - Use Windows-style paths with backslashes.
 
 ## Folder naming
