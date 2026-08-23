@@ -21,9 +21,11 @@ metadata:
 ## Core Rules
 
 - **Account unclear** → Ask the user, do not guess
+- **Context affecting the account is missing** → Ask before renaming or updating the memo when the recipient name, the relationship to that person, or the business purpose is unclear. These change the account (e.g. 接待交際費 / 会議費 / 事業主貸). Never infer them from vendor or amount alone.
 - **Scope** → The default examples assume Japanese bookkeeping and Japanese tax-filing terminology
 - **Filename format** → Use `YYYY-MM-DD-content-vendor-note-amount-勘定科目[-メモ].ext`
 - **Date** → Use the service date, not screenshot date or settlement date
+- **Evidence priority when values conflict** → Trust EXIF first, then the existing filename, then the OCR result, and use the file timestamp only as a last resort. The file timestamp shifts on copy, sync, and re-save, so never let it override a date visible in the receipt.
 - **Private card payment** → The receipt itself uses the real expense account (e.g. 印刷費); the reimbursement transfer uses 事業主借
 - **Personal withdrawal from booked business account** → Use `借方: 事業主貸 / 貸方: 普通預金`, never `対象外`; include the source account and journal entry in the monthly memo.
 - **Cash withdrawal source or use unclear** → Ask whether the source is a booked business `普通預金` and whether the cash was for private or business use before renaming or updating the memo.
