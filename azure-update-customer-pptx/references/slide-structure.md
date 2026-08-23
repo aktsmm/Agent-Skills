@@ -59,8 +59,8 @@ a retirement or a forced default change cannot honestly be labelled a benefit.
   - ❌ `仮想ネットワーク間の広帯域ルーティングを、仮想マシン ベースの NVA を並べて構成している場合`
     — a paraphrase of the feature name; the reader cannot picture where it goes.
   - ✅ `ハブ VNet でスポーク間通信を集約し、VM ベース NVA を冗長化している場合`
-  - The complaint that triggers this rule sounds like *"I follow it when you explain it, but the slide
-    alone doesn't land."* The fix is vocabulary the reader already uses for their own topology, not more
+  - The complaint that triggers this rule sounds like _"I follow it when you explain it, but the slide
+    alone doesn't land."_ The fix is vocabulary the reader already uses for their own topology, not more
     text. Expect one or two offenders per issue rather than a uniformly bad set — the rest of the deck
     usually reads fine, which is why it survives review.
 - `想定シナリオ` and the Before panel must not converge on the same sentence. `想定シナリオ` states the
