@@ -1,6 +1,6 @@
 ---
 name: local-media-transcription
-description: "Transcribe local audio/video files to text, then optionally produce meeting minutes, action items, speaker separation, and PPT-ready summaries. Use when 文字起こし, transcription, transcribe mp4, meeting transcript, mp4から文字起こし, 録画から議事録, 話者分離, or diarization."
+description: "Transcribe local MP4/M4A/MP3/WAV/WEBM audio or video with ffmpeg and Whisper, then optionally produce diarized transcripts, customer-facing meeting minutes, action items, and PPT-ready summaries. Use when: 文字起こし, transcription, transcribe mp4, meeting transcript, mp4から文字起こし, 録画から議事録, 顧客向け議事録, 話者分離, diarization, whisper CLI, ffmpeg."
 argument-hint: "文字起こししたいファイルパス or 対象会議の説明"
 user-invocable: true
 license: CC BY-NC-SA 4.0
