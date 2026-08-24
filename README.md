@@ -40,7 +40,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [export-session-log](export-session-log/) | Export the current chat session as a structured Markdown work timeline or blog-draft seed |
 | [goal-loop](goal-loop/) | Run an explicit end-to-end goal loop with frozen Scope/criteria, worker delegation, external verification, evaluator review, and bounded retries |
 | [humanize-writing](humanize-writing/) | Remove AI-generated tone and make writing sound more human in Japanese and English |
-| [local-media-transcription](local-media-transcription/) | Transcribe local audio/video files to text, then optionally produce meeting minutes, action items, speaker separation, and PPT-ready summaries |
+| [local-media-transcription](local-media-transcription/) | Transcribe local MP4/M4A/MP3/WAV/WEBM audio or video with ffmpeg and Whisper, then optionally produce diarized transcripts, customer-facing meeting minutes, action items, and PP... |
 | [microsoft-graph-gateway](microsoft-graph-gateway/) | Route Microsoft Graph work in this workspace |
 | [ocr-super-surya](ocr-super-surya/) | GPU-optimized OCR using Surya |
 | [opportunity-factory](opportunity-factory/) | Run a reusable opportunity-to-artifact workflow: discover unmet needs, set up workspace factories, schedule recurring commander/worker/reporter prompts, batch-refine many items,... |
