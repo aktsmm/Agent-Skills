@@ -42,6 +42,7 @@ Humanize Writing の検出辞書。検出は厳密に、修正は文脈判断で
 | 無理な差し込み理由      | 画像・図・表の前に `〜を掴みやすくするためです` `〜のイメージを掴みやすいので` のような正当化を置く                                        | まず対象を普通に紹介する。例: `こちらは GitHub Codespaces です。〜という製品ですね。` 理由説明は必要なときだけ残す                                  |
 | 教科書型橋渡し          | `この違いが分かると〜` `ここで重要なのは〜` `大事なのは〜` `〜と覚えておけば、ひとまず十分です`                                            | 半数以上を削除。残すなら事実か判断軸で閉じる                                                                                                        |
 | 姿勢宣言                | `正面から扱う` `正面から回収する` `多角的に見る` `掘り下げる` `言語化する` `触れる` `言及する` が、何を見たかを増やしていない              | 姿勢ではなく、扱った対象・判断・結果を書く。新情報がなければ削る                                                                                    |
+| 出典の擬人化 | `Docs 自身が認めている` `公式が警告している` `ドキュメントが語る` のように出典を主語にして意志を持たせる。`はっきり書かれている` `明確に述べている` の強調副詞が付きやすいが、引用の中身は増えていない | 出典は主語にせず `Docs にも〜と書かれている` と事実で書く。強調副詞は削り、引用文そのもので強さを出す |
 | 接続テンプレ            | `〜において` `〜という側面から` `〜の観点から` `さらに` `また` `加えて` の連打                                                             | 接続で論理を作ったように見せず、前後の関係や追加された事実を具体的に書く                                                                            |
 | 予測的足場設営          | 章冒頭の `ここで大事なのは〜です` `〜が考慮すべき点です`                                                                                   | 予測を削り、本文へ直結させる                                                                                                                        |
 | 内部資産列挙            | `SSOT` `handbook` `playbook` `checklist` `運営メモ` の棚卸し                                                                               | 公開文では一覧化せず、何がやりやすくなったかに圧縮する                                                                                              |
@@ -156,9 +157,11 @@ Humanize Writing の検出辞書。検出は厳密に、修正は文脈判断で
 
 Not every tell is tonal. Long-form Japanese generation occasionally substitutes a visually similar character for the intended one, producing a word no dictionary contains that a reader's eye still slides over.
 
-- Observed substitutions include `覆う` coming out as `覛`, `厄介` as `厨い`, and `食い違い` collapsing into unrelated kana
+- Observed substitutions include `覆う` coming out as `覛`, `厄介` as `厨い` or `厥介`, and `食い違い` collapsing into unrelated kana
 - Spellcheckers and structural gates miss it. Each character is individually valid and the surrounding grammar still parses
-- Detect it by grepping a curated list of rare characters that have no business appearing in this text, and grow the list whenever a new one turns up. Reading for it does not work reliably
+- A curated list of rare characters is not enough on its own. It only catches substitutions you have already seen, and a new one passes straight through. `厥介` survived a list-based sweep and was caught only by a human reader
+- Prefer a frequency sweep that needs no list: extract every CJK character in the draft, group by character, and review the ones that occur exactly once. A substitution is almost always a single occurrence, so it always surfaces
+- Judge those candidates in context rather than mechanically. Correct but uncommon wording such as `土俺に乗らない` or `腑に落ちる` also occurs once
 - Run the sweep after any long generation pass, not only before publication
 
 ## Experience-writing Signals

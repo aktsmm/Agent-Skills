@@ -114,7 +114,7 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 
 ## Troubleshooting
 
-頻度高トップ 4 件を下記に掲載。全一覧（フレーム/エッジ/余白/PDF 出力、レジェンド位置、エスケープ層、CLI の export オプション 等 21 項目）は [references/troubleshooting.md](references/troubleshooting.md)。
+頻度高トップ 4 件を下記に掲載。全一覧（フレーム/エッジ/余白/PDF 出力、レジェンド位置、エスケープ層、CLI の export オプション 等 24 項目）は [references/troubleshooting.md](references/troubleshooting.md)。
 
 | Issue | Solution |
 | --- | --- |
