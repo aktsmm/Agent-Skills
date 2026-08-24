@@ -137,6 +137,8 @@ CDP recovery、blocking dialog、context/page selection は [references/instruct
 - CDP 二重接続で入力先が混線する
 - CDP の別 context/page を使い、未ログイン画面や別アカウントを操作してしまう
 - 「見えているがクリックできない」状態を無理に通常 click で押し切る
+- 座標クリックが成功を返すのに何も起きない（要素が実ウィンドウ外にいる）
+- ページは正常なのに特定の widget だけ、一定回数の操作後に無反応になる
 
 ## Subprocess + CDP Stability (Windows)
 

@@ -43,6 +43,21 @@ A read-back only proves transient UI state. Re-verify after the form's own save 
 
 Never assume a radio group starts empty. A group can arrive with a non-default option pre-selected, so read the whole group's state before deciding whether you need to change anything.
 
+## Element sits outside the real viewport
+
+Canvas-like widgets (org charts, diagram editors, graph views) lay children out around a centred root, so a target can resolve with a valid rect at a NEGATIVE `left` or a `top` past the window height. `Input.dispatchMouseEvent` at those coordinates lands on nothing and returns success, so the click looks like it worked.
+
+- Widening the viewport with `Emulation.setDeviceMetricsOverride` does **not** fix this. Input hit testing still follows the real window, so a coordinate inside the enlarged virtual viewport but outside the window hits nothing.
+- Measure first and only scroll when the point is outside the window. Some widgets re-run their own layout and reset the container scroll, so an unconditional `scrollIntoView` can move the target back out of view.
+- `scrollIntoView` is not synchronous with layout. Scroll, wait, then re-read `getBoundingClientRect()` in a second evaluation. Reading the rect in the same call returns pre-scroll coordinates and you click the previous element.
+- Refuse to click when the re-measured point is still outside the window, instead of dispatching into empty space.
+
+## Handler runs but synthetic clicks are ignored
+
+When coordinate click and `el.click()` both do nothing, read the element's inline `onclick`. Frameworks that wrap handlers in drag detection (`_onClickButNotDrag`-style) bail out unless a real `mousedown` preceded the click, so both synthetic paths are silently dropped.
+
+Invoke the declared handler directly instead: `new Function('event', el.getAttribute('onclick')).call(el, new MouseEvent('click', {bubbles: true}))`. Verify the resulting DOM state, because a handler that no longer exists fails the same silent way.
+
 ## Hiding sensitive UI before a capture
 
 When a selector suppresses something that must not appear in a published image (account avatar, notification badge, tenant name), a zero-match must be an error. Helpers that loop over `querySelectorAll` and hide each hit succeed silently on zero elements, so a renamed class ships the very thing you meant to remove. Return the match count and fail the run when it is 0. Split the selectors into must-hide and optional so localization or A/B variants that legitimately lack an element do not fail every run.
@@ -72,6 +87,8 @@ Rules:
 - Use UI for login, preflight, and before/after evidence.
 - Keep business logic in Python or the main script; let JavaScript execute fetch/write only.
 - Complete fetch -> decision -> update -> result return in one evaluation when possible.
+- The same path turns the browser into a local rendering engine: `import()` a renderer (diagram, chart, markdown) into a blank tab and return the produced markup, instead of installing a headless toolchain or posting the payload to a hosted rendering service. The data never leaves the machine, which matters when it holds names or internal structure.
+- Pin the exact version of any library imported this way. A floating major on a CDN can change or break an unattended run months later, and the failure surfaces as a parse error far from the change.
 
 ## Minimal UI Write Fallback
 
