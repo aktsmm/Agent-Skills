@@ -71,6 +71,8 @@ The verdict is the producer's, not the critic's. A critic states its findings an
 - For multiple trials or collectors, preserve the run, method, unit, and marked symptom window; do not present cross-run values as one continuous experiment or as directly comparable metrics.
 - Require a candidate cause to align with symptom onset and duration. A later or isolated spike cannot explain an earlier, sustained failure without additional evidence.
 - Treat collection overhead as a confounder. Require a smoke test, baseline, or equivalent evidence before trusting measurements from a new collector.
+- A quotation must match the source verbatim. Truncating one can invert its meaning: dropping a trailing condition turns "X is one example" into "X is required". Re-fetch the source and diff the quoted span, including the paraphrase or translation that follows it.
+- A claim about when something was written or changed is checkable. Read the commit history of the source file instead of inferring order from publication dates. A "documented later" story often collapses into a single commit that already contained both parts.
 
 ## Output Discipline
 
