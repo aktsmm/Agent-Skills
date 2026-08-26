@@ -60,9 +60,10 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 4. Use viewport-size clipping, not `fullPage`, when decorative elements can overflow the poster. `fullPage` may capture off-canvas decoration and create white margins.
 5. Use `domcontentloaded` plus a short fixed wait if external fonts make `load` or `networkidle` hang.
 6. Use `device_scale_factor=1` when the PNG must be the stated size. Use `2` only when high-density output is desired and the larger pixel dimensions are acceptable.
-7. Inspect every PNG with `view_image`.
-8. If any PNG has overlap, clipping, unreadable text, wrong order, unexpected margins, wrong pixel size, or excessive density, fix the HTML or renderer, render again, and re-check that PNG.
-9. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
+7. Prefer `container-type: inline-size` when only width-relative units such as `cqw` are needed. With `container-type: size`, give the wrapper a definite block size or an intrinsic fallback: full size containment ignores descendants when resolving an auto block size, so the wrapper can collapse to an empty-box height while a descendant's `scrollHeight` stays nonzero.
+8. Inspect every PNG with `view_image`.
+9. If any PNG has overlap, clipping, unreadable text, wrong order, unexpected margins, wrong pixel size, or excessive density, fix the HTML or renderer, render again, and re-check that PNG.
+10. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
 
 ## Visual QA Checklist
 
@@ -73,6 +74,7 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 - Step numbers and visual order match DOM / reading order.
 - Card text fits without cramped line breaks.
 - Contrast is readable on the final PNG, not just in HTML.
+- A blank or short capture is treated as a defect to diagnose, not an empty design. Check the wrapper's computed height before blaming the content.
 - The final answer refers to the current infographic request, not an older topic from the conversation.
 
 ## Completion Report

@@ -1,0 +1,295 @@
+/* single-html-forge deck template v1 — hash-pinned.
+ * Every variable value arrives through a --shf-* custom property.
+ */
+:root {
+  --shf-color-bg: #ffffff;
+  --shf-color-fg: #1b1f27;
+  --shf-color-muted: #5b6472;
+  --shf-color-accent: #0067b8;
+  --shf-color-surface: #f6f8fb;
+  --shf-color-line: #e1e5eb;
+  --shf-size-base: 20px;
+  --shf-scale-step: 1.25;
+  --shf-space-gap: 24px;
+  --shf-radius-card: 12px;
+  --shf-weight-display: 700;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #0d0f13;
+}
+
+body {
+  font-family:
+    "Segoe UI", "Yu Gothic UI", "Hiragino Sans", Meiryo, system-ui, sans-serif;
+  font-feature-settings: "palt" 1;
+  line-break: strict;
+  overflow-wrap: anywhere;
+  color: var(--shf-color-fg);
+  display: grid;
+  place-items: center;
+}
+
+/* 16:9 stage that scales to the viewport without changing layout maths. */
+#shf-root {
+  width: 100vw;
+  height: 56.25vw;
+  max-height: 100vh;
+  max-width: 177.78vh;
+  position: relative;
+  background: var(--shf-color-bg);
+  container-type: size;
+  overflow: hidden;
+}
+
+[data-slide-id] {
+  position: absolute;
+  inset: 0;
+  padding: 6cqw 7cqw;
+  display: flex;
+  flex-direction: column;
+  gap: var(--shf-space-gap);
+  font-size: 2.6cqw;
+  line-height: 1.7;
+}
+
+[data-slide-id][hidden] {
+  display: none;
+}
+
+[data-slide-id] h1 {
+  font-size: 6.2cqw;
+  line-height: 1.25;
+  margin: 0;
+  font-weight: var(--shf-weight-display);
+  letter-spacing: -0.01em;
+}
+
+[data-slide-id] h2 {
+  font-size: 4.4cqw;
+  line-height: 1.3;
+  margin: 0;
+  font-weight: var(--shf-weight-display);
+}
+
+[data-slide-id] h2::after {
+  content: "";
+  display: block;
+  width: 2.6em;
+  height: 0.14em;
+  margin-top: 0.4em;
+  background: var(--shf-color-accent);
+}
+
+[data-slide-id] p {
+  margin: 0;
+}
+[data-slide-id] ul,
+[data-slide-id] ol {
+  margin: 0;
+  padding-left: 1.3em;
+}
+[data-slide-id] li {
+  margin: 0.35em 0;
+}
+
+.shf-lead {
+  color: var(--shf-color-muted);
+  font-size: 2.2cqw;
+}
+
+.shf-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--shf-space-gap);
+}
+
+.shf-card {
+  background: var(--shf-color-surface);
+  border: 1px solid var(--shf-color-line);
+  border-top: 0.25em solid var(--shf-color-accent);
+  border-radius: var(--shf-radius-card);
+  padding: 1.1em 1.2em;
+}
+
+.shf-card h3 {
+  margin: 0 0 0.4em;
+  font-size: 2.5cqw;
+  color: var(--shf-color-accent);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 2.1cqw;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--shf-color-line);
+  padding: 0.55em 0.7em;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--shf-color-surface);
+  font-weight: var(--shf-weight-display);
+}
+
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+code,
+pre {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-feature-settings: normal;
+}
+
+pre {
+  background: var(--shf-color-surface);
+  border: 1px solid var(--shf-color-line);
+  border-radius: var(--shf-radius-card);
+  padding: 0.9em 1em;
+  overflow: auto;
+  font-size: 1.9cqw;
+}
+
+a {
+  color: var(--shf-color-accent);
+}
+
+/* chrome */
+#shf-chrome {
+  position: absolute;
+  right: 1.6cqw;
+  bottom: 1.2cqw;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 1.6cqw;
+  color: var(--shf-color-muted);
+}
+
+#shf-chrome button {
+  font: inherit;
+  color: inherit;
+  background: var(--shf-color-surface);
+  border: 1px solid var(--shf-color-line);
+  border-radius: 999px;
+  padding: 0.25em 0.9em;
+  cursor: pointer;
+}
+
+#shf-chrome button:hover {
+  border-color: var(--shf-color-accent);
+  color: var(--shf-color-accent);
+}
+
+[data-shf-notes] {
+  display: none;
+}
+
+/* presenter overlay lives in the document and is only toggled */
+#shf-presenter {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #0d0f13;
+  color: #f2f4f7;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+  padding: 28px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+#shf-presenter[hidden] {
+  display: none;
+}
+#shf-presenter h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #9fb0c4;
+  text-transform: uppercase;
+}
+#shf-presenter .shf-pane {
+  background: #171b22;
+  border: 1px solid #262d38;
+  border-radius: 12px;
+  padding: 16px 18px;
+  overflow: auto;
+}
+#shf-presenter-clock {
+  font-size: 34px;
+  font-variant-numeric: tabular-nums;
+}
+#shf-presenter-notes {
+  white-space: pre-wrap;
+}
+.shf-presenter-head {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+@media print {
+  /* The stage carries container-type: size so slides can use cqw units. Size
+   * containment makes height:auto resolve to 0, which combined with the stage's
+   * overflow:hidden clipped every slide away in PDF output. Moving the container
+   * down to each slide keeps cqw working and lets the stage grow. */
+  html,
+  body {
+    height: auto;
+  }
+  body {
+    background: #fff;
+    display: block;
+  }
+  #shf-root {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    container-type: normal;
+    overflow: visible;
+  }
+  [data-slide-id] {
+    position: static;
+    break-after: page;
+    height: 100vh;
+    container-type: size;
+  }
+  [data-slide-id]:last-of-type {
+    break-after: auto;
+  }
+  [data-slide-id][hidden] {
+    display: flex;
+  }
+  #shf-chrome,
+  #shf-presenter {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

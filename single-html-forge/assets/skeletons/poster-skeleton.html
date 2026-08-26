@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja" data-shf-archetype="poster" data-shf-runtime="1" data-shf-css="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poster skeleton</title>
+<style id="shf-theme">:root{--shf-color-accent:#0067b8;--shf-size-canvas-w:1200px;--shf-size-canvas-h:630px}</style>
+<style id="shf-css">/* single-html-forge poster template v1 — hash-pinned.
+ * Fixed-canvas artifact meant to be exported as a PNG at an exact pixel size.
+ */
+:root {
+  --shf-color-bg: #ffffff;
+  --shf-color-fg: #1b1f27;
+  --shf-color-muted: #5b6472;
+  --shf-color-accent: #0067b8;
+  --shf-color-surface: #f6f8fb;
+  --shf-color-line: #e1e5eb;
+  --shf-size-canvas-w: 1200px;
+  --shf-size-canvas-h: 630px;
+  --shf-size-base: 20px;
+  --shf-space-gap: 24px;
+  --shf-radius-card: 14px;
+  --shf-weight-display: 700;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #eceff3;
+}
+
+body {
+  font-family:
+    "Segoe UI", "Yu Gothic UI", "Hiragino Sans", Meiryo, system-ui, sans-serif;
+  font-feature-settings: "palt" 1;
+  line-break: strict;
+  overflow-wrap: anywhere;
+  color: var(--shf-color-fg);
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+/* Exact pixel canvas. Export renders this element at 1:1 or an integer scale. */
+#shf-root {
+  width: var(--shf-size-canvas-w);
+  height: var(--shf-size-canvas-h);
+  background: var(--shf-color-bg);
+  position: relative;
+  overflow: hidden;
+  padding: 56px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--shf-space-gap);
+  font-size: var(--shf-size-base);
+  line-height: 1.7;
+}
+
+#shf-root::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 10px;
+  background: var(--shf-color-accent);
+}
+
+.shf-eyebrow {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--shf-color-accent);
+}
+
+#shf-root h1 {
+  font-size: 52px;
+  line-height: 1.22;
+  margin: 0;
+  font-weight: var(--shf-weight-display);
+  letter-spacing: -0.015em;
+}
+
+#shf-root h2 {
+  font-size: 30px;
+  line-height: 1.3;
+  margin: 0;
+}
+#shf-root p {
+  margin: 0;
+}
+
+.shf-lead {
+  font-size: 22px;
+  color: var(--shf-color-muted);
+}
+
+.shf-points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--shf-space-gap);
+  margin-top: auto;
+}
+
+.shf-point {
+  background: var(--shf-color-surface);
+  border: 1px solid var(--shf-color-line);
+  border-top: 5px solid var(--shf-color-accent);
+  border-radius: var(--shf-radius-card);
+  padding: 18px 20px;
+}
+
+.shf-point h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: var(--shf-color-accent);
+}
+.shf-point p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.shf-figure {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.shf-figure img,
+.shf-figure svg {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+}
+
+.shf-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  color: var(--shf-color-muted);
+  border-top: 1px solid var(--shf-color-line);
+  padding-top: 14px;
+}
+
+a {
+  color: var(--shf-color-accent);
+}
+
+@media print {
+  body {
+    background: #fff;
+    min-height: 0;
+  }
+  #shf-root {
+    break-inside: avoid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+</head>
+<body>
+<main id="shf-root">
+<p class="shf-eyebrow">SUMMARY</p>
+<h1>1 枚で伝わる見出し</h1>
+<p class="shf-lead">読み手が持ち帰る 1 文をここに置く。</p>
+<div class="shf-points">
+<div class="shf-point"><h3>要点 1</h3><p>短く。長い説明は資料側に置く。</p></div>
+<div class="shf-point"><h3>要点 2</h3><p>数値を出すなら単位まで書く。</p></div>
+<div class="shf-point"><h3>要点 3</h3><p>行動につながる一言で締める。</p></div>
+</div>
+<div class="shf-footer"><span>single-html-forge</span><span>2026-08</span></div>
+</main>
+<script id="shf-model" type="application/json">{"schemaVersion":1,"profileId":"base","profileVersion":1,"assets":[]}</script>
+<script id="shf-runtime">/* single-html-forge fixed runtime v1
+ *
+ * Hash-pinned. Obeys the dataflow invariants in references/artifact-grammar.md:
+ * it never creates elements, never writes markup, never touches CSSOM, and
+ * never builds a URL. Every element it touches already exists in the artifact.
+ */
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+  var archetype = root.getAttribute("data-shf-archetype");
+
+  function all(sel) {
+    return Array.prototype.slice.call(document.querySelectorAll(sel));
+  }
+
+  /* ---------- deck ---------- */
+
+  function initDeck() {
+    var slides = all("[data-slide-id]");
+    if (slides.length === 0) return;
+
+    var index = 0;
+    var counter = document.getElementById("shf-slide-counter");
+    var presenter = document.getElementById("shf-presenter");
+    var pNow = document.getElementById("shf-presenter-now");
+    var pNext = document.getElementById("shf-presenter-next");
+    var pNotes = document.getElementById("shf-presenter-notes");
+    var pClock = document.getElementById("shf-presenter-clock");
+    var started = Date.now();
+    var ticking = null;
+
+    function noteFor(i) {
+      var n = slides[i] ? slides[i].querySelector("[data-shf-notes]") : null;
+      return n ? n.textContent : "";
+    }
+
+    function titleFor(i) {
+      if (!slides[i]) return "";
+      var h = slides[i].querySelector("h1, h2, h3");
+      return h ? h.textContent : slides[i].getAttribute("data-slide-id");
+    }
+
+    function render() {
+      for (var i = 0; i < slides.length; i++) {
+        var active = i === index;
+        slides[i].classList.toggle("is-active", active);
+        slides[i].hidden = !active;
+        slides[i].setAttribute("aria-hidden", active ? "false" : "true");
+      }
+      if (counter) {
+        counter.textContent = index + 1 + " / " + slides.length;
+      }
+      if (pNow) pNow.textContent = titleFor(index);
+      if (pNext) {
+        pNext.textContent =
+          index + 1 < slides.length ? titleFor(index + 1) : "\u2014";
+      }
+      if (pNotes) pNotes.textContent = noteFor(index);
+    }
+
+    function go(next) {
+      if (next < 0) next = 0;
+      if (next > slides.length - 1) next = slides.length - 1;
+      index = next;
+      render();
+    }
+
+    function pad(n) {
+      return n < 10 ? "0" + n : "" + n;
+    }
+
+    function tick() {
+      if (!pClock) return;
+      var s = Math.floor((Date.now() - started) / 1000);
+      pClock.textContent = pad(Math.floor(s / 60)) + ":" + pad(s % 60);
+    }
+
+    function togglePresenter() {
+      if (!presenter) return;
+      var on = presenter.hidden;
+      presenter.hidden = !on;
+      document.body.classList.toggle("shf-presenting", on);
+      if (on) {
+        started = Date.now();
+        tick();
+        ticking = window.setInterval(tick, 1000);
+      } else if (ticking !== null) {
+        window.clearInterval(ticking);
+        ticking = null;
+      }
+    }
+
+    document.addEventListener("keydown", function (e) {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      var k = e.key;
+      if (k === "ArrowRight" || k === "PageDown" || k === " ") {
+        go(index + 1);
+        e.preventDefault();
+      } else if (k === "ArrowLeft" || k === "PageUp") {
+        go(index - 1);
+        e.preventDefault();
+      } else if (k === "Home") {
+        go(0);
+        e.preventDefault();
+      } else if (k === "End") {
+        go(slides.length - 1);
+        e.preventDefault();
+      } else if (k === "s" || k === "S") {
+        togglePresenter();
+        e.preventDefault();
+      }
+    });
+
+    all("[data-shf-action]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var action = btn.getAttribute("data-shf-action");
+        if (action === "next") go(index + 1);
+        else if (action === "prev") go(index - 1);
+        else if (action === "presenter") togglePresenter();
+      });
+    });
+
+    render();
+  }
+
+  /* ---------- doc ---------- */
+
+  function initDoc() {
+    var sections = all("main section[id]");
+    var links = all("[data-shf-navlink]");
+    if (sections.length === 0 || links.length === 0) return;
+
+    function activate(id) {
+      links.forEach(function (a) {
+        var on = a.getAttribute("data-shf-navlink") === id;
+        a.classList.toggle("is-current", on);
+        if (on) a.setAttribute("aria-current", "true");
+        else a.removeAttribute("aria-current");
+      });
+    }
+
+    if (typeof window.IntersectionObserver !== "function") {
+      activate(sections[0].id);
+      return;
+    }
+
+    var seen = Object.create(null);
+    var io = new window.IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          seen[entry.target.id] = entry.isIntersecting
+            ? entry.intersectionRatio
+            : 0;
+        });
+        var best = null;
+        var bestRatio = 0;
+        sections.forEach(function (s) {
+          var r = seen[s.id] || 0;
+          if (r > bestRatio) {
+            bestRatio = r;
+            best = s.id;
+          }
+        });
+        if (best) activate(best);
+      },
+      { rootMargin: "-10% 0px -70% 0px", threshold: [0, 0.25, 0.5, 1] },
+    );
+    sections.forEach(function (s) {
+      io.observe(s);
+    });
+    activate(sections[0].id);
+  }
+
+  /* ---------- boot ---------- */
+
+  if (archetype === "deck") initDeck();
+  else if (archetype === "doc") initDoc();
+  /* poster is static and needs no runtime behaviour */
+})();
+</script>
+</body>
+</html>

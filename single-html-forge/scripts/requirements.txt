@@ -1,0 +1,11 @@
+# Everything required by the skill is in the Python standard library.
+# Both entries below are OPTIONAL and only unlock specific steps.
+
+# Pillow   - resizing/re-encoding in embed_assets.py, and mask_image.py
+# playwright - Tier 2 browser checks in verify_html.py, and export_html.py
+#
+# Without them those steps stop with installation guidance; they never
+# silently pass. Tier 1 verification works with no third-party package.
+
+Pillow>=10.0 ; extra == "images"
+playwright>=1.40 ; extra == "browser"

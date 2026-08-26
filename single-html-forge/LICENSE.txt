@@ -1,6 +1,6 @@
 # CC BY-NC-SA 4.0
 
-Copyright (c) {author}
+Copyright (c) yamapan (https://github.com/aktsmm)
 
 This Skill is licensed under the Creative Commons Attribution-NonCommercial-
 ShareAlike 4.0 International License.

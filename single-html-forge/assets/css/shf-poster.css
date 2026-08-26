@@ -1,0 +1,162 @@
+/* single-html-forge poster template v1 — hash-pinned.
+ * Fixed-canvas artifact meant to be exported as a PNG at an exact pixel size.
+ */
+:root {
+  --shf-color-bg: #ffffff;
+  --shf-color-fg: #1b1f27;
+  --shf-color-muted: #5b6472;
+  --shf-color-accent: #0067b8;
+  --shf-color-surface: #f6f8fb;
+  --shf-color-line: #e1e5eb;
+  --shf-size-canvas-w: 1200px;
+  --shf-size-canvas-h: 630px;
+  --shf-size-base: 20px;
+  --shf-space-gap: 24px;
+  --shf-radius-card: 14px;
+  --shf-weight-display: 700;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #eceff3;
+}
+
+body {
+  font-family:
+    "Segoe UI", "Yu Gothic UI", "Hiragino Sans", Meiryo, system-ui, sans-serif;
+  font-feature-settings: "palt" 1;
+  line-break: strict;
+  overflow-wrap: anywhere;
+  color: var(--shf-color-fg);
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+/* Exact pixel canvas. Export renders this element at 1:1 or an integer scale. */
+#shf-root {
+  width: var(--shf-size-canvas-w);
+  height: var(--shf-size-canvas-h);
+  background: var(--shf-color-bg);
+  position: relative;
+  overflow: hidden;
+  padding: 56px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--shf-space-gap);
+  font-size: var(--shf-size-base);
+  line-height: 1.7;
+}
+
+#shf-root::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 10px;
+  background: var(--shf-color-accent);
+}
+
+.shf-eyebrow {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--shf-color-accent);
+}
+
+#shf-root h1 {
+  font-size: 52px;
+  line-height: 1.22;
+  margin: 0;
+  font-weight: var(--shf-weight-display);
+  letter-spacing: -0.015em;
+}
+
+#shf-root h2 {
+  font-size: 30px;
+  line-height: 1.3;
+  margin: 0;
+}
+#shf-root p {
+  margin: 0;
+}
+
+.shf-lead {
+  font-size: 22px;
+  color: var(--shf-color-muted);
+}
+
+.shf-points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--shf-space-gap);
+  margin-top: auto;
+}
+
+.shf-point {
+  background: var(--shf-color-surface);
+  border: 1px solid var(--shf-color-line);
+  border-top: 5px solid var(--shf-color-accent);
+  border-radius: var(--shf-radius-card);
+  padding: 18px 20px;
+}
+
+.shf-point h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: var(--shf-color-accent);
+}
+.shf-point p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.shf-figure {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.shf-figure img,
+.shf-figure svg {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+}
+
+.shf-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+  color: var(--shf-color-muted);
+  border-top: 1px solid var(--shf-color-line);
+  padding-top: 14px;
+}
+
+a {
+  color: var(--shf-color-accent);
+}
+
+@media print {
+  body {
+    background: #fff;
+    min-height: 0;
+  }
+  #shf-root {
+    break-inside: avoid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "note": "Shared by embed_assets.py and verify_html.py. The verifier is authoritative.",
+  "perImageBytes": {
+    "warn": 400000,
+    "fail": 2000000
+  },
+  "wholeFileBytes": {
+    "warn": 3000000,
+    "fail": 12000000
+  },
+  "inlineSvgBytes": {
+    "warn": 120000,
+    "fail": 500000
+  }
+}

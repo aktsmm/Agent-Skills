@@ -61,6 +61,16 @@ Use the [target license profiles](references/target-license-profiles.json) and
 [validation lanes](references/validation-lanes.md). Baseline review is always
 required; Python helpers and packaging are conditional.
 
+### Gotchas
+
+- `init_skill.py --path` takes the **existing parent directory**; the target becomes `<path>/<skill_name>`. Passing the skill directory itself nests a duplicate.
+- Three artifacts are generated: `SKILL.md`, `LICENSE.txt`, `skill-license.json`.
+- `quick_validate.py` compares `LICENSE.txt` **content exactly** against the rendered template and requires `metadata.author` to equal `authorAttribution.value` character for character. Never hand-edit `LICENSE.txt`; regenerate it with the tool and copy the result over.
+- **A passing gate proves consistency, not correctness.** The manifest hashes whatever the template rendered, so a broken template yields a broken notice that still validates. Read the rendered `LICENSE.txt` once after scaffolding.
+- Classification turns on whether the **source** is independently authored, not on the act of copying. Reusing your own material stays `self-authored`; `PROVENANCE.md` and `upstreamAttributions` are required only for `third-party` and `derivative`.
+- A Skill with no `skill-license.json` is treated as legacy and skips the content comparison, so repairing a shared template does not invalidate older Skills.
+- When importing a Skill into another repository, regenerate `LICENSE.txt` and `skill-license.json` with **that** repository's toolchain. The manifest pins the template hash, so a copied pair fails validation there.
+
 ## Core Principles
 
 | Principle                  | Description                                                          |
