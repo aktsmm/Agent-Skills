@@ -29,7 +29,7 @@ Named colours, `rgb()`, and `hsl()` are all rejected. Hex keeps the contrast che
 
 ## Choosing a palette
 
-Pick a base hue from the subject, not from habit.
+If an earlier artifact in the same series already carries a theme block, reuse it and stop here. Otherwise pick a base hue from the subject, not from habit.
 
 | Subject                              | Hue range                |
 | ------------------------------------ | ------------------------ |
@@ -52,6 +52,23 @@ Then:
 Relative luminance per channel: `c/255`, then `c<=0.03928 ? c/12.92 : ((c+0.055)/1.055)**2.4`, weighted `0.2126 R + 0.7152 G + 0.0722 B`. Ratio is `(lighter+0.05)/(darker+0.05)`.
 
 The default accent `#0067b8` on white is about 5.6:1, so it is safe for body text. Lighten it much and it stops being.
+
+## Reusing a look
+
+The `<style id="shf-theme">` block is the design system — everything else is hash-pinned — so carrying that block into the next artifact carries the palette and spacing with it. Keep it beside the artifacts when a series has to match, and derive the palette once rather than per file. It does not make two artifacts identical: archetype, markup, viewport and the fonts the machine resolves all still differ, and glyphs never match exactly across machines ([japanese-typography.md](japanese-typography.md)).
+
+Which tokens an archetype actually reads, counted from `var()` uses in the pinned CSS:
+
+| Token                                                                              | deck | doc | poster |
+| ---------------------------------------------------------------------------------- | ---- | --- | ------ |
+| `--shf-color-bg` `-fg` `-muted` `-accent` `-surface` `-line`                       | ✓    | ✓   | ✓      |
+| `--shf-space-gap` `--shf-radius-card` `--shf-weight-display`                       | ✓    | ✓   | ✓      |
+| `--shf-size-base`                                                                  | —    | ✓   | ✓      |
+| `--shf-color-accent-deep` `-ok` `-warn` `-bad` `-surface-alt` `--shf-size-measure` | —    | ✓   | —      |
+| `--shf-size-canvas-w` `-h`                                                         | —    | —   | ✓      |
+| `--shf-scale-step`                                                                 | —    | —   | —      |
+
+The verifier checks the token grammar by prefix, not against an archetype's list, so a token the archetype never reads still passes — it simply does nothing. That is how a token quietly stops working: deck typography is entirely `cqw`, so **`--shf-size-base` does not scale a deck**, and `--shf-scale-step` is read by nothing at all. Never take a passing verification as proof that a value took effect; change it and look.
 
 ## Varying the look without new CSS
 

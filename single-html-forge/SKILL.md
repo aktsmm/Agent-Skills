@@ -36,7 +36,7 @@ Ask which one unless the request already says. Load only that archetype's refere
 ## Intake
 
 1. Archetype (above).
-2. Topic, audience, and roughly how much content.
+2. Topic, audience, what they should be able to do or decide afterwards, and roughly how much content.
 3. Colour direction — propose two or three, or derive one from the topic. See [design-tokens.md](references/design-tokens.md).
 4. Images? If any is a screenshot or of unknown provenance, ask the sanitization question in Hard Constraints **before** embedding.
 5. Which export, if any: PDF, PNG, or per-slide PNG. Produce only what was asked for.
@@ -56,11 +56,19 @@ These gate the output. They are here, not in a reference, because a reference ma
 
 ## Build Flow
 
-1. Copy the skeleton for the chosen archetype from `assets/skeletons/`.
-2. Replace the content. Keep `data-slide-id` and section `id` values stable — they are the handles for later edits.
-3. Adjust colours by editing `<style id="shf-theme">` only. Never touch `<style id="shf-css">` or `<script id="shf-runtime">`; both are hash-pinned.
-4. For each image: `embed_assets.py`, then paste the `dataUri` into an `<img>` with `alt` and `data-asset-ref`, and add the asset entry to `<script id="shf-model">`.
-5. Verify, then export only the requested format.
+1. **Storyboard first and stop there.** Open with one sentence for the whole artifact — where it starts, what it passes through, where it lands — then one row per slide or section: the id it will keep, the assertion it makes, and the block that carries it. Wait for the user's answer before opening a skeleton.
+
+   | id  | assertion              | block           |
+   | --- | ---------------------- | --------------- |
+   | s2  | 鍵は保管するのをやめる | `shf-cards` × 2 |
+
+   Assertions, not topic names ([anti-slop.md](references/anti-slop.md)). One wrong line is free to fix here and costs a rebuild plus a re-verify once twelve slides exist. Skip only for a poster, or when the user arrives with the structure already settled. If the user hands the rest back, fill it provisionally and mark which rows they never saw.
+
+2. Copy the skeleton for the chosen archetype from `assets/skeletons/`.
+3. Replace the content, using the storyboard ids as `data-slide-id` and section `id`. Keep them stable — they are the handles for later edits.
+4. Adjust colours by editing `<style id="shf-theme">` only; that block is the whole design system, so carrying it into the next artifact is how a series stays consistent. Never touch `<style id="shf-css">` or `<script id="shf-runtime">`; both are hash-pinned.
+5. For each image: `embed_assets.py`, then paste the `dataUri` into an `<img>` with `alt` and `data-asset-ref`, and add the asset entry to `<script id="shf-model">`.
+6. Verify, then export only the requested format.
 
 Changing anything under `assets/runtime/` or `assets/css/` means re-running `build_skeletons.py`, which regenerates the skeletons and re-pins the registry.
 
@@ -107,6 +115,8 @@ A harness with file read/write and Python 3.x. Everything in this folder is self
 ## Done Criteria
 
 - [ ] Archetype confirmed with the user
+- [ ] Storyboard agreed, or the skip recorded (poster / structure already settled)
+- [ ] Claims that could not be backed are named for the user, or the artifact makes none
 - [ ] `verify_html.py --tier2` exits `0`; a Tier 1-only run is reported as `UNVERIFIED`
 - [ ] Every image has `alt`, a model entry, and a sanitization answer if it is a screenshot
 - [ ] Only the requested exports exist

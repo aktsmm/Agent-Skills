@@ -136,6 +136,12 @@ raw WebSocket を使う場合は、CDP command id で応答をフィルタし、
 
 CDP recovery、blocking dialog、context/page selection は [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) を参照する。
 
+### ローカルファイルを MCP で開く
+
+Playwright MCP は `file:` を拒否する（`Access to "file:" protocol is blocked`）。ローカル HTML を開いて検証・計測したいときは、そのフォルダーを `python -m http.server <port> --bind 127.0.0.1` で配信して `http://127.0.0.1:<port>/...` を開く。
+
+MCP は既存ブラウザーの CDP に attach するだけなので、ユーザーがそのブラウザーを閉じると途中で `Target page, context or browser has been closed` になり、再 navigate も debug port への `ECONNREFUSED` で失敗する。**計測は 1 回の `browser_evaluate` で取り切る**。二分探索や全要素走査を複数 call に分けると、途中で失われて最初からやり直しになる。
+
 ### 破綻しやすい場面
 
 - modal overlay が snapshot に出ない
