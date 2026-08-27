@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -20,8 +21,8 @@ RUNTIME = SKILL / "assets" / "runtime" / "shf-runtime.js"
 CSS_DIR = SKILL / "assets" / "css"
 OUT_DIR = SKILL / "assets" / "skeletons"
 
-RUNTIME_VERSION = "1"
-CSS_VERSION = "1"
+RUNTIME_VERSION = "3"
+CSS_VERSION = "3"
 
 THEME = {
     "deck": """:root{--shf-color-accent:#0067b8;--shf-color-bg:#ffffff;--shf-color-fg:#1b1f27;--shf-size-base:20px}""",
@@ -63,6 +64,7 @@ DECK_BODY = """<main id="shf-root">
 <span id="shf-slide-counter">1 / 3</span>
 <button type="button" data-shf-action="next">次へ</button>
 <button type="button" data-shf-action="presenter">発表者</button>
+<button type="button" data-shf-action="print">PDF</button>
 </div>
 </main>
 <div id="shf-presenter" hidden>
@@ -90,6 +92,7 @@ DOC_BODY = """<nav>
 <li><a href="#sources" data-shf-navlink="sources">出典</a></li>
 </ol>
 <p class="shf-nav-note">この資料は単一ファイルで、外部リソースを読み込みません。</p>
+<button type="button" class="shf-print" data-shf-action="print">PDF として保存</button>
 </nav>
 <main>
 <header class="shf-hero">
@@ -143,10 +146,36 @@ POSTER_BODY = """<main id="shf-root">
 <div class="shf-point"><h3>要点 3</h3><p>行動につながる一言で締める。</p></div>
 </div>
 <div class="shf-footer"><span>single-html-forge</span><span>2026-08</span></div>
-</main>"""
+</main>
+<button type="button" class="shf-print" data-shf-action="print">PDF として保存</button>"""
 
 BODIES = {"deck": DECK_BODY, "doc": DOC_BODY, "poster": POSTER_BODY}
 TITLES = {"deck": "Deck skeleton", "doc": "Doc skeleton", "poster": "Poster skeleton"}
+
+SLIDE_RE = re.compile(
+    r'data-slide-id="([^"]+)"[^>]*>\s*(?:<p[^>]*>.*?</p>\s*)?<h[12][^>]*>(.*?)</h[12]>',
+    re.S,
+)
+TAG_RE = re.compile(r"<[^>]+>")
+
+
+def outline_nav(body: str) -> str:
+    """Build the slide list from the slides themselves, so the two cannot drift."""
+    items = []
+    for slide_id, heading in SLIDE_RE.findall(body):
+        label = TAG_RE.sub("", heading).strip()
+        items.append(
+            f'<li><button type="button" data-shf-goto="{slide_id}">{label}</button></li>'
+        )
+    if not items:
+        raise SystemExit("outline variant found no slides to list")
+    entries = "\n".join(items)
+    return (
+        '<nav id="shf-outline">\n'
+        '<p class="shf-outline-title">SLIDES</p>\n'
+        f"<ol>\n{entries}\n</ol>\n"
+        "</nav>"
+    )
 
 
 def read_text(path: Path) -> str:
@@ -158,21 +187,22 @@ def sha(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def build(archetype: str, runtime: str) -> str:
+def build(archetype: str, runtime: str, layout: str = "", title: str = "", body: str = "") -> str:
     css = read_text(CSS_DIR / f"shf-{archetype}.css")
+    layout_attr = f' data-shf-layout="{layout}"' if layout else ""
     return (
         "<!DOCTYPE html>\n"
-        f'<html lang="ja" data-shf-archetype="{archetype}"'
+        f'<html lang="ja" data-shf-archetype="{archetype}"{layout_attr}'
         f' data-shf-runtime="{RUNTIME_VERSION}" data-shf-css="{CSS_VERSION}">\n'
         "<head>\n"
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        f"<title>{TITLES[archetype]}</title>\n"
+        f"<title>{title or TITLES[archetype]}</title>\n"
         f'<style id="shf-theme">{THEME[archetype]}</style>\n'
         f'<style id="shf-css">{css}</style>\n'
         "</head>\n"
         "<body>\n"
-        f"{BODIES[archetype]}\n"
+        f"{body or BODIES[archetype]}\n"
         f'<script id="shf-model" type="application/json">{MODEL}</script>\n'
         f'<script id="shf-runtime">{runtime}</script>\n'
         "</body>\n"
@@ -184,20 +214,47 @@ def main() -> int:
     runtime = read_text(RUNTIME)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    registry = {"runtime": {RUNTIME_VERSION: sha(runtime)}, "css": {}}
+    # The registry is append-only. Dropping an old version would report every
+    # artifact built before this run as TAMPERED, which is not what happened to it.
+    reg_path = HERE / "runtime-registry.json"
+    if reg_path.exists():
+        registry = json.loads(reg_path.read_text(encoding="utf-8"))
+    else:
+        registry = {"runtime": {}, "css": {}}
+    registry.setdefault("runtime", {})
+    registry.setdefault("css", {})
+
+    registry["runtime"][RUNTIME_VERSION] = sha(runtime)
     for archetype in ("deck", "doc", "poster"):
         css = read_text(CSS_DIR / f"shf-{archetype}.css")
-        registry["css"][archetype] = {CSS_VERSION: sha(css)}
+        registry["css"].setdefault(archetype, {})[CSS_VERSION] = sha(css)
         out = OUT_DIR / f"{archetype}-skeleton.html"
         with open(out, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(build(archetype, runtime))
         print(f"wrote {out.relative_to(SKILL)}")
 
-    reg_path = HERE / "runtime-registry.json"
+    outline_body = (
+        outline_nav(DECK_BODY)
+        + "\n"
+        + DECK_BODY.replace(
+            '<button type="button" data-shf-action="print">PDF</button>',
+            '<button type="button" data-shf-action="outline">目次</button>\n'
+            '<button type="button" data-shf-action="print">PDF</button>',
+            1,
+        )
+    )
+    out = OUT_DIR / "deck-outline-skeleton.html"
+    with open(out, "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(
+            build("deck", runtime, layout="outline", title="Deck skeleton (outline)", body=outline_body)
+        )
+    print(f"wrote {out.relative_to(SKILL)}")
+
     with open(reg_path, "w", encoding="utf-8", newline="\n") as handle:
-        json.dump(registry, handle, indent=2, ensure_ascii=False)
+        json.dump(registry, handle, indent=2, ensure_ascii=False, sort_keys=True)
         handle.write("\n")
-    print(f"wrote {reg_path.relative_to(SKILL)}")
+    versions = ", ".join(sorted(registry["runtime"]))
+    print(f"wrote {reg_path.relative_to(SKILL)} (runtime versions: {versions})")
     return 0
 
 

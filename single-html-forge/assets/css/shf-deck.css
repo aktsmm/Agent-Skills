@@ -248,6 +248,103 @@ a {
   align-items: baseline;
 }
 
+/* ---------- outline layout ----------
+ * Opt in with <html data-shf-layout="outline">. Sizes stay explicit because
+ * #shf-root carries container-type: size, which resolves an auto height to 0.
+ */
+
+html[data-shf-layout="outline"] body {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#shf-outline {
+  display: none;
+}
+
+html[data-shf-layout="outline"] #shf-outline {
+  display: block;
+  flex: 0 0 264px;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 22px 14px;
+  background: #11151c;
+  color: #e6ecf3;
+}
+
+html[data-shf-layout="outline"].shf-outline-off #shf-outline {
+  display: none;
+}
+
+#shf-outline .shf-outline-title {
+  margin: 0 0 14px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #8fa3bb;
+}
+
+#shf-outline ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: shf-toc;
+}
+
+#shf-outline li {
+  counter-increment: shf-toc;
+}
+
+#shf-outline button {
+  display: block;
+  width: 100%;
+  margin-bottom: 3px;
+  padding: 9px 10px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  color: #e6ecf3;
+  background: transparent;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+#shf-outline button::before {
+  content: counter(shf-toc, decimal-leading-zero);
+  margin-right: 9px;
+  font-weight: 800;
+  color: #6f8299;
+}
+
+#shf-outline button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#shf-outline button.is-current {
+  background: rgba(255, 255, 255, 0.14);
+  border-left-color: var(--shf-color-accent);
+}
+
+#shf-outline button.is-current::before {
+  color: var(--shf-color-accent);
+}
+
+html[data-shf-layout="outline"] #shf-root {
+  width: calc(100vw - 264px);
+  height: calc((100vw - 264px) * 0.5625);
+  max-width: 177.78vh;
+  max-height: 100vh;
+  margin: auto;
+}
+
+html[data-shf-layout="outline"].shf-outline-off #shf-root {
+  width: 100vw;
+  height: 56.25vw;
+}
+
 @media print {
   /* The stage carries container-type: size so slides can use cqw units. Size
    * containment makes height:auto resolve to 0, which combined with the stage's
@@ -282,8 +379,23 @@ a {
     display: flex;
   }
   #shf-chrome,
-  #shf-presenter {
+  #shf-presenter,
+  #shf-outline {
     display: none;
+  }
+  /* The layout-scoped rule above is more specific than a bare id, and a media
+   * query adds no specificity, so it has to be matched here to be overridden. */
+  html[data-shf-layout="outline"] #shf-outline {
+    display: none;
+  }
+  html[data-shf-layout="outline"] body {
+    display: block;
+  }
+  html[data-shf-layout="outline"] #shf-root {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    max-height: none;
   }
 }
 

@@ -32,6 +32,8 @@ python scripts/export_html.py poster.html --png out.png --scale 2
 
 `--scale 2` renders at twice the canvas size. Any embedded bitmap therefore needs at least `displayed width x scale` real pixels, or it will look soft in the export while looking fine on screen. `embed_assets.py` records the true dimensions so this is checkable.
 
+A floating `PDF として保存` button sits outside `#shf-root`, so it never lands in the exported PNG and is hidden when printing. It exists for a recipient who opens the HTML directly; the PNG remains the normal deliverable.
+
 ## Composition
 
 The skeleton is eyebrow, headline, lead, a row of points, then a footer. It works because it has one focal point.

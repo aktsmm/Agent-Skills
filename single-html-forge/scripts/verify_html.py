@@ -316,6 +316,8 @@ def walk(tokens: list, rep: Report) -> dict:
         "asset_payloads": [],
         "img_srcs": [],
         "hrefs": [],
+        "slide_ids": [],
+        "goto_targets": [],
         "root_attrs": {},
     }
     for token in tokens:
@@ -362,6 +364,10 @@ def walk(tokens: list, rep: Report) -> dict:
 
         if lname == "html":
             ctx["root_attrs"] = dict(tag.attrs)
+        if "data-slide-id" in tag.attrs:
+            ctx["slide_ids"].append(tag.attrs["data-slide-id"])
+        if "data-shf-goto" in tag.attrs:
+            ctx["goto_targets"].append(tag.attrs["data-shf-goto"])
         if lname == "img":
             ref = tag.attrs.get("data-asset-ref", "")
             ctx["img_srcs"].append((tag.attrs.get("src", ""), tag.attrs.get("alt"), ref))
@@ -592,6 +598,26 @@ def check_assets(ctx: dict, model: dict, budget: dict, rep: Report) -> None:
             rep.error("ASSET", f"asset '{aid}' manifest alt disagrees with the alt attribute")
 
 
+def check_navigation(ctx: dict, rep: Report) -> None:
+    """The outline list is authored, not generated, so it can drift from the slides."""
+    slides = ctx["slide_ids"]
+    if len(slides) != len(set(slides)):
+        rep.error("NAV", "duplicate data-slide-id values")
+    targets = ctx["goto_targets"]
+    if len(targets) != len(set(targets)):
+        rep.error("NAV", "duplicate data-shf-goto values")
+    for target in targets:
+        if target not in slides:
+            rep.error("NAV", f"data-shf-goto '{target}' does not match any slide")
+    if ctx["root_attrs"].get("data-shf-layout") == "outline":
+        missing = [s for s in slides if s not in targets]
+        if missing:
+            rep.error(
+                "NAV",
+                "outline layout is missing list entries for: " + ", ".join(missing),
+            )
+
+
 def check_urls(ctx: dict, rep: Report) -> None:
     for href in ctx["hrefs"]:
         value = html_unescape(href).strip()
@@ -680,6 +706,7 @@ def verify(path: Path, registry: dict, budget: dict) -> Report:
     check_theme(ctx, rep)
     model = parse_model(ctx, rep)
     check_assets(ctx, model, budget, rep)
+    check_navigation(ctx, rep)
     check_urls(ctx, rep)
     return rep
 

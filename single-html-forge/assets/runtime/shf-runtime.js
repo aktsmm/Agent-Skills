@@ -29,6 +29,7 @@
     var pClock = document.getElementById("shf-presenter-clock");
     var started = Date.now();
     var ticking = null;
+    var tocLinks = all("[data-shf-goto]");
 
     function noteFor(i) {
       var n = slides[i] ? slides[i].querySelector("[data-shf-notes]") : null;
@@ -57,6 +58,13 @@
           index + 1 < slides.length ? titleFor(index + 1) : "\u2014";
       }
       if (pNotes) pNotes.textContent = noteFor(index);
+      var here = slides[index] ? slides[index].getAttribute("data-slide-id") : "";
+      tocLinks.forEach(function (link) {
+        var on = link.getAttribute("data-shf-goto") === here;
+        link.classList.toggle("is-current", on);
+        if (on) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
     }
 
     function go(next) {
@@ -109,7 +117,27 @@
       } else if (k === "s" || k === "S") {
         togglePresenter();
         e.preventDefault();
+      } else if (k === "o" || k === "O") {
+        root.classList.toggle("shf-outline-off");
+        e.preventDefault();
       }
+    });
+
+    function indexOfSlide(id) {
+      for (var i = 0; i < slides.length; i++) {
+        if (slides[i].getAttribute("data-slide-id") === id) return i;
+      }
+      return -1;
+    }
+
+    tocLinks.forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        var found = indexOfSlide(link.getAttribute("data-shf-goto"));
+        if (found >= 0) {
+          go(found);
+          e.preventDefault();
+        }
+      });
     });
 
     all("[data-shf-action]").forEach(function (btn) {
@@ -118,6 +146,7 @@
         if (action === "next") go(index + 1);
         else if (action === "prev") go(index - 1);
         else if (action === "presenter") togglePresenter();
+        else if (action === "outline") root.classList.toggle("shf-outline-off");
       });
     });
 
@@ -172,9 +201,20 @@
     activate(sections[0].id);
   }
 
+  /* ---------- print ---------- */
+
+  function initPrint() {
+    all('[data-shf-action="print"]').forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        window.print();
+      });
+    });
+  }
+
   /* ---------- boot ---------- */
 
+  initPrint();
   if (archetype === "deck") initDeck();
   else if (archetype === "doc") initDoc();
-  /* poster is static and needs no runtime behaviour */
+  /* poster is static apart from the print button */
 })();

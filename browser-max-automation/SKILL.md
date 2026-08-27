@@ -83,6 +83,12 @@ API と DOM の状態が一時的にずれるケースがある。API が stale 
 - Treat a missing picker option, modal, or navigation as **unknown**, not success. Confirm the persistent assignment state (or an equivalent destination-specific DOM state) before recording an item as done; distinguish an already-assigned item from a picker-render failure.
 - Process one bounded batch, persist its completed stable IDs in the active run, then scroll until new IDs appear. End only after several end-of-feed scrolls yield no new stable IDs, and report any unverified items separately.
 
+### handler が何回走ったかを数えるとき
+
+「クリックで 1 回だけ実行されたか」を確かめるのに `locator.click()` を oracle にしない。Chromium / Playwright の実測で、リスナー 1 個の同じ `<button>` に対し `click()` は 2 回、`dispatchEvent(new MouseEvent("click"))` は 1 回を返した。`click()` の値だけ見て二重バインドと判断すると、正常なコードを壊す。
+
+呼び出し回数をカウンタに記録し、`dispatchEvent` で 1 クリック分を測る。両者が食い違ったら automation 側の差として扱う。実ユーザーの 1 クリックは `dispatchEvent` 側と一致する。
+
 ### unsaved editor / draft タブを壊さない
 
 未保存 form を持つ editor / SPA タブに別 URL を踏ませると `beforeunload` dialog で upload や遷移が崩れる。既存タブは再利用し、新規作業は別タブで開く。`dialog.accept()` / `page.reload()` / API トリガー目的の reload で dirty を踏み越さない。詳細と Qiita / CMS 例は [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md) を参照する。

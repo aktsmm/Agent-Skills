@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" data-shf-archetype="poster" data-shf-runtime="1" data-shf-css="1">
+<html lang="ja" data-shf-archetype="poster" data-shf-runtime="3" data-shf-css="3">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -151,6 +151,25 @@ a {
   color: var(--shf-color-accent);
 }
 
+/* Lives outside #shf-root so it never lands in the exported PNG. */
+.shf-print {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  padding: 10px 20px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--shf-color-accent);
+  background: #ffffff;
+  border: 1px solid var(--shf-color-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.shf-print:hover {
+  border-color: var(--shf-color-accent);
+}
+
 @media print {
   body {
     background: #fff;
@@ -158,6 +177,9 @@ a {
   }
   #shf-root {
     break-inside: avoid;
+  }
+  .shf-print {
+    display: none;
   }
 }
 
@@ -181,6 +203,7 @@ a {
 </div>
 <div class="shf-footer"><span>single-html-forge</span><span>2026-08</span></div>
 </main>
+<button type="button" class="shf-print" data-shf-action="print">PDF として保存</button>
 <script id="shf-model" type="application/json">{"schemaVersion":1,"profileId":"base","profileVersion":1,"assets":[]}</script>
 <script id="shf-runtime">/* single-html-forge fixed runtime v1
  *
@@ -213,6 +236,7 @@ a {
     var pClock = document.getElementById("shf-presenter-clock");
     var started = Date.now();
     var ticking = null;
+    var tocLinks = all("[data-shf-goto]");
 
     function noteFor(i) {
       var n = slides[i] ? slides[i].querySelector("[data-shf-notes]") : null;
@@ -241,6 +265,13 @@ a {
           index + 1 < slides.length ? titleFor(index + 1) : "\u2014";
       }
       if (pNotes) pNotes.textContent = noteFor(index);
+      var here = slides[index] ? slides[index].getAttribute("data-slide-id") : "";
+      tocLinks.forEach(function (link) {
+        var on = link.getAttribute("data-shf-goto") === here;
+        link.classList.toggle("is-current", on);
+        if (on) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
     }
 
     function go(next) {
@@ -293,7 +324,27 @@ a {
       } else if (k === "s" || k === "S") {
         togglePresenter();
         e.preventDefault();
+      } else if (k === "o" || k === "O") {
+        root.classList.toggle("shf-outline-off");
+        e.preventDefault();
       }
+    });
+
+    function indexOfSlide(id) {
+      for (var i = 0; i < slides.length; i++) {
+        if (slides[i].getAttribute("data-slide-id") === id) return i;
+      }
+      return -1;
+    }
+
+    tocLinks.forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        var found = indexOfSlide(link.getAttribute("data-shf-goto"));
+        if (found >= 0) {
+          go(found);
+          e.preventDefault();
+        }
+      });
     });
 
     all("[data-shf-action]").forEach(function (btn) {
@@ -302,6 +353,7 @@ a {
         if (action === "next") go(index + 1);
         else if (action === "prev") go(index - 1);
         else if (action === "presenter") togglePresenter();
+        else if (action === "outline") root.classList.toggle("shf-outline-off");
       });
     });
 
@@ -356,11 +408,22 @@ a {
     activate(sections[0].id);
   }
 
+  /* ---------- print ---------- */
+
+  function initPrint() {
+    all('[data-shf-action="print"]').forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        window.print();
+      });
+    });
+  }
+
   /* ---------- boot ---------- */
 
+  initPrint();
   if (archetype === "deck") initDeck();
   else if (archetype === "doc") initDoc();
-  /* poster is static and needs no runtime behaviour */
+  /* poster is static apart from the print button */
 })();
 </script>
 </body>

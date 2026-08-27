@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import struct
 import sys
 import tempfile
@@ -28,6 +29,9 @@ import verify_html as V  # noqa: E402
 REGISTRY = json.loads((HERE / "runtime-registry.json").read_text(encoding="utf-8"))
 BUDGET = json.loads((HERE / "budget.json").read_text(encoding="utf-8"))
 SKELETON = (SKILL / "assets" / "skeletons" / "deck-skeleton.html").read_text(encoding="utf-8")
+OUTLINE = (SKILL / "assets" / "skeletons" / "deck-outline-skeleton.html").read_text(
+    encoding="utf-8"
+)
 
 
 def tiny_png(extra_chunk: bytes = b"") -> bytes:
@@ -203,7 +207,9 @@ class Negative(unittest.TestCase):
         self.assertFails(text, "TAMPERED")
 
     def test_unsupported_runtime_version(self):
-        text = SKELETON.replace('data-shf-runtime="1"', 'data-shf-runtime="99"', 1)
+        # Derived from the skeleton so the fixture survives a version bump.
+        text = re.sub(r'data-shf-runtime="\d+"', 'data-shf-runtime="99"', SKELETON, count=1)
+        self.assertNotEqual(text, SKELETON, "the version attribute was not found")
         self.assertFails(text, "UNSUPPORTED_VERSION")
 
     # --- theme tokens ---
@@ -319,7 +325,6 @@ class Negative(unittest.TestCase):
 
     def test_javascript_href(self):
         self.assertFails(with_body('<a href="javascript:alert(1)">x</a>'), "URL")
-
     def test_file_href(self):
         self.assertFails(with_body('<a href="file:///etc/passwd">x</a>'), "URL")
 
@@ -328,6 +333,28 @@ class Negative(unittest.TestCase):
 
     def test_protocol_relative_href(self):
         self.assertFails(with_body('<a href="//example.com/a">x</a>'), "URL")
+
+    # --- outline navigation ---
+
+    def test_goto_without_matching_slide(self):
+        self.assertFails(
+            with_body('<button type="button" data-shf-goto="ghost">x</button>'), "NAV"
+        )
+
+    def test_outline_missing_an_entry(self):
+        text = re.sub(
+            r'<li><button type="button" data-shf-goto="s2">.*?</button></li>\n',
+            "",
+            OUTLINE,
+            count=1,
+        )
+        self.assertNotEqual(text, OUTLINE, "the entry to drop was not found")
+        self.assertFails(text, "NAV")
+
+    def test_duplicate_slide_id(self):
+        self.assertFails(
+            with_body('<section data-slide-id="s1" hidden><h2>dup</h2></section>'), "NAV"
+        )
 
     # --- helper ---
 
@@ -356,10 +383,9 @@ class Positive(unittest.TestCase):
         self.assertEqual(rep.errors, [], f"expected a clean pass, got {rep.errors}")
 
     def test_all_skeletons(self):
-        for name in ("deck", "doc", "poster"):
-            path = SKILL / "assets" / "skeletons" / f"{name}-skeleton.html"
+        for path in sorted((SKILL / "assets" / "skeletons").glob("*.html")):
             rep = V.verify(path, REGISTRY, BUDGET)
-            self.assertEqual(rep.errors, [], f"{name}: {rep.errors}")
+            self.assertEqual(rep.errors, [], f"{path.name}: {rep.errors}")
 
     def test_crlf_artifact_still_passes(self):
         # git checkout and Windows editors produce CRLF. The pinned-region hashes

@@ -59,6 +59,8 @@ Below 850px the sidebar stops being sticky and the nav becomes a two-column list
 
 The sidebar is dropped and sections avoid breaking across pages. This is the archetype that prints well; a deck does not.
 
+A `PDF として保存` button sits at the bottom of the sidebar and calls the browser's print dialog. It is inside `<nav>`, so the existing print rule already removes it from the output.
+
 ## Common mistakes
 
 - A nav entry whose `data-shf-navlink` does not match any section `id`.

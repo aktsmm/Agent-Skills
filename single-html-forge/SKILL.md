@@ -31,6 +31,8 @@ Ask which one unless the request already says. Load only that archetype's refere
 | `doc`     | vertical scroll, sidebar nav, numbered citations | explainers, comparisons, handouts | [archetype-doc.md](references/archetype-doc.md)       |
 | `poster`  | one fixed canvas, exported as PNG                | summary images, social cards      | [archetype-poster.md](references/archetype-poster.md) |
 
+`deck` also has an **outline layout**: a slide list on the left, the stage on the right, collapsed with `O` when projecting. Start from `deck-outline-skeleton.html` when the deck will be read or reviewed rather than presented.
+
 ## Intake
 
 1. Archetype (above).

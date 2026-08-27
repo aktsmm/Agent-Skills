@@ -167,7 +167,7 @@ Any other `script` or `style` element is `FAIL`, including one that would otherw
 
 ### 4.1 Version registry
 
-`scripts/runtime-registry.json` maps a declared version to an approved SHA-256:
+`scripts/runtime-registry.json` maps a declared version to an approved SHA-256. It is **append-only**: `build_skeletons.py` merges into the existing file rather than replacing it, because dropping an old version would report every artifact built before that change as `TAMPERED` when nothing was tampered with. Bump the version when the pinned content changes, and leave the previous entry in place.
 
 ```json
 { "runtime": { "1": "<sha256>" }, "css": { "deck": { "1": "<sha256>" } } }
@@ -255,7 +255,7 @@ The runtime may only:
 
 - read `dataset`, `getAttribute` for `data-shf-*`, `classList`, `textContent`
 - write `classList`, `hidden`, `textContent`, `aria-*`
-- call `scrollIntoView`, `focus`, `addEventListener`, `postMessage`
+- call `scrollIntoView`, `focus`, `addEventListener`, `postMessage`, `window.print`
 - open a presenter window via `window.open("about:blank", name)` from a user gesture
 
 Because the runtime never creates elements and never writes markup, an artifact value cannot become a new element, a new style rule, or a URL.

@@ -144,6 +144,25 @@ a {
   color: var(--shf-color-accent);
 }
 
+/* Lives outside #shf-root so it never lands in the exported PNG. */
+.shf-print {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  padding: 10px 20px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--shf-color-accent);
+  background: #ffffff;
+  border: 1px solid var(--shf-color-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.shf-print:hover {
+  border-color: var(--shf-color-accent);
+}
+
 @media print {
   body {
     background: #fff;
@@ -151,6 +170,9 @@ a {
   }
   #shf-root {
     break-inside: avoid;
+  }
+  .shf-print {
+    display: none;
   }
 }
 

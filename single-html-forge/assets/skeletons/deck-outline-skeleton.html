@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja" data-shf-archetype="deck" data-shf-runtime="3" data-shf-css="3">
+<html lang="ja" data-shf-archetype="deck" data-shf-layout="outline" data-shf-runtime="3" data-shf-css="3">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deck skeleton</title>
+<title>Deck skeleton (outline)</title>
 <style id="shf-theme">:root{--shf-color-accent:#0067b8;--shf-color-bg:#ffffff;--shf-color-fg:#1b1f27;--shf-size-base:20px}</style>
 <style id="shf-css">/* single-html-forge deck template v1 — hash-pinned.
  * Every variable value arrives through a --shf-* custom property.
@@ -415,6 +415,14 @@ html[data-shf-layout="outline"].shf-outline-off #shf-root {
 </style>
 </head>
 <body>
+<nav id="shf-outline">
+<p class="shf-outline-title">SLIDES</p>
+<ol>
+<li><button type="button" data-shf-goto="s1">タイトルをここに置く</button></li>
+<li><button type="button" data-shf-goto="s2">3 つの論点</button></li>
+<li><button type="button" data-shf-goto="s3">比較</button></li>
+</ol>
+</nav>
 <main id="shf-root">
 <section data-slide-id="s1" class="is-active">
 <p class="shf-eyebrow">SINGLE HTML FORGE</p>
@@ -447,6 +455,7 @@ html[data-shf-layout="outline"].shf-outline-off #shf-root {
 <span id="shf-slide-counter">1 / 3</span>
 <button type="button" data-shf-action="next">次へ</button>
 <button type="button" data-shf-action="presenter">発表者</button>
+<button type="button" data-shf-action="outline">目次</button>
 <button type="button" data-shf-action="print">PDF</button>
 </div>
 </main>
