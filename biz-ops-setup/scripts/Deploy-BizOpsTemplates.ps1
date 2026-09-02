@@ -126,7 +126,7 @@ foreach ($file in $promptFiles) {
 # Create prompts README
 $promptsReadme = Join-Path $promptsTarget "README.md"
 if (-not (Test-Path $promptsReadme)) {
-    @"
+    @'
 # Prompts
 
 Prompt templates for report generation.
@@ -145,7 +145,7 @@ Prompt templates for report generation.
 Use with corresponding agent:
 - Reports: `@report-generator`
 - Review: `@report-reviewer`
-"@ | Out-File -FilePath $promptsReadme -Encoding utf8
+'@ | Out-File -FilePath $promptsReadme -Encoding utf8
     Write-Host "   ✅ Created: README.md" -ForegroundColor Green
 }
 
@@ -155,6 +155,9 @@ Use with corresponding agent:
 
 Write-Host ""
 Write-Host "⚙️ Deploying configuration..." -ForegroundColor Yellow
+
+$dataSourcesTarget = Join-Path $WorkspacePath "_datasources"
+New-Item -ItemType Directory -Path $dataSourcesTarget -Force | Out-Null
 
 # copilot-instructions.md
 $copilotSource = Join-Path $assetsPath "copilot-instructions.template.md"
