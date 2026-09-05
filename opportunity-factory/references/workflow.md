@@ -105,6 +105,7 @@ For review tasks, add `## required fixes`: write `none` when there is no blockin
 - A repair is one artifact, not an open-ended retry. It validates the changed artifact and hands it to independent re-review; it cannot mark its own findings complete.
 - A rejected approach uses `replan`, not cosmetic repair. The commander records a new hypothesis and new evidence before redispatch.
 - Store workflow round, finding IDs, resolution evidence, hashes, and next state in `dashboard-state.criticLog`. Follow `references/rubber-duck-review.md` for caps and recovery.
+- When direct owner feedback rejects a build, retain the statement, screenshot and assisted/unaided context without filling missing outcomes. Supersede that build's owner-ready packet, update canonical readiness and reviewer eligibility, and queue one bounded repair/replan with independent re-review; preserve other candidates and historical evidence. Suppress repeat owner requests until the new source-bound gate passes. Requested gameplay help makes the session assisted, not invalid feedback.
 
 ## Review Gates
 
@@ -129,6 +130,19 @@ Which gate runs is only half the design. **When it runs decides how much work ge
 - The boundary is **full evidence collection and build**, not all evidence. A **light probe is allowed and expected**: two or three pieces of evidence, enough to enumerate claims. Fully separating the gate from evidence creates a chicken-and-egg problem, because you cannot name what is distinctive about a candidate without touching it.
 - Judge **per claim, not per topic**. An incumbent covering the subject does not cover every claim about it. Failure conditions, side effects, applicability limits, and operational judgement are frequently absent from official sources even when the topic is documented.
 - Failing the gate means reject or re-angle, never proceed to the expensive lanes. Cap re-angle attempts so a doomed candidate cannot loop.
+
+### Rendered-UI Acceptance
+
+Apply these criteria inside the existing design/build/review phases for visual artifacts. They are artifact acceptance conditions, not a sixth Layer 3 critic category or a new attempt budget; keep the existing independence and repair-accounting contracts.
+
+1. **Design the visible task before code.** Define the user's goal, primary action, labeled layout/wireframe, request-to-control mapping, feedback, and supported viewport/language/text-scale matrix. Set measurable readability, visibility, and interaction criteria before implementation. A graybox may use placeholders, but that does not excuse obstructed or ambiguous controls.
+2. **Review the design before implementing it.** Carry the required design review and exact artifact revision into the queued implementation task. Missing prerequisites select bounded design/review work, not speculative code. Do not invent a new candidate, resume a paused lane, or cross device/approval gates to satisfy this condition.
+3. **Inspect current runtime images.** Cover initial, active interaction, success, failure, and end states where applicable; record scope-based exclusions explicitly. Use the declared primary and smallest supported viewport without silently narrowing support. Bind images to the source/build fingerprint, capture scenario, viewport/scale/language and capture time; recapture after relevant changes.
+4. **Open the evidence.** Screenshot creation, source/DOM assertions, headless test success, or a presentation mockup does not prove the actual product is usable. Record expected vs observed results, image/region references, and pass/fail/unobserved for each required criterion. Measure visible text and hit-target bounds, clipping, overlap, occlusion and contrast at the declared render scale; element centers, hidden legacy nodes or a merged bounding box of scattered decorations are not substitutes. Retain original render dimensions: resizing a capture cannot prove the requested native layout.
+5. **Reject visible interaction defects.** Overlapping or clipped essential labels, panels covering the work area, unclear primary actions, or ambiguous request/control mapping are required fixes when they prevent the intended task. They are not cosmetic preferences or merely human-only uncertainties.
+6. **Keep acceptance honest.** The configured independent reviewer inspects source evidence before the producer verdict. Required technical, interaction and visual gates combine with AND; averages, votes or unrelated strengths cannot cancel a demonstrated blocker. Missing required renders or unresolved blocking findings prevent UI-ready, owner-ready, and release-ready claims. Technical or source-only completion remains distinct; AI image review cannot establish human comprehension, enjoyment, device behavior, or an untested native build.
+
+Allow bounded automated local rendering/capture inside the approved tool envelope even when it opens a window; distinguish it from human play or manual-only device evaluation. When the renderer or image-inspection capability is unavailable, retain the evidence gap rather than silently waiving the gate. Reuse the existing repair/re-review budget, preserve historical findings, and stop or replan at its limit.
 
 ## Domain Examples
 

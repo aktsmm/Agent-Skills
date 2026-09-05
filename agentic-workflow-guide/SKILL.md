@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow-guide
-description: "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for .agent.md / .instructions.md / .prompt.md / AGENTS.md work, workflow architecture, orchestration planning, or when agent workflows may be overkill. Triggers on 'agent workflow', 'create agent', 'ワークフロー設計', 'orchestrator'."
+description: "Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for .agent.md / .instructions.md / .prompt.md / AGENTS.md work, workflow architecture, orchestration planning, scheduled automation model allocation, or when agent workflows may be overkill. Triggers on 'agent workflow', 'create agent', 'automation models', 'ワークフロー設計', 'orchestrator'."
 argument-hint: "作りたい .agent.md / .instructions.md / .prompt.md / AGENTS.md、設計したい workflow、または困っている症状"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -86,6 +86,7 @@ Pattern details: [references/workflow-patterns/overview.md](references/workflow-
 - repo local の `.instructions.md` には workspace 固有の差分だけを残す。差分が無い generic instruction は merge back して削除候補にする。
 - IR は原則 in-memory で扱う。validator、script、deterministic handoff が必要な場合だけ中間 file を materialize し、不要になったら片付ける。
 - scheduler / service / config など決定論的な state mutation は、AI/UI loop ではなく direct script / API で現状確認 -> 最小変更 -> live read-back まで行う。LLM は scope と整合対象の判断に限定する。
+- For model allocation, trace actual producer/reviewer responsibilities, verify live availability and applicable pricing, and show current-to-proposed assignments with quality/cost tradeoffs before mutation; use [scheduled runtime bindings](references/scheduled-runtime-bindings.md).
 
 ## Escalation Rules
 

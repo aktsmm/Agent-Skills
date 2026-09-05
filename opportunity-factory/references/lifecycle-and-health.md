@@ -149,6 +149,8 @@ For an interrupted `repair` child, also reconcile `parentTaskId`, `inputHash`, a
 
 For a suspected scheduled failure, require command exit/output and the expected artifact to agree. Scheduler history and terminal/PTY warnings are corroborating signals; a host warning alone is not a task failure.
 
+For a launched app/service that must stay open, use the harness-supported detached mode and verify the same process identity remains responsive for a declared observation window **after the launch tool/caller returns**. A momentary PID/window, launcher exit code or headless test does not prove interactive lifetime. If it exits, retain logs and distinguish application failure from launch-host cleanup as hypotheses until reproduced; do not claim an argument or renderer fix from a brief restart alone.
+
 Never infer task completion from a modified target file alone.
 
 Never auto-change:

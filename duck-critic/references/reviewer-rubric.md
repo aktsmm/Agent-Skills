@@ -16,6 +16,7 @@ Examples:
 - Runtime/deployment success is assumed from build success alone.
 - Tests cannot prove the acceptance criteria.
 - The plan depends on an unverified external constraint that changes the finish line.
+- Essential labels overlap or clip, a panel obscures the active task area, or action/feedback mapping prevents the intended interaction; these are not style-only findings.
 
 ### Non-blocking
 
@@ -73,6 +74,9 @@ The verdict is the producer's, not the critic's. A critic states its findings an
 - Treat collection overhead as a confounder. Require a smoke test, baseline, or equivalent evidence before trusting measurements from a new collector.
 - A quotation must match the source verbatim. Truncating one can invert its meaning: dropping a trailing condition turns "X is one example" into "X is required". Re-fetch the source and diff the quoted span, including the paraphrase or translation that follows it.
 - A claim about when something was written or changed is checkable. Read the commit history of the source file instead of inferring order from publication dates. A "documented later" story often collapses into a single commit that already contained both parts.
+- For visual acceptance, open actual-render images from the current source/build at the declared viewport, scale, language, and representative states. Cite the image and affected region; a screenshot path, capture-exit success, mockup, or producer summary is not inspection.
+- Inspect raw visual evidence before the producer's verdict to reduce anchoring. If required images are missing, stale, or inaccessible, report the acceptance-evidence gap without inventing a visual defect or passing the UI. Do not demand post-implementation captures for a design-only checkpoint.
+- Separate observed visual defects from human-only questions. AI review cannot establish enjoyment, unaided comprehension, or physical-device behavior; unresolved visible interaction blockers cannot be downgraded into those uncertainties.
 
 ## Output Discipline
 
