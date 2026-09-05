@@ -11,8 +11,8 @@ Qiita、CMS、SPA admin など **未保存 form** を持つタブを壊さない
 - upload 専用の一時 editor を作った場合は、その exact URL / ID をログに残す。下流の保存・公開・画像表示を確認してからその ID だけ削除し、無題や最新時刻だけで対象を推測しない
 - dirty な form / SPA では `page.reload()`、`location.reload()`、API 捕捉目的の reload trigger を使わない
 - まず保存・キャンセル・画面上の status 読み取りで clean にする
-- reload 確認や unsaved alert が出たら、追加自動化を止めて手動 Cancel / Stay を優先する
-- native `beforeunload` prompt は browser chrome UI として window 全体を塞ぎ、通常の page dialog 操作で閉じられない場合がある。表示後に新しいタブを開いても解消しないため、先にユーザーが Cancel / Stay で閉じてから clean な新規タブへ進む
+- If a leave-site confirmation appears, pause page mutations. Cancel/Stay may be automated only after the browser process, selected-tab address, exact warning and button uniquely match the owned task. Otherwise request manual Cancel/Stay. Never automatically accept Leave or discard unknown edits.
+- A native `beforeunload` prompt can block the whole browser window while CDP returns `No dialog is showing`; opening another tab does not dismiss it. Use the scoped [native recovery procedure](cdp-recovery-and-context.md#windows-browser-chrome-leave-site-prompt), verify dismissal and same-target readback, then use a clean work tab without navigating the dirty original. Cancel preserves unsaved form values and does not establish that they were saved.
 
 ## 典型ケース
 

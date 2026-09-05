@@ -91,7 +91,9 @@ API と DOM の状態が一時的にずれるケースがある。API が stale 
 
 ### unsaved editor / draft タブを壊さない
 
-未保存 form を持つ editor / SPA タブに別 URL を踏ませると `beforeunload` dialog で upload や遷移が崩れる。既存タブは再利用し、新規作業は別タブで開く。`dialog.accept()` / `page.reload()` / API トリガー目的の reload で dirty を踏み越さない。詳細と Qiita / CMS 例は [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md) を参照する。
+Keep dirty editor tabs in place; use a separate clean work tab instead of navigating or reloading them. Never auto-accept Leave or discard changes.
+CDP reporting `No dialog is showing` does not rule out a browser-chrome prompt. Native automation may invoke **Cancel/Stay only** when the owned browser process, selected-tab address, exact leave-site warning and enabled button uniquely match; otherwise stop. Never handle credential, permission or arbitrary dialogs this way.
+After dismissal, verify the same target responds; preserved form values are not proof of saved settings. See [unsaved-form safety](references/instructions/unsaved-form-tabs.md) and [native recovery](references/instructions/cdp-recovery-and-context.md).
 
 Azure Portal iframe / OOPIF / trusted event の注意は [references/instructions/azure-portal.md](references/instructions/azure-portal.md) を参照する。
 Angular Material / `mat-select` / `cdk-overlay` / disabled save の注意は [references/instructions/angular-material.md](references/instructions/angular-material.md) を参照する。

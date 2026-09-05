@@ -1,6 +1,6 @@
 ---
 name: ocr-super-surya
-description: "GPU-optimized OCR using Surya. Use when: (1) Extracting text from images/screenshots, (2) Processing PDFs with embedded images, (3) Multi-language document OCR, (4) Layout analysis and table detection. Supports 90+ languages with 2x accuracy over Tesseract."
+description: "GPU-optimized OCR using Surya. Use when extracting text from images/screenshots, recovering image-only content in PDFs or slides, or inspecting multilingual document layouts. Preserve source locations and report recognition gaps separately from verified text."
 argument-hint: "OCR したい画像・PDF、対象言語、欲しい出力"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -19,30 +19,26 @@ GPU-optimized OCR using [Surya](https://github.com/datalab-to/surya).
 - Processing PDFs with embedded images
 - Multi-language document OCR (90+ languages including Japanese)
 
-## Features
+## Extraction and Verification
 
-| Feature       | Description                             |
-| ------------- | --------------------------------------- |
-| **Accuracy**  | 2x better than Tesseract (0.97 vs 0.88) |
-| **GPU**       | PyTorch-based, CUDA optimized           |
-| **Languages** | 90+ including CJK                       |
-| **Layout**    | Document layout, table recognition      |
+1. Confirm the input scope and a non-public output location for sensitive material; preserve source files and do not bypass document protection. Text redaction does not anonymize retained images or authorize redistribution.
+2. Extract native PDF/slide text first, including slide notes where present. A nonempty text layer can still omit screenshots, diagrams, or image-only pages; inventory those gaps before selecting OCR targets.
+3. Record source-relative path, source hash, page/slide number, and image hash. Deduplicate identical images without dropping their source locations; distinguish pending, recognized, no-text, and failed outcomes.
+4. Run a small sample and compare it with the original image before scaling. Reuse predictors within a batch and checkpoint each completed item so interruption does not require starting over.
+5. Keep raw OCR separate from corrected notes. Flag low or missing confidence and inspect multi-column order, code symbols, and tables; high confidence is not proof of correctness, and no-text is not proof of an empty image.
+6. Report extracted documents, processed OCR targets, unrecognized targets, and manually reviewed scope separately. Verify saved files and hashes; a saved hash alone proves neither source freshness nor semantic accuracy. Recheck the source hash when claiming the same source version.
 
 ## Quick Start
 
 ### Installation
 
-```bash
-# 1. Check GPU
-python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
+Check the selected interpreter and existing dedicated environments before installing or declaring a PDF/OCR dependency unavailable. Set `OcrPython` to the resolved environment's interpreter; do not assume the active workspace environment has the same packages.
 
-# 2. Install (with CUDA if GPU available)
-pip install surya-ocr
-
-# If CUDA=False but you have GPU, reinstall PyTorch:
-pip uninstall torch torchvision torchaudio -y
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```powershell
+& $OcrPython -c "import importlib.util,json; print(json.dumps({name: importlib.util.find_spec(name) is not None for name in ['surya','torch','pypdf','pypdfium2']}))"
 ```
+
+After imports succeed, check package versions and `torch.cuda.is_available()` with that same interpreter. GPU unavailability alone is not a reason to uninstall a working environment. If dependencies are missing, use an isolated environment; stop repeated equivalent TLS failures instead of disabling certificate validation.
 
 #### Windows + uv 環境（OneDrive配下でのインストール）
 
@@ -129,6 +125,7 @@ surya_ocr image.png
 | `AttributeError: 'SuryaDecoderConfig' object has no attribute 'pad_token_id'`                    | `transformers 5.x` との非互換       | `pip install "transformers<5.0"` でダウングレード                                 |
 | `failed to hardlink file ... OneDrive` (uv, os error 396)                                        | OneDrive のハードリンク制限         | `--link-mode=copy` を付けてインストール＋`UV_CACHE_DIR` をOneDrive外に設定        |
 | `UnicodeEncodeError: 'cp932' codec can't encode character`                                       | Windows のCP932デフォルトエンコード | `sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')` を先頭に追加 |
+| `PdfDocument` does not support the context manager protocol | Installed pypdfium2 API differs | Use explicit `try/finally` cleanup and close bitmap, page, and document after copying the rendered image; verify against the installed version. |
 
 ## License Note
 

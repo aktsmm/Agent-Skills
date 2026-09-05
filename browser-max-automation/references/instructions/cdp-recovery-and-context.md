@@ -14,12 +14,23 @@ When the browser closes or crashes (`Target page, context or browser has been cl
 
 If `/json/list` works but `Runtime.evaluate` or `Page.enable` times out, suspect a JS dialog, beforeunload prompt, reload confirmation, or in-page modal.
 
-- Probe with `Runtime.evaluate({expression: '1+1'})` and a short timeout.
-- Try `Page.handleJavaScriptDialog({accept: false})`.
-- If no native dialog exists, close in-page overlays with DOM/Escape.
-- Browser system dialogs may not be controllable by CDP; ask the user to cancel rather than retrying blindly.
-- While a browser-chrome prompt is visible, `/json/list` can show the destination URL before navigation has completed. Do not treat target URL/title changes as success; re-check `Runtime.evaluate` and durable DOM after the prompt is closed.
-- Hard reset when a native dialog has wedged the renderer: closing the wedged tab releases the dialog. But closing the LAST tab via `/json/close/<id>` exits the whole browser process and the debug port closes — relaunch the browser with the same port + profile to recover. Keep a second blank tab open if you want to close a wedged tab without killing the browser.
+- Use one short read probe. `Page.getFrameTree` can also stall; switching from JavaScript to another page command does not exclude a browser-chrome modal.
+- For a known leave-site confirmation on the owned target, try `Page.handleJavaScriptDialog({accept: false})` once. A `No dialog is showing` response describes that CDP session, not the entire browser window. If page commands still stall, inspect native UI before asking the user to intervene.
+- Keep `Page.enable`, dialog events and command responses on the same WebSocket session when using event-driven recovery; dispatch responses by command ID instead of dropping dialog notifications.
+- While a browser-chrome prompt is visible, `/json/list` can show the destination URL before navigation commits. Verify the actual address and same-target DOM after dismissal; do not infer navigation or save success from the target list.
+- Do not close tabs, kill the browser, clear profiles or blindly send Escape/Enter to recover a dirty editor. If safe ownership and dialog matching cannot be established, request manual Cancel/Stay and preserve the stopped state.
+
+### Windows Browser-Chrome Leave-Site Prompt
+
+Use native UI Automation only to cancel an identified leave-site prompt, not as a generic consent handler. Cancellation preserves the form; Leave can discard it.
+
+1. Resolve the loopback CDP listener's owning process and verify the expected browser executable and dedicated profile. Pin the target ID and the application's owned resource identity. Enumerate only that process's top-level windows with `UIAutomationClient` / `UIAutomationTypes`.
+2. In that window, match the selected-tab address bar through `ValuePattern` against the approved origin and resource route. A matching process or generic window title alone is insufficient. Refuse unrelated URLs, multiple candidates or an unavailable address.
+3. Require an exact leave-site dialog title, unsaved-changes warning, and one visible enabled Cancel/Stay button in that dialog subtree, using labels actually observed for the current locale. Edge can expose the dialog as a `RootView` window while CDP reports none. Treat class names as observed hints, not universal version guarantees.
+4. Default to dry-run. On explicit apply within the authorized browser task, recheck the candidate and invoke its `InvokePattern` once. Do not click coordinates, accept Leave, target permission/authentication prompts, or operate another tab.
+5. Verify both dialog disappearance and `Runtime.evaluate` response on the same owned target. A repeat with no matching dialog must not click anything. If readback fails, record dismissal and page recovery separately rather than claiming success.
+
+Keep screenshots, capture time and sanitized recovery results; protect exact addresses and identifiers in private records. Read persisted settings separately: Cancel leaves a dirty form dirty. Use a clean work tab for subsequent server-state reads and never overwrite the original evidence.
 
 ## A Widget Stops Responding After Many Operations
 
