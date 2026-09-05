@@ -51,7 +51,7 @@ pj_{topic}/
 | Open actions  | Item, owner, due date, status                                                   |
 | Related files | Links to the dated files and to the meeting notes that reference this thread    |
 
-The current-state line is the point of the folder. If a reader has to reconstruct the status from the timeline, the README has failed.
+The current-state line is the point of the folder. If a reader has to reconstruct the status from the timeline, the README has failed. Include the verification date; if the formal status is not explicitly confirmed, record the last confirmed action and mark the formal status unconfirmed instead of carrying forward a stale `Open`, owner, or waiting party.
 
 ## Single Source of Truth
 
