@@ -63,6 +63,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 ```
 
 UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
+返信・コメント form では editor に残った送信文が `get_by_text` に一致しても成功ではない。POST の 2xx と、reply ID・件数・本文の readback で確定する。
 
 API と DOM の状態が一時的にずれるケースがある。API が stale / capture failure を返しても、画面上の cell / row の `aria-label` や status text が進展した状態を示しているなら DOM も正本候補として扱う。API 単独で「未完了」と断定しない。
 
@@ -107,8 +108,8 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 外部プラットフォームは、認証や前後の書き込みが正常でも、送信内容が攻撃 payload に似ているという理由で 403 を返したり書き込みを拒否したりする。技術・セキュリティ内容を繰り返し／一括送信する前に:
 
 - run a deterministic checker for platform-known blocked signatures across **every field included in the request body**, not only the visible field being edited;
-- on rejection, compare same-session successful controls that vary one feature at a time (for example sensitive path alone vs traversal chain alone vs their adjacent combination) before changing content;
-- preserve the user-visible meaning and never use invisible characters as a filter bypass;
+- on rejection, capture the failed POST status and response body, then compare same-session successful controls that vary one feature at a time before changing content;
+- URL-like text can enter a dedicated link-warning path or return 400 even when nearby plain text succeeds. Use the platform's supported confirmation path or semantically equivalent non-URL wording, preserving meaning and never inserting invisible characters;
 - keep one-item rejection isolated so independent later items still run, but keep the overall result non-PASS until the rejected item is fixed or explicitly waived;
 
 信頼できる preflight がない場合は、使い捨て draft / canary target または可逆な 1 件 pilot を使う。成功した probe を同じ経路で復元できない production target 上で mutation の binary search をしない。
