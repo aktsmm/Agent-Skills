@@ -1,6 +1,6 @@
 ---
 name: browser-max-automation
-description: Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation. Use when navigating websites, clicking elements, filling forms, taking screenshots, testing web applications, reusing an existing browser session, or troubleshooting CDP / iframe / modal / file chooser / passkey (WebAuthn) issues.
+description: Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, repeatable browser workflows, existing-session reuse, or troubleshooting CDP / iframe / modal / file chooser / passkey (WebAuthn) issues.
 argument-hint: "自動化したい URL、操作内容、使いたいモード"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -31,36 +31,31 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 
 ## Choose Mode First
 
-| モード             | 向く場面                                               | メリット                       | 注意点                     |
-| ------------------ | ------------------------------------------------------ | ------------------------------ | -------------------------- |
-| 新規ブラウザ       | まず安定して動かしたい                                 | 設定が簡単                     | 既存ログイン状態は使えない |
-| 既存ブラウザ (CDP) | 普段のブラウザ状態をそのまま使いたい                   | ログイン済み状態を再利用できる | デバッグモード起動が必要   |
-| 直接 CDP WebSocket | Playwright CDP が不安定、または MCP と競合させたくない | 低レベル操作で安定しやすい     | CDP コマンドを自前管理する |
+- Default to a visible, headed browser. Use headless only when explicitly requested, never as an automatic recovery path. Reuse a verified authenticated session and an owned work tab when possible; a new profile does not imply reusable authentication.
+- Preserve the OS foreground window and the user's selected tab. Do not routinely call `bring_to_front`, `Page.bringToFront`, `Target.activateTarget`, or native focus/keystroke helpers. This applies to browser launch, tab creation, navigation, capture, and recovery, not just clicks.
+- If a necessary operation cannot avoid activation, explain why and which bounded step needs it before proceeding. Do not force focus back afterward: the user may have switched applications meanwhile. Credentials and MFA remain user-entered.
+- Identify the work tab and goal at the start, report meaningful stage changes, and leave progress inspectable. Pause writes on user editing, target drift, or lost ownership; resolve ownership before resuming. A tab merely being viewed is not permission to discard it.
+- Prefer API/CLI helpers for supported data operations, but preserve UI execution when the goal is a demo, UI verification, or observation of the browser workflow.
+
+| Mode | Use when | Boundary |
+| --- | --- | --- |
+| Existing headed browser + MCP/CDP | Authentication or interactive exploration matters | Verify profile, owned target, and non-activation behavior |
+| Playwright CLI or saved Playwright script | A stable workflow will repeat | Reuse the session; explicitly request headed mode for new launches |
+| Direct CDP WebSocket | A verified lower-level route is needed | Pin target ID; do not bypass ownership or recovery limits |
 
 既存ブラウザ CDP の起動、profile 確認、port drift、認証 URL encode、スクリーンショット取得は [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) を参照する。
 直接 WebSocket CDP の起動フラグ、`websocket-client` 接続、SPA hash navigation、virtual scroll 操作は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
-## Quick Reference
-
-| Command                   | Purpose           |
-| ------------------------- | ----------------- |
-| `browser_navigate`        | URL を開く        |
-| `browser_snapshot`        | 要素 ref を取る   |
-| `browser_click`           | ref でクリック    |
-| `browser_type`            | テキスト入力      |
-| `browser_take_screenshot` | 画面確認          |
-| `browser_wait_for`        | 表示待機          |
-| `browser_evaluate`        | DOM 直接操作      |
-| `browser_file_upload`     | file chooser 対応 |
-
 ## Core Loop
 
 ```text
-1. browser_navigate(url)
-2. browser_snapshot で ref を取る
-3. browser_click / browser_type で操作する
-4. browser_snapshot or screenshot で結果確認する
+1. Reuse a suitable script or establish the flow on an owned, verified work tab.
+2. Resolve the target and expected postcondition with a scoped snapshot or query.
+3. Perform the action once; wait for the expected state with a deadline.
+4. Read back the durable result before retrying or moving to the next item.
 ```
+
+Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read.
 
 UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
 返信・コメント form では editor に残った送信文が `get_by_text` に一致しても成功ではない。POST の 2xx と、reply ID・件数・本文の readback で確定する。
@@ -72,11 +67,13 @@ API と DOM の状態が一時的にずれるケースがある。API が stale 
 | Situation | Action |
 | --- | --- |
 | Flow or selectors are still unknown | Use MCP interactively |
-| Flow is stable and must run for many items | Switch to a CLI/API helper |
+| A stable multi-step flow recurs a second time | Reuse or parameterize a saved script when repetition outweighs maintenance; for known bulk work, validate one item and script the rest on the first run |
 | Snapshot returns a ref | Use normal click/type |
 | Element is visible but has no ref | Confirm visually, then use evaluate or the relevant UI fallback |
-| Element is not visible | Wait or reload before forcing interaction |
+| Element is not visible | Wait for a bounded readiness condition; preserve dirty forms and do not force interaction |
 | Read-only tabular extraction | Keep navigation evidence, then return compact JSON from DOM evaluation |
+
+CLI commands alone do not remove per-action reasoning. Save a verified sequence with stable locators, input/target parameters, readback, duplicate-write protection, and resumable per-item results. Store task-specific scripts with their project and generic helpers with the owning skill; record purpose and invocation for discovery. Do not persist secrets or transient snapshot refs. See [repeatable workflows](references/instructions/ui-fallbacks.md#repeatable-workflows-and-playwright-cli).
 
 ### Virtualized feeds and per-item mutations
 
@@ -86,9 +83,7 @@ API と DOM の状態が一時的にずれるケースがある。API が stale 
 
 ### handler が何回走ったかを数えるとき
 
-「クリックで 1 回だけ実行されたか」を確かめるのに `locator.click()` を oracle にしない。Chromium / Playwright の実測で、リスナー 1 個の同じ `<button>` に対し `click()` は 2 回、`dispatchEvent(new MouseEvent("click"))` は 1 回を返した。`click()` の値だけ見て二重バインドと判断すると、正常なコードを壊す。
-
-呼び出し回数をカウンタに記録し、`dispatchEvent` で 1 クリック分を測る。両者が食い違ったら automation 側の差として扱う。実ユーザーの 1 クリックは `dispatchEvent` 側と一致する。
+Instrument the listener and compare isolated runs before diagnosing duplicate binding. `locator.click()`, `el.click()`, and `dispatchEvent()` have different event sequences and trust semantics; none is a universal oracle for a real user's click. Verify the resulting state, and never replay a possibly successful write merely to compare methods.
 
 ### unsaved editor / draft タブを壊さない
 
@@ -116,24 +111,18 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 
 ### Failure Budget
 
-- Write操作の前に、成功を示す永続stateと復旧経路を決める。既定は通常UI 1回と、state再取得・対象再特定後に同じ通常UI操作を1回だけ再実行する復旧までにする
-- 同じ永続stateが2回続いたら停止し、対象・試行回数・最終state・再開条件をcompactに返す。固定waitやfull-page snapshotを重ねない
+- Before a write, choose its durable success signal and one bounded recovery. Allow the initial attempt plus at most one recovery attempt per logical operation across UI, CLI, CDP, script, and replacement-tab routes; switching routes does not reset the budget.
+- A timeout is not proof of failure. Re-read authoritative state; retry only when non-application is established or an idempotency mechanism prevents duplication. If the outcome remains ambiguous, stop without replaying the write.
+- Stop after two failed attempts and report target, attempts, last state, and restart condition. Waiting for normal asynchronous progress is not another attempt: use a deadline and a narrow state check, not fixed sleeps or repeated full-page snapshots.
 - UI clickからDOM mutation、keyboard、private frontend internalsへ連続的にfallbackしない。公開されていないViewModelやupload実装の操作は、明示承認のある単発incident以外では使わない
 - `Session ended`、login redirect、別contextを検出したらstale DOMを操作しない。再認証後は永続stateを再取得し、未完了操作だけを再開する
 
 ### CDP 排他制御
 
-MCP Playwright と Python スクリプトは **同じ CDP ポートへ同時接続しない**。
-とくに Python 側も `connect_over_cdp()` を使う場合、MCP と Playwright セッションが二重になり、ページ操作が競合して「遷移先が想定外」「フォーム送信が効かない」等の不定失敗が起きる。
-共有ブラウザへ raw CDP で接続する場合は、専用作業タブを作成して返された target ID を固定し、各 write batch 前に URL / route / query を再検証する。ドメイン一致の先頭タブを毎回選ぶと、ユーザー操作中の別タブを誤操作する。
-
-| ルール        | 内容                                                                                                               |
-| ------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 同時接続禁止  | MCP と Python を同じ CDP に同時接続しない                                                                          |
-| MCP 切断優先  | Python 実行前に **`browser_close` で MCP ページを解放** してから実行する                                           |
-| プロセス確認  | 実行前にゾンビ Python を確認する                                                                                   |
-| 標準フロー    | MCP で手順確立 → `browser_close` → Python 単独実行 → 完了後に MCP 再接続して検証                                   |
-| raw WebSocket | `websocket-client` 等で CDP WebSocket に直接繋ぐスクリプトは MCP と共存可能（Playwright セッションを張らないため） |
+- Use one controller per work target. Do not attach competing Playwright clients to a shared browser unless coordination is verified; raw WebSocket access is not an exemption for concurrent writes or browser-wide settings.
+- Pin the verified profile/context and owned target ID; re-check URL, route, query, and item ID before each write batch. Never select the first domain match again after binding the work target.
+- Before a necessary handoff, stop the owned runner and verify the current tool's detach/close semantics. Do not use `browser_close` as a generic disconnect: it may destroy tabs or the browser. Preserve dirty tabs; if safe detachment is unavailable, retain the working route or stop.
+- Close only explicitly owned, no-longer-needed targets after result verification. Never close the last tab of a shared browser or stop another session's runner as cleanup.
 
 raw WebSocket を使う場合は、CDP command id で応答をフィルタし、`Runtime.enable` / `Page.enable` など必要な domain を先に有効化する。詳細は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
@@ -175,6 +164,8 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 
 ## Done Criteria
 
+- Verify the actual control route preserves OS foreground and user tab selection during the operation, not just before/after it; distinguish measured results from unverified behavior. Inspect saved captures for incomplete rendering.
+- Report the work target and durable result; for repeat runs, report script reuse and compare elapsed time, tool calls, and retries without omitting verification. See the [acceptance scenarios](references/instructions/ui-fallbacks.md#repeatable-workflows-and-playwright-cli).
 - MCP または CDP 設定が完了している
 - 対象ページまで安定して到達できる
 - 目的の操作が完了している

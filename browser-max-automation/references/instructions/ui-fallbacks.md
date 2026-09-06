@@ -1,6 +1,41 @@
 # UI Fallbacks and Fast Paths
 
-Use these patterns after the normal MCP snapshot/click flow has established the page model.
+Use these patterns after establishing the page model on an owned work tab. The Skill's foreground, ownership, and shared recovery limits apply to every fallback; this is not a ladder to exhaust after two failures.
+
+## Repeatable Workflows and Playwright CLI
+
+Look for an existing project/skill script before exploring the UI again. On the second occurrence of a stable multi-step flow, parameterize and reuse it when repetition outweighs maintenance. If bulk work is known upfront, validate one item and script the remainder during the first run; a trivial one-off click does not need a new script.
+
+### Choosing the execution route
+
+- MCP is useful for discovering unknown controls. Once a route works, retain it; a CLI invocation per click still leaves the agent doing per-click reasoning. A saved sequence is the reusable unit.
+- Playwright CLI is a candidate, not a required installation or universal replacement. Check the installed version and `--help` before depending on commands. Its default new-browser mode is headless: use `open ... --headed` unless the user explicitly requests headless.
+- Where supported, `attach --cdp=<verified-endpoint>` can reuse an authenticated headed browser; verify the profile and work target rather than assuming attachment selects the correct tab. Bind a run-owned named session, and do not use `close-all` or `kill-all` on shared sessions.
+- `run-code --filename=<script>` can execute a saved Playwright sequence. Use stable locators and validated parameters, not stale snapshot refs or generated source containing untrusted input. `detach` is for an attached session and should leave the external browser running; verify actual version behavior before handoff. Neither CLI nor headed mode guarantees non-activation.
+- Prefer supported API helpers for data operations, but retain UI actions and visible checkpoints for UI verification or demos. API execution without a browser is not permission to launch a headless browser or export credentials indiscriminately.
+
+CLI reference: https://github.com/microsoft/playwright-cli
+
+### Reusable sequence contract
+
+- Accept endpoint/session, target/resource identity, input data, and bounded batch size as parameters. Default mutating helpers to read-only/dry-run; require an explicit apply option within the authorized task scope.
+- Validate ownership and preconditions, resolve the current item, act once, wait for its postcondition with a deadline, and read back the durable result. Batch independent reads; serialize writes on one target.
+- Check for competing user edits at transaction boundaries. If a shared target cannot detect concurrent editing reliably, coordinate a no-edit interval before writes; do not claim an unattended takeover guard exists. Observing the work tab alone is not a reason to destroy or replace it.
+- Return completed/failed/unknown item IDs, stage, restart condition, and elapsed time; persist only non-secret task state. Reconcile unknown outcomes before replay and skip verified completed items.
+- Keep task-specific scripts with the project and generic helpers with the skill. Record purpose and invocation in the existing workflow reference; search there on later runs. Do not retain auth dumps or customer-specific examples in a portable helper.
+
+### Acceptance scenarios
+
+These are required checks for a new or changed execution route, not claims of completed testing. Use a safe fixture and report unexecuted cases explicitly.
+
+| Scenario                                                                                  | Pass condition                                                                                                                    |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Another app is foreground during tab creation, input, save, upload, capture, and recovery | No automation-induced OS activation or user-tab switch throughout the run; captures are readable                                  |
+| The user views the work tab, then edits it                                                | Viewing remains possible; conflicting writes pause or use an explicitly coordinated interval                                      |
+| Same workflow runs again                                                                  | Saved sequence is discovered and reused; durable results match and completed items are not duplicated                             |
+| Save times out, or the target disappears                                                  | Readback distinguishes success, non-application, and unknown; no ambiguous replay or first-domain-match rebinding                 |
+| Background rendering fails or detach is unavailable                                       | At most one bounded recovery; announce a necessary foreground exception or stop, never silently use headless or destructive close |
+| Efficiency comparison                                                                     | Compare elapsed time, tool calls, and retries on equivalent input while preserving the same verification; do not invent savings   |
 
 ## Hidden File Input Upload
 
@@ -31,13 +66,13 @@ In Angular-Material / web-component UIs (GCP Console, YouTube Studio), many butt
 
 ## Click times out on "visible, enabled and stable"
 
-Playwright's actionability check can never settle when the browser window is backgrounded or minimized, so `click()` times out even though the element resolved. The snapshot and `fill()` still work because they skip that check.
+Background/minimized rendering can contribute to actionability timeouts, but it is not a universal failure mode. Inspect readiness, overlays, and current target state with a bounded query; successful reads or fills do not prove a click can succeed.
 
-Fall back to a JS click on the resolved node (`el.click()` on the submit button, or submit the form) instead of retrying the same call. Two consecutive timeouts on the same target mean the route is wrong, not the selector. Some widgets only accept trusted input events and ignore a JS click, so verify the resulting state change rather than the call returning.
+Keep ordinary scoped click/fill as the default. Only choose JS click as the single recovery when its semantics are acceptable and any prior write is known not to have applied. Synthetic events are not equivalent to trusted input. Verify durable state; an ambiguous timeout stops writes rather than triggering another click method or automatic foreground activation.
 
 ## Radio and checkbox groups that ignore a click
 
-In component frameworks with obfuscated class names, `.click()` on the `<input>` and on its `label[for=<id>]` can both be silent no-ops while a click on the parent control works. Try parent click and synthesized `mousedown`/`mouseup`/`click` as later attempts, and read `input.checked` back: the call returning tells you nothing about which attempt won.
+Prefer a state-setting check/select operation over toggling. If an input or label click is ineffective, inspect the actual control and choose at most one recovery within the shared budget. Read `input.checked` before and after; do not cycle through parent clicks and synthetic event sequences blindly.
 
 A read-back only proves transient UI state. Re-verify after the form's own save and reload before treating the value as submitted.
 
@@ -54,9 +89,7 @@ Canvas-like widgets (org charts, diagram editors, graph views) lay children out 
 
 ## Handler runs but synthetic clicks are ignored
 
-When coordinate click and `el.click()` both do nothing, read the element's inline `onclick`. Frameworks that wrap handlers in drag detection (`_onClickButNotDrag`-style) bail out unless a real `mousedown` preceded the click, so both synthetic paths are silently dropped.
-
-Invoke the declared handler directly instead: `new Function('event', el.getAttribute('onclick')).call(el, new MouseEvent('click', {bubbles: true}))`. Verify the resulting DOM state, because a handler that no longer exists fails the same silent way.
+Do not invoke application handlers or private frontend internals as another retry after click failures. Inspect event/state evidence to distinguish trust or gesture requirements from a stale target, then use a supported route within the existing budget or stop. Never treat handler execution as proof of the user's intended transaction. The Skill's explicitly approved single-incident exception still requires ownership and foreground checks and does not reset the retry budget.
 
 ## Hiding sensitive UI before a capture
 
@@ -92,7 +125,7 @@ Rules:
 
 ## Minimal UI Write Fallback
 
-If API write fails with stale state, guardrail refusal, or route mismatch:
+If an authorized API write is confirmed not applied because of stale automation state or a route mismatch, choose a UI recovery within the shared budget. Permission or service-policy refusals are not a reason to bypass the restriction:
 
 1. Confirm the UI save path is stable.
 2. Use the shortest path: search -> select row -> required fields -> save.

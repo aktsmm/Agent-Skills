@@ -238,14 +238,13 @@ Important:
 - You may be able to inspect React handlers or invoke `onClick`, but blade navigation can still fail because the Portal expects a **trusted user event**.
 - When iframe text is visible but programmatic click / handler invocation does not navigate, treat this as a Portal constraint and switch the last click to a human.
 
-## Session Extraction and Headless Handoff
+## Authenticated API Handoff
 
-If the browser already holds the valid login state, prefer extracting session material at runtime and moving the bulk operation out of visible UI flows.
+For supported data operations, prefer requests within the already authenticated context over exporting session material. Keep the headed work tab available for inspection; preserve UI execution when that is the purpose of the task.
 
-- Use CDP to read cookies, local storage, CSRF tokens, or in-page bootstrap state from the live browser session.
-- Pass the extracted values directly to a headless HTTP/API helper in the same run.
-- Keep the browser UI for login, target verification, and before/after evidence only.
-- Do not persist tokens, cookies, or auth headers to tracked files.
+- If an authorized helper genuinely needs session material, pass only the minimum required values in memory within the same run. Do not broadly dump cookies, local storage, or bootstrap state.
+- An HTTP/API helper does not require a browser window; this is distinct from launching a headless browser, which requires an explicit user request.
+- Keep visible checkpoints and compact progress/results. Do not persist tokens, cookies, or auth headers to files or tool output.
 
 ## Virtual Scroll and Modal Patterns
 
