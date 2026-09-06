@@ -103,6 +103,31 @@ The list numbers itself with a CSS counter, so entry order is document order. Th
 
 Press `O` or use the 目次 button to collapse the sidebar and give the stage the full width. Do that when projecting; the list is for reading and reviewing. Printing and per-slide PNG export drop the sidebar either way.
 
+### Chapter groups
+
+For multi-section review decks, group the outline by the source's chapters rather than listing all slides as peers. Runtime/CSS v4 supports `details[data-shf-section]` groups with native keyboard-accessible `summary` controls:
+
+```html
+<details data-shf-section="introduction" open="open">
+  <summary>Introduction</summary>
+  <ol>
+    <li>
+      <button type="button" data-shf-page="01" data-shf-goto="s1">
+        Overview
+      </button>
+    </li>
+  </ol>
+</details>
+```
+
+Use one level of groups. Each slide belongs to exactly one group; button order follows slide order. The optional `data-shf-page` overrides the per-list counter with a global page number. Navigation opens the current slide's group and marks it `is-current-section`; collapsing a group does not change the selected slide. Check membership, collapse/expand, chapter jumps, next/previous across boundaries, and a unique current-page marker.
+
+If separate files are needed for authoring, offer a combined review deck as well, with stable slide IDs. Grouping must change navigation behavior, not just add decorative headings.
+
+## Cross-format review
+
+Keep the source's titles, body, examples, caveats, source labels/URLs, and the order and relationships expressed by diagrams. Decoration and line wrapping can differ; replacing an ordered or branching diagram with a flat list can remove meaning even when its words match. Compare each mapped slide's visible content and relationships with the source, and state which presentation details intentionally differ. Hidden notes or serialized content are not proof of visible information parity.
+
 ## Printing
 
 Print rules put one slide per page and drop the chrome and the overlay. Use this for a quick handout; use `export_html.py --pdf` when the output matters.

@@ -58,12 +58,23 @@
           index + 1 < slides.length ? titleFor(index + 1) : "\u2014";
       }
       if (pNotes) pNotes.textContent = noteFor(index);
-      var here = slides[index] ? slides[index].getAttribute("data-slide-id") : "";
+      var here = slides[index]
+        ? slides[index].getAttribute("data-slide-id")
+        : "";
       tocLinks.forEach(function (link) {
         var on = link.getAttribute("data-shf-goto") === here;
         link.classList.toggle("is-current", on);
-        if (on) link.setAttribute("aria-current", "true");
-        else link.removeAttribute("aria-current");
+        if (on) {
+          link.setAttribute("aria-current", "true");
+          var group = link.closest("details[data-shf-section]");
+          if (group) group.open = true;
+        } else link.removeAttribute("aria-current");
+      });
+      all("details[data-shf-section]").forEach(function (group) {
+        group.classList.toggle(
+          "is-current-section",
+          !!group.querySelector('[aria-current="true"]'),
+        );
       });
     }
 
@@ -102,6 +113,12 @@
     document.addEventListener("keydown", function (e) {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       var k = e.key;
+      if (
+        e.target &&
+        e.target.closest("summary") &&
+        (k === " " || k === "Enter")
+      )
+        return;
       if (k === "ArrowRight" || k === "PageDown" || k === " ") {
         go(index + 1);
         e.preventDefault();

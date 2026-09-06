@@ -36,7 +36,7 @@ ELEMENTS = {
     "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
     "figure", "figcaption", "blockquote", "pre", "code", "kbd", "samp",
     "strong", "em", "b", "i", "u", "s", "small", "sub", "sup", "mark", "abbr", "time",
-    "span", "div", "hr", "br", "a", "img", "button",
+    "span", "div", "hr", "br", "a", "img", "button", "details", "summary",
     "template", "data", "script",
 }
 
@@ -55,6 +55,7 @@ ELEMENT_ATTRS = {
     "ol": {"start", "reversed", "type"},
     "time": {"datetime"},
     "button": {"type", "disabled"},
+    "details": {"open"},
     "data": {"value", "data-asset-id", "data-mime"},
     "template": {"id"},
     "script": {"id", "type"},
@@ -758,7 +759,8 @@ def run_tier2(path: Path, rep: Report) -> str:
             bad_svg = page.evaluate(
                 "Array.from(document.querySelectorAll('svg')).filter(function (s) {"
                 " var b = s.getBoundingClientRect();"
-                " return !s.getAttribute('viewBox') || b.width === 0 || b.height === 0; }).length"
+                " var slide = s.closest('[data-slide-id]');"
+                " return !s.getAttribute('viewBox') || (!(slide && slide.hidden) && (b.width === 0 || b.height === 0)); }).length"
             )
             if bad_svg:
                 problems.append(f"state {i}: {bad_svg} inline svg without a viewBox or with zero size")

@@ -22,6 +22,8 @@ python scripts/test_verify.py
 
 Negative fixtures must fail, positive ones must pass. A suite where everything passes proves nothing.
 
+Run `python scripts/test_browser.py` when changing runtime navigation or visibility-dependent checks. It requires Playwright and Chromium and tests real page transitions, not only generated markup.
+
 ## Error codes
 
 | Code                                 | Meaning                                                                  |
@@ -48,6 +50,8 @@ Negative fixtures must fail, positive ones must pass. A suite where everything p
 
 Blocks all network egress, walks every slide, waits for fonts and images to finish — by event, not by timer, because a timed sample lets a slow image escape inspection — then checks for zero-size images, SVG without a viewBox, overflow, and console errors.
 
+SVG viewBox validity is checked on every slide. Dimensions are checked only while that slide is active: an inactive slide correctly has zero layout size. Keep the full navigation walk so a broken diagram on a later slide still fails when reached; do not skip all hidden content permanently.
+
 ## What no check can tell you
 
 **Secrets inside an image.** A tenant name in a screenshot is pixels. Look at every screenshot before embedding, and again in the finished file.
@@ -62,6 +66,7 @@ Blocks all network egress, walks every slide, waits for fonts and images to fini
 
 - Open the file directly from disk, not through a server. That is how the recipient will open it.
 - Deck: arrow through every slide, press `S`, confirm the notes match.
+- Grouped outline: compare chapter membership with the source, expand/collapse with mouse and keyboard, jump between chapters, cross a boundary with next/previous, and confirm exactly one current-page marker. Tier 2 alone does not prove chapter membership or cross-format information parity.
 - Doc: scroll from top to bottom and watch the sidebar highlight follow. Click a citation and confirm it lands.
 - Poster: export the PNG and look at the PNG, not the HTML.
 - Narrow the window to about 800px on a doc.

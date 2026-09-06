@@ -72,7 +72,7 @@ h1 h2 h3 h4 h5 h6 p ul ol li dl dt dd
 table thead tbody tfoot tr th td caption colgroup col
 figure figcaption blockquote pre code kbd samp
 strong em b i u s small sub sup mark abbr time
-span div hr br a img button
+span div hr br a img button details summary
 template data svg
 script
 ```
@@ -103,6 +103,7 @@ data-shf-*        (name matches data-shf-[a-z0-9-]+)
 | `ol`              | `start`, `reversed`, `type`                 |
 | `time`            | `datetime`                                  |
 | `button`          | `type`, `disabled`                          |
+| `details`         | `open`                                      |
 | `data`            | `value`, `data-asset-id`, `data-mime`       |
 | `template`        | `id`                                        |
 | `script`          | `id`, `type`                                |

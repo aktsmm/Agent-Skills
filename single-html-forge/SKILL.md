@@ -31,7 +31,7 @@ Ask which one unless the request already says. Load only that archetype's refere
 | `doc`     | vertical scroll, sidebar nav, numbered citations | explainers, comparisons, handouts | [archetype-doc.md](references/archetype-doc.md)       |
 | `poster`  | one fixed canvas, exported as PNG                | summary images, social cards      | [archetype-poster.md](references/archetype-poster.md) |
 
-`deck` also has an **outline layout**: a slide list on the left, the stage on the right, collapsed with `O` when projecting. Start from `deck-outline-skeleton.html` when the deck will be read or reviewed rather than presented.
+`deck` also has an **outline layout**: a slide list on the left, the stage on the right, collapsed with `O` when projecting. Start from `deck-outline-skeleton.html` when the deck will be read or reviewed rather than presented; preserve chapter groups when reviewing a multi-section source (see the deck reference).
 
 ## Intake
 
@@ -66,6 +66,7 @@ These gate the output. They are here, not in a reference, because a reference ma
 
 2. Copy the skeleton for the chosen archetype from `assets/skeletons/`.
 3. Replace the content, using the storyboard ids as `data-slide-id` and section `id`. Keep them stable — they are the handles for later edits.
+  For a draft corresponding to another format, preserve claims, examples, caveats, citations, and diagram relationships; compare visible slide content, not merely hidden notes or JSON. Record any approved reduction rather than treating "draft" as permission to summarize.
 4. Adjust colours by editing `<style id="shf-theme">` only; that block is the whole design system, so carrying it into the next artifact is how a series stays consistent. Never touch `<style id="shf-css">` or `<script id="shf-runtime">`; both are hash-pinned.
 5. For each image: `embed_assets.py`, then paste the `dataUri` into an `<img>` with `alt` and `data-asset-ref`, and add the asset entry to `<script id="shf-model">`.
 6. Verify, then export only the requested format.

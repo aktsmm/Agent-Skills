@@ -332,6 +332,35 @@ html[data-shf-layout="outline"].shf-outline-off #shf-outline {
   color: var(--shf-color-accent);
 }
 
+#shf-outline details {
+  border-bottom: 1px solid #34423d;
+  padding: 8px 0;
+}
+
+#shf-outline summary {
+  padding: 10px 4px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+  cursor: pointer;
+  color: #e6ecf3;
+  overflow-wrap: anywhere;
+}
+
+#shf-outline details.is-current-section > summary {
+  color: #a8ddba;
+}
+
+#shf-outline summary:focus-visible,
+#shf-outline button:focus-visible {
+  outline: 2px solid #a8ddba;
+  outline-offset: 2px;
+}
+
+#shf-outline button[data-shf-page]::before {
+  content: attr(data-shf-page);
+}
+
 html[data-shf-layout="outline"] #shf-root {
   width: calc(100vw - 264px);
   height: calc((100vw - 264px) * 0.5625);
