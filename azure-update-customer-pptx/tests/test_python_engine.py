@@ -25,12 +25,25 @@ COMPARER = importlib.util.module_from_spec(COMPARE_SPEC)
 assert COMPARE_SPEC and COMPARE_SPEC.loader
 sys.modules[COMPARE_SPEC.name] = COMPARER
 COMPARE_SPEC.loader.exec_module(COMPARER)
+PDF_VERIFY_PATH = SKILL_ROOT / "scripts" / "python" / "verify_pdf_text.py"
+PDF_VERIFY_SPEC = importlib.util.spec_from_file_location("azure_pdf_verify", PDF_VERIFY_PATH)
+PDF_VERIFIER = importlib.util.module_from_spec(PDF_VERIFY_SPEC)
+assert PDF_VERIFY_SPEC and PDF_VERIFY_SPEC.loader
+sys.modules[PDF_VERIFY_SPEC.name] = PDF_VERIFIER
+PDF_VERIFY_SPEC.loader.exec_module(PDF_VERIFIER)
 
 
 class PythonEngineTests(unittest.TestCase):
     def test_balanced_chunks(self):
         pages = BUILDER.chunks([{"id": str(index)} for index in range(11)], 10)
         self.assertEqual([len(page) for page in pages], [6, 5])
+
+    def test_status_order_and_publication_period(self):
+        items = [{"label": label, "priority": 1, "title": label} for label in ("廃止", "GA", "更新", "Preview")]
+        self.assertEqual([item["label"] for item in BUILDER.order_items(items)], ["Preview", "GA", "廃止", "更新"])
+        inventory = {"filter": "created ge 2026-08-15T00:00:00Z and created le 2026-09-08T23:59:59Z", "items": []}
+        self.assertEqual(BUILDER.publication_period(inventory), "対象期間: 2026年8月15日〜9月8日公開分")
+        self.assertEqual(PDF_VERIFIER.normalize_extracted_text("11～13"), PDF_VERIFIER.normalize_extracted_text("11〜13"))
 
     def test_all_region_stamp_statuses(self):
         prs = Presentation(SKILL_ROOT / "assets" / "template" / "azure-update-template.pptx")
@@ -80,7 +93,10 @@ class PythonEngineTests(unittest.TestCase):
                 })
             appendix = [{**items[-1], "id": "4", "title": "Appendix update", "titleJa": "参考更新", "sourceUrl": "https://azure.microsoft.com/updates/?id=4"}]
             manifest = root / "0818" / "manifest"
-            (manifest / "fetched-updates.json").write_text(json.dumps({"items": items + appendix}, ensure_ascii=False), encoding="utf-8")
+            (manifest / "fetched-updates.json").write_text(json.dumps({
+                "filter": "created ge 2026-08-15T00:00:00Z and created le 2026-08-18T23:59:59Z",
+                "items": items + appendix,
+            }, ensure_ascii=False), encoding="utf-8")
             (manifest / "classification.json").write_text(json.dumps({"weekly": items, "appendix": appendix}, ensure_ascii=False), encoding="utf-8")
             regions = {
                 item["title"]: {"status": "Japan East / West 対応", "japanEast": True, "japanWest": True, "verified": True, "source": item["learnUrl"]}
@@ -113,6 +129,7 @@ class PythonEngineTests(unittest.TestCase):
             self.assertIn("UPDATE Points", presentation_xml)
             all_text = "\n".join(text for slide in prs.slides for text in BUILDER.slide_texts(slide))
             self.assertNotIn("{{CUSTOMER}}", all_text)
+            self.assertIn("対象期間: 2026年8月15日〜8月18日公開分", all_text)
             weekly_slide = prs.slides[2]
             link_shapes = [shape for shape in weekly_slide.shapes if shape.name in {"MicrosoftLearnReference", "AzureUpdatesReference"}]
             self.assertEqual(len(link_shapes), 2)

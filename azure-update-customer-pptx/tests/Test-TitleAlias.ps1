@@ -51,4 +51,11 @@ $duplicateItems = @(
 )
 Assert-Throws { Find-ClassificationItemBySlideTitle -SlideTitle '共通の表示タイトル' -Items $duplicateItems } 'duplicate display titles must throw'
 
+$previewLabel = Get-SlideLabel -Title 'Public Preview: Example capability'
+$gaLabel = Get-SlideLabel -Title 'Generally Available: Example capability'
+$retirementLabel = Get-SlideLabel -Title 'Retirement: Example capability'
+Assert-Equal $previewLabel.Priority 1 'Preview must sort first'
+Assert-Equal $gaLabel.Priority 2 'GA must sort second'
+Assert-Equal $retirementLabel.Priority 3 'Retirement must sort third'
+
 Write-Host 'Title alias tests passed'

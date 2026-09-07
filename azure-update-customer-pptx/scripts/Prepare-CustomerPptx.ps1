@@ -272,9 +272,9 @@ function Get-LabelSortRank {
     )
 
     switch ($Label) {
-        "廃止" { return 1 }
+        "Preview" { return 1 }
         "GA" { return 2 }
-        "Preview" { return 3 }
+        "廃止" { return 3 }
         default { return 4 }
     }
 }

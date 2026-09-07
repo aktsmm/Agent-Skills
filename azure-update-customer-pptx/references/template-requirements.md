@@ -4,7 +4,7 @@
 - Store the runtime template in workspace `template/`.
 - Set `.config/config.json` `template.folder` and `template.fileName` to the runtime template.
 - Python v1 requires `assets/template-contract.v1.json`; contract role predicates must resolve exactly one supported prototype for each required role before output mutation.
-- Neutral templates may use placeholders such as `{{CUSTOMER}}`, `{{SYSTEM}}`, and `{{DATE}}`.
+- Cover templates use `{{CUSTOMER}}`, `{{SYSTEM}}`, `{{DATE}}`, and `{{PUBLICATION_PERIOD}}`. The publication period comes from the fetched Azure Updates range and is distinct from the meeting date.
 - The template must support the configured slide size and expected section order.
 - Customer branding belongs in the workspace template, not in skill references.
 - Maintenance scripts such as refine/cleanup helpers are repair tools. Do not make them part of the normal build path unless a verifier has identified a concrete failure.

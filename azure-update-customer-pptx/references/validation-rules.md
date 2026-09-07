@@ -14,6 +14,7 @@ Current script gate checks:
 8. UPDATE Points key points are not generic fallback text.
 9. Notes match slide titles/content.
 10. No unresolved template placeholders remain anywhere on slides, including hidden cover variants (`{{...}}`).
+10a. The visible cover shows the meeting date and the Azure Updates publication range as separate values; the range matches `fetched-updates.json`.
 11. No duplicate honorifics appear anywhere on slides: `御中 御中`, `様 様`, or mixed suffix duplication caused by config/template overlap.
 12. No customer-specific terms appear on visible slides outside cover/metadata: customer name, system name, tenant domain, subscription IDs, or GUID-like environment identifiers from `.config/customer-profile.md`.
 13. Visible Weekly slides distinguish `Microsoft Learn` detail links from `Azure Updates` announcement links, and the labels hyperlink to `learnUrl` / `sourceUrl` respectively.
@@ -34,6 +35,7 @@ Quality review checks that must also pass before final done:
 25. When PDF is a delivery artifact, export it after the final PPTX mutation and verify its page count equals the final slide count.
 26. When the delivery requirement is an unprotected PDF, export with `Export-PptxToPdf.ps1 -RequireUnencrypted`; it must not detect a PDF `/Encrypt` reference. If encryption is expected, record that the protection is intentional before delivery.
 27. Match authored fields to actual saved PPTX text and, when delivered, extracted PDF text, including Appendix pages. Require nonempty extraction and complete topic coverage; PPTX XML is not PDF evidence. Topic notes retain the summary, impact, action, announcement/Learn sources and Weekly region evidence; every visible slide has purpose or transition notes.
+27a. Before exact PDF text comparison, apply Unicode normalization, remove layout whitespace, and normalize `〜`, `～`, and `~` to one token because PowerPoint PDF export can substitute these characters.
 28. Export customer PDFs from a unique local copy. Before and after export, verify the canonical PPTX remains an OpenXML ZIP and has the same SHA-256 hash; do not reuse an open canonical presentation for PDF export.
 29. Section membership is valid, not only section order. Gate check 5 passes even when a section is empty, so inspect the saved PPTX and confirm every declared section owns the expected slide range and no section holds zero slides. An empty Weekly section absorbed by the preceding summary section is the usual symptom after a Weekly rebuild.
 30. Visible Weekly slide count matches the `classification.json` Weekly item count. A mismatch that is an exact duplication of the Weekly slice indicates a cloud-sync conflict merge, not a manifest error.

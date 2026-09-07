@@ -110,7 +110,7 @@ The template may keep three ending variants aligned to the three cover variants:
 
 ## Weekly order (SSOT)
 
-Within Weekly New Topics, order slides: 1) **【廃止】** 2) **【GA】** 3) **【Preview】** 4) **【アナウンス】/【更新】**. Priority reads as: needs-action → now-usable → future → notice/other.
+Within Weekly New Topics and UPDATE Points, order items: 1) **【Preview】** 2) **【GA】** 3) **【廃止】** 4) **【アナウンス】/【更新】**. Apply the same order to Appendix so every view has one sequence.
 
 ### Label decision (SSOT — `PptxCommon.psm1 Get-SlideLabel` reads here)
 
@@ -118,9 +118,9 @@ Match the source status wording from title / body head / reference, first hit wi
 
 | Priority | Label              | Regex                                                                  |
 | -------- | ------------------ | ---------------------------------------------------------------------- |
-| 1        | **【廃止】**       | `サービス終了\|提供終了\|廃止\|Retirement\|Deprecated\|End of Support` |
+| 1        | **【Preview】**    | `プレビュー\|Preview\|Public Preview\|Private Preview`                 |
 | 2        | **【GA】**         | `一般公開\|一般提供\|利用可能になりました\|Generally Available`        |
-| 3        | **【Preview】**    | `プレビュー\|Preview\|Public Preview\|Private Preview`                 |
+| 3        | **【廃止】**       | `サービス終了\|提供終了\|廃止\|Retirement\|Deprecated\|End of Support` |
 | 4        | **【アナウンス】** | `アナウンス\|Announcement`                                             |
 | 5        | **【更新】**       | fallback (no match above)                                              |
 

@@ -5,10 +5,16 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 from pypdf import PdfReader
 from pptx import Presentation
+
+
+def normalize_extracted_text(value: str) -> str:
+    normalized = unicodedata.normalize("NFKC", value).replace("〜", "~").replace("～", "~")
+    return re.sub(r"\s+", "", normalized).casefold()
 
 
 def profile_terms(path: Path) -> list[str]:
@@ -39,7 +45,8 @@ def main() -> int:
     full_text = "\n".join(pages)
     terms = profile_terms(args.workspace_root / ".config" / "customer-profile.md")
     body_text = "\n".join(pages[1:])
-    findings = [term for term in terms if term.casefold() in body_text.casefold()]
+    normalized_body = normalize_extracted_text(body_text)
+    findings = [term for term in terms if normalize_extracted_text(term) in normalized_body]
     result = {
         "schemaVersion": 1,
         "pdf": str(args.pdf),

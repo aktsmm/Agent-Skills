@@ -7,7 +7,7 @@
 #   3. リージョンスタンプの存在
 #   4. スピーカーノートの存在
 #   5. セクション順序の検証
-#   6. スライド並び順の検証（【廃止】→【GA】→【Preview】→【アナウンス/更新】）
+#   6. スライド並び順の検証（【Preview】→【GA】→【廃止】→【アナウンス/更新】）
 #   7. UPDATE Points 位置の検証（Weekly Topics の後）
 #   8. 表内容品質の検証（汎用的な文言禁止）
 #   9. ノート内容整合性チェック（タイトルとノートの対応）★ 2026-02-16 追加
@@ -564,7 +564,7 @@ if ($sectionOrderOk) {
 # ========================================
 # 検証 6: スライド並び順の検証（新規）
 # ========================================
-Write-Host "`n[検証6] スライド並び順（【廃止】→【GA】→【Preview】→【アナウンス/更新】）..." -ForegroundColor Yellow
+Write-Host "`n[検証6] スライド並び順（【Preview】→【GA】→【廃止】→【アナウンス/更新】）..." -ForegroundColor Yellow
 
 $slideOrder = @()
 $titleResolutionIssues = @()
@@ -610,7 +610,7 @@ foreach ($issue in $titleResolutionIssues) {
 }
 
 # 優先順位マッピング
-$labelPriority = @{ "【廃止】" = 1; "【GA】" = 2; "【Preview】" = 3; "【アナウンス】" = 4; "【更新】" = 4 }
+$labelPriority = @{ "【Preview】" = 1; "【GA】" = 2; "【廃止】" = 3; "【アナウンス】" = 4; "【更新】" = 4 }
 
 $orderOk = $true
 $lastPriority = 0
@@ -626,8 +626,8 @@ foreach ($item in $slideOrder) {
 if ($orderOk) {
     Write-Host "  ✅ スライド並び順が正しい" -ForegroundColor Green
 } else {
-    Write-Host "  ❌ スライド並び順が不正（【廃止】→【GA】→【Preview】→【アナウンス/更新】の順にすること）" -ForegroundColor Red
-    $errors += "スライド並び順: 【廃止】→【GA】→【Preview】→【アナウンス/更新】の順になっていない"
+    Write-Host "  ❌ スライド並び順が不正（【Preview】→【GA】→【廃止】→【アナウンス/更新】の順にすること）" -ForegroundColor Red
+    $errors += "スライド並び順: 【Preview】→【GA】→【廃止】→【アナウンス/更新】の順になっていない"
     foreach ($item in $slideOrder) {
         Write-Host "     P$($item.Slide): $($item.Label)" -ForegroundColor Yellow
     }

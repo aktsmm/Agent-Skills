@@ -4,7 +4,7 @@
 .DESCRIPTION
     1. classification.json を読み込み
     2. テンプレートをコピー
-    3. 正しい順序でスライドを挿入（【廃止】→【GA】→【Preview】→【更新】）
+    3. 正しい順序でスライドを挿入（【Preview】→【GA】→【廃止】→【更新】）
     4. セクション構成を設定
 .PARAMETER DateFolder
     日付フォルダ（例: 0120）のパス

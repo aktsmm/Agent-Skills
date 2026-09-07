@@ -16,6 +16,7 @@ import unicodedata
 import uuid
 import zipfile
 from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -29,7 +30,7 @@ from pptx.util import Inches, Pt
 
 ENGINE_VERSION = "1.0.0"
 P14_NS = "http://schemas.microsoft.com/office/powerpoint/2010/main"
-STATUS_ORDER = {"廃止": 1, "GA": 2, "Preview": 3, "アナウンス": 4, "更新": 5}
+STATUS_ORDER = {"Preview": 1, "GA": 2, "廃止": 3, "アナウンス": 4, "更新": 5}
 
 
 @dataclass(frozen=True)
@@ -188,6 +189,23 @@ def profile_value(path: Path, field: str) -> str:
     return ""
 
 
+def publication_period(inventory: dict) -> str:
+    metadata_range = inventory.get("metadata", {}).get("publicationRange", {})
+    dates = [metadata_range.get("from"), metadata_range.get("to")]
+    if not all(dates):
+        dates = re.findall(r"created (?:ge|le) (\d{4}-\d{2}-\d{2})", str(inventory.get("filter") or ""))
+    if len(dates) < 2:
+        dates = [str(item.get("created") or item.get("publishedDate") or "")[:10] for item in inventory.get("items", [])]
+        dates = [value for value in dates if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value)]
+        if not dates:
+            raise ValueError("Publication range is missing from fetched-updates.json")
+        dates = [min(dates), max(dates)]
+    start, end = (date.fromisoformat(value) for value in dates[:2])
+    if start.year == end.year:
+        return f"対象期間: {start.year}年{start.month}月{start.day}日〜{end.month}月{end.day}日公開分"
+    return f"対象期間: {start.year}年{start.month}月{start.day}日〜{end.year}年{end.month}月{end.day}日公開分"
+
+
 def placeholder_values(paths: Paths, config: dict) -> dict[str, str]:
     profile = paths.workspace / ".config" / "customer-profile.md"
     customer = profile_value(profile, "Customer name")
@@ -206,6 +224,7 @@ def placeholder_values(paths: Paths, config: dict) -> dict[str, str]:
         "{{SYSTEM}}": system,
         "{{SPEAKER}}": speaker,
         "{{DATE}}": display_date,
+        "{{PUBLICATION_PERIOD}}": publication_period(load_json(paths.manifest / "fetched-updates.json")),
     }
 
 
@@ -661,10 +680,16 @@ def build(paths: Paths, run_id: str) -> dict:
     classification = load_json(paths.manifest / "classification.json")
     region_data = load_json(paths.manifest / "region_info_reviewed.json")
     notes_data = load_json(paths.manifest / "notes.json") if (paths.manifest / "notes.json").exists() else {}
-    weekly = list(classification.get("weekly", []))
-    appendix = list(classification.get("appendix", []))
+    weekly = order_items(list(classification.get("weekly", [])))
+    appendix = order_items(list(classification.get("appendix", [])))
     prs = Presentation(paths.template)
     roles = validate_template(prs, contract)
+    missing_period = [
+        index + 1 for index in roles["cover"]
+        if "{{PUBLICATION_PERIOD}}" not in "\n".join(slide_texts(prs.slides[index]))
+    ]
+    if missing_period:
+        raise ValueError(f"Cover slide(s) missing {{{{PUBLICATION_PERIOD}}}}: {missing_period}")
     replace_placeholders(prs, placeholder_values(paths, config))
     layouts = {layout.name: layout for layout in prs.slide_layouts}
     content_layout = layouts[contract["roles"]["summary"]["layoutName"]]

@@ -428,13 +428,13 @@ function Get-SlideLabel {
     
     # 元スライドのステータス語句を優先して判定
     if ($Title -match "サービス終了|提供終了|廃止|Retirement|Deprecated|End\s*of\s*(Support|Life)|EOL") {
-        return @{ Label = "廃止"; Priority = 1 }
+        return @{ Label = "廃止"; Priority = 3 }
     }
     elseif ($Title -match "一般公開|一般提供|利用可能になりました|Generally Available") {
         return @{ Label = "GA"; Priority = 2 }
     }
     elseif ($Title -match "プレビュー|Preview|Private Preview|Public Preview") {
-        return @{ Label = "Preview"; Priority = 3 }
+        return @{ Label = "Preview"; Priority = 1 }
     }
     elseif ($Title -match "^\s*(Update|アップデート)\s*[:：]" -or $Title -match "アナウンス|Announcement") {
         return @{ Label = "アナウンス"; Priority = 4 }
@@ -443,13 +443,13 @@ function Get-SlideLabel {
     # タイトルで判定できなかった場合、本文でフォールバック判定
     if ($bodySnippet) {
         if ($bodySnippet -match "サービス終了|提供終了|廃止|Retirement|Deprecated|End\s*of\s*(Support|Life)|EOL") {
-            return @{ Label = "廃止"; Priority = 1 }
+            return @{ Label = "廃止"; Priority = 3 }
         }
         elseif ($bodySnippet -match "一般公開|一般提供|利用可能になりました|Generally Available") {
             return @{ Label = "GA"; Priority = 2 }
         }
         elseif ($bodySnippet -match "プレビュー|Preview|Private Preview|Public Preview|パブリック\s*プレビュー") {
-            return @{ Label = "Preview"; Priority = 3 }
+            return @{ Label = "Preview"; Priority = 1 }
         }
         elseif ($bodySnippet -match "(^|`n)\s*(Update|アップデート)\s*[:：]" -or $bodySnippet -match "アナウンス|Announcement") {
             return @{ Label = "アナウンス"; Priority = 4 }
