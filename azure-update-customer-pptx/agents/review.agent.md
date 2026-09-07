@@ -38,7 +38,7 @@ Prepare Agent が生成した `region_info.json` を **#microsoft.docs.mcp** で
 ## Done Criteria
 
 - [ ] region_info.json の全エントリを MCP で検証した
-- [ ] 各エントリに `source`（出典 URL）と `evidence`（判定根拠）が記録されている
+- [ ] 各エントリに `source`、`evidence`、`verified: true` があり、`status: unknown` と `【判定レベル: 根拠未取得】` が残っていない
 - [ ] region_info_reviewed.json が出力された
 - [ ] 修正があった場合は `corrections` 配列に記録されている
 - [ ] 🔴 **検証結果を報告**（※本 Agent はスクリプト実行なし。MCP 検証結果のみ報告）
@@ -148,7 +148,7 @@ MCP 検証前に以下を確認し、不足があれば即座にエラー報告�
 2. **公式ドキュメント優先**: Azure Updates よりも Learn ドキュメントを優先
 3. **未対応は陽性証拠でのみ**: 公式の提供リージョン一覧に Japan East / West が無いと確認できた場合だけ「日本リージョン未対応」にする。曖昧な場合は安全側に倒さず 4c へエスカレーション
 4. **出典 URL 必須**: 根拠となる URL を必ず記録
-5. **evidence 必須**: 判定根拠の具体的な文言を記録
+5. **未解決を完了扱いにしない**: `evidence` に具体的な根拠を記録し、`status: unknown`、`verified: false`、`【判定レベル: 根拠未取得】` が残る場合は顧客配布ビルドへ渡さない
 
 ---
 

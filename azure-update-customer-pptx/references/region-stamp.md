@@ -43,6 +43,10 @@ regions are listed (e.g. East US 2, Sweden Central), judge by those; (5) `micros
 rarely carry the region table itself — `microsoft_docs_fetch` the top feature page (overview / deploy /
 limitations) before deciding. A search whose snippets never say "Japan" is not a verdict.
 
+For hardware- or VM-SKU-dependent features, when Learn delegates availability to the SKU catalog, query
+both Japan regions with `az vm list-skus --location <region> --resource-type virtualMachines --all`.
+Filter by the documented `family`, not a guessed SKU-name substring, and record quota/capacity as a separate runtime constraint.
+
 > ⚠️ Past incident: an "Offer Availability includes Japan → グローバル" misjudgement; real Deploy
 > Region was East US 2 / Sweden Central only = 日本リージョン未対応.
 

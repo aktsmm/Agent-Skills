@@ -644,6 +644,45 @@ function Get-RegionInfo {
     return "要確認"
 }
 
+function Get-RegionReviewIssues {
+    <#
+    .SYNOPSIS
+        region_info_reviewed.json の未完了エントリを検出
+    #>
+    param(
+        [object]$RegionData,
+        [switch]$DeliveryMode
+    )
+
+    $issues = [System.Collections.Generic.List[string]]::new()
+    if (-not $RegionData) {
+        $issues.Add("region review data is empty")
+        return @($issues)
+    }
+
+    $regionsObject = if ($RegionData.PSObject.Properties["regions"]) {
+        $RegionData.regions
+    } elseif ($RegionData.PSObject.Properties["services"]) {
+        $RegionData.services
+    } else {
+        $RegionData
+    }
+
+    foreach ($prop in $regionsObject.PSObject.Properties) {
+        $info = $prop.Value
+        if (-not $info.PSObject.Properties["verified"] -or $info.verified -ne $true -or -not $info.evidence -or -not $info.source) {
+            $issues.Add("$($prop.Name): verified/evidence/source missing")
+            continue
+        }
+        $status = [string]$info.status
+        $evidence = [string]$info.evidence
+        if ($DeliveryMode -and ($status -match "^(?i:unknown)$|要確認|未確認" -or $evidence -match "【判定レベル:\s*根拠未取得】")) {
+            $issues.Add("$($prop.Name): unresolved region judgement")
+        }
+    }
+    return @($issues)
+}
+
 # ============================================================
 # テンプレートプレースホルダー
 # ============================================================

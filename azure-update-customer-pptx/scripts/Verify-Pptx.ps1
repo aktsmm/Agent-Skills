@@ -1068,17 +1068,7 @@ $regionReviewedIssues = @()
 if (Test-Path -LiteralPath $regionReviewedPath) {
     try {
         $reviewed = Get-Content -LiteralPath $regionReviewedPath -Raw -Encoding UTF8 | ConvertFrom-Json
-        $regionsObject = if ($reviewed.PSObject.Properties['regions']) { $reviewed.regions } elseif ($reviewed.PSObject.Properties['services']) { $reviewed.services } else { $reviewed }
-        $missingEvidence = @()
-        foreach ($prop in $regionsObject.PSObject.Properties) {
-            $info = $prop.Value
-            if (-not $info.PSObject.Properties['verified'] -or $info.verified -ne $true -or -not $info.evidence -or -not $info.source) {
-                $missingEvidence += $prop.Name
-            }
-        }
-        if ($missingEvidence.Count -gt 0) {
-            $regionReviewedIssues += "region_info_reviewed.json に verified/evidence/source 不足があります: $($missingEvidence -join ', ')"
-        }
+        $regionReviewedIssues += @(Get-RegionReviewIssues -RegionData $reviewed -DeliveryMode:$DeliveryMode)
     } catch {
         $regionReviewedIssues += "region_info_reviewed.json を解析できません: $($_.Exception.Message)"
     }

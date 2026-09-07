@@ -19,7 +19,7 @@ Current script gate checks:
 13. Visible Weekly slides distinguish `Microsoft Learn` detail links from `Azure Updates` announcement links, and the labels hyperlink to `learnUrl` / `sourceUrl` respectively.
 14. Ending variants are valid: exactly one visible formal Ending, matching cover/ending visual variant, non-selected variants hidden, no empty `Ending-Title`/`Ending-Subtitle`, and no generic scaffold text.
 15. Appendix slides are hidden and the hidden Appendix slide count matches `classification.json` Appendix count.
-16. Region review evidence is present when required: `region_info_reviewed.json` with `verified`, `source`, and `evidence` fields. In draft mode, missing reviewed evidence is a warning; in delivery mode, it is a failure. This gate is a presence check, so passing it never proves the judgement was verified against first-party docs.
+16. Region review is complete only when every entry has `verified: true`, `source`, and `evidence`. Delivery rejects `status: unknown`, `リージョン情報要確認`, and `【判定レベル: 根拠未取得】`; draft may warn before Review completes.
 
 Quality review checks that must also pass before final done:
 
@@ -30,7 +30,7 @@ Quality review checks that must also pass before final done:
 21. For nontrivial or customer-delivery decks, a rubber-duck style read-only critic review has checked the deck path, manifests, Verify result, placeholders, bullets, reference affordance, customer grounding, visible-slide neutrality, formal Ending, Appendix visibility, and region review evidence.
 22. Visible Weekly Topics use one approved customer body layout. If source imports preserve different masters, rebuild the Weekly slice from a named body prototype before delivery.
 23. Visible references never point readers to speaker notes. Each Weekly Topic has a dedicated hyperlink shape whose label distinguishes Microsoft Learn detail from Azure Updates announcement; inspect the saved PPTX to prove the shape-level URL persisted.
-24. Every visible Weekly region entry has `verified: true`, a first-party `source`, and concrete `evidence`. A fail-safe 日本リージョン未対応 result records the sources checked and why no explicit Japan availability was found.
+24. Every visible Weekly region entry has `verified: true`, a first-party `source`, and concrete `evidence`. `日本リージョン未対応` requires an official list excluding Japan; absent a feature-level restriction, inherit the parent service's Japan availability and record `【判定レベル: リージョン限定記載なし】`.
 25. When PDF is a delivery artifact, export it after the final PPTX mutation and verify its page count equals the final slide count.
 26. When the delivery requirement is an unprotected PDF, export with `Export-PptxToPdf.ps1 -RequireUnencrypted`; it must not detect a PDF `/Encrypt` reference. If encryption is expected, record that the protection is intentional before delivery.
 27. Match authored fields to actual saved PPTX text and, when delivered, extracted PDF text, including Appendix pages. Require nonempty extraction and complete topic coverage; PPTX XML is not PDF evidence. Topic notes retain the summary, impact, action, announcement/Learn sources and Weekly region evidence; every visible slide has purpose or transition notes.
