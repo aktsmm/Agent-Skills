@@ -22,7 +22,7 @@ Do not stop at "PPTX was generated". A deck can be technically valid but still f
 Before handoff:
 
 1. Export every slide to images from the actual final PPTX.
-2. Inspect the images, not only extracted text.
+2. Inspect the images, not only extracted text. Automated checks must never prefill a manual-review PASS; keep it pending until images are actually inspected, then record reviewed slides and the artifact hash separately from machine results.
 3. Run a text scan for old product names, old acronyms, placeholder text, and literal escape sequences.
 4. Verify slide count, section/story order, and embedded media/video count against the expected deck.
 5. Fix visible issues, regenerate/export, and inspect the affected slides again.
@@ -46,7 +46,7 @@ For each slide, explicitly check:
 
 ## Content adaptation rules
 
-- Replace source-deck business logic, not just names. If a source deck says "AH / SS / TRF", map the slide's purpose to the new offering and rewrite the slide.
+- Replace source-deck business logic, not just names. Review source accuracy, the before/change/benefit explanation, and natural target-language wording separately; fluent text and valid layout cannot establish factual correctness. Keep terminology precise without translating technical verbs into misleading everyday meanings.
 - When the user corrects offer semantics, update the deck model first, then slides. Example:
   - VBD standalone is a standalone VBD offer.
   - Designated Engineering Tier 1 / Tier 2 are DE tiers, not generic "T1/T2" labels.

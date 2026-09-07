@@ -344,6 +344,7 @@ if ($updatePointTables.Count -gt 0) {
     $regionColIndex = 5  # 5列目がリージョン
     $invalidRows = @()
     $overflowSlides = @()
+    $undersizedCells = @()
 
     foreach ($tableInfo in $updatePointTables) {
         $table = $tableInfo.Table
@@ -354,6 +355,12 @@ if ($updatePointTables.Count -gt 0) {
         }
 
         for ($r = 2; $r -le $table.Rows.Count; $r++) {
+            for ($c = 1; $c -le $table.Columns.Count; $c++) {
+                $cellText = $table.Rows.Item($r).Cells($c).Shape.TextFrame.TextRange
+                if (-not [string]::IsNullOrWhiteSpace($cellText.Text) -and $cellText.Font.Size -lt 11) {
+                    $undersizedCells += "P$($tableInfo.SlideNumber) 行$($r - 1) 列${c}: $($cellText.Font.Size)pt"
+                }
+            }
             if ($table.Columns.Count -ge $regionColIndex) {
                 $regionText = $table.Rows.Item($r).Cells($regionColIndex).Shape.TextFrame.TextRange.Text
 
@@ -388,6 +395,12 @@ if ($updatePointTables.Count -gt 0) {
     } else {
         Write-Host "  ❌ UPDATE Points: $($invalidRows -join ', ') のリージョン情報が不正" -ForegroundColor Red
         $errors += "UPDATE Points: リージョン情報が不正（$($invalidRows -join ', ')）"
+    }
+    if ($undersizedCells.Count -eq 0) {
+        Write-Host "  ✅ UPDATE Points: 表本文は11pt以上です" -ForegroundColor Green
+    } else {
+        Write-Host "  ❌ UPDATE Points: 11pt未満のセルあり（$($undersizedCells[0])）" -ForegroundColor Red
+        $errors += "UPDATE Points: 11pt未満の表本文がある（$($undersizedCells -join ', ')）"
     }
 } else {
     Write-Host "  ⚠️ UPDATE Points: 表が見つかりません" -ForegroundColor Yellow

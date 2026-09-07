@@ -34,6 +34,7 @@ az account get-access-token `
 - token が取れる場合: `az account set` に依存しない REST helper で Cost / Advisor を取得する
 - token が取れない場合: `az login --tenant {tenantId}` を実行し、ログイン後に再確認する
 - token 本体は保存・表示しない。出力する場合は tenant / expiresOn などのメタデータだけにする
+- Windowsのユーザー認証はWAMを使い、device code flowを強制しない。WAM認証後もCLIが待機する場合は、対象subscriptionが`az account list --all`に現れ、ARM tokenとread-only ARM API応答を確認してから、待機中の`az login`呼び出しだけを終了する。WAM brokerは終了しない
 
 ## Step 2.5: 事前チェック（API 経路の確定）
 
@@ -67,6 +68,8 @@ az rest --method get `
 4. WebDirect では、月次総額と TopN 集計は `Microsoft.Consumption/usageDetails` のページング取得を使う
 
 > 実績ベースの知見: WebDirect では `CostManagement/query` が 429、`generateCostDetailsReport` が 422 で塞がるケースがある。その場合でも legacy Usage Details API から月次集計は取得できる。
+
+複数環境の一方だけが429/5xxで失敗した場合は、manifestへ環境別status/reasonを記録し、成功済みrawを保持して失敗環境だけを再収集する。全環境を上書き再実行して成功済み証跡を失わない。
 
 ## Step 3: Advisor 推奨取得
 

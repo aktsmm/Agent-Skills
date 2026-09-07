@@ -1,6 +1,6 @@
 # MCP-sourced Content Contract
 
-MCP fetch and research are agent-mediated. PowerShell scripts consume JSON and do not call MCP directly.
+Research is agent-mediated; scripts consume JSON, not MCP. For every included topic, including Appendix content exported to PDF, retrieve the full Azure Updates item by ID and the relevant Learn feature page. Retain the announcement and claim-supporting excerpts with URLs under that ID in research evidence; titles, search snippets, URL presence, and a successful MCP call are not proof of the authored explanation. If an excerpt is insufficient, retrieve the relevant source section before removing or inventing a claim.
 
 ## Required Manifests
 
@@ -52,7 +52,9 @@ When imported source slides predate `sourceUrl`, recover the Azure Updates recor
 
 ## Visible Content Boundary
 
-Visible slide body fields must be reusable across decks. The customer-facing contract is `targetService`, `updateSummary`, `useCase`, `impactStatement` (rendered under the `impactLabel` derived from `impactType`), `action`, `condition` (rendered under `conditionLabel`), `beforeAfter`, and the mode-specific lower-row content. Keep `impactType` as internal classification only; never render `【…】` inside `impactStatement`. `updateSummary` must explain what was added, changed, or retired instead of repeating the title. Region wording belongs to the RegionStamp only and must not appear in any body line.
+Keep visible fields reusable: `targetService`, `updateSummary`, `useCase`, `impactStatement` (with the `impactLabel` derived from `impactType`), `action`, `condition` (with `conditionLabel`), `beforeAfter`, and mode-specific lower-row content. Keep `impactType` internal and `【…】` out of `impactStatement`; region wording belongs only to RegionStamp.
+
+Explain the evidenced previous/default state, actual change, mechanism, concrete benefit and applicable constraint. `updateSummary` must not repeat the title; generic advice to check documentation or evaluate performance is not a mechanism or comparison. GA may only change support status, and a regional expansion may add no capability in existing regions: never invent previous impossibility or a disadvantage to fill a slot. Missing required evidence or topic-specific text stops generation rather than triggering boilerplate fallback.
 
 ### Per-Item Layout Mode
 
