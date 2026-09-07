@@ -104,7 +104,7 @@ Use `_knowledge/` only for compact, reusable learnings when the user explicitly 
 
 ## Optional Material Folders
 
-When customer-shared files accumulate, split them by lifecycle: `_received/` for immutable originals, `_working/` for internal edits, and `_provided/` for customer-safe copies. Apply [Customer Material Lifecycle](references/material-lifecycle.md) before moving or renaming files.
+When customer-shared files accumulate or are directly supplied in scope, split them by lifecycle: `_received/` for immutable originals, `_working/` for internal edits, and `_provided/` for customer-safe copies. Attempt to import accessible originals before relying only on a summary. Apply [Customer Material Lifecycle](references/material-lifecycle.md) before moving or renaming files.
 
 ---
 
