@@ -30,7 +30,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [biz-ops-setup](biz-ops-setup/) | Business operations workspace setup with workIQ integration. Creates report generation, task management, and customer management system |
 | [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support |
 | [browser-bookmark-organizer](browser-bookmark-organizer/) | Safely audit, classify, deduplicate, and reorganize bookmarks or favorites in Google Chrome and Microsoft Edge while preserving intentional toolbar shortcuts, signed-in profiles... |
-| [browser-max-automation](browser-max-automation/) | Browser automation using Playwright MCP, CDP, and direct WebSocket CDP for web testing, UI verification, and form automation |
+| [browser-max-automation](browser-max-automation/) | Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, repeatable browser workflo... |
 | [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script'... |
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |
 | [context-to-video](context-to-video/) | Turn any context (blog URL, pasted article, PR diff, meeting notes, release notes, raw prompt) into a narrated explainer mp4 with slides, subtitles, and optionally a talking-hea... |
