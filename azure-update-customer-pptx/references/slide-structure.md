@@ -21,6 +21,11 @@ Weekly) → Appendix(hidden) → Ending. **UPDATE Points goes AFTER Weekly Topic
 UPDATE Points continuation slides stay in the UPDATE Points section right after Weekly — never treat a
 continuation as the Appendix start.
 
+P2 is a decision index, not a title-only list. Every row shows `【status】 product/service | key point`; use
+`targetService` as the product/service signal and never substitute a broad customer category. For a
+time-limited offer, append its short `promotion.headline` so the evaluation window is visible before the
+reader opens the topic slide.
+
 ## Reference footer
 
 Visible update slides must distinguish reference types. Use short, linked labels rather than raw URL walls:
@@ -91,6 +96,10 @@ a retirement or a forced default change cannot honestly be labelled a benefit.
 - Reserve the title space before the status badge. Enable WordWrap unconditionally and shrink the font until
   the text fits the title box; a character-count heuristic that disables wrapping lets short titles run under
   the badge, which renders fine in the file and only shows up in an exported image.
+- A free trial, credit, or temporary fee waiver is a first-class decision signal. Show a compact promotion
+  badge beside the status badge with the benefit and what remains charged. Keep eligibility, duration,
+  waived charges, continuing charges, post-trial behavior, and first-party evidence in structured
+  `promotion` data and speaker notes; never abbreviate it to an unqualified `無料`.
 - References may sit in two columns (Learn on the left, Azure Updates on the right) to free vertical space
   for the mode row. Keep the shape names (`OfficialReferenceLearn`, `ReferenceLearnN`,
   `OfficialReferenceAzureUpdates`) — Verify looks them up by name.
@@ -197,7 +206,8 @@ priority signal). Each key point must contain a benefit OR an action (廃止 = r
 ### Title normalization (Japanese display title, raw join key)
 
 Keep `classification.title` as the byte-exact Azure Updates title and manifest join key. Use
-`classification.titleJa` as the customer-visible display title on P2, Weekly slides, and UPDATE Points.
+`classification.titleJa` as the primary display title on P2, Weekly slides, and UPDATE Points. On each
+topic slide, show the exact English `classification.title` below `titleJa` in smaller text for traceability.
 The display title should be a concise natural Japanese summary, normally within 36 full-width characters
 and two rendered lines; validate the saved deck when an official name makes it longer.
 
@@ -250,7 +260,7 @@ match). Display the Japanese category name in UPDATE Points (normalize per
 
 Do not repeat visible value, impact, Before/After, or keypoint lines verbatim in notes.
 
-### notes.json (Notes Generator output → `{dateFolder}/manifest/notes.json`)
+### classification.json item (Prepare output)
 
 ```json
 {
@@ -275,7 +285,15 @@ Do not repeat visible value, impact, Before/After, or keypoint lines verbatim in
       "glossary": [
         {
           "term": "既定の送信アクセス",
-          "definition": "VM が明示的な送信設定なしでインターネットへ接続できる従来の挙動"
+          "definition": "VM が明示的な送信設定なしでインターネットへ接続できる従来の挙動",
+          "source": "https://learn.microsoft.com/azure/example",
+          "evidence": "Claim-supporting excerpt from the first-party source"
+        },
+        {
+          "term": "NAT Gateway",
+          "definition": "サブネットの送信接続を明示的に提供するサービス",
+          "source": "https://learn.microsoft.com/azure/example-2",
+          "evidence": "Claim-supporting excerpt from the first-party source"
         }
       ],
       "customerConcerns": ["Q: … → A: …"]

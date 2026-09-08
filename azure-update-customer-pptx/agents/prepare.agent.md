@@ -35,23 +35,27 @@ Each fetched item must have `id`, `title`, `label`, `sourceUrl`; retain `product
    - preserve official product, SKU, and protocol names
    - do not include GA/Preview/Retirement wording; the label badge owns status display
    - do not add customer/system-specific terms
-4. Run:
+4. Add exactly two `glossary` entries to every item. Each entry requires `term`, a concise beginner-facing `definition`, a first-party `source`, and a claim-supporting `evidence` excerpt. Prefer the service concept plus the protocol, SKU, or mechanism needed to understand that update.
+5. For a free trial, credit, temporary fee waiver, or other limited offer, add `promotion` with `headline`, `detail`, `audience`, `duration`, `waivedCharges`, `continuingCharges`, `postTrial`, first-party `source`, and supporting `evidence`. `detail` must state what remains charged. Classify the item as Weekly because the evaluation window is time-sensitive.
+6. Run:
 
 ```powershell
 & "$BasePath\scripts\Prepare-CustomerPptx.ps1" -DateFolder "{date}"
 ```
 
-5. Review `classification.json`:
+7. Review `classification.json`:
    - `title` is preserved as the raw join key and `titleJa` is present on every item
    - label/category/exclusion/keypoint use raw `title` plus products/categories
    - Weekly and Appendix are sorted by label priority then raw title
-6. Produce `region_info.json` keyed by raw `title`; hand it to Review for Docs-backed verification.
+8. Produce `region_info.json` keyed by raw `title`; hand it to Review for Docs-backed verification.
 
 ## Gates
 
 - `fetched-updates.json` exists before Prepare. A new config with `content.requireTitleJa=true` must fail Prepare when any item lacks `titleJa`.
 - Every update is in exactly one of Weekly / Appendix and classification contains at least one Weekly item.
 - `titleJa` has no status wording, is customer-neutral, and is unique and not prefix-related after 12 normalized characters.
+- Every classified item retains exactly two sourced glossary entries; missing or generic definitions fail Prepare.
+- Every Weekly item has a specific `targetService` for P2 display. A promotion must be Weekly, visible on P2 and its topic slide, with complete eligibility, duration, waived charges, continuing charges, post-trial behavior, source, and evidence.
 - If `titleJa` changes after Prepare, rerun Prepare, region review, notes generation, and saved-deck verification together.
 - Report the actual exit code; do not infer success.
 

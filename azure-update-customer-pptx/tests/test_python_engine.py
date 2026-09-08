@@ -45,6 +45,11 @@ class PythonEngineTests(unittest.TestCase):
         self.assertEqual(BUILDER.publication_period(inventory), "対象期間: 2026年8月15日〜9月8日公開分")
         self.assertEqual(PDF_VERIFIER.normalize_extracted_text("11～13"), PDF_VERIFIER.normalize_extracted_text("11〜13"))
 
+    def test_summary_requires_target_service(self):
+        prs = Presentation(SKILL_ROOT / "assets" / "template" / "azure-update-template.pptx")
+        with self.assertRaisesRegex(ValueError, "targetService"):
+            BUILDER.add_summary(prs, prs.slide_layouts[1], [{"id": "missing", "label": "GA"}])
+
     def test_all_region_stamp_statuses(self):
         prs = Presentation(SKILL_ROOT / "assets" / "template" / "azure-update-template.pptx")
         style = BUILDER.load_json(SKILL_ROOT / "assets" / "render-style.v1.json")
@@ -90,6 +95,31 @@ class PythonEngineTests(unittest.TestCase):
                     "learnUrl": f"https://learn.microsoft.com/azure/example/{index}",
                     "priority": index,
                     "publishedDate": "2026-08-18",
+                    "glossary": [
+                        {
+                            "term": f"用語A{index}",
+                            "definition": f"更新{index}を理解するための基礎概念A",
+                            "source": f"https://learn.microsoft.com/azure/example/{index}/a",
+                            "evidence": f"Definition evidence A{index}",
+                        },
+                        {
+                            "term": f"用語B{index}",
+                            "definition": f"更新{index}を理解するための基礎概念B",
+                            "source": f"https://learn.microsoft.com/azure/example/{index}/b",
+                            "evidence": f"Definition evidence B{index}",
+                        },
+                    ],
+                    "promotion": {
+                        "headline": "30日間 基本料金免除",
+                        "detail": "処理量課金は対象外",
+                        "audience": "新規利用者",
+                        "duration": "作成から30日",
+                        "waivedCharges": "常時稼働の基本料金",
+                        "continuingCharges": "処理量に応じた料金",
+                        "postTrial": "削除しない場合は通常料金へ移行",
+                        "source": f"https://learn.microsoft.com/azure/example/{index}/offer",
+                        "evidence": "Trial terms and continuing charges",
+                    } if index == 2 else None,
                 })
             appendix = [{**items[-1], "id": "4", "title": "Appendix update", "titleJa": "参考更新", "sourceUrl": "https://azure.microsoft.com/updates/?id=4"}]
             manifest = root / "0818" / "manifest"
@@ -130,6 +160,31 @@ class PythonEngineTests(unittest.TestCase):
             all_text = "\n".join(text for slide in prs.slides for text in BUILDER.slide_texts(slide))
             self.assertNotIn("{{CUSTOMER}}", all_text)
             self.assertIn("対象期間: 2026年8月15日〜8月18日公開分", all_text)
+            self.assertIn("Example update 1", all_text)
+            self.assertIn("用語A1: 更新1を理解するための基礎概念A", all_text)
+            self.assertIn("【GA】Example Service｜確認ポイント 2｜30日間 基本料金免除", all_text)
+            self.assertIn("30日間 基本料金免除", all_text)
+            self.assertIn("処理量課金は対象外", all_text)
+            note_text = "\n".join(slide.notes_slide.notes_text_frame.text for slide in prs.slides)
+            self.assertIn("用語A1: https://learn.microsoft.com/azure/example/1/a", note_text)
+            self.assertIn("継続課金: 処理量に応じた料金", note_text)
+
+    def test_region_detail_and_glossary_validation(self):
+        style = BUILDER.load_json(SKILL_ROOT / "assets" / "render-style.v1.json")
+        prs = Presentation(SKILL_ROOT / "assets" / "template" / "azure-update-template.pptx")
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+        region = {
+            "status": "日本リージョン未対応",
+            "displayHeadline": "今回の拡大に日本なし",
+            "displayDetail": "拡大先: Azure Government、中国",
+        }
+        BUILDER.add_region_stamp(slide, region, style)
+        self.assertIn("今回の拡大に日本なし", slide.shapes[-1].text)
+        self.assertIn("拡大先: Azure Government、中国", slide.shapes[-1].text)
+        with self.assertRaises(ValueError):
+            BUILDER.item_glossary({"id": "missing"})
+        with self.assertRaises(ValueError):
+            BUILDER.item_promotion({"id": "missing", "promotion": {"headline": "無料"}})
             weekly_slide = prs.slides[2]
             link_shapes = [shape for shape in weekly_slide.shapes if shape.name in {"MicrosoftLearnReference", "AzureUpdatesReference"}]
             self.assertEqual(len(link_shapes), 2)

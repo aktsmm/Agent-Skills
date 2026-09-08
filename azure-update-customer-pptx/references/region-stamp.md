@@ -6,13 +6,15 @@ Source: `region-stamp.instructions.md`. **SSOT** — this definition must match 
 
 ## Stamp types and colors
 
-| Type                   | Text                     | Background (RGB)     | Use                            |
-| ---------------------- | ------------------------ | -------------------- | ------------------------------ |
-| グローバル             | `グローバル`             | green `#00B050`      | all regions (retirements etc.) |
-| 日本リージョン未対応   | `日本リージョン未対応`   | blue `#005EB8`       | neither Japan East nor West    |
-| Japan East のみ        | `Japan East のみ対応`    | light blue `#0078D4` | Japan East only                |
-| Japan West のみ        | `Japan West のみ対応`    | light blue `#0078D4` | Japan West only                |
-| Japan East / West 対応 | `Japan East / West 対応` | cyan `#00B0F0`       | both                           |
+| Type                   | Text                           | Contrast            | Use                         |
+| ---------------------- | ------------------------------ | ------------------- | --------------------------- |
+| グローバル             | `グローバル（リージョン不問）` | blue on pale blue   | all regions / nonregional   |
+| 日本リージョン未対応   | `日本リージョン未対応`         | red on pale red     | neither Japan East nor West |
+| Japan East のみ        | `東日本のみ対応`               | green on pale green | Japan East only             |
+| Japan West のみ        | `西日本のみ対応`               | green on pale green | Japan West only             |
+| Japan East / West 対応 | `東日本・西日本対応`           | green on pale green | both                        |
+
+Use text as the primary signal; do not rely on small check/cross marks or color alone. For unsupported items, add a second line from reviewed evidence such as `対応地域例: East US、West Europeなど`. Distinguish deploy-region limits from `販売対象: 米国のみ` and region-expansion announcements from `今回の拡大に日本なし`.
 
 ## Placement
 
@@ -137,6 +139,8 @@ Azure Updates `title`** (join key), not the optional Japanese display alias `tit
 
 Canonical `status` values: `グローバル` / `Japan East / West 対応` / `Japan East のみ対応` /
 `Japan West のみ対応` / `日本リージョン未対応`.
+
+Optional display fields: `displayHeadline`, `displayDetail`. Require both plus a first-party `source` when an unsupported item needs examples or when offer availability / expansion scope must not be described as deploy-region support.
 
 ## Required rules
 

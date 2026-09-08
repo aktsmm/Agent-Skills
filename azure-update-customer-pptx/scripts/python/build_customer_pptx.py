@@ -23,7 +23,7 @@ from xml.sax.saxutils import escape
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import MSO_AUTO_SIZE, PP_ALIGN
+from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE, PP_ALIGN
 from pptx.oxml import parse_xml
 from pptx.oxml.ns import nsdecls, qn
 from pptx.util import Inches, Pt
@@ -360,6 +360,43 @@ def item_source_url(item: dict) -> str:
     return str(item.get("sourceUrl") or item.get("url") or "")
 
 
+def item_glossary(item: dict) -> list[dict]:
+    entries = item.get("glossary")
+    if not isinstance(entries, list) or len(entries) != 2:
+        raise ValueError(f"Exactly two glossary entries are required: {item.get('id') or item_title(item)}")
+    required = ("term", "definition", "source", "evidence")
+    if any(not isinstance(entry, dict) or any(not str(entry.get(key) or "").strip() for key in required) for entry in entries):
+        raise ValueError(f"Glossary term/definition/source/evidence are required: {item.get('id') or item_title(item)}")
+    return entries
+
+
+def item_promotion(item: dict) -> dict | None:
+    promotion = item.get("promotion")
+    if not promotion:
+        return None
+    required = (
+        "headline", "detail", "audience", "duration", "waivedCharges",
+        "continuingCharges", "postTrial", "source", "evidence",
+    )
+    if not isinstance(promotion, dict) or any(not str(promotion.get(key) or "").strip() for key in required):
+        raise ValueError(f"Promotion eligibility/charges/duration/source/evidence are required: {item.get('id') or item_title(item)}")
+    return promotion
+
+
+def reviewed_region(info: dict) -> dict:
+    reviewed = {
+        "status": canonical_region_status(info),
+        "source": str(info.get("source") or ""),
+        "displayHeadline": str(info.get("displayHeadline") or ""),
+        "displayDetail": str(info.get("displayDetail") or ""),
+    }
+    if bool(reviewed["displayHeadline"]) != bool(reviewed["displayDetail"]):
+        raise ValueError("displayHeadline and displayDetail must be provided together")
+    if reviewed["displayDetail"] and not reviewed["source"]:
+        raise ValueError("Region display detail requires a first-party source")
+    return reviewed
+
+
 def resolve_region(item: dict, region_data: dict, *, allow_unknown: bool = False) -> dict:
     direct = str(item.get("japanRegion") or "")
     direct_url = str(item.get("japanRegionUrl") or "")
@@ -370,11 +407,10 @@ def resolve_region(item: dict, region_data: dict, *, allow_unknown: bool = False
     candidates = [title, item_title(item), str(item.get("id") or "")]
     for key in candidates:
         if key and key in regions:
-            info = regions[key]
-            return {"status": canonical_region_status(info), "source": str(info.get("source") or "")}
+            return reviewed_region(regions[key])
     for info in regions.values() if isinstance(regions, dict) else []:
         if str(item.get("id")) in [str(value) for value in info.get("topicIds", [])]:
-            return {"status": canonical_region_status(info), "source": str(info.get("source") or "")}
+            return reviewed_region(info)
     if re.search(r"Retirement|廃止|End of Support", title, re.IGNORECASE):
         return {"status": "グローバル", "source": direct_url}
     if allow_unknown:
@@ -440,6 +476,11 @@ def build_note(item: dict, notes: dict[str, str], region: dict) -> str:
         "【参照】", f"Microsoft Learn 詳細: {learn}", f"Azure Updates 発表: {source}",
         "【想定Q&A】", "適用条件と導入判断は公式ドキュメントの最新情報で確認します。",
     ]
+    parts.extend(["【基礎知識の根拠】"])
+    for entry in item_glossary(item):
+        parts.append(f"{entry['term']}: {entry['source']}")
+    if region.get("displayDetail"):
+        parts.extend(["【リージョン表示補足】", region["displayDetail"]])
     return "\n".join(part for part in parts if part is not None)
 
 
@@ -449,13 +490,16 @@ def remove_region_samples(slide) -> None:
             slide.shapes._spTree.remove(shape._element)
 
 
-def add_region_stamp(slide, status: str, style: dict) -> None:
+def add_region_stamp(slide, region: str | dict, style: dict) -> None:
     settings = style["regionStamp"]
+    status = region if isinstance(region, str) else region["status"]
     entry = settings["styles"].get(status)
     if not entry:
         raise ValueError(f"Unknown region stamp status: {status}")
+    detail = "" if isinstance(region, str) else str(region.get("displayDetail") or "")
+    headline = entry["text"] if isinstance(region, str) else str(region.get("displayHeadline") or entry["text"])
     width = Pt(settings["widthPt"])
-    height = Pt(settings["heightPt"])
+    height = Pt(settings.get("detailHeightPt", settings["heightPt"]) if detail else settings["heightPt"])
     left = slide.part.package.presentation_part.presentation.slide_width - width - Pt(settings["marginRightPt"])
     top = slide.part.package.presentation_part.presentation.slide_height - height - Pt(settings["marginBottomPt"])
     shape = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
@@ -463,11 +507,20 @@ def add_region_stamp(slide, status: str, style: dict) -> None:
     shape.fill.solid()
     shape.fill.fore_color.rgb = rgb(entry["background"])
     shape.line.fill.background()
-    set_text(shape, entry["text"], settings["fontSizePt"], settings["fontBold"], style["font"]["eastAsian"])
-    shape.text_frame.word_wrap = False
-    shape.text_frame.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
+    foreground = rgb(entry.get("foreground", settings["fontColor"]))
+    set_text(shape, headline, settings["fontSizePt"], settings["fontBold"], style["font"]["eastAsian"])
+    shape.text_frame.word_wrap = True
+    shape.text_frame.auto_size = MSO_AUTO_SIZE.NONE
+    shape.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
     shape.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
-    shape.text_frame.paragraphs[0].runs[0].font.color.rgb = rgb(settings["fontColor"])
+    shape.text_frame.paragraphs[0].runs[0].font.color.rgb = foreground
+    if detail:
+        paragraph = shape.text_frame.add_paragraph()
+        paragraph.text = detail
+        paragraph.alignment = PP_ALIGN.CENTER
+        paragraph.font.size = Pt(settings.get("detailFontSizePt", 10))
+        paragraph.font.color.rgb = foreground
+        set_east_asian_font(paragraph.runs[0], style["font"]["eastAsian"])
 
 
 def populate_body(slide, item: dict, region: dict, style: dict, notes: dict[str, str], contract: dict, *, require_publication_date: bool = True) -> None:
@@ -476,14 +529,19 @@ def populate_body(slide, item: dict, region: dict, style: dict, notes: dict[str,
     title_limit = int(contract["python"]["maxTitleCharacters"])
     if len(title) > title_limit:
         raise ValueError(f"Title exceeds contract limit ({title_limit}): {title}")
+    promotion = item_promotion(item)
     title_placeholder = title_shape(slide)
     if title_placeholder is not None:
         title_placeholder.left = Inches(0.2)
         title_placeholder.top = Inches(0.15)
-        title_placeholder.width = Inches(10.65)
-        title_placeholder.height = Inches(0.95)
+        title_placeholder.width = Inches(7.9 if promotion else 10.65)
+        title_placeholder.height = Inches(0.72)
         set_text(title_placeholder, title, 24, True, style["font"]["eastAsian"])
         title_placeholder.text_frame.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
+    raw_title = str(item.get("title") or "").strip()
+    if raw_title:
+        original_title = add_textbox(slide, Inches(0.6), Inches(0.9), Inches(12.1), Inches(0.25), raw_title, size=10, color="#444444")
+        original_title.name = "OriginalTitle"
     label = item_label(item)
     badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(11.2), Inches(0.2), Inches(1.5), Inches(0.42))
     badge.name = "StatusBadge"
@@ -493,6 +551,22 @@ def populate_body(slide, item: dict, region: dict, style: dict, notes: dict[str,
     set_text(badge, f"【{label}】", 12, True, style["font"]["eastAsian"])
     badge.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
     badge.text_frame.paragraphs[0].runs[0].font.color.rgb = RGBColor(255, 255, 255)
+    if promotion:
+        offer = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(8.35), Inches(0.16), Inches(2.6), Inches(0.52))
+        offer.name = "PromotionBadge"
+        offer.fill.solid()
+        offer.fill.fore_color.rgb = rgb("#FFF4CE")
+        offer.line.fill.background()
+        set_text(offer, promotion["headline"], 10.5, True, style["font"]["eastAsian"])
+        offer.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
+        offer.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+        offer.text_frame.paragraphs[0].runs[0].font.color.rgb = rgb("#6B4F00")
+        detail = offer.text_frame.add_paragraph()
+        detail.text = promotion["detail"]
+        detail.alignment = PP_ALIGN.CENTER
+        detail.font.size = Pt(8)
+        detail.font.color.rgb = rgb("#6B4F00")
+        set_east_asian_font(detail.runs[0], style["font"]["eastAsian"])
     body_shape = body_placeholder(slide, title_placeholder)
     body = "\n".join(
         line for line in [
@@ -507,7 +581,7 @@ def populate_body(slide, item: dict, region: dict, style: dict, notes: dict[str,
         raise ValueError(f"Body exceeds contract limit (520): {title}")
     if body_shape:
         body_shape.left = Inches(0.6)
-        body_shape.top = Inches(1.2)
+        body_shape.top = Inches(1.25)
         body_shape.width = Inches(12.1)
         body_shape.height = Inches(2.75)
         set_text(body_shape, body, 14, False, style["font"]["eastAsian"])
@@ -515,10 +589,20 @@ def populate_body(slide, item: dict, region: dict, style: dict, notes: dict[str,
     after = str(item.get("after") or item.get("beforeAfter", {}).get("after") or "更新後の構成・選択肢")
     add_panel(slide, Inches(0.6), Inches(4.25), Inches(5.7), Inches(0.95), "Before", before)
     add_panel(slide, Inches(6.7), Inches(4.25), Inches(5.7), Inches(0.95), "After", after)
-    mode = str(item.get("layoutMode") or ("action" if label == "廃止" else "change"))
-    mode_heading = {"action": "対応の要点", "technical": "技術の要点", "change": "基礎知識"}.get(mode, "基礎知識")
-    mode_body = str(item.get("action") or item.get("keypoint") or item.get("background") or "適用条件と利用シナリオを確認します。")
-    add_panel(slide, Inches(0.6), Inches(5.35), Inches(11.8), Inches(0.8), mode_heading, mode_body, fill="#EAF2F8")
+    glossary = item_glossary(item)
+    band = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.6), Inches(5.35), Inches(11.8), Inches(0.8))
+    band.name = "GlossaryBand"
+    band.fill.solid()
+    band.fill.fore_color.rgb = rgb("#EAF2F8")
+    band.line.fill.background()
+    heading = add_textbox(slide, Inches(0.75), Inches(5.39), Inches(11.4), Inches(0.2), "基礎知識", size=13, bold=True, color="#0078D4")
+    heading.name = "GlossaryHeading"
+    for index, entry in enumerate(glossary):
+        glossary_shape = add_textbox(
+            slide, Inches(0.75 + index * 5.85), Inches(5.67), Inches(5.55), Inches(0.35),
+            f"{entry['term']}: {entry['definition']}", size=13, color="#333333",
+        )
+        glossary_shape.name = f"Glossary-{index + 1}"
     source = item_source_url(item)
     learn = str(item.get("learnUrl") or region.get("source") or "")
     if "learn.microsoft.com" in learn.casefold():
@@ -530,8 +614,16 @@ def populate_body(slide, item: dict, region: dict, style: dict, notes: dict[str,
         raise ValueError(f"Visible publication date is missing: {title}")
     if created:
         add_textbox(slide, Inches(9.0), Inches(6.35), Inches(3.4), Inches(0.18), f"掲載: {created.replace('-', '/')}", size=8, color="#666666", align=PP_ALIGN.RIGHT)
-    add_region_stamp(slide, region["status"], style)
-    add_notes(slide, build_note(item, notes, region))
+    add_region_stamp(slide, region, style)
+    note = build_note(item, notes, region)
+    if promotion:
+        note += "\n" + "\n".join([
+            "【期間限定オファー】", promotion["headline"], promotion["detail"],
+            f"対象: {promotion['audience']}", f"期間: {promotion['duration']}",
+            f"免除: {promotion['waivedCharges']}", f"継続課金: {promotion['continuingCharges']}",
+            f"終了後: {promotion['postTrial']}", f"根拠: {promotion['source']}",
+        ])
+    add_notes(slide, note)
 
 
 def add_summary(prs: Presentation, layout, weekly: list[dict]):
@@ -541,9 +633,13 @@ def add_summary(prs: Presentation, layout, weekly: list[dict]):
         set_text(title_placeholder, "Weekly News Topics サマリ", 28, True)
     lines = [f"■ 今週の Weekly New Topics（{len(weekly)}件）"]
     for index, item in enumerate(weekly, 1):
-        title = item_title(item)
-        short = title if len(title) <= 40 else title[:39] + "…"
-        lines.append(f"{index}. 【{item_label(item)}】{short}")
+        service = str(item.get("targetService") or "").strip()
+        if not service:
+            raise ValueError(f"Weekly targetService is required for P2 display: {item.get('id') or item_title(item)}")
+        point = str(item.get("keypoint") or item.get("updateSummary") or item_title(item)).strip()
+        short = point if len(point) <= 42 else point[:41] + "…"
+        offer = f"｜{item_promotion(item)['headline']}" if item_promotion(item) else ""
+        lines.append(f"{index}. 【{item_label(item)}】{service}｜{short}{offer}")
     body = body_placeholder(slide, title_placeholder)
     if body:
         body.left = Inches(0.55)

@@ -137,6 +137,7 @@ MCP 検証前に以下を確認し、不足があれば即座にエラー報告�
 - `regions` オブジェクト（キー: スライドタイトル完全一致）
 - 各エントリに `japanEast`, `japanWest`, `status`, `source`, `evidence`, `verified`
 - `status` は正規形式のみ使用（「グローバル」「Japan East / West 対応」等）
+- 日本未対応の表示に地域例、販売対象、または今回の拡大先を出す場合は、`displayHeadline` と `displayDetail` を一組で保存し、同じエントリのfirst-party `source` / `evidence`で裏付ける
 
 > 🔴 **注意**: `stamp` フィールドは廃止。`status` フィールドを使用すること。
 

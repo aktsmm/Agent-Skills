@@ -70,6 +70,12 @@ Background/minimized rendering can contribute to actionability timeouts, but it 
 
 Keep ordinary scoped click/fill as the default. Only choose JS click as the single recovery when its semantics are acceptable and any prior write is known not to have applied. Synthetic events are not equivalent to trusted input. Verify durable state; an ambiguous timeout stops writes rather than triggering another click method or automatic foreground activation.
 
+## Text locator matches hidden or whitespace-shifted rows
+
+- Do not fix a text locator to `.first` when duplicate hidden and visible nodes can coexist. Enumerate matches and act on the first candidate with a non-empty visible bounding box.
+- Rich-text APIs and list DOMs can represent the same text differently: an API may fold `<br>` into spaces while `innerText` joins the boundary without a space. If ordinary text matching finds no visible row, compare whitespace-stripped text and choose the smallest visible container containing the target, rather than a broad ancestor.
+- A fallback match only identifies a row to open. Before filling or saving, compare the opened editor's complete normalized text with the expected item; reject a shared prefix or section label so a whitespace-tolerant click cannot overwrite a neighboring row.
+
 ## Radio and checkbox groups that ignore a click
 
 Prefer a state-setting check/select operation over toggling. If an input or label click is ineffective, inspect the actual control and choose at most one recovery within the shared budget. Read `input.checked` before and after; do not cycle through parent clicks and synthetic event sequences blindly.

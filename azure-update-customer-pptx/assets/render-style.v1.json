@@ -8,32 +8,43 @@
   "regionStamp": {
     "widthPt": 180,
     "heightPt": 30,
+    "detailHeightPt": 44,
     "marginRightPt": 20,
     "marginBottomPt": 20,
     "fontSizePt": 14,
+    "detailFontSizePt": 10,
     "fontBold": true,
-    "fontColor": "#FFFFFF",
+    "fontColor": "#244A66",
     "styles": {
-      "グローバル": { "text": "グローバル", "background": "#00B050" },
+      "グローバル": {
+        "text": "グローバル（リージョン不問）",
+        "background": "#EAF1F7",
+        "foreground": "#244A66"
+      },
       "日本リージョン未対応": {
         "text": "日本リージョン未対応",
-        "background": "#005EB8"
+        "background": "#FBEFEA",
+        "foreground": "#923522"
       },
       "リージョン情報要確認": {
         "text": "リージョン情報要確認",
-        "background": "#666666"
+        "background": "#F3F2F1",
+        "foreground": "#444444"
       },
       "Japan East のみ対応": {
-        "text": "Japan East のみ対応",
-        "background": "#0078D4"
+        "text": "東日本のみ対応",
+        "background": "#EAF5EF",
+        "foreground": "#145C43"
       },
       "Japan West のみ対応": {
-        "text": "Japan West のみ対応",
-        "background": "#0078D4"
+        "text": "西日本のみ対応",
+        "background": "#EAF5EF",
+        "foreground": "#145C43"
       },
       "Japan East / West 対応": {
-        "text": "Japan East / West 対応",
-        "background": "#00B0F0"
+        "text": "東日本・西日本対応",
+        "background": "#EAF5EF",
+        "foreground": "#145C43"
       }
     }
   },

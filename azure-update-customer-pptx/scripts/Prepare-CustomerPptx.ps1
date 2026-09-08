@@ -364,6 +364,25 @@ foreach ($u in $fetched) {
         $customerImpactVal = if ($u.customerImpact) { $u.customerImpact } else { $u.userBenefit }
         $pricingVal        = if ($u.pricing)        { $u.pricing }        else { '課金面は公式価格ページで要確認' }
         $japanRegionVal    = if ($u.japanRegion)    { $u.japanRegion }    else { $u.regionNote }
+        $glossaryVal       = if ($u.PSObject.Properties.Name -contains 'glossary') { @($u.glossary) } else { @() }
+        if ($glossaryVal.Count -ne 2) {
+            throw "Exactly two sourced glossary entries are required before Prepare: $($u.id)"
+        }
+        foreach ($entry in $glossaryVal) {
+            foreach ($field in @('term', 'definition', 'source', 'evidence')) {
+                if (-not $entry.PSObject.Properties[$field] -or [string]::IsNullOrWhiteSpace([string]$entry.$field)) {
+                    throw "Glossary $field is required before Prepare: $($u.id)"
+                }
+            }
+        }
+        $promotionVal = if ($u.PSObject.Properties.Name -contains 'promotion' -and $null -ne $u.promotion) { $u.promotion } else { $null }
+        if ($promotionVal) {
+            foreach ($field in @('headline', 'detail', 'audience', 'duration', 'waivedCharges', 'continuingCharges', 'postTrial', 'source', 'evidence')) {
+                if (-not $promotionVal.PSObject.Properties[$field] -or [string]::IsNullOrWhiteSpace([string]$promotionVal.$field)) {
+                    throw "Promotion $field is required before Prepare: $($u.id)"
+                }
+            }
+        }
 
         # bodyContent (後方互換): 6 項目を改行連結
         $bodySegments = @()
@@ -401,6 +420,8 @@ foreach ($u in $fetched) {
             priority       = $c.priority
             excluded       = $c.excluded
             keypoint       = if ($u.keypoint) { $u.keypoint } else { Get-PreparedKeypoint -Title $u.title }
+            glossary       = $glossaryVal
+            promotion      = $promotionVal
         }
 }
 
@@ -439,6 +460,15 @@ $weekly = $allSlides | Where-Object { -not $_.excluded } | Sort-Object @{ Expres
 
 # Appendix（excluded = true）
 $appendix = $allSlides | Where-Object { $_.excluded } | Sort-Object @{ Expression = { Get-LabelSortRank -Label $_.label } }, @{ Expression = { $_.title } }
+
+$promotionInAppendix = @($appendix | Where-Object { $null -ne $_.promotion })
+if ($promotionInAppendix.Count -gt 0) {
+    throw "Time-limited promotions must be classified as Weekly: $($promotionInAppendix.updateId -join ', ')"
+}
+$missingWeeklyService = @($weekly | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.targetService) })
+if ($missingWeeklyService.Count -gt 0) {
+    throw "Weekly targetService is required for P2 display: $($missingWeeklyService.updateId -join ', ')"
+}
 
 Write-Host ""
 Write-Host "=== Weekly Topics ($($weekly.Count) 件) ===" -ForegroundColor Green

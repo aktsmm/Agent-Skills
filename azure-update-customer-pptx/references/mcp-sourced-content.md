@@ -31,6 +31,7 @@ contract versions, output hash, verifier exit code, and error state; readers mus
   `classification.json` and the build prefers it on visible slides.
 - Preserve official product, SKU, and protocol names in `titleJa`, but do not copy the raw English
   announcement title. Keep GA/Preview/Retirement wording in `label`, not in `titleJa`.
+- Topic slides show the raw English `title` directly below `titleJa` in smaller text. Keep it exact rather than translating it twice or truncating it; the raw value remains the join key.
 - `titleJa` values must be unique and must not be prefix-related after 12 normalized characters. `notes.json` must use raw `title` as its join key. If `titleJa` changes after Prepare, rerun Prepare,
   region review, notes generation, and the saved-deck verifier together. Do not edit only one manifest
   because `title` remains the raw join key.
@@ -45,6 +46,12 @@ Each `fetched-updates.json` item should carry both reference layers when possibl
 - Saved-deck QA must inspect every visible Weekly reference shape for a nonempty hyperlink URL and compare its page URL (ignoring an optional `#fragment`) with the manifest URL.
 - Speaker notes should carry the full source trail: `Microsoft Learn 詳細: <url>` and `Azure Updates 発表: <url>`.
 - If `learnUrl` is `null`, add a review note such as `learnUrl_note` explaining whether no first-party page was found or the page is still unverified.
+
+### Foundational glossary
+
+- Every Weekly and Appendix item has exactly two `glossary` entries: `term`, concise beginner-facing `definition`, first-party `source`, and claim-supporting `evidence`.
+- Choose concepts needed to understand the update, such as the service itself plus a protocol, SKU, or mechanism. Do not use pricing, region, or release-state claims as glossary definitions.
+- Display both definitions in a full-width `基礎知識` band and retain both source URLs in speaker notes. Missing or generic entries stop Prepare and Build.
 
 ### Historical Source URL Recovery
 
