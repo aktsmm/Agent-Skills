@@ -19,6 +19,12 @@ MISSING = (
 )
 
 
+def hide_png_chrome(page) -> None:
+    page.locator('[data-shf-action="print"]').evaluate_all(
+        "elements => elements.forEach(element => { element.hidden = true; })"
+    )
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Export an artifact to PDF or PNG")
     ap.add_argument("artifact", type=Path)
@@ -75,6 +81,9 @@ def main(argv=None) -> int:
             args.pdf.parent.mkdir(parents=True, exist_ok=True)
             page.pdf(path=str(args.pdf), print_background=True, prefer_css_page_size=True)
             produced.append(args.pdf)
+
+        if args.png or args.slides_png:
+            hide_png_chrome(page)
 
         if args.png:
             args.png.parent.mkdir(parents=True, exist_ok=True)

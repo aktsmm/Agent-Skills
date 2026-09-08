@@ -32,7 +32,7 @@ python scripts/export_html.py poster.html --png out.png --scale 2
 
 `--scale 2` renders at twice the canvas size. Any embedded bitmap therefore needs at least `displayed width x scale` real pixels, or it will look soft in the export while looking fine on screen. `embed_assets.py` records the true dimensions so this is checkable.
 
-A floating `PDF として保存` button sits outside `#shf-root`, so it never lands in the exported PNG and is hidden when printing. It exists for a recipient who opens the HTML directly; the PNG remains the normal deliverable.
+A floating `PDF として保存` button sits outside `#shf-root` for recipients who open the HTML directly. Because fixed elements can still paint over an element screenshot, `export_html.py` hides the button immediately before PNG capture. Do not remove it from each artifact.
 
 ## Composition
 
@@ -50,4 +50,5 @@ If the poster is destined for a specific publishing target and the active worksp
 
 - Designing at the wrong canvas size and rescaling afterwards; type sizing stops being right.
 - Embedding a screenshot without checking its real resolution against the export scale.
+- Capturing `#shf-root` directly without hiding fixed export controls; they can overlap the PNG even when they sit outside the root in the DOM.
 - Treating the HTML as the deliverable when the recipient expects an image.
