@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 import unicodedata
+import zipfile
 from pathlib import Path
 
 from pypdf import PdfReader
@@ -30,15 +31,25 @@ def profile_terms(path: Path) -> list[str]:
     return terms
 
 
+def resolve_verification_pptx(pptx: Path, retained_openxml: Path | None) -> Path:
+    if zipfile.is_zipfile(pptx):
+        return pptx
+    if retained_openxml and zipfile.is_zipfile(retained_openxml):
+        return retained_openxml
+    raise ValueError("Canonical PPTX is protected/non-OpenXML and a valid retained OpenXML source is missing")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pdf", required=True, type=Path)
     parser.add_argument("--workspace-root", required=True, type=Path)
     parser.add_argument("--result", required=True, type=Path)
     parser.add_argument("--pptx", required=True, type=Path)
+    parser.add_argument("--retained-openxml", type=Path)
     args = parser.parse_args()
     reader = PdfReader(args.pdf)
-    presentation = Presentation(args.pptx)
+    verification_pptx = resolve_verification_pptx(args.pptx, args.retained_openxml)
+    presentation = Presentation(verification_pptx)
     visible_slide_count = sum(slide._element.get("show") != "0" for slide in presentation.slides)
     pages = [(page.extract_text() or "").strip() for page in reader.pages]
     nonempty = [text for text in pages if text]
@@ -50,6 +61,7 @@ def main() -> int:
     result = {
         "schemaVersion": 1,
         "pdf": str(args.pdf),
+        "verificationPptx": str(verification_pptx),
         "pageCount": len(pages),
         "visibleSlideCount": visible_slide_count,
         "pageCountMatchesVisibleSlides": len(pages) == visible_slide_count,

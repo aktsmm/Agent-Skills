@@ -65,7 +65,9 @@ if ($Engine -eq 'python') {
     $python = if ($env:AZURE_UPDATE_PYTHON) { $env:AZURE_UPDATE_PYTHON } else { Join-Path $workspace '.venv\Scripts\python.exe' }
     $textVerifier = Join-Path $PSScriptRoot 'python\verify_pdf_text.py'
     $textResult = Join-Path (Split-Path -Parent $ResultPath) 'pdf-text-result.json'
-    & $python $textVerifier --pdf $pdf --pptx $pptx --workspace-root $workspace --result $textResult | Out-Null
+    $textArgs = @('--pdf', $pdf, '--pptx', $pptx, '--workspace-root', $workspace, '--result', $textResult)
+    if ($retained) { $textArgs += @('--retained-openxml', $retained) }
+    & $python $textVerifier @textArgs | Out-Null
     $textExitCode = $LASTEXITCODE
     $checks += [ordered]@{ name='pdf-text-customer-safe'; pass=($textExitCode -eq 0); actual=$textExitCode; expected=0 }
 }

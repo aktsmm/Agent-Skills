@@ -50,6 +50,17 @@ class PythonEngineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "targetService"):
             BUILDER.add_summary(prs, prs.slide_layouts[1], [{"id": "missing", "label": "GA"}])
 
+    def test_pdf_verifier_uses_retained_openxml_for_protected_pptx(self):
+        with tempfile.TemporaryDirectory(prefix="azure-pdf-source-test-") as temp:
+            root = Path(temp)
+            protected = root / "protected.pptx"
+            protected.write_bytes(b"not an OpenXML ZIP")
+            retained = root / "retained.zip"
+            shutil.copy2(SKILL_ROOT / "assets" / "template" / "azure-update-template.pptx", retained)
+            self.assertEqual(PDF_VERIFIER.resolve_verification_pptx(protected, retained), retained)
+            with self.assertRaisesRegex(ValueError, "retained OpenXML"):
+                PDF_VERIFIER.resolve_verification_pptx(protected, None)
+
     def test_all_region_stamp_statuses(self):
         prs = Presentation(SKILL_ROOT / "assets" / "template" / "azure-update-template.pptx")
         style = BUILDER.load_json(SKILL_ROOT / "assets" / "render-style.v1.json")
