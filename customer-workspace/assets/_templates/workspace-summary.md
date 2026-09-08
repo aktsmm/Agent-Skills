@@ -9,6 +9,7 @@ Primary month: {{YEAR_MONTH}}
 - Active questions: `_questions/{{YEAR_MONTH}}.md`
 - Customer profile: `_customer/profile.md`
 - Research/report outputs: `research-reports/`
+- Workstream portfolio: `workstreams/README.md`
 - Material folders when used: `_received/`, `_working/`, `_provided/`
 - Important working files:
 
@@ -20,6 +21,7 @@ Primary month: {{YEAR_MONTH}}
 | Current month intake    | `_inbox/{{YEAR_MONTH}}.md`     | Raw notes and imported material     |
 | Open questions/actions  | `_questions/{{YEAR_MONTH}}.md` | Track follow-up items               |
 | Research/report outputs | `research-reports/`            | Generated Markdown deliverables     |
+| Workstream portfolio    | `workstreams/README.md`        | Confirmed workstream status index   |
 
 ## Bring-Along vs Reference-Only
 

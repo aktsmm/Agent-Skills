@@ -34,6 +34,7 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 | **Knowledge Ledger**  | Reusable generic learnings extracted on request       |
 | **Research Reports**  | Store generated research/report Markdown away from root |
 | **Material Split**    | Optional split for customer originals, working copies, and customer-facing files |
+| **Workstreams**       | Portfolio of confirmed workstreams within one parent workspace |
 
 ---
 
@@ -81,6 +82,10 @@ Keep setup questions lightweight. Capture only facts that change routing, sharin
 ├── _customer/profile.md           ← Customer profile
 ├── _templates/                    ← Templates
 ├── research-reports/              ← Generated research/report Markdown
+├── workstreams/                   ← Confirmed workstream portfolio
+│   ├── README.md                  ← Portfolio index
+│   ├── _candidates.md             ← New or ambiguous workstream candidates
+│   └── {workstream-id}/README.md  ← Per-workstream current status
 ├── meeting-notes/                 ← Meeting minutes (one file per MTG)
 ├── next-actions/                  ← Per-MTG homework workspace
 │   ├── to-YYYY-MM-DD/             ← Tasks for the next MTG
@@ -92,7 +97,7 @@ Keep setup questions lightweight. Capture only facts that change routing, sharin
 └── pj_{topic}/                     ← Topic-scoped thread spanning many meetings
 ```
 
-`Initialize-CustomerWorkspace.ps1` creates only `.github/`, `_inbox/`, `_questions/`, `_knowledge/`, `_customer/`, `_templates/`, `research-reports/`, and copies four templates (`meeting-minutes`, `internal-memo`, `customer-profile`, `attachments`). Create `meeting-notes/`, `next-actions/`, `pj_{topic}/`, and the material folders on demand, and read `next-actions-*` / `knowledge-*` / `workspace-*` templates directly from `assets/_templates/`.
+`Initialize-CustomerWorkspace.ps1` creates only `.github/`, `_inbox/`, `_questions/`, `_knowledge/`, `_customer/`, `_templates/`, `research-reports/`, `workstreams/`, and the portfolio index plus candidate ledger. It copies seven templates (`meeting-minutes`, `internal-memo`, `customer-profile`, `attachments`, `workstream-portfolio`, `workstream-candidates`, `workstream-readme`). Create confirmed workstream folders, `meeting-notes/`, `next-actions/`, `pj_{topic}/`, and the material folders on demand.
 
 ## Research Reports
 
@@ -118,6 +123,15 @@ When customer-shared files accumulate or are directly supplied in scope, split t
 | Contains `From:` `Date:`     | → Inbox           |
 | Bullet points / short memo   | → Inbox           |
 | Question format              | → Normal response |
+
+## Workstream Portfolio
+
+Use `workstreams/` when one customer workspace contains multiple confirmed workstreams. The portfolio index summarizes active work; each workstream README owns its current status, current owner, actions, and timeline.
+
+- Route an input to one existing workstream only when its name, keywords, and current scope make the match unambiguous.
+- Keep raw short input in `_inbox/`; keep meeting records in `meeting-notes/`; link to those sources rather than duplicating them in the workstream.
+- Record new, ambiguous, or multi-workstream inputs in `workstreams/_candidates.md` and ask for confirmation before creating a workstream folder.
+- Use `pj_{topic}/` only after a workstream needs its own long-lived evidence and history. Full rules are in [Workstream Portfolio Rules](references/workstream-portfolio-rules.md).
 
 ## Default Tags
 
@@ -173,6 +187,7 @@ Before calling meeting notes done:
 - [ ] `_knowledge/README.md` and `_knowledge/general.md` exist
 - [ ] `_customer/profile.md` configured
 - [ ] `research-reports/` exists for generated Markdown deliverables
+- [ ] `workstreams/README.md` and `workstreams/_candidates.md` exist
 - [ ] Auto-routing rules working
 
 ## Key References
@@ -180,6 +195,7 @@ Before calling meeting notes done:
 - [Inbox Rules](references/inbox-rules.md)
 - [Meeting Minutes Rules](references/meeting-minutes-rules.md)
 - [Workspace Summary Rules](references/workspace-summary-rules.md)
+- [Workstream Portfolio Rules](references/workstream-portfolio-rules.md)
 - [Knowledge Ledger Rules](references/knowledge-ledger-rules.md)
 - [Customer Material Lifecycle](references/material-lifecycle.md)
 - [Project Thread Rules](references/project-threads.md)

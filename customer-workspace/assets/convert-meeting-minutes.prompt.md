@@ -74,6 +74,12 @@ Teams AI議事録を以下のルールで変換：
 
 変換結果を `meeting-notes/{YYYY-MM-DD}_{topic}.md` に保存する。内部限定の内容は `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md` へ分ける。
 
+### Step 4.5: 案件への紐付け
+
+- 保存後、`workstreams/README.md` と各案件 README の名称、判定キーワード、現在の範囲を照合する。
+- 既存案件が 1 件に明確に一致した場合は、案件 README の状態、現在のボール、履歴を更新し、会議議事録へのリンクを追加する。議事録全文は複製しない。
+- 新規、複数該当、または低確信の場合は、`workstreams/_candidates.md` に候補として記録して確認する。案件フォルダは確認後にだけ作成する。
+
 ---
 
 ## 🎯 使用例

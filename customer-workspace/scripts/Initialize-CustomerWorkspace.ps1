@@ -85,7 +85,8 @@ $folders = @(
     "_knowledge",
     "_customer",
     "_templates",
-    "research-reports"
+    "research-reports",
+    "workstreams"
 )
 
 foreach ($folder in $folders) {
@@ -129,7 +130,12 @@ if (Test-Path $copilotInstructionsPath) {
 }
 
 # プロンプトファイルのコピー
-$prompts = @("inbox.prompt.md", "convert-meeting-minutes.prompt.md", "extract-questions.prompt.md")
+$prompts = @(
+    "inbox.prompt.md",
+    "convert-meeting-minutes.prompt.md",
+    "extract-questions.prompt.md",
+    "triage-workstream-update.prompt.md"
+)
 foreach ($prompt in $prompts) {
     $src = Join-Path $AssetsPath $prompt
     $dst = Join-Path $WorkspacePath ".github\prompts\$prompt"
@@ -140,7 +146,15 @@ foreach ($prompt in $prompts) {
 }
 
 # テンプレートのコピー
-$templates = @("meeting-minutes.md", "internal-memo.md", "customer-profile.md", "attachments.md")
+$templates = @(
+    "meeting-minutes.md",
+    "internal-memo.md",
+    "customer-profile.md",
+    "attachments.md",
+    "workstream-portfolio.md",
+    "workstream-candidates.md",
+    "workstream-readme.md"
+)
 foreach ($template in $templates) {
     $src = Join-Path $TemplatesPath $template
     $dst = Join-Path $WorkspacePath "_templates\$template"
@@ -169,6 +183,28 @@ if (-not (Test-Path $workspaceSummaryPath)) {
         $content = Expand-TemplateContent -TemplatePath $workspaceSummaryTemplate
         Set-Content -Path $workspaceSummaryPath -Value $content -Encoding UTF8
         Write-Host "   📝 作成: workspace-summary.md" -ForegroundColor Green
+    }
+}
+
+# 案件ポートフォリオの初期ファイル作成
+$workstreamsPath = Join-Path $WorkspacePath "workstreams"
+$workstreamPortfolioPath = Join-Path $workstreamsPath "README.md"
+if (-not (Test-Path $workstreamPortfolioPath)) {
+    $workstreamPortfolioTemplate = Join-Path $TemplatesPath "workstream-portfolio.md"
+    if (Test-Path $workstreamPortfolioTemplate) {
+        $content = Expand-TemplateContent -TemplatePath $workstreamPortfolioTemplate
+        Set-Content -Path $workstreamPortfolioPath -Value $content -Encoding UTF8
+        Write-Host "   📝 作成: workstreams/README.md" -ForegroundColor Green
+    }
+}
+
+$workstreamCandidatesPath = Join-Path $workstreamsPath "_candidates.md"
+if (-not (Test-Path $workstreamCandidatesPath)) {
+    $workstreamCandidatesTemplate = Join-Path $TemplatesPath "workstream-candidates.md"
+    if (Test-Path $workstreamCandidatesTemplate) {
+        $content = Expand-TemplateContent -TemplatePath $workstreamCandidatesTemplate
+        Set-Content -Path $workstreamCandidatesPath -Value $content -Encoding UTF8
+        Write-Host "   📝 作成: workstreams/_candidates.md" -ForegroundColor Green
     }
 }
 
@@ -242,6 +278,7 @@ Write-Host "   - .github/copilot-instructions.md（自動判定ルール）"
 Write-Host "   - .github/prompts/inbox.prompt.md（インボックス）"
 Write-Host "   - .github/prompts/convert-meeting-minutes.prompt.md（議事録変換）"
 Write-Host "   - .github/prompts/extract-questions.prompt.md（質問抽出）"
+Write-Host "   - .github/prompts/triage-workstream-update.prompt.md（案件更新の振り分け）"
 Write-Host "   - README.md（開始案内）"
 Write-Host "   - workspace-summary.md（引き継ぎサマリ）"
 Write-Host "   - _inbox/$currentYearMonth.md（インボックス）"
@@ -250,6 +287,7 @@ Write-Host "   - _knowledge/（汎用知見台帳）"
 Write-Host "   - _customer/profile.md（顧客プロファイル）"
 Write-Host "   - _templates/（テンプレート）"
 Write-Host "   - research-reports/（調査・レポート成果物）"
+Write-Host "   - workstreams/（案件ポートフォリオ）"
 Write-Host ""
 Write-Host "🎯 使い方:" -ForegroundColor Cyan
 Write-Host "   1. 情報を貼るだけ → 自動でインボックスに蓄積"

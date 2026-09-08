@@ -22,6 +22,12 @@
 - Mark the latest authoritative file as `正本` or `確認先` when applicable.
 - Don't force readers to infer which file is current.
 
+### Workstream Portfolio
+
+- When a workspace has multiple confirmed workstreams, link `workstreams/README.md` from the summary.
+- Keep each workstream's current status, owner, actions, and timeline in its own README; the summary is an index and priority view, not a second status ledger.
+- Keep unconfirmed workstream ideas in `workstreams/_candidates.md` until the user confirms the name and scope.
+
 ### Bring-Along vs Reference-Only
 
 - Separate files to carry into the new workspace from files kept only for reference.
