@@ -132,7 +132,7 @@ Lightweight inputs such as greetings, short Q&A, and numeric-only replies should
 - [ ] New additions are proposed only after delete / merge / split / move options are checked
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early
-- [ ] Results are verifiable at each step
+- [ ] Verify actual producer-to-consumer dataflow, not only fixtures injected into a validator; cover empty results and meaningful state transitions. Repeating unchanged input proves idempotency, not the full lifecycle.
 - [ ] Deterministic parts are offloaded to scripts / IR / hooks, and state changes are confirmed by reading authoritative live state back (not LLM/UI loops)
 
 Full checklist: [references/review-checklist.md](references/review-checklist.md)
@@ -162,4 +162,4 @@ Use [references/agent-template.md](references/agent-template.md) for tool mappin
 - [ ] New agent / workflow assets are registered in the appropriate catalog or docs when needed
 - [ ] `AGENTS.md` is updated only when shared guardrails or entry behavior need to change
 - [ ] Long-running or ad-hoc terminals/tasks started during the workflow are closed, or remaining terminals are explicitly reported with a reason
-- [ ] Async operations are verified by live state before being called complete; if blocked by retention/locks/background platform work, the blocker and next check condition are explicit
+- [ ] Distinguish configuration saved, code tested, live read verified, action authorized, and recurring cycle completed. Verify authoritative state before claiming completion or unattended readiness; pending safeguards and unobserved cycles retain their blockers and next check conditions.

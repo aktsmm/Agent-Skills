@@ -34,7 +34,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 - Default to a visible, headed browser. Use headless only when explicitly requested, never as an automatic recovery path. Reuse a verified authenticated session and an owned work tab when possible; a new profile does not imply reusable authentication.
 - Preserve the OS foreground window and the user's selected tab. Do not routinely call `bring_to_front`, `Page.bringToFront`, `Target.activateTarget`, or native focus/keystroke helpers. This applies to browser launch, tab creation, navigation, capture, and recovery, not just clicks.
 - If a necessary operation cannot avoid activation, explain why and which bounded step needs it before proceeding. Do not force focus back afterward: the user may have switched applications meanwhile. Credentials and MFA remain user-entered.
-- Identify the work tab and goal at the start, report meaningful stage changes, and leave progress inspectable. Pause writes on user editing, target drift, or lost ownership; resolve ownership before resuming. A tab merely being viewed is not permission to discard it.
+- Identify the work tab, goal, and authorized side effects. Broad browser permission does not authorize purchases, trades, cancellations, or contract changes; read-only work must not call helpers that can submit them. Report attempted actions even when a gate prevents submission. Pause writes on user editing, target drift, or lost ownership; viewing a tab does not permit discarding it.
 - Prefer API/CLI helpers for supported data operations, but preserve UI execution when the goal is a demo, UI verification, or observation of the browser workflow.
 
 | Mode | Use when | Boundary |
@@ -56,6 +56,8 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 ```
 
 Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read.
+
+Wait for required fields and completed loading, not a sample record's presence. Test empty results, zero values, alternate records, and partial rendering through the actual collector; a visible heading alone does not prove complete data.
 
 UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
 返信・コメント form では editor に残った送信文が `get_by_text` に一致しても成功ではない。POST の 2xx と、reply ID・件数・本文の readback で確定する。
