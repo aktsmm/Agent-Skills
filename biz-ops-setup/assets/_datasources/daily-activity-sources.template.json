@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "timeZone": "Asia/Tokyo",
+  "roots": [
+    {
+      "id": "workspace",
+      "path": ".",
+      "kinds": ["files", "git"],
+      "required": true
+    }
+  ],
+  "excludeDirectories": [
+    ".git",
+    ".venv",
+    "node_modules",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".next",
+    "dist",
+    "build",
+    "coverage"
+  ],
+  "classifications": [
+    {
+      "category": "dependency_noise",
+      "patterns": ["**/package-lock.json", "**/uv.lock", "**/pnpm-lock.yaml"]
+    },
+    {
+      "category": "generated_noise",
+      "patterns": [
+        "**/output/**",
+        "**/tmp/**",
+        "**/logs/**",
+        "**/*.log",
+        "**/*.pyc"
+      ]
+    },
+    {
+      "category": "reference_only",
+      "patterns": [
+        "**/research/**",
+        "**/manifest/**",
+        "**/inputs/**",
+        "**/outputs/**"
+      ]
+    }
+  ]
+}

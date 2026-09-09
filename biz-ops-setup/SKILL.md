@@ -71,6 +71,8 @@ Collect the following information:
 - [ ] 9 agents deployed to `.github/agents/`
 - [ ] 4 prompts deployed to `.github/prompts/`
 - [ ] Customer mappings configured in `copilot-instructions.md`
+- [ ] Daily activity roots configured without redundant child roots
+- [ ] Deterministic local evidence collection passes for a representative date
 - [ ] Workflow verification passed (daily report test)
 - [ ] Preflight checks fire (missing-report detection runs before requests; see [references/agent-list.md](references/agent-list.md))
 
@@ -82,3 +84,4 @@ Collect the following information:
 | Folder Structure | [references/folder-structure.md](references/folder-structure.md) |
 | Agent List       | [references/agent-list.md](references/agent-list.md)             |
 | Holidays         | [references/holidays.md](references/holidays.md)                 |
+| Daily Evidence   | [references/daily-activity-collection.md](references/daily-activity-collection.md) |

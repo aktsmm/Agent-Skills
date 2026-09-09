@@ -199,6 +199,22 @@ if ((Test-Path $workiqSource) -and -not (Test-Path $workiqTarget)) {
     Write-Host "   ✅ Deployed: _datasources/workiq-spec.md" -ForegroundColor Green
 }
 
+# deterministic daily activity collection
+$activityConfigSource = Join-Path $assetsPath "_datasources\daily-activity-sources.template.json"
+$activityConfigTarget = Join-Path $WorkspacePath "_datasources\daily-activity-sources.json"
+if ((Test-Path $activityConfigSource) -and -not (Test-Path $activityConfigTarget)) {
+    Copy-Item -Path $activityConfigSource -Destination $activityConfigTarget
+    Write-Host "   ✅ Deployed: _datasources/daily-activity-sources.json" -ForegroundColor Green
+}
+
+$activityScriptSource = Join-Path $assetsPath "scripts\collect_daily_activity.py"
+$activityScriptTarget = Join-Path $WorkspacePath "_datasources\scripts\daily-ops\collect_daily_activity.py"
+if ((Test-Path $activityScriptSource) -and -not (Test-Path $activityScriptTarget)) {
+    New-Item -ItemType Directory -Path (Split-Path $activityScriptTarget -Parent) -Force | Out-Null
+    Copy-Item -Path $activityScriptSource -Destination $activityScriptTarget
+    Write-Host "   ✅ Deployed: deterministic daily activity collector" -ForegroundColor Green
+}
+
 # ============================================
 # 4. Apply Customer Mappings (if provided)
 # ============================================
@@ -256,5 +272,6 @@ Write-Host "📋 Next Steps:" -ForegroundColor Cyan
 Write-Host "   1. Review and customize copilot-instructions.md" -ForegroundColor White
 Write-Host "   2. Add customer mappings to data-collector agent" -ForegroundColor White
 Write-Host "   3. Configure external paths in _datasources/external-paths.md" -ForegroundColor White
-Write-Host "   4. Copy holiday file to _workiq/" -ForegroundColor White
-Write-Host "   5. Test with 'Create daily report' command" -ForegroundColor White
+Write-Host "   4. Configure _datasources/daily-activity-sources.json and validate it" -ForegroundColor White
+Write-Host "   5. Copy holiday file to _workiq/" -ForegroundColor White
+Write-Host "   6. Collect local evidence, then test with 'Create daily report'" -ForegroundColor White

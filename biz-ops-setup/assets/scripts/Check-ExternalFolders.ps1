@@ -45,11 +45,20 @@ param(
     [int]$DaysBack = 7,
     
     [string]$CustomerId,
+
+    [datetime]$Since,
+
+    [datetime]$Until,
     
     [switch]$DryRun,
     
-    [bool]$ShowContent = $true
+    [bool]$ShowContent = $true,
+
+    [switch]$NoUpdateLastCheck
 )
+
+$SinceWasSpecified = $PSBoundParameters.ContainsKey("Since")
+$UntilWasSpecified = $PSBoundParameters.ContainsKey("Until")
 
 # === 設定 ===
 
@@ -76,28 +85,46 @@ $CustomerMapping = @{
     # "02_CustomerB"  = "customer-b"
 }
 
-# 最終チェック記録ファイル
-$LastCheckFile = Join-Path $DestinationPath "_datasources\scripts\.last-check"
+# ソースルート別の最終チェック記録ファイル
+$LastCheckStateFile = Join-Path $DestinationPath "_datasources\scripts\.last-checks.json"
+$SourceKey = [System.IO.Path]::GetFullPath($SourcePath).TrimEnd("\", "/").ToLowerInvariant()
 
 # === 関数 ===
 
 function Get-LastCheckTime {
-    if (Test-Path $LastCheckFile) {
+    if ($SinceWasSpecified) { return $Since }
+    if (Test-Path -LiteralPath $LastCheckStateFile) {
         try {
-            return [datetime](Get-Content $LastCheckFile -Raw)
+            $state = Get-Content -LiteralPath $LastCheckStateFile -Raw -Encoding UTF8 | ConvertFrom-Json
+            $sourceProperty = $state.sources.PSObject.Properties[$SourceKey]
+            if ($sourceProperty) { return [datetime]$sourceProperty.Value }
         } catch {
-            return (Get-Date).AddDays(-$DaysBack)
+            Write-Warning "last-check state could not be read; using DaysBack"
         }
     }
     return (Get-Date).AddDays(-$DaysBack)
 }
 
 function Set-LastCheckTime {
-    $dir = Split-Path $LastCheckFile -Parent
+    param([datetime]$CheckedThrough)
+
+    $dir = Split-Path $LastCheckStateFile -Parent
     if (-not (Test-Path $dir)) {
         New-Item -Path $dir -ItemType Directory -Force | Out-Null
     }
-    (Get-Date).ToString("o") | Out-File $LastCheckFile -Force
+    $sources = [ordered]@{}
+    if (Test-Path -LiteralPath $LastCheckStateFile) {
+        $state = Get-Content -LiteralPath $LastCheckStateFile -Raw -Encoding UTF8 | ConvertFrom-Json
+        foreach ($property in $state.sources.PSObject.Properties) {
+            $sources[$property.Name] = $property.Value
+        }
+    }
+    $sources[$SourceKey] = $CheckedThrough.ToString("o")
+    $payload = [ordered]@{ schemaVersion = 1; sources = $sources } | ConvertTo-Json -Depth 4
+    $temporary = "$LastCheckStateFile.tmp"
+    [System.IO.File]::WriteAllText($temporary, "$payload`n", [System.Text.UTF8Encoding]::new($false))
+    Get-Content -LiteralPath $temporary -Raw -Encoding UTF8 | ConvertFrom-Json | Out-Null
+    Move-Item -LiteralPath $temporary -Destination $LastCheckStateFile -Force
 }
 
 function Test-ShouldExclude {
@@ -171,7 +198,8 @@ function Get-FileIcon {
 function Find-ChangedFiles {
     param(
         [string]$RootPath,
-        [datetime]$Since
+        [datetime]$Since,
+        [datetime]$Until
     )
     
     $changedFiles = @()
@@ -181,12 +209,13 @@ function Find-ChangedFiles {
         $pattern = "*$ext"
         $files = Get-ChildItem -Path $RootPath -Filter $pattern -Recurse -File -ErrorAction SilentlyContinue |
             Where-Object { 
-                $_.LastWriteTime -gt $Since -and
+                $_.LastWriteTime -ge $Since -and
+                $_.LastWriteTime -lt $Until -and
                 -not (Test-ShouldExclude $_.FullName)
             }
         
         foreach ($file in $files) {
-            $customerId = Get-CustomerIdFromPath -FilePath $file.FullName
+            $detectedCustomerId = Get-CustomerIdFromPath -FilePath $file.FullName
             $fileType = Get-FileType -FileInfo $file
             
             $changedFiles += [PSCustomObject]@{
@@ -196,7 +225,7 @@ function Find-ChangedFiles {
                 Extension    = $file.Extension.ToLower()
                 LastModified = $file.LastWriteTime
                 SizeKB       = [math]::Round($file.Length / 1KB, 1)
-                CustomerId   = $customerId
+                CustomerId   = $detectedCustomerId
                 FileType     = $fileType
             }
         }
@@ -290,9 +319,10 @@ function Sync-ToBizOps {
 
 # パス検証
 if (-not (Test-Path $SourcePath)) {
-    Write-Host "❌ エラー: ソースパスが存在しません: $SourcePath" -ForegroundColor Red
-    exit 1
+    throw "ソースパスが存在しません: $SourcePath"
 }
+
+$scanStartedAt = Get-Date
 
 Write-Host ""
 Write-Host "🔍 外部フォルダ更新チェック" -ForegroundColor Cyan
@@ -310,19 +340,21 @@ Write-Host ""
 
 # 最終チェック時刻を取得
 $lastCheck = Get-LastCheckTime
+$checkUntil = if ($UntilWasSpecified) { $Until } else { $scanStartedAt }
+if ($checkUntil -le $lastCheck) { throw "Until must be later than Since" }
 Write-Host "📅 前回チェック: $($lastCheck.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Gray
+Write-Host "📅 チェック終端: $($checkUntil.ToString('yyyy-MM-dd HH:mm:ss')) (exclusive)" -ForegroundColor Gray
 Write-Host ""
 
 # 変更ファイルを検索
-$changedFiles = Find-ChangedFiles -RootPath $SourcePath -Since $lastCheck
+$changedFiles = @(Find-ChangedFiles -RootPath $SourcePath -Since $lastCheck -Until $checkUntil)
 
 if ($changedFiles.Count -eq 0) {
     Write-Host "✅ 変更なし" -ForegroundColor Green
-    exit 0
+} else {
+    Write-Host "📋 変更ファイル: $($changedFiles.Count) 件" -ForegroundColor Yellow
+    Write-Host ""
 }
-
-Write-Host "📋 変更ファイル: $($changedFiles.Count) 件" -ForegroundColor Yellow
-Write-Host ""
 
 # 結果表示
 $syncCount = 0
@@ -351,7 +383,9 @@ foreach ($file in $changedFiles) {
 
 # 最終チェック時刻を更新
 if (-not $DryRun) {
-    Set-LastCheckTime
+    if (-not $NoUpdateLastCheck) {
+        Set-LastCheckTime -CheckedThrough $checkUntil
+    }
     Write-Host "✅ 完了: $syncCount 件を同期しました" -ForegroundColor Green
 } else {
     Write-Host "ℹ️ DryRunモード: 同期は実行されませんでした" -ForegroundColor Yellow

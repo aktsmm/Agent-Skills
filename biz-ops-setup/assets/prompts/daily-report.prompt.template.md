@@ -37,21 +37,13 @@ Also list "talking points usable in performance reviews (achievements, actions, 
 
 ### Weekend/Holiday Skip Rule
 
-#### Weekend Skip
+#### Weekend Handling
 
-If target date is Saturday or Sunday:
+If target date is Saturday or Sunday, collect activity evidence first. Generate `{YYYY-MM-DD}_dayoff.md` when activity exists; skip only when verified activity is zero.
 
-- Skip report generation
-- Notify: "🎌 Skipped due to weekend"
-- Weekly report will include this date; individual daily not needed
+#### Holiday Handling
 
-#### Holiday Skip
-
-If target date is a holiday (check `_workiq/{country}-holidays.md`):
-
-- Skip report generation
-- Notify: "🎌 Skipped due to {holiday name}"
-- Holiday dates are also skipped in previous day checks
+If target date is a holiday (check `_workiq/{country}-holidays.md`), use the same activity-first rule as weekends.
 
 ### PTO (Paid Time Off) Adjustment Rule
 
@@ -82,6 +74,14 @@ Count PTO hours as working hours. **Total should be 8 hours**.
 ---
 
 ## 4) Data Sources (Inputs)
+
+### 4.0 Deterministic Local Evidence (MANDATORY)
+
+Before using agent-provided sources, run `_datasources/scripts/daily-ops/collect_daily_activity.py --date {target date}` and read `_reports/{YYYY-MM}/daily-ops/{YYYY-MM-DD}.json`.
+
+- Stop if the file is absent or unreadable, `targetDate` differs, `summary.rootCount` is zero, or `status` is `error`.
+- Continue on `partial` only when every unavailable or failed root is listed in generation notes. Treat those roots as unverified, not zero activity.
+- Use `complete` plus a zero count as the only evidence for zero local activity.
 
 ### 4.1 Auto-Collection (Priority) - workIQ Optional
 

@@ -6,7 +6,7 @@
 
 ## Overview
 
-Monitor folders outside the workspace and sync updated files automatically.
+Monitor folders outside the workspace. Daily activity evidence collection is read-only; customer synchronization is a separate operation with mapping and dry-run gates.
 
 ---
 
@@ -23,34 +23,34 @@ Monitor folders outside the workspace and sync updated files automatically.
 
 ### Transaction (One-time projects)
 
-| Folder | Customer ID | Customer Name |
-| ------ | ----------- | ------------- |
+| Folder          | Customer ID     | Customer Name   |
+| --------------- | --------------- | --------------- |
 | `{folder_name}` | `{customer_id}` | {Customer Name} |
 
 ### Ongoing Projects
 
-| Folder | Customer ID | Customer Name | Notes |
-| ------ | ----------- | ------------- | ----- |
+| Folder          | Customer ID     | Customer Name   | Notes   |
+| --------------- | --------------- | --------------- | ------- |
 | `{folder_name}` | `{customer_id}` | {Customer Name} | {notes} |
 
 ---
 
 ## Reference Folders (Detail)
 
-| Customer ID | Folder Path | Target Files |
-| ----------- | ----------- | ------------ |
-| `{id}` | `{path}` | `_inbox/*.md`, `_meetings/*.md` |
+| Customer ID | Folder Path | Target Files                    |
+| ----------- | ----------- | ------------------------------- |
+| `{id}`      | `{path}`    | `_inbox/*.md`, `_meetings/*.md` |
 
 ---
 
 ## Check Target Files
 
-| File Pattern | Content | Sync To |
-| ------------ | ------- | ------- |
-| `_inbox/{YYYY-MM}.md` | Customer info accumulation | `Customers/{id}/_inbox/` |
-| `_meetings/*.md` | Meeting notes | `Customers/{id}/_meetings/` |
-| `*_議事録.md` | Meeting notes (alt format) | `Customers/{id}/_meetings/` |
-| `AGENTS.md` | Workspace overview | Reference only |
+| File Pattern          | Content                    | Sync To                     |
+| --------------------- | -------------------------- | --------------------------- |
+| `_inbox/{YYYY-MM}.md` | Customer info accumulation | `Customers/{id}/_inbox/`    |
+| `_meetings/*.md`      | Meeting notes              | `Customers/{id}/_meetings/` |
+| `*_議事録.md`         | Meeting notes (alt format) | `Customers/{id}/_meetings/` |
+| `AGENTS.md`           | Workspace overview         | Reference only              |
 
 ---
 
@@ -58,7 +58,7 @@ Monitor folders outside the workspace and sync updated files automatically.
 
 ### Auto-check Timing
 
-1. **On report generation**: Before daily/weekly/monthly report creation
+1. **On report generation**: Run deterministic read-only activity collection before daily/weekly/monthly report creation
 2. **Manual trigger**: "Check external folders" command
 
 ### Process Flow
@@ -82,18 +82,18 @@ graph TD
 ## Customer Configuration Example
 
 ```yaml
-customer_id: {id}
-customer_name: {Customer Name}
-external_folder: {absolute_path}
+customer_id: { id }
+customer_name: { Customer Name }
+external_folder: { absolute_path }
 sync_targets:
   - source: _inbox/{YYYY-MM}.md
     destination: Customers/{id}/_inbox/{YYYY-MM}.md
-    mode: merge  # Diff merge
+    mode: merge # Diff merge
   - source: _meetings/*.md
     destination: Customers/{id}/_meetings/
-    mode: copy   # Copy
+    mode: copy # Copy
 check_frequency: on_report_generation
-last_checked: {YYYY-MM-DD}
+last_checked: { YYYY-MM-DD }
 ```
 
 ---
@@ -111,11 +111,11 @@ last_checked: {YYYY-MM-DD}
 
 Detect and create tasks from these patterns:
 
-| Pattern | Action |
-| ------- | ------ |
-| `📌 **TODO**:` | Add to Tasks/active.md |
+| Pattern           | Action                     |
+| ----------------- | -------------------------- |
+| `📌 **TODO**:`    | Add to Tasks/active.md     |
 | `⚠️ **Warning**:` | Add with priority "Medium" |
-| `🔲` (unchecked) | Notify as task candidate |
+| `🔲` (unchecked)  | Notify as task candidate   |
 
 ---
 

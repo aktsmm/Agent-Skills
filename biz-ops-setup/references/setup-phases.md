@@ -20,4 +20,4 @@ Create one customer folder per mapped customer and initialize profile, tasks, in
 
 ## Phase 5: Config and Verification
 
-Configure customer mapping, holidays, external folders, and optional workIQ references. Run a dry daily-report or task-management flow to verify routing and preflight behavior.
+Configure customer mapping, holidays, external folders, and optional workIQ references. Configure `_datasources/daily-activity-sources.json`, then run the collector for a representative date before the dry daily-report flow. See [daily activity collection](daily-activity-collection.md).
