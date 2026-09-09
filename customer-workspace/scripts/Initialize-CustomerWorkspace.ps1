@@ -20,6 +20,9 @@
 .PARAMETER WorkspacePath
     ワークスペースのパス（デフォルト: カレントディレクトリ）
 
+.PARAMETER Force
+    既存の管理対象設定、プロンプト、テンプレートを変更することを許可します。
+
 .EXAMPLE
     .\Initialize-CustomerWorkspace.ps1 -CustomerName "ABC株式会社様"
     
@@ -41,10 +44,27 @@ param(
     [string]$KeyContacts = "",
 
     [Parameter(Mandatory = $false)]
-    [string]$WorkspacePath = (Get-Location).Path
+    [string]$WorkspacePath = (Get-Location).Path,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
+
+$managedPaths = @(
+    ".github\copilot-instructions.md",
+    ".github\prompts",
+    "_templates"
+)
+$existingManagedPaths = @($managedPaths | Where-Object {
+    Test-Path -LiteralPath (Join-Path $WorkspacePath $_)
+})
+
+if ($existingManagedPaths -and -not $Force) {
+    $paths = $existingManagedPaths -join ", "
+    throw "Existing workspace assets detected: $paths. Review and add missing assets manually, or rerun with -Force only when overwriting generated prompts and templates is intentional."
+}
 
 # スキルのルートパスを取得
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path

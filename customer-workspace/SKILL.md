@@ -54,6 +54,8 @@ Initialize customer-specific workspaces with information accumulation, meeting n
 
 If PowerShell is unavailable, manually create the same folders, copy the prompt/template files from `assets/`, and create `README.md` plus `workspace-summary.md` from the workspace root templates.
 
+For an existing workspace, inventory `.github/copilot-instructions.md`, `.github/prompts/`, and `_templates/` before initialization. The script stops by default when these managed assets exist; add only the missing assets manually, or use `-Force` only when overwriting generated prompts and templates is intentional.
+
 ## Setup Intake
 
 Keep setup questions lightweight. Capture only facts that change routing, sharing, or follow-up behavior; leave detailed technical inventory to inbox and later notes.
