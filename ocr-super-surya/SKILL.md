@@ -22,10 +22,10 @@ GPU-optimized OCR using [Surya](https://github.com/datalab-to/surya).
 ## Extraction and Verification
 
 1. Confirm the input scope and a non-public output location for sensitive material; preserve source files and do not bypass document protection. Text redaction does not anonymize retained images or authorize redistribution.
-2. Extract native PDF/slide text first, including slide notes where present. A nonempty text layer can still omit screenshots, diagrams, or image-only pages; inventory those gaps before selecting OCR targets.
+2. Extract native PDF/slide text first, including slide notes where present. A nonempty text layer can still omit screenshots, diagrams, or image-only pages; inventory those gaps before selecting OCR targets. For image targets, resolve the highest-resolution original before recognizing: chat attachments and thumbnails are downscaled re-encodes, so locate the original capture by timestamp, then crop the region of interest and upscale 4-7x (LANCZOS). Dense CJK glyphs collapse at screen scale.
 3. Record source-relative path, source hash, page/slide number, and image hash. Deduplicate identical images without dropping their source locations; distinguish pending, recognized, no-text, and failed outcomes.
 4. Run a small sample and compare it with the original image before scaling. Reuse predictors within a batch and checkpoint each completed item so interruption does not require starting over.
-5. Keep raw OCR separate from corrected notes. Flag low or missing confidence and inspect multi-column order, code symbols, and tables; high confidence is not proof of correctness, and no-text is not proof of an empty image.
+5. Keep raw OCR separate from corrected notes. Flag low or missing confidence and inspect multi-column order, code symbols, and tables; high confidence is not proof of correctness, and no-text is not proof of an empty image. Confirm ambiguous CJK characters line by line on the zoomed crop and mark the unresolved ones; a plausible homoglyph is the default failure mode, not a blank.
 6. Report extracted documents, processed OCR targets, unrecognized targets, and manually reviewed scope separately. Verify saved files and hashes; a saved hash alone proves neither source freshness nor semantic accuracy. Recheck the source hash when claiming the same source version.
 
 ## Quick Start
