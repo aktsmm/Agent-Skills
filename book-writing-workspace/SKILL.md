@@ -47,8 +47,9 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 7. Measuring the built page count before treating a page-budget overrun as a structural problem; character-count estimates run high, and an author-side build is not the publisher's printed page count.
 8. Ruling on external issues, pull requests, and publisher proof comments point by point, first confirming which revision the proof was typeset from, then verifying each factual claim against its source of truth.
 9. Giving typeset-only elements such as chapter frontispieces a source of truth in the manuscript, marked so the converter can emit them, once it is settled that the author writes them.
-10. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
-11. Freezing a release candidate and running the release-readiness gates before delivery or publication.
+10. Treating an author-introduction page as part of the publication contract: keep its author order, display names, roles, confirmed profiles, and links aligned with the structure map, metadata, cover, and colophon. Do not invent missing biography details; track provisional text until the author confirms it, and visually verify cover wrapping when the author count changes.
+11. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
+12. Freezing a release candidate and running the release-readiness gates before delivery or publication.
 
 ## Bootstrap Workflow
 
@@ -134,6 +135,7 @@ For workspaces that add conversion or PDF rendering, apply [build pipeline gates
 - [ ] `docs/release-readiness-record.md` is available for release candidates
 - [ ] `README.md` and `docs/schedule.md` customized
 - [ ] Manuscript files follow the chapter/section naming convention
+- [ ] Author introductions, metadata, cover, and colophon agree on author order and display names; provisional profiles are not treated as release-ready
 - [ ] `scripts/count_chars.py` works for target manuscript files
 - [ ] Setup fails before mutation when a required template, script, or asset is missing
 - [ ] A clean temporary-directory smoke test generates `docs/reader-personas.md` and exits successfully
