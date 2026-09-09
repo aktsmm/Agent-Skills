@@ -34,7 +34,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 - Default to a visible, headed browser. Use headless only when explicitly requested, never as an automatic recovery path. Reuse a verified authenticated session and an owned work tab when possible; a new profile does not imply reusable authentication.
 - Preserve the OS foreground window and the user's selected tab. Do not routinely call `bring_to_front`, `Page.bringToFront`, `Target.activateTarget`, or native focus/keystroke helpers. This applies to browser launch, tab creation, navigation, capture, and recovery, not just clicks.
 - If a necessary operation cannot avoid activation, explain why and which bounded step needs it before proceeding. Do not force focus back afterward: the user may have switched applications meanwhile. Credentials and MFA remain user-entered.
-- Identify the work tab, goal, and authorized side effects. Broad browser permission does not authorize purchases, trades, cancellations, or contract changes; read-only work must not call helpers that can submit them. Report attempted actions even when a gate prevents submission. Pause writes on user editing, target drift, or lost ownership; viewing a tab does not permit discarding it.
+- Identify the work tab, goal, and authorized side effects. Browser access or drafting permission does not authorize sending messages, purchases, trades, cancellations, or contract changes; bind approval to the destination and exact content/action. Read-only helpers must not submit. Report attempted writes, including blocked ones. Pause on user editing, target drift, or lost ownership; viewing a tab does not permit discarding it.
 - Prefer API/CLI helpers for supported data operations, but preserve UI execution when the goal is a demo, UI verification, or observation of the browser workflow.
 
 | Mode | Use when | Boundary |
@@ -57,10 +57,10 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 
 Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read.
 
-Wait for required fields and completed loading, not a sample record's presence. Test empty results, zero values, alternate records, and partial rendering through the actual collector; a visible heading alone does not prove complete data.
+Wait for required controls or an explicit empty state after loading. A generic title, header/footer, route, or text-length threshold proves neither authentication nor its loss. Distinguish parse/collection failure from an empty result; test empty, zero, alternate, and partially rendered data through the actual collector. A readiness deadline ends in unverified state, not inferred logout.
 
 UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
-返信・コメント form では editor に残った送信文が `get_by_text` に一致しても成功ではない。POST の 2xx と、reply ID・件数・本文の readback で確定する。
+For replies/messages, exclude the composer and list previews from success checks. Capture POST status and reply/message ID when available; otherwise verify the approved body and sender appear once in the intended thread after a fresh read/reload. Preserve drafts before reload, never discard another person's input, and report unavailable network evidence as unobserved. Stale counts or a retained draft after submission are not grounds to resend.
 
 API と DOM の状態が一時的にずれるケースがある。API が stale / capture failure を返しても、画面上の cell / row の `aria-label` や status text が進展した状態を示しているなら DOM も正本候補として扱う。API 単独で「未完了」と断定しない。
 
@@ -157,7 +157,7 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 | Existing browser CDP, profile, port drift, screenshot capture | [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) |
 | Raw CDP WebSocket | [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) |
 | WebAuthn virtual authenticator / passkey | [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) |
-| CDP recovery and context selection | [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) |
+| CDP recovery, context selection, Windows UI Automation without CDP | [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) |
 | Azure Portal iframe / OOPIF | [references/instructions/azure-portal.md](references/instructions/azure-portal.md) |
 | Angular Material forms | [references/instructions/angular-material.md](references/instructions/angular-material.md) |
 | Hidden upload, VS Code Web, evaluate+fetch, UI fallback | [references/instructions/ui-fallbacks.md](references/instructions/ui-fallbacks.md) |

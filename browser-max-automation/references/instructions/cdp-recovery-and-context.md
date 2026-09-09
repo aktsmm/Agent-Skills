@@ -32,6 +32,17 @@ Use native UI Automation only to cancel an identified leave-site prompt, not as 
 
 Keep screenshots, capture time and sanitized recovery results; protect exact addresses and identifiers in private records. Read persisted settings separately: Cancel leaves a dirty form dirty. Use a clean work tab for subsequent server-state reads and never overwrite the original evidence.
 
+### Windows Application Content Without CDP
+
+An authenticated window outside the inspected CDP endpoint is not evidence of logout. Before relaunching, copying profiles, installing OCR, or guessing coordinates, check whether native UI Automation exposes the intended application content. This route does not expand permission to handle browser consent, credentials, or leave-site dialogs.
+
+- Enumerate top-level windows under the verified browser process; `MainWindowHandle` may identify a different window under the same PID. Match the selected address/document URL and resource identity, then pin the HWND for this run. A title or process match alone is insufficient; ambiguity stops writes.
+- Check minimization before trusting a small or blank `PrintWindow` image or empty UIA tree. A successful capture return value is not rendering proof. Restore only the identified, authorized window after announcing any necessary activation; re-read its bounds and content before further action.
+- Prefer scoped `TextPattern` reads and a uniquely matched control's supported pattern over global keys or OCR. Separate conversation history from the composer and repeated list previews; retrieve full relevant content before deciding whether a reply is outstanding. Stop if the target URL or content cannot be verified.
+- `ValuePattern.SetValue`, `SetForegroundWindow`, `SetFocus`, and `InvokePattern` may return before observable state changes; a successful call is not input or save proof. Before native keystrokes, verify `GetForegroundWindow()` equals the pinned HWND and the intended editor has keyboard focus. Await those conditions within a deadline; on mismatch send no keys, and never use blind Enter/Escape to recover.
+- Re-read the editor after input and compare it with the approved body before enabling a send step. Treat delayed readback as pending, not permission to type twice. Record whether focus, typing, or submission actually occurred; resume only from verified state within the same retry budget.
+- Keep PowerShell UIA helpers repeatable: do not store collections in the automatic `$Matches` variable; guard unchanged `Add-Type` declarations, and use a new type name with consistent call sites when a signature changes. Parse CDP JSON arrays into a variable and enumerate their objects before projecting fields; blank projections must not become "no windows/tabs".
+
 ## A Widget Stops Responding After Many Operations
 
 A single component can wear out while the rest of the page stays healthy: a type-ahead that stops returning suggestions after a few dozen lookups, a picker that no longer opens, an editor that stops accepting input. The page answers `Runtime.evaluate` normally, so none of the dialog checks above apply.
@@ -49,6 +60,6 @@ Safe selection:
 
 1. Enumerate contexts/pages only to identify the approved profile and workload; domain matches are candidates, not ownership evidence.
 2. Reuse an explicitly designated target or create a dedicated background work tab using [the existing-browser procedure](cdp-existing-browser.md#background-work-tab).
-3. Verify login, authorization, origin, resource route, and required controls. Pin that context and target ID for the run.
+3. Verify login, authorization, origin, resource route, and required controls after loading; generic titles or header/footer-only frames are inconclusive. Pin that context and target ID for the run.
 4. Before writes, re-check route, resource/item identity, and absence of competing user editing. Pause on drift or ownership uncertainty; do not silently choose another matching tab.
 5. If identity or readiness cannot be established, return a compact stopped state with sanitized URL/title and reason. After a crash, rebind explicitly instead of pretending the old target ID is still valid.
