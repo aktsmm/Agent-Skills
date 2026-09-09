@@ -1,44 +1,40 @@
 ---
 name: customer-workspace
-description: Customer workspace initialization skill. Provides inbox (information accumulation), meeting minutes management, and auto-classification rules. Use for "setup customer workspace" or "add inbox feature" requests. Triggers on customer workspace, 顧客ワークスペース, inbox 追加, 議事録管理, 顧客フォルダ作成.
-argument-hint: "作りたい顧客ワークスペース名、必要機能、管理対象"
+description: "Set up and operate customer workspaces: route customer updates, record meetings, track questions and actions, manage workstreams, and prepare handoffs. Use when creating or maintaining a customer workspace, processing meeting notes or updates, reviewing next actions, or preparing a handoff. Triggers: customer workspace, 顧客ワークスペース, inbox 追加, 議事録管理, 案件更新, 宿題管理, 引き継ぎ."
+argument-hint: "Customer workspace name or an existing-workspace task (meeting, update, follow-up, handoff)"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
 
-# Customer Workspace Skill
+# Customer Workspace
 
-Initialize customer-specific workspaces with information accumulation, meeting notes management, and handoff-ready summaries.
+Set up or operate customer workspaces without confusing setup artifacts with live records.
 
 ## When to Use
 
-- **Customer workspace**, **inbox**, **meeting notes**, **workspace summary**, **handoff**
-- Setting up per-customer workspaces
-- Adding inbox or meeting minutes management
-- Creating handoff-ready workspace summaries with source file paths
-- Implementing auto-classification rules for customer information
+- Creating a per-customer workspace.
+- Operating an existing workspace: inbox updates, meeting notes, questions, actions, workstreams, or handoffs.
+- Adding customer-information routing or meeting-note workflows.
+- Reviewing the current owner, next action, and source records before a handoff.
 
-## Features
+## Choose a Mode First
 
-| Feature               | Description                                          |
-| --------------------- | ---------------------------------------------------- |
-| **Inbox**             | Paste chat/email for auto-classification             |
-| **Meeting Notes**     | Convert Teams AI notes to template format            |
-| **Questions**         | Extract questions/actions from meeting log           |
-| **Auto-Routing**      | Route input based on pattern detection               |
-| **Customer Profile**  | Centralized customer information                     |
-| **Workspace Summary** | Handoff summary with related file paths              |
-| **Next Actions**      | Per-MTG homework workspace with traceable tasks       |
-| **Knowledge Ledger**  | Reusable generic learnings extracted on request       |
-| **Research Reports**  | Store generated research/report Markdown away from root |
-| **Material Split**    | Optional split for customer originals, working copies, and customer-facing files |
-| **Workstreams**       | Portfolio of confirmed workstreams within one parent workspace |
+Inspect the workspace before choosing an action. Treat it as existing when it contains any managed record such as `.github/copilot-instructions.md`, `.github/prompts/`, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, or `workstreams/`.
+
+| Mode | Use when | First action |
+| ---- | -------- | ------------ |
+| Setup | No managed structure exists | Create the scaffold and capture routing facts. |
+| Operate | A managed workspace receives new information | Update the canonical record for the input. |
+| Review / Handoff | Status, ownership, or continuity is requested | Read current indexes first and report sources, owner, and next action. |
+
+- Do not rerun the initializer or use `-Force` in an existing workspace unless overwriting generated assets is explicitly requested.
+- Existing records are authoritative. Add only explicitly requested missing assets; never replace live notes, tasks, or workstream records with templates.
 
 ---
 
-## Quick Start
+## Setup a New Workspace
 
 ```powershell
 # Basic
@@ -52,54 +48,26 @@ Initialize customer-specific workspaces with information accumulation, meeting n
   -KeyContacts "John Doe (Infra Lead)"
 ```
 
-If PowerShell is unavailable, manually create the same folders, copy the prompt/template files from `assets/`, and create `README.md` plus `workspace-summary.md` from the workspace root templates.
+If PowerShell is unavailable, manually create the same folders and copy only the required prompt and template files from `assets/`.
 
-For an existing workspace, inventory `.github/copilot-instructions.md`, `.github/prompts/`, and `_templates/` before initialization. The script stops by default when these managed assets exist; add only the missing assets manually, or use `-Force` only when overwriting generated prompts and templates is intentional.
+Use setup only when the managed structure is absent. The initializer stops by default when managed assets exist; use `-Force` only for an explicitly approved replacement of generated prompts and templates.
 
 ## Setup Intake
 
-Keep setup questions lightweight. Capture only facts that change routing, sharing, or follow-up behavior; leave detailed technical inventory to inbox and later notes.
+Capture only routing facts: workspace scope, sharing boundary, own-team aliases, key roles, meeting cadence, and primary inputs. Leave detailed technical inventory to later inbox and meeting records.
 
-- Workspace purpose and scope: customer-wide, project-specific, proposal, PoC, or ongoing support.
-- Sharing boundary: customer-shareable, internal-only, or mixed. This controls what can appear in meeting notes.
-- Own team names and aliases: used to split action items into own-team vs customer follow-up.
-- Key contacts and roles: decision maker, technical owner, coordinator, or other routing-relevant roles.
-- Meeting cadence and next date when known: used to create `next-actions/to-YYYY-MM-DD/`.
-- Primary information sources: meetings, chat, email, shared files, received materials, or service portals.
+## Canonical Records
 
-## Generated Structure
+| Need | Canonical record |
+| ---- | ---------------- |
+| Navigation and handoff | `README.md`, `workspace-summary.md` |
+| Raw updates and open questions | `_inbox/`, `_questions/` |
+| Customer context | `_customer/profile.md` |
+| Meetings and follow-up | `meeting-notes/`, `next-actions/` |
+| Ongoing scope and detailed history | `workstreams/`, `pj_{topic}/` |
+| Deliverables and reusable learning | `research-reports/`, `_knowledge/` |
 
-```
-{workspace}/
-├── README.md                    ← Start here / workspace overview
-├── workspace-summary.md         ← Handoff-ready summary
-├── .github/
-│   ├── copilot-instructions.md    ← Auto-routing rules
-│   └── prompts/                   ← Inbox, meeting notes, questions
-├── _inbox/{YYYY-MM}.md            ← Inbox files
-├── _questions/{YYYY-MM}.md        ← Accumulated questions (optional)
-├── _knowledge/                    ← Reusable generic learnings (opt-in extraction)
-│   ├── README.md                   ← Rules, taxonomy, and safety gates
-│   └── general.md                  ← Initial ledger; split later only when useful
-├── _customer/profile.md           ← Customer profile
-├── _templates/                    ← Templates
-├── research-reports/              ← Generated research/report Markdown
-├── workstreams/                   ← Confirmed workstream portfolio
-│   ├── README.md                  ← Portfolio index
-│   ├── _candidates.md             ← New or ambiguous workstream candidates
-│   └── {workstream-id}/README.md  ← Per-workstream current status
-├── meeting-notes/                 ← Meeting minutes (one file per MTG)
-├── next-actions/                  ← Per-MTG homework workspace
-│   ├── to-YYYY-MM-DD/             ← Tasks for the next MTG
-│   │   ├── README.md               ← Progress board
-│   │   ├── homework/               ← Customer-agreed homework
-│   │   ├── proposals/              ← Self-initiated proposal prep
-│   │   └── research/               ← Supplementary research/validation
-│   └── ongoing/                    ← Continuing items without a deadline
-└── pj_{topic}/                     ← Topic-scoped thread spanning many meetings
-```
-
-`Initialize-CustomerWorkspace.ps1` creates only `.github/`, `_inbox/`, `_questions/`, `_knowledge/`, `_customer/`, `_templates/`, `research-reports/`, `workstreams/`, and the portfolio index plus candidate ledger. It copies seven templates (`meeting-minutes`, `internal-memo`, `customer-profile`, `attachments`, `workstream-portfolio`, `workstream-candidates`, `workstream-readme`). Create confirmed workstream folders, `meeting-notes/`, `next-actions/`, `pj_{topic}/`, and the material folders on demand.
+`Initialize-CustomerWorkspace.ps1` creates the managed scaffold and its templates. Create workstream folders, meeting notes, next actions, project threads, and material folders only when the operating workflow requires them.
 
 ## Research Reports
 
@@ -115,84 +83,43 @@ When customer-shared files accumulate or are directly supplied in scope, split t
 
 ---
 
-## Auto-Routing Patterns
+## Operate an Existing Workspace
 
-| Pattern                      | Action            |
-| ---------------------------- | ----------------- |
-| "Generated by AI"            | → Meeting notes   |
-| Meeting memo with agenda / tasks / next meeting | → Meeting notes + Questions (automatic) |
-| Name + datetime + short text | → Inbox           |
-| Contains `From:` `Date:`     | → Inbox           |
-| Bullet points / short memo   | → Inbox           |
-| Question format              | → Normal response |
+| Input or request | Action |
+| ---------------- | ------ |
+| Short chat, email, or unstructured update | Preserve it in `_inbox/` and classify it. |
+| Meeting memo or Teams AI record | Create or update one meeting note and extract questions/actions in the same operation. |
+| Clear update for one confirmed workstream | Update its README with the source link and state change. |
+| New, ambiguous, or multi-workstream input | Record it in `workstreams/_candidates.md` and ask for confirmation. |
+| Time-bounded follow-up | Track it in `next-actions/`; use `ongoing/` only when no next-meeting date is known. |
+| Status review or handoff | Read `workspace-summary.md`, the portfolio, active actions, and open questions before reporting. |
 
-For a Teams AI meeting record, save the meeting note at the determined location and extract follow-ups, open questions, and confirmation requests into `_questions/{YYYY-MM}.md` in the same operation. Do not request a separate save confirmation; when there are no extractable items, save the meeting note and report that outcome.
+Keep source records authoritative: summaries and workstreams link to meeting notes and inbox entries instead of duplicating them.
 
-## Workstream Portfolio
+## Track Work
 
-Use `workstreams/` when one customer workspace contains multiple confirmed workstreams. The portfolio index summarizes active work; each workstream README owns its current status, current owner, actions, and timeline.
-
-- Route an input to one existing workstream only when its name, keywords, and current scope make the match unambiguous.
-- Keep raw short input in `_inbox/`; keep meeting records in `meeting-notes/`; link to those sources rather than duplicating them in the workstream.
-- Record new, ambiguous, or multi-workstream inputs in `workstreams/_candidates.md` and ask for confirmation before creating a workstream folder.
-- Use `pj_{topic}/` only after a workstream needs its own long-lived evidence and history. Full rules are in [Workstream Portfolio Rules](references/workstream-portfolio-rules.md).
-
-## Default Tags
-
-`#network` `#cost` `#contract` `#proposal` `#ai` `#container` `#meeting` `#support` `#organization` `#deadline` `#internal`
-
-## Next Actions (per-MTG homework workspace)
-
-Carve homework, proposal prep, and supplementary research out of meeting notes into a date-scoped `next-actions/to-YYYY-MM-DD/` folder.
-
-- **Folders**: `homework/` (customer-agreed), `proposals/` (self-initiated), `research/` (supplementary)
-- **Traceability**:
-  - Keep meeting-note decision and homework tables copy-friendly: content, owner, due date, and status only. Do not put local `next-actions/...` paths in rows intended for sharing.
-  - Track local work links in `next-actions/to-YYYY-MM-DD/README.md` and each task file instead.
-  - In each task file, the header records `出どころ:` pointing back to the meeting note (or `自主提案` / `自主検証`).
-- **Progress states**: `not-started` / `in-progress` / `blocked` / `done` / `dropped`. Only the state table lives in `to-YYYY-MM-DD/README.md`; details stay in each task file.
-- **Why split by type**: mixing `proposals` into homework turns self-initiated ideas into apparent customer commitments.
-- Full rules and templates: see `Next Actions Workspace` section in [assets/copilot-instructions.md](assets/copilot-instructions.md).
-
-## Project Threads (topic-scoped work)
-
-`meeting-notes/` and `next-actions/` are both time-scoped, so a topic that outlives the meeting cycle survives as an ever-growing appendix inside one meeting note.
-
-- **Required to split**: the topic spans multiple meeting cycles. Without this, keep it in the meeting note.
-- **Plus at least one**: it already has three or more files, it accumulates its own evidence (logs, vendor replies, an external case ID), or its owners differ from the people who normally attend the recurring meeting. If none hold, use `next-actions/ongoing/`.
-- **Naming**: `pj_{topic}/`, where `{topic}` is kebab-case. No date prefix, because a thread is identified by topic and its start date stops being useful as soon as the thread moves.
-- **Single source of truth**: the thread folder owns current status and history. Meeting notes link to it and never restate it, or the two drift and the reader cannot tell which is current.
-- **README first**: `pj_{topic}/README.md` must answer "who holds the ball right now" without reading anything else.
-- **Migration trigger**: the topic has been appended to the same meeting note across three or more meetings, or its section in that note is longer than all the other sections combined.
-- **Closure**: a thread stays open until closed explicitly. No open actions and no timeline entry for two meeting cycles makes it a closure candidate.
-- Split checklist, README layout, migration steps, and closure rules: [Project Thread Rules](references/project-threads.md)
+- A workstream README owns its current status, owner, actions, and timeline; the portfolio is its index. Create a workstream only after its name and scope are confirmed.
+- Put customer-agreed homework, self-initiated proposals, and supplementary research in separate `next-actions/` folders. Task headers link back to their meeting source, while customer-shareable meeting tables exclude local task paths.
+- Use only `candidate`, `not-started`, `in-progress`, `blocked`, `done`, or `dropped`. A `blocked` record names the current owner and its transition condition.
+- Create `pj_{topic}/` only when the topic spans multiple meetings and meets the detailed project-thread split conditions.
 
 ## Meeting Notes Quality Gate
 
 Before calling meeting notes done:
 
-- Mark uncertain names, times, product names, model names, prices, or support boundaries as `要確認` instead of overclaiming.
-- Speech-to-text transcripts especially mishear short technical acronyms, time codes, and engagement names (e.g. `2H` heard from `EDE 時間`, `Entra ID` from `エントラ ID`). If a short token looks off in context, verify with the user or keep it as `要確認`.
-- AI-generated follow-up tasks (Teams AI / Otter etc.) tend to be too literal or too generic. Cross-check with the body transcript and refine owner, deadline, and concrete deliverable. Do not leave ambiguous phrasing as-is.
-- Extract open questions and action items into `_questions/{YYYY-MM}.md`; create `next-actions/` tasks only for work that needs follow-up outside the meeting note.
-- Ensure shareable meeting-note tables contain no local file paths or internal-only work links.
-- Keep actual internal speculation and commercial engagement terms (tier, contracted hours, SKU, paid-menu composition, effort burn) out of customer-shareable content. Default to one working meeting note: do not create `*_internal.md` solely for unverified technical details; mark them `要確認` and exclude them from customer-facing highlights. Create a separate internal memo only on explicit request or when sensitive material cannot stay in a clearly marked internal section. Hold the engagement ledger inside `_customer/profile.md` as internal-only.
-- When the note will be shared with the customer, produce a copy-paste highlight block (`## お客様共有用ハイライト (コピペ用)`) with 3-5 confirmed bullets + next actions split into `お客様側 / 自社側 / 双方 (両者で調整)`. Cross-side coordination (schedule, joint review) goes in `双方` only — do not duplicate. See [references/meeting-minutes-rules.md](references/meeting-minutes-rules.md).
+- Mark uncertain names, times, product names, prices, and support boundaries as `要確認`; verify ambiguous AI-generated follow-ups against the source before assigning owner, deadline, or deliverable.
+- Extract open questions and work needing follow-up into `_questions/{YYYY-MM}.md` and `next-actions/` in the same operation.
+- Keep local paths, internal links, internal speculation, and commercial terms out of customer-shareable content.
+- Default to one working meeting note. Do not create `*_internal.md` solely for unverified technical details; separate only on explicit request or when sensitive material cannot remain in a clearly marked internal section.
+- Customer highlights contain only confirmed items and split cross-side coordination into one `双方 (両者で調整)` bucket. Apply [Meeting Minutes Rules](references/meeting-minutes-rules.md) for details.
 
 ---
 
 ## Done Criteria
 
-- [ ] Workspace folder created
-- [ ] `README.md` exists at workspace root
-- [ ] `workspace-summary.md` exists at workspace root
-- [ ] `_inbox/{YYYY-MM}.md` exists
-- [ ] `_questions/{YYYY-MM}.md` exists
-- [ ] `_knowledge/README.md` and `_knowledge/general.md` exist
-- [ ] `_customer/profile.md` configured
-- [ ] `research-reports/` exists for generated Markdown deliverables
-- [ ] `workstreams/README.md` and `workstreams/_candidates.md` exist
-- [ ] Auto-routing rules working
+- Setup: the managed scaffold exists and routing facts are captured.
+- Operate: the canonical record, related question/action ledger, and relevant index reflect the input without duplicate source content.
+- Review / Handoff: the report identifies authoritative sources, current owner, next action, and unresolved questions.
 
 ## Key References
 

@@ -83,11 +83,14 @@ graph TD
 ### 議事録検出時の動作
 
 1. 日付を抽出（入力から or 今日の日付）
-2. `meeting-notes/{YYYY-MM-DD}_{topic}.md` を作成または更新する（日付フォルダは作らない）
-   - 内部限定の内容は `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md` に分ける
-3. Teams AI議事録を `_templates/meeting-minutes.md` の形式に変換する
-4. 同じ入力から宿題・確認事項を `_questions/{YYYY-MM}.md` へ抽出する
-5. **確認メッセージ**: 「📝 議事録を作成しました: {日付}」
+2. 会議種別を判定し、`meeting-notes/` 直下に 1 会議 1 ファイルで作成または更新する
+  - 会議名または入力に `Internal`、`社内`、`準備会` があり、内部のみの会議と明確な場合: `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md`
+  - それ以外または会議種別が不明な場合: `meeting-notes/{YYYY-MM-DD}_{topic}.md`
+  - 同じ日付に内部用と共有用の記録がともに必要な場合だけ、両方を作る前にユーザーへ確認する
+3. 未確定の技術条件、構成、費用、担当だけを理由に `_internal.md` は作らず、議事録本文に `要確認` として残す。顧客共有用ハイライトには未確定事項を含めない
+4. Teams AI議事録を `_templates/meeting-minutes.md` の形式に変換する
+5. 同じ入力から宿題・確認事項を `_questions/{YYYY-MM}.md` へ抽出する
+6. **確認メッセージ**: 「📝 議事録を作成しました: {日付}」
 
 ### 会議メモ検出時の動作
 

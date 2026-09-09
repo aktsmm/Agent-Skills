@@ -1,5 +1,5 @@
 ---
-description: Teams AI議事録をテンプレートに変換して meeting-notes/ へ保存
+description: Teams AI議事録を会議種別に応じた1ファイルのテンプレートへ変換して meeting-notes/ に保存
 ---
 
 # Teams AI議事録 → 議事録変換
@@ -7,7 +7,7 @@ description: Teams AI議事録をテンプレートに変換して meeting-notes
 ## 概要
 
 Teams会議のAI生成議事録を、議事録テンプレートに沿ったMarkdownに変換します。
-保存先は `meeting-notes/` 直下で、1 会議 1 ファイルです（日付フォルダは作りません）。
+保存先は `meeting-notes/` 直下とし、会議種別に応じて 1 会議 1 ファイルを作成します。
 
 ---
 
@@ -18,14 +18,18 @@ graph TD
     A[ユーザー入力] --> B{日付指定あり?}
     B -->|あり| C[指定日付を使用]
     B -->|なし| D[今日の日付を取得]
-    C --> E{同日の meeting note あり?}
+  C --> E{内部のみの会議・準備会?}
     D --> E
-    E -->|なし| F[新規ファイルをテンプレートから作成]
-    E -->|あり| G[既存ファイルを更新]
-    F --> G
-    G --> H[Teams AI議事録をパース]
-    H --> I[テンプレート形式に変換]
-    I --> J[議事録ファイル保存]
+  E -->|はい| F[_internal.md を選択]
+  E -->|いいえ・不明| G[標準議事録を選択]
+  F --> H{選択した議事録あり?}
+  G --> H
+  H -->|なし| I[テンプレートから作成]
+  H -->|あり| J[既存ファイルを更新]
+  I --> K[Teams AI議事録をパース]
+  J --> K
+  K --> L[テンプレート形式に変換]
+  L --> M[議事録ファイル保存]
 ```
 
 ---
@@ -35,7 +39,7 @@ graph TD
 ### Step 1: 日付の決定
 
 1. ユーザーが日付を指定した場合 → その日付を使用
-2. 日付指定がない場合 → 今日の日付 `Get-Date -Format "yyyyMMdd"` を使用
+2. 日付指定がない場合 → 今日の日付 `Get-Date -Format "yyyy-MM-dd"` を使用
 
 ### Step 1.5: ファイル確認と連携判定
 
@@ -48,15 +52,14 @@ graph TD
      - 現在開いているファイルの「🔄 前回持ち帰り事項の確認」に反映
      - **ユーザーに確認**: 「入力は{入力日付}のメモですが、開いているファイルは{ファイル日付}です。前回持ち帰りとして反映しますか？」
 
-### Step 2: ファイル作成
+### Step 2: 会議種別と保存先の決定
 
-`meeting-notes/` 直下に 1 会議 1 ファイルで作る（日付フォルダは作らない）:
+`meeting-notes/` 直下に 1 会議 1 ファイルで作成または更新する（日付フォルダは作らない）。
 
-```
-meeting-notes/
-├── {YYYY-MM-DD}_{topic}.md           ← _templates/meeting-minutes.md からコピー
-└── {YYYY-MM-DD}_{topic}_internal.md  ← _templates/internal-memo.md からコピー
-```
+- 会議名または入力に `Internal`、`社内`、`準備会` があり、内部のみの会議と明確な場合: `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md` を `_templates/internal-memo.md` から作成する。
+- それ以外または会議種別が不明な場合: `meeting-notes/{YYYY-MM-DD}_{topic}.md` を `_templates/meeting-minutes.md` から作成する。
+- 未確定の技術条件、構成、費用、担当だけを理由に `_internal.md` を作らず、本文に `要確認` として残す。顧客共有用ハイライトには未確定事項を含めない。
+- 同じ日付に内部用と共有用の記録がともに必要な場合だけ、両方を作る前にユーザーへ確認する。
 
 ### Step 3: 議事録変換
 
@@ -72,7 +75,7 @@ Teams AI議事録を以下のルールで変換：
 
 ### Step 4: 議事録と質問・アクションの保存
 
-変換結果を `meeting-notes/{YYYY-MM-DD}_{topic}.md` に保存する。内部限定の内容は `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md` へ分ける。
+変換結果を Step 2 で決めた `meeting-notes/{YYYY-MM-DD}_{topic}.md` または `meeting-notes/{YYYY-MM-DD}_{topic}_internal.md` に保存する。
 
 フォローアップ タスク、未回答の質問、確認依頼を抽出し、`_questions/{YYYY-MM}.md` に同時に追記する。既存項目と同じ場合は重複登録せず、状態または回答を更新する。保存先の追加確認は不要とし、抽出対象がない場合は議事録のみを保存して報告する。
 
@@ -98,7 +101,7 @@ AI によって生成されます。必ず精度を確認してください。
 ### 例2: 日付指定あり
 
 ```
-日付: 20260204
+日付: 2026-02-04
 
 # 以下をペースト:
 AI によって生成されます。必ず精度を確認してください。
