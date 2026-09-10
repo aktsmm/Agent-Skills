@@ -99,6 +99,7 @@ Keep source records authoritative: summaries and workstreams link to meeting not
 ## Track Work
 
 - A workstream README owns its current status, owner, actions, and timeline; the portfolio is its index. Create a workstream only after its name and scope are confirmed.
+- When a customer follow-up continues an existing question or delivered answer, keep the original exchange visible and append the follow-up chronologically in the owning deliverable or thread. For month-bound `_questions` ledgers, append to the current month and reference the original entry instead of rewriting the prior month.
 - Put customer-agreed homework, self-initiated proposals, and supplementary research in separate `next-actions/` folders. Task headers link back to their meeting source, while customer-shareable meeting tables exclude local task paths.
 - Use only `candidate`, `not-started`, `in-progress`, `blocked`, `done`, or `dropped`. Before assigning `not-started` or `done`, inspect task-linked external work locations; workspace absence does not prove a deliverable is missing. When external progress and artifacts confirm completion, update the canonical action record and indexes in the same operation. Do not copy external artifacts unless the material lifecycle requires it. A `blocked` record names the current owner and its transition condition.
 - Create `pj_{topic}/` only when the topic spans multiple meetings and meets the detailed project-thread split conditions.

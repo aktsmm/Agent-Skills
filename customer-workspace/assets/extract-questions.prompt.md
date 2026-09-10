@@ -89,6 +89,8 @@ Microsoft / Azure / Microsoft 365 / Copilot の **仕様・制限・課金・モ
 
 `_questions/{YYYY-MM}.md` の末尾に追記:
 
+既存質問への追加質問・再回答では、初回の質問と回答を上書きしない。当月の会議日付でfollow-upを追記し、元質問の日付またはリンクを添える。同じ月でも追加内容を元項目より前へ置かない。
+
 ```markdown
 ---
 
