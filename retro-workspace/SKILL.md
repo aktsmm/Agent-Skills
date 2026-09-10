@@ -52,6 +52,7 @@ CLI / Scout は VS Code のアクティブ workspace を常に取得できない
 - 新規ファイルより既存への統合を優先し、`削除 → 統合 → 分離 → 追加` の順で検討する
 - 新しいルールを書く前に、同じ判断が scripts / 生成物 / 既存資産に実装済みでないか確認する。実装と矛盾するルールは、次の run に正しい資産を壊させる
 - 他セッションと working tree を共有する repo では、編集を長く dirty のまま残さない。別セッションの広い `git add` が未完成の編集を巻き込んで commit する。連番 ID を持つ append-only な台帳へ追記するときは、書き込む直前に次の空き ID を取り直し、commit 後に重複がないことを確かめる
+- After moving a multi-paragraph Markdown section, verify heading order, exactly one occurrence of the moved heading and its first content line, and `git diff --check`; delete-plus-insert moves can otherwise leave an omission or duplicate.
 - 圧縮は AI が判断できる最小情報を主目的にし、人間向け可読性は二次とする
 - 冗長説明は圧縮するが、根拠 URL と非自明手順は残す
 - 同じ Learning / Evidence / Impact を言い換えて繰り返さず、1 論点 1 塊でまとめる
