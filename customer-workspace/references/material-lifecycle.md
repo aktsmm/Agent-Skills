@@ -17,7 +17,8 @@ _provided/                       <- customer-safe send-out or projection copies
 - Never edit files in `_received/` in place.
 - Use `overall-architecture/` for material relevant across meetings; use `mtg-YYYY-MM-DD-name/` only for meeting-scoped material.
 - Store meeting screenshots with stable names and an `attachments.md` manifest.
-- When the task includes a direct attachment path or link, attempt to import every accessible original into the matching `_received/` folder before relying only on a summary. Copy local originals without modification and record a content hash when practical.
+- When the task includes a customer-provided file, link, or pasted body, preserve every accessible original in the matching `_received/` folder before answering or relying on a summary. Copy local originals without modification and record a content hash when practical.
+- Save a pasted body as a text file without changing its wording, symbols, or paragraph structure. Use the meeting-scoped folder when its date is known; otherwise use `_received/incoming/` until it can be classified.
 - If a linked source needs authentication or cannot be transferred, make one controlled attempt through an available authenticated route. Do not repeat a persistent failure; record the filename, source system, unreviewed status, and restart condition in `attachments.md`. Do not store credentials, secret-bearing URLs, or absolute local paths in the manifest.
 - When files appear at workspace root, inspect all candidate documents, images, diagrams, and archives before classifying them.
 - Rename received originals with a stable date prefix; leave only unclassified items in `_received/incoming/`.
