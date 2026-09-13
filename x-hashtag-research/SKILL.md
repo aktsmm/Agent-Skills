@@ -10,7 +10,7 @@ metadata:
 
 # X Hashtag Research
 
-X の live search を起点に、公開投稿を大量収集し、一次情報 URL、関連 GitHub repo、画像、論点を research 配下へ整理する workspace 用 skill。
+FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 GitHub repo、画像、論点を research 配下へ整理する workspace 用 skill。
 
 ## When to Use
 
@@ -48,19 +48,15 @@ X の live search を起点に、公開投稿を大量収集し、一次情報 U
 
 ユーザーが省略した場合は既定値を提案して確認を取る。勝手に `4時間 / 500件` で走らせない。
 
-## Minimal Browser Fallback
+## Collection Paths
 
-`browser-max-automation` が無い環境でも、この skill の進め方は変えない。
-
-- 使えるブラウザ系ツールで、最低限次ができればよい
-  - X の live search を開く
-  - 投稿 URL、時刻、本文、画像 URL を取る
-  - 下へスクロールして追加投稿を読む
-- 構造化抽出が弱い環境でも、順番は固定する
-  1. raw 投稿の保存
-  2. visible domain / card title で粗く分類
-  3. 高シグナルな一次情報だけ深掘る
-- 全件自動化にこだわらず、公式アカウント、live blog 導線、代表画像を優先する
+- 公開投稿の収集は、合意済みの時間窓・件数内に限り `GET https://api.fxtwitter.com/2/search?q=<URL-encoded-query>&feed=latest&count=100` を既定にする。次ページは `cursor.bottom` を `cursor` に渡す。
+- FxTwitter は X の公式 API ではない。Cookie、トークン、アカウント情報を渡さず、公開投稿の一回限りの収集に限定する。
+- HTTP ステータスだけでなく JSON の `code` を確認し、`200` の `results` だけを採用する。`400`、`404`、`500` は再試行を重ねず、X の画面または一次情報へ戻る。
+- 非公開、削除済み、アクセス制限付き投稿、継続監視には使わない。
+- API が失敗するか、投稿の画面文脈を確認する必要がある場合は、ブラウザ系ツールで X の live search を開き、投稿 URL、時刻、本文、画像 URL を取得して下へスクロールする。
+- 構造化抽出が弱い場合も、raw 投稿の保存、visible domain / card title による粗い分類、高シグナルな一次情報の深掘りの順番は固定する。
+- 全件自動化にこだわらず、公式アカウント、live blog 導線、代表画像を優先する。
 
 この skill の本体はブラウザ操作のコツではなく、SNS ノイズを一次情報へ収束させる順番にある。
 
@@ -69,8 +65,8 @@ X の live search を起点に、公開投稿を大量収集し、一次情報 U
 1. 収集対象を固定する
    対象ハッシュタグ、時間窓、件数目標、主目的、research の保存先を決める。
 
-2. live search から効率よく収集する
-   利用可能なブラウザ系ツールで `article` 相当の単位を構造化抽出し、status URL を主キーに重複排除する。
+2. API から効率よく収集する
+   API の `results` から status URL を主キーに構造化抽出し、重複排除する。API が失敗した場合だけ画面から補う。
 
 3. raw artifacts を先に保存する
    `tmp/<slug>-posts-raw.json` と batch 単位の中間 JSON を残す。
@@ -92,8 +88,8 @@ X の live search を起点に、公開投稿を大量収集し、一次情報 U
 
 ## Branching Rules
 
-- X live search が使える場合: live search を正本にして収集する
-- X live search が不安定な場合: 公式アカウント、live blog、official blog、repo 導線付き投稿を優先する
+- 公開・一回限り・上限付きの収集: FxTwitter API search を使い、`code: 200` の結果だけを raw artifact に残す
+- API が失敗または投稿の画面文脈が必要な場合: 公式アカウント、live blog、official blog、repo 導線付き投稿を優先する
 - 短縮 URL 解決が重い場合: 全解決しない。高頻度・高シグナルだけ解決する
 - 画像が多すぎる場合: curated を先に確保し、bulk は上限を切る
 
@@ -104,6 +100,7 @@ X の live search を起点に、公開投稿を大量収集し、一次情報 U
 - repo 名が切れている場合は本文・card title・公式 blog で補正している
 - 画像保存先が research 配下で整理されている
 - 元の公開投稿を改変した断定はしていない
+- FxTwitter を使った場合、出典は API URL ではなく各 `status.url` の元の X 投稿 URL にしている
 
 ## Efficiency Rules
 
