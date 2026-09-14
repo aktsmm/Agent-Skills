@@ -89,6 +89,11 @@ metadata:
 ## Privacy Routing
 
 - For a private event, set the requested privacy level in each private calendar.
+- For a provisional hold that may be visible to others, use a neutral title such
+  as `調整中（仮）` and leave the location blank; record its purpose only in an
+  approved event body or comment. Set Outlook sensitivity to `normal` only when
+  the user has confirmed that their sharing settings expose titles and locations
+  but not the detailed body.
 - For a shared calendar, use a generic blocker without names or notes only when
   the user explicitly asks for a dummy event. Add its location only when the user
   explicitly requests it.
