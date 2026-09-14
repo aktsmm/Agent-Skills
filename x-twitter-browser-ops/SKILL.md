@@ -34,6 +34,13 @@ Use this skill for all X/Twitter browser operations: browsing and analysis, foll
 6. Bookmark folder creation, renaming, deletion, and assignment are permitted after the user explicitly approves the organization plan.
 7. Before any write or relationship-changing action, verify the acting account identity from the account switcher or profile UI and confirm it matches the intended account for this task.
 
+## Post Draft Validation
+
+- Before treating a draft as ready to post or entering it in the browser, measure it with a `twitter-text` v3-compatible parser using the official configuration: https://raw.githubusercontent.com/twitter/twitter-text/master/config/v3.json
+- Require `valid === true` and `weightedLength <= maxWeightedTweetLength` (currently 280).
+- Let the parser apply URL transformation and emoji parsing. An HTTP(S) URL uses `transformedURLLength` (currently 23), while ZWJ emoji and variation selectors must not be counted by visible glyphs or `String.length`.
+- If a compatible parser or configuration is unavailable, report the draft as length-unverified rather than claiming it is ready to post.
+
 ## Bookmark Management
 
 1. Inspect existing folders plus representative unfoldered and folder-specific posts before proposing a minimal taxonomy.
