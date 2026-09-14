@@ -162,6 +162,14 @@ normalized baseline **when edit starts** and diff against that frozen baseline
 on submit. Do not recompute the original side of the diff from current defaults,
 or unchanged fields can become false updates if settings change mid-edit.
 
+For persisted edits, send that baseline to the host and compare it with current
+data before confirmation and again inside the storage transaction. A browser
+save lock cannot protect other windows. Reject stale edits without restoring
+revoked consent; recheck cancellation and trust at commit. Compare settings only
+when unrelated history updates should not conflict; revision-based callers may
+intentionally use a stricter whole-store check. Reset must load a fresh baseline
+and disclose that unsaved input is discarded.
+
 ```javascript
 let editingTaskSnapshot = null;
 let editingTaskNormalizedSnapshot = null;
@@ -206,6 +214,14 @@ function buildUpdateData(formData, currentDefaults) {
 This matters when you correctly keep create-form defaults reactive but avoid
 overwriting active edit forms during `updateDefaults` / configuration-change
 events.
+
+Keep persistence and presentation outcomes separate. After a confirmed save,
+a failed refresh or notification must retain the saved ID/success and return a
+sanitized warning, not an apparent save failure that invites duplicate retries.
+Actual write failures and standalone refresh failures remain errors. Persist a
+new folder approval with the successful task save, not as an earlier side effect.
+Test revoked consent during a queued save, changes during confirmation, stale
+form/reset, unrelated updates and presenter failure against real fixture storage.
 
 ## VS Code Theme Integration
 

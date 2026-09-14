@@ -110,7 +110,10 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 ### Language Model Tools
 
 - Extension-provided LM Tools need strong `modelDescription` intent phrases. Prefer `Use when the user asks to ...` plus natural-language verbs for create/update/delete/toggle paths, and add a manifest/doc guard so future wording changes do not silently weaken agent-mode tool selection.
-- Treat `prepareInvocation().confirmationMessages` as extension custom confirmation text, not a complete approval bypass. VS Code / Copilot Chat can still show generic approval or Always Allow UI, so docs/settings should say they control custom confirmations only.
+- For configuration from VS Code Chat, prefer native LM Tools when no external client is required; do not call them an external MCP server. Share validated domain operations with the GUI, expose only necessary actions, and use explicit enable/disable values rather than retry-sensitive toggles.
+- Keep `prepareInvocation` side-effect free and request confirmation for mutations or sensitive disclosure. Revalidate input, cancellation, trust and the queried revision inside the locked write after confirmation. Host approval UI/policies still apply; custom confirmation text is not a bypass. Never accept secret values through tool arguments or silently widen execution permissions.
+- Page query results and omit prompt, environment and raw-output payloads by default. Make sensitive detail retrieval explicit with disclosure confirmation; describe which metadata reaches the model and treat stored strings as data, not instructions.
+- Return typed outcomes from shared operations; a GUI handler that catches errors and returns nothing cannot prove a tool succeeded. Keep committed IDs/success when only presentation fails, return a sanitized warning and tell the caller to query rather than repeat the mutation. Configuration saved is not work executed.
 - Before publishing an extension with LM Tools, inspect the packaged VSIX rather than trusting source files: confirm `extension/package.json` has the intended version, expected `contributes.languageModelTools` count, and no `src/`, test payloads, or sourcemaps unless intentionally shipped.
 
 ### Generated Sections

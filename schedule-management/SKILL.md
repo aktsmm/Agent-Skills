@@ -80,8 +80,12 @@ metadata:
 ## Privacy Routing
 
 - For a private event, set the requested privacy level in each private calendar.
-- For a shared calendar, use a generic blocker without names, locations, or notes
-  only when the user explicitly asks for a dummy event.
+- For a shared calendar, use a generic blocker without names or notes only when
+  the user explicitly asks for a dummy event. Add its location only when the user
+  explicitly requests it.
+- Always set a TimeTree dummy event to `Soft violet` unless the user explicitly
+  chooses another label; never retain the label of an event being converted into
+  a dummy.
 - Keep detailed information out of destinations the user has not approved.
 
 ## Done Criteria
