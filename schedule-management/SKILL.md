@@ -49,6 +49,12 @@ metadata:
 - When evaluating available times, check OOF blocks first. Do not offer a
   full-day OOF date; ask whether tentative or unaccepted events should be treated
   as busy or available.
+- For a meeting reschedule, verify the proposed slot against every required
+  attendee. Preserve the original attendees, organizer, online-meeting link,
+  location, category, and visibility when changing the time.
+- Before sending a meeting update, preview its recipient, new time, and exact
+  message. Use a concise generic explanation; do not disclose private calendar
+  details in the update or a follow-up chat.
 
 ## Workflow
 
@@ -76,6 +82,9 @@ metadata:
 6. Read back title, start/end, location, notes, privacy, and category or label
    from each destination. If a field is missing, restore the full intended event
    state and re-verify before reporting completion.
+7. For a rescheduled meeting, confirm that the update notification was sent. If
+   the user approves a Teams follow-up, send a separate concise message only
+   after the meeting update succeeds.
 
 ## Privacy Routing
 
