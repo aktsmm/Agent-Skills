@@ -160,3 +160,5 @@ Always give a `viewBox` and a `<title>`. Without a viewBox the export can render
 | An aside                 | `shf-callout`                         |
 | A process                | `shf-flow`, or an SVG if it branches  |
 | Numbers                  | a table                               |
+
+When actor boundaries matter, use two complementary views: a flow for order and a table for `stage / automation action / human decision / output`. Do not force responsibility detail into the arrows.

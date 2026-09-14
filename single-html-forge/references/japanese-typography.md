@@ -48,6 +48,7 @@ font-variant-numeric: tabular-nums;
 
 ## Things that break silently
 
+- `overflow-wrap: anywhere` は長い token を守る一方、短い日本語ラベルを意味の途中で折ることがある。短い caption / card label だけ `word-break: keep-all; overflow-wrap: normal` にし、Tier 2 で overflow を確認する。
 - A `<code>` element inherits `palt` unless the template resets it. The deck and doc CSS already do; if you add code elsewhere, check the spacing.
 - Vertical writing (`writing-mode: vertical-rl`) is not supported in v1. The stage sizing assumes horizontal.
 - Rare glyphs may fall back to a different face mid-sentence on some machines. Nothing to do about it in a font-free artifact, but it is worth knowing before someone reports it as a bug.
