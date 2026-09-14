@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "provenance": "self-authored",
+  "spdxId": "CC-BY-NC-SA-4.0",
+  "frontmatterLicense": "CC BY-NC-SA 4.0",
+  "profile": {
+    "id": "cc-by-nc-sa-4.0",
+    "registryVersion": 1,
+    "spdxId": "CC-BY-NC-SA-4.0",
+    "frontmatterLicense": "CC BY-NC-SA 4.0",
+    "evidenceFile": "LICENSE.txt",
+    "templateSha256": "e422548dc736bb97e6157edfe82a6b93f65c7488bb4fd2be9c69e8f5e18819b9",
+    "requiresAuthorAttribution": true
+  },
+  "authorAttribution": {
+    "value": "yamapan"
+  },
+  "evidence": [
+    {
+      "path": "LICENSE.txt",
+      "sha256": "b075302a4793131040f96e8874847109d1147f1e7efeffa1c9f6c0bfe862d0be"
+    }
+  ],
+  "confirmationMode": "explicit-cli"
+}

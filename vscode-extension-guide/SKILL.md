@@ -12,6 +12,10 @@ metadata:
 
 Create, develop, and publish VS Code extensions.
 
+For extensions with a management UI, default to a dedicated Activity Bar icon
+and sidebar unless another entry point is explicitly chosen. A Marketplace
+`icon` alone does not create that navigation; use the TreeView reference below.
+
 ## When to Use
 
 - **VS Code extension**, **extension development**, **vscode plugin**
@@ -57,7 +61,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 ## Done Criteria
 
 - [ ] Extension activates without errors
-- [ ] All commands registered and working
+- [ ] Primary sidebar entry and commands work; referenced icons are present in the VSIX
 - [ ] Package size < 5MB (use `.vscodeignore`)
 - [ ] README.md includes Marketplace/GitHub links
 - [ ] Local VSIX artifacts stored outside the repo root and pruned regularly

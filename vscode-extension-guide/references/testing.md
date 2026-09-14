@@ -243,6 +243,13 @@ test("Should handle file save", async () => {
 });
 ```
 
+## Terminal Readiness and Owned Cleanup
+
+- Diagnose `terminal.shellIntegration`, its `cwd`, and `terminal.state.shell` separately. Active integration does not guarantee a detected shell type; log only readiness flags and an allowlisted shell label, not commands, output or environment values.
+- If shell detection is absent, do not guess from a profile label, switch shells silently or stretch readiness timeouts to pass a gate. A platform-specific fallback needs bounded read-only observation of the owned terminal's actual process, PID validation and fail-closed handling of errors or ambiguous children; it must not kill processes or bypass execution-time authorization checks.
+- Use isolated local fixtures to assert real start/output/end events, literal argv/stdin, cancellation and unrelated-process survival. Unit mocks or a blocked outcome do not substitute for successful real-shell gates. Retry only after new evidence or a corrective change.
+- Resolve owned Webview tabs from the current `tabGroups` immediately before cleanup rather than retaining stale `Tab` objects across asynchronous UI changes. Limit cleanup to the view opened by the test; never close unrelated user tabs.
+
 ## CI Integration
 
 **.github/workflows/test.yml:**

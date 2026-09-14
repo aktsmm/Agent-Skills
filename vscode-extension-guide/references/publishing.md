@@ -32,10 +32,10 @@ Complete guide for publishing your VS Code extension.
 
 5. Click **Create** and **copy token immediately** (shown only once)
 
-Before publishing, verify the token from the same terminal session that will run `vsce`:
+Before publishing, verify the token against the manifest's publisher from the same terminal session that will run `vsce`:
 
 ```powershell
-npx --yes vsce verify-pat -p "$env:VSCE_PAT"
+npx --yes vsce verify-pat <publisher-id> -p "$env:VSCE_PAT"
 ```
 
 If `verify-pat` fails but `VSCE_PAT` exists in the User environment, reload it into the current process before retrying:
@@ -46,6 +46,8 @@ npx --yes vsce verify-pat -p "$env:VSCE_PAT"
 ```
 
 If you control the repository workflow, prefer a wrapper script over repeating manual environment-variable recovery steps. A small PowerShell wrapper can validate the current Process `VSCE_PAT` first, automatically fall back to the User-scoped `VSCE_PAT` when VS Code is still holding an expired process value, and then forward `vsce verify-pat`, `vsce show`, or `vsce publish` with the resolved token. This avoids the common failure mode where the User environment is correct but VS Code child processes still inherit a stale token from the older process environment.
+
+Publisher authorization failure is not proof that the token expired. Verify permissions for the intended publisher; switching to another authorized publisher changes the extension ID and requires approval. Then synchronize manifest, activation-test IDs and listing links.
 
 ## Login and Publish
 
@@ -66,7 +68,7 @@ npx @vscode/vsce publish
 # Publish an already-built VSIX (prevents packaging the wrong artifact)
 npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix
 
-# Confirm an already-published version without failing the release script
+# Resume an explicitly requested publish idempotently, not as a read-only check
 npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix --skip-duplicate
 
 # Publish with version bump
@@ -211,10 +213,9 @@ Require the exact lowercase `<publisher>.<name>@<version>` line. A strong local 
 
 ## Post-publish Verification
 
-- Treat Marketplace listing metadata and `vsce show` as eventually consistent. If publish logs, the pushed tag, and GitHub Release are successful but the listing still shows the previous version, do not republish immediately; verify the version-specific VSIX endpoint first.
-- Use the version-specific package URL pattern `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<extension>/<version>/vspackage`. Some Marketplace endpoints return `405` for `HEAD`, so use a small `GET` download to a temp file and confirm HTTP 200 plus a plausible size before declaring the version missing.
-- Compare the downloaded VSIX size and SHA256 with the locally packaged artifact or GitHub Release asset. A matching hash is stronger evidence than a stale human-facing Marketplace page.
-- Verify the same artifact through both independent channels: download the version-specific Marketplace package and the GitHub Release asset, then require both SHA256 hashes and byte sizes to match the local VSIX. Also confirm the release tag resolves to the release commit and branch ahead/behind is zero.
+- Apply the **Release Completion Contract** below; use read-only checks, never another publish command to prove existence.
+- If an artifact audit is required, use `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<extension>/<version>/vspackage`. A `405` from `HEAD` is inconclusive; download via `GET` directly to a temporary file and inspect the actual ZIP.
+- Compare size and SHA256 with the local VSIX or GitHub Release asset when exact-byte provenance was required before publication. Otherwise treat additional downloads as follow-up audit, not a new completion gate.
 - If a pushed release tag fails CI before publication, keep the failed tag as provenance. Fix the issue, bump to a new patch version, synchronize package/lock/changelog/spec files, and publish a new tag; do not move or reuse the pushed tag.
 
 ## Local VSIX Artifact Hygiene
@@ -308,14 +309,22 @@ are done or explicitly blocked:
 4. Publish the exact VSIX to Marketplace.
 5. Create and push the release tag.
 6. Create the GitHub Release with the VSIX attached.
-7. Download the version-specific Marketplace package and GitHub Release asset;
-   require both byte sizes and SHA256 hashes to match the local VSIX. Also verify
-   `gh release view`, the remote tag target, and branch ahead/behind state.
+7. Confirm the public item page is accessible and the public gallery API or
+   `vsce show --json` returns the intended publisher, extension and version.
+   Confirm the GitHub Release asset is uploaded, the tag resolves to the release
+   commit, and the intended branch is synchronized with its remote.
 
-Marketplace metadata commands such as `vsce show --json` and the public item page
-can lag immediately after a successful publish. If publish output, remote tag,
-GitHub Release, and the attached VSIX asset are consistent, treat stale
-Marketplace metadata as propagation delay and do not republish or bump again.
+Successful submission can precede Marketplace validation and public visibility.
+While the page or API is stale, use authenticated read-only status when available
+to distinguish pending validation from rejection. Use one bounded watcher with
+an explicit deadline and resumable status; never republish merely to check.
+
+Once these checks and the pre-agreed quality gates pass, report publication
+complete and stop. Extra screenshots, repeated page loads and optional package
+hash comparisons are follow-up audits, not reasons to withhold completion.
+If a repository explicitly required exact artifact equality before publication,
+retain that gate; do not invent or relax gates mid-run. Update local state and
+task status without reopening completed verification.
 
 If a blocker appears after the version bump, report the state separately:
 `Version`, `VSIX`, `Marketplace publish`, `Git tag`, and `GitHub Release`.
@@ -340,22 +349,16 @@ Get-Item $vsix | Select-Object Name, Length
 Get-FileHash $vsix -Algorithm SHA256 | Select-Object Hash
 ```
 
-After publishing, `vsce show` output can lag or sort versions unexpectedly. If you need a deterministic confirmation, run duplicate-safe publish against the exact VSIX and verify that the Marketplace reports the version as already published.
-
-Marketplace metadata can be stale immediately after a successful publish. If
-`vsce show --json` or the public Marketplace page still shows the previous
-version, do not republish or bump the version just from that signal. Verify the
-GitHub Release and remote tag while the Marketplace package endpoint propagates:
+Verify the GitHub Release and remote tag independently while Marketplace
+validation or metadata propagation is pending:
 
 ```powershell
 gh release view vX.Y.Z --json "tagName,name,url,isDraft,isPrerelease,publishedAt"
 git ls-remote --tags origin vX.Y.Z
 ```
 
-If `vsce publish` reported success and GitHub Release plus remote tag are present,
-record Marketplace verification as pending propagation. Complete the release
-only after the version-specific Marketplace VSIX and GitHub Release asset both
-match the local artifact's byte size and SHA256.
+Record submission and public availability separately until the Release Completion
+Contract passes; do not use duplicate-safe publish as a verification command.
 
 ## Marketplace URLs
 
@@ -413,6 +416,7 @@ src/**
 # Dev tooling
 .vscode/**
 .vscode-test/**
+.playwright-mcp/**
 .github/**
 node_modules/**
 
@@ -425,8 +429,7 @@ session/**
 FULL_SPECIFICATION.md
 AGENTS.md
 
-# Secondary docs or local artifacts that are not needed in the VSIX
-README_ja.md
+# Local artifacts (exclude secondary docs only if no shipped link needs them)
 artifacts/**
 
 # Large or unnecessary assets
@@ -472,16 +475,25 @@ When the README references images by relative path (e.g. `![demo](images/demo.gi
 the Marketplace web view and the in-VS Code extension details pane both resolve
 those paths against `repository.url` in `package.json` and fetch the file from
 `raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>`. So as long as the
-image is committed and pushed to the default branch, you can keep it **out of
+repository is public and the image is pushed to the default branch, you can keep it **out of
 the VSIX** to drop multi-megabyte demo media without breaking the listing.
 
 This auto-resolution applies to **images**, not to arbitrary Markdown links. If
 you exclude secondary documents such as `README_ja.md` from the VSIX, link to
 them with an absolute GitHub URL from the primary `README.md` instead of a
-relative Markdown link.
+relative Markdown link to a publicly readable document.
 
-A single 15 MB demo GIF can shrink a VSIX from ~15 MB to ~175 KB (≈99% reduction)
-with no visible difference in Marketplace rendering.
+Marketplace publication does not authorize making a private source repository
+public. Private raw GitHub image URLs will not serve anonymous readers: use
+public distribution assets, keep required icons in the VSIX, and provide alternate
+language content on the listing or a publicly reachable page. Label restricted
+source/support links explicitly; including a document in the VSIX does not make
+its private GitHub URL public.
+
+An unchanged documentation icon may pin an earlier published asset version.
+Validate its publisher, extension, asset type and expected image rather than
+requiring the URL version to equal a not-yet-published package version. The new
+VSIX must still contain its own declared runtime and Activity Bar icons.
 
 ### Verify VSIX integrity before publish
 
@@ -513,5 +525,5 @@ asserts the referenced files physically exist before packaging.
 
 - `vsce show --json` and the human listing can lag; do not republish solely from stale metadata.
 - Gallery "latest" resolution lags too, so `code --install-extension <publisher>.<name> --force` right after publish can silently install the previous version. While propagation is pending, do not install or verify by extension ID: install the identical verified local VSIX (or one downloaded from the version-specific endpoint) with `code --install-extension <path> --force`, confirm with `code --list-extensions --show-versions`, and do not republish.
-- Use the version-specific Marketplace package endpoint and exact hash contract defined above. If that endpoint is not yet available, record publish/tag/release state as pending verification rather than weakening the gate.
+- Follow the Release Completion Contract; after the public page and exact API identity/version are confirmed, stop waiting unless a pre-agreed artifact gate is still unmet.
 - If publish is paused by review, auth, duplicate, or permissions, report version, artifact checksum, commit, tag, push, and publish state separately so the same VSIX can be resumed without guessing.

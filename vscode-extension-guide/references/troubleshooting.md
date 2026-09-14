@@ -2,6 +2,14 @@
 
 Common issues and solutions for VS Code extension development.
 
+## Installation Versus Navigation
+
+- Clarify what is missing: the browser's Install handoff, the Extensions search result, the installed extension, or an Activity Bar icon. These are separate paths; an installed extension need not contribute a sidebar.
+- For a browser handoff, compare the registered `vscode:` handler and the process that received `--open-url` with the intended VS Code executable/profile. Multiple installed, portable or test builds can route to a different window. Do not close shared windows or change associations without approval.
+- For an empty `@id:<publisher>.<name>` result, compare the public gallery's exact-ID response, engine/platform compatibility and the running build's gallery/resource endpoints. A working public page or one CDN's 404 does not establish the search failure's cause without matching request/log evidence.
+- With installation approval, use the intended build's CLI to install the extension ID, then confirm that exact ID/version using its `--list-extensions --show-versions` and the same profile. A successful CLI install proves that route, not that search or the browser handoff was repaired. Never trigger real extension tasks merely to test installation.
+- For a missing Activity Bar icon, inspect view-container contributions, packaged SVG and saved view placement; see [TreeView](treeview.md). Avoid reinstalling or resetting unrelated UI when the entry point was never contributed.
+
 ## Extension Not Loading
 
 | Symptom                     | Cause                      | Solution                                                         |
@@ -73,7 +81,8 @@ output.appendLine(
 | ---------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | VSIX too large (100MB+)                                          | `node_modules` shipped, incl. a huge transitive dep | Exclude `node_modules/**` in `.vscodeignore` when `out/` needs no external runtime packages (see below) |
 | Files missing in VSIX                                            | Over-aggressive ignore                              | Use `npx @vscode/vsce ls` to check                                                                      |
-| Icon not showing                                                 | Wrong path or format                                | Use 128x128 PNG, check path in package.json                                                             |
+| Listing icon missing                                             | Missing PNG or incorrect manifest path              | Check the top-level icon and packaged PNG                                                               |
+| Activity Bar entry missing                                       | Missing container, SVG or hidden/relocated view     | Check viewsContainers.activitybar, views[containerId], packaged SVG and saved view placement            |
 | `End of central directory record signature not found` on install | Truncated / corrupt VSIX (build interrupted)        | Re-run `vsce package`; verify with `code --install-extension <vsix> --force` before publish             |
 
 ### Inspect VSIX Contents

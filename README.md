@@ -57,6 +57,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a managed Agent Skills repository with scope gates, safe local commits, and conditional push |
 | [retro-workspace](retro-workspace/) | Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks) |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
+| [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree |
 | [session-handoff](session-handoff/) | Create a compact handoff note so a new chat/session can first acknowledge the current state before work resumes |
 | [single-html-forge](single-html-forge/) | Generate a single self-contained HTML file — a horizontal slide deck, a vertical-scroll explainer document, or a fixed-canvas summary image — with zero external runtime dependen... |
 | [skill-creator-plus](skill-creator-plus/) | Create or review a reusable skill (SKILL.md) that packages a workflow, and decide whether the request should be a skill instead of a prompt, instruction, agent, or hook |
