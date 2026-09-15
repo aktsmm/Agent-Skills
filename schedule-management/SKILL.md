@@ -37,10 +37,12 @@ metadata:
 - Put the official facility name and postal-code address in both the location
   field and the event notes. Research a missing address from a reliable source
   before writing it.
-- Keep a user-selected source of truth for every event. Use an API for supported
-  destinations, but treat TimeTree as a visible-UI workflow unless the user
-  provides an official supported integration; do not claim automatic TimeTree
-  extraction or synchronization.
+- Keep a user-selected source of truth for every event. Prefer the official
+  Google Calendar API over browser automation for Google Calendar writes. If API
+  access is not configured, suggest setting it up; use browser automation only
+  as an explicitly approved fallback. Treat TimeTree as a visible-UI workflow
+  unless the user provides an official supported integration; do not claim
+  automatic TimeTree extraction or synchronization.
 - If a browser session expires, return to the appropriate login page, have the
   user authenticate, then re-read the target calendar and check for duplicates
   before resuming.
