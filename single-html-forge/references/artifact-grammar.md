@@ -72,7 +72,7 @@ h1 h2 h3 h4 h5 h6 p ul ol li dl dt dd
 table thead tbody tfoot tr th td caption colgroup col
 figure figcaption blockquote pre code kbd samp
 strong em b i u s small sub sup mark abbr time
-span div hr br a img button details summary
+span div hr br a img button details summary input label
 template data svg
 script
 ```
@@ -107,6 +107,11 @@ data-shf-*        (name matches data-shf-[a-z0-9-]+)
 | `data`            | `value`, `data-asset-id`, `data-mime`       |
 | `template`        | `id`                                        |
 | `script`          | `id`, `type`                                |
+| `section`         | `tabindex` (only `-1`)                      |
+| `label`           | `for`                                      |
+| `input`           | `type`, `min`, `max`, `step`, `value`, `checked`, `disabled` |
+
+Inputs are void elements limited to `checkbox` and `range`. A range must declare min=0, max=100, step=1 and an integer value within that interval. Other input types, form submission, URL-bearing input attributes and arbitrary tab order remain forbidden.
 
 ### 2.4 URL-bearing attributes
 
@@ -117,7 +122,7 @@ The complete set is `a[href]` and `img[src]`. Nothing else in the allowlist can 
 
 ### 2.5 Elements that are absent by construction
 
-Because the allowlist is closed, these need no rule and cannot reappear: `object`, `embed`, `iframe`, `video`, `audio`, `source`, `track`, `picture`, `link`, `base`, `form`, `input`, `canvas`, `noscript`, `frame`, `frameset`, `applet`, `marquee`. Likewise `srcset`, `srcdoc`, `poster`, and `http-equiv` are simply not allowed attributes.
+Because the allowlist is closed, these need no rule and cannot reappear: `object`, `embed`, `iframe`, `video`, `audio`, `source`, `track`, `picture`, `link`, `base`, `form`, `canvas`, `noscript`, `frame`, `frameset`, `applet`, `marquee`. Likewise `srcset`, `srcdoc`, `poster`, and `http-equiv` are simply not allowed attributes.
 
 ## 3. Inline SVG subset
 
@@ -183,7 +188,7 @@ Any other `script` or `style` element is `FAIL`, including one that would otherw
 `<script id="shf-model" type="application/json">` is inert data. It is never executed.
 
 - Content must parse as JSON.
-- `schemaVersion` must be exactly `1`. Any other value is rejected rather than treated as readable.
+- `schemaVersion` is the integer `1` for legacy/base artifacts or `2` for finalized decks; booleans and floating-point numbers are not versions. Duplicate JSON object keys and non-finite numbers fail. Schema 2 requires registered runtime/CSS versions at least 6, a string sourceDigest and a thumbnails array. Each asset must be an object with a nonempty string ID and a supported MIME type; optional alt and SHA-256 fields must have their documented string types. Thumbnail step/width/height must be integers, not bool/float substitutes. Unknown schemas fail. Existing valid schema 1 assets retain their checks.
 - Every `<` in the serialisation is escaped as `\u003c`, so a raw `</script>` can never terminate the block early. A literal `<` in the content is `FAIL`.
 
 ### 5.2 Asset closure
@@ -255,8 +260,13 @@ WebSocket  Worker  importScripts  import(
 The runtime may only:
 
 - read `dataset`, `getAttribute` for `data-shf-*`, `classList`, `textContent`
-- write `classList`, `hidden`, `textContent`, `aria-*`
+- write `classList`, `hidden` (including SVG toggleAttribute), `textContent`, `aria-*`, the fixed `data-shf-current-step` marker, and the predefined input `checked`/input or button `disabled`/details `open` states
 - call `scrollIntoView`, `focus`, `addEventListener`, `postMessage`, `window.print`
-- open a presenter window via `window.open("about:blank", name)` from a user gesture
+- read predefined input values, media queries and visibility; call Fullscreen APIs from a user gesture and observe their result
+- create fixed Web Audio oscillator/gain nodes after explicit opt-in, with bounded numeric volume, cancelable resume promises and no external audio resource
+
+Before registering new fixed code, `build_skeletons.py` checks prohibited API tokens; browser fixtures exercise navigation under API monitors. This scan is defense in depth, not a proof against computed-property or indirect calls: fixed-source review and negative tests remain required. Registration rejects a changed hash under an existing version before writing any skeletons. Old entries are retained.
+
+Schema 2 also carries generated static print pages and optional thumbnail mappings. `derived_assets.py` derives their identity from LF-normalized slide markup and pinned/theme content, excluding the print pages and sidebar images themselves. This deliberately conservative digest can invalidate harmless formatting edits; rerun finalization. It detects staleness, not visual truth. Print markup is regenerated and compared exactly, while thumbnail source/ID/step/image closure is checked separately. Images still use the normal asset manifest, decoding and metadata limits.
 
 Because the runtime never creates elements and never writes markup, an artifact value cannot become a new element, a new style rule, or a URL.

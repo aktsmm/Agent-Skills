@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deck skeleton (outline)</title>
+<title>Slide player demo</title>
 <style id="shf-theme">:root{--shf-color-accent:#0067b8;--shf-color-bg:#ffffff;--shf-color-fg:#1b1f27;--shf-size-base:20px}</style>
 <style id="shf-css">/* single-html-forge deck template v1 — hash-pinned.
  * Every variable value arrives through a --shf-* custom property.
@@ -503,37 +503,32 @@ html[data-shf-layout="outline"].shf-outline-off #shf-root {
 <nav id="shf-outline">
 <p class="shf-outline-title">SLIDES</p>
 <ol>
-<li><button type="button" data-shf-goto="s1">タイトルをここに置く</button></li>
-<li><button type="button" data-shf-goto="s2">3 つの論点</button></li>
-<li><button type="button" data-shf-goto="s3">比較</button></li>
+<li><button type="button" data-shf-goto="s1">Ideas, one step at a time.</button></li>
+<li><button type="button" data-shf-goto="s2">A signal becomes a decision</button></li>
+<li><button type="button" data-shf-goto="s3">Change the conclusion, not the context</button></li>
 </ol>
 </nav>
 <main id="shf-root">
 <section tabindex="-1" data-slide-id="s1" class="is-active">
-<p class="shf-eyebrow">SINGLE HTML FORGE</p>
-<h1>タイトルをここに置く</h1>
-<p class="shf-lead">副題。1 行で主張を言い切る。</p>
-<p data-shf-notes>話者メモ。発表者モードにだけ出る。</p>
+<p class="shf-eyebrow">SINGLE HTML FORGE / PLAYER</p>
+<h1>Ideas, one step at a time.</h1>
+<p class="shf-lead">A focused explanation, with the whole story within reach.</p>
 </section>
 <section tabindex="-1" data-slide-id="s2" hidden>
-<h2>3 つの論点</h2>
-<div class="shf-cards">
-<div class="shf-card"><h3>論点 1</h3><p>短く書く。読ませるのではなく見せる。</p></div>
-<div class="shf-card"><h3>論点 2</h3><p>1 枚に詰め込まない。</p></div>
-<div class="shf-card"><h3>論点 3</h3><p>数字は表に逃がす。</p></div>
-</div>
-<p data-shf-notes>ここで一度止まって質問を取る。</p>
+<h2>A signal becomes a decision</h2>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="900" height="240" aria-label="Observe, compare, decide">
+<g><rect x="20" y="60" width="230" height="100" rx="8" fill="#dcefe5"/><text x="135" y="120" text-anchor="middle" font-size="28" fill="#20362c">Observe</text></g>
+<g data-shf-step="1" data-shf-effect="fade"><path d="M270 110h65" stroke="#34825e" stroke-width="5"/><rect x="350" y="60" width="230" height="100" rx="8" fill="#e3ecf7"/><text x="465" y="120" text-anchor="middle" font-size="28" fill="#20362c">Compare</text></g>
+<g data-shf-step="2" data-shf-effect="fade"><path d="M600 110h45" stroke="#34825e" stroke-width="5"/><rect x="660" y="60" width="220" height="100" rx="8" fill="#f4e9c9"/><text x="770" y="120" text-anchor="middle" font-size="28" fill="#20362c">Decide</text></g>
+</svg>
+<p data-shf-step="1" data-shf-effect="rise">Compare the evidence before choosing a response.</p>
+<p data-shf-step="2" data-shf-effect="emphasis">Make the decision and keep its rationale.</p>
 </section>
-<section tabindex="-1" data-slide-id="s3" hidden>
-<h2>比較</h2>
-<table>
-<thead><tr><th>観点</th><th>従来</th><th>今回</th></tr></thead>
-<tbody>
-<tr><td>配布</td><td>専用アプリが要る</td><td>ブラウザーだけ</td></tr>
-<tr><td>依存</td><td>外部リソース</td><td>単一ファイル</td></tr>
-</tbody>
-</table>
-<p data-shf-notes>表は 5 行を超えたら分割する。</p>
+<section tabindex="-1" data-slide-id="s3" data-shf-print="all" hidden>
+<h2>Change the conclusion, not the context</h2>
+<p data-shf-step="0" data-shf-until="0">Before: a conclusion without supporting evidence.</p>
+<p data-shf-step="1" data-shf-effect="rise">After: a decision linked to observations and alternatives.</p>
+<p class="shf-lead">The complete explanation remains in the handout.</p>
 </section>
 <div id="shf-chrome">
 <button type="button" data-shf-action="prev" title="Previous" aria-label="Previous"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M5 12h14"/></svg></button>

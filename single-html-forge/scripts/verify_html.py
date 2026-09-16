@@ -18,6 +18,7 @@ import base64
 import binascii
 import hashlib
 import json
+import math
 import re
 import sys
 from dataclasses import dataclass, field
@@ -27,7 +28,7 @@ from urllib.parse import urlsplit
 HERE = Path(__file__).resolve().parent
 
 RAW_TEXT = {"script", "style", "textarea", "title"}
-VOID = {"meta", "br", "hr", "img", "col"}
+VOID = {"meta", "br", "hr", "img", "col", "input"}
 
 ELEMENTS = {
     "html", "head", "meta", "title", "style", "body",
@@ -37,7 +38,7 @@ ELEMENTS = {
     "figure", "figcaption", "blockquote", "pre", "code", "kbd", "samp",
     "strong", "em", "b", "i", "u", "s", "small", "sub", "sup", "mark", "abbr", "time",
     "span", "div", "hr", "br", "a", "img", "button", "details", "summary",
-    "template", "data", "script",
+    "template", "data", "script", "input", "label",
 }
 
 GLOBAL_ATTRS = {"id", "class", "lang", "dir", "title", "hidden", "role"}
@@ -59,6 +60,9 @@ ELEMENT_ATTRS = {
     "data": {"value", "data-asset-id", "data-mime"},
     "template": {"id"},
     "script": {"id", "type"},
+    "section": {"tabindex"},
+    "label": {"for"},
+    "input": {"type", "min", "max", "step", "value", "checked", "disabled"},
 }
 
 SVG_ELEMENTS = {
@@ -365,6 +369,17 @@ def walk(tokens: list, rep: Report) -> dict:
 
         if lname == "html":
             ctx["root_attrs"] = dict(tag.attrs)
+        if "tabindex" in tag.attrs and tag.attrs["tabindex"] != "-1":
+            rep.error("ATTR", "Only tabindex=-1 on a section is allowed")
+        if lname == "input":
+            if tag.attrs.get("type") not in {"range", "checkbox"}:
+                rep.error("ELEMENT", "Only range and checkbox inputs are allowed")
+            numeric = {name: tag.attrs[name] for name in ("min", "max", "step", "value") if name in tag.attrs}
+            if any(not re.fullmatch(r"\d{1,3}", value) or int(value) > 100 for value in numeric.values()):
+                rep.error("INPUT", "Input numbers must be integers from 0 through 100")
+            elif tag.attrs.get("type") == "range":
+                if numeric.get("min") != "0" or numeric.get("max") != "100" or numeric.get("step") != "1" or "value" not in numeric:
+                    rep.error("INPUT", "Range requires min=0 max=100 step=1 and value")
         if "data-slide-id" in tag.attrs:
             ctx["slide_ids"].append(tag.attrs["data-slide-id"])
         if "data-shf-goto" in tag.attrs:
@@ -477,6 +492,26 @@ def check_theme(ctx: dict, rep: Report) -> None:
             rep.error("THEME", f"custom property '{prop}' has no declared grammar")
 
 
+def unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def reject_json_constant(value):
+    raise ValueError(f"non-finite JSON number: {value}")
+
+
+def finite_json_float(value):
+    result = float(value)
+    if not math.isfinite(result):
+        raise ValueError("JSON number exceeds the finite numeric range")
+    return result
+
+
 def parse_model(ctx: dict, rep: Report) -> dict:
     raw = ctx["pinned"].get("shf-model")
     if raw is None:
@@ -484,15 +519,47 @@ def parse_model(ctx: dict, rep: Report) -> dict:
     if "<" in raw.content:
         rep.error("MODEL", "shf-model contains a literal '<'; it must be escaped as \\u003c")
     try:
-        model = json.loads(raw.content)
-    except json.JSONDecodeError as exc:
+        model = json.loads(raw.content, object_pairs_hook=unique_json_object, parse_constant=reject_json_constant, parse_float=finite_json_float)
+    except (ValueError, RecursionError) as exc:
         rep.error("MODEL", f"shf-model is not valid JSON: {exc}")
         return {"schemaVersion": 1, "assets": []}
-    if model.get("schemaVersion") != 1:
-        rep.error("MODEL", f"unsupported schemaVersion {model.get('schemaVersion')!r}; only 1 is readable")
+    if not isinstance(model, dict):
+        rep.error("MODEL", "model must be an object")
+        return {"schemaVersion": 1, "assets": []}
+    if type(model.get("schemaVersion")) is not int or model["schemaVersion"] not in (1, 2):
+        rep.error("MODEL", f"unsupported schemaVersion {model.get('schemaVersion')!r}")
+    if model.get("schemaVersion") == 2:
+        if any(not str(ctx["root_attrs"].get(key, "")).isdigit() or int(ctx["root_attrs"][key]) < 6 for key in ("data-shf-runtime", "data-shf-css")):
+            rep.error("MODEL", "schema 2 requires player runtime/CSS 6 or later")
+        if not isinstance(model.get("thumbnails"), list) or not isinstance(model.get("sourceDigest"), str) or not re.fullmatch(r"[0-9a-f]{64}", model["sourceDigest"]):
+            rep.error("MODEL", "schema 2 requires thumbnails and sourceDigest")
+        if isinstance(model.get("thumbnails"), list):
+            for position, item in enumerate(model["thumbnails"]):
+                if not isinstance(item, dict):
+                    rep.error("MODEL", f"thumbnails[{position}] must be an object")
+                    continue
+                if any(not isinstance(item.get(key), str) or not item[key].strip() for key in ("slideId", "assetId")):
+                    rep.error("MODEL", f"thumbnails[{position}] requires string slideId and assetId")
+                if any(type(item.get(key)) is not int for key in ("step", "width", "height")):
+                    rep.error("MODEL", f"thumbnails[{position}] requires integer step, width and height")
+                elif not 0 <= item["step"] <= 99 or item["width"] != 320 or item["height"] != 180:
+                    rep.error("MODEL", f"thumbnails[{position}] has invalid step or dimensions")
     if not isinstance(model.get("assets", []), list):
         rep.error("MODEL", "assets must be a list")
         model["assets"] = []
+    valid_assets = []
+    for position, asset in enumerate(model.get("assets", [])):
+        if not isinstance(asset, dict) or not isinstance(asset.get("id"), str) or not asset["id"].strip():
+            rep.error("MODEL", f"assets[{position}] must be an object with a nonempty string id")
+            continue
+        if not isinstance(asset.get("mime"), str) or asset["mime"] not in MAGIC:
+            rep.error("MODEL", f"assets[{position}].mime must be a supported image MIME type")
+        if "alt" in asset and not isinstance(asset["alt"], str):
+            rep.error("MODEL", f"assets[{position}].alt must be a string")
+        if "sha256" in asset and (not isinstance(asset["sha256"], str) or not re.fullmatch(r"[0-9a-f]{64}", asset["sha256"])):
+            rep.error("MODEL", f"assets[{position}].sha256 must be a lowercase SHA-256 digest")
+        valid_assets.append(asset)
+    model["assets"] = valid_assets
     return model
 
 
@@ -624,7 +691,13 @@ def check_urls(ctx: dict, rep: Report) -> None:
         value = html_unescape(href).strip()
         if FRAGMENT_RE.fullmatch(value):
             continue
-        parts = urlsplit(value)
+        try:
+            parts = urlsplit(value)
+            if parts.scheme.lower() in {"http", "https"} and (not parts.hostname or parts.port == 0):
+                raise ValueError("HTTP links require a hostname and a valid nonzero port")
+        except ValueError as exc:
+            rep.error("URL", f"invalid href: {exc}")
+            continue
         if parts.scheme.lower() not in {"http", "https"}:
             rep.error("URL", f"href '{href}' resolves to scheme '{parts.scheme}'; only http and https are allowed")
 
@@ -709,10 +782,48 @@ def verify(path: Path, registry: dict, budget: dict) -> Report:
     check_assets(ctx, model, budget, rep)
     check_navigation(ctx, rep)
     check_urls(ctx, rep)
+    if not rep.errors:
+        try:
+            import derived_assets
+            derived_assets.validate_steps(text)
+            derived_assets.check_derived(text, model)
+        except (ValueError, KeyError, TypeError, StopIteration) as exc:
+            rep.error("DERIVED", str(exc))
     return rep
 
 
-def run_tier2(path: Path, rep: Report) -> str:
+DECK_PRINT_VIEWPORT = {"width": 1536, "height": 864}
+
+
+def check_print_layout(page):
+    previous = page.viewport_size
+    try:
+        page.set_viewport_size(DECK_PRINT_VIEWPORT)
+        page.emulate_media(media="print")
+        page.wait_for_function("document.fonts.status === 'loaded' && [...document.images].every(image => image.complete)")
+        return page.evaluate(
+            "() => { const errors = []; const derived = document.getElementById('shf-print');"
+            "const pages = [...document.querySelectorAll(derived ? '#shf-print > [data-shf-print-slide]' : '#shf-root > [data-slide-id]')];"
+            "if (!pages.length) return ['print: no slide pages found'];"
+            "for (const [index, slide] of pages.entries()) {"
+            "const bounds = slide.getBoundingClientRect();"
+            "if (bounds.width < 1 || bounds.height < 1) errors.push('print page ' + index + ': zero-size page');"
+            "for (const node of slide.querySelectorAll('h1,h2,h3,h4,p,table,ul,ol,figure,svg,img')) {"
+            "if (node.closest('[data-shf-notes], [hidden]') && getComputedStyle(node).display === 'none') continue;"
+            "const rect = node.getBoundingClientRect();"
+            "if (!rect.width && !rect.height) { if (node.matches('svg,img') && !node.closest('[hidden]')) errors.push('print page ' + index + ': zero-size media'); continue; }"
+            "if (rect.right > bounds.right + 2 || rect.left < bounds.left - 2 || rect.bottom > bounds.bottom + 2 || rect.top < bounds.top - 2) errors.push('print page ' + index + ': ' + node.tagName + ' outside page');"
+            "if (node.scrollWidth > node.clientWidth + 2 && node.clientWidth > 0) errors.push('print page ' + index + ': horizontal content overflow');"
+            "}"
+            "if (slide.scrollHeight > slide.clientHeight + 2 || slide.scrollWidth > slide.clientWidth + 2) errors.push('print page ' + index + ': content overflow');"
+            "} return errors; }")
+    finally:
+        page.emulate_media(media="screen")
+        if previous:
+            page.set_viewport_size(previous)
+
+
+def run_tier2(path: Path, rep: Report, require_print: bool = True) -> str:
     """Runtime checks. Returns 'ok', 'unavailable', or 'failed'.
 
     Completion is event-based: every slide is visited and every image is waited
@@ -739,13 +850,21 @@ def run_tier2(path: Path, rep: Report) -> str:
         page.goto(path.resolve().as_uri(), wait_until="load")
         page.wait_for_function("document.fonts ? document.fonts.status === 'loaded' : true")
 
-        states = page.evaluate("document.querySelectorAll('[data-slide-id]').length") or 1
-        if states > 1:
+        import derived_assets
+        source = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+        expected = derived_assets.states(source)
+        if expected:
             page.keyboard.press("Home")
-        for i in range(states):
-            if states > 1 and i:
+        if require_print and any(step > 0 for _, step in expected) and not page.locator("#shf-print").count():
+            problems.append("Step decks require --finalize before delivery")
+        for i, state in enumerate(expected or [(None, 0)]):
+            if expected and i:
                 # Advance through the real navigation path so chrome state is checked too.
                 page.keyboard.press("ArrowRight")
+            if state[0] is not None:
+                actual = page.evaluate("[document.querySelector('[data-slide-id].is-active')?.getAttribute('data-slide-id'), Number(document.documentElement.getAttribute('data-shf-current-step') || 0)]")
+                if actual != list(state):
+                    problems.append(f"state {i}: expected {state}, got {actual}")
             page.wait_for_function(
                 "Array.from(document.images).every(function (i) { return i.complete; })"
             )
@@ -759,8 +878,8 @@ def run_tier2(path: Path, rep: Report) -> str:
             bad_svg = page.evaluate(
                 "Array.from(document.querySelectorAll('svg')).filter(function (s) {"
                 " var b = s.getBoundingClientRect();"
-                " var slide = s.closest('[data-slide-id]');"
-                " return !s.getAttribute('viewBox') || (!(slide && slide.hidden) && (b.width === 0 || b.height === 0)); }).length"
+                " var excluded = s.closest('[hidden], #shf-print, details:not([open])');"
+                " return !s.getAttribute('viewBox') || (!excluded && (b.width === 0 || b.height === 0)); }).length"
             )
             if bad_svg:
                 problems.append(f"state {i}: {bad_svg} inline svg without a viewBox or with zero size")
@@ -772,6 +891,27 @@ def run_tier2(path: Path, rep: Report) -> str:
                 problems.append(
                     f"state {i}: content overflows by {overflow[0]}x{overflow[1]} px at 1600x900"
                 )
+            if expected:
+                bad_steps = page.evaluate(
+                    "() => { const slide = document.querySelector('[data-slide-id].is-active');"
+                    "const step = Number(document.documentElement.getAttribute('data-shf-current-step') || 0);"
+                    "return [...slide.querySelectorAll('[data-shf-step]')].filter(node => {"
+                    "const visible = Number(node.getAttribute('data-shf-step')) <= step && step <= Number(node.getAttribute('data-shf-until') || 99);"
+                    "const rect = node.getBoundingClientRect();"
+                    "return node.hasAttribute('hidden') === visible || (visible && (!rect.width || !rect.height)); }).length; }")
+                if bad_steps:
+                    problems.append(f"state {i}: step visibility mismatch")
+                clipped = page.evaluate(
+                    "() => { const slide = document.querySelector('[data-slide-id].is-active');"
+                    "const boundary = slide.getBoundingClientRect();"
+                    "return [...slide.querySelectorAll('h1,h2,h3,p,table,svg,img')].filter(node => {"
+                    "if (node.closest('[hidden], [data-shf-notes]')) return false;"
+                    "const rect = node.getBoundingClientRect(); if (!rect.width && !rect.height) return false;"
+                    "return rect.right > boundary.right + 2 || rect.bottom > boundary.bottom + 2 || rect.left < boundary.left - 2 || rect.top < boundary.top - 2; }).length; }")
+                if clipped:
+                    problems.append(f"state {i}: {clipped} visible elements outside the slide")
+        if expected and require_print:
+            problems.extend(check_print_layout(page))
         browser.close()
 
     for url in blocked:

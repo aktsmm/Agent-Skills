@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" data-shf-archetype="poster" data-shf-runtime="8" data-shf-css="8">
+<html lang="ja" data-shf-archetype="poster" data-shf-runtime="4" data-shf-css="4">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -237,130 +237,6 @@ a {
     var started = Date.now();
     var ticking = null;
     var tocLinks = all("[data-shf-goto]");
-    var step = 0;
-    var outline = document.getElementById("shf-outline");
-    var menu = document.getElementById("shf-menu");
-    var status = document.getElementById("shf-status");
-    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    var narrow = window.matchMedia("(max-width: 700px)");
-    var motionInput = document.getElementById("shf-motion");
-    var soundInput = document.getElementById("shf-sound");
-    var volumeInput = document.getElementById("shf-volume");
-    var context = null;
-    var voices = [];
-    var audioEpoch = 0;
-    var soundOn = false;
-    var motionOn = true;
-    var beforePrint = null;
-
-    function lastStep(slide) {
-      return Array.prototype.reduce.call(slide.querySelectorAll("[data-shf-step]"), function (last, node) {
-        return Math.max(last, Number(node.getAttribute("data-shf-step")));
-      }, 0);
-    }
-
-    function announce(message) {
-      if (status) status.textContent = message;
-    }
-
-    function cancelSound() {
-      audioEpoch++;
-      voices.forEach(function (voice) {
-        try { voice.stop(); } catch (_) {}
-        voice.disconnect();
-      });
-      voices = [];
-    }
-
-    function playSound(chapter) {
-      cancelSound();
-      if (!soundOn || document.hidden || !context) return;
-      var epoch = audioEpoch;
-      context.resume().then(function () {
-        if (epoch !== audioEpoch || !soundOn || document.hidden) return;
-        var volume = volumeInput ? Number(volumeInput.value) / 100 : 0.3;
-        if (!volume) return;
-        var oscillator = context.createOscillator();
-        var gain = context.createGain();
-        var now = context.currentTime;
-        oscillator.type = "sine";
-        oscillator.frequency.setValueAtTime(chapter ? 660 : 520, now);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(volume * 0.12, now + 0.008);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-        oscillator.connect(gain);
-        gain.connect(context.destination);
-        voices.push(oscillator);
-        oscillator.onended = function () { oscillator.disconnect(); gain.disconnect(); };
-        oscillator.start(now);
-        oscillator.stop(now + 0.12);
-      }).catch(function () {
-        if (epoch !== audioEpoch) return;
-        soundOn = false;
-        if (soundInput) soundInput.checked = false;
-        cancelSound();
-        syncControls();
-        announce("Sound unavailable. Navigation remains available.");
-      });
-    }
-
-    function setSound(enabled) {
-      soundOn = enabled;
-      cancelSound();
-      if (enabled) {
-        try {
-          if (!context) context = new window.AudioContext();
-          playSound(false);
-        } catch (_) {
-          soundOn = false;
-          announce("Sound unavailable. Navigation remains available.");
-        }
-      }
-      if (soundInput) soundInput.checked = soundOn;
-      syncControls();
-    }
-
-    function closeMenu(restore) {
-      if (!menu) return;
-      menu.open = false;
-      if (restore) menu.querySelector("summary").focus();
-    }
-
-    function setOutline(open, restore) {
-      if (!outline) return;
-      root.classList.toggle("shf-outline-off", !open);
-      if (!open && (restore || outline.contains(document.activeElement))) {
-        var control = document.querySelector('[data-shf-action="outline"]');
-        if (control) control.focus();
-      }
-      syncControls();
-    }
-
-    function syncControls() {
-      var isOpen = !!outline && !root.classList.contains("shf-outline-off");
-      all('[data-shf-action="outline"]').forEach(function (button) {
-        button.hidden = !outline;
-        button.setAttribute("aria-expanded", String(isOpen));
-      });
-      all('[data-shf-action="mute"]').forEach(function (button) { button.hidden = !soundOn; });
-      all('[data-shf-action="prev"]').forEach(function (button) { button.disabled = index === 0 && step === 0; });
-      all('[data-shf-action="next"]').forEach(function (button) { button.disabled = index === slides.length - 1 && step === lastStep(slides[index]); });
-      all('[data-shf-action="fullscreen"]').forEach(function (button) {
-        button.setAttribute("aria-pressed", String(!!document.fullscreenElement));
-      });
-      var hasThumbnails = !!document.querySelector("[data-shf-thumbnail]");
-      all('[data-shf-action="list-style"]').forEach(function (button) {
-        button.hidden = !hasThumbnails;
-        button.setAttribute("aria-pressed", String(root.classList.contains("shf-text-outline")));
-      });
-      root.classList.toggle("shf-motion-off", !motionOn || reduced.matches);
-      if (motionInput) {
-        motionInput.disabled = reduced.matches;
-        motionInput.checked = motionOn && !reduced.matches;
-      }
-      var motionStatus = document.getElementById("shf-motion-status");
-      if (motionStatus) motionStatus.hidden = !reduced.matches;
-    }
 
     function noteFor(i) {
       var n = slides[i] ? slides[i].querySelector("[data-shf-notes]") : null;
@@ -374,26 +250,14 @@ a {
     }
 
     function render() {
-      root.setAttribute("data-shf-current-step", String(step));
       for (var i = 0; i < slides.length; i++) {
         var active = i === index;
         slides[i].classList.toggle("is-active", active);
         slides[i].hidden = !active;
         slides[i].setAttribute("aria-hidden", active ? "false" : "true");
-        Array.prototype.forEach.call(slides[i].querySelectorAll("[data-shf-step]"), function (node) {
-          var start = Number(node.getAttribute("data-shf-step"));
-          var until = node.hasAttribute("data-shf-until") ? Number(node.getAttribute("data-shf-until")) : Infinity;
-          node.toggleAttribute("hidden", step < start || step > until);
-          node.classList.toggle("shf-emphasis", active && step === start);
-        });
       }
       if (counter) {
         counter.textContent = index + 1 + " / " + slides.length;
-      }
-      var stepCounter = document.getElementById("shf-step-counter");
-      if (stepCounter) {
-        stepCounter.hidden = lastStep(slides[index]) === 0;
-        stepCounter.textContent = "Step " + (step + 1) + " / " + (lastStep(slides[index]) + 1);
       }
       if (pNow) pNow.textContent = titleFor(index);
       if (pNext) {
@@ -401,9 +265,7 @@ a {
           index + 1 < slides.length ? titleFor(index + 1) : "\u2014";
       }
       if (pNotes) pNotes.textContent = noteFor(index);
-      var here = slides[index]
-        ? slides[index].getAttribute("data-slide-id")
-        : "";
+      var here = slides[index] ? slides[index].getAttribute("data-slide-id") : "";
       tocLinks.forEach(function (link) {
         var on = link.getAttribute("data-shf-goto") === here;
         link.classList.toggle("is-current", on);
@@ -411,37 +273,19 @@ a {
           link.setAttribute("aria-current", "true");
           var group = link.closest("details[data-shf-section]");
           if (group) group.open = true;
-          if (outline && !root.classList.contains("shf-outline-off")) link.scrollIntoView({block: "nearest"});
-        } else link.removeAttribute("aria-current");
+        }
+        else link.removeAttribute("aria-current");
       });
       all("details[data-shf-section]").forEach(function (group) {
-        group.classList.toggle(
-          "is-current-section",
-          !!group.querySelector('[aria-current="true"]'),
-        );
+        group.classList.toggle("is-current-section", !!group.querySelector('[aria-current="true"]'));
       });
-      syncControls();
     }
 
-    function go(next, nextStep, quiet) {
+    function go(next) {
       if (next < 0) next = 0;
       if (next > slides.length - 1) next = slides.length - 1;
-      nextStep = Math.max(0, Math.min(nextStep || 0, lastStep(slides[next])));
-      var changed = index !== next || step !== nextStep;
-      cancelSound();
       index = next;
-      step = nextStep;
       render();
-      if (changed && !quiet) playSound(slides[index].getAttribute("data-shf-chapter") === "true" && step === 0);
-      if (changed) announce(titleFor(index) + ". Step " + (step + 1));
-    }
-
-    function advance(direction) {
-      if (direction > 0) {
-        if (step < lastStep(slides[index])) go(index, step + 1);
-        else if (index < slides.length - 1) go(index + 1, 0);
-      } else if (step > 0) go(index, step - 1);
-      else if (index > 0) go(index - 1, lastStep(slides[index - 1]));
     }
 
     function pad(n) {
@@ -457,62 +301,40 @@ a {
     function togglePresenter() {
       if (!presenter) return;
       var on = presenter.hidden;
-      closeMenu(false);
       presenter.hidden = !on;
       document.body.classList.toggle("shf-presenting", on);
       if (on) {
         started = Date.now();
         tick();
         ticking = window.setInterval(tick, 1000);
-        var close = presenter.querySelector("button");
-        if (close) close.focus();
       } else if (ticking !== null) {
         window.clearInterval(ticking);
         ticking = null;
-        if (menu) menu.querySelector("summary").focus();
       }
     }
 
     document.addEventListener("keydown", function (e) {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
       var k = e.key;
-      if (k === "Escape") {
-        if (presenter && !presenter.hidden) togglePresenter();
-        else if (menu && menu.open) closeMenu(true);
-        else if (narrow.matches) setOutline(false, true);
-        return;
-      }
-      if (e.target && e.target.closest("input, textarea, select, [contenteditable]")) return;
-      if (presenter && !presenter.hidden && k === "Tab") {
-        var focusable = Array.prototype.slice.call(presenter.querySelectorAll("button, a[href]"));
-        var position = focusable.indexOf(document.activeElement);
-        if (focusable.length) focusable[(position + (e.shiftKey ? -1 : 1) + focusable.length) % focusable.length].focus();
-        e.preventDefault();
-        return;
-      }
-      if ((menu && menu.open) || (e.target && e.target.closest("button, a, summary") && (k === " " || k === "Enter"))) return;
+      if (e.target && e.target.closest("summary") && (k === " " || k === "Enter")) return;
       if (k === "ArrowRight" || k === "PageDown" || k === " ") {
-        advance(1);
+        go(index + 1);
         e.preventDefault();
       } else if (k === "ArrowLeft" || k === "PageUp") {
-        advance(-1);
+        go(index - 1);
         e.preventDefault();
       } else if (k === "Home") {
         go(0);
         e.preventDefault();
       } else if (k === "End") {
-        go(slides.length - 1, lastStep(slides[slides.length - 1]));
+        go(slides.length - 1);
         e.preventDefault();
       } else if (k === "s" || k === "S") {
         togglePresenter();
         e.preventDefault();
       } else if (k === "o" || k === "O") {
-        setOutline(root.classList.contains("shf-outline-off"));
+        root.classList.toggle("shf-outline-off");
         e.preventDefault();
-      } else if (k === "m" || k === "M") {
-        setSound(false);
-      } else if (k === "f" || k === "F") {
-        toggleFullscreen();
       }
     });
 
@@ -528,10 +350,6 @@ a {
         var found = indexOfSlide(link.getAttribute("data-shf-goto"));
         if (found >= 0) {
           go(found);
-          if (narrow.matches) {
-            setOutline(false, false);
-            slides[index].focus();
-          }
           e.preventDefault();
         }
       });
@@ -540,46 +358,13 @@ a {
     all("[data-shf-action]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var action = btn.getAttribute("data-shf-action");
-        if (action === "next") advance(1);
-        else if (action === "prev") advance(-1);
+        if (action === "next") go(index + 1);
+        else if (action === "prev") go(index - 1);
         else if (action === "presenter") togglePresenter();
-        else if (action === "outline") setOutline(root.classList.contains("shf-outline-off"));
-        else if (action === "fullscreen") toggleFullscreen();
-        else if (action === "mute") setSound(false);
-        else if (action === "test-sound") setSound(true);
-        else if (action === "list-style") {
-          root.classList.toggle("shf-text-outline");
-          syncControls();
-        }
+        else if (action === "outline") root.classList.toggle("shf-outline-off");
       });
     });
 
-    function toggleFullscreen() {
-      try {
-        var request = document.fullscreenElement ? document.exitFullscreen() : root.requestFullscreen();
-        request.catch(function () { announce("Fullscreen unavailable. Single-slide view is still available."); });
-      } catch (_) { announce("Fullscreen unavailable. Single-slide view is still available."); }
-    }
-
-    if (soundInput) soundInput.addEventListener("change", function () { setSound(soundInput.checked); });
-    if (volumeInput) volumeInput.addEventListener("input", cancelSound);
-    if (motionInput) motionInput.addEventListener("change", function () { motionOn = motionInput.checked; syncControls(); });
-    reduced.addEventListener("change", syncControls);
-    narrow.addEventListener("change", function () { if (narrow.matches) setOutline(false, true); });
-    document.addEventListener("fullscreenchange", syncControls);
-    document.addEventListener("visibilitychange", cancelSound);
-    document.addEventListener("click", function (event) { if (menu && !menu.contains(event.target)) closeMenu(false); });
-    window.addEventListener("beforeprint", function () {
-      beforePrint = {index: index, step: step};
-      cancelSound();
-      root.classList.add("shf-printing");
-    });
-    window.addEventListener("afterprint", function () {
-      root.classList.remove("shf-printing");
-      if (beforePrint) go(beforePrint.index, beforePrint.step, true);
-      beforePrint = null;
-    });
-    if (narrow.matches) setOutline(false, false);
     render();
   }
 

@@ -130,7 +130,42 @@ Keep the source's titles, body, examples, caveats, source labels/URLs, and the o
 
 ## Printing
 
+### Player controls and steps
+
+Player v8 keeps navigation available while effects run. Both deck skeletons include a sidebar: the presentation skeleton starts with it closed. Use O or the sidebar icon, F for fullscreen, M to mute, and Esc to close settings or presenter notes. On narrow screens the sidebar is a temporary drawer. Settings use ordinary Tab/Space interaction, not ARIA menu semantics. Notes remain in the shared window, not a private presenter window.
+
+Sound is opt-in; the settings menu contains sound, volume, motion and printing. The thumbnail/title-list button appears only after thumbnails are generated. Motion can be disabled without changing content order; OS reduced-motion always disables timing effects. During that override the Motion checkbox is disabled and unchecked with a visible system-status message. Removing the override restores the user's prior choice.
+
+Use sibling step groups with contiguous indices starting at 0 (unmarked content is also stage 0). The next action reveals the next step before advancing to another slide. Previous reverses this path. A sidebar jump selects the first step. View changes preserve the step. Supported effects are `fade`, `rise`, `emphasis`, and `route` (SVG path emphasis). Do not nest step groups.
+
+```html
+<section data-slide-id="flow" data-shf-print="all" hidden>
+  <h2>A conclusion changes with the evidence</h2>
+  <p data-shf-step="0" data-shf-until="0">Initial interpretation.</p>
+  <p data-shf-step="1" data-shf-effect="rise">Revised interpretation.</p>
+</section>
+```
+
+`data-shf-until` is inclusive and requires `data-shf-print="all"`: each stage is printed separately. Cumulative steps use the default `final` print policy. The finalizer generates static print markup, so printing does not discard replaced explanations or depend on animation timing.
+
+Print copies rewrite fragment links, label `for`, and ARIA ID references together with the target IDs. A target on the same printed stage is preferred; otherwise the first printed occurrence is used. Keep referenced descriptions inside printable slide content, not speaker notes or permanently hidden elements. Missing print targets and duplicate content IDs fail finalization. SVG `title`/`desc` identifiers and author-supplied `aria-hidden` on decorative descendants are retained. After changing content or upgrading the print generator, finalize again; do not patch generated print pages by hand.
+
+```
+python scripts/export_html.py draft.html --finalize final.html --thumbnails
+python scripts/verify_html.py final.html --tier2
+```
+
+Finalization needs Playwright; thumbnails additionally need Pillow. Recipients need neither. Thumbnails are 320x180 PNGs of the last step, one per slide, and are navigation previews rather than a substitute for all explanation stages. The command replaces its target only after Tier 1/2 pass; existing content is preserved on failure. Edit the original draft and rerun after content/style changes. The final HTML has schema 2 derived metadata; old schema 1 artifacts remain supported.
+
+For individual PNG export, cumulative slides keep `slide-01.png` naming; replacement stages add `-step-01`. The generated manifest maps filenames to actual slide IDs and steps. Use [deck-motion-skeleton.html](../assets/skeletons/deck-motion-skeleton.html) as a reproducible example, not the reference document's custom JavaScript.
+
+Run `--finalize` separately from `--pdf`, `--png` and `--slides-png`; combining them fails before rendering. `--thumbnails` requires `--finalize`. Export paths must differ from the source HTML and from each other, including filesystem aliases. In-place `--finalize` is supported because the candidate is verified before replacement. `--slides-png` requires actual slides; it does not silently succeed with an empty document export.
+
+All requested exports are rendered and checked in temporary storage before destination files are changed. Each file replacement is atomic; multiple destination files are not a filesystem transaction. If a later save fails, earlier successfully reported files remain. Use the reported filenames and PNG manifest to reconcile a partial save; unrelated existing files are never deleted. Invalid paths, rendering and file-write failures report `STOP:` with a nonzero exit code.
+
 Print rules put one slide per page and drop the chrome and the overlay. Use this for a quick handout; use `export_html.py --pdf` when the output matters.
+
+Current deck CSS sets a 16in x 9in page with zero margins. Tier 2 and PDF export measure the actual print-media layout at the matching 1536 x 864 CSS-pixel viewport before accepting it. A print-only overflow blocks PDF publication even when the screen view fits. Custom printer scaling/paper overrides are outside that verified layout. Preserving HTML accessible names does not by itself certify PDF tagging or screen-reader behavior in every PDF viewer.
 
 The `print` button in the chrome calls the browser's own print dialog, so a recipient can save a PDF without any tooling. It is the only path available to someone who just opened the file, and it disappears in the printed output along with the rest of the chrome.
 

@@ -31,7 +31,7 @@ Ask which one unless the request already says. Load only that archetype's refere
 | `doc`     | vertical scroll, sidebar nav, numbered citations | explainers, comparisons, handouts | [archetype-doc.md](references/archetype-doc.md)       |
 | `poster`  | one fixed canvas, exported as PNG                | summary images, social cards      | [archetype-poster.md](references/archetype-poster.md) |
 
-`deck` also has an **outline layout**: a slide list on the left, the stage on the right, collapsed with `O` when projecting. Start from `deck-outline-skeleton.html` when the deck will be read or reviewed rather than presented; preserve chapter groups when reviewing a multi-section source (see the deck reference).
+`deck` includes a collapsible sidebar, settings menu, fullscreen, optional sound and reduced-motion-aware effects. Start from `deck-outline-skeleton.html` for reading/review, `deck-skeleton.html` for single-slide presentation, or `deck-motion-skeleton.html` for a worked step example. Both views can switch without losing position. Preserve chapter groups; finalize with thumbnails for a visual sidebar (see the deck reference).
 
 ## Intake
 
@@ -69,7 +69,8 @@ These gate the output. They are here, not in a reference, because a reference ma
   For a draft corresponding to another format, preserve claims, examples, caveats, citations, and diagram relationships; compare visible slide content, not merely hidden notes or JSON. Record any approved reduction rather than treating "draft" as permission to summarize.
 4. Adjust colours by editing `<style id="shf-theme">` only; that block is the whole design system, so carrying it into the next artifact is how a series stays consistent. Never touch `<style id="shf-css">` or `<script id="shf-runtime">`; both are hash-pinned.
 5. For each image: `embed_assets.py`, then paste the `dataUri` into an `<img>` with `alt` and `data-asset-ref`, and add the asset entry to `<script id="shf-model">`.
-6. Verify, then export only the requested format.
+6. For deck steps or thumbnails, run `export_html.py draft.html --finalize final.html --thumbnails` (omit `--thumbnails` for a title-only sidebar). This verifies the draft, builds embedded previews and complete static print pages, then verifies the final HTML before saving. After editing slide content, finalize again; do not hand-edit derived images or print pages.
+7. Verify, then export only the requested format. Choose effects only where they explain order, change or focus; do not animate every slide merely because the player supports it. Sound starts off and is a recipient choice.
 
 Changing anything under `assets/runtime/` or `assets/css/` means re-running `build_skeletons.py`, which regenerates the skeletons and re-pins the registry.
 

@@ -91,6 +91,133 @@ def with_model(model: str) -> str:
     return SKELETON[: start + open_len] + model + SKELETON[end:]
 
 
+class RegistryTests(unittest.TestCase):
+    def test_print_rewrites_links_and_accessible_references(self):
+        import derived_assets as derived
+        fragment = '<p id="evidence">Evidence</p><a href="#evidence" aria-describedby="evidence">Read evidence</a><label for="choice">Choice</label><input id="choice" type="checkbox">'
+        source = SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2>' + fragment)
+        printed, _ = derived.print_markup(source)
+        self.assertIn('id="shf-print-3-0-evidence"', printed)
+        self.assertIn('href="#shf-print-3-0-evidence"', printed)
+        self.assertIn('aria-describedby="shf-print-3-0-evidence"', printed)
+        self.assertIn('for="shf-print-3-0-choice"', printed)
+        self.assertEqual(run(derived.finalize(source, [])).errors, [])
+
+    def test_print_svg_name_and_decoration_survive(self):
+        import derived_assets as derived
+        diagram = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" aria-labelledby="chart-title" aria-describedby="chart-desc"><title id="chart-title">Revenue</title><desc id="chart-desc">A comparison</desc><circle aria-hidden="true" cx="40" cy="40" r="10"/></svg>'
+        source = SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2>' + diagram)
+        printed, _ = derived.print_markup(source)
+        self.assertIn('aria-labelledby="shf-print-3-0-chart-title"', printed)
+        self.assertIn('aria-describedby="shf-print-3-0-chart-desc"', printed)
+        self.assertIn('<title id="shf-print-3-0-chart-title">Revenue</title>', printed)
+        self.assertIn('<circle aria-hidden="true"', printed)
+        self.assertEqual(run(derived.finalize(source, [])).errors, [])
+        with self.assertRaisesRegex(ValueError, 'Duplicate slide content id'):
+            derived.print_markup(source.replace('<desc id="chart-desc">', '<desc id="chart-title">'))
+
+    def test_print_refs_across_pages_and_steps(self):
+        import derived_assets as derived
+        source = SKELETON.replace('<section tabindex="-1" data-slide-id="s2" hidden>', '<section tabindex="-1" data-slide-id="s2" data-shf-print="all" hidden>')
+        source = source.replace('<h2>3 つの論点</h2>', '<h2 id="destination">3 つの論点</h2><p data-shf-step="1" aria-labelledby="destination">Step</p>')
+        source = source.replace('<h2>比較</h2>', '<h2>比較</h2><a href="#destination">Earlier page</a><a href="https://example.com/#destination">External</a>')
+        printed, _ = derived.print_markup(source)
+        self.assertIn('aria-labelledby="shf-print-2-1-destination"', printed)
+        self.assertIn('href="#shf-print-2-0-destination"', printed)
+        self.assertIn('href="https://example.com/#destination"', printed)
+        self.assertEqual(run(derived.finalize(source, [])).errors, [])
+
+    def test_print_missing_or_omitted_references_fail(self):
+        import derived_assets as derived
+        for fragment in ['<a href="#missing">Missing</a>', '<p id="notes" data-shf-notes>Private note</p><a href="#notes">Omitted</a>', '<p id="hidden-target" hidden>Hidden</p><a href="#hidden-target">Hidden</a>']:
+            with self.subTest(fragment=fragment), self.assertRaisesRegex(ValueError, 'Print reference has no visible target'):
+                derived.print_markup(SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2>' + fragment))
+
+    def test_test_methods_are_discoverable(self):
+        import ast
+        nested = []
+        for path in HERE.glob('test_*.py'):
+            tree = ast.parse(path.read_text(encoding='utf-8'))
+            parents = {child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith('test_') and not isinstance(parents.get(node), ast.ClassDef):
+                    nested.append(f'{path.name}:{node.lineno} {node.name}')
+        self.assertEqual(nested, [], 'Test methods must belong directly to their test class')
+
+    def test_thumbnail_real_dimensions_are_checked(self):
+        import derived_assets as derived
+        thumbnails = [(slide_id, 0, data_uri('image/png', tiny_png()), {'id': 'thumb-' + slide_id, 'mime': 'image/png', 'alt': '', 'sha256': hashlib.sha256(tiny_png()).hexdigest()}) for slide_id in ('s1', 's2', 's3')]
+        result = derived.finalize(SKELETON, thumbnails)
+        self.assertTrue(any('dimensions' in error for error in run(result).errors))
+
+    def test_self_closing_svg_and_raw_attributes_survive_print(self):
+        import derived_assets as derived
+        fragment = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-label="A &amp; B > C"><defs/><g/></svg>'
+        result = derived.finalize(SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2>' + fragment), [])
+        self.assertEqual(run(result).errors, [])
+        printed, _ = derived.print_markup(result)
+        self.assertIn('A &amp; B > C', printed)
+        self.assertIn('<defs />', printed)
+        self.assertNotIn('&amp;amp;', printed)
+
+    def test_finalize_without_model_reports_reason(self):
+        import derived_assets as derived
+        source = re.sub(r'<script id="shf-model".*?</script>', '', SKELETON, flags=re.S)
+        with self.assertRaisesRegex(ValueError, 'requires a shf-model'):
+            derived.finalize(source, [])
+
+    def test_runtime_policy_rejects_unsafe_apis(self):
+        from build_skeletons import check_runtime_policy
+        runtime = (SKILL / 'assets/runtime/shf-runtime.js').read_text(encoding='utf-8')
+        check_runtime_policy(runtime)
+        for code in ['node.innerHTML = value;', 'document.createElement("img");', 'fetch(value);', 'window.eval(value);']:
+            with self.assertRaises(ValueError):
+                check_runtime_policy(runtime + code)
+
+    def test_invalid_inputs_and_steps_fail(self):
+        self.assertIn('INPUT', codes(run(with_body('<input type="range" min="0" max="100" step="1" value="999">'))))
+        self.assertIn('DERIVED', codes(run(SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2><p data-shf-step="1" data-shf-until="1">Replace</p>'))))
+        self.assertIn('MODEL', codes(run(with_model('[]'))))
+
+    def test_legacy_v4_still_valid(self):
+        fixtures = list((HERE / "fixtures").glob("legacy-v4-*.html"))
+        self.assertEqual(len(fixtures), 4)
+        for fixture in fixtures:
+            self.assertEqual(V.verify(fixture, REGISTRY, BUDGET).errors, [], fixture.name)
+
+    def test_finalized_model_passes(self):
+        import derived_assets as derived
+        result = derived.finalize(SKELETON, [])
+        self.assertEqual(run(result).errors, [])
+        self.assertIn("DERIVED", codes(run(result.replace('SINGLE HTML FORGE', 'CHANGED', 1))))
+
+    def test_derived_states_and_print(self):
+        import derived_assets as derived
+        source = SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2><p data-shf-step="1">Second step</p>')
+        derived.validate_steps(source)
+        self.assertEqual(derived.states(source), [("s1", 0), ("s2", 0), ("s3", 0), ("s3", 1)])
+        result = derived.finalize(source, [])
+        model = json.loads(next(item[1].content for item in V.lex(result) if item[0] == "raw" and item[1].attrs.get("id") == "shf-model"))
+        derived.check_derived(result, model)
+        with self.assertRaises(ValueError):
+            derived.check_derived(result.replace("Second step", "Changed step", 1), model)
+
+    def test_non_contiguous_steps_rejected(self):
+        import derived_assets as derived
+        with self.assertRaises(ValueError):
+            derived.validate_steps(SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2><p data-shf-step="2">Gap</p>'))
+
+    def test_registration_preserves_old_versions(self):
+        from build_skeletons import register_hash
+        entries = {"1": "old"}
+        register_hash(entries, "2", "new")
+        register_hash(entries, "2", "new")
+        self.assertEqual(entries, {"1": "old", "2": "new"})
+        with self.assertRaises(ValueError):
+            register_hash(entries, "1", "changed")
+        self.assertEqual(entries["1"], "old")
+
+
 class Negative(unittest.TestCase):
     """Every case here must FAIL, and for the stated reason."""
 
@@ -98,6 +225,44 @@ class Negative(unittest.TestCase):
         rep = run(text, budget, registry)
         self.assertTrue(rep.errors, "expected at least one error, got a clean pass")
         self.assertIn(code, codes(rep), f"expected {code}, got {rep.errors}")
+
+    def test_malformed_model_types_fail_without_exceptions(self):
+        invalid = [
+            {"schemaVersion": True, "assets": []},
+            {"schemaVersion": 1.0, "assets": []},
+            {"schemaVersion": 1, "assets": [None]},
+            {"schemaVersion": 1, "assets": ["not an asset"]},
+            {"schemaVersion": 1, "assets": [{"id": []}]},
+            {"schemaVersion": 1, "assets": [{"id": {}}]},
+        ]
+        for model in invalid:
+            with self.subTest(model=model):
+                self.assertFails(with_model(json.dumps(model)), "MODEL")
+
+    def test_json_duplicates_and_nonfinite_values_fail(self):
+        for model in ['{"schemaVersion":1,"schemaVersion":2}', '{"schemaVersion":1,"assets":[],"number":NaN}', '{"schemaVersion":1,"assets":[],"number":Infinity}', '{"schemaVersion":1,"assets":[],"number":1e999}', '[' * 1100 + '0' + ']' * 1100]:
+            with self.subTest(model=model):
+                self.assertFails(with_model(model), "MODEL")
+
+    def test_thumbnail_metadata_requires_exact_types(self):
+        import derived_assets
+        valid = derived_assets.finalize(SKELETON, [])
+        raw = next(token[1] for token in V.lex(valid) if token[0] == "raw" and token[1].attrs.get("id") == "shf-model")
+        base = json.loads(raw.content)
+        invalid = [None, {"slideId": [], "assetId": "thumb", "step": 0, "width": 320, "height": 180}]
+        for key, value in [("step", False), ("step", 0.0), ("width", 320.0), ("height", True)]:
+            item = {"slideId": "s1", "assetId": "thumb", "step": 0, "width": 320, "height": 180}
+            item[key] = value
+            invalid.append(item)
+        for item in invalid:
+            model = dict(base, thumbnails=[item])
+            with self.subTest(item=item):
+                self.assertFails(valid.replace(raw.content, json.dumps(model)), "MODEL")
+
+    def test_malformed_http_links_fail_without_exceptions(self):
+        for href in ["http://exa[mple.com", "https://[::1", "https://example.com:invalid", "https:///missing-host", "http://example.com:0"]:
+            with self.subTest(href=href):
+                self.assertFails(with_body('<a href="' + href + '">Link</a>'), "URL")
 
     # --- canonical grammar ---
 

@@ -22,6 +22,8 @@ python scripts/test_verify.py
 
 Negative fixtures must fail, positive ones must pass. A suite where everything passes proves nothing.
 
+Assert `MODEL`/`URL` reports for malformed JSON types and links, not merely a failing process. A traceback is not the verifier's failure contract. The export contract tests also check unsupported option combinations, source/output collisions and byte-for-byte preservation after rendering or replacement failure. Verify that new test methods are actually discovered: nesting a `test_*` function inside another function silently removes it from the suite; an AST guard rejects that form.
+
 Run `python scripts/test_browser.py` when changing runtime navigation or visibility-dependent checks. It requires Playwright and Chromium and tests real page transitions, not only generated markup.
 
 ## Error codes
@@ -44,13 +46,19 @@ Run `python scripts/test_browser.py` when changing runtime navigation or visibil
 | `BUDGET`                             | over the size limit                                                      |
 | `TIER2`                              | something only visible in a browser                                      |
 
-`TAMPERED` after editing `assets/css/` or `assets/runtime/` just means the registry is stale. Re-run `build_skeletons.py`.
+After editing fixed CSS/runtime, bump the version before running `build_skeletons.py`; reusing an existing version with a changed hash is rejected. Do not overwrite old registry entries to silence `TAMPERED`.
 
 ## What Tier 2 does
 
-Blocks all network egress, walks every slide, waits for fonts and images to finish — by event, not by timer, because a timed sample lets a slow image escape inspection — then checks for zero-size images, SVG without a viewBox, overflow, and console errors.
+Blocks network egress, builds an independent ordered list of every slide/step, follows the actual keyboard path and checks each resulting state. It waits for fonts/images, then checks decoded images, SVG viewBox, expected step visibility, element boundaries, overflow and console errors. Step decks must be finalized before delivery so complete print pages are present. `DERIVED` indicates invalid steps or stale/mismatched derived output; `INPUT` indicates an invalid numeric control.
 
-SVG viewBox validity is checked on every slide. Dimensions are checked only while that slide is active: an inactive slide correctly has zero layout size. Keep the full navigation walk so a broken diagram on a later slide still fails when reached; do not skip all hidden content permanently.
+SVG viewBox validity is checked even while hidden. Dimensions are checked in the visible state, excluding intentionally hidden steps and static print markup. Expected visible step groups must have nonzero size. Keep the complete walk: a diagram hidden now must be inspected when its stage is reached. For SVG use the hidden attribute, not a JavaScript expando named hidden.
+
+For a deliverable deck, Tier 2 also enters print media and checks each printed page for nonzero dimensions, media visibility and content outside its boundary. PDF export calls that same print check immediately before rendering, without publishing any output on failure. Tests inject print-only overflow and verify actual browser resolution of copied SVG names and internal links. The check restores the screen viewport and does not change the selected slide/step. Draft finalization preflight skips print checks until the static pages have been generated; the final candidate never skips them.
+
+The print generator's exact-text self-comparison only proves deterministic generation. It does not prove that references resolve to the intended elements or that text fits: keep the independent browser link/name assertions, geometry failure fixture and PDF checks instead of relying on generator-against-itself tests alone.
+
+Player regression: run `python -B -m unittest discover -s scripts -p "test_*.py"`. This includes pending audio resume/mute, volume zero, failed fullscreen, focus restoration, sidebar/display changes, replacement-stage printing, thumbnail generation and actual PNG export. Optional `SHF_SCREENSHOTS` records desktop/mobile captures from the browser tests. Sound API success is not an assessment of pleasantness; listen before choosing a tone for a live presentation.
 
 ## What no check can tell you
 

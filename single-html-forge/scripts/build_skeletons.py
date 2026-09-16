@@ -21,8 +21,8 @@ RUNTIME = SKILL / "assets" / "runtime" / "shf-runtime.js"
 CSS_DIR = SKILL / "assets" / "css"
 OUT_DIR = SKILL / "assets" / "skeletons"
 
-RUNTIME_VERSION = "4"
-CSS_VERSION = "4"
+RUNTIME_VERSION = "8"
+CSS_VERSION = "8"
 
 THEME = {
     "deck": """:root{--shf-color-accent:#0067b8;--shf-color-bg:#ffffff;--shf-color-fg:#1b1f27;--shf-size-base:20px}""",
@@ -60,17 +60,34 @@ DECK_BODY = """<main id="shf-root">
 <p data-shf-notes>表は 5 行を超えたら分割する。</p>
 </section>
 <div id="shf-chrome">
-<button type="button" data-shf-action="prev">前へ</button>
+<button type="button" data-shf-action="prev" title="Previous" aria-label="Previous">&#8592;</button>
 <span id="shf-slide-counter">1 / 3</span>
-<button type="button" data-shf-action="next">次へ</button>
-<button type="button" data-shf-action="presenter">発表者</button>
-<button type="button" data-shf-action="print">PDF</button>
+<span id="shf-step-counter" hidden></span>
+<button type="button" data-shf-action="next" title="Next" aria-label="Next">&#8594;</button>
+<button type="button" data-shf-action="outline" title="Slide sidebar" aria-label="Slide sidebar" aria-expanded="false">&#9776;</button>
+<button type="button" data-shf-action="fullscreen" title="Fullscreen" aria-label="Fullscreen" aria-pressed="false">&#9974;</button>
+<button type="button" data-shf-action="mute" title="Mute" aria-label="Mute" hidden>M</button>
+<details id="shf-menu">
+<summary title="Settings" aria-label="Settings">&#8943;</summary>
+<div class="shf-settings">
+<label><input id="shf-sound" type="checkbox"> Sound</label>
+<label>Volume <input id="shf-volume" type="range" min="0" max="100" step="1" value="30" aria-label="Volume"></label>
+<button type="button" data-shf-action="test-sound">Test sound</button>
+<label><input id="shf-motion" type="checkbox" aria-describedby="shf-motion-status" checked> Motion</label>
+<p id="shf-motion-status" role="status" hidden>Reduced motion is enabled by the system.</p>
+<button type="button" data-shf-action="list-style" aria-pressed="false" hidden>Title list</button>
+<button type="button" data-shf-action="presenter">Presenter notes (shared screen)</button>
+<button type="button" data-shf-action="print">Print / PDF</button>
+</div>
+</details>
 </div>
 </main>
-<div id="shf-presenter" hidden>
+<p id="shf-status" class="shf-sr" role="status" aria-live="polite"></p>
+<div id="shf-presenter" role="dialog" aria-modal="true" aria-label="Presenter notes" hidden>
 <div class="shf-presenter-head">
 <h4>PRESENTER</h4>
 <span id="shf-presenter-clock">00:00</span>
+<button type="button" data-shf-action="presenter" aria-label="Close presenter">Close</button>
 </div>
 <div class="shf-pane">
 <h4>現在</h4>
@@ -159,6 +176,15 @@ SLIDE_RE = re.compile(
 TAG_RE = re.compile(r"<[^>]+>")
 
 
+CONTROL_ICONS = {
+    "prev": '<path d="m12 19-7-7 7-7M5 12h14"/>',
+    "next": '<path d="m12 5 7 7-7 7M19 12H5"/>',
+    "outline": '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/>',
+    "fullscreen": '<path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/>',
+    "mute": '<path d="m11 5-6 4H3v6h2l6 4V5m6 4 5 6m0-6-5 6"/>',
+}
+
+
 def outline_nav(body: str) -> str:
     """Build the slide list from the slides themselves, so the two cannot drift."""
     items = []
@@ -189,7 +215,17 @@ def sha(text: str) -> str:
 
 def build(archetype: str, runtime: str, layout: str = "", title: str = "", body: str = "") -> str:
     css = read_text(CSS_DIR / f"shf-{archetype}.css")
-    layout_attr = f' data-shf-layout="{layout}"' if layout else ""
+    body = body or BODIES[archetype]
+    if archetype == "deck":
+        for action, paths in CONTROL_ICONS.items():
+            icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>'
+            body = re.sub(r'(<button[^>]*data-shf-action="' + action + r'"[^>]*>)[^<]*(</button>)', lambda match: match[1] + icon + match[2], body)
+        if '<nav id="shf-outline">' not in body:
+            body = outline_nav(body) + "\n" + body
+        body = re.sub(r'<section data-slide-id="([^"]+)"', r'<section tabindex="-1" data-slide-id="\1"', body)
+        layout_attr = ' data-shf-layout="outline"' + (' class="shf-outline-off"' if not layout else '')
+    else:
+        layout_attr = ""
     return (
         "<!DOCTYPE html>\n"
         f'<html lang="ja" data-shf-archetype="{archetype}"{layout_attr}'
@@ -202,7 +238,7 @@ def build(archetype: str, runtime: str, layout: str = "", title: str = "", body:
         f'<style id="shf-css">{css}</style>\n'
         "</head>\n"
         "<body>\n"
-        f"{body or BODIES[archetype]}\n"
+        f"{body}\n"
         f'<script id="shf-model" type="application/json">{MODEL}</script>\n'
         f'<script id="shf-runtime">{runtime}</script>\n'
         "</body>\n"
@@ -210,8 +246,22 @@ def build(archetype: str, runtime: str, layout: str = "", title: str = "", body:
     )
 
 
+def register_hash(entries: dict, version: str, digest: str) -> None:
+    if version in entries and entries[version] != digest:
+        raise ValueError(f"Version {version} already has a different hash; bump the version")
+    entries[version] = digest
+
+
+def check_runtime_policy(runtime: str) -> None:
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", runtime, flags=re.S)
+    prohibited = r"\b(innerHTML|outerHTML|insertAdjacentHTML|createElement|createElementNS|appendChild|fetch|XMLHttpRequest|WebSocket|Worker|eval|Function|insertRule|replaceSync|setProperty|adoptedStyleSheets)\b|document\.(write|writeln)\b|\bimport\s*\("
+    if re.search(prohibited, code):
+        raise ValueError("Runtime violates the fixed-player API policy")
+
+
 def main() -> int:
     runtime = read_text(RUNTIME)
+    check_runtime_policy(runtime)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # The registry is append-only. Dropping an old version would report every
@@ -224,10 +274,12 @@ def main() -> int:
     registry.setdefault("runtime", {})
     registry.setdefault("css", {})
 
-    registry["runtime"][RUNTIME_VERSION] = sha(runtime)
+    register_hash(registry["runtime"], RUNTIME_VERSION, sha(runtime))
+    for archetype in ("deck", "doc", "poster"):
+        register_hash(registry["css"].setdefault(archetype, {}), CSS_VERSION,
+                      sha(read_text(CSS_DIR / f"shf-{archetype}.css")))
     for archetype in ("deck", "doc", "poster"):
         css = read_text(CSS_DIR / f"shf-{archetype}.css")
-        registry["css"].setdefault(archetype, {})[CSS_VERSION] = sha(css)
         out = OUT_DIR / f"{archetype}-skeleton.html"
         with open(out, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(build(archetype, runtime))
@@ -249,6 +301,31 @@ def main() -> int:
             build("deck", runtime, layout="outline", title="Deck skeleton (outline)", body=outline_body)
         )
     print(f"wrote {out.relative_to(SKILL)}")
+
+    demo_slides = '''<section data-slide-id="s1" class="is-active">
+<p class="shf-eyebrow">SINGLE HTML FORGE / PLAYER</p>
+<h1>Ideas, one step at a time.</h1>
+<p class="shf-lead">A focused explanation, with the whole story within reach.</p>
+</section>
+<section data-slide-id="s2" hidden>
+<h2>A signal becomes a decision</h2>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="900" height="240" aria-label="Observe, compare, decide">
+<g><rect x="20" y="60" width="230" height="100" rx="8" fill="#dcefe5"/><text x="135" y="120" text-anchor="middle" font-size="28" fill="#20362c">Observe</text></g>
+<g data-shf-step="1" data-shf-effect="fade"><path d="M270 110h65" stroke="#34825e" stroke-width="5"/><rect x="350" y="60" width="230" height="100" rx="8" fill="#e3ecf7"/><text x="465" y="120" text-anchor="middle" font-size="28" fill="#20362c">Compare</text></g>
+<g data-shf-step="2" data-shf-effect="fade"><path d="M600 110h45" stroke="#34825e" stroke-width="5"/><rect x="660" y="60" width="220" height="100" rx="8" fill="#f4e9c9"/><text x="770" y="120" text-anchor="middle" font-size="28" fill="#20362c">Decide</text></g>
+</svg>
+<p data-shf-step="1" data-shf-effect="rise">Compare the evidence before choosing a response.</p>
+<p data-shf-step="2" data-shf-effect="emphasis">Make the decision and keep its rationale.</p>
+</section>
+<section data-slide-id="s3" data-shf-print="all" hidden>
+<h2>Change the conclusion, not the context</h2>
+<p data-shf-step="0" data-shf-until="0">Before: a conclusion without supporting evidence.</p>
+<p data-shf-step="1" data-shf-effect="rise">After: a decision linked to observations and alternatives.</p>
+<p class="shf-lead">The complete explanation remains in the handout.</p>
+</section>
+'''
+    demo_body = '<main id="shf-root">\n' + demo_slides + DECK_BODY[DECK_BODY.index('<div id="shf-chrome">'):]
+    (OUT_DIR / "deck-motion-skeleton.html").write_text(build("deck", runtime, "outline", "Slide player demo", demo_body), encoding="utf-8", newline="\n")
 
     with open(reg_path, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(registry, handle, indent=2, ensure_ascii=False, sort_keys=True)
