@@ -100,10 +100,13 @@ For article-facing concept diagrams that explain a repeated workflow:
 
 ### Edge Crossing Prevention
 
-For complex diagrams (>15 nodes) with many-to-one or fan-out edges:
+Apply to small diagrams too; automatic elbows can overlap node borders even with only two nodes.
+
+- **Route stepped connectors inside the gap** — for a rightward connector between vertically offset boxes, put both bend points at the gap midpoint: `(gapX, sourceY)` and `(gapX, targetY)`. Enter the target horizontally, not along its border. Widen the gap if the arrowhead lacks clearance; routing hints still require exported-image inspection.
+- **Separate forward and return paths** — give a feedback edge a different entry side and corridor from the forward edge (for example, enter the earlier node from below). Preserve the process meaning and keep the return label off nodes and other lines.
 
 - **Align source and target y** — place each agent/processor at the same y as its output node. Lines stay horizontal, crossing drops to near zero.
-- **Do not route decision outcomes back to earlier nodes or a distant shared sink** — use terminal result nodes near each branch, or make one clean vertical path. Long return/merge lines often pass validation while still being hard to edit and visually tangled.
+- **Avoid unnecessary return/merge lines** — use nearby terminal nodes for decision outcomes; keep semantically required feedback on a separate path. Long detours may validate while remaining visually tangled.
 - **Reorder sibling nodes before drawing detours** — if a connector from one item in a stacked group must jump around another item, first swap or move the related item closer to its target/callout. A short straight connector is usually clearer than a routed line that skirts sibling boxes.
 - **Avoid swimlane-relative coordinates** — when edges cross swimlane boundaries, `exitX`/`entryY` resolve to group-relative positions that are hard to predict. Use absolute positioning (`parent="1"`) for all nodes instead.
 - **Spread entryY on shared targets** — when multiple edges enter the same node, enlarge the node height and assign distinct `entryY` values (e.g., 0.1 / 0.5 / 0.9) so lines arrive at different vertical points.
