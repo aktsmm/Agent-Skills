@@ -191,6 +191,8 @@ Scan the `.drawio` source and the exported asset for:
 
 Report these rather than blocking on them. They are strong hints, not verdicts, and a deliberate overlap occasionally reads better than the alternative.
 
+Check meaning against the accompanying text: arrows imply direction or sequence, so do not chain independent comparison categories into a pipeline. For a whole-set review, include diagrams with no machine warnings; record each as revised and visually checked, unchanged and visually checked, or unverified. Contact sheets support triage, not proof that small text is readable at the delivery size.
+
 Always shrink-wrap: set page width/height to tightest bounding box + 20px margin.
 
 ## Editable Source Policy
