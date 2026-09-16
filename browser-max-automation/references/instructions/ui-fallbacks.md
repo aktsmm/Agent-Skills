@@ -20,6 +20,8 @@ CLI reference: https://github.com/microsoft/playwright-cli
 
 - Accept endpoint/session, target/resource identity, input data, and bounded batch size as parameters. Default mutating helpers to read-only/dry-run; require an explicit apply option within the authorized task scope.
 - Validate ownership and preconditions, resolve the current item, act once, wait for its postcondition with a deadline, and read back the durable result. Batch independent reads; serialize writes on one target.
+- After an authentication action that may open another tab, re-enumerate contexts and pages. Bind the post-authentication page by its URL and an authenticated control instead of reading the stale pre-authentication page.
+- In a split-pane SPA, a matching search result does not prove its detail pane is selected. Select the result, then wait for both its title and stable ID to match before a mutation.
 - Check for competing user edits at transaction boundaries. If a shared target cannot detect concurrent editing reliably, coordinate a no-edit interval before writes; do not claim an unattended takeover guard exists. Observing the work tab alone is not a reason to destroy or replace it.
 - Return completed/failed/unknown item IDs, stage, restart condition, and elapsed time; persist only non-secret task state. Reconcile unknown outcomes before replay and skip verified completed items.
 - Keep task-specific scripts with the project and generic helpers with the skill. Record purpose and invocation in the existing workflow reference; search there on later runs. Do not retain auth dumps or customer-specific examples in a portable helper.
@@ -41,6 +43,8 @@ These are required checks for a new or changed execution route, not claims of co
 
 - If `connectOverCDP()` times out but `/json/list` exposes a page WebSocket URL, use raw CDP.
 - For editors with hidden `input[type=file]`, target the existing editor tab and use `DOM.setFileInputFiles`.
+- If an upload button changes to a dedicated upload view without emitting a file chooser, treat the view transition as successful navigation. Resolve the new view's `input[type=file]` and set the file once instead of replaying the button click.
+- When upload consent starts parsing or a loading state, wait for the form's required selector to reappear. Refill parser-controlled fields afterward, then verify the filename, field values, and submit-enabled state without submitting unless authorized.
 - Do not navigate an unsaved draft tab to a new URL. Open a separate new tab for a fresh draft if needed.
 - Capture existing asset URLs from every active editor surface (textarea, CodeMirror/contenteditable, rendered HTML), call `DOM.setFileInputFiles` once, then require a newly inserted URL. Do not dispatch duplicate `input` / `change` events unless the first upload produced no URL; double dispatch can upload the same file twice.
 - If upload creates a persistent temporary draft/entity, return its exact URL or ID as cleanup evidence. Delete only that entity after the downstream article/save is verified; never infer a cleanup target from title or recency alone.

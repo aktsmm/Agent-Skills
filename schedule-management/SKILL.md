@@ -41,19 +41,21 @@ metadata:
   field and the event notes. Research a missing address from a reliable source
   before writing it.
 - Keep a user-selected source of truth for every event. Prefer the official
-  Google Calendar API over browser automation for Google Calendar writes. If API
-  access is not configured, suggest setting it up; use browser automation only
-  as an explicitly approved fallback. Treat TimeTree as a visible-UI workflow
-  unless the user provides an official supported integration; do not claim
-  automatic TimeTree extraction or synchronization.
+  Google Calendar API for Google writes; recover the existing connection below
+  before proposing setup. Browser fallback requires explicit approval. TimeTree
+  requires its own visible-UI write unless a supported integration is verified.
+  A Google calendar named "TimeTree sync" is not evidence of automatic syncing;
+  distinguish separate copies, external-calendar display, and verified sync.
+  Never rename or delete a misleadingly named calendar without approval.
 - If a browser session expires, return to the appropriate login page, have the
   user authenticate, then re-read the target calendar and check for duplicates
   before resuming.
 - If an image or message does not establish a time, duration, location, target
   calendar, or whether the event is confirmed, ask only for the missing detail.
-- When evaluating available times, check OOF blocks first. Do not offer a
-  full-day OOF date; ask whether tentative or unaccepted events should be treated
-  as busy or available.
+- Check OOF first; exclude full-day OOF dates unless an explicit exception is
+  permitted. Holiday OOF titles do not establish personal availability or cancel
+  recurring work meetings. Clarify their scope and ask whether tentative or
+  unaccepted blocks should count as busy or available.
 - For a meeting reschedule, verify the proposed slot against every required
   attendee. Preserve the original attendees, organizer, online-meeting link,
   location, category, and visibility when changing the time.
@@ -61,13 +63,31 @@ metadata:
   message. Use a concise generic explanation; do not disclose private calendar
   details in the update or a follow-up chat.
 
+## Recover an Existing Google API Connection
+
+- If the user reports prior setup, trace the successful operation in earlier
+  session history and its helper/configuration references, not only recent turns.
+  Inspect those locations before a bounded search of user configuration folders;
+  filename searches for "Google" or "Calendar" miss `service-account.json`.
+- Distinguish service-account credentials, dedicated user OAuth, and gcloud ADC.
+  An ADC scope error or logged-out browser says nothing about another route.
+  Reuse the established identity and calendar; do not overwrite unrelated ADC
+  credentials, broaden scopes, or repeat a blocked default-client login.
+- Load credentials only into the official authentication client; never print
+  keys/tokens or copy them into artifacts. Read calendar metadata and ACLs to
+  confirm the intended calendar, user access, and sharing before writing.
+  Report failures per route, not as proof that no integration exists.
+
 ## Workflow
 
 1. Extract the event's title, actual time, duration, place, notes, confirmation
    status, privacy level, and requested destinations from the user message,
    attachment, or source event.
 2. Inspect every affected calendar for duplicates, conflicts, full-day OOF, and
-   tentative holds. Present a compact plan before a large or ambiguous batch.
+   tentative holds before offering date/time choices or recommendations. Include
+   travel margins and flag unknown store hours. Resolve ambiguous holds, then
+   offer viable alternatives; wait for the user's selection before moving events.
+   Setting `showAs=free` or transparency never resolves a real booking conflict.
 3. Resolve missing facility addresses and format a shared location string as
    `施設名｜〒郵便番号 住所`. Copy it into the notes as `場所` and `住所`.
 4. Apply the appropriate event pattern:
@@ -82,11 +102,15 @@ metadata:
    - **Appointment:** when a travel buffer is requested, block the requested
      buffer while keeping the confirmed appointment time in notes. Mark an
      unconfirmed appointment as provisional.
-5. Write or update every approved destination. For TimeTree, use visible UI
-   automation and the requested label; do not rely on an undocumented API.
-6. Read back title, start/end, location, notes, privacy, and category or label
-   from each destination. If a field is missing, restore the full intended event
-   state and re-verify before reporting completion.
+5. Update existing event IDs in every approved destination; create only missing
+   copies. For TimeTree, use visible UI and the requested label, not an
+   undocumented API. Match screenshots to their service/calendar before
+   diagnosing missing events.
+6. Read back title, start/end, location, notes, privacy, reminders, and category
+   or label from each destination; confirm the old slot no longer contains the moved event.
+   Restore missing fields before reporting completion. Name each service/calendar
+   and its saved, visibly confirmed, or blocked state; never describe an API
+   readback as proof of client display or another service's synchronization.
 7. For a rescheduled meeting, confirm that the update notification was sent. If
    the user approves a Teams follow-up, send a separate concise message only
    after the meeting update succeeds.
