@@ -30,6 +30,9 @@ metadata:
   it is pending visual sync rather than claiming it is visible.
 - Use a stable source key or idempotency identifier when an API supports it so
   retries update the same event instead of creating duplicates.
+- When a private event has no requested destination, register it in every
+  configured calendar integration with a supported write route. Report any
+  route blocked by authentication or configuration; do not silently omit it.
 - Before updating an event, read its complete current state. Write the complete
   intended state for title, start, end, time zone, location, notes, categories or
   labels, availability, and visibility. Do not perform a location-only or

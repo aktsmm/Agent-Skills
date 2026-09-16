@@ -23,7 +23,8 @@ _provided/                       <- customer-safe send-out or projection copies
 - When files appear at workspace root, inspect all candidate documents, images, diagrams, and archives before classifying them.
 - Rename received originals with a stable date prefix; leave only unclassified items in `_received/incoming/`.
 - Check file signatures as well as extensions. A `.pptx` with an OLE signature must be handled as legacy Office content.
-- Review every PDF page and deck slide before updating summaries.
+- Record transfer, integrity, and content-review states separately in `attachments.md`: retrieved, signature/hash checked, rendered pages reviewed, and original reviewed are not interchangeable. If only rendered page images are available, record their page count and provenance; summarize only those pages, keep the original as not retrieved, and assign no original-file hash.
+- Review every PDF page and deck slide before updating summaries from that original.
 - If the shared PDF is hard to parse, read the source deck instead. An Office original opens as a ZIP with no extra dependency, and also yields speaker notes and in-meeting memo slides that the PDF flattens away.
 - When neither the PDF nor a source original can be read, do not claim a full review. Record the unreviewed status in `attachments.md` and state where the summarized points actually came from (transcript, prior deck, etc.).
 - To confirm what the customer actually received, check that `shared PDF pages = source slides - hidden slides`, then verify every internal-only marker sits on a hidden slide. Record the result in `attachments.md`.

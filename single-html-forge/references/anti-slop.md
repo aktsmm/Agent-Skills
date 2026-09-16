@@ -16,7 +16,7 @@ A file can pass every mechanical check and still read as machine-made. These are
 
 - Openings like "In today's fast-paced world" or 「現代のビジネス環境において」.
 - Every bullet the same length and the same grammatical shape.
-- Headings that describe the section instead of asserting something. 「セキュリティについて」 tells the reader nothing; 「鍵は保管するのをやめる」 does.
+- Topic-only headings with no point behind them. Keep the storyboard assertion explicit, but do not force it verbatim into the visible heading: a business deck may use the noun phrase 「鍵の管理」 and place 「鍵は保管しない」 in the lead. Avoid repetitive sentence titles that all end in 「〜する」 unless the cadence is intentional.
 - Filler adjectives: 革新的, シームレス, 強力な.
 - Restating the heading as the first sentence.
 - A closing summary that repeats what was just read.

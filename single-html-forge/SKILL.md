@@ -56,13 +56,13 @@ These gate the output. They are here, not in a reference, because a reference ma
 
 ## Build Flow
 
-1. **Storyboard first and stop there.** Open with one sentence for the whole artifact — where it starts, what it passes through, where it lands — then one row per slide or section: the id it will keep, the assertion it makes, and the block that carries it. Wait for the user's answer before opening a skeleton.
+1. **Storyboard first and stop there.** Open with one sentence for the whole artifact — where it starts, what it passes through, where it lands — then one row per slide or section: the id it will keep, its visible title, the assertion it makes, and the block that carries it. For a deck with six or more slides or multiple topics, assign every slide to one of 3–5 chapters before drafting. Wait for the user's answer before opening a skeleton.
 
-   | id  | assertion              | block           |
-   | --- | ---------------------- | --------------- |
-   | s2  | 鍵は保管するのをやめる | `shf-cards` × 2 |
+    | id  | visible title | assertion              | block           |
+    | --- | ------------- | ---------------------- | --------------- |
+    | s2  | 鍵の管理      | 鍵は保管するのをやめる | `shf-cards` × 2 |
 
-   Assertions, not topic names ([anti-slop.md](references/anti-slop.md)). One wrong line is free to fix here and costs a rebuild plus a re-verify once twelve slides exist. Skip only for a poster, or when the user arrives with the structure already settled. If the user hands the rest back, fill it provisionally and mark which rows they never saw.
+    Assertions drive the content; they do not have to become the displayed heading. In business and review decks, prefer concise noun-phrase titles and carry the full claim in the lead or body. Use sentence titles only when their rhetorical force is intentional ([anti-slop.md](references/anti-slop.md)). One wrong line is free to fix here and costs a rebuild plus a re-verify once twelve slides exist. Skip only for a poster, or when the user arrives with the structure already settled. If the user hands the rest back, fill it provisionally and mark which rows they never saw.
 
 2. Copy the skeleton for the chosen archetype from `assets/skeletons/`.
 3. Replace the content, using the storyboard ids as `data-slide-id` and section `id`. Keep them stable — they are the handles for later edits.

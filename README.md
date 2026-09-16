@@ -63,6 +63,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [skill-creator-plus](skill-creator-plus/) | Create or review a reusable skill (SKILL.md) that packages a workflow, and decide whether the request should be a skill instead of a prompt, instruction, agent, or hook |
 | [skill-finder](skill-finder/) | Search, install, and manage Agent Skills locally and from GitHub, then help decide whether the task really needs a skill or another customization primitive |
 | [sync-public-skills](sync-public-skills/) | Synchronize curated Agent Skills across approved repositories with policy checks and verification |
+| [teams-desktop-automation](teams-desktop-automation/) | Prepare and verify Microsoft Teams desktop chat drafts with Windows UI Automation, stopping before send. Use for Teamsチャット下書き, デスクトップTeams操作, 宛先確認, メッセージ入力, or when Teams Web/CD... |
 | [video-watch](video-watch/) | Prepare video URLs or local video files for GitHub Copilot analysis by extracting captions, sampled frames, contact sheets, and a prompt packet |
 | [visualize-as-infographic](visualize-as-infographic/) | Create colorful infographic PNGs from a conversation, topic, file, skill, or workflow |
 | [vscode-extension-guide](vscode-extension-guide/) | Guide for creating VS Code extensions and plugins from scratch through Marketplace publication |

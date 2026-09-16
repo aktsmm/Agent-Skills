@@ -23,7 +23,7 @@ The stage is `100vw` wide and `56.25vw` tall, capped by the viewport, so the dec
 
 Because sizes are proportional, **shrinking text to make content fit is not an option** — it shrinks for everyone. If a slide overflows, split it. The verifier fails on overflow rather than letting you scale down past readability.
 
-Rough vertical capacity per slide at the default scale: one heading plus about six short lines, or a table of five rows, or three cards.
+Rough vertical capacity per slide at the default scale: one heading plus about six short lines, or a table of five rows, or three cards. An eyebrow or chapter label consumes another line; a five-row table that fits without it can overflow once it is added.
 
 ## How much text fits on a line
 
@@ -121,6 +121,8 @@ For multi-section review decks, group the outline by the source's chapters rathe
 ```
 
 Use one level of groups. Each slide belongs to exactly one group; button order follows slide order. The optional `data-shf-page` overrides the per-list counter with a global page number. Navigation opens the current slide's group and marks it `is-current-section`; collapsing a group does not change the selected slide. Check membership, collapse/expand, chapter jumps, next/previous across boundaries, and a unique current-page marker.
+
+Plan 3–5 chapters before authoring when a deck has six or more slides or crosses multiple topics. Keep slide titles short and parallel within a chapter. If slides also carry a visible eyebrow or chapter label, put it on the chapter opener only; repeating it on every slide weakens hierarchy and consumes vertical capacity. Use a full divider slide only when the audience needs a deliberate reset.
 
 If separate files are needed for authoring, offer a combined review deck as well, with stable slide IDs. Grouping must change navigation behavior, not just add decorative headings.
 
