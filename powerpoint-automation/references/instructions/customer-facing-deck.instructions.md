@@ -50,14 +50,14 @@ Use these rules when creating or revising decks intended to be shown directly to
 ## Content Accuracy Review
 
 - Review content separately from visual layout.
-- For Microsoft or Azure topics, verify claims against official Microsoft sources before handoff.
+- For Microsoft or Azure topics, identify the exact feature, distribution and deployment model before checking official sources; a nearby feature's documentation is not interchangeable. Reconcile dated service-specific releases with feature-specific region tables when a generic list conflicts.
 - Avoid turning preview features into GA claims. If the deck date is before a stated GA date, use "planned" or "announced for" wording.
 - Prefer conservative governance wording when a control is not explicitly documented. For example, say "confirm Microsoft 365 data protection and management controls" rather than over-claiming specific enforcement.
 - Use the product's official feature names on slide surfaces. For Microsoft Scout, prefer `Heartbeat` and `Automations`; if the user says "Pulse", explain it as shorthand rather than the official feature name.
 - When discussing Skills, verify the actual environment or current docs before labeling something as built-in. If the environment shows additional built-in skills, it may be described as built-in for that environment.
 - For Scout-specific positioning, distinguish Microsoft 365 Copilot, Copilot Cowork, GitHub Copilot, and Microsoft Scout instead of treating them as interchangeable.
 - If a deck mentions Work IQ, clarify what Work IQ enables: contextual retrieval, semantic work context, people/org/collaboration understanding, Tools, and Workspaces for long-running agent state. Avoid implying Work IQ alone performs the whole workflow.
-- Pricing, billing, supportability, deadline, and availability claims must be verified against official/current sources; if not confirmed, say `要確認` or move the caveat to notes instead of asserting free/included/available.
+- Verify pricing, support, deadlines and availability against current official sources; keep unresolved qualifications with the claim. Failed streams, incomplete pagination and missing prices do not prove nonavailability. Bound query duration, confirm all pages and distinguish region support from subscription restrictions, quota and capacity.
 - Summary or UPDATE-style tables must make each key point decision-useful: name a concrete service/scenario and state an action, impact, or evaluation value. Reject thin cells such as `参考情報`, `コストを改善`, or `活用可能` without the object/action.
 - Map approved manuscript topics/questions to generated slide IDs and record adopted reductions. Compare actual questions, answers, conditions and citations across the generation inputs and final deck; equal counts or complete notes alone do not prove visible content fidelity. Avoid independently hardcoding the same copy in multiple builders.
 

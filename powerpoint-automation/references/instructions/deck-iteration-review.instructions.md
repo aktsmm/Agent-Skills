@@ -23,10 +23,10 @@ Before handoff:
 
 1. Export every slide to images from the actual final PPTX.
 2. Inspect the images, not only extracted text. Automated checks must never prefill a manual-review PASS; keep it pending until images are actually inspected, then record reviewed slides and the artifact hash separately from machine results.
-3. Run a text scan for old product names, old acronyms, placeholder text, and literal escape sequences.
-4. Verify slide count, section/story order, and embedded media/video count against the expected deck.
+3. Scan visible and hidden slides, table cells, nested groups and notes for old terms, placeholders and literal escape sequences. Record matches by stable slide/topic ID; retained matches need explicit approval, not just a reviewer name.
+4. Reconcile expected topic IDs, section/story order and embedded media against the final deck; equal counts and complete notes do not prove that every slide body was populated.
 5. Fix visible issues, regenerate/export, and inspect the affected slides again.
-6. Only then open the final PPTX for the user.
+6. Derive results from current artifact-bound evidence, not old logs or fixed review flags. Record content approval, artifact readiness and successful opening separately; only then attempt to open the final PPTX for the user.
 
 ## Visual checks
 
@@ -78,4 +78,4 @@ For each slide, explicitly check:
 - For COM edits to an open deck, save only the target presentation and do not call `Application.Quit()`.
 - If PowerPoint locks the file, save to a clearly named next artifact; after user acceptance, remove intermediate PPTX files.
 - Keep only one final PPTX in the output folder unless the user asks to preserve variants.
-- If PowerPoint shows a modal dialog or rejects COM calls, stop batching operations, dismiss the dialog, and re-run validation from the actual open deck before continuing.
+- If PowerPoint shows a modal dialog or rejects COM calls, stop batching. Do not dismiss or bypass a security denial; report opening as blocked without erasing verified artifact readiness. For recoverable dialogs, resolve them and revalidate the actual deck before continuing.
