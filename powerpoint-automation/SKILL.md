@@ -87,7 +87,7 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 
 ## Operating Rules
 
-- **SSOT**: content.json を正とする
+- **SSOT**: Derive content.json from the approved manuscript and retain stable topic/question-to-slide mappings. Reuse approval for unchanged content; changed claims or explicit scope constraints need confirmation. Compress related Q&A for the presentation format, not by dropping qualifying conditions.
 - **One phase, one purpose**: 抽出・翻訳・生成・レビューを混ぜない
 - **Fail fast**: 問題が出たら次フェーズへ無理に進めない
 - **Human in loop**: PLAN でユーザー確認を入れる
@@ -96,8 +96,8 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 - **COM for open decks**: 開いている PPTX や既存 deck の直接編集は [references/instructions/com-automation.instructions.md](references/instructions/com-automation.instructions.md) を参照する
 - **Leave it open or close it fully**: COM 作業の最後は「ユーザーに見せるので開いたまま」か「完全に終了」かを必ず決める。中身のない PowerPoint ウィンドウを残さない。内部処理だけなら `Presentation.Close()` の後に `Presentations.Count` が 0 であることを確認して `Application.Quit()` し、それでも残る `POWERPNT` は **MainWindowTitle が空またはファイル名なしのプロセスだけ** 停止する（ファイル名入りはユーザー作業中）
 - **Know how the deck was opened**: `Invoke-Item` / エクスプローラー経由で開いた OneDrive・SharePoint 上の PPTX は `Presentation.FullName` が `https://` になり、**`SaveCopyAs` が %TEMP% へも書かずに例外なしで失敗する**。PDF 書き出し前に `FullName` を確認し、URL なら一度 Close してローカル絶対パスで `Presentations.Open()` し直してから `SaveAs($tmp, 32)` する
-- **Operational text stays in notes**: 運営メモはスライド面に出さない
-- **Customer-facing surface only**: 顧客向け deck のスライド面には内部向け話法、避ける表現、作業メモ、検証メモ、ファイル用途ラベルを混ぜない。話者向け情報は speaker notes へ分離する
+- **Notes are distributable content**: Put presenter guidance in notes, but exclude material the recipient may not receive from the entire deliverable, including hidden slides, notes and embedded sources. Use a separate restricted file; NDA labels and hidden flags do not grant sharing permission.
+- **Audience context first**: Introduce each topic's purpose or trigger, current situation and unresolved concern before answers and next actions. Keep this context on main slides, not only in notes; reserve notes for permitted presenter guidance and implementation detail.
 - **Template means template**: ユーザー指定テンプレートがある場合、特に表紙はテンプレートの既存プレースホルダー/レイアウトを使い、上から別図形を重ねて隠さない
 - **Reusable template means slide master**: 「テンプレートを作る」と言われたら、表紙・本文・Ending の再利用デザインはスライド直置きではなく `SlideMaster.CustomLayouts` に置き、編集する文字は placeholder / text shape として残す
 - **PPTX asset metadata gate**: テンプレートや配布用 PPTX を skill asset / public artifact に含める前に `scripts/clean_template.py` で `docProps/custom.xml`（MIP ラベル、tenant、SharePoint フィールド、同僚メール）と `docProps/core.xml`（`cp:lastModifiedBy` / `cp:revision`）を sanitize する。PowerPoint は OneDrive / SharePoint から開くたびに MIP を再付与するので、check-in 直前に毎回実行する。詳細は [references/instructions/template.instructions.md](references/instructions/template.instructions.md#template-metadata-hygiene)。スライド本文検索だけで安全判定しない

@@ -6,9 +6,9 @@ Use these rules when creating or revising decks intended to be shown directly to
 
 - Slide surfaces must contain only audience-ready content.
 - Do not show internal talk tracks, "avoid saying" guidance, dry-run findings, validation notes, file-purpose labels, or implementation/debug notes on visible slides.
-- Put presenter guidance, source rationale, assumptions, and caveats in speaker notes.
+- Put presenter guidance and supporting detail in notes, but keep conditions that change an answer visible with its claim. Exclude material the recipient may not receive from the whole file; hidden slides and notes are not access controls.
 - Speaker note citations must include usable URLs, not just source names. Example: `Source: Microsoft Scout overview - https://...`.
-- If a useful slide is primarily for the presenter, either move the content into notes or mark the slide hidden.
+- A presenter-only slide may be hidden or moved into notes only if its contents may also be received by the audience; otherwise keep it in a separate restricted file.
 
 ## Template Fidelity
 
@@ -27,12 +27,11 @@ Use these rules when creating or revising decks intended to be shown directly to
 
 ## Source and URL Handling
 
-- Put public source references in a references/appendix slide unless the user asks for per-slide citations.
 - Each visible URL must be a real PowerPoint hyperlink, not plain text.
 - Use neutral source labels for customer-facing decks. Avoid internal or overly personal labels unless the user wants them.
 - Verify hyperlink count after generation.
 - If a claim comes from a private customer notification, email, or tenant message, label it as such and do not imply that a public URL proves the exact notification text or date. Separate visible wording into: `Notification says ...` and `Public docs confirm ...`.
-- For customer-facing technical decks, put a compact source strip on each factual slide when the slide makes a pricing, deadline, supportability, limitation, or actionability claim. The appendix can hold the full URL list, but it is not a substitute for slide-level citations.
+- Put the first-party announcement beside the change's background and the applicable specification beside its limits or recommended action. On those main slides show a linked source title and publication/check date; an appendix list does not replace this evidence. Keep case-specific evidence distinct from general product documentation.
 - Presenter notes should use the deck language unless the user asks otherwise. For Japanese customer decks, do not leave English notes such as `Presenter guidance` or `Slide purpose`; localize notes before handoff.
 - If screenshots come from the user's environment, mask personal data, customer/tenant names, email addresses, session identifiers, local file names, and other environment-specific details before insertion.
 - Do not add a visible "masked" disclaimer unless the user asks for one; put that note in speaker notes instead.
@@ -60,13 +59,14 @@ Use these rules when creating or revising decks intended to be shown directly to
 - If a deck mentions Work IQ, clarify what Work IQ enables: contextual retrieval, semantic work context, people/org/collaboration understanding, Tools, and Workspaces for long-running agent state. Avoid implying Work IQ alone performs the whole workflow.
 - Pricing, billing, supportability, deadline, and availability claims must be verified against official/current sources; if not confirmed, say `要確認` or move the caveat to notes instead of asserting free/included/available.
 - Summary or UPDATE-style tables must make each key point decision-useful: name a concrete service/scenario and state an action, impact, or evaluation value. Reject thin cells such as `参考情報`, `コストを改善`, or `活用可能` without the object/action.
-- If generation uses multiple manifests or JSON files, verify they describe the same adopted slide set before handoff. Do not let a broad candidate list and a narrower final deck drift without an explicit selection record.
+- Map approved manuscript topics/questions to generated slide IDs and record adopted reductions. Compare actual questions, answers, conditions and citations across the generation inputs and final deck; equal counts or complete notes alone do not prove visible content fidelity. Avoid independently hardcoding the same copy in multiple builders.
 
 ## Story Flow and Sections
 
-- For customer decks longer than about 10 slides, add PowerPoint sections so the left pane communicates the story structure.
+- For multi-topic decks, align agenda items and PowerPoint sections with distinct projects or decisions, starting each section at its first topic slide. Group related subtopics, but do not merge unrelated projects solely because they use the same product family.
 - For multi-session customer decks, include the session number on the file name and slide surface, for example `YYYYMMDD-01_04-topic.pptx` and `Session 1 of 4`.
-- Near the end of recurring support decks, include must-decide items such as next meeting date, attendees, owners, and what the customer will try before the next session.
+- For status and support reviews, establish the original goal, affected setup or symptom, dated current state, and unresolved concern before the response and today's discussion. Label prior configuration reports as such, not verified current state. Preserve this context when condensing Q&A; allow minimal growth within agreed page limits rather than hiding prerequisites in notes.
+- On key discussion slides, provide a blank editable note area clear of body text and citations. Keep a closing table for actual agreements, owners, dates and next checks; do not prefill participant responses or unagreed commitments. Do not describe a static worksheet as an input or save feature.
 - Carry forward explicit requests from previous meeting notes, such as basic Git/GitHub explanations, but keep them scoped so they support the main story instead of becoming a separate training deck.
 - For customer sales or proposal decks, verify the story proves both customer fit and differentiation: name the customer's environment, risk, problem, constraint, or timing, then explain why this solution or vendor is objectively preferable to plausible alternatives.
 - On agenda slides, make main items visually stronger than explanatory sub-lines. Use brand color/bold for main items and muted gray/smaller text for sub-lines; avoid making sub-lines look like links or warnings.
@@ -84,9 +84,9 @@ Use these rules when creating or revising decks intended to be shown directly to
 
 ## Visual Review Gate
 
-- Render slides to images before final response.
-- Check for text cropping, empty cards, placeholder remnants, white-on-white text, and title overlays.
-- Review all visible slides; hidden presenter slides are not a substitute for cleaning visible content.
+- Before bulk generation, render the actual template cover, a representative table, the longest reference URL and a two-digit page number. Check contrast, wrapping and element overlap; inherited text colour can be unreadable on a valid background.
+- Render the final deck, including hidden supplements, before handoff. Check cropping, empty cards, placeholder remnants, white-on-white text, title overlays and footer collisions. Measure text against the box's usable area after margins; enlarge/reposition or split content before reducing it below the minimum font size.
+- For each topic, verify that a reader can identify its background, current concern, proposed next step and source without opening notes. Check agenda/section alignment and that note areas remain blank, editable and non-overlapping in the saved deck; slide counts alone do not prove these properties.
 - If card body text is enlarged, re-check `TextRange.BoundHeight` or image output for bottom clipping.
 - Check for duplicate text introduced by iterative COM edits, especially footers, slide numbers, and titles.
 - Re-run review after sectioning or slide insertion because slide numbers, notes, and flow can shift.

@@ -72,8 +72,9 @@ Player regression: run `python -B -m unittest discover -s scripts -p "test_*.py"
 
 ## By eye, before shipping
 
-- Open the file directly from disk, not through a server. That is how the recipient will open it.
-- Deck: arrow through every slide, press `S`, confirm the notes match.
+- Open the final file directly from disk. On a reused tab, reload and compare its title and slide IDs/count with the saved artifact; a stale tab is not evidence about the new file.
+- Deck: walk every slide at the target viewport and any promised narrow viewport. Fixed-pixel gaps do not shrink with the slide; group related content or split a page if references overflow, without reducing readable type or altering pinned CSS. Re-finalize after edits so thumbnails and print pages match.
+- Check arrow navigation, sidebar selection, and `S` with matching notes and a working close action. If an embedded browser ignores input, make one bounded check in an independent browser against the same final file; do not relabel DOM mutation as successful user input or turn a host-control failure into a runtime change.
 - Grouped outline: compare chapter membership with the source, expand/collapse with mouse and keyboard, jump between chapters, cross a boundary with next/previous, and confirm exactly one current-page marker. Tier 2 alone does not prove chapter membership or cross-format information parity.
 - Doc: scroll from top to bottom and watch the sidebar highlight follow. Click a citation and confirm it lands.
 - Poster: export the PNG and look at the PNG, not the HTML.

@@ -40,6 +40,7 @@ Ask which one unless the request already says. Load only that archetype's refere
 3. Colour direction — propose two or three, or derive one from the topic. See [design-tokens.md](references/design-tokens.md).
 4. Images? If any is a screenshot or of unknown provenance, ask the sanitization question in Hard Constraints **before** embedding.
 5. Which export, if any: PDF, PNG, or per-slide PNG. Produce only what was asked for.
+6. For editable notes or forms, resolve the capability gap before promising implementation: the bundled player has no free-text input or persistence. Offer a static worksheet only with agreement; otherwise route to an application workflow. Do not patch the pinned runtime to disguise an unsupported requirement.
 
 ## Hard Constraints
 
@@ -85,7 +86,7 @@ python scripts/verify_html.py <artifact.html> --tier2
 
 Exit codes: `0` PASS, `1` FAIL, `2` UNVERIFIED. Anything but `0` means do not ship it.
 
-Fast path is the default: one viewport, only the requested export. Do the exhaustive pass at publish time. Even the fast path never skips single-file-ness, image decode, overflow at the target viewport, deck navigation, or the sanitization question.
+Fast path uses the target viewport and requested export. If mobile or responsive use is promised, also walk the final artifact at the narrow target width; a desktop PASS does not cover it. Never skip single-file-ness, image decode, overflow, navigation, or the sanitization question. Report untested capabilities separately.
 
 ## Scripts
 
