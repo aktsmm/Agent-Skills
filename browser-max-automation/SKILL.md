@@ -57,7 +57,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 
 Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read.
 
-Wait for required controls or an explicit empty state after loading. A generic title, header/footer, route, or text-length threshold proves neither authentication nor its loss. Distinguish parse/collection failure from an empty result; test empty, zero, alternate, and partially rendered data through the actual collector. A readiness deadline ends in unverified state, not inferred logout.
+Wait for required controls or an explicit empty state. A title, route or tab-click success proves neither authentication nor that the selected view matches rendered rows. Distinguish parse failure from empty data: preserve raw text, normalize observed invisible label characters only in an extraction copy, and test explicit zero, missing fields and mismatched IDs through the collector. Never inject an expected ID to pass validation. A readiness deadline ends in unverified state, not inferred logout.
 
 UI verification では、操作前に期待する state と確認方法を決める。成功 toast やボタン押下だけを成功判定にせず、DOM、URL、永続化された一覧行、API の read 結果、または screenshot / trace などの証跡で確認する。
 For replies/messages, exclude the composer and list previews from success checks. Capture POST status and reply/message ID when available; otherwise verify the approved body and sender appear once in the intended thread after a fresh read/reload. Preserve drafts before reload, never discard another person's input, and report unavailable network evidence as unobserved. Stale counts or a retained draft after submission are not grounds to resend.
@@ -121,7 +121,7 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 
 ### CDP 排他制御
 
-- Use one controller per work target. Do not attach competing Playwright clients to a shared browser unless coordination is verified; raw WebSocket access is not an exemption for concurrent writes or browser-wide settings.
+- Use one controller per work target. If another session owns the browser and coordination is unverified, use both a free port and a separate unused user-data-dir. A different port or profile-directory alone does not isolate a Chromium process; do not attach, restart it or copy its credentials to bypass ownership.
 - Pin the verified profile/context and owned target ID; re-check URL, route, query, and item ID before each write batch. Never select the first domain match again after binding the work target.
 - Before a necessary handoff, stop the owned runner and verify the current tool's detach/close semantics. Do not use `browser_close` as a generic disconnect: it may destroy tabs or the browser. Preserve dirty tabs; if safe detachment is unavailable, retain the working route or stop.
 - Close only explicitly owned, no-longer-needed targets after result verification. Never close the last tab of a shared browser or stop another session's runner as cleanup.
