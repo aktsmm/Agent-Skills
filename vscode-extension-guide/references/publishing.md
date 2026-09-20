@@ -137,12 +137,18 @@ npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
 ```
 
 Use the repository's release hygiene test for payload safety. Besides checking
-paths, compare packaged runtime, Webview JS/CSS and locale resources with the
-same release build; correct filenames do not detect stale bytes. A mismatch
-blocks distribution: rebuild from the intended commit, do not weaken the guard.
-Report mismatched paths rather than dumping buffers or payloads. Add a negative
-case that rejects a stale asset; `vsce ls` alone proves neither content identity
-nor installability.
+paths, compare packaged runtime, Webview JS/CSS, locales and icons with the same
+release build. Compare runtime manifest fields structurally, including publisher,
+version, engines, entry point, localization, contributions and opt-ins. Negative
+tests must reject same-name stale assets and wrong engine requirements; file
+lists alone prove neither content identity nor installability.
+
+On a byte mismatch, report paths without dumping payloads. Normalize line endings
+only to diagnose formatter/checkout differences, never to waive the release gate.
+Build a clean checkout of the CI commit with the same locked toolchain and rerun
+strict comparison. If it passes, keep the original verified CI artifact; otherwise
+resolve the content drift before publication. Remove only the temporary checkout
+you created, preserving the user's working tree.
 
 If a release test asserts the extension version inside docs or spec files (README, CHANGELOG, a `FULL_SPECIFICATION`-style file), bump **every** one of them together with `package.json`. A single doc lagging the package version fails the release gate even when the build itself is correct, so update the version in all asserted files before tagging.
 
@@ -175,7 +181,8 @@ Do not add Marketplace/version/install badges that imply publication before the 
 - Prefer `npx vsce package --out <file>` over ambiguous `npm exec -- vsce package --out <file>` forms. If `vsce` reports `Invalid version <path>`, the package path was parsed as a version argument; switch runner syntax rather than changing the version.
 - Run `git status --short` after packaging and `vsce ls`, not only before committing. Repository prepublish scripts can regenerate tracked metadata or JSON formatting; if that happens after the release commit/tag, either commit the mutation before packaging or restore and rebuild the VSIX so the artifact matches the tagged commit.
 - Do not use interactive `gh run watch` output as the only completion signal in terminals that may switch to an alternate screen or truncate output. Redirect it to a temporary log, then confirm the final run through the Actions API and expected release artifacts.
-- After `npm install` or `npm audit fix`, reject non-public `resolved` URLs and an unexpectedly empty lockfile. Prove a clean public-registry `npm ci` succeeds; `--registry` alone may leave mirror URLs intact. If local TLS blocks that proof, use non-publishing CI before tagging, without disabling TLS checks. Preserve integrity values when normalizing URLs; their algorithm alone does not prove a mirror mismatch.
+- After dependency changes, reject non-public `resolved` URLs or an unexpectedly empty lockfile and prove public-registry `npm ci` succeeds; `--registry` alone may leave mirror URLs intact. Preserve integrity when normalizing URLs; its algorithm alone does not prove a mismatch. If local TLS blocks reproduction, stop repeated retries and use verification-only CI without disabling TLS checks. If repository policy excludes workflows, obtain approval for the exact workflow exception, not the entire `.github` tree. An authorized source push may precede CI; tag only its successful commit and publish its validated VSIX.
+- Failed `npm ci` can leave local dependencies incomplete. If offline restore lacks a locked tarball, export that exact public-registry tarball from the verified CI run separately from the VSIX, match its bytes to the lockfile integrity, then use `npm cache add <tarball> --offline` and `npm ci --offline --registry=https://registry.npmjs.org`. Verify local compilation and remove recovery copies. For artifacts under dot-directories, set `include-hidden-files: true` only with a narrowly allowlisted upload path and `if-no-files-found: error`; never enable broad hidden-directory uploads that could expose credentials.
 - Prefer an exact archive allowlist for small extensions, not only forbidden-pattern checks, and run it automatically after every package. Verify `extension/package.json`, compiled entry points, locale bundles, icon, license, and every linked README are present while `src/`, tests, sourcemaps, debug logs, private storage snapshots, and generator scripts are absent. Account for `vsce` normalizing `README.md` to `readme.md` and extension `LICENSE` to `LICENSE.txt`; pin the observed archive names.
 
 ```javascript

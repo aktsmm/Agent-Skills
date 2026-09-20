@@ -38,20 +38,38 @@ my-extension/
 
 ## test/runTest.ts
 
+Treat `engines.vscode` as the supported API/runtime floor, not the developer's
+installed version. Pin `@types/vscode` to that floor; derive test-host and
+isolated-install versions from the validated manifest range rather than separate
+constants. Only strip a caret after validating a simple `^major.minor.patch`
+range; use a range parser for other forms. Keep lockfile and compatibility docs
+aligned. A host rejecting activation on its engine check does not prove an API
+failure: test a proposed lower floor with its types and real Extension Host
+before lowering it. Newer versions inside the declared range need no blanket
+untested-version warning; report actual failures with a manual, data-free Issue
+link instead of uploading diagnostics automatically.
+
 ```typescript
 import * as path from "path";
+import { readFileSync } from "node:fs";
 import { runTests } from "@vscode/test-electron";
 
 async function main() {
   try {
     const extensionDevelopmentPath = path.resolve(__dirname, "../../");
     const extensionTestsPath = path.resolve(__dirname, "./suite/index");
+    const manifest = JSON.parse(
+      readFileSync(path.join(extensionDevelopmentPath, "package.json"), "utf8"),
+    );
+    const range = manifest.engines?.vscode;
+    if (typeof range !== "string" || !/^\^\d+\.\d+\.\d+$/.test(range)) {
+      throw new Error("This runner requires a simple caret engine range.");
+    }
 
     await runTests({
       extensionDevelopmentPath,
       extensionTestsPath,
-      // Optional: specify VS Code version
-      // version: '1.85.0',
+      version: range.slice(1),
       // Optional: open specific workspace
       // launchArgs: ['--disable-extensions', path.resolve(__dirname, '../../test-workspace')],
     });
@@ -178,7 +196,8 @@ For small fixes, a good baseline is `npm run compile` plus the smallest script o
 - Do not assume `npm test -- --grep <pattern>` reaches Mocha. Parse supported options before editor download/launch, reject unknown arguments and empty/invalid regex, and forward the unchanged pattern through `extensionTestsEnv`. With no CLI filter, explicitly clear the inherited filter so CI runs the full suite. Verify selected-test counts, zero-match exit failure, and unfiltered execution with an impossible ambient filter. If PowerShell drops options through `npm.ps1`, use `npm.cmd`; for shell-sensitive regex, compile first and invoke the Node runner directly.
 - Make each direct test entry point compile or clean first. An explicit list such as `node --test out/test/a.test.js` can silently pass against stale `out/` while a newly added source test never runs. Give every public test script a matching npm lifecycle hook (for example, `pretest:unit`) and add a guard that every source `*.test.ts` has a compiled path in the test script, or use deterministic discovery.
 - For privacy-sensitive opt-outs around asynchronous file reads, clearing a cache is not enough. Increment a generation on opt-out/disposal, check it after every `await` and before cache/UI writes, close any view showing the disabled data, and use an injected delayed filesystem in tests to prove an in-flight read cannot repopulate state after opt-out.
-- For scanners backed by file watchers, test the pure merge/update function separately from Extension Host wiring. Frequent create/change events should update one entry when possible; deletion can fall back to a debounced full scan when sibling files share one logical ID.
+- For scanners, test pure merging and the actual registered create/change/delete callbacks: prove cache invalidation, in-flight cancellation and displayed-state updates, including another open item. Frequent writes should update one entry; deletion may use a debounced full scan when sibling files share an ID. Before optimizing selected-item refresh, measure filesystem call counts and guard new/deleted files, sibling formats, cold caches and ordinary full refresh. Synthetic call reductions are not wall-clock speedups; state when other items' cached timestamps refresh.
+- Test optional builtins through the real lazy loader, not only an injected replacement. Load the compiled module in an isolated VM with controlled `require`; assert zero loads on import, one load across repeated successful or failed reads, safe failure results, and isolation between module instances. Exercise the default read path too. Avoid production reset APIs or changing global module caches for tests; account for cross-realm prototypes in object comparisons.
 - Async scans need a generation token and a disposed guard so an older completion cannot overwrite newer state or update UI after deactivation. Route fire-and-forget promises through one rejection handler and assert that watcher/timer entry points use it.
 - If behavior depends on `ExtensionContext.storageUri`, run the Extension Host suite both with a folder argument and without one. Empty windows can have different storage roots and otherwise remain an unexecuted branch.
 - Size Extension Host fixtures by what the assertion discriminates, not by the production limit. Building a multi-megabyte payload inside the host can trip the `Extension host is unresponsive` watchdog even when the suite still passes; shrink the fixture until it is fast and still exercises the branch.
