@@ -47,9 +47,10 @@ metadata:
   A Google calendar named "TimeTree sync" is not evidence of automatic syncing;
   distinguish separate copies, external-calendar display, and verified sync.
   Never rename or delete a misleadingly named calendar without approval.
-- If a browser session expires, return to the appropriate login page, have the
-  user authenticate, then re-read the target calendar and check for duplicates
-  before resuming.
+- A closed browser-control target does not prove logout. Do not use its stale DOM;
+  when browser reopening is authorized, re-establish a clean target and verify
+  the signed-in calendar before requesting login. Authenticate only after an
+  actual login state, then re-read the target calendar and check duplicates.
 - If an image or message does not establish a time, duration, location, target
   calendar, or whether the event is confirmed, ask only for the missing detail.
 - Check OOF first; exclude full-day OOF dates unless an explicit exception is
