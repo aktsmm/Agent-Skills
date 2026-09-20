@@ -105,6 +105,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 - `package.json` の commands、views、configuration、menus を変えたら、コード上の command ID / setting key と同時に確認する。
 - Marketplace 表示や設定説明をローカライズしている拡張では、`package.nls.json` と対象言語の `package.nls.*.json` を同じ変更で更新する。
+- In `markdownDescription`, use native setting references such as `` `#editor.wordWrap#` ``, not `[label](#editor.wordWrap#)`: the latter can leave a trailing hash in the Settings `@id:` filter. Guard each locale's syntax and verify the resolved target.
 - 設定の並び順や説明を変えたら README の設定表、manifest consistency test、release notes の必要有無までまとめて見る。
 
 ### Language Model Tools

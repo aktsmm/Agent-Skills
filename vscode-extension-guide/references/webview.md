@@ -282,6 +282,12 @@ vscode.window.registerWebviewViewProvider(
 
 ## Fallback Patterns
 
+### Keyboard Tabs
+
+Use one tab stop: the selected tab has `tabindex="0"`, others `-1`, with matching `aria-selected` and panel associations in both initial HTML and every switch. Left/Right wrap; Home/End select endpoints. Reuse the click switch path and retain native Enter/Space activation to avoid double handling. Ignore modifiers, composition and non-tab fields; reject missing targets before hiding the current panel. Move focus off hidden panels or deactivated tab buttons, but do not steal unrelated focus.
+
+Test actual handlers and registration with real key presses, active element, selected state and visible panel assertions. An extracted production-code browser fixture can verify those interactions; label it as partial evidence, not full VS Code host or screen-reader verification. Remove its owned server and temporary files afterward.
+
 ### Promise-based Callback Fallback
 
 When using Promise-based callbacks (e.g., `resolveCreate`), always provide a fallback mechanism:

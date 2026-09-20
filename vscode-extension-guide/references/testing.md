@@ -76,6 +76,7 @@ export async function run(): Promise<void> {
     ui: "tdd",
     color: true,
     timeout: 10000,
+    failZero: true,
   });
 
   const testsRoot = path.resolve(__dirname, ".");
@@ -154,7 +155,7 @@ npm test
 
 ## Risk-Based Regression Checks
 
-Run a full compile first, then add targeted checks based on what changed.
+Typecheck explicitly when `compile` only bundles (for example, esbuild); then run the smallest behavior check and the full suite before release.
 
 | Change area                                   | Extra checks                                                                                                                                                                                                                                         |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -173,6 +174,8 @@ For small fixes, a good baseline is `npm run compile` plus the smallest script o
 
 ## Reliability Gotchas
 
+- For bounded automatic dispatch, test oldest-due selection, reserved daily capacity and slot release on both execution and persistence failures. Keep unclaimed work pending. Name what callback completion proves: a Chat command resolving may confirm dispatch, not completion of the model response; a per-window limiter is not a cross-window guarantee.
+- Do not assume `npm test -- --grep <pattern>` reaches Mocha. Parse supported options before editor download/launch, reject unknown arguments and empty/invalid regex, and forward the unchanged pattern through `extensionTestsEnv`. With no CLI filter, explicitly clear the inherited filter so CI runs the full suite. Verify selected-test counts, zero-match exit failure, and unfiltered execution with an impossible ambient filter. If PowerShell drops options through `npm.ps1`, use `npm.cmd`; for shell-sensitive regex, compile first and invoke the Node runner directly.
 - Make each direct test entry point compile or clean first. An explicit list such as `node --test out/test/a.test.js` can silently pass against stale `out/` while a newly added source test never runs. Give every public test script a matching npm lifecycle hook (for example, `pretest:unit`) and add a guard that every source `*.test.ts` has a compiled path in the test script, or use deterministic discovery.
 - For privacy-sensitive opt-outs around asynchronous file reads, clearing a cache is not enough. Increment a generation on opt-out/disposal, check it after every `await` and before cache/UI writes, close any view showing the disabled data, and use an injected delayed filesystem in tests to prove an in-flight read cannot repopulate state after opt-out.
 - For scanners backed by file watchers, test the pure merge/update function separately from Extension Host wiring. Frequent create/change events should update one entry when possible; deletion can fall back to a debounced full scan when sibling files share one logical ID.

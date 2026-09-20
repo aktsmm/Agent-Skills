@@ -49,6 +49,8 @@ If you control the repository workflow, prefer a wrapper script over repeating m
 
 Publisher authorization failure is not proof that the token expired. Verify permissions for the intended publisher; switching to another authorized publisher changes the extension ID and requires approval. Then synchronize manifest, activation-test IDs and listing links.
 
+In CI, a nonempty secret is not proof of a valid PAT. Verify publisher authorization using the job's secret without printing it. Local Process/User environment values and repository/environment secrets are separate stores: a local refresh does not repair CI. A `publish=false` build validates no credentials unless it explicitly runs that read-only check. On authentication failure, retain the artifact and commit/tag identity; report publication and downstream GitHub Release as blocked and request owner-side secret repair, never the token in chat.
+
 ## Login and Publish
 
 ```bash
@@ -173,7 +175,7 @@ Do not add Marketplace/version/install badges that imply publication before the 
 - Prefer `npx vsce package --out <file>` over ambiguous `npm exec -- vsce package --out <file>` forms. If `vsce` reports `Invalid version <path>`, the package path was parsed as a version argument; switch runner syntax rather than changing the version.
 - Run `git status --short` after packaging and `vsce ls`, not only before committing. Repository prepublish scripts can regenerate tracked metadata or JSON formatting; if that happens after the release commit/tag, either commit the mutation before packaging or restore and rebuild the VSIX so the artifact matches the tagged commit.
 - Do not use interactive `gh run watch` output as the only completion signal in terminals that may switch to an alternate screen or truncate output. Redirect it to a temporary log, then confirm the final run through the Actions API and expected release artifacts.
-- After `npm install` or `npm audit fix`, scan every `package-lock.json` `resolved` URL before committing. Public repositories should reject non-public registry hosts and prove a clean `npm ci --registry=https://registry.npmjs.org` succeeds; passing `--registry` does not always rewrite existing resolved URLs.
+- After `npm install` or `npm audit fix`, reject non-public `resolved` URLs and an unexpectedly empty lockfile. Prove a clean public-registry `npm ci` succeeds; `--registry` alone may leave mirror URLs intact. If local TLS blocks that proof, use non-publishing CI before tagging, without disabling TLS checks. Preserve integrity values when normalizing URLs; their algorithm alone does not prove a mirror mismatch.
 - Prefer an exact archive allowlist for small extensions, not only forbidden-pattern checks, and run it automatically after every package. Verify `extension/package.json`, compiled entry points, locale bundles, icon, license, and every linked README are present while `src/`, tests, sourcemaps, debug logs, private storage snapshots, and generator scripts are absent. Account for `vsce` normalizing `README.md` to `readme.md` and extension `LICENSE` to `LICENSE.txt`; pin the observed archive names.
 
 ```javascript
@@ -312,9 +314,9 @@ are done or explicitly blocked:
 1. Package the VSIX under `artifacts/vsix/`.
 2. Inspect the VSIX contents or run the repo-specific package integrity test.
 3. Run the **Isolated Install Gate** above against the generated VSIX; do not modify the normal user profile.
-4. Publish the exact VSIX to Marketplace.
-5. Create and push the release tag.
-6. Create the GitHub Release with the VSIX attached.
+4. Follow the repository's single publication route. For tag-triggered CI, first validate the candidate commit with an explicit non-publishing branch run, then push its matching tag and let CI publish and attach the same VSIX. Do not publish locally first and make CI collide with an existing version.
+5. For manual publication, publish the verified VSIX, push the matching tag and attach that VSIX to the GitHub Release; ensure the tag does not independently trigger a second publish.
+6. Keep manual workflow dispatch non-publishing by default and serialize runs capable of publishing the same package, including branch and tag routes. Check both the dispatch input and ref: a tag condition can override `publish=false`. Never move a published tag; follow the repository's version/retry policy after failure.
 7. Confirm the public item page is accessible and the public gallery API or
    `vsce show --json` returns the intended publisher, extension and version.
    Confirm the GitHub Release asset is uploaded, the tag resolves to the release
