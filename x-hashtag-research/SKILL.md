@@ -1,7 +1,7 @@
 ---
 name: x-hashtag-research
-description: "Collect and analyze public X posts from hashtags to discover primary sources, official docs, related GitHub repos, and reusable images. Use when researching launch-day announcements, event hashtags like #MSBuild or #MicrosoftBuild, keynote reactions, or when you want to turn noisy X posts into a structured research note under research/. X専用のハッシュタグ調査 workflow。"
-argument-hint: "対象ハッシュタグ、時間窓、件数、保存先メモ名"
+description: "Collect and analyze public X posts from hashtags, keywords, domains, or known post URLs to discover popular discussions, primary sources, official docs, related GitHub repos, and reusable images. Use for launch-day announcements, event hashtags, new-technology use cases, popularity research, keynote reactions, or turning noisy X posts into a structured research note. X専用の公開投稿調査 workflow。"
+argument-hint: "対象クエリまたは投稿URL、時間窓、件数、保存先メモ名"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -15,6 +15,8 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 ## When to Use
 
 - X のハッシュタグからイベント当日の発表を追いたいとき
+- X の通常キーワード、`OR`、ドメイン、既知投稿 URL から新技術やユースケースを探したいとき
+- 反応数の多い投稿を候補として抽出し、一次成果物まで確認したいとき
 - `#MSBuild` や `#MicrosoftBuild` のような event hashtag を直近数時間で総ざらいしたいとき
 - keynote 直後に、一次情報 URL と repo の導線を先に集めたいとき
 - noisy な実況投稿から、Microsoft Learn / blog / GitHub / session repo に収束させたいとき
@@ -41,7 +43,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 
 既定値はあるが、毎回この 4 点は確認する。
 
-1. 対象ハッシュタグ
+1. 対象クエリ（ハッシュタグ / キーワード / `OR` / ドメイン）または既知投稿 URL
 2. 時間窓
 3. 目標件数
 4. 保存先メモ名
@@ -50,7 +52,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 
 ## Collection Paths
 
-- 公開投稿の収集は、合意済みの時間窓・件数内に限り `GET https://api.fxtwitter.com/2/search?q=<URL-encoded-query>&feed=latest&count=100` を既定にする。次ページは `cursor.bottom` を `cursor` に渡す。
+- 公開投稿の収集は、合意済みの時間窓・件数内に限り `GET https://api.fxtwitter.com/2/search?q=<URL-encoded-query>&feed=latest&count=100` を既定にする。`q` はハッシュタグだけでなく通常キーワード、`OR`、ドメインを URL encode してよい。次ページは `cursor.bottom` を `cursor` に渡す。既知投稿は `GET /2/status/{id}` で再取得する。
 - FxTwitter は X の公式 API ではない。Cookie、トークン、アカウント情報を渡さず、公開投稿の一回限りの収集に限定する。
 - HTTP ステータスだけでなく JSON の `code` を確認し、`200` の `results` だけを採用する。`400`、`404`、`500` は再試行を重ねず、X の画面または一次情報へ戻る。
 - 非公開、削除済み、アクセス制限付き投稿、継続監視には使わない。
@@ -72,16 +74,16 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
    `tmp/<slug>-posts-raw.json` と batch 単位の中間 JSON を残す。
 
 4. ローカル分類を先にやる
-   rawText、tweetText、display text、X card の visible domain から theme、domain、repo、image candidates を作る。
+   rawText、tweetText、display text、X card の visible domain から theme、domain、repo、image candidates を作る。人気候補は重複排除後に `likes`、`reposts`、`views` で sort するが、反応数を正確性の根拠にはしない。
 
 5. 高シグナルリンクだけ深掘る
-   全 t.co を解決せず、高頻度リンク、公式アカウント、画像付き高シグナル投稿、repo 名が半分読めている投稿だけを追う。
+   全 t.co を解決せず、高頻度リンク、公式アカウント、画像付き高シグナル投稿、repo 名が半分読めている投稿だけを追う。外部リンク先の repo / Docs / app /記事で実装と主張を確認する。
 
 6. research ノートは source-centric に書く
-   投稿の感想ではなく、投稿がどの一次情報へ収束したかを正本にする。
+   投稿の感想ではなく、投稿がどの一次情報へ収束したかを正本にする。A=一次成果物+測定、B=一次成果物、C=投稿内デモ/自己申告、D=アイデアのみ、で証拠レベルを分ける。
 
 7. 画像は 2 層で保存する
-   curated set は 5〜10 枚、bulk は 20〜30 枚程度を目安にする。
+   curated set は 5〜10 枚、bulk は 20〜30 枚程度を目安にする。X Article は title / blocks /引用元、画像は原寸、動画は captions または代表 frame を確認し、見ていない media の内容を断定しない。
 
 8. 再現可能な成果物で終える
    research ノート、raw JSON、主要一次情報 URL、画像保存先、必要なら manifest 追記まで揃える。
@@ -101,6 +103,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 - 画像保存先が research 配下で整理されている
 - 元の公開投稿を改変した断定はしていない
 - FxTwitter を使った場合、出典は API URL ではなく各 `status.url` の元の X 投稿 URL にしている
+- 人気順と証拠レベルを分け、自己申告・アイデアを実証済みとして扱っていない
 
 ## Efficiency Rules
 

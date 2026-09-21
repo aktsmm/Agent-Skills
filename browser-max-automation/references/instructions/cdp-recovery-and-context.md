@@ -10,6 +10,13 @@ When the browser closes or crashes (`Target page, context or browser has been cl
 4. Reconnect using the tool's verified attachment semantics; `browser_close` is not a generic disconnect. Re-establish the owned target identity, authentication, and durable state before any write.
 5. If another helper is needed, stop the owned controller and detach without destroying tabs. If safe detachment is unavailable, retain the current route or stop. Reconnection never resets the logical operation's recovery budget.
 
+## Sign-In Rejected as an Unsafe Browser
+
+- A provider message such as "This browser or app may not be secure" is browser sign-in rejection, not proof of a wrong account or password. Record the observed message separately from the cause: automation/CDP can be a hypothesis, not a diagnosis from the screenshot alone. [Google guidance](https://support.google.com/accounts/answer/7675428) lists several possible browser-related causes.
+- Stop retries on the unchanged rejected route. Ask the user to test the intended account in a normally launched, supported browser; credentials and MFA stay user-entered. This is a next check, not a verified recovery. Do not spoof automation signals, weaken security settings, copy cookies/credentials or restart a user browser without consent.
+- Successful manual login does not transfer authentication or control to MCP/CDP. Re-establish the authorized route and target/account identity before writes; otherwise offer a manual handoff. Never borrow another session's authenticated browser to escape the rejection.
+- Preserve completed work and the verified artifacts. Report authentication, tool attachment and the intended submission/save as separate states; request only the blocked next step, not a repeat of completed writes.
+
 ## Unresponsive but Still Connected
 
 If `/json/list` works but `Runtime.evaluate` or `Page.enable` times out, suspect a JS dialog, beforeunload prompt, reload confirmation, or in-page modal.

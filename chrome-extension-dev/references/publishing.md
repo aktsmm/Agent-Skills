@@ -16,7 +16,7 @@
 
 ### 推奨項目
 
-- [ ] スクリーンショット（1280x800 または 640x400）を用意
+- [ ] Capture from the packaged runtime with synthetic data in an isolated, sync-disabled profile verified empty before seeding. Await ready state plus expected records/controls, not nonempty status text; inspect every saved image and its required dimensions (1280x800 or 640x400). Obsolete selectors or cleanup failure fail the capture run.
 - [ ] プロモーションタイル画像（440x280 small、920x680 large）
 - [ ] 詳細な説明文（多言語対応推奨）
 - [ ] カテゴリが適切に選択されている
@@ -25,11 +25,12 @@
 
 ## Release Gate
 
-- 既存 tag に後続修正が入った場合、tag 付け替えではなく patch version を上げる。
-- 公開前に `npm run test`, `npm run lint`, `npm run typecheck`, `npm run validate:bridge`, `npm audit --omit=dev`, `npm run zip` を通す。
-- full `npm audit` が WXT 経由の dev-only 脆弱性を返す場合は、`--omit=dev` の runtime audit と分けて判断する。semver-major の WXT 更新は別サイクルで扱う。
-- CLI stdout や success marker だけで gate 完了を判定しない。ZIP の存在、サイズ、更新時刻、checksum、プロセス残存なしを別経路で確認する。
-- publish / release 報告へ反映する値は、stdout ではなく durable source で裏取りする: git refs は `git ls-remote`、GitHub Release は `gh release view --json`、CWS は `?projection=DRAFT` の `crxVersion` + `itemError`、Marketplace は `vsce publish` 成功 + tag / GitHub Release を優先する。
+- Before edits, read current remote tags/releases and the public store version; old pending-review notes are not current evidence. Use a new version for changed runtime content, never move a published tag or overwrite its verified ZIP.
+- Run the repository's declared test/lint/typecheck/build/package gates; do not require nonexistent scripts such as a bridge validator. Check dependencies when present, distinguishing runtime from dev-only findings and avoiding unrelated major upgrades. Tie package/manifest versions and submission copy to the same release; remove stale "unreleased" feature/privacy claims before publication.
+- Verify the actual ZIP's manifest version, entry allowlist/count, size and SHA256; compare extracted runtime bytes with the intended build and test that extracted package. Exclude credentials, private data, local customization and temporary profiles. A source-tree test or CLI success line alone does not validate the shipped artifact.
+- Verify remote commit/tag refs and Release assets independently, using asset digests when available. Track GitHub publication, store upload/draft version, submission acceptance, review and public availability separately. Read back saved descriptions and screenshot thumbnails after navigation; disabled Save alone is not persistence proof.
+- If store authentication blocks after GitHub publication, preserve the same verified artifact, commit/tag and prepared listing assets. Report the exact unfinished stage and resume it after publisher/item verification; do not bump/rebuild/republish or resubmit solely because a public page is stale. API client credentials alone do not prove a usable authorized API session; never print secrets while checking availability.
+- A provider's unsafe-browser sign-in rejection is not proof of account mismatch or CDP causation. Stop unchanged-route retries, request a supported normal-browser login check, and keep secrets user-entered. Manual login does not grant automation access; use a verified authorized route or manual submission, without stealth flags, credential copying or unapproved browser restarts. [Google sign-in guidance](https://support.google.com/accounts/answer/7675428).
 
 ## ZIP パッケージ作成
 
