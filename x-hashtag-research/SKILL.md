@@ -39,16 +39,16 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 - curated images: `research/assets/YYYYMMDD-<topic>-from-x/`
 - bulk images: `research/images/YYYYMMDD-<topic>-from-x/`
 
-## Always Confirm Before Running
+## Confirm Collection Scope
 
-既定値はあるが、毎回この 4 点は確認する。
+検索で投稿群を収集するときは、次の 4 点を確認する。
 
 1. 対象クエリ（ハッシュタグ / キーワード / `OR` / ドメイン）または既知投稿 URL
 2. 時間窓
 3. 目標件数
 4. 保存先メモ名
 
-ユーザーが省略した場合は既定値を提案して確認を取る。勝手に `4時間 / 500件` で走らせない。
+ユーザーが省略した場合は既定値を提案して確認を取る。勝手に `4時間 / 500件` で走らせない。既知投稿 URL が列挙済みなら、その URL 群が対象と件数を定義するため時間窓は不要。保存先を既存成果物から一意に決められる場合も聞き直さない。
 
 ## Collection Paths
 
@@ -77,13 +77,13 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
    rawText、tweetText、display text、X card の visible domain から theme、domain、repo、image candidates を作る。人気候補は重複排除後に `likes`、`reposts`、`views` で sort するが、反応数を正確性の根拠にはしない。
 
 5. 高シグナルリンクだけ深掘る
-   全 t.co を解決せず、高頻度リンク、公式アカウント、画像付き高シグナル投稿、repo 名が半分読めている投稿だけを追う。外部リンク先の repo / Docs / app /記事で実装と主張を確認する。
+   全 t.co を解決せず、高頻度リンク、公式アカウント、画像付き高シグナル投稿、repo 名が半分読めている投稿だけを追う。外部リンク先の repo / Docs / app /記事で実装と主張を確認し、README の roadmap や planned を実装済みとして数えない。
 
 6. research ノートは source-centric に書く
    投稿の感想ではなく、投稿がどの一次情報へ収束したかを正本にする。A=一次成果物+測定、B=一次成果物、C=投稿内デモ/自己申告、D=アイデアのみ、で証拠レベルを分ける。
 
 7. 画像は 2 層で保存する
-   curated set は 5〜10 枚、bulk は 20〜30 枚程度を目安にする。X Article は title / blocks /引用元、画像は原寸、動画は captions または代表 frame を確認し、見ていない media の内容を断定しない。
+   curated set は 5〜10 枚、bulk は 20〜30 枚程度を目安にする。X Article は title / blocks /引用元、画像は原寸、動画は captions または代表 frame を確認し、見ていない media の内容を断定しない。古い star 数や実装前の説明を含む card 画像は、一次成果物へのリンク以上の価値がなければ採用しない。画像単体で誤認する場合は、筆者追加と分かる注記を入れるか掲載しない。
 
 8. 再現可能な成果物で終える
    research ノート、raw JSON、主要一次情報 URL、画像保存先、必要なら manifest 追記まで揃える。
@@ -104,6 +104,8 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 - 元の公開投稿を改変した断定はしていない
 - FxTwitter を使った場合、出典は API URL ではなく各 `status.url` の元の X 投稿 URL にしている
 - 人気順と証拠レベルを分け、自己申告・アイデアを実証済みとして扱っていない
+- repo / app の現在状態を確認し、実装済み・roadmap・作者 benchmark・筆者実測を分けている
+- 掲載画像の日時と主張が一致し、筆者追加の注記を原画像の表現と混同させていない
 
 ## Efficiency Rules
 
