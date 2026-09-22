@@ -1,14 +1,16 @@
-# CWS Submission Without CDP
+# CWS Submission In An Authenticated Browser
 
-Use this fallback only when a normal Chromium window is already authenticated to the Chrome Web Store Dashboard and no suitable API, MCP, or CDP route exists.
+Use a verified authenticated CWS tab for listing/privacy fields and Dashboard state. Prefer API/CLI for token validation, package upload and publish when available; combine them with UI readback rather than forcing one route to do everything.
 
 1. Pin one browser process, top-level window, selected address-bar value, publisher route, and item ID. Exclude unrelated browser sessions by PID, `user-data-dir`, and URL. Do not restart the browser, copy a profile, or handle credentials.
 2. Attach Windows UI Automation read-only first. If browser chrome appears without `RootWebArea`, verify that the exact CWS page has no unsaved work, invoke Reload once, and require `RootWebArea` before any write.
 3. Use `ValuePattern`, `InvokePattern`, `ExpandCollapsePattern`, and `TogglePattern`; do not use coordinates, OS keystrokes, or the clipboard. Re-resolve controls after each SPA update because automation IDs can change.
 4. Accept a native file chooser only when it is the visible `Open` dialog owned by a child of the pinned browser and the matched browser window is disabled by that modal. Hash the artifact before selecting it.
 5. CWS image deletion has a separate confirmation. Delete and confirm one image at a time. A multi-file choice may add only its first image, so upload remaining screenshots individually and verify the count after each upload.
-6. Save the draft, navigate away and back, then re-read both locale descriptions and compare normalized-newline hashes to the source. Recheck package version and screenshot count.
-7. The first **Submit for review** opens a confirmation. Verify product name and auto-publish state before confirming. Do not retry until readback proves non-application.
-8. Completion requires the Dashboard item to show the expected version and **Pending review**. Keep upload, draft save, submission, review approval, and public availability as separate states.
+6. For Privacy, classify every data checkbox from implemented feature/schema/payload/listener evidence. Local-only handling still requires disclosure, but do not equate requested browser actions with behavioral monitoring or incidental page contents with dedicated category collection. Save, navigate away/back, and re-read every checkbox, attestation, remote-code choice, purpose/permission field and policy URL.
+7. For Listing, save then navigate away/back and compare descriptions/URLs and required media state. Recheck package version separately; listing save does not prove ZIP upload.
+8. Before submit, verify the expected DRAFT version in API and Dashboard package views. Sparse API values such as `uploadState: NOT_FOUND` or null error elements do not override a matching draft version plus a successful upload; record each signal.
+9. A first **Submit for review** may open a confirmation or may be ambiguous. Verify product/version/auto-publish before confirmation. If UI readback proves non-application and an authenticated publish API exists, switch once; never replay both routes speculatively.
+10. Completion requires API publish acceptance plus Dashboard **Pending review/審査待ち**. Keep upload, draft/listing/privacy save, submission, review approval and public availability as separate states. Do not resubmit while review is pending or because the public page still shows the prior version.
 
-This workflow does not make UIA a security boundary. Stop on an ambiguous window, item, modal, control, or post-write state.
+For OAuth `invalid_grant`, keep the same verified ZIP and reauthorize through the normal browser with a loopback redirect, state and PKCE; never send auth codes/tokens through chat. This workflow does not make browser automation or UIA a security boundary. Stop on an ambiguous account, publisher, item, modal, control, or post-write state.

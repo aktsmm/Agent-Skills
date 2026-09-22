@@ -110,6 +110,8 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 - Privacy タブの **remote code ラジオが 「使用している」側に選択済みで到着することがある**。
   remote code を持たない拡張でも、触らずに submit すると事実と逆の申告になる。
   意図した値を明示的に選び直し、保存後に読み戻して検証する。他のラジオ群も同様に空とは限らない。
+- データ種別は manifest 名や「ページに含まれ得る情報」だけで全選択せず、各チェック項目について専用機能、保存 schema、送信 payload、監視 listener をコードから列挙して判定する。端末内だけの保存・処理も開示対象。一方、要求されたクリックを実行することはクリック履歴の収集ではなく、住所入力欄は PII でも GPS/IP の位置情報取得とは別。汎用ページ本文・画像・添付に機微情報が偶発的に含まれ得る限界はポリシーに書き、専用収集機能がないカテゴリを憶測で選択しない。
+- 保存後はページを再読込し、全データ種別、Limited Use の全証明、remote code、単一目的、権限理由、policy URL を構造化して読み戻す。保存ボタンの disabled だけを永続化の根拠にしない。申告と公開ポリシーと実装の不一致は公開ブロッカー。
 - 「送信できない理由」系のバナーは、必須項目をすべて埋めた後も残り、ダイアログ本文が空のことがある。
   実障害と断定する前に一度 draft を保存し直し、それでも残るかで判定する。
 
@@ -210,17 +212,17 @@ export default defineConfig({
 ## Artifact Hygiene
 
 - ZIP の中身を列挙し、`src/`, `tests/`, `.github/`, `.vscode/`, `store-assets/`, `*.map`, log が入っていないことを確認する。ロゴやタイルなどの掲載専用画像も同様で、**パッケージ内に置かない**。manifest が参照しないファイルを弾く readiness checker を使っている場合は、そこで落ちる。
-- `publish-extension` は `.env.submit` を自動読込する。OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可後に再実行する。
-- 再認可時の auth code や refresh token はチャットやログへ貼らず、ターミナルへ直接入力する。更新後は secret を表示せず token exchange の成功だけ確認する。
+- OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可する。廃止済み OOB redirect を使わず、通常ブラウザーの承認と state + PKCE 付き loopback callback を使う。auth code / refresh token はチャットやログへ貼らず、更新後は token exchange と item read の成功だけ確認する。
 - `.env.submit` / `.env*` / token / client secret / auth code を grep や全文検索の対象にしない。存在確認、キー名確認、dry-run 成功、CWS API の `crxVersion` / `itemError` だけを証跡にする。
-- live retry 前に `publish-extension --dry-run --chrome-zip <zip>` を通し、認証と設定だけ先に確認する。
+- live retry 前に利用中 CLI の package/repository/help を確認する。手順書の旧 CLI 名や存在しない dry-run option を推測で実行せず、upload と publish が分離できる CLI では upload → DRAFT 版確認 → publish の順にする。
 - CWS publish が止まった場合でも、ZIP と SHA256 を GitHub Release に残して再開可能にする。
 - 審査中、認証、権限、duplicate など外部状態で publish だけ止まる場合は、ZIP / SHA256 / version / commit / tag / upload の状態を分けて記録し、再開条件を明記する。
 - ブロッカー解消後の再開では、**最新タグの ZIP を rollup 提出**する。ブロック時点の古い ZIP を蘇生せず、間に積まれた patch をまとめて出す（実例: v0.1.11→v0.1.15 で 4 版分を一括公開）。
 - `publish-extension` が `400 "Publish condition not met: You may not edit or publish an item that is in review."` で失敗する場合は、前回の draft が審査キュー残留中。先に `?projection=DRAFT` で stuck している `crxVersion` を確認し、Dashboard UI から `more_vert` → 審査をキャンセル → 確認ダイアログで取り下げる。ステータスバッジが「公開済み」に戻り次第 `publish-extension` を再実行できる。
 - 同じ制限は UI 側にも出る。審査中は保存と提出の操作が無効化され、掲載情報を一切編集できない。解除条件は「審査完了」か「審査キャンセル」の 2 つだけ。ロケール追加や文言修正を提出直後にやる前提で計画しない。先に入れるか、次の update に回す。
 - publish 後の CWS API 確認は item endpoint に `?projection=DRAFT` を付ける。`crxVersion` が対象版で `itemError` が 0 件なら API 側の確認は通過扱いにし、`uploadState: NOT_FOUND` だけで失敗判定や再アップロードをしない。
-- API 応答が疎または stale な場合、最終ステータスは Chrome Web Store Developer Dashboard で確認する。
+- `itemError` が null 要素だけを返すことがあるため、配列長だけで失敗判定しない。API 応答が疎または stale な場合、CLI の upload/publish 成功、DRAFT の対象版、Dashboard の package/status を突合する。
+- Submit UI のクリック結果が曖昧なら同じ click を反復しない。Dashboard status が未適用と確認でき、認証済み API publish が使える場合だけ 1 回切り替える。完了は API の Pending review と Dashboard の「審査待ち」を両方確認し、公開中の旧版とは別状態として記録する。
 
 ## 自動パブリッシング
 
