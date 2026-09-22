@@ -37,6 +37,7 @@ This skill is inspired by `bradautomates/claude-video`, but it targets GitHub Co
    For private or authenticated media, prefer `--detail transcript --metadata-only --transcript-file <path>` and do not pass cookies, bearer tokens, or signed URL credentials.
 3. Read artifacts in this order:
    `manifest.json` → `prompt.md` → `transcript.md` → `frame-index.md` → `contact-sheet.jpg` → selected files in `frames/` only if needed.
+   `manifest.json` records SHA-256 for local source bytes, or for downloaded URL video bytes when a download occurred. Metadata-only URL runs leave the hash null rather than fetching media.
 4. Answer from the artifacts. State when the answer is transcript-only, frame-only, or limited by sparse sampling.
 5. For named moments, rerun with `--start` / `--end` to focus the frame budget.
 

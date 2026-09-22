@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import math
 import re
@@ -88,6 +89,14 @@ def source_display(source: str) -> str:
 
 def dependency(command: str) -> bool:
     return shutil.which(command) is not None
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def warn_sensitive_url(source: str) -> list[str]:
@@ -401,12 +410,21 @@ def main() -> int:
         local_source = Path(args.source).expanduser().resolve()
         duration_source = local_source if local_source.exists() else None
     duration_seconds = ffprobe_duration(duration_source) if duration_source and dependency("ffprobe") else None
+    hash_source = video_path
+    hash_scope = "downloaded-video-bytes" if video_path and is_url(args.source) else None
+    if hash_source is None and not is_url(args.source):
+        local_source = Path(args.source).expanduser().resolve()
+        if local_source.exists():
+            hash_source = local_source
+            hash_scope = "local-file-bytes"
 
     manifest = {
         "created_at": timestamp,
         "source_type": "url" if is_url(args.source) else "local-file",
         "source_display": source_display(args.source),
         "source_query_redacted": bool(urlparse(args.source).query) if is_url(args.source) else False,
+        "source_sha256": sha256_file(hash_source) if hash_source else None,
+        "source_sha256_scope": hash_scope,
         "detail": args.detail,
         "question": args.question,
         "time_window": {"start": format_time(args.start or 0), "end": format_time(args.end) if args.end else None},
