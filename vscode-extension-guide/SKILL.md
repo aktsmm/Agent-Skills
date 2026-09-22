@@ -16,6 +16,12 @@ For extensions with a management UI, default to a dedicated Activity Bar icon
 and sidebar unless another entry point is explicitly chosen. A Marketplace
 `icon` alone does not create that navigation; use the TreeView reference below.
 
+For user-facing extensions, provide a clearly labeled bug-report/feature-request
+entry in the primary sidebar or management UI and a Command Palette fallback;
+a README or Marketplace link alone is insufficient. Preview minimal, non-sensitive
+metadata before opening a fixed feedback destination; leave submission to the user
+and never auto-attach prompts, raw logs, secrets or private paths.
+
 ## When to Use
 
 - **VS Code extension**, **extension development**, **vscode plugin**
@@ -63,7 +69,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 - [ ] Extension activates without errors
 - [ ] Primary sidebar entry and commands work; referenced icons are present in the VSIX
 - [ ] Package size < 5MB (use `.vscodeignore`)
-- [ ] README.md includes Marketplace/GitHub links
+- [ ] README links and feedback UI reach the intended support destination; verify the UI-to-form path with synthetic data without submitting
 - [ ] Local VSIX artifacts stored outside the repo root and pruned regularly
 
 ## Quick Troubleshooting

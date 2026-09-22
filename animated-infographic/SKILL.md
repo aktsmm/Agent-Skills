@@ -33,9 +33,12 @@ metadata:
 1. **Freeze the evidence**
   - source artifact、取得日時、対象件数、測定境界を固定する。
   - latencyは`1 request`、`serial total`、`fresh-process end to end`など、何を測った値か決める。
+  - 外部mediaを加工する場合は元URL、取得日、source相対path、SHA-256をmanifestへ記録し、生成前にhashを照合する。
 2. **Design the story**
   - 1 GIFは1つの主張に絞る。長文説明は本文へ戻す。
   - 入力 → 判断 → 次処理、before → after、比較 → 結論など、読み順を固定する。
+  - 狭いdecision gateが主題なら、accent色、太いoutline、中央配置、calloutのいずれかで視覚階層の主役にする。入力と出力を両側に置き、gateが決める値を箱内へ書く。
+  - 公式用語と作者独自の層・分類を同じ見た目で断定しない。独自モデルはasset内で`この記事での整理`などscopeを示し、製品包含や成熟度に見える矢印・入れ子を避ける。
 3. **Localize before rendering**
   - 説明UI、status、captionは読者言語へ合わせる。日本語記事に汎用英語UIを残さない。
   - 製品名、API field、model IDなどの固有名詞は公式表記を保つ。
@@ -47,6 +50,7 @@ metadata:
 5. **Generate reproducibly**
   - generator script、GIF、静止fallback、必要ならsource snapshotを残す。
   - 数値を手入力せずsource artifactから読む。
+  - 第三者動画は主張に必要な最小frame（例: before / operation / after）へ絞り、無関係なbrowser chromeを除く。出典と、ダミーデータ・未送信・筆者追加注記などの誤読防止情報をasset内で区別して表示する。
 6. **Validate mechanically**
   ```powershell
   python scripts/validate_animation.py output.gif `
@@ -71,7 +75,10 @@ metadata:
 - [ ] GIFがanimatedで、期待寸法・最小frame数を満たす。
 - [ ] timing modeと測定境界がasset内に見える。
 - [ ] source artifactの数値と表示値が一致する。
+- [ ] 外部media由来ならsource URL / 取得日 / SHA-256がmanifestと一致する。
 - [ ] 説明UIが読者言語に統一されている。
+- [ ] 主題のdecision gateが最初に見え、何を受け取り何を返すか読める。
+- [ ] 公式定義と作者独自の整理がasset単体でも区別できる。
 - [ ] 開始・中間・終了frameとループ再生を確認した。
 - [ ] target embed幅で文字が読める。
 - [ ] generator、GIF、静止fallback、validation reportの所在を報告した。

@@ -80,13 +80,13 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
    全 t.co を解決せず、高頻度リンク、公式アカウント、画像付き高シグナル投稿、repo 名が半分読めている投稿だけを追う。外部リンク先の repo / Docs / app /記事で実装と主張を確認し、README の roadmap や planned を実装済みとして数えない。
 
 6. research ノートは source-centric に書く
-   投稿の感想ではなく、投稿がどの一次情報へ収束したかを正本にする。A=一次成果物+測定、B=一次成果物、C=投稿内デモ/自己申告、D=アイデアのみ、で証拠レベルを分ける。
+   投稿の感想ではなく、投稿がどの一次情報へ収束したかを正本にする。A=一次成果物+測定、B=一次成果物、C=投稿内デモ/自己申告、D=アイデアのみ、で証拠レベルを分ける。動画UIしか根拠がない主張は`動画内の説明では`と帰属し、実装、精度、token、費用を確認済みにしない。
 
 7. 画像は 2 層で保存する
-   curated set は 5〜10 枚、bulk は 20〜30 枚程度を目安にする。X Article は title / blocks /引用元、画像は原寸、動画は captions または代表 frame を確認し、見ていない media の内容を断定しない。古い star 数や実装前の説明を含む card 画像は、一次成果物へのリンク以上の価値がなければ採用しない。画像単体で誤認する場合は、筆者追加と分かる注記を入れるか掲載しない。
+   curated set は 5〜10 枚、bulk は 20〜30 枚程度を目安にする。X Article は title / blocks /引用元、画像は原寸、動画は captions または代表 frame を確認し、見ていない media の内容を断定しない。記事掲載では全編の再配布より、主張に必要なbefore / operation / afterなど最小frameを優先し、無関係なbrowser chromeを除く。古い star 数や実装前の説明を含む card 画像は、一次成果物へのリンク以上の価値がなければ採用しない。画像単体で誤認する場合は、筆者追加と分かる注記を入れるか掲載しない。
 
 8. 再現可能な成果物で終える
-   research ノート、raw JSON、主要一次情報 URL、画像保存先、必要なら manifest 追記まで揃える。
+   research ノート、raw JSON、主要一次情報 URL、画像保存先、必要なら manifest 追記まで揃える。外部mediaを保存・加工した場合は元投稿URL、取得日、source相対path、SHA-256をmanifestへ記録し、builder / auditで照合する。
 
 ## Branching Rules
 

@@ -501,9 +501,12 @@ relative Markdown link to a publicly readable document.
 Marketplace publication does not authorize making a private source repository
 public. Private raw GitHub image URLs will not serve anonymous readers: use
 public distribution assets, keep required icons in the VSIX, and provide alternate
-language content on the listing or a publicly reachable page. Label restricted
-source/support links explicitly; including a document in the VSIX does not make
-its private GitHub URL public.
+language content on the listing or a publicly reachable page. Verify support access
+as an intended user, not only as the maintainer. A private issue tracker is not a
+public support channel: use an approved accessible alternative or clearly disclose
+restricted access in the feedback UI and listing. Keep `bugs.url`, UI actions and
+README destinations aligned; neither a VSIX link nor a support need authorizes a
+repository visibility change.
 
 An unchanged documentation icon may pin an earlier published asset version.
 Validate its publisher, extension, asset type and expected image rather than
