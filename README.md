@@ -20,7 +20,9 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | Skill | Description / 説明 |
 | --- | --- |
 | [agentic-workflow-guide](agentic-workflow-guide/) | Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for .ag... |
+| [ai-cli-benchmark](ai-cli-benchmark/) | Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, pr... |
 | [analyze-copilot-sessions](analyze-copilot-sessions/) | Analyze historical VS Code GitHub Copilot Chat sessions by model, reasoning effort, AIU, time, reliability, workflow behavior, and external quality evidence, or safely prune wor... |
+| [animated-infographic](animated-infographic/) | Create reproducible animated infographic GIFs from structured data or measured results, with audience-language labels, explicit timing semantics, representative-frame QA, and a... |
 | [azure-advisor-report](azure-advisor-report/) | Generate Azure environment monthly report (Markdown + PowerPoint) from Azure Advisor and Cost Management API |
 | [azure-env-builder](azure-env-builder/) | [Alpha] Experimental Azure environment builder for infrastructure and deployment design |
 | [azure-infra-validation](azure-infra-validation/) | Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs |
@@ -68,7 +70,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [visualize-as-infographic](visualize-as-infographic/) | Create colorful infographic PNGs from a conversation, topic, file, skill, or workflow |
 | [vscode-extension-guide](vscode-extension-guide/) | Guide for creating VS Code extensions and plugins from scratch through Marketplace publication |
 | [web-accessibility](web-accessibility/) | Build and review accessible web products using WCAG 2.2 AA |
-| [x-hashtag-research](x-hashtag-research/) | Collect and analyze public X posts from hashtags to discover primary sources, official docs, related GitHub repos, and reusable images |
+| [x-hashtag-research](x-hashtag-research/) | Collect and analyze public X posts from hashtags, keywords, domains, or known post URLs to discover popular discussions, primary sources, official docs, related GitHub repos, an... |
 | [x-twitter-browser-ops](x-twitter-browser-ops/) | X/Twitter browser operations. Use for X browsing, analysis, bookmark management, content and profile operations, or browser-driven troubleshooting. Require explicit confirmation... |
 <!-- public-skills-table:end -->
 

@@ -44,6 +44,9 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 ## Design Rules
 
 - Use visual hierarchy: title, short lead, 3-6 visual units, concise footer if useful.
+- Match explanatory labels to the artifact's audience language. For Japanese articles, use natural Japanese for titles, captions, status labels, and generic UI; keep product names, API fields, and other proper nouns in their official form. Avoid literal labels that sound unnatural, such as `段階で採点`, when `定義した基準のどの段階に近いか` is the intended meaning.
+- Read numeric claims from the source artifact or SSOT instead of retyping them. For latency, cost, accuracy, and token values, state the measurement boundary in or next to the image: per request, serial total, fresh-process end to end, estimate, or saved-result playback.
+- If an infographic depicts motion or elapsed time, state inside the asset whether movement is illustrative or timed from measurements. Animation duration must not be presented as API or processing latency unless frames are generated from those timestamps.
 - Avoid information overload. If text looks dense, split into another pattern rather than shrinking aggressively.
 - Set `html, body` to exact poster `width` / `height` and `overflow: hidden`.
 - Use Noto Sans JP for Japanese poster text unless a project-specific style says otherwise.
@@ -62,8 +65,9 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 6. Use `device_scale_factor=1` when the PNG must be the stated size. Use `2` only when high-density output is desired and the larger pixel dimensions are acceptable.
 7. Prefer `container-type: inline-size` when only width-relative units such as `cqw` are needed. With `container-type: size`, give the wrapper a definite block size or an intrinsic fallback: full size containment ignores descendants when resolving an auto block size, so the wrapper can collapse to an empty-box height while a descendant's `scrollHeight` stays nonzero.
 8. Inspect every PNG with `view_image`.
-9. If any PNG has overlap, clipping, unreadable text, wrong order, unexpected margins, wrong pixel size, or excessive density, fix the HTML or renderer, render again, and re-check that PNG.
-10. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
+9. Inspect at the target embed width as well as full size. A 1200px image that is readable full-size can become illegible when embedded near 360px on mobile.
+10. If any PNG has overlap, clipping, unreadable text, wrong order, unexpected margins, wrong pixel size, or excessive density, fix the HTML or renderer, render again, and re-check that PNG.
+11. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
 
 ## Visual QA Checklist
 
@@ -74,6 +78,8 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 - Step numbers and visual order match DOM / reading order.
 - Card text fits without cramped line breaks.
 - Contrast is readable on the final PNG, not just in HTML.
+- Generic English UI does not remain in a Japanese artifact unless it is part of a quoted product surface.
+- Numeric values and caveats agree with their source artifact, and an image shared alone cannot confuse illustrative playback with measured latency.
 - A blank or short capture is treated as a defect to diagnose, not an empty design. Check the wrapper's computed height before blaming the content.
 - The final answer refers to the current infographic request, not an older topic from the conversation.
 

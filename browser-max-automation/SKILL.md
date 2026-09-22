@@ -129,6 +129,7 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 raw WebSocket を使う場合は、CDP command id で応答をフィルタし、`Runtime.enable` / `Page.enable` など必要な domain を先に有効化する。詳細は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 
 CDP recovery、blocking dialog、context/page selection は [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) を参照する。
+CDPなしの認証済み通常ブラウザーからCWSを更新・提出する場合は [references/instructions/cws-store-submission.instructions.md](references/instructions/cws-store-submission.instructions.md) を参照する。
 
 ### ローカルファイルを MCP で開く
 
@@ -156,6 +157,7 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 | --- | --- |
 | Existing browser CDP, profile, port drift, screenshot capture | [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) |
 | Raw CDP WebSocket | [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) |
+| CWS submission from an authenticated browser without CDP | [references/instructions/cws-store-submission.instructions.md](references/instructions/cws-store-submission.instructions.md) |
 | WebAuthn virtual authenticator / passkey | [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) |
 | CDP recovery, context selection, Windows UI Automation without CDP | [references/instructions/cdp-recovery-and-context.md](references/instructions/cdp-recovery-and-context.md) |
 | Azure Portal iframe / OOPIF | [references/instructions/azure-portal.md](references/instructions/azure-portal.md) |
