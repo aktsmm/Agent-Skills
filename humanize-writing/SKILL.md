@@ -68,7 +68,7 @@ AI 生成っぽさを検出し、人間が書いた文章として読める形�
 5. 同じ箇所に複数の tell が重なる場合は `stacking pattern` として 1 件にまとめる。
 6. 変換型では初稿後に「まだ AI っぽく見える理由」を短く洗い出し、必要な箇所だけ最終稿で直す。
 7. 最後に声に出して読んだとき、同僚や知人にそのまま話せる文かを見る。
-8. 重要な原稿では、初稿と同じモデルで自己監査して取りこぼしを許容しない場合、**別モデルまたは subagent を skeptic として 1 回走らせる**。同じモデルは自分の出力を褒める傾向があり、副詞偏愛 cluster や TL;DR の取りこぼしが残る（Generator/Evaluator パターン）。
+8. For important drafts where same-model self-review is insufficient, run one different-model or subagent skeptic pass. Verify quoted text and line numbers against the actual draft before acting on feedback.
 
 ## Fix Order
 
