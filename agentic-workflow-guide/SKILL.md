@@ -86,7 +86,7 @@ Pattern details: [references/workflow-patterns/overview.md](references/workflow-
 - repo local の `.instructions.md` には workspace 固有の差分だけを残す。差分が無い generic instruction は merge back して削除候補にする。
 - IR は原則 in-memory で扱う。validator、script、deterministic handoff が必要な場合だけ中間 file を materialize し、不要になったら片付ける。
 - scheduler / service / config など決定論的な state mutation は、AI/UI loop ではなく direct script / API で現状確認 -> 最小変更 -> live read-back まで行う。LLM は scope と整合対象の判断に限定する。
-- For model allocation, trace actual producer/reviewer responsibilities, verify live availability and applicable pricing, and show current-to-proposed assignments with quality/cost tradeoffs before mutation; use [scheduled runtime bindings](references/scheduled-runtime-bindings.md).
+- For model allocation, trace actual producer/reviewer responsibilities, verify live availability and applicable pricing, and show current-to-proposed assignments with quality/cost tradeoffs before mutation; use [scheduled runtime bindings](references/scheduled-runtime-bindings.md). Try the cheapest capable model first when a human can check the result quickly; after a stronger model completes a task once, capture its steps and checks as a prompt or skill, route repeats to the cheaper model, and fall back when the steps fail.
 
 ## Escalation Rules
 
