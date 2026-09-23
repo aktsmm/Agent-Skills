@@ -61,7 +61,7 @@ disable-model-invocation: false # Optional: Prevent subagent invocation (default
 ---
 ````
 
-> **Model note:** `model:` is optional. Do not guess model names. If you have not verified the exact display name in the current environment, omit `model:` instead of using speculative values like `gpt-4o`.
+> **Model note:** In VS Code, subagents inherit the parent's model unless `.agent.md` sets `model:` or the caller specifies one (highest priority). A requested model cannot exceed the parent's cost tier. Use only exact names verified locally. [VS Code Docs](https://code.visualstudio.com/docs/agents/run/subagents#_select-the-model-for-a-subagent)
 
 When fallback matters, `model:` can be an ordered array and the first available model is used. Use only model display names verified in the current environment.
 

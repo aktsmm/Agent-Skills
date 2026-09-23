@@ -120,7 +120,7 @@ Humanize Writing の検出辞書。検出は厳密に、修正は文脈判断で
 ## Structure Signals
 
 - Paragraph lengths are too uniform. Mix in one- or two-sentence paragraphs.
-- Heading endings repeat too much. Change at least one if all headings end the same way.
+- Align subjects and comparison axes across sibling headings with the same role; do not force unrelated sections into identical sentence patterns.
 - Lists always collapse to 3 or 5 items. Use the number the content actually needs.
 - A short post has both a neat 3-point summary and a 2-point advice list. Return one list item to prose or keep only the needed count.
 - The opening has too much runway: disclaimers, background, glossary, digressions. Put the main claim, axis, or TL;DR first.
