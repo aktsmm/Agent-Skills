@@ -70,7 +70,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [visualize-as-infographic](visualize-as-infographic/) | Create colorful infographic PNGs from a conversation, topic, file, skill, or workflow |
 | [vscode-extension-guide](vscode-extension-guide/) | Guide for creating VS Code extensions and plugins from scratch through Marketplace publication |
 | [web-accessibility](web-accessibility/) | Build and review accessible web products using WCAG 2.2 AA |
-| [x-hashtag-research](x-hashtag-research/) | Collect and analyze public X posts from hashtags, keywords, domains, or known post URLs to discover popular discussions, primary sources, official docs, related GitHub repos, an... |
+| [x-post-research](x-post-research/) | Collect and analyze public X posts from keywords, hashtags, OR queries, domains, or known post URLs, then trace them to primary sources, official docs, GitHub repos, benchmarks,... |
 | [x-twitter-browser-ops](x-twitter-browser-ops/) | X/Twitter browser operations. Use for X browsing, analysis, bookmark management, content and profile operations, or browser-driven troubleshooting. Require explicit confirmation... |
 <!-- public-skills-table:end -->
 

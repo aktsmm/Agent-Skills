@@ -1,21 +1,22 @@
 ---
-name: x-hashtag-research
-description: "Collect and analyze public X posts from hashtags, keywords, domains, or known post URLs to discover popular discussions, primary sources, official docs, related GitHub repos, and reusable images. Use for launch-day announcements, event hashtags, new-technology use cases, popularity research, keynote reactions, or turning noisy X posts into a structured research note. X専用の公開投稿調査 workflow。"
-argument-hint: "対象クエリまたは投稿URL、時間窓、件数、保存先メモ名"
+name: x-post-research
+description: "Collect and analyze public X posts from keywords, hashtags, OR queries, domains, or known post URLs, then trace them to primary sources, official docs, GitHub repos, benchmarks, and reusable images. Use for launch-day reactions to a new model or product, event hashtags, keynote coverage, new-technology use cases, popularity research, or turning noisy X posts into a source-backed research note. Triggers: X で調べて, X の反応, ハッシュタグ調査, キーワードで X 検索, X 投稿からネタ探し. Not for posting or account operations on X."
+argument-hint: "検索クエリ（キーワード / ハッシュタグ / OR / ドメイン）または投稿 URL、時間窓、件数、保存先メモ名"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
 ---
 
-# X Hashtag Research
+# X Post Research
 
-FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 GitHub repo、画像、論点を research 配下へ整理する workspace 用 skill。
+FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 GitHub repo、画像、論点を research 配下へ整理する workspace 用 skill。ハッシュタグに限らず、通常キーワードや既知投稿 URL から始めてよい。
 
 ## When to Use
 
-- X のハッシュタグからイベント当日の発表を追いたいとき
+- 新モデル・新機能の名前（例: `"GPT-6 Luna" OR "GPT6 Luna"`）で、発表後の反応、第三者評価、実使用報告を拾いたいとき
 - X の通常キーワード、`OR`、ドメイン、既知投稿 URL から新技術やユースケースを探したいとき
+- X のハッシュタグからイベント当日の発表を追いたいとき
 - 反応数の多い投稿を候補として抽出し、一次成果物まで確認したいとき
 - `#MSBuild` や `#MicrosoftBuild` のような event hashtag を直近数時間で総ざらいしたいとき
 - keynote 直後に、一次情報 URL と repo の導線を先に集めたいとき
@@ -26,6 +27,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 
 - この skill は X 専用にする
 - Bluesky、LinkedIn、YouTube comments などは対象外
+- X への投稿やアカウント操作は対象外
 - それらを扱いたい場合は別 skill に切り出す
 
 ## Default Profile
@@ -48,7 +50,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 3. 目標件数
 4. 保存先メモ名
 
-ユーザーが省略した場合は既定値を提案して確認を取る。勝手に `4時間 / 500件` で走らせない。既知投稿 URL が列挙済みなら、その URL 群が対象と件数を定義するため時間窓は不要。保存先を既存成果物から一意に決められる場合も聞き直さない。
+ユーザーが省略した場合は既定値を提案して確認を取る。勝手に `4時間 / 500件` で走らせない。既知投稿 URL が列挙済みなら、その URL 群が対象と件数を定義するため時間窓は不要。保存先を既存成果物から一意に決められる場合も聞き直さない。発表当日の新モデル名などは `feed=latest` の 500 件が数時間分で尽きるため、件数上限に先に達したら実際の対象期間を記録して未充足と報告し、発表直後の公式投稿を既知 URL として追加取得するか、件数を増やすかを提案する。
 
 ## Collection Paths
 
@@ -65,7 +67,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 ## Workflow
 
 1. 収集対象を固定する
-   対象ハッシュタグ、時間窓、件数目標、主目的、research の保存先を決める。
+   対象クエリ、時間窓、件数目標、主目的、research の保存先を決める。
 
 2. API から効率よく収集する
    API の `results` から status URL を主キーに構造化抽出し、重複排除する。API が失敗した場合だけ画面から補う。
@@ -97,7 +99,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 
 ## Quality Gates
 
-- 収集件数と時間窓の両方を満たしている
+- 収集件数と時間窓の両方を満たしている。満たせない場合は、実際の対象期間と未収集の範囲を research ノートに明記している
 - 主要テーマが公開情報の塊として整理されている
 - repo 名が切れている場合は本文・card title・公式 blog で補正している
 - 画像保存先が research 配下で整理されている
@@ -116,12 +118,12 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 
 ## Example Prompts
 
-- `/x-hashtag-research #MSBuild と #MicrosoftBuild を直近4時間で500件以上集めて、一次情報と repo と画像を research に保存して`
-- `/x-hashtag-research #Build2026 で GitHub Copilot app と Foundry まわりだけ拾って`
-- `/x-hashtag-research #Ignite と #MicrosoftIgnite を2時間で300件、画像は代表8枚だけでいい`
+- `/x-post-research "GPT-6 Luna" OR "GPT6 Luna" を直近7日で500件集めて、記事に足せる第三者評価や注意点を拾って`
+- `/x-post-research #MSBuild と #MicrosoftBuild を直近4時間で500件以上集めて、一次情報と repo と画像を research に保存して`
+- `/x-post-research #Ignite と #MicrosoftIgnite を2時間で300件、画像は代表8枚だけでいい`
 
 ## Related Customizations To Create Next
 
-- ハッシュタグ research 結果を keynote research に差し込む prompt
+- X 調査結果を keynote research に差し込む prompt
 - 保存画像から記事向きのものだけ選別する skill
 - official blog / Learn / GitHub repo のみを二次整理する prompt
