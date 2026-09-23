@@ -66,7 +66,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 ## Done Criteria
 
-- [ ] Extension activates without errors
+- [ ] The packaged VSIX installs and activates in an isolated profile; changed user-facing integrations complete their real workflow there
 - [ ] Primary sidebar entry and commands work; referenced icons are present in the VSIX
 - [ ] Package size < 5MB (use `.vscodeignore`)
 - [ ] README links and feedback UI reach the intended support destination; verify the UI-to-form path with synthetic data without submitting

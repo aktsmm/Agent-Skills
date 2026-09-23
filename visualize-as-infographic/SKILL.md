@@ -76,6 +76,7 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 - No unintended white margins or oversized canvas from screenshot capture.
 - Pixel dimensions match the promised output size unless high-density output was explicitly chosen.
 - Step numbers and visual order match DOM / reading order.
+- In named comparison plots, label points near their marks or connect them visibly to names at the target embed width; do not make readers decode numbered points from a distant legend alone.
 - Card text fits without cramped line breaks.
 - Contrast is readable on the final PNG, not just in HTML.
 - Generic English UI does not remain in a Japanese artifact unless it is part of a quoted product surface.

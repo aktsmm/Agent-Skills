@@ -222,7 +222,7 @@ const { stdout } = await runVSCodeCommand(
 );
 ```
 
-Require the exact lowercase `<publisher>.<name>@<version>` line. A strong local release gate is: dependency audit → unit/Extension Host tests → package → exact ZIP verification → isolated install. Derive the VSIX filename from manifest name/version so version bumps cannot leave scripts or docs pointing to a stale artifact.
+Require the exact lowercase `<publisher>.<name>@<version>` line. A strong local release gate is: dependency audit → unit/Extension Host tests → package → exact ZIP verification → isolated install → behavior-scoped live smoke for changed external integrations. The live smoke must use that same VSIX in disposable user-data/extensions roots and observe the real result; a resolved command or dispatch status is insufficient when the contract requires a downstream response. Derive the VSIX filename from manifest name/version so version bumps cannot leave scripts or docs pointing to a stale artifact.
 
 `runVSCodeCommand` adds isolated `--user-data-dir` and `--extensions-dir` arguments when `reuseMachineInstall` is `false` (the default). Resolve `cachePath` from a repository-owned disposable test root, not user input. If you bypass that helper and invoke the CLI yourself, provide both directories explicitly under that root before using `--install-extension`.
 
