@@ -15,6 +15,7 @@ Use this skill when the user asks to create, open, prepare, or organize a projec
 ## Default location
 
 - When an active VS Code workspace is provided and the user is adding or organizing assets for the current task, use that workspace as the default target even without repo markers. Do not redirect it to an external project root.
+- When that workspace already manages a customer's ongoing work, add requested validation evidence under the confirmed topic and link to its existing status and actions. Do not create a second project workspace or parallel task ledger unless a separate workspace is explicitly requested.
 - Use the configured project root only when the user requests a separate project workspace or no active workspace target is available.
 - In CLI / Scout without active-workspace context, ask for a target folder when CWD does not identify a workspace. Do not infer an external project location.
 - Use Windows-style paths with backslashes.
@@ -31,7 +32,7 @@ Use this skill when the user asks to create, open, prepare, or organize a projec
 ## Creation flow
 
 1. Determine the intended project topic and folder slug.
-2. Create the folder under the configured Clawpilot project root.
+2. Resolve the target using Default location. Reuse an active workspace for in-place work; create a new folder under the configured project root only when a separate project workspace is requested.
 3. Default to creating a lightweight project package, not just an empty folder, when the request is for validation, investigation, PoC, comparison, customer explanation, screenshot collection, or when the user asks for viewpoints/criteria.
 4. If the user explicitly asks for only a folder, create the folder only and report the path.
 5. For large moves, renames, or destructive cleanup, follow dry-run -> confirmation -> execution.
@@ -65,6 +66,7 @@ If the user mentions cost, pricing, TCO, FinOps, billing, or comparing the cost 
 - Environment and prerequisites to prepare.
 - Step-by-step validation scenarios.
 - Evidence plan, including screenshot targets and naming convention.
+- Provenance for source material and screenshots; keep originals distinct from edited or shareable copies.
 - Comparison or decision criteria when there are multiple options.
 - Customer value story: what benefit the customer should understand from the validation.
 - Actual measurement scenarios for claims that require evidence. Do not stop at conceptual comparison when the user asks to "actually compare", "verify", "measure", or "cost compare".

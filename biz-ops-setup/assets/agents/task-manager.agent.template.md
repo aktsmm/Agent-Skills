@@ -32,19 +32,19 @@ Task completion conditions (must meet all):
 - [ ] Reflected to `Tasks/active.md` or `Tasks/completed.md`
 - [ ] If customer-related, synced to `Customers/{id}/tasks.md`
 - [ ] Reported operation result to user
-- [ ] **Synced `DASHBOARD.md` "Today's Focus" and "This Week" sections**
+- [ ] **Synced the existing focus, this-week, and recent-completed sections in `DASHBOARD.md`**
 
 ## Dashboard Sync Rules (MANDATORY)
 
-Always sync `DASHBOARD.md` when updating tasks.
+Always sync `DASHBOARD.md` when updating tasks. Match the existing headings in the target file (including any icons) and keep their language; do not add duplicate sections for an alternate label.
 
 ### Sync Targets
 
 | DASHBOARD Section | Sync Source                                      |
 | ----------------- | ------------------------------------------------ |
-| Today's Focus     | Top 3 high-priority tasks from `Tasks/active.md` |
-| This Week         | Tasks due this week from `Tasks/active.md`       |
-| Recent Completed  | Latest 3 from `Tasks/completed.md`               |
+| 今日のフォーカス / Today's Focus | Top 3 high-priority tasks from `Tasks/active.md` |
+| 今週の予定 / This Week | Tasks due this week from `Tasks/active.md`       |
+| 直近の完了 / Recent Completed | Latest 3 from `Tasks/completed.md`               |
 
 ### Sync Timing
 

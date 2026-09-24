@@ -22,6 +22,7 @@ Set up or operate customer workspaces without confusing setup artifacts with liv
 ## Choose a Mode First
 
 Inspect the workspace before choosing an action. Treat it as existing when it contains any managed record such as `.github/copilot-instructions.md`, `.github/prompts/`, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, or `workstreams/`.
+An aggregate operations workspace may contain a lightweight `Customers/{id}/` profile, task list, inbox, and meetings. Do not initialize a full customer workspace over those records; ask for a separate target if dedicated customer management is needed.
 
 | Mode | Use when | First action |
 | ---- | -------- | ------------ |
@@ -68,6 +69,7 @@ Capture only routing facts: workspace scope, sharing boundary, own-team aliases,
 | Deliverables and reusable learning | `research-reports/`, `_knowledge/` |
 
 `Initialize-CustomerWorkspace.ps1` creates the managed scaffold and its templates. Create workstream folders, meeting notes, next actions, project threads, and material folders only when the operating workflow requires them.
+Leave cross-customer activity reports and global task indexes in the owning operations workspace; link to them when needed instead of copying them into a customer record.
 
 ## Research Reports
 
