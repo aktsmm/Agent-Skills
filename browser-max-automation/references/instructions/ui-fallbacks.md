@@ -64,6 +64,10 @@ Intercept it instead of letting the OS dialog open:
 
 For download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downloadPath: <dir>, eventsEnabled: true})` before clicking so the file lands where you expect instead of the default Downloads folder.
 
+## GitHub issue / PR image attachment
+
+GitHub has no public API for issue attachments. Upload through a signed-in comment box without posting: click `Paste, drop, or click to add files`, send the file to the chooser, wait for `Uploading` to disappear, then read the `https://github.com/user-attachments/assets/...` URL from the textarea value. Clear the textarea (`select()` + `execCommand('delete')`; keyboard shortcuts may not reach it), confirm the comment count is unchanged, and write the URL into the body with `gh issue edit --body-file`.
+
 ## Shadow-DOM / Material widgets: rect comes back (0,0)
 
 In Angular-Material / web-component UIs (GCP Console, YouTube Studio), many buttons live in shadow DOM and `el.getBoundingClientRect()` returns `{x:0, y:0, width:0}` to page-level JS, so a JS-computed click misses. Click by screenshot pixel coordinates with `Input.dispatchMouseEvent` instead. Also scope element queries to the form region (x/y bounds): a generic `document.querySelector('mat-select,[role=combobox]')` often grabs the page's top search box and opens a search overlay — press Escape to dismiss, then retry within the form area.

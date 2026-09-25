@@ -76,7 +76,7 @@ Guidelines for manuscript writing style and quality.
 - Keep diagram intent explicit in the outline: note both the visual type and the reader takeaway.
 - Use tables for comparison and figures for flow; do not overload a table with process steps that belong in a diagram.
 - Keep one conceptual axis per table. Separate hierarchy or management units from account, membership, or role subtypes, then connect the two axes in prose.
-- When using a figure, add 1 to 2 sentences before or after it to tell the reader what to look at.
+- Introduce a figure before showing it; explain visible UI labels after the image. Describe only the state actually captured: a signed-in or disconnected screen does not prove a working session.
 
 ## Word Count Targets
 

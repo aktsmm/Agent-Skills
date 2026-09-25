@@ -124,7 +124,7 @@ iframe、force click、file chooser、hidden input、evaluate+fetchは [UI Fallb
 - Use one controller per work target. If another session owns the browser and coordination is unverified, use both a free port and a separate unused user-data-dir. A different port or profile-directory alone does not isolate a Chromium process; do not attach, restart it or copy its credentials to bypass ownership.
 - Pin the verified profile/context and owned target ID; re-check URL, route, query, and item ID before each write batch. Never select the first domain match again after binding the work target.
 - Before a necessary handoff, stop the owned runner and verify the current tool's detach/close semantics. Do not use `browser_close` as a generic disconnect: it may destroy tabs or the browser. Preserve dirty tabs; if safe detachment is unavailable, retain the working route or stop.
-- Close only explicitly owned, no-longer-needed targets after result verification. Never close the last tab of a shared browser or stop another session's runner as cleanup.
+- Close only explicitly owned, no-longer-needed targets after result verification. Never close the last tab of a shared browser or stop another session's runner as cleanup. When Playwright MCP is attached over CDP, `browser_close` may only detach and leave the owned tab open; re-list targets and close the owned one by ID (`/json/close/<id>`).
 
 raw WebSocket を使う場合は、CDP command id で応答をフィルタし、`Runtime.enable` / `Page.enable` など必要な domain を先に有効化する。詳細は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
 

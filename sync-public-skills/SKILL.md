@@ -100,6 +100,7 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 - **`HEAD.lock` rename failure**: 同じ失敗が2回続いたら`n`で停止し、HEAD・status・diff・rebase metadata・lock所有を確認する。未commit変更を保護し、`reset --hard`やlock一括削除はしない。HEADが不変でindex/worktreeだけがfetched remoteと一致すると証明できる場合だけ対象をHEADへ戻し、HEADをdetachしないverified mergeへ切り替える
 - **Git Data API transient failure**: blob/tree/commit/ref APIは共通retryと空SHA fail-fastを通す。ref更新後にremote treeを再取得し、stale path削除と完全一致を確認する
 - **Internal full mirror only**: internal subset指定は未選択Skillを削除し得るため拒否する。distribution configの全集合だけをdesired setとして使う
+- **Skill rename**: フォルダ名と `name`、distribution config、README / LICENSE index を同じ変更で揃え、旧フォルダを消す broad sync で反映する（primary-only は旧フォルダを消さない）。配布先でインストール済みの旧名コピーは更新で解決できず保留・要修復になり得るため、完了報告で新名の再インストールと旧フォルダ削除を案内する
 - **All Mode rollback**: tracked metadata、cross-root rename、commit失敗で停止する。commit途中の失敗は元HEADへ戻し、差分をunstagedで保持する
 
 ## Report

@@ -39,7 +39,7 @@ Start by assessing the manuscript workspace, even when creating a new project:
 When the workspace already exists, do not stop at setup-oriented advice. This skill should also support:
 
 1. Normalizing manuscript folders and section naming.
-2. Keeping outlines, drafts, final manuscript, and images aligned by chapter.
+2. Keeping outlines, drafts, final manuscript, and images aligned by chapter. For screenshots, describe only the captured state; introduce the image before explaining its visible labels.
 3. Running focused writing and review loops until P1/P2 issues are resolved.
 4. Applying reviewer fixes without leaving outlines, chapter maps, question digests, and progress trackers out of sync.
 5. Reviewing each chapter against the book-specific reader persona and expected outcome.
