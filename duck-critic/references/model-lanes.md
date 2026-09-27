@@ -22,7 +22,7 @@ Never hardcode model IDs. Model names churn faster than this skill does, so reso
 
 ### 1. Discover
 
-Read the harness's current model list at run time; see [harness adapters](./harness-adapters.md) for how each harness exposes it. Never assume a name from memory or from an earlier session. Discover once per session and reuse the result.
+Read the harness's current model list at run time; see [harness adapters](./harness-adapters.md) for how each harness exposes it. Never assume a name from memory, an earlier session, or a repository's model table; when such a table names an older generation than the live list offers, use the live list's current-generation tier and flag the table as stale. Discover once per session and reuse the result.
 
 ### 2. Exclude
 

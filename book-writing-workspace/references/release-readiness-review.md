@@ -170,6 +170,8 @@ Review the full manuscript for release-wide invariants. Review 100% of the chang
 
 For answer-bearing content, compare each answer with its explanation and source. Structural presence checks cannot detect a valid-looking but wrong answer label.
 
+When exercise difficulty must match a reference question bank, score both sets blind in the same run: mix a reference sample with the book's items, hide the source, and keep one model and one knowledge-based rubric. Compare means within a run, and repeat the run before tuning items, because one scorer's mean can move by about 0.2 on a four-level scale between runs. Rules that ban giveaway distractors push items up a level, and multi-select items whose correct options rest on different facts score as the hardest level; ease an item by swapping one look-alike distractor for a more distant one, not by reintroducing giveaways.
+
 ### Gate 5: Figures, Screenshots, and Rights
 
 Inspect every new or changed visual, plus unchanged visuals selected by risk. Always include first and last chapters, chapter boundaries, dense tables, full-page figures, and output-format boundaries.
