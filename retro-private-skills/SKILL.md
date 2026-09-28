@@ -125,6 +125,7 @@ Choose exactly one:
 - For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
 - For heavily changed existing skills, re-check frontmatter instead of assuming old metadata still routes correctly.
 - Add `references/` only when detail would bloat `SKILL.md`.
+- When editing Markdown table rows, pad the edited row to the existing column widths before committing. Otherwise the editor's save-time formatter realigns it later and leaves whitespace-only drift that blocks a primary-only sync. If drift still appears, confirm `git diff --ignore-all-space` is empty and commit it separately as `chore(<skill>): normalize table whitespace`.
 - In `safe-auto`, make a focused local commit when the scope is clear and all changed paths are intended, then push it in the same run after the automatic-push checks pass.
 
 ### 4. Bloat Check
