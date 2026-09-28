@@ -110,7 +110,7 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 - Privacy タブの **remote code ラジオが 「使用している」側に選択済みで到着することがある**。
   remote code を持たない拡張でも、触らずに submit すると事実と逆の申告になる。
   意図した値を明示的に選び直し、保存後に読み戻して検証する。他のラジオ群も同様に空とは限らない。
-- データ種別は manifest 名や「ページに含まれ得る情報」だけで全選択せず、各チェック項目について専用機能、保存 schema、送信 payload、監視 listener をコードから列挙して判定する。端末内だけの保存・処理も開示対象。一方、要求されたクリックを実行することはクリック履歴の収集ではなく、住所入力欄は PII でも GPS/IP の位置情報取得とは別。汎用ページ本文・画像・添付に機微情報が偶発的に含まれ得る限界はポリシーに書き、専用収集機能がないカテゴリを憶測で選択しない。
+- Classify each data checkbox from implemented features, stored fields, payloads and listeners, not manifest names or incidental page content. Local-only handling counts: an optional encrypted card number/expiry is financial/payment data even without model transfer. Align that category, the store listing, permission justifications and the public privacy policy before upload. A requested click is not activity logging; a typed address is PII, not device geolocation. Disclose limits for arbitrary page text, images and attachments without claiming dedicated collection. Source: https://developer.chrome.com/docs/webstore/program-policies/user-data-faq.
 - 保存後はページを再読込し、全データ種別、Limited Use の全証明、remote code、単一目的、権限理由、policy URL を構造化して読み戻す。保存ボタンの disabled だけを永続化の根拠にしない。申告と公開ポリシーと実装の不一致は公開ブロッカー。
 - 「送信できない理由」系のバナーは、必須項目をすべて埋めた後も残り、ダイアログ本文が空のことがある。
   実障害と断定する前に一度 draft を保存し直し、それでも残るかで判定する。

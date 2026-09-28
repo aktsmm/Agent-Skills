@@ -40,11 +40,11 @@ Always sync `DASHBOARD.md` when updating tasks. Match the existing headings in t
 
 ### Sync Targets
 
-| DASHBOARD Section | Sync Source                                      |
-| ----------------- | ------------------------------------------------ |
+| DASHBOARD Section                | Sync Source                                      |
+| -------------------------------- | ------------------------------------------------ |
 | 今日のフォーカス / Today's Focus | Top 3 high-priority tasks from `Tasks/active.md` |
-| 今週の予定 / This Week | Tasks due this week from `Tasks/active.md`       |
-| 直近の完了 / Recent Completed | Latest 3 from `Tasks/completed.md`               |
+| 今週の予定 / This Week           | Tasks due this week from `Tasks/active.md`       |
+| 直近の完了 / Recent Completed    | Latest 3 from `Tasks/completed.md`               |
 
 ### Sync Timing
 
