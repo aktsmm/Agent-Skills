@@ -1,7 +1,7 @@
 ---
 name: project-workspace
-description: "Create and manage topic-specific project workspace folders for validation, investigation, PoC, comparison, or workstream projects. Use when creating/opening a project workspace, validation folder, topic-specific work folder, or cost comparison workspace. Triggers on project workspace, プロジェクトワークスペース, 検証フォルダ, PoC ワークスペース, トピック別作業フォルダ."
-argument-hint: "作成したいプロジェクト名や検証テーマ"
+description: "Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a project workspace, cost comparison workspace, or project meeting notes. Triggers on プロジェクトワークスペース, 検証フォルダ, PoC ワークスペース, トピック別作業フォルダ, プロジェクトの議事メモ."
+argument-hint: "プロジェクト名・検証テーマ、または既存プロジェクトの議事メモ"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -10,7 +10,7 @@ metadata:
 
 # Project Workspace Skill
 
-Use this skill when the user asks to create, open, prepare, or organize a project/workspace folder for a validation, investigation, PoC, topic-specific workstream, comparison, or similar Clawpilot project.
+Use this skill when the user asks to create, open, prepare, or organize a topic-specific project workspace, or to record a meeting in an existing project. Use a customer-specific workflow for customer account operations, and a transcription workflow when the source media still needs transcription.
 
 ## Default location
 
@@ -36,6 +36,13 @@ Use this skill when the user asks to create, open, prepare, or organize a projec
 3. Default to creating a lightweight project package, not just an empty folder, when the request is for validation, investigation, PoC, comparison, customer explanation, screenshot collection, or when the user asks for viewpoints/criteria.
 4. If the user explicitly asks for only a folder, create the folder only and report the path.
 5. For large moves, renames, or destructive cleanup, follow dry-run -> confirmation -> execution.
+
+## Meeting notes in an existing project
+
+- Locate the project's existing meeting note or retrospective and update it; otherwise use a dated note in its notes folder if one exists, or alongside its existing records. Do not initialize a new project, create a customer workspace, or add meeting folders to the default package just for one meeting.
+- Record the meeting date, source (link to the original transcript or attachment when available), confirmed discussion and decisions, open questions, and follow-up actions. Assign owners and deadlines only when explicitly agreed; mark uncertain names, figures, and speech-recognition output as unverified.
+- Keep restricted source material in its existing authorized location. Do not copy confidential slides or raw transcripts into a shareable summary; distinguish what a participant proposed from an agreed commitment or outcome.
+- Verify that the note exists in the owning project and that unresolved questions and next actions are visible there or linked to an existing action record. Avoid a parallel task ledger.
 
 ## Default project package
 

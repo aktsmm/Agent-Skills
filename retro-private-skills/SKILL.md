@@ -66,7 +66,7 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - In `safe-auto`, edit directly when scope is clear, the safety gate passes, and the change is small or medium
 - Ask for confirmation only for broad rewrites, deletion, ambiguous private/public boundaries, or possible secret/customer/private data handling
 - In `safe-auto`, create a focused local commit and push it in the same run. There is no ahead-count threshold: several PCs share this repo, so a local commit left behind means the next machine starts from a stale tree. Invoking this skill counts as the push approval. To keep a draft local instead, use `review-only` or `dry-run`.
-- Before any automatic push, verify the remote is the private repo and the working tree is clean, then `git fetch origin` and recompute ahead/behind. For `git rev-list --left-right --count HEAD...origin/<branch>`, the first count is HEAD-only (ahead) and the second is origin-only (behind). Confirm the commits in `origin/<branch>..HEAD` touch only the target skill; stop and ask when unrelated commits are queued. If behind, use `git pull --rebase`; do not push stale tracking refs.
+- Before any automatic push, verify the remote is the private repo and the working tree is clean, then `git fetch origin` and recompute ahead/behind. For `git rev-list --left-right --count HEAD...origin/<branch>`, the first count is HEAD-only (ahead) and the second is origin-only (behind). Confirm the commits in `origin/<branch>..HEAD` touch only the target skill; stop and ask when unrelated commits are queued. If behind, use `git pull --rebase`; do not push stale tracking refs. After a canceled or interrupted push, fetch and recheck status, ahead commits, and paths before retrying; do not resend if already reflected remotely.
 - If Git repeats a `HEAD.lock` / `couldn't set HEAD` rename failure twice, answer `n` and stop retrying. Preserve uncommitted work; inspect HEAD, status, diffs, rebase metadata, and lock ownership. Restore index/worktree only when HEAD is unchanged and the half-applied tree is proven to match the fetched remote, then use a verified merge path that does not detach HEAD. Never `reset --hard`, force push, or delete locks blindly.
 - Verify the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
 - Treat dirty primary skill changes as authoring or intake material. In safe-auto, stage and commit only the target skill changes, and leave unrelated dirty paths untouched.
@@ -123,7 +123,6 @@ Choose exactly one:
 - Edit only under `<private-repo>/.github/skills/<skill>/`.
 - Keep the diff focused and small.
 - For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
-- For heavily changed existing skills, re-check frontmatter instead of assuming old metadata still routes correctly.
 - Add `references/` only when detail would bloat `SKILL.md`.
 - When editing Markdown table rows, pad the edited row to the existing column widths before committing. Otherwise the editor's save-time formatter realigns it later and leaves whitespace-only drift that blocks a primary-only sync. If drift still appears, confirm `git diff --ignore-all-space` is empty and commit it separately as `chore(<skill>): normalize table whitespace`.
 - In `safe-auto`, make a focused local commit when the scope is clear and all changed paths are intended, then push it in the same run after the automatic-push checks pass.
@@ -138,9 +137,7 @@ Before final response:
 
 - Check changed paths are all under `<private-repo>/.github/skills/`.
 - Check no forbidden target was changed.
-- Check `SKILL.md` frontmatter name matches folder name for new or heavily changed skills.
-- Check description includes both what the skill does and when to use it, with trigger phrases users actually say.
-- Check required optional metadata is intentional: `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
+- Parse YAML frontmatter for every changed `SKILL.md`, even one-line edits. Check `name` against the folder, `description` triggers and `argument-hint` against the current use case, and `user-invocable`, `license`, and `metadata.author` against repo conventions; metadata lint alone cannot detect a stale hint.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added. Scan added lines or the staged target content; do not scan unchanged diff context, which can trigger false positives on pre-existing terms.
 - Commit by default in `safe-auto`; commit only intended private skill repo changes, then push in the same run after the remote/clean-tree checks pass. Done means a clean working tree with ahead/behind `0/0`.
 
