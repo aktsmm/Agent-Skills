@@ -64,6 +64,14 @@ Intercept it instead of letting the OS dialog open:
 
 For download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downloadPath: <dir>, eventsEnabled: true})` before clicking so the file lands where you expect instead of the default Downloads folder.
 
+With Playwright MCP, a chooser opened inside `browser_run_code_unsafe` becomes MCP modal state instead of reaching the script's `waitForEvent('filechooser')`; finish it with `browser_file_upload`. Its allowed-root check compares the drive letter case literally, so pass the path in the same case as the reported root (for example `c:\...`). Some apps (e.g. D365) ignore `setInputFiles` on the hidden input and only accept the chooser route; verify the app's own "selected file" field before continuing.
+
+## Playwright MCP run_code Files and PDF Capture
+
+- `browser_run_code_unsafe` with `filename` wraps the file as `(<content>)(page)`. A workspace formatter that saves the file with a trailing `};` breaks it with `SyntaxError: Unexpected token ';'`; strip the trailing semicolon or keep the script outside formatted paths.
+- Do not await download completion inside `browser_run_code_unsafe` (`waitForEvent('download')`, CDP `Browser.downloadProgress`). On a headed browser attached over CDP the event may never arrive and the tool call hangs until the user cancels. Trigger the download, return, then verify the file on disk from the shell. After two hangs on the same route, stop and ask the user.
+- `page.pdf()` works on a headed Chromium/Edge attached over CDP. For a site "Print" button that opens a print-layout popup, stub `window.print` with `context.addInitScript` first, wait for the popup `load`, verify its text, then `popup.pdf()` and close it. Prefer this over printing the input form page, which captures editable boxes and caret.
+
 ## GitHub issue / PR image attachment
 
 GitHub has no public API for issue attachments. Upload through a signed-in comment box without posting: click `Paste, drop, or click to add files`, send the file to the chooser, wait for `Uploading` to disappear, then read the `https://github.com/user-attachments/assets/...` URL from the textarea value. Clear the textarea (`select()` + `execCommand('delete')`; keyboard shortcuts may not reach it), confirm the comment count is unchanged, and write the URL into the body with `gh issue edit --body-file`.

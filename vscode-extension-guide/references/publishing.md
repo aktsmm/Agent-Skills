@@ -78,7 +78,7 @@ npx @vscode/vsce publish minor  # 0.1.0 → 0.2.0
 npx @vscode/vsce publish patch  # 0.1.0 → 0.1.1
 ```
 
-> `vsce` option names vary by version. If `--packagePath` is rejected, check the local `vsce publish --help` and prefer the supported package input option such as `-i`. Do not paste help output into public logs if it displays PAT defaults.
+> `vsce` option names vary by version. For an existing VSIX, prefer the documented `-i` input option. If syntax must be checked, run help only in a process without `VSCE_PAT`; the help output itself can disclose the effective token, including to private tool logs.
 
 ## Pre-publish Checklist
 
@@ -411,7 +411,7 @@ If a publish command still uses an expired token after you update the User envir
 
 - ❌ Never paste a PAT into chat, issue comments, or commit messages
 - ❌ Never echo `$env:VSCE_PAT` – check existence/length only
-- ❌ Avoid sharing raw `vsce publish --help` output when `VSCE_PAT` is set; some versions display the effective PAT default in help text
+- ❌ Never run `vsce publish --help` with `VSCE_PAT` set; some versions print the effective PAT default even into private tool logs
 - ✅ Use `VSCE_PAT` env var; `vsce publish` picks it up automatically
 - ✅ Set expiry ≤ 1 year and rotate on a schedule
 

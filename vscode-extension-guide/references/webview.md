@@ -654,7 +654,8 @@ document.addEventListener("click", function (e) {
 });
 ```
 
-- ❌ Avoid `onclick="..."` 直書き（クォート崩れ・minify時のSyntaxErrorの温床）。
+- ❌ `script-src 'nonce-...'` は `onclick="..."` などのインラインイベント属性を許可しない。nonce 付き script 内で `addEventListener` を登録し、実機クリックと Webview Developer Tools の CSP エラーを確認する。ソース検査だけで動作確認済みとしない。
+- ✅ 未信頼の Markdown リンクは Webview からの URL を信用せず、Extension Host 側でスキームを許可リスト照合し、相対パスを信頼できる配布元 URL に解決してから `vscode.env.openExternal` で開く。
 - ❌ Avoid TypeScript キャスト文字列（`as HTMLElement` がそのままHTMLに出てSyntaxError）。
 - ✅ 属性は必ず escape し、委譲で処理する。
 
