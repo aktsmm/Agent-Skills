@@ -176,3 +176,4 @@ Windows の PIPE デッドロック、VS Code terminal の SIGINT、JSON status 
 - 成功判定を toast だけに頼らず、DOM / URL / API read / screenshot / status artifact のいずれかで確認している
 - modal / file chooser / iframe / CDP context のどこで詰まるか説明できる
 - 一括処理が必要なら MCP から CLI / API helper へ切り替える判断ができている
+- Playwright MCP が作業 repo 直下へ書く `.playwright-mcp/`（console log / snapshot）が `.gitignore` 済みで、自分が作った未追跡分は `git clean -n` で確認して削除している。追跡済みなら `git rm -r --cached -- .playwright-mcp`（ファイルは残る）

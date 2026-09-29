@@ -149,6 +149,8 @@ Rules:
 
 - In TipTap/contenteditable fields, `.fill()` may append to the old text. Before saving, read back the entire field, check the old anchor is absent, and use the site's own length counter rather than `innerText.length` for limits.
 - If concatenated, focus only that editor, use Ctrl+A then Backspace, verify the field and counter are empty, refill, and read back before saving. Preserve unrelated paragraphs when changing only one claim.
+- Click-to-edit `<textarea>` bound to a framework (rendered block turns into a textarea + Save): if the block's click times out, dispatch one `click` event on it, then set the value with the native setter (`Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(el, v)`) and dispatch `input`/`change`; a plain `el.value =` may be ignored. Edit by string replace on the value just read, aborting unless the anchor occurs exactly once and the new text is absent, then press that form's own Save.
+- When Save publishes immediately (no draft/preview), treat it as the publish write: show the exact body first, click once, and read back the public page with a cache-busting query instead of the editor state.
 
 ## Minimal UI Write Fallback
 
