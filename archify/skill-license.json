@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "provenance": "derivative",
+  "spdxId": "MIT",
+  "frontmatterLicense": "MIT",
+  "profile": {
+    "id": "mit",
+    "registryVersion": 1,
+    "spdxId": "MIT",
+    "frontmatterLicense": "MIT",
+    "evidenceFile": "LICENSE.txt",
+    "templateSha256": "b1063121a97c3fca2289324b0241a28cdb95bf1884f7e3bbf3a8db90492c387e",
+    "requiresAuthorAttribution": true
+  },
+  "authorAttribution": {
+    "value": "tt-a1i"
+  },
+  "evidence": [
+    {
+      "path": "LICENSE",
+      "sha256": "b799ab081703e7821ae5096d2c1abdf14bbdc75e8ea1c4045998c36ed6db9706"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "sha256": "0b7fb59365dc21c93b0f62526d74ee913aeec9ae532c112bc76afa7edcd56e14"
+    }
+  ],
+  "upstreamAttributions": [
+    {
+      "name": "archify",
+      "author": "tt-a1i",
+      "license": "MIT",
+      "source": "https://github.com/tt-a1i/archify/tree/69cf672087289033af5138648d3875d3d73fc431/archify"
+    },
+    {
+      "name": "architecture-diagram-generator",
+      "author": "Cocoon-AI",
+      "license": "MIT",
+      "source": "declared in upstream SKILL.md metadata.based_on"
+    }
+  ],
+  "confirmationMode": "derivative-import"
+}
