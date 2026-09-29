@@ -28,7 +28,7 @@ If CDP startup may already be automated, inspect its owner before adding another
 ## Rules
 
 - Treat "port is open" and "right profile is logged in" as separate checks.
-- Verify listener PID and process arguments before connecting, then corroborate the owned endpoint with `/json/version` and target URLs. A launched browser may fail to bind while another answers; disagreement is an ownership failure, not permission to drive whichever endpoint responds.
+- Verify listener PID and process arguments before connecting, then corroborate the owned endpoint with `/json/version` and target URLs. Parse quoted or bare `--user-data-dir` values instead of comparing raw command-line substrings; a launcher may add quotes. A launched browser may fail to bind while another answers; disagreement is an ownership failure, not permission to drive whichever endpoint responds.
 - Quote the whole `--profile-directory=<name>` switch when the profile name contains a space. An unquoted one can be split by the shell into `--profile-directory=<first word>` plus a bare trailing token, which silently selects a different existing profile and can be opened as a URL instead (a window titled `0.0.0.2` is one observed signature of a trailing `2`). Verify which profile actually resolved rather than that a window appeared.
 - Terminate only the instance you started: match on the PID or process tree you launched, or on the PID owning the CDP port. Do not match by process name or image path, which also hits the user's own browser. Giving your instance a unique `--user-data-dir` makes a command-line filter unambiguous; the default profile has no such switch to match on.
 - Closing every window may still leave the profile locked. Chrome can keep a windowless background process launched with `--no-startup-window`, and a window-based close never reaches it, so a relaunch with a debugging port joins the locked instance instead of opening the port.
@@ -69,6 +69,7 @@ Protocol: https://chromedevtools.github.io/devtools-protocol/tot/Target/#method-
 ## Authentication Gotchas
 
 - Prefer headful existing profile + CDP over temporary `--user-data-dir` for sites that rely on cookies or device auth.
+- For recurring sign-in, reuse a single-owner dedicated `--user-data-dir` outside temp, synced, and workspace directories. To promote an owned temporary profile, stop its process before copying, verify authenticated UI with the destination after relaunch, then remove only the unused source.
 - Chrome 136+ ignores `--remote-debugging-port` / `--remote-debugging-pipe` against its default data directory and requires a non-standard `--user-data-dir`; check other Chromium browsers separately. Do not treat a renamed path, junction, or copied profile as proof that an authenticated session is reusable. Source: https://developer.chrome.com/blog/remote-debugging-port
 - Copied profile cookies can be app-bound or device-bound and may decrypt only in the original profile context. After any profile copy, verify the target site URL and authenticated controls; a cookie row existing on disk is not login evidence.
 - Treat a temporary profile directory as a single-owner lifecycle: copy, launch, use, stop, then delete. Never copy, delete, or launch the same directory in parallel; a partial copy or competing process can create misleading authentication state.

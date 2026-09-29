@@ -145,6 +145,11 @@ Rules:
 - The same path turns the browser into a local rendering engine: `import()` a renderer (diagram, chart, markdown) into a blank tab and return the produced markup, instead of installing a headless toolchain or posting the payload to a hosted rendering service. The data never leaves the machine, which matters when it holds names or internal structure.
 - Pin the exact version of any library imported this way. A floating major on a CDN can change or break an unattended run months later, and the failure surfaces as a parse error far from the change.
 
+## Rich-text Editor Replacement
+
+- In TipTap/contenteditable fields, `.fill()` may append to the old text. Before saving, read back the entire field, check the old anchor is absent, and use the site's own length counter rather than `innerText.length` for limits.
+- If concatenated, focus only that editor, use Ctrl+A then Backspace, verify the field and counter are empty, refill, and read back before saving. Preserve unrelated paragraphs when changing only one claim.
+
 ## Minimal UI Write Fallback
 
 If an authorized API write is confirmed not applied because of stale automation state or a route mismatch, choose a UI recovery within the shared budget. Permission or service-policy refusals are not a reason to bypass the restriction:
