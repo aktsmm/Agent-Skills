@@ -62,7 +62,7 @@ Intercept it instead of letting the OS dialog open:
 4. `DOM.setFileInputFiles({backendNodeId, files: [path]})`.
 5. `Page.setInterceptFileChooserDialog({enabled: false})`.
 
-For download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downloadPath: <dir>, eventsEnabled: true})` before clicking so the file lands where you expect instead of the default Downloads folder.
+For raw CDP-controlled download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downloadPath: <dir>, eventsEnabled: true})` before clicking. Do not override download behavior underneath a Playwright-controlled context; use its download API instead.
 
 With Playwright MCP, a chooser opened inside `browser_run_code_unsafe` becomes MCP modal state instead of reaching the script's `waitForEvent('filechooser')`; finish it with `browser_file_upload`. Its allowed-root check compares the drive letter case literally, so pass the path in the same case as the reported root (for example `c:\...`). Some apps (e.g. D365) ignore `setInputFiles` on the hidden input and only accept the chooser route; verify the app's own "selected file" field before continuing.
 
@@ -71,6 +71,16 @@ With Playwright MCP, a chooser opened inside `browser_run_code_unsafe` becomes M
 - `browser_run_code_unsafe` with `filename` wraps the file as `(<content>)(page)`. A workspace formatter that saves the file with a trailing `};` breaks it with `SyntaxError: Unexpected token ';'`; strip the trailing semicolon or keep the script outside formatted paths.
 - Do not await download completion inside `browser_run_code_unsafe` (`waitForEvent('download')`, CDP `Browser.downloadProgress`). On a headed browser attached over CDP the event may never arrive and the tool call hangs until the user cancels. Trigger the download, return, then verify the file on disk from the shell. After two hangs on the same route, stop and ask the user.
 - `page.pdf()` works on a headed Chromium/Edge attached over CDP. For a site "Print" button that opens a print-layout popup, stub `window.print` with `context.addInitScript` first, wait for the popup `load`, verify its text, then `popup.pdf()` and close it. Prefer this over printing the input form page, which captures editable boxes and caret.
+
+### Durable Downloads and GUID Filenames
+
+- Playwright's temporary download filename can be a random GUID without an extension, so the browser download list may show a generic icon. Neither that icon nor clicking the history entry proves the file is corrupt or durable.
+- In standalone Playwright, register `expect_download()` before the click, check `download.failure()`, and `save_as()` an explicit persistent path with the intended extension. Use `suggested_filename` when preserving the provider's name. Temporary downloads belong to the context and must not be the final deliverable. The MCP event-wait caveat above still applies.
+- Record the document identity and saved path immediately, then validate file signature, parser readability, and expected content; inspect a render for missing or clipped content. After a verification failure, inspect the existing file and reconcile its identity before another download. Hash-check copied/renamed originals.
+- Return only the task-relevant page region, never an entire account home/chat sidebar. Keep signed document URLs and authentication state out of logs and reusable scripts.
+- On Windows, configure UTF-8 output before printing non-ASCII page/PDF text. A console encoding error is a reporting failure, not evidence of a failed download or sign-in.
+
+Official API: https://playwright.dev/python/docs/api/class-download
 
 ## GitHub issue / PR image attachment
 

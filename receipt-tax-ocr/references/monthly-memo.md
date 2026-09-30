@@ -28,6 +28,12 @@ This memo format is optimized for Japanese sole-proprietor or side-business expe
 - Do not create a bookkeeping entry for a withdrawal from an unbooked personal account; retain it as `対象外` only when the evidence is useful.
 - Ask before updating the memo when the withdrawal's source account or use is unclear.
 
+## Personal Funding and Advance Payments
+
+- Record business purpose and who funded the payment independently. A private card does not turn a confirmed business expense into 事業主貸 or 対象外; preserve the expense account and identify personal funding as 事業主借.
+- For advance payments, record both payment date and service date; placing evidence in the service-month folder does not create the payment-month ledger entry. If using 前払金, describe the payment-stage and service-stage entries separately so the expense is recognized once.
+- Do not invent a reimbursement transfer. Link a later repayment only when its evidence exists.
+
 ## Multiple Items
 
 - When one image contains multiple items, keep one file and add a `品目内訳` bullet list in the memo

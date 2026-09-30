@@ -24,6 +24,15 @@ YYYY-MM-DD-content-vendor-note-amount-勘定科目[-メモ].ext
 
 Use the service date（乗車日・購入日・利用日）, not screenshot date or settlement date.
 
+## Foreign Currency
+
+When the JPY total is unavailable, prefix the amount with the lowercase currency code and encode its minor units: `usd-1234` means USD 12.34, not JPY 1,234. For another currency, confirm its minor-unit scale rather than assuming two decimals. Record the human-readable currency/amount and encoding in the memo; leave JPY conversion pending card-statement reconciliation.
+
+```text
+YYYY-MM-DD-subscription-vendor-plan-usd-1234-通信費-領収書.pdf
+YYYY-MM-DD-subscription-vendor-plan-usd-1234-補助画像-請求書.pdf
+```
+
 ## Content Vocabulary
 
 | English      | Meaning                    |

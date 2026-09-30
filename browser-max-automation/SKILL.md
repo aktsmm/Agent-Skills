@@ -1,6 +1,6 @@
 ---
 name: browser-max-automation
-description: Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, repeatable browser workflows, existing-session reuse, or troubleshooting CDP / iframe / modal / file chooser / passkey (WebAuthn) issues.
+description: Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, durable file downloads, repeatable browser workflows, existing-session reuse, or troubleshooting CDP / iframe / modal / file chooser / passkey (WebAuthn) issues.
 argument-hint: "自動化したい URL、操作内容、使いたいモード"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -56,6 +56,8 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 ```
 
 Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read.
+
+For downloads, save a durable extension-bearing copy before context/runner cleanup and verify its bytes/content, not its browser-history name or icon; see [download handling](references/instructions/ui-fallbacks.md#durable-downloads-and-guid-filenames).
 
 Wait for required controls or an explicit empty state. A title, route or tab-click success proves neither authentication nor that the selected view matches rendered rows. Distinguish parse failure from empty data: preserve raw text, normalize observed invisible label characters only in an extraction copy, and test explicit zero, missing fields and mismatched IDs through the collector. Never inject an expected ID to pass validation. A readiness deadline ends in unverified state, not inferred logout.
 
