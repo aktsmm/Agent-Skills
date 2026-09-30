@@ -88,6 +88,8 @@ Exit codes: `0` PASS, `1` FAIL, `2` UNVERIFIED. Anything but `0` means do not sh
 
 Fast path uses the target viewport and requested export. If mobile or responsive use is promised, also walk the final artifact at the narrow target width; a desktop PASS does not cover it. Never skip single-file-ness, image decode, overflow, navigation, or the sanitization question. Report untested capabilities separately.
 
+For visual QA, inspect final rendered previews yourself or delegate them with the approved storyboard and theme constraints to an image-capable, read-only reviewer. Request reviewed slide/section IDs, issues and fixes only. Re-finalize after content changes and rerun both verification tiers.
+
 ## Scripts
 
 | Script                                           | Needs                       | Purpose                             |

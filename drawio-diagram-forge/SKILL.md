@@ -69,6 +69,8 @@ If the user asks for an editable diagram, make `*.drawio` the primary deliverabl
 
 ## Workflow
 
+Treat generated images as optional layout references, not requirement evidence. Resolve labels, nodes, groups and edge directions in the manifest; flag ambiguity instead of inventing content. Rebuild native mxCells and connectors; wrapping a raster image in draw.io metadata does not make its elements editable.
+
 ```
 USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 ```

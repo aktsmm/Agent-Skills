@@ -44,6 +44,7 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 ## Design Rules
 
 - Use visual hierarchy: title, short lead, 3-6 visual units, concise footer if useful.
+- Use a consistent licensed icon set for generic concepts and embed its SVG/image assets rather than loading a runtime CDN. For product identities, use permitted official assets, not generated logos.
 - Match explanatory labels to the artifact's audience language. For Japanese articles, use natural Japanese for titles, captions, status labels, and generic UI; keep product names, API fields, and other proper nouns in their official form. Avoid literal labels that sound unnatural, such as `段階で採点`, when `定義した基準のどの段階に近いか` is the intended meaning.
 - Read numeric claims from the source artifact or SSOT instead of retyping them. For latency, cost, accuracy, and token values, state the measurement boundary in or next to the image: per request, serial total, fresh-process end to end, estimate, or saved-result playback.
 - If an infographic depicts motion or elapsed time, state inside the asset whether movement is illustrative or timed from measurements. Animation duration must not be presented as API or processing latency unless frames are generated from those timestamps.

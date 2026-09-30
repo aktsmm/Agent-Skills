@@ -102,11 +102,12 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 - **Reusable template means slide master**: 「テンプレートを作る」と言われたら、表紙・本文・Ending の再利用デザインはスライド直置きではなく `SlideMaster.CustomLayouts` に置き、編集する文字は placeholder / text shape として残す
 - **PPTX asset metadata gate**: テンプレートや配布用 PPTX を skill asset / public artifact に含める前に `scripts/clean_template.py` で `docProps/custom.xml`（MIP ラベル、tenant、SharePoint フィールド、同僚メール）と `docProps/core.xml`（`cp:lastModifiedBy` / `cp:revision`）を sanitize する。PowerPoint は OneDrive / SharePoint から開くたびに MIP を再付与するので、check-in 直前に毎回実行する。詳細は [references/instructions/template.instructions.md](references/instructions/template.instructions.md#template-metadata-hygiene)。スライド本文検索だけで安全判定しない
 - **JP template font default**: 日本語の再利用テンプレートでは master/layout の既定和文フォントを `BIZ UDPゴシック` に揃え、生成スライド側の後処理で毎回フォントを直す設計にしない
-- **Rendered QA before handoff**: COM で開いている deck を直接 touch-up した後も、対象 deck から実レンダー画像を書き出し、重なり・フォントばらつき・表の可読性を個別 slide で確認する
+- **Rendered QA before handoff**: Export every slide after building or COM touch-up; check overlaps, font consistency and table readability. If an image-capable, read-only reviewer is available, delegate previews, approved content.json and template constraints; request reviewed slide IDs, issues and fixes only. Otherwise inspect locally. Re-render and recheck affected slides after fixes.
 - **Review like a critic, not a generator**: ユーザーに見せる前に、レンダー画像で「スカスカ・文字が小さい・アイコンが雑・テンプレ踏襲不足・旧文言残り」を自分で探して直す。詳しくは [references/instructions/deck-iteration-review.instructions.md](references/instructions/deck-iteration-review.instructions.md)
 - **Media restore gate**: slide insertion/deletion/recovery after a user review must re-check expected slide count and embedded video/media positions before continuing
 - **Template base-slide gate**: テンプレートを複製して生成する場合は、保持する sample slide を先に明示し、不要な contact / next-event 等を構造編集で削除する。完了前に content manifest から導いた期待枚数、残存 placeholder、slide order を検証する
-- **Architecture diagrams use shapes**: ASCII art ではなく図形で組む
+- **Editable diagrams**: Generated images are optional design references, not editable output. Rebuild text, shapes and connectors from approved content.json with suitable licensed icon assets; preserve diagram relationships. Keep photos/screenshots as images; no ASCII art or full-slide rasterization as a substitute for editable slides.
+- **Grid-first placement**: Initialize positions on a consistent layout grid, refine against actual slide renders, and remove temporary grid overlays from final exports.
 - **Appendix URLs use Title - URL**: 参考 URL の表示形式は統一する
 - **Review content and visuals separately**: 生成後は見た目レビューだけでなく、公式情報との正確性レビュー、URL hyperlink 数、notes 数、placeholder/internal wording を確認する
 
