@@ -68,7 +68,7 @@ Which tokens an archetype actually reads, counted from `var()` uses in the pinne
 | `--shf-size-canvas-w` `-h`                                                         | —    | —   | ✓      |
 | `--shf-scale-step`                                                                 | —    | —   | —      |
 
-The verifier checks the token grammar by prefix, not against an archetype's list, so a token the archetype never reads still passes — it simply does nothing. That is how a token quietly stops working: deck typography is entirely `cqw`, so **`--shf-size-base` does not scale a deck**, and `--shf-scale-step` is read by nothing at all. Never take a passing verification as proof that a value took effect; change it and look.
+The verifier checks the token grammar by prefix, not against an archetype's list, so a token the archetype never reads still passes — it simply does nothing. That is how a token quietly stops working: deck typography is entirely `cqw`, so **`--shf-size-base` does not scale a deck**, and `--shf-scale-step` is read by nothing at all. Never take a passing verification as proof that a value took effect; change it and look. Measured on the poster skeleton: `shf-theme` sits before `shf-css`, whose `:root` defaults then win, so a changed accent renders unchanged while verification passes. Put `shf-theme` after `shf-css` (the verifier accepts either order) and confirm by rendering; deck and doc are untested.
 
 ## Varying the look without new CSS
 

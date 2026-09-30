@@ -52,3 +52,4 @@ If the poster is destined for a specific publishing target and the active worksp
 - Embedding a screenshot without checking its real resolution against the export scale.
 - Capturing `#shf-root` directly without hiding fixed export controls; they can overlap the PNG even when they sit outside the root in the DOM.
 - Treating the HTML as the deliverable when the recipient expects an image.
+- Hand-built SVG figure: `<text>` does not wrap, so use one `<text>` per line (about one font-size of width per CJK character). With eyebrow, `h1` and footer the figure gets about 300px of height. Inset strokes 2px or more from the viewBox edge. Tier 2 passes even when text or a stroke touches a cell or the canvas edge, so view the exported PNG.
