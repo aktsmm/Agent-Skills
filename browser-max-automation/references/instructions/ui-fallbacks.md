@@ -123,6 +123,14 @@ Canvas-like widgets (org charts, diagram editors, graph views) lay children out 
 
 Do not invoke application handlers or private frontend internals as another retry after click failures. Inspect event/state evidence to distinguish trust or gesture requirements from a stale target, then use a supported route within the existing budget or stop. Never treat handler execution as proof of the user's intended transaction. The Skill's explicitly approved single-incident exception still requires ownership and foreground checks and does not reset the retry budget.
 
+A concrete gesture case: a button that calls `window.open` (new tab/popup) does nothing visible when clicked with `el.click()` from `Runtime.evaluate`, because there is no user activation, and the target list shows no new page. Click the element's centre with `Input.dispatchMouseEvent` (`mouseMoved`, `mousePressed`, `mouseReleased`) instead, then re-list targets and bind the new tab by its full URL. Do not count the silent miss as an application failure or replay a possibly-applied write.
+
+## Hidden tabs and ambiguous targets
+
+- A background tab can make `Page.captureScreenshot` time out or leave a spinner in the capture. Check `document.visibilityState`; in a browser the run owns, select the owned tab once (`/json/activate/<id>`) and re-check instead of retrying the capture.
+- Wrap `/json/list` results in `@(...)` before filtering (a single page unwraps to a scalar) and match tabs by full URL. A path fragment such as `/agents/new` can match two apps.
+- Do not treat an empty `[role=dialog]` / `aria-live` query as "no message". Error banners often render outside those roles, so search `document.body.innerText` for the expected text and read the screenshot.
+
 ## Hiding sensitive UI before a capture
 
 When a selector suppresses something that must not appear in a published image (account avatar, notification badge, tenant name), a zero-match must be an error. Helpers that loop over `querySelectorAll` and hide each hit succeed silently on zero elements, so a renamed class ships the very thing you meant to remove. Return the match count and fail the run when it is 0. Split the selectors into must-hide and optional so localization or A/B variants that legitimately lack an element do not fail every run.
