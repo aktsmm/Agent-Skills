@@ -25,6 +25,19 @@ Because sizes are proportional, **shrinking text to make content fit is not an o
 
 Rough vertical capacity per slide at the default scale: one heading plus about six short lines, or a table of five rows, or three cards. An eyebrow or chapter label consumes another line; a five-row table that fits without it can overflow once it is added.
 
+## Density classes
+
+The default scale suits title and divider slides. Put one class on a slide `<section>` to scale its text; titles and body scale separately, and the top padding is already tight.
+
+| Class         | Body / heading | Use for                                         |
+| ------------- | -------------- | ----------------------------------------------- |
+| `shf-d-body`  | ×0.88 / ×0.86  | ordinary content slides                         |
+| `shf-d-dense` | ×0.78 / ×0.80  | a diagram plus a table, or cards with a callout |
+| `shf-d-ref`   | ×0.66 / ×0.80  | source and link lists                           |
+| `shf-d-large` | ×1.15 / ×1.10  | sparse or closing slides                        |
+
+The capacity figures below are for the default scale; scale them by the factor. Inline SVG diagrams and `shf-callout` need no extra CSS. A slide that overflows still fails Tier 2: change the class or split it. Add `shf-nw` to a `td`, `th` or `span` to keep a short label (a role, a date range) on one line; the other columns then absorb the wrapping.
+
 ## How much text fits on a line
 
 Horizontal capacity is arithmetic, not taste. A slide's padding is `7cqw` each side, so content is `86cqw` wide:
@@ -176,3 +189,6 @@ The `print` button in the chrome calls the browser's own print dialog, so a reci
 - Writing paragraphs instead of lines. A deck is read at a distance.
 - Leaving `hidden` off a slide, so two render at once.
 - Putting a numeric chart in v1. Only diagrams without a numeric scale are supported; a hand-authored axis is where invented numbers appear.
+- Letting `pre` run past about seven lines. It is `overflow:auto`, so the extra lines are clipped inside the slide and Tier 2 still passes. Cut the block, then confirm in the rendered PNG.
+- Pairing a Latin-word first column with a long neighbouring cell. `overflow-wrap:anywhere` lets the squeezed column break mid-word (`Noteboo` / `ks`); shorten the long cell instead of widening the column.
+- Editing a finalized deck by hand (the build script is gone). Removing a slide leaves its `shf-thumb-*` asset in `shf-model`, and finalize stops with `manifest asset ... is never referenced`: drop that asset and its `thumbnails` entry first. After a pinned-CSS bump, swap the `shf-css` block and `data-shf-css` too, or the hash check fails. Keep the build script beside the deliverable instead.

@@ -40,7 +40,7 @@ Ask which one unless the request already says. Load only that archetype's refere
 3. Colour direction — propose two or three, or derive one from the topic. See [design-tokens.md](references/design-tokens.md).
 4. Images? If any is a screenshot or of unknown provenance, ask the sanitization question in Hard Constraints **before** embedding.
 5. Which export, if any: PDF, PNG, or per-slide PNG. Produce only what was asked for.
-6. For editable notes or forms, resolve the capability gap before promising implementation: the bundled player has no free-text input or persistence. Offer a static worksheet only with agreement; otherwise route to an application workflow. Do not patch the pinned runtime to disguise an unsupported requirement.
+6. For editable notes or forms, resolve the capability gap before promising implementation: the bundled player has no free-text input or persistence. Offer a static worksheet only with agreement; otherwise route to an application workflow. Do not patch the pinned runtime to disguise an unsupported requirement. For per-slide review comments, finish the deck, then wrap it once with `build_review_viewer.py` and ship that single file (deck plus a closable comment panel, slide grid, search, deep links, presenter view in a second window, laser pointer; no separate review copy). The wrapper has its own script and is not covered by the verifier; the embedded deck still is. `--extract` recovers the deck for edits.
 
 ## Hard Constraints
 
@@ -73,7 +73,7 @@ These gate the output. They are here, not in a reference, because a reference ma
 6. For deck steps or thumbnails, run `export_html.py draft.html --finalize final.html --thumbnails` (omit `--thumbnails` for a title-only sidebar). This verifies the draft, builds embedded previews and complete static print pages, then verifies the final HTML before saving. After editing slide content, finalize again; do not hand-edit derived images or print pages.
 7. Verify, then export only the requested format. Choose effects only where they explain order, change or focus; do not animate every slide merely because the player supports it. Sound starts off and is a recipient choice.
 
-Changing anything under `assets/runtime/` or `assets/css/` means re-running `build_skeletons.py`, which regenerates the skeletons and re-pins the registry.
+Changing anything under `assets/runtime/` or `assets/css/` means re-running `build_skeletons.py`, which regenerates the skeletons and re-pins the registry. Write those files from a script, not through an editor with format-on-save (Prettier rewrites the whole pinned CSS and inflates the diff), and reset an unreleased version's registry entry before rebuilding: the same version with a different hash is rejected.
 
 ## Verification Gate
 
@@ -88,7 +88,7 @@ Exit codes: `0` PASS, `1` FAIL, `2` UNVERIFIED. Anything but `0` means do not sh
 
 Fast path uses the target viewport and requested export. If mobile or responsive use is promised, also walk the final artifact at the narrow target width; a desktop PASS does not cover it. Never skip single-file-ness, image decode, overflow, navigation, or the sanitization question. Report untested capabilities separately.
 
-For visual QA, inspect final rendered previews yourself or delegate them with the approved storyboard and theme constraints to an image-capable, read-only reviewer. Request reviewed slide/section IDs, issues and fixes only. Re-finalize after content changes and rerun both verification tiers.
+For visual QA, inspect final rendered previews yourself (Tier 2 does not catch a `pre` block clipped by its own `overflow:auto`) or delegate them with the approved storyboard and theme constraints to an image-capable, read-only reviewer. Request reviewed slide/section IDs, issues and fixes only. Re-finalize after content changes and rerun both verification tiers.
 
 ## Scripts
 
@@ -98,6 +98,7 @@ For visual QA, inspect final rendered previews yourself or delegate them with th
 | [build_skeletons.py](scripts/build_skeletons.py) | stdlib                      | rebuild skeletons and re-pin hashes |
 | [embed_assets.py](scripts/embed_assets.py)       | stdlib (resize: Pillow)     | fetch, strip metadata, encode       |
 | [mask_image.py](scripts/mask_image.py)           | Pillow                      | mask rectangles before embedding    |
+| [build_review_viewer.py](scripts/build_review_viewer.py) | stdlib (test: Playwright) | wrap a deck into the single shipped file: comment panel (types, filter, search, quote, AI-request copy, md/json export and import), slide grid (G), jump and #s5 deep links, presenter view window synced with the audience window, laser pointer (L), fullscreen; `--extract` recovers the deck (wrapper not gated) |
 | [export_html.py](scripts/export_html.py)         | Playwright                  | PDF / PNG                           |
 | [test_verify.py](scripts/test_verify.py)         | stdlib                      | proves the gate actually fails      |
 

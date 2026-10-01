@@ -70,6 +70,7 @@ required; Python helpers and packaging are conditional.
 - Classification turns on whether the **source** is independently authored, not on the act of copying. Reusing your own material stays `self-authored`; `PROVENANCE.md` and `upstreamAttributions` are required only for `third-party` and `derivative`.
 - A Skill with no `skill-license.json` is treated as legacy and skips the content comparison, so repairing a shared template does not invalidate older Skills.
 - When importing a Skill into another repository, regenerate `LICENSE.txt` and `skill-license.json` with **that** repository's toolchain. The manifest pins the template hash, so a copied pair fails validation there.
+- Before uploading to Microsoft 365 Agent Builder (Preview, Frontier-only), desk-check against the documented limits: 8 skills per agent, zip 50 MB, `SKILL.md` under 20,000 characters, directory depth 3, 350 files, scripts only `.py .js .mjs .cjs .ts .mts .sh .bash` (no `.ps1`) with no network or installs in the sandbox. `package_skill.py` nests files under `<skill_name>/` while the documented example has `SKILL.md` at the zip root; import of either layout is untested, so do not promise it. Source: learn.microsoft.com/microsoft-365/copilot/extensibility/declarative-agent-skills
 
 ## Core Principles
 

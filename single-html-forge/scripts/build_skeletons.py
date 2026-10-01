@@ -22,7 +22,7 @@ CSS_DIR = SKILL / "assets" / "css"
 OUT_DIR = SKILL / "assets" / "skeletons"
 
 RUNTIME_VERSION = "8"
-CSS_VERSION = "8"
+CSS_VERSION = "10"
 
 THEME = {
     "deck": """:root{--shf-color-accent:#0067b8;--shf-color-bg:#ffffff;--shf-color-fg:#1b1f27;--shf-size-base:20px}""",
