@@ -102,6 +102,7 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 
 ## Gotchas
 
+- **Verification cost**: measured on the sync suite, fixture rebuilds and pwsh-spawning integration tests dominate (about 100s for 42 tests); isolation and fetch cost seconds. For small skill edits run the targeted checks plus `Invoke-Pester -ExcludeTag Integration`, and run the full suite once before committing runner/backend changes. Call `Update-PublicSkillsReadme.ps1 -Check` once; it can leave a stale non-zero `$LASTEXITCODE`, so reset it before reuse.
 - **Formatter drift**: relevant alignment belongs with the owning skill's bounded change; unrelated whitespace drift is a separate normalization change after verification. Do not blanket-stage other authoring or require a separate commit for every formatting line.
 - **Push rejected / divergence**: push前にfetchしてahead/behindを再計算する。双方にcommitがあれば変更pathの重複を調べ、競合がなければnormal mergeで同期する。stale tracking refのままrebaseやpushへ進まない
 - **`HEAD.lock` rename failure**: 同じ失敗が2回続いたら`n`で停止し、HEAD・status・diff・rebase metadata・lock所有を確認する。未commit変更を保護し、`reset --hard`やlock一括削除はしない。HEADが不変でindex/worktreeだけがfetched remoteと一致すると証明できる場合だけ対象をHEADへ戻し、HEADをdetachしないverified mergeへ切り替える
