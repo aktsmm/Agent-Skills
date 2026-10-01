@@ -41,7 +41,7 @@ graph TD
 お客様・会議参加者から新規に提示されたメモ本文は、変換・要約・質問への回答より先に原文として保存する。
 
 1. 会議日が分かる場合は `_received/mtg-YYYY-MM-DD-{topic}/`、不明な場合は `_received/incoming/` に保存する。
-2. 本文の語句・記号・段落構造を変更しない。整形済みの議事録や要約を原文の代わりにしない。
+2. Preserve source wording, symbols, and paragraphs, except credentials and token-bearing image URLs; omit those and record the omission without sensitive values. Do not substitute a summary for the source.
 3. `attachments.md` に出どころ・機密区分・関連議事録を記録し、議事録から原文へリンクする。
 
 ### Step 1: 日付の決定
@@ -92,6 +92,10 @@ Teams AI議事録を以下のルールで変換：
 - 保存後、`workstreams/README.md` と各案件 README の名称、判定キーワード、現在の範囲を照合する。
 - 既存案件が 1 件に明確に一致した場合は、案件 README の状態、現在のボール、履歴を更新し、会議議事録へのリンクを追加する。議事録全文は複製しない。
 - 新規、複数該当、または低確信の場合は、`workstreams/_candidates.md` に候補として記録して確認する。案件フォルダは確認後にだけ作成する。
+
+### Step 5: Meeting URL Check
+
+After saving the note and ledger, ask whether a Teams meeting, recap, or recording URL is available if none was supplied. Record supplied links in the existing note without asking again; distinguish saving a URL from accessing or verifying the full recording/transcript.
 
 ---
 
@@ -163,7 +167,7 @@ AI によって生成されます。必ず精度を確認してください。
 ### 5. 品質ゲート
 
 - 音声書き起こしは、**短い技術略語 / 時間単位 / エンゲージメント名 / 固有名詞**を特に聞き違える。例: `2H` が `EDE (Enhanced Delivery Engagement) 時間`、`SES` が `CES` / `SES`、`Entra ID` が `エントラID` になるなど。文脈と合わない短いトークンは推測で確定せず、ユーザーに確認するか `要確認` で残す。
-- Teams AI の follow-up タスクは一般化しすぎ / literal すぎのことがある。本文トランスクリプトと cross-check し、実際に合意された内容 (期限、owner、具体的な成果物) へ refine する。ambiguous な表現はそのまま残さない。
+- Cross-check AI follow-ups against the available transcript and record its coverage range. Keep unsupported owners, deadlines, and deliverables provisional; do not treat a partial transcript as full-meeting verification or internal proposals as customer-agreed homework.
 - 未回答事項、宿題、次回確認事項は `_questions/{YYYY-MM}.md` にも抽出する。
 - 会議後の作業が発生する場合だけ `next-actions/` に切り出し、議事録本文は決定事項と持ち帰りの発生記録までで止める。
 - `blocked` の持ち帰りには **ボール（どちら側の返答待ちか）と次の遷移条件** を書く。

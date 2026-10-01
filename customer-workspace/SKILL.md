@@ -110,7 +110,8 @@ Keep source records authoritative: summaries and workstreams link to meeting not
 
 Before calling meeting notes done:
 
-- Mark uncertain names, times, product names, prices, and support boundaries as `要確認`; verify ambiguous AI-generated follow-ups against the source before assigning owner, deadline, or deliverable.
+- Mark uncertain names, times, product names, prices, and support boundaries as `要確認`; record the available transcript range and keep uncorroborated AI follow-ups provisional rather than assigning confirmed owners, deadlines, or deliverables.
+- Omit credentials and token-bearing image URLs from saved source text. After saving, ask for a Teams meeting/recap/recording URL if absent; record supplied links without asking again, and distinguish link capture from full-content verification.
 - Extract open questions and work needing follow-up into `_questions/{YYYY-MM}.md` and `next-actions/` in the same operation.
 - Keep local paths, internal links, internal speculation, and commercial terms out of customer-shareable content.
 - Default to one working meeting note. Do not create `*_internal.md` solely for unverified technical details; separate only on explicit request or when sensitive material cannot remain in a clearly marked internal section.

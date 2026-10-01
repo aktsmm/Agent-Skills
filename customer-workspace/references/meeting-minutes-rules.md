@@ -96,7 +96,8 @@ graph TD
 ## 品質ゲート
 
 - 人名、時刻、製品名、モデル名、価格、サポート境界などが文字起こし由来で怪しい場合は、本文で断定せず `要確認` に残す。- 音声書き起こしは、短い技術略語 / 時間単位 / エンゲージメント名 / 固有名詞を特に聞き違える。例: `2H` が `EDE (Enhanced Delivery Engagement) 時間`、`SES` が `CES` / `SES`、`Entra ID` が `エントラID` になるなど。文脈と合わない短いトークンは推測で確定せず、ユーザーに確認するか `要確認` で残す。
-- Teams AI の follow-up タスクは一般化すぎ / literal すぎのことがある。本文トランスクリプトと cross-check し、実際に合意された内容 (期限、owner、具体的な成果物) へ refine する。ambiguous な表現はそのまま残さない。- 顧客共有し得る議事録には、内部ファイルパス、ローカル作業リンク、内部だけの推測を混ぜない。
+- Cross-check AI follow-ups against the available transcript and record its coverage range. Keep unsupported owners, deadlines, and deliverables provisional; do not treat a partial transcript as full-meeting verification or internal proposals as customer-agreed homework.
+- Exclude credentials and token-bearing image URLs from saved source text; note the omission without reproducing sensitive values. Preserve ordinary meeting links under the record's sharing boundary.
 - 未回答事項、宿題、次回確認事項は `_questions/{YYYY-MM}.md` にも抽出する。
 - 質問台帳の月は入力された会議日付を唯一の根拠にする。月をまたぐ場合は旧月の既存台帳へ追記せず新月の台帳を作成し、完了前に記録見出しが対象月に 1 件、誤った月に 0 件であることを確認する。
 - 顧客に共有する議事録または共有用ハイライトを作るときは、Internal 語（Tier、契約時間、SKU、有償メニュー、社内チャット由来の固有語）とローカルパスが含まれていないことを確認する。`*_internal.md` の有無で判定しない。
@@ -105,6 +106,7 @@ graph TD
 
 ## 会議後の状態更新
 
+- After saving the note and action ledger, ask whether a Teams meeting, recap, or recording URL is available if none was supplied. Record supplied links in the existing note without asking again; a saved URL is not evidence that its recording or full transcript was accessed or verified.
 - `blocked` の持ち帰りには **ボール（どちら側の返答待ちか）と次の遷移条件** を書く。これがないと後から「今どうなっている？」に即答できない。
 - 催促連絡、返信待ち、日程確定のように **成果物を伴わない経過は `next-actions/` のタスクにならず記録が消える**。議事録末尾の追記セクションに `日付 / 内容 / 担当 / 次のアクション` の 1 行で残し、会議時点の決定事項・持ち帰り表は書き換えない。
 - 返信待ちを作る連絡は、次のアクション欄に **再連絡の条件**（例: 数日返信がなければ再連絡）まで書く。
