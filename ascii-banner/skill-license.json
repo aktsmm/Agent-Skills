@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "provenance": "self-authored",
+  "spdxId": "CC-BY-NC-SA-4.0",
+  "frontmatterLicense": "CC BY-NC-SA 4.0",
+  "profile": {
+    "id": "cc-by-nc-sa-4.0",
+    "registryVersion": 1,
+    "spdxId": "CC-BY-NC-SA-4.0",
+    "frontmatterLicense": "CC BY-NC-SA 4.0",
+    "evidenceFile": "LICENSE.txt",
+    "templateSha256": "e422548dc736bb97e6157edfe82a6b93f65c7488bb4fd2be9c69e8f5e18819b9",
+    "requiresAuthorAttribution": true
+  },
+  "authorAttribution": {
+    "value": "yamapan (https://github.com/aktsmm)"
+  },
+  "evidence": [
+    {
+      "path": "LICENSE.txt",
+      "sha256": "c90912dd82ed7e5f3cc9f28a09fd67f6ae0bbf8d8a6e0b8116bb484094ddd1f3"
+    }
+  ],
+  "confirmationMode": "explicit-cli"
+}
