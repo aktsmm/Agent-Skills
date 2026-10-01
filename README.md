@@ -23,6 +23,8 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [ai-cli-benchmark](ai-cli-benchmark/) | Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, pr... |
 | [analyze-copilot-sessions](analyze-copilot-sessions/) | Analyze historical VS Code GitHub Copilot Chat sessions by model, reasoning effort, AIU, time, reliability, workflow behavior, and external quality evidence, or safely prune wor... |
 | [animated-infographic](animated-infographic/) | Create reproducible animated infographic GIFs from structured data or measured results, with audience-language labels, explicit timing semantics, representative-frame QA, and a... |
+| [archify](archify/) | Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional t... |
+| [ascii-banner](ascii-banner/) | Generate ASCII-art text banners for terminals, READMEs, and CLI startup messages |
 | [azure-advisor-report](azure-advisor-report/) | Generate Azure environment monthly report (Markdown + PowerPoint) from Azure Advisor and Cost Management API |
 | [azure-env-builder](azure-env-builder/) | [Alpha] Experimental Azure environment builder for infrastructure and deployment design |
 | [azure-infra-validation](azure-infra-validation/) | Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs |
@@ -32,7 +34,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [biz-ops-setup](biz-ops-setup/) | Set up or operate a business operations workspace for activity reports, tasks, and customer routing; workIQ is optional |
 | [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support |
 | [browser-bookmark-organizer](browser-bookmark-organizer/) | Safely audit, classify, deduplicate, and reorganize bookmarks or favorites in Google Chrome and Microsoft Edge while preserving intentional toolbar shortcuts, signed-in profiles... |
-| [browser-max-automation](browser-max-automation/) | Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, repeatable browser workflo... |
+| [browser-max-automation](browser-max-automation/) | Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, durable file downloads, re... |
 | [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script'... |
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |
 | [context-to-video](context-to-video/) | Turn any context (blog URL, pasted article, PR diff, meeting notes, release notes, raw prompt) into a narrated explainer mp4 with slides, subtitles, and optionally a talking-hea... |
@@ -51,12 +53,12 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [permission-max](permission-max/) | Reduce repeated permission prompts across Microsoft Scout, Copilot CLI, and host tool confirmations with user-approved settings and explicit before/after verification |
 | [powerpoint-automation](powerpoint-automation/) | Create and edit professional PowerPoint presentations from web articles, blog posts, existing PPTX files, or templates |
 | [powerpoint-planning](powerpoint-planning/) | Plan high-quality PowerPoint presentations before file creation or editing |
-| [project-workspace](project-workspace/) | Create and manage topic-specific project workspace folders for validation, investigation, PoC, comparison, or workstream projects |
+| [project-workspace](project-workspace/) | Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a pro... |
 | [receipt-expense-workflow](receipt-expense-workflow/) | Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment |
-| [receipt-tax-ocr](receipt-tax-ocr/) | 個人事業・副業・確定申告専用。日本の勘定科目（印刷費 / 事業主借 等）で領収書画像を OCR してリネームし、月次メモを整える。会社経費 / D365 / 出張精算は receipt-expense-workflow を使う。Use when: 領収書, レシート, receipt, OCR, リネーム, 確定申告, 勘定科目, 経費, rename. |
+| [receipt-tax-ocr](receipt-tax-ocr/) | Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
 | [retro-copilot](retro-copilot/) | Run a retro for ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks |
-| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a managed Agent Skills repository with scope gates, safe local commits, and conditional push |
+| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push |
 | [retro-workspace](retro-workspace/) | Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks) |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
 | [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree |
