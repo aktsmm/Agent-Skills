@@ -1,6 +1,6 @@
 ---
 name: "retro-private-skills"
-description: "Reflect reusable learnings into a managed Agent Skills repository with scope gates, safe local commits, and conditional push. Use when: skill retro, managed skill authoring, skill repository fix, create or update SKILL.md."
+description: "Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Use when: skill retro, private skill authoring, skill repository fix, create or update SKILL.md."
 argument-hint: "反映したい学び、対象 skill 名、private repo path、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -40,7 +40,7 @@ Never write to these targets for this workflow unless the user explicitly asks t
 - `~/.copilot/m-skills/**`
 - VS Code User Data prompts or instructions
 - workspace `.github/**`, `AGENTS.md`, or repository-specific instructions
-- memories, public sync output, remote push targets
+- memories, public sync output or remote targets other than the verified private origin authorized by safe-auto
 
 If the best target appears to be an instruction, prompt, memory, or agent, stop with `scope 不一致`. For this skill, `New Skill Proposal` means a proposed or created `.github/skills/<new-skill>/SKILL.md`, not an instruction file. Content written back to a skill must be self-contained and portable; do not depend on a workspace file, memory note, local absolute path, or environment-specific ledger remaining available.
 
@@ -64,12 +64,12 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - Default: `safe-auto`
 - `review-only`, `dry-run`, or `プレビュー`: propose target changes and stop before editing
 - In `safe-auto`, edit directly when scope is clear, the safety gate passes, and the change is small or medium
-- Ask for confirmation only for broad rewrites, deletion, ambiguous private/public boundaries, or possible secret/customer/private data handling
+- Confirm unclear scope, new privileges/destinations/visibility/defaults, destructive deletion or uncertain sensitive data. Otherwise use safe-auto without reapproval; read-only and holds take precedence.
 - In `safe-auto`, create a focused local commit and push it in the same run. There is no ahead-count threshold: several PCs share this repo, so a local commit left behind means the next machine starts from a stale tree. Invoking this skill counts as the push approval. To keep a draft local instead, use `review-only` or `dry-run`.
-- Before any automatic push, verify the remote is the private repo and the working tree is clean, then `git fetch origin` and recompute ahead/behind. For `git rev-list --left-right --count HEAD...origin/<branch>`, the first count is HEAD-only (ahead) and the second is origin-only (behind). Confirm the commits in `origin/<branch>..HEAD` touch only the target skill; stop and ask when unrelated commits are queued. If behind, use `git pull --rebase`; do not push stale tracking refs. After a canceled or interrupted push, fetch and recheck status, ahead commits, and paths before retrying; do not resend if already reflected remotely.
+- Fetch and classify dirty/ahead paths before editing. Preserve unrelated original dirty; isolate a clean execution checkout. Verify private remote/allowed commits, integrate behind/divergence before push and revalidate. In `HEAD...refs/remotes/origin/<branch>`, left is ahead/right behind. After interruption, fetch/read back before retrying; never resend reflected commits.
 - If Git repeats a `HEAD.lock` / `couldn't set HEAD` rename failure twice, answer `n` and stop retrying. Preserve uncommitted work; inspect HEAD, status, diffs, rebase metadata, and lock ownership. Restore index/worktree only when HEAD is unchanged and the half-applied tree is proven to match the fetched remote, then use a verified merge path that does not detach HEAD. Never `reset --hard`, force push, or delete locks blindly.
 - Verify the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
-- Treat dirty primary skill changes as authoring or intake material. In safe-auto, stage and commit only the target skill changes, and leave unrelated dirty paths untouched.
+- Treat dirty primary changes as authoring/intake material. Commit by owning skill; combine its related small edits and relevant formatting in one commit. Keep unrelated skills/paths separate and untouched.
 - Do not run public, internal, or EMU sync from this skill. If distribution is needed, hand off the primary to `sync-public-skills` in the completion report.
 
 ## Routing Rules
@@ -105,7 +105,8 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 
 - Resolve private repo root.
 - Verify `.github/skills/` exists.
-- Check `git status --short --branch` plus ahead/behind, and classify dirty paths by skill. Do not stage dirty paths outside the target skill.
+- Fetch before checking status/ahead/behind. Classify dirty and queued paths, isolate unrelated dirty, integrate behind/divergence in the clean execution checkout, and never stage unrelated paths.
+- Treat an isolated checkout of the verified private remote as the execution repo for path/clean checks. If approved dirty input is copied there, report the original copy as retained, not newly pending work; compare against the confirmed commit before suggesting another intake.
 - List candidate skills and read the most likely `SKILL.md` files. For large repos or thorough audits, delegate this inventory step to a sub-agent so scope is settled before extracting learnings.
 - If a `skill-creator-plus` skill exists in the private repo, follow its structure and review guidance for new or heavily changed skills.
 
@@ -124,7 +125,7 @@ Choose exactly one:
 - Keep the diff focused and small.
 - For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
 - Add `references/` only when detail would bloat `SKILL.md`.
-- When editing Markdown table rows, pad the edited row to the existing column widths before committing. Otherwise the editor's save-time formatter realigns it later and leaves whitespace-only drift that blocks a primary-only sync. If drift still appears, confirm `git diff --ignore-all-space` is empty and commit it separately as `chore(<skill>): normalize table whitespace`.
+- Verify table/formatter drift; group relevant formatting with the owning skill's small change. Separate unrelated normalization; never blanket-stage or split one bounded improvement into repeated pushes.
 - In `safe-auto`, make a focused local commit when the scope is clear and all changed paths are intended, then push it in the same run after the automatic-push checks pass.
 
 ### 4. Bloat Check
@@ -139,7 +140,8 @@ Before final response:
 - Check no forbidden target was changed.
 - Parse YAML frontmatter for every changed `SKILL.md`, even one-line edits. Check `name` against the folder, `description` triggers and `argument-hint` against the current use case, and `user-invocable`, `license`, and `metadata.author` against repo conventions; metadata lint alone cannot detect a stale hint.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added. Scan added lines or the staged target content; do not scan unchanged diff context, which can trigger false positives on pre-existing terms.
-- Commit by default in `safe-auto`; commit only intended private skill repo changes, then push in the same run after the remote/clean-tree checks pass. Done means a clean working tree with ahead/behind `0/0`.
+- Commit/push intended private skill changes in safe-auto after remote/scope checks. Done means the execution checkout is clean with ahead/behind `0/0`; original unrelated dirty is preserved and reported, not a completion blocker.
+- List up to three read-only candidates: dirty -> Retro; pending private commits -> ahead-range review; committed public-safe gap -> separately requested sync. Honor holds/visibility; never expand operations or offer private/internal/denied content for public sync.
 
 ## Output
 

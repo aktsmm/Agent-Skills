@@ -26,9 +26,10 @@ metadata:
   - `/memories/**`、user memory、session memory、repo memory を対象にしない
 - 既定モードは `safe-auto`。`.copilot` scope が明確で、Safety & Scope Gate を通過し、既存資産への小〜中規模な統合・更新で済む場合は、確認なしで反映まで実行してよい
 - `review-only` / `確認だけ` / `dry-run` / `プレビュー` が明示された場合だけ、変更案の提示で停止する
-- 次の場合だけユーザー確認で停止する: scope 判断が曖昧、大規模削除、公開・同期範囲変更、hook / config の高リスク変更、既存 agent / skill の意味を大きく変える変更、secret / 個人情報 / 環境固有値の扱いに迷う場合
+- Confirm only unclear scope, new privileges/destinations/visibility/defaults, destructive deletion or uncertain sensitive data; otherwise use safe-auto without reapproval. Read-only and holds take precedence.
 - 新規ファイル作成より既存ファイルへの統合を優先する
-- 新しいルールを書く前に、同じ判断が scripts / 生成物 / 既存資産に実装済みでないか確認する。実装と矛盾するルールは、次の run に正しい資産を壊させる
+- Match committed implementation, not local drafts; defer unsupported operations rather than inventing capabilities.
+- List up to three scoped read-only follow-ups: authoring/private-push/distribution gaps. Honor holds and visibility; never widen actions or audits from a suggestion.
 - 他スコープの内容なら自分で編集せず handoff する
 
 ## Workflow

@@ -4,22 +4,22 @@
 
 ## New Skill Classification Gate (incident 2026-06-24 再発防止)
 
-`Sync-AndPush.ps1` は Step 0.5 で `Invoke-NewSkillGate` を実行し、private repo の `.github/skills/` 配下と `scripts/skill-distribution.json` のpublic / internal / denied集合を照合する。未分類 skill が1件でもあればsyncを強制停止する。
+Broad/all compares all native skills with distribution config and stops on unknowns. A committed runner implementing scoped, audited-SHA primary-only may limit classification to selected skills; unknown/uncommitted unselected skills stay deferred and are never copied. Legacy runners keep their full stop conditions until upgraded.
 
-Agent はこの script 停止を待たず、sync 実行前に同じ照合を行う。未分類 skill があれば、内容・命名・直近会話から勝手に public/internal/private を推測せず、必ずユーザーに `public-safe` / `internal-only` / `public-denied` / `今回は同期しない` の分類を確認する。
+Before execution, verify the applicable scope and committed runner capabilities. Ask public/internal/denied classification only for selected unknowns; never infer permission from naming or history. "Not this run" removes that skill from the selection without changing permanent policy or blocking independently safe targets.
 
 - 検知された skill は以下のいずれかへ分類してから再実行する
   - **public-safe**→ `publicSkills`へ追記する。Copilot-Skills Public Audit Gateを先に通す
   - **internal-only**→ `internalSkills`へname / audience / internalOnlyを追記する。public denylistへ自動統合されGIM/EMUへmirrorされる
   - **public-denied**→ `deniedSkills`へ追記する。internalにも出さない
-- `-AllowUnknownSkills` は後方互換で受理してもoverrideには使わない。分類をconfigへ保存するまで停止する
+- `-AllowUnknownSkills` never overrides publication policy. Every copied selected skill must already be public-safe in the audited config; unselected unknowns need not be repaired for a scoped sync, but broad/all requires full classification.
 - この Gate は internal skill の public 漏洩（2026-06-24）の直接根原因（internal SSOT に未登録の skill が sync を通ってしまう）を防ぐために追加された
 
 ## Copilot-Skills Private Inventory Gate
 
 `copilot-skills/`（`.copilot` 由来ミラー）は private inventory とし、license に関係なく public へ同期しない。distribution config の `publicCopilotSkills` は空を維持し、inventory 全件を `deniedCopilotSkills` に分類する。`-IncludeCopilotSkills` は script が拒否する。
 
-- 新しい inventory が増えたら `deniedCopilotSkills` へ分類してから sync gate を再実行する。未分類 inventory は停止する
+- Broad/all retains inventory classification gates. Scoped native primary-only neither reads nor distributes mirrored inventory; unknown inventory stays deferred, never public.
 - 同名 native skill が必要なら、内容・provenance を private repo の `.github/skills/<skill>/` へ別途 authoring し、native skill として public safety audit を通す。mirror をそのまま公開しない
 - public repo に `copilot-skills/` が存在したら broad sync で削除し、remote tree でも不在を確認する
 
@@ -46,14 +46,18 @@ org-owned internal repo（env `SYNC_INTERNAL_SKILLS_GIM_REPO`、例: `<internal-
 
 ## Script CLI
 
-- `Sync-AndPush.ps1` はcleanな確定済みcommitの機械適用のみ。dirty intakeは `Commit-DirtySkills.ps1` のdry-run / `-Apply`へ分離する。internal mirrorは `-SyncEmu` / `-SyncInternal`（各DryRunあり）を明示する
-- native public の狭い同期は `-PrimarySkills <skill-name...>` を使う。temporary copy script を作らず、正式 runner の classification / staging / rollback / path scope / hash gate を再利用する
+- Broad/push paths require a clean/current execution branch. Dirty intake remains separate from sync; preserve unrelated original dirty. Internal mirrors require explicit `-SyncEmu` / `-SyncInternal` and the full configured set.
+- Probe the installed committed runner before using relaxed primary-only: it must support `-PrimarySkills`, mandatory audited `-SourceCommit` / `-ExpectedSourceOrigin`, same-SHA policy, selected dirty/unpushed refusal, private source preservation and public index/tree/scope verification. Parameter names alone do not prove those gates; inspect their implementation or trusted tests.
+- If these capabilities are missing, report the unsupported runner and hand off its update. Do not execute new flags, bypass the legacy classification/master/clean gates, invent a temporary sync variant or silently broaden the selected set.
+- Only with that capability-verified runner, audit/pin selected blobs/config at the fetched remote SHA/origin and re-audit after advancement. Its read-only source may be behind/detached; run matching code from a clean audited checkout if needed, with temporary Process source env and finally restoration. Legacy primary/broad retains master/clean/current and cannot make the pin/pre-push-tree guarantee.
 - internal API syncはretry＋空SHA fail-fastを使い、stale skill pathを削除する。ref更新後のremote treeでMissing / Mismatch / Extraが0にならなければ失敗とする
 - internal同期はdistribution configの全集合をfull mirrorする。subset指定は他Skill削除につながるため拒否する
 - 公開可否・internal振り分けの判断基準はSKILL（と同名prompt）が持ち、確定結果はdistribution configへ保存する。scriptはconfigを機械適用する
 - push はこの skill が明示実行され、`review-only` / `dry-run` でない場合だけ行う。VS Code では同名 prompt を使う
 
 ## Incident Recovery（internal content が public へ漏れた後）
+
+History rewriting, force push or destructive cleanup in this section requires explicit recovery approval and preservation of unrelated work; an ordinary sync request grants none of these operations.
 
 prevention gate を通り抜けて漏洩した場合の復旧手順。internal skill が public へ漏洩した incident（2026-06-24）の実対応から。
 
@@ -70,4 +74,4 @@ prevention gate を通り抜けて漏洩した場合の復旧手順。internal s
 
 - **env stale → public 全削除**: repo path / repo 名を rename した後、rename 前に起動した既存ターミナルは古い `SYNC_PUBLIC_SKILLS_PRIVATE_REPO` を保持する。`$DevRepo` が存在しない旧パスに解決され、source skill 0 件 → コピー 0 件 → 削除ループで public 全 skill が消える。対策として script に **DevRepo 健全性 Guard**（Step 0.0: source skill 数が下限 `$MinSourceSkills` 未満なら abort）と **削除 abort Guard**（コピー 0 件なら public 削除を中止）の二重防御を実装済み。rename 後は新ターミナルで env を読み直すか、プロセスに `$env:...` で明示注入してから sync する
 - **pwsh 7 専用**: `Sync-AndPush.ps1` は PowerShell 7 構文を使う。Windows PowerShell 5.1 で起動すると 40+ の parse error で落ちる。必ず `pwsh` で実行する（`powershell.exe` ではない）
-- **復旧手順**: 全削除に気づいたら、削除直前の正常 commit へ `git reset --hard <good-sha>` + `git push --force` で即復元できる（public repo の 1 commit 前がクリーンなら最速）
+- **Destructive recovery**: verify the actual bad/public state and preserve unrelated work first. `reset --hard` or force-pushing a prior commit requires explicit history-rewrite approval; prefer a normal revert commit when possible. Never infer rewrite approval from an ordinary sync request.

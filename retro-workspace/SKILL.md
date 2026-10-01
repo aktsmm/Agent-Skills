@@ -38,7 +38,7 @@ CLI / Scout は VS Code のアクティブ workspace を常に取得できない
 
 - 既定は `safe-auto`。workspace scope が明確で、既存資産への小〜中規模更新で済む場合は確認なしで反映してよい
 - `review-only` / `確認だけ` / `dry-run` / `プレビュー` が明示された場合だけ、変更案の提示で停止する
-- scope 曖昧、大規模削除、公開・同期範囲変更、高リスクな実行コード / hook 変更、workflow の意味変更、secret / 個人情報 / 環境固有値の扱いに迷う場合だけ確認で停止する
+- Confirm only unclear scope, new privileges/destinations/visibility/defaults, destructive deletion or uncertain sensitive data. Bounded fixes need no reapproval; code/hooks widening permissions still do.
 
 ## Scope Gate
 
@@ -51,7 +51,8 @@ CLI / Scout は VS Code のアクティブ workspace を常に取得できない
 
 - 新規ファイルより既存への統合を優先し、`削除 → 統合 → 分離 → 追加` の順で検討する
 - 新しいルールを書く前に、同じ判断が scripts / 生成物 / 既存資産に実装済みでないか確認する。実装と矛盾するルールは、次の run に正しい資産を壊させる
-- 他セッションと working tree を共有する repo では、編集を長く dirty のまま残さない。別セッションの広い `git add` が未完成の編集を巻き込んで commit する。連番 ID を持つ append-only な台帳へ追記するときは、書き込む直前に次の空き ID を取り直し、commit 後に重複がないことを確かめる
+- Use an isolated clean checkout for authorized Git mutations; preserve unrelated dirty, avoid blanket staging/autostash, and group owning-scope edits. Refresh ledger IDs before appending and verify uniqueness after an authorized commit. Do not add unrequested commits/pushes.
+- For an explicitly authorized push, fetch, inspect the permitted ahead range and integrate behind/divergence in the clean execution checkout first; never use force or stale tracking refs.
 - After moving a multi-paragraph Markdown section, verify heading order, exactly one occurrence of the moved heading and its first content line, and `git diff --check`; delete-plus-insert moves can otherwise leave an omission or duplicate.
 - 圧縮は AI が判断できる最小情報を主目的にし、人間向け可読性は二次とする
 - 冗長説明は圧縮するが、根拠 URL と非自明手順は残す
@@ -88,6 +89,10 @@ CLI / Scout は VS Code のアクティブ workspace を常に取得できない
 ### 3.5. 肥大化チェック（反映後）
 
 反映後、DRY 違反・冗長表現・重複定義があれば圧縮・削除・分離する。
+
+## Next Candidates
+
+List up to three scoped read-only follow-ups: dirty authoring/private-push/distribution gaps. Use the owning workflow, honor holds/visibility, and never widen scope or execute suggestions.
 
 ## Example Report
 
