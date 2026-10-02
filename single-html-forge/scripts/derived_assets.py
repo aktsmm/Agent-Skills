@@ -152,6 +152,7 @@ def print_markup(text):
         replacements = [(start - slide.start, end - slide.start, "") for start, end in excluded]
         for node in included:
             attrs = {key: value for key, value in node.attrs.items() if key not in {"hidden", "data-shf-step", "data-shf-until", "data-shf-effect", "data-slide-id", "tabindex"}}
+            attrs.pop("data-shf-goto", None)
             if node is slide:
                 attrs.pop("aria-hidden", None)
                 attrs["data-shf-print-slide"] = slide.attrs["data-slide-id"]

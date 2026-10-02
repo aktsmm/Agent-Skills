@@ -14,6 +14,38 @@ SKEL = Path(__file__).resolve().parent.parent / "assets" / "skeletons" / "deck-o
 
 @unittest.skipIf(sync_playwright is None, "playwright is not installed")
 class ReviewViewerTest(unittest.TestCase):
+    def test_slide_image_opens_and_closes_lightbox(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            deck = Path(tmp) / "deck.html"
+            pixel = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+            deck.write_text(
+                SKEL.read_text(encoding="utf-8").replace(
+                    "<h1>タイトルをここに置く</h1>",
+                    '<h1>タイトルをここに置く</h1><img src="' + pixel + '" alt="検証画像">',
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            out = Path(tmp) / "review.html"
+            build_review_viewer.build(deck, out)
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch()
+                page = browser.new_page(viewport={"width": 1400, "height": 800})
+                page.goto(out.as_uri())
+                page.wait_for_function("document.querySelectorAll('#list button').length === 3")
+                image = page.frame_locator("#deck").locator('[data-slide-id="s1"] img[alt="検証画像"]')
+                image.click()
+                self.assertTrue(page.is_visible("#lightbox"))
+                self.assertEqual(page.get_attribute("#lightboximage", "alt"), "検証画像")
+                self.assertEqual(page.inner_text("#lightboxcaption"), "検証画像")
+                page.keyboard.press("Escape")
+                self.assertFalse(page.is_visible("#lightbox"))
+                image.press("Enter")
+                self.assertTrue(page.is_visible("#lightbox"))
+                page.click("#lightboxclose")
+                self.assertFalse(page.is_visible("#lightbox"))
+                browser.close()
+
     def test_comment_follows_slide_persists_and_exports(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "review.html"

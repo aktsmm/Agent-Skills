@@ -79,6 +79,8 @@ To shrink: `--max-width 1600` (needs Pillow), crop to the part that matters, or 
 
 A poster exported at `--scale 2` renders the canvas at twice its pixel size. An image displayed 600px wide therefore wants 1200 real pixels. `embed_assets.py` reports the true dimensions so this is arithmetic rather than guesswork.
 
+The review viewer's lightbox enlarges the slide's own `<img src>`, so a screenshot shrunk to fit the slide looks the same size when clicked. Embed the full-resolution image (e.g. `--max-width 1400`) and cap its on-slide size with `width`/`height` attributes; the lightbox then shows the real pixels.
+
 ## What is not embedded
 
 Original paths and fetch URLs stay out of the distributed file. Keep them in your own notes alongside the asset id if you need to re-fetch later. Signed URLs and query tokens must never be written anywhere.

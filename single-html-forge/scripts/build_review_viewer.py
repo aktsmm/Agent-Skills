@@ -6,7 +6,7 @@ deck, not this wrapper). The wrapper adds: a closable, resizable comment panel w
 per-slide autosave (keyed by deck title + slide id, stale marker when a slide
 changed), comment types, filter and search, slide overview grid, jump by number and
 deep links (#s5), AI-request copy, Markdown/JSON export and import, quoting of
-selected slide text, a laser pointer, a presenter view in a second window (notes,
+ selected slide text, image lightbox, a laser pointer, a presenter view in a second window (notes,
 next slide, timer, synced with the audience window), and a fullscreen mode that
 hides the panel. Ship this one file; it replaces a separate review copy.
 It carries its own script and is NOT covered by verify_html.py.
@@ -88,6 +88,11 @@ textarea:focus { outline: 2px solid var(--accent); }
 #gridbody img { width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #fff; border-radius: 4px; }
 #gridbody .ph { aspect-ratio: 16 / 9; background: #2b313c; border-radius: 4px; }
 #gridclose { position: fixed; top: 12px; right: 16px; }
+#lightbox { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 48px; background: rgba(13, 15, 19, 0.94); }
+#lightbox[hidden] { display: none; }
+#lightbox img { max-width: min(94vw, 1800px); max-height: 84vh; object-fit: contain; background: #fff; box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55); }
+#lightbox p { position: fixed; left: 24px; right: 24px; bottom: 12px; margin: 0; color: #fff; text-align: center; font-size: 14px; }
+#lightboxclose { position: fixed; top: 12px; right: 16px; width: 42px; height: 42px; padding: 0; border-color: #fff; border-radius: 50%; background: #1b1f27; color: #fff; font-size: 28px; line-height: 1; }
 body.pres #presextra { display: block; }
 body.pres #editor, body.pres #tools, body.pres #list, body.pres #actions, body.pres #pv, body.pres #close, body.pres #fs, body.pres #nav .edit { display: none; }
 body.pres #notes { flex: 1; overflow: auto; border-bottom: 0; }
@@ -129,6 +134,7 @@ body.pres #app { --panel: 46vw; }
 </aside>
 </div>
 <div id="gridview" hidden role="dialog" aria-label="スライド一覧"><button type="button" id="gridclose" aria-label="一覧を閉じる">×</button><div id="gridbody"></div></div>
+<div id="lightbox" hidden role="dialog" aria-modal="true" aria-label="画像の拡大表示"><button type="button" id="lightboxclose" aria-label="拡大表示を閉じる">×</button><img id="lightboximage" alt=""><p id="lightboxcaption"></p></div>
 <script>
 (function () {
   var KEY = "review:__KEY__";
@@ -141,6 +147,7 @@ body.pres #app { --panel: 46vw; }
   function $(id) { return document.getElementById(id); }
   var frame = $("deck"), where = $("where"), box = $("comment"), ctype = $("ctype"), list = $("list"), status = $("status"), app = $("app");
   var gridView = $("gridview"), gridBody = $("gridbody");
+  var lightbox = $("lightbox"), lightboxImage = $("lightboximage"), lightboxCaption = $("lightboxcaption"), lightboxReturn = null;
   var data = {}, slides = [], shown = null, filterMode = "all", query = "";
   var laserOn = false, laserDot = null, laserBtn = null, toggleBtn = null, gridBtn = null, pendingQuote = "";
 
@@ -493,6 +500,27 @@ body.pres #app { --panel: 46vw; }
     e.preventDefault();
   });
 
+  function openLightbox(image, focusTarget) {
+    if (!image || !image.getAttribute("src")) return;
+    setLaser(false);
+    lightboxReturn = focusTarget || image;
+    lightboxImage.src = image.getAttribute("src");
+    lightboxImage.alt = image.alt || "拡大画像";
+    lightboxCaption.textContent = image.alt || "";
+    lightbox.hidden = false;
+    $("lightboxclose").focus();
+  }
+  function closeLightbox() {
+    if (lightbox.hidden) return;
+    lightbox.hidden = true;
+    lightboxImage.removeAttribute("src");
+    var target = lightboxReturn;
+    lightboxReturn = null;
+    try { if (target) target.focus(); } catch (e) {}
+  }
+  $("lightboxclose").addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) { if (e.target === lightbox) closeLightbox(); });
+
   function typing(e) {
     var t = e.target;
     return !!(t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable));
@@ -503,6 +531,7 @@ body.pres #app { --panel: 46vw; }
       if (e.key === "c" || e.key === "C") { setPanelOff(!app.classList.contains("panel-off")); e.preventDefault(); }
       return;
     }
+    if (e.key === "Escape" && !lightbox.hidden) { closeLightbox(); e.preventDefault(); return; }
     if (e.key === "Escape" && !gridView.hidden) { closeGrid(); return; }
     if (typing(e)) return;
     if (e.key === "g" || e.key === "G") { gridView.hidden ? openGrid() : closeGrid(); e.preventDefault(); }
@@ -694,7 +723,7 @@ body.pres #app { --panel: 46vw; }
     var bar = d && d.getElementById("shf-chrome");
     if (!d || !d.body || !bar || bar.querySelector("[data-review-toggle]")) return;
     var st = d.createElement("style");
-    st.textContent = "#review-laser{position:fixed;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:rgba(230,30,30,.9);box-shadow:0 0 14px 6px rgba(230,30,30,.45);pointer-events:none;z-index:9999;display:none}html.review-laser,html.review-laser *{cursor:none!important}#review-quote{position:fixed;z-index:9999;display:none;padding:4px 10px;font:14px/1.4 system-ui,sans-serif;background:#0067b8;color:#fff;border:0;border-radius:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.35)}";
+    st.textContent = "#review-laser{position:fixed;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:rgba(230,30,30,.9);box-shadow:0 0 14px 6px rgba(230,30,30,.45);pointer-events:none;z-index:9999;display:none}html.review-laser,html.review-laser *{cursor:none!important}#review-quote{position:fixed;z-index:9999;display:none;padding:4px 10px;font:14px/1.4 system-ui,sans-serif;background:#0067b8;color:#fff;border:0;border-radius:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.35)}#shf-root>[data-slide-id] img{cursor:zoom-in}";
     d.head.appendChild(st);
     laserDot = d.createElement("div"); laserDot.id = "review-laser"; d.body.appendChild(laserDot);
     var q = d.createElement("button"); q.type = "button"; q.id = "review-quote"; q.textContent = "コメントに引用"; d.body.appendChild(q);
@@ -728,6 +757,25 @@ body.pres #app { --panel: 46vw; }
     d.addEventListener("mousedown", function (e) { if (e.target !== q) q.style.display = "none"; });
     q.addEventListener("mousedown", function (e) { e.preventDefault(); });
     q.addEventListener("click", function () { quoteText(pendingQuote); q.style.display = "none"; d.getSelection().removeAllRanges(); });
+    [].forEach.call(d.querySelectorAll("#shf-root > [data-slide-id] img"), function (image) {
+      var interactive = image.closest("a,button");
+      var target = interactive || image;
+      if (!interactive) {
+        image.tabIndex = 0;
+        image.setAttribute("role", "button");
+        image.setAttribute("aria-label", (image.alt || "画像") + "を拡大表示");
+      }
+      target.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openLightbox(image, target);
+      }, true);
+      if (!interactive) image.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        openLightbox(image, image);
+        e.preventDefault();
+      });
+    });
   }
 
   function openLinksInNewTab(d) {

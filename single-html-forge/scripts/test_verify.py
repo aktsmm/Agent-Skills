@@ -103,6 +103,12 @@ class RegistryTests(unittest.TestCase):
         self.assertIn('for="shf-print-3-0-choice"', printed)
         self.assertEqual(run(derived.finalize(source, [])).errors, [])
 
+    def test_print_removes_live_slide_navigation(self):
+        import derived_assets as derived
+        source = SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2><button type="button" data-shf-goto="s1">Open</button>')
+        printed, _ = derived.print_markup(source)
+        self.assertNotIn('data-shf-goto', printed)
+
     def test_print_svg_name_and_decoration_survive(self):
         import derived_assets as derived
         diagram = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80" aria-labelledby="chart-title" aria-describedby="chart-desc"><title id="chart-title">Revenue</title><desc id="chart-desc">A comparison</desc><circle aria-hidden="true" cx="40" cy="40" r="10"/></svg>'
