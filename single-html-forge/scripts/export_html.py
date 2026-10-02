@@ -60,6 +60,16 @@ def publish_file(staged: Path, target: Path) -> None:
 
 def finalize_deck(artifact: Path, target: Path, thumbnails: bool) -> int:
     import derived_assets as derived
+    # An edited finalized deck (e.g. from build_review_viewer --extract) has stale derived assets; finalize from its stripped draft.
+    draft = derived.strip(artifact.read_text(encoding="utf-8").replace("\r\n", "\n"))
+    with tempfile.TemporaryDirectory() as folder:
+        staged = Path(folder) / artifact.name
+        staged.write_text(draft, encoding="utf-8", newline="\n")
+        return _finalize_draft(staged, target, thumbnails)
+
+
+def _finalize_draft(artifact: Path, target: Path, thumbnails: bool) -> int:
+    import derived_assets as derived
     import verify_html as verifier
     from embed_assets import resize, strip_png
     from playwright.sync_api import sync_playwright
@@ -220,6 +230,7 @@ def export_formats(args) -> int:
                     raise ValueError("; ".join(print_errors) + "; no exports were published")
             staged = staging / "document.pdf"
             pdf_options = {"width": "16in", "height": "9in", "margin": {"top": "0", "bottom": "0", "left": "0", "right": "0"}} if slides else {}
+            page.emulate_media(media="print")
             page.pdf(path=str(staged), print_background=True, prefer_css_page_size=True, **pdf_options)
             produced.append((staged, args.pdf))
 

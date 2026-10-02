@@ -98,7 +98,7 @@ For visual QA, inspect final rendered previews yourself (Tier 2 does not catch a
 | [build_skeletons.py](scripts/build_skeletons.py) | stdlib                      | rebuild skeletons and re-pin hashes |
 | [embed_assets.py](scripts/embed_assets.py)       | stdlib (resize: Pillow)     | fetch, strip metadata, encode       |
 | [mask_image.py](scripts/mask_image.py)           | Pillow                      | mask rectangles before embedding    |
-| [build_review_viewer.py](scripts/build_review_viewer.py) | stdlib (test: Playwright) | wrap a deck into the single shipped file: comment panel (types, filter, search, quote, AI-request copy, md/json export and import), slide grid (G), jump and #s5 deep links, presenter view window synced with the audience window, laser pointer (L), image lightbox (click, Esc or × closes), fullscreen; `--extract` recovers the deck (wrapper not gated) |
+| [build_review_viewer.py](scripts/build_review_viewer.py) | stdlib (test: Playwright) | wrap a deck into the single shipped file: comment panel (types, filter, search, quote, AI-request copy, md/json export and import), slide grid (G), jump and #s5 deep links, presenter view window synced with the audience window, laser pointer (L), image lightbox (click, Esc or × closes), fullscreen; `--extract` recovers the deck (wrapper not gated); `--pdf deck.pdf` embeds a PDF behind a save button that ignores browser print settings |
 | [export_html.py](scripts/export_html.py)         | Playwright                  | PDF / PNG                           |
 | [test_verify.py](scripts/test_verify.py)         | stdlib                      | proves the gate actually fails      |
 

@@ -335,6 +335,22 @@ class ReviewViewerTest(unittest.TestCase):
                 self.assertEqual(deck.locator("[data-review-laser]").get_attribute("aria-pressed"), "false")
                 browser.close()
 
+    def test_ctrl_p_prints_the_deck_frame_not_the_wrapper(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "review.html"
+            build_review_viewer.build(SKEL, out)
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch()
+                page = browser.new_page(viewport={"width": 1400, "height": 800})
+                page.goto(out.as_uri())
+                page.wait_for_function("document.querySelectorAll('#list button').length === 3")
+                page.evaluate("(function () { window.__wrapperPrinted = 0; window.print = function () { window.__wrapperPrinted++; }; })()")
+                page.frames[1].evaluate("(function () { window.__framePrinted = 0; window.print = function () { window.__framePrinted++; }; })()")
+                page.keyboard.press("Control+p")
+                self.assertEqual(page.frames[1].evaluate("window.__framePrinted"), 1)
+                self.assertEqual(page.evaluate("window.__wrapperPrinted"), 0)
+                browser.close()
+
     def test_presenter_window_syncs_with_the_audience_window(self):
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "review.html"
@@ -533,6 +549,43 @@ class ReviewViewerTest(unittest.TestCase):
             build_review_viewer.build(SKEL, out)
             build_review_viewer.extract(out, back)
             self.assertEqual(back.read_text(encoding="utf-8"), SKEL.read_text(encoding="utf-8"))
+
+    def test_extract_survives_a_reformatted_iframe_tag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "review.html"
+            back = Path(tmp) / "deck.html"
+            build_review_viewer.build(SKEL, out)
+            page = out.read_text(encoding="utf-8")
+            deck = SKEL.read_text(encoding="utf-8")
+            reformatted = deck.replace("&", "&amp;").replace("'", "&apos;")
+            start = page.index('<iframe id="deck"')
+            end = page.index("</iframe>", start)
+            page = page[:start] + '<iframe\n  id="deck"\n  title="x"\n  srcdoc=\'' + reformatted + "'\n></iframe" + page[end + len("</iframe"):]
+            out.write_text(page, encoding="utf-8")
+            build_review_viewer.extract(out, back)
+            self.assertEqual(back.read_text(encoding="utf-8"), deck)
+
+    def test_embedded_pdf_downloads_from_the_save_button(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "deck.pdf"
+            pdf.write_bytes(b"%PDF-1.4\n% embedded test payload\n%%EOF\n")
+            plain, with_pdf = Path(tmp) / "plain.html", Path(tmp) / "review.html"
+            build_review_viewer.build(SKEL, plain)
+            build_review_viewer.build(SKEL, with_pdf, pdf)
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch()
+                page = browser.new_page(viewport={"width": 1400, "height": 800}, accept_downloads=True)
+                page.goto(plain.as_uri())
+                self.assertFalse(page.is_visible("#savepdf"))
+                page.goto(with_pdf.as_uri())
+                page.wait_for_function("document.querySelectorAll('#list button').length === 3")
+                with page.expect_download() as info:
+                    page.click("#savepdf")
+                saved = Path(tmp) / "saved.pdf"
+                info.value.save_as(saved)
+                self.assertEqual(saved.read_bytes(), pdf.read_bytes())
+                self.assertTrue(info.value.suggested_filename.endswith(".pdf"))
+                browser.close()
 
     def test_rejects_non_deck_input(self):
         with tempfile.TemporaryDirectory() as tmp:

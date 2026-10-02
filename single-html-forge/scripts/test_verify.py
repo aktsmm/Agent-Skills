@@ -103,6 +103,25 @@ class RegistryTests(unittest.TestCase):
         self.assertIn('for="shf-print-3-0-choice"', printed)
         self.assertEqual(run(derived.finalize(source, [])).errors, [])
 
+    def test_edited_finalized_deck_is_stripped_then_finalized_again(self):
+        import derived_assets as derived
+        final = derived.finalize(SKELETON, [])
+        edited = final.replace('<h2>比較</h2>', '<h2>比較 edited</h2>', 1)
+        self.assertTrue(any('stale' in error for error in run(edited).errors))
+        draft = derived.strip(edited)
+        self.assertNotIn('id="shf-print"', draft)
+        self.assertEqual(run(draft).errors, [])
+        self.assertEqual(run(derived.finalize(draft, [])).errors, [])
+        self.assertEqual(derived.strip(SKELETON), SKELETON)
+
+    def test_thumbnail_needs_a_sidebar_button_not_an_in_slide_link(self):
+        import derived_assets as derived
+        source = SKELETON.replace('<li><button type="button" data-shf-goto="s3">比較</button></li>', '')
+        source = source.replace('<h2>比較</h2>', '<h2>比較</h2><button type="button" data-shf-goto="s3">Self</button>', 1)
+        thumbnail = ('s3', 0, 'data:image/png;base64,AA==', {'id': 'thumb', 'mime': 'image/png', 'sha256': '0' * 64, 'alt': ''})
+        with self.assertRaisesRegex(ValueError, 'no sidebar button'):
+            derived.finalize(source, [thumbnail])
+
     def test_print_removes_live_slide_navigation(self):
         import derived_assets as derived
         source = SKELETON.replace('<h2>比較</h2>', '<h2>比較</h2><button type="button" data-shf-goto="s1">Open</button>')

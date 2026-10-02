@@ -138,6 +138,17 @@ class ExportContractTests(unittest.TestCase):
         self.assertEqual(pdf.read_bytes(), b'original pdf')
         self.assertEqual(png.read_bytes(), b'original png')
 
+    def test_pdf_is_rendered_with_print_media(self):
+        target = self.root / 'new.pdf'
+        with patch('playwright.sync_api.sync_playwright') as playwright, patch('verify_html.check_print_layout', return_value=[]):
+            page = playwright.return_value.__enter__.return_value.chromium.launch.return_value.new_page.return_value
+            page.evaluate.return_value = True
+            page.pdf.side_effect = lambda **kwargs: Path(kwargs['path']).write_bytes(b'new pdf')
+            code, _, _ = self.invoke(['--pdf', str(target)])
+        self.assertEqual(code, 0)
+        names = [(call[0], call[2].get('media')) for call in page.method_calls if call[0] in {'emulate_media', 'pdf'}]
+        self.assertEqual(names[-2:], [('emulate_media', 'print'), ('pdf', None)])
+
     def test_failed_replace_preserves_original_file(self):
         staged, target = self.root / 'pending', self.root / 'existing'
         staged.write_bytes(b'new')

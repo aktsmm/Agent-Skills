@@ -222,6 +222,31 @@ def check_derived(text, model):
             raise ValueError("Thumbnail is not inside its slide navigation button")
 
 
+def strip(text):
+    """Drop derived print pages, thumbnails and digests so an edited finalized deck can be finalized again."""
+    import verify_html as verifier
+    model_raw = next((parts[0] for kind, *parts in verifier.lex(text) if kind == "raw" and parts[0].attrs.get("id") == "shf-model"), None)
+    if model_raw is None:
+        return text
+    model = json.loads(model_raw.content)
+    if model.get("schemaVersion") != 2:
+        return text
+    replacements, old_refs = [], set()
+    for node in flatten(elements(text)):
+        if node.attrs.get("id") == "shf-print" or "data-shf-thumbnail" in node.attrs:
+            replacements.append((node.start, node.end, ""))
+            old_refs.update(child.attrs["data-asset-ref"] for child in flatten([node]) if "data-asset-ref" in child.attrs)
+    clean = splice(text, replacements)
+    model["assets"] = [asset for asset in model.get("assets", []) if asset["id"] not in old_refs]
+    model.update(schemaVersion=1)
+    model.pop("sourceDigest", None)
+    model.pop("thumbnails", None)
+    model_raw = next(parts[0] for kind, *parts in verifier.lex(clean) if kind == "raw" and parts[0].attrs.get("id") == "shf-model")
+    start = verifier.lex_start_tag(clean, model_raw.pos)[1]
+    encoded = json.dumps(model, ensure_ascii=True, separators=(",", ":")).replace("<", "\\u003c")
+    return clean[:start] + encoded + clean[start + len(model_raw.content):]
+
+
 def finalize(text, thumbnails):
     import verify_html as verifier
     tokens = verifier.lex(text)
@@ -242,9 +267,12 @@ def finalize(text, thumbnails):
     model.update(schemaVersion=2, sourceDigest=digest(clean), thumbnails=[])
     model["assets"].extend(print_assets)
     additions = []
-    links = [node for node in flatten(elements(clean)) if "data-shf-goto" in node.attrs]
+    spans = [(s.start, s.end) for s in slides(clean)]
+    links = [node for node in flatten(elements(clean)) if "data-shf-goto" in node.attrs and not any(a <= node.start < b for a, b in spans)]
     for slide_id, step, uri, asset in thumbnails:
-        link = next(node for node in links if node.attrs["data-shf-goto"] == slide_id)
+        link = next((node for node in links if node.attrs["data-shf-goto"] == slide_id), None)
+        if link is None:
+            raise ValueError("Slide " + slide_id + " has no sidebar button for its thumbnail")
         image = '<img data-shf-thumbnail="' + html.escape(slide_id, quote=True) + '" data-asset-ref="' + asset["id"] + '" src="' + uri + '" alt="" width="320" height="180">'
         additions.append((link.opening_end, link.opening_end, image))
         model["assets"].append(asset)

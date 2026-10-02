@@ -17,6 +17,7 @@ Usage: python build_review_viewer.py deck.html review.html
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import html
 import json
@@ -94,10 +95,11 @@ textarea:focus { outline: 2px solid var(--accent); }
 #lightbox p { position: fixed; left: 24px; right: 24px; bottom: 12px; margin: 0; color: #fff; text-align: center; font-size: 14px; }
 #lightboxclose { position: fixed; top: 12px; right: 16px; width: 42px; height: 42px; padding: 0; border-color: #fff; border-radius: 50%; background: #1b1f27; color: #fff; font-size: 28px; line-height: 1; }
 body.pres #presextra { display: block; }
-body.pres #editor, body.pres #tools, body.pres #list, body.pres #actions, body.pres #pv, body.pres #close, body.pres #fs, body.pres #nav .edit { display: none; }
+body.pres #savepdf, body.pres #editor, body.pres #tools, body.pres #list, body.pres #actions, body.pres #pv, body.pres #close, body.pres #fs, body.pres #nav .edit { display: none; }
 body.pres #notes { flex: 1; overflow: auto; border-bottom: 0; }
 body.pres #notesBody { font-size: 20px; max-height: none; }
 body.pres #app { --panel: 46vw; }
+@media print { @page { size: 16in 9in; margin: 0; } }
 @media (max-width: 900px) { #app { --panel: 40vh; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 10px var(--panel); } #panel { border-left: 0; overflow: auto; } textarea { min-height: 90px; } #split { cursor: row-resize; } #split::after { inset: 3px calc(50% - 24px); } }
 </style>
 </head>
@@ -107,7 +109,7 @@ body.pres #app { --panel: 46vw; }
 <div id="split" role="separator" aria-orientation="vertical" aria-label="スライドとコメント欄の境界" tabindex="0" title="ドラッグで幅を変更（ダブルクリックで初期化）"></div>
 <aside id="panel">
 <header>
-<div id="panelhead"><h1>コメント</h1><button type="button" id="pv" title="発表者ビューを別ウィンドウで開く（メモ・次のスライド・タイマー）">発表者ビュー</button><button type="button" id="fs" title="全画面で発表（コメント欄を隠す）">発表（全画面）</button><button type="button" id="close" aria-label="コメント欄を閉じる" title="コメント欄を閉じる（Alt+C）">×</button></div>
+<div id="panelhead"><h1>コメント</h1><button type="button" id="savepdf" hidden title="埋め込み済みの PDF を保存（ブラウザーの印刷設定に依存しない）">PDF 保存</button><button type="button" id="pv" title="発表者ビューを別ウィンドウで開く（メモ・次のスライド・タイマー）">発表者ビュー</button><button type="button" id="fs" title="全画面で発表（コメント欄を隠す）">発表（全画面）</button><button type="button" id="close" aria-label="コメント欄を閉じる" title="コメント欄を閉じる（Alt+C）">×</button></div>
 <div id="where">読み込み中</div>
 <div id="summary"></div>
 <div id="nav"><button type="button" id="prev">前</button><button type="button" id="next">次</button><button type="button" id="grid" title="スライド一覧（G）">一覧</button><label>移動 <input type="number" id="jump" min="1" aria-label="スライド番号へ移動"></label></div>
@@ -135,7 +137,7 @@ body.pres #app { --panel: 46vw; }
 </div>
 <div id="gridview" hidden role="dialog" aria-label="スライド一覧"><button type="button" id="gridclose" aria-label="一覧を閉じる">×</button><div id="gridbody"></div></div>
 <div id="lightbox" hidden role="dialog" aria-modal="true" aria-label="画像の拡大表示"><button type="button" id="lightboxclose" aria-label="拡大表示を閉じる">×</button><img id="lightboximage" alt=""><p id="lightboxcaption"></p></div>
-<script>
+__PDF_BLOCK__<script>
 (function () {
   var KEY = "review:__KEY__";
   var LEGACY_KEY = "review:__LEGACY__";
@@ -150,6 +152,16 @@ body.pres #app { --panel: 46vw; }
   var lightbox = $("lightbox"), lightboxImage = $("lightboximage"), lightboxCaption = $("lightboxcaption"), lightboxReturn = null;
   var data = {}, slides = [], shown = null, filterMode = "all", query = "";
   var laserOn = false, laserDot = null, laserBtn = null, toggleBtn = null, gridBtn = null, pendingQuote = "";
+
+  // Print the deck frame (its @page has margin 0), not the wrapper: wrapper printing adds the browser's file-path header/footer and a rotated page.
+  function printDeck(e) {
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === "p" || e.key === "P") && frame.contentWindow) {
+      e.preventDefault();
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    }
+  }
+  document.addEventListener("keydown", printDeck);
 
   if (PRES) document.body.classList.add("pres");
 
@@ -396,6 +408,20 @@ body.pres #app { --panel: 46vw; }
   $("copy").addEventListener("click", function () { copyWith(markdown(false), "Markdown をコピーしました"); });
   $("copyai").addEventListener("click", function () { copyWith(markdown(true), "AI への依頼文をコピーしました"); });
   $("save").addEventListener("click", function () { download("slide-review-comments.md", "text/markdown", markdown(false)); });
+  var pdfNode = $("deck-pdf");
+  if (pdfNode) {
+    $("savepdf").hidden = false;
+    $("savepdf").addEventListener("click", function () {
+      var bin = atob(pdfNode.textContent.trim()), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+      a.download = TITLE.replace(/[\\/:*?"<>|]/g, "_") + ".pdf";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+      status.textContent = "PDF を保存しました";
+    });
+  }
   $("savejson").addEventListener("click", function () { download("slide-review-comments.json", "application/json", JSON.stringify({ title: TITLE, exportedAt: new Date().toISOString(), data: data }, null, 1)); });
   $("clear").addEventListener("click", function () {
     if (!window.confirm("すべてのコメントを消去しますか。")) return;
@@ -793,6 +819,7 @@ body.pres #app { --panel: 46vw; }
       installDeckTools(d);
       openLinksInNewTab(d);
       d.addEventListener("keydown", hotkeys);
+      d.addEventListener("keydown", printDeck);
     }
     var side = d && d.querySelector('[data-shf-action="outline"]');
     if (side && side.getAttribute("aria-expanded") === "true") side.click();
@@ -820,7 +847,7 @@ body.pres #app { --panel: 46vw; }
 """
 
 
-def build(deck_path: Path, out_path: Path) -> None:
+def build(deck_path: Path, out_path: Path, pdf_path: Path | None = None) -> None:
     text = deck_path.read_text(encoding="utf-8")
     match = re.search(r"<title>(.*?)</title>", text, flags=re.S)
     title = html.unescape(match.group(1)).strip() if match else deck_path.stem
@@ -829,10 +856,17 @@ def build(deck_path: Path, out_path: Path) -> None:
     key = hashlib.sha256(title.encode("utf-8")).hexdigest()[:16]
     legacy = hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
     srcdoc = text.replace("&", "&amp;").replace('"', "&quot;")
+    pdf_block = ""
+    if pdf_path is not None:
+        payload = pdf_path.read_bytes()
+        if not payload.startswith(b"%PDF"):
+            raise SystemExit("STOP: --pdf is not a PDF file")
+        pdf_block = '<script type="application/octet-stream" id="deck-pdf">' + base64.b64encode(payload).decode("ascii") + "</script>\n"
     page = (
         TEMPLATE.replace("__SRCDOC__", srcdoc)
         .replace("__TITLE_JS__", json.dumps(title, ensure_ascii=False).replace("</", "<\\/"))
         .replace("__TITLE__", html.escape(title))
+        .replace("__PDF_BLOCK__", pdf_block)
         .replace("__LEGACY__", legacy)
         .replace("__KEY__", key)
     )
@@ -842,10 +876,10 @@ def build(deck_path: Path, out_path: Path) -> None:
 def extract(viewer_path: Path, out_path: Path) -> None:
     """Recover the embedded deck so it can be edited and re-finalized."""
     page = viewer_path.read_text(encoding="utf-8")
-    match = re.search(r'<iframe id="deck"[^>]*? srcdoc="([^"]*)"', page)
+    match = re.search(r'<iframe\b[^>]*?\bid=(["\'])deck\1[^>]*?\bsrcdoc=(["\'])(.*?)\2\s*>', page, re.S)
     if not match:
         raise SystemExit("STOP: no embedded deck found")
-    out_path.write_text(html.unescape(match.group(1)), encoding="utf-8", newline="\n")
+    out_path.write_text(html.unescape(match.group(3)), encoding="utf-8", newline="\n")
 
 
 def main() -> int:
@@ -853,10 +887,13 @@ def main() -> int:
     parser.add_argument("deck", type=Path, help="deck.html (or the review viewer with --extract)")
     parser.add_argument("output", type=Path)
     parser.add_argument("--extract", action="store_true", help="recover the deck from a review viewer")
+    parser.add_argument("--pdf", type=Path, help="embed this PDF behind a save button (browser print settings can rotate or add headers)")
     args = parser.parse_args()
     if args.deck.resolve() == args.output.resolve():
         raise SystemExit("STOP: output must differ from the input")
-    (extract if args.extract else build)(args.deck, args.output)
+    if args.extract and args.pdf:
+        raise SystemExit("STOP: --pdf cannot be combined with --extract")
+    extract(args.deck, args.output) if args.extract else build(args.deck, args.output, args.pdf)
     print(f"wrote {args.output} ({args.output.stat().st_size} bytes)")
     return 0
 
