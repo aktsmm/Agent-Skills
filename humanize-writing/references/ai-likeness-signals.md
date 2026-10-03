@@ -123,7 +123,7 @@ Humanize Writing の検出辞書。検出は厳密に、修正は文脈判断で
 ## Structure Signals
 
 - Paragraph lengths are too uniform. Mix in one- or two-sentence paragraphs.
-- Align subjects and comparison axes across sibling headings with the same role; do not force unrelated sections into identical sentence patterns.
+- Align subjects and comparison axes in headings, lists, and contrasts serving the same role. Interfaces (Chat, CLI) and tasks (implementation, documentation) are different axes: separate them instead of joining them with "not only ... but also". Do not force unrelated sections into identical patterns.
 - Lists always collapse to 3 or 5 items. Use the number the content actually needs.
 - A short post has both a neat 3-point summary and a 2-point advice list. Return one list item to prose or keep only the needed count.
 - The opening has too much runway: disclaimers, background, glossary, digressions. Put the main claim, axis, or TL;DR first.
@@ -131,9 +131,10 @@ Humanize Writing の検出辞書。検出は厳密に、修正は文脈判断で
 - A paragraph cannot say what it receives from the previous paragraph, what role it plays, or what it passes to the next paragraph. Treat it as an argument-flow gap.
 - Public-facing paragraphs explain internal structure too long. Write what became easier for the reader or operator.
 - Fact, feeling, and intent are mixed in one paragraph. Separate numbers, hand-feel, and aim.
+- Distinguish requirements, optional capabilities, and choices made in the described workflow. Use "can" or "can also" for genuine alternatives; retain verified prerequisites and actual actions rather than weakening every assertion.
 - All paragraphs have the same heat. Let important sections carry more weight.
 - Observation is preceded by a label such as `〜として見ると追いやすい` or `〜に見える`. Put the observed fact first.
-- The framework announced in the opening does not match the section structure. Remove, move, or fold out-of-axis topics.
+- The opening framework does not match the sections or figures. Remove, move, or fold out-of-axis topics. Keep diagrams focused on the relation being explained; put unrelated axes and author-only classification labels outside the figure.
 - Sentence length variance is too low. Mix short and long sentences intentionally.
 - The ending follows a problem-to-future template. Close with a concrete next action.
 - The ending has multiple routes for the reader. Keep one main route and move the rest to references.

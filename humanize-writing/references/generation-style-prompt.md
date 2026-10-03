@@ -38,6 +38,8 @@ Humanize Writing の生成指示モードで使う追加指示。
 - 価格、preview、仕様差分のように動きやすい話では、必要に応じて `YYYY-MM-DD 時点の公開 Docs ベース` と分かる注記を入れる
 - 文例がある場合は、その voice を mirror する
 - 想定読者が前提にできない専門用語だけ、初出で短く補う
+- Match wording to intent: use "can" for an optional capability, state the chosen workflow directly, and preserve genuine requirements. Do not hedge every factual statement.
+- Keep each figure focused on its intended relation; omit unrelated classification axes and author-only labels from reader-facing graphics.
 - 読者を安心させる文は、本文で確認できる条件や手順があるときだけ使う。経験、失敗、感情は分かりやすさのために創作しない
 - 初稿後に「まだ AI っぽく見える理由」を短く洗い出し、必要な箇所だけ最終稿で直す
 

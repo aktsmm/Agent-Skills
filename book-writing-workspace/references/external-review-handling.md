@@ -76,6 +76,14 @@ The size of the gap decides the order of work, so diff that revision against cur
 
 From that point the current manuscript is the single source of truth, and every comment earns one of three verdicts: still valid, already resolved, or void because its premise changed. Guard the middle one. "Already resolved" is the verdict that costs trust when it is wrong, so require a quote of the current text and the commit that resolved it before recording it. Without both, record it as pending.
 
+If a reported choice label or wording matches neither current text nor its history, inspect the reviewed proof before selecting a replacement. Do not assume the reviewer meant a neighbouring choice; adding a correct claim to a distractor can create an extra valid answer.
+
+## Ground cover copy in the manuscript
+
+Check promotional claims against the introduction, reader personas, and relevant chapters, not the contents list alone. A chapter's examples may be narrower than the book's overall scope; read the adjacent explanation before either broadening the promise or restricting it. Keep the author's intended emphasis without implying capabilities or outcomes the book does not teach.
+
+For a replacement in a fixed cover frame, count original and proposed text mechanically with the same whitespace policy, separating heading and body. Report the difference; equal counts do not prove the typeset layout fits. Draft approval is not posting approval. Preserve whether the author speaks for themselves or for the group: mentioning coauthors does not establish their agreement. Confirm recipients from the actual thread and read back the posted body and mentions.
+
 ## Rank proof comments by what cannot be recalled after printing
 
 The top priority is anything that becomes unfixable once printed: a disputed answer key, a rights or licensing question, and any note saying the typesetter already changed the text.
@@ -135,7 +143,7 @@ Group related requests into one commit when they share a topic, and reference th
 
 ## Widen the scope before applying
 
-A reported occurrence is a sample. Search the whole manuscript for the same pattern before editing, or the next review reports the siblings.
+A reported occurrence is a sample. Search the manuscript for siblings, but distinguish detection scope from authorised edit scope. Report out-of-scope findings instead of changing them without approval.
 
 Two follow-ups pay off repeatedly:
 
@@ -162,6 +170,6 @@ Recompute after every edit pass. Shortening the longest cell shrinks the whole c
 
 Reply, then close. An issue that was fixed but left open reads as ignored, and the reviewer has no way to tell the difference.
 
-Before closing, recompute whatever is derived from the manuscript text. A global replacement shifts counts, and counts feed page budgets and schedule decisions, so closing on a stale number pushes the error into planning.
+Before closing, regenerate affected question digests and counts and run the manuscript gates. A reference URL change must preserve support for the answer and use a reachable, specific source. Compare each question's reference format separately from the chapter's supplementary reference heading when aligning books. If an explicitly requested source triggers a duplicate limit, report that conflict; do not substitute a weaker source or relax the gate merely to pass.
 
 If the fix is not visible yet because the work is unpushed, publish first. A reply that references an invisible commit is worse than a late reply.
