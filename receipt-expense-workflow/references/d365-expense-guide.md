@@ -155,7 +155,7 @@ attachment statusが曖昧、または1つのreceiptを複数lineで共有して
 
 ## Change Category
 
-1. Expense line を選択して `Edit`
+1. Expense line を選択し、右ペインの行編集ボタン（`EditExpense`）を押す
 2. Category コンボボックスへカテゴリ名を入力
 3. `Tab` で確定して `Close`
 
@@ -165,8 +165,8 @@ attachment statusが曖昧、または1つのreceiptを複数lineで共有して
 
 - 右ペインの行編集ボタン（controlname `EditExpense`）で Edit expense を開く。汎用の `Edit` ボタンの先頭は Bulk edit を開くことがある
 - Category は Ctrl+A → Delete → 入力 → Alt+ArrowDown → Enter で選ぶ。fill だけだと既存値に追記される
-- カテゴリ変更で form が再描画され、Notes が消えたり form が自動で閉じたりする。カテゴリだけ form で変え、Description / Country/region / 税グループは右ペインで入力して `Save and continue` し、保存後の値を読み戻す
-- 必須エラーが出ている行では Edit expense form が開かない。右ペインで埋めてから保存する
+- カテゴリ変更で form が再描画され、Notes が消えたり form が自動で閉じたりする。カテゴリ変更と Description などの入力は別の保存単位に分け、どちらも保存後に値を読み戻す
+- 必須エラーが出ている行では Edit expense form が開かない。右ペインで必須項目（Country/region / 税グループなど）を埋めて保存してから開き直す
 
 ### Required Line Fields
 
@@ -187,10 +187,10 @@ Description は実態を推測して書かない。顧客訪問、出張先、�
 
 ### Edit Line Description Safely
 
-Expense line の Description は、右ペインの inline edit ではなく **Edit expense** dialog を正本にする。右ペインは active row と表示値がずれたり、古い Description が残ったりすることがある。
+Expense line の Description は **Edit expense** dialog で編集するのを既定にする。右ペインは active row と表示値がずれたり、古い Description が残ったりすることがある。dialog が開けない行（必須エラー中）だけ右ペインで入力してよい。どちらの経路でも、保存後に対象行を選び直して値を読み戻すまで完了にしない。
 
 1. Expense line を選択し、Amount / Merchant / date-category が対象行と一致することを確認する
-2. 右ペイン上部の `Edit` を押す
+2. 右ペインの行編集ボタン（controlname `EditExpense`）を押す。汎用の `Edit` は Bulk edit が開くことがある
 3. dialog の Description を編集する
 4. `Close` 後、右ペインと grid を再読取する
 5. `Save and continue` 後、対象行を選び直して Description / Category / Country / tax group / receipt を確認する

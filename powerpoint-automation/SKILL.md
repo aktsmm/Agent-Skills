@@ -1,6 +1,6 @@
 ---
 name: powerpoint-automation
-description: Create and edit professional PowerPoint presentations from web articles, blog posts, existing PPTX files, or templates. Use when creating PPTX, converting articles to slides, translating presentations, editing open PowerPoint files, or doing COM Automation / RefURL / overflow review work. Triggers on PowerPoint, PPTX, パワポ, スライド作成, 記事をスライド化, COM自動化, RefURL.
+description: Convert web articles or blog posts into slides through a content.json pipeline, translate or rebuild existing PPTX files onto a template, and edit an already-open PowerPoint deck with COM Automation (RefURL, overflow review). Use for article-to-slides conversion, deck translation, template-based rebuilds, or live COM editing of an open deck. Not for simply reading, inspecting, or lightly editing a .pptx file. Triggers on 記事をスライド化, スライド翻訳, 開いているパワポを編集, COM自動化, RefURL, content.json.
 argument-hint: "変換したい URL・PPTX・テンプレート、または編集内容"
 user-invocable: true
 license: CC BY-NC-SA 4.0

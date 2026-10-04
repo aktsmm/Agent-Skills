@@ -51,7 +51,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [packet-capture-analysis](packet-capture-analysis/) | Use when analyzing pcap or pcapng files, triaging network captures, labeling IPs with evidence, generating PNG charts, or writing packet analysis reports. Keywords: pcap, pcapng... |
 | [peer-feedback](peer-feedback/) | 同僚への半期ピアフィードバック下書きを自動生成する。workIQ で 1:1 チャット・グループチャット・メンション・共通会議・メール・SPO の履歴を収集し、6項目テンプレートに沿ってポジティブかつプロモーション志向で起票する。Use when: ピアフィードバック, フィードバック下書き, 同僚評価, 半期フィードバック, 360度フィードバック。 |
 | [permission-max](permission-max/) | Reduce repeated permission prompts across Microsoft Scout, Copilot CLI, and host tool confirmations with user-approved settings and explicit before/after verification |
-| [powerpoint-automation](powerpoint-automation/) | Create and edit professional PowerPoint presentations from web articles, blog posts, existing PPTX files, or templates |
+| [powerpoint-automation](powerpoint-automation/) | Convert web articles or blog posts into slides through a content.json pipeline, translate or rebuild existing PPTX files onto a template, and edit an already-open PowerPoint dec... |
 | [powerpoint-planning](powerpoint-planning/) | Plan high-quality PowerPoint presentations before file creation or editing |
 | [project-workspace](project-workspace/) | Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a pro... |
 | [receipt-expense-workflow](receipt-expense-workflow/) | Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment |
