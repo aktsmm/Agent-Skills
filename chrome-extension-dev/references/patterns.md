@@ -1,220 +1,40 @@
 # よくあるパターン集
 
-ブラウザ拡張機能開発でよく使う実装パターン。
+WXT / MV3 拡張で繰り返し使う実装パターンと落とし穴。API の基本形は [chrome-api.md](chrome-api.md) と WXT 公式を参照。
 
----
+## メッセージング
 
-## メッセージングパターン
-
-### Content Script ↔ Service Worker
-
-```typescript
-// content.ts - メッセージ送信
-const response = await chrome.runtime.sendMessage({
-  type: "GET_DATA",
-  payload: { key: "value" },
-});
-
-// background.ts - メッセージ受信
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "GET_DATA") {
-    // 非同期処理
-    fetchData(message.payload).then((data) => {
-      sendResponse({ success: true, data });
-    });
-    return true; // 非同期レスポンスを示す
-  }
-});
-```
-
-### Service Worker → Content Script
+- 非同期応答は `return true`（[chrome-api.md](chrome-api.md#chromeruntime)）。送信先タブにコンテンツスクリプトが未注入だと `tabs.sendMessage` は `Could not establish connection` で失敗するので、捕捉して注入または無視する。
+- 型安全にするならメッセージ名 → request/response の型マップを 1 か所で定義し、送受信の両側で同じ型を使う。WXT では [Messaging](https://wxt.dev/guide/essentials/messaging) の推奨ライブラリを使ってよい。
 
 ```typescript
-// background.ts
-const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-const response = await chrome.tabs.sendMessage(tab.id!, {
-  type: "UPDATE_UI",
-  data: { theme: "dark" },
-});
-```
-
-### 型安全なメッセージング
-
-```typescript
-// types/messages.ts
 type MessageMap = {
   GET_DATA: { request: { key: string }; response: { value: string } };
-  SET_DATA: { request: { key: string; value: string }; response: void };
 };
 
-type MessageType = keyof MessageMap;
-
-async function sendMessage<T extends MessageType>(
+async function sendMessage<T extends keyof MessageMap>(
   type: T,
-  payload: MessageMap[T]["request"]
+  payload: MessageMap[T]["request"],
 ): Promise<MessageMap[T]["response"]> {
   return chrome.runtime.sendMessage({ type, payload });
 }
-
-// 使用
-const result = await sendMessage("GET_DATA", { key: "settings" });
 ```
 
----
+## ストレージ
 
-## ストレージパターン
+- WXT では `storage.defineItem<T>("local:key")` で型付きアイテムを定義し、`getValue` / `setValue` / `watch` を使う。手書きのラッパーより WXT の [Storage](https://wxt.dev/guide/essentials/storage) を優先する。
+- UI で購読する場合は初期値の読み込みと `onChanged`（または `watch`）の購読を両方行い、アンマウント時に解除する。
 
-### 型安全なストレージラッパー
+## Content Script
 
-```typescript
-// utils/storage.ts
-interface StorageSchema {
-  settings: {
-    theme: "light" | "dark";
-    notifications: boolean;
-  };
-  lastSync: number;
-}
+- **コンテキスト無効化**: 拡張の更新・無効化後も既存ページのコンテンツスクリプトは残り、拡張 API 呼び出しが `Extension context invalidated` で失敗する。WXT では `ctx.addEventListener` / `ctx.setTimeout` などを使い、`ctx.isValid` を確認する。
+- **スタイル分離**: WXT の `createShadowRootUi`（`cssInjectionMode: "ui"`、CSS は entrypoint で import）を使う。`all: initial` で継承スタイルは戻るが、`rem` は `<html>` の font-size に依存するため Tailwind 等はサイトごとに大きさが変わる。ページの CSS 影響を完全に避けたい、または HMR が必要なら `createIframeUi`。
+- 動的に出現する要素への mount は `anchor` + `ui.autoMount()`。
+- **ページ変数へのアクセス**: `world: "MAIN"` は拡張 API を使えない。WXT は unlisted script + `injectScript()`（`web_accessible_resources` に登録）を推奨しており、親コンテンツスクリプト経由で拡張 API と連携できる。
+- **SPA**: コンテンツスクリプトはフルリロード時にしか走らない。広めの `matches` で注入し、`wxt:locationchange` イベントと `MatchPattern` で対象 URL を判定する。
+- WXT の import は `#imports` 経由で解決される（例: `createShadowRootUi` の実体は `wxt/utils/content-script-ui/shadow-root`）。古い `wxt/client` からの import は現行版に合わせる。
 
-export async function getStorage<K extends keyof StorageSchema>(
-  key: K
-): Promise<StorageSchema[K] | undefined> {
-  const result = await chrome.storage.local.get(key);
-  return result[key];
-}
-
-export async function setStorage<K extends keyof StorageSchema>(
-  key: K,
-  value: StorageSchema[K]
-): Promise<void> {
-  await chrome.storage.local.set({ [key]: value });
-}
-
-// 使用
-const settings = await getStorage("settings");
-await setStorage("settings", { theme: "dark", notifications: true });
-```
-
-### リアクティブストレージ（React）
-
-```typescript
-// hooks/useStorage.ts
-import { useState, useEffect } from "react";
-
-export function useStorage<T>(key: string, defaultValue: T) {
-  const [value, setValue] = useState<T>(defaultValue);
-
-  useEffect(() => {
-    // 初期値を読み込み
-    chrome.storage.local.get(key).then((result) => {
-      if (result[key] !== undefined) {
-        setValue(result[key]);
-      }
-    });
-
-    // 変更を監視
-    const listener = (
-      changes: { [key: string]: chrome.storage.StorageChange },
-      areaName: string
-    ) => {
-      if (areaName === "local" && changes[key]) {
-        setValue(changes[key].newValue);
-      }
-    };
-
-    chrome.storage.onChanged.addListener(listener);
-    return () => chrome.storage.onChanged.removeListener(listener);
-  }, [key]);
-
-  const updateValue = async (newValue: T) => {
-    await chrome.storage.local.set({ [key]: newValue });
-    setValue(newValue);
-  };
-
-  return [value, updateValue] as const;
-}
-
-// 使用
-function SettingsComponent() {
-  const [theme, setTheme] = useStorage("theme", "light");
-  return <button onClick={() => setTheme("dark")}>Dark Mode</button>;
-}
-```
-
----
-
-## Content Script パターン
-
-### Shadow DOM でスタイル分離
-
-```typescript
-// content.ts
-export default defineContentScript({
-  matches: ["<all_urls>"],
-  main() {
-    // Shadow DOM でホストページのスタイルから分離
-    const container = document.createElement("div");
-    const shadow = container.attachShadow({ mode: "closed" });
-
-    shadow.innerHTML = `
-      <style>
-        .ext-panel { /* スタイル */ }
-      </style>
-      <div class="ext-panel">
-        <!-- UI -->
-      </div>
-    `;
-
-    document.body.appendChild(container);
-  },
-});
-```
-
-### WXT の createShadowRootUi
-
-```typescript
-// content.ts
-import { createShadowRootUi } from "wxt/client";
-
-export default defineContentScript({
-  matches: ["<all_urls>"],
-  cssInjectionMode: "ui",
-  async main(ctx) {
-    const ui = await createShadowRootUi(ctx, {
-      name: "my-extension-ui",
-      position: "inline",
-      anchor: "body",
-      onMount: (container) => {
-        const root = createRoot(container);
-        root.render(<App />);
-        return root;
-      },
-      onRemove: (root) => {
-        root.unmount();
-      },
-    });
-    ui.mount();
-  },
-});
-```
-
-### ページコンテキストでの実行
-
-```typescript
-// ページのグローバル変数にアクセスする必要がある場合
-export default defineContentScript({
-  matches: ["<all_urls>"],
-  world: "MAIN", // ページコンテキストで実行
-  main() {
-    // window オブジェクトはページと共有
-    console.log(window.somePageVariable);
-  },
-});
-```
-
----
-
-## ブラウザ自動操作パターン
+## ブラウザ自動操作
 
 ### ref 番号システム
 
@@ -224,7 +44,7 @@ DOM要素に一意の ref 番号を付与し、LLMが確実に要素を特定で
 // DOM解析でref番号を付与
 function assignRefNumbers() {
   const interactiveElements = document.querySelectorAll(
-    'button, a, input, select, [role="button"], [role="link"], [role="checkbox"]'
+    'button, a, input, select, [role="button"], [role="link"], [role="checkbox"]',
   );
 
   interactiveElements.forEach((el, i) => {
@@ -253,127 +73,39 @@ function executeAction(action: string, ref: string) {
 }
 ```
 
-### ボット検出回避
+### 操作ペース
 
-```typescript
-// ループ間に3-5秒のランダム待機
-async function humanLikeDelay() {
-  const waitTime = 3000 + Math.random() * 2000;
-  await new Promise((resolve) => setTimeout(resolve, waitTime));
-}
+連続操作は対象サイトの負荷と利用規約を考慮して間隔を空ける。ボット検出や利用制限の回避を目的とした人間らしさの偽装（ランダム遅延、マウス移動の模倣など）は実装しない。
 
-// マウス移動をシミュレート
-async function humanLikeClick(element: HTMLElement) {
-  // ホバーイベント
-  element.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-  await new Promise((resolve) => setTimeout(resolve, 100 + Math.random() * 200));
-
-  // クリック
-  element.click();
-}
-```
-
----
-
-## Service Worker パターン
+## Service Worker
 
 ### 長時間処理の分割
 
+SW は処理中でも終了され得る（[manifest-v3.md](manifest-v3.md#service-worker-のライフサイクル)）。即座に `sendResponse` で受付を返し、チャンクごとに進捗を `storage.session` に保存して、再起動後に続きから再開できるようにする。
+
 ```typescript
-// 30秒制限を回避するため、処理を分割
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "LONG_TASK") {
-    // 即座にレスポンスを返す
-    sendResponse({ status: "started" });
-
-    // バックグラウンドで処理を継続
-    processInChunks(message.data);
-
-    return false; // 同期レスポンス
-  }
-});
-
-async function processInChunks(data: any[]) {
+async function processInChunks(data: unknown[]) {
   const CHUNK_SIZE = 100;
-
-  for (let i = 0; i < data.length; i += CHUNK_SIZE) {
-    const chunk = data.slice(i, i + CHUNK_SIZE);
-    await processChunk(chunk);
-
-    // 進捗を保存
+  const { progress = 0 } = await chrome.storage.session.get("progress");
+  for (let i = progress; i < data.length; i += CHUNK_SIZE) {
+    await processChunk(data.slice(i, i + CHUNK_SIZE));
     await chrome.storage.session.set({ progress: i + CHUNK_SIZE });
   }
-
-  // 完了通知
   await chrome.runtime.sendMessage({ type: "TASK_COMPLETE" });
 }
 ```
 
-### Keep-Alive パターン
+### アラームによる再開
 
-```typescript
-// 定期的にウェイクアップ
-chrome.alarms.create("keepAlive", { periodInMinutes: 0.5 });
+`chrome.alarms`（最小 30 秒）で保留タスクを定期確認し、残っていれば再開する。SW を延命するための常時アラームにはしない。
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "keepAlive") {
-    // セッションストレージをチェック
-    chrome.storage.session.get("pendingTasks").then((result) => {
-      if (result.pendingTasks?.length > 0) {
-        processPendingTasks(result.pendingTasks);
-      }
-    });
-  }
-});
-```
+## スクリーンショット
 
----
-
-## スクリーンショットパターン
-
-### 現在のタブをキャプチャ
-
-```typescript
-// background.ts
-async function captureTab(): Promise<string> {
-  const dataUrl = await chrome.tabs.captureVisibleTab(undefined, {
-    format: "png",
-  });
-  return dataUrl;
-}
-
-// 使用（権限: activeTab または tabs + host_permissions）
-chrome.action.onClicked.addListener(async (tab) => {
-  const screenshot = await captureTab();
-  // Base64 データURL が返る
-});
-```
-
-### フルページキャプチャ
-
-```typescript
-// Content Script でスクロールしながらキャプチャ
-async function captureFullPage(): Promise<string[]> {
-  const screenshots: string[] = [];
-  const viewportHeight = window.innerHeight;
-  const totalHeight = document.documentElement.scrollHeight;
-
-  for (let y = 0; y < totalHeight; y += viewportHeight) {
-    window.scrollTo(0, y);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    const screenshot = await chrome.runtime.sendMessage({ type: "CAPTURE" });
-    screenshots.push(screenshot);
-  }
-
-  return screenshots;
-}
-```
-
----
+- `tabs.captureVisibleTab()` は `activeTab`（ユーザー操作時）か `<all_urls>` 相当の host 権限が必要で、Base64 の data URL を返す。
+- フルページ撮影でスクロール→撮影を繰り返すと呼び出し頻度上限に当たる。各撮影の間隔を空け、固定ヘッダーの重複や遅延読み込み画像を考慮して結合する。
 
 ## 外部リソース
 
-- [WXT Messaging](https://wxt.dev/guide/messaging.html)
-- [WXT Content Script UI](https://wxt.dev/guide/content-script-ui.html)
-- [Chrome Extension Examples](https://github.com/nicolo-ribaudo/nicolo-ribaudo.github.io/issues/14)
+- [WXT Messaging](https://wxt.dev/guide/essentials/messaging)
+- [WXT Content Scripts](https://wxt.dev/guide/essentials/content-scripts)
+- [Chrome Extensions Samples](https://github.com/GoogleChrome/chrome-extensions-samples)

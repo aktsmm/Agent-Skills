@@ -91,9 +91,9 @@ resource subscriptionActivityLog 'Microsoft.Insights/diagnosticSettings@2021-05-
 
 ```bicep
 // ExpressRoute 回線 + ゲートウェイ構成
-@description('ExpressRoute Gateway SKU')
+@description('ExpressRoute Gateway SKU (本番はゾーン冗長の AZ SKU 推奨。ErGwScale は scale unit 指定が別途必要)')
 @allowed(['Standard', 'HighPerformance', 'UltraPerformance', 'ErGw1AZ', 'ErGw2AZ', 'ErGw3AZ'])
-param gatewaySku string = 'HighPerformance'
+param gatewaySku string = 'ErGw1AZ'
 
 @description('Virtual network name')
 param vnetName string
@@ -157,8 +157,8 @@ output gatewayName string = gateway.name
 
 ```bicep
 // VPN Gateway for S2S connection
-@description('VPN Gateway SKU')
-@allowed(['VpnGw1', 'VpnGw2', 'VpnGw2AZ', 'VpnGw3', 'VpnGw3AZ'])
+@description('VPN Gateway SKU (非 AZ の VpnGw1-5 は 2025-11-01 以降新規作成不可)')
+@allowed(['VpnGw1AZ', 'VpnGw2AZ', 'VpnGw3AZ', 'VpnGw4AZ', 'VpnGw5AZ'])
 param vpnGatewaySku string = 'VpnGw2AZ'
 
 @description('Virtual network name')
@@ -224,8 +224,8 @@ param clusterName string = 'aksprivate'
 @description('Location')
 param location string = resourceGroup().location
 
-@description('Kubernetes version')
-param kubernetesVersion string = '1.30'
+@description('Kubernetes version (az aks get-versions -l <region> でサポート中の版を指定)')
+param kubernetesVersion string
 
 @description('Node count')
 param nodeCount int = 3
@@ -658,6 +658,8 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
 
 **Source:** https://learn.microsoft.com/en-us/azure/redis/redis-cache-bicep-provision
 
+> Basic / Standard / Premium は 2026-04-01 以降、新規顧客（2026-04-01 以前に同一テナントで利用実績なし）は作成不可。2028-09-30 に全廃止。新規構築は下の Azure Managed Redis を使う（[What's New](https://learn.microsoft.com/en-us/azure/azure-cache-for-redis/cache-whats-new)、2026-10-04 確認）。
+
 ```bicep
 // Azure Cache for Redis
 @description('Redis cache name')
@@ -698,12 +700,12 @@ resource redisCache 'Microsoft.Cache/redis@2023-08-01' = {
 output redisHostName string = redisCache.properties.hostName
 ```
 
-### Azure Managed Redis (Enterprise)
+### Azure Managed Redis（推奨）
 
 **Source:** https://learn.microsoft.com/en-us/azure/redis/redis-cache-bicep-provision
 
 ```bicep
-// Azure Managed Redis (Enterprise)
+// Azure Managed Redis (リソース型は Microsoft.Cache/redisEnterprise)
 @description('Redis cache name')
 param redisCacheName string = 'redisCache-${uniqueString(resourceGroup().id)}'
 
@@ -735,23 +737,7 @@ resource redisEnterpriseDatabase 'Microsoft.Cache/redisEnterprise/databases@2024
 
 ## MCP ツール活用例
 
-最新のスキーマ・サンプルを取得する:
-
-```python
-# リソース型のスキーマを取得
-mcp_bicep_experim_get_az_resource_type_schema(
-    azResourceType="Microsoft.ContainerService/managedClusters"
-)
-
-# 公式 Bicep サンプルを検索
-mcp_microsoft_docs_microsoft_code_sample_search(
-    query="AKS private cluster Bicep",
-    language="bicep"
-)
-
-# Azure Verified Modules を検索
-mcp_bicep_experim_list_avm_metadata()
-```
+スキーマ・公式サンプル・AVM の取得手順は [SKILL.md](../SKILL.md) の「Required: MCP Tools」を参照。
 
 ---
 

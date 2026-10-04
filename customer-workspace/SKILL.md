@@ -24,10 +24,10 @@ Set up or operate customer workspaces without confusing setup artifacts with liv
 Inspect the workspace before choosing an action. Treat it as existing when it contains any managed record such as `.github/copilot-instructions.md`, `.github/prompts/`, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, or `workstreams/`.
 An aggregate operations workspace may contain a lightweight `Customers/{id}/` profile, task list, inbox, and meetings. Do not initialize a full customer workspace over those records; ask for a separate target if dedicated customer management is needed.
 
-| Mode | Use when | First action |
-| ---- | -------- | ------------ |
-| Setup | No managed structure exists | Create the scaffold and capture routing facts. |
-| Operate | A managed workspace receives new information | Update the canonical record for the input. |
+| Mode             | Use when                                      | First action                                                           |
+| ---------------- | --------------------------------------------- | ---------------------------------------------------------------------- |
+| Setup            | No managed structure exists                   | Create the scaffold and capture routing facts.                         |
+| Operate          | A managed workspace receives new information  | Update the canonical record for the input.                             |
 | Review / Handoff | Status, ownership, or continuity is requested | Read current indexes first and report sources, owner, and next action. |
 
 - Do not rerun the initializer or use `-Force` in an existing workspace unless overwriting generated assets is explicitly requested.
@@ -59,14 +59,14 @@ Capture only routing facts: workspace scope, sharing boundary, own-team aliases,
 
 ## Canonical Records
 
-| Need | Canonical record |
-| ---- | ---------------- |
-| Navigation and handoff | `README.md`, `workspace-summary.md` |
-| Raw updates and open questions | `_inbox/`, `_questions/` |
-| Customer context | `_customer/profile.md` |
-| Meetings and follow-up | `meeting-notes/`, `next-actions/` |
-| Ongoing scope and detailed history | `workstreams/`, `pj_{topic}/` |
-| Deliverables and reusable learning | `research-reports/`, `_knowledge/` |
+| Need                               | Canonical record                    |
+| ---------------------------------- | ----------------------------------- |
+| Navigation and handoff             | `README.md`, `workspace-summary.md` |
+| Raw updates and open questions     | `_inbox/`, `_questions/`            |
+| Customer context                   | `_customer/profile.md`              |
+| Meetings and follow-up             | `meeting-notes/`, `next-actions/`   |
+| Ongoing scope and detailed history | `workstreams/`, `pj_{topic}/`       |
+| Deliverables and reusable learning | `research-reports/`, `_knowledge/`  |
 
 `Initialize-CustomerWorkspace.ps1` creates the managed scaffold and its templates. Create workstream folders, meeting notes, next actions, project threads, and material folders only when the operating workflow requires them.
 Leave cross-customer activity reports and global task indexes in the owning operations workspace; link to them when needed instead of copying them into a customer record.
@@ -87,14 +87,14 @@ Separate immutable originals, internal edits and shareable copies; use `_receive
 
 ## Operate an Existing Workspace
 
-| Input or request | Action |
-| ---------------- | ------ |
-| Short chat, email, or unstructured update | Preserve it in `_inbox/` and classify it. |
-| Meeting memo or Teams AI record | Create or update one meeting note and extract questions/actions in the same operation. |
-| Clear update for one confirmed workstream | Update its README with the source link and state change. |
-| New, ambiguous, or multi-workstream input | Record it in `workstreams/_candidates.md` and ask for confirmation. |
-| Time-bounded follow-up | Track it in `next-actions/`; use `ongoing/` only when no next-meeting date is known. |
-| Status review or handoff | Read `workspace-summary.md`, the portfolio, active actions, and open questions before reporting. |
+| Input or request                          | Action                                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Short chat, email, or unstructured update | Preserve it in `_inbox/` and classify it.                                                        |
+| Meeting memo or Teams AI record           | Create or update one meeting note and extract questions/actions in the same operation.           |
+| Clear update for one confirmed workstream | Update its README with the source link and state change.                                         |
+| New, ambiguous, or multi-workstream input | Record it in `workstreams/_candidates.md` and ask for confirmation.                              |
+| Time-bounded follow-up                    | Track it in `next-actions/`; use `ongoing/` only when no next-meeting date is known.             |
+| Status review or handoff                  | Read `workspace-summary.md`, the portfolio, active actions, and open questions before reporting. |
 
 Keep source records authoritative: summaries and workstreams link to meeting notes and inbox entries instead of duplicating them.
 
@@ -140,6 +140,6 @@ Before calling meeting notes done:
 > **Note**: `assets/` 配下の prompt / instruction / template は、新しい顧客ワークスペースを初期化するときの **コピー元** として使う scaffolding 用ファイル。ホスト workspace の `.github/prompts/` や `.github/copilot-instructions.md` とは独立に進化させてよい（同期は必須ではない）。ホスト側で機能追加した場合に scaffolding にも反映したいときは、明示的にこのフォルダへ back-port する。
 
 - `assets/_templates/`: next-actions, knowledge ledger, attachments, and workspace templates
-- `assets/*.prompt.md`: inbox, meeting-note conversion, and question extraction prompts
+- `assets/*.prompt.md`: inbox, meeting-note conversion, and question extraction prompts. Prompt files load only in the VS Code Local agent (not Agent Host sessions), so the routing rules in `copilot-instructions.md` must work without them.
 - `assets/copilot-instructions.md`: generated workspace auto-routing rules
 - `scripts/Test-ReceivedMaterialPlacement.ps1` - Read-only root audit for unclassified received-material candidates

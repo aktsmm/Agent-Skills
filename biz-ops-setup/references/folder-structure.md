@@ -53,32 +53,11 @@
 
 ## Naming Conventions
 
-| Prefix       | Purpose                         | View Frequency |
-| ------------ | ------------------------------- | -------------- |
-| `PascalCase` | Human-use, daily operations     | High           |
-| `_xxx`       | System-use, log accumulation    | Low            |
+| Prefix       | Purpose                      | View Frequency |
+| ------------ | ---------------------------- | -------------- |
+| `PascalCase` | Human-use, daily operations  | High           |
+| `_xxx`       | System-use, log accumulation | Low            |
 
 ## Creation Command
 
-```powershell
-# Root folders
-$folders = @(
-    "ActivityReport",
-    "Customers",
-    "Tasks",
-    "_internal\_inbox",
-    "_internal\_meetings",
-    "_internal\tech-connect",
-    "_internal\team",
-    "_inbox",
-    "_datasources",
-    "_workiq",
-    ".github\agents",
-    ".github\prompts",
-    ".github\skills"
-)
-
-foreach ($folder in $folders) {
-    New-Item -ItemType Directory -Path $folder -Force
-}
-```
+`scripts/Initialize-BizOpsWorkspace.ps1` owns the folder list and also creates customer folders and README files. For manual setup, create the folders shown in the diagram above.

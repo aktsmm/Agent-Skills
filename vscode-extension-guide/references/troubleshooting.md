@@ -12,11 +12,11 @@ Common issues and solutions for VS Code extension development.
 
 ## Extension Not Loading
 
-| Symptom                     | Cause                      | Solution                                                         |
-| --------------------------- | -------------------------- | ---------------------------------------------------------------- |
-| Extension never activates   | Missing `activationEvents` | Add to package.json: `"activationEvents": ["onStartupFinished"]` |
-| "Extension is not active"   | Wrong activation trigger   | Use `"*"` to always activate (dev only) or specific event        |
-| Works in dev, not installed | Build output not included  | Check `.vscodeignore`, ensure `out/` is included                 |
+| Symptom                     | Cause                                       | Solution                                                                                                                                                                             |
+| --------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Extension never activates   | Wrong `main` path or `engines.vscode` floor | Since VS Code 1.74, contributed commands/views/languages activate implicitly; add `activationEvents` only for other triggers (for example `onStartupFinished`, `workspaceContains:`) |
+| "Extension is not active"   | Wrong activation trigger                    | Avoid `"*"`; use the narrowest event that covers the entry point                                                                                                                     |
+| Works in dev, not installed | Build output not included                   | Check `.vscodeignore`, ensure `out/` is included                                                                                                                                     |
 
 ### Debug Activation
 
@@ -31,11 +31,11 @@ Prefer Output Channel logs for extension diagnostics. Use **Help** → **Toggle 
 
 ## Command Not Found
 
-| Symptom                   | Cause                        | Solution                                             |
-| ------------------------- | ---------------------------- | ---------------------------------------------------- |
-| "command not found"       | ID mismatch                  | Ensure same ID in package.json and registerCommand() |
-| Command not in palette    | Missing contributes.commands | Add command definition to package.json               |
-| Command defined but fails | Extension not activated      | Check activationEvents includes the command          |
+| Symptom                   | Cause                        | Solution                                                                                                        |
+| ------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| "command not found"       | ID mismatch                  | Ensure same ID in package.json and registerCommand()                                                            |
+| Command not in palette    | Missing contributes.commands | Add command definition to package.json                                                                          |
+| Command defined but fails | Extension not activated      | On `engines.vscode` < 1.74, add `onCommand:<id>`; otherwise check `activate()` errors in the Extension Host log |
 
 ### Verify Command Registration
 
@@ -87,60 +87,11 @@ output.appendLine(
 
 ### Inspect VSIX Contents
 
-```bash
-# List what will be packaged
-npx @vscode/vsce ls
-
-# Extract and inspect VSIX
-unzip -l my-extension-1.0.0.vsix
-```
-
-### When it is safe to exclude `node_modules/**` entirely
-
-A bundled extension (esbuild/webpack) needs no `node_modules` in the VSIX. An
-unbundled extension only needs the packages its compiled `out/` actually
-`require`s at runtime. Check before trusting `dependencies`:
-
-```powershell
-# What does the compiled output actually require at runtime?
-Select-String -Path out\*.js -Pattern 'require\("([^.][^"]+)"\)' -AllMatches |
-  ForEach-Object { $_.Matches } | ForEach-Object { $_.Groups[1].Value } |
-  Sort-Object -Unique
-# Also scan for dynamic import("pkg")
-```
-
-If the only externals are `vscode` (provided by the host) and Node built-ins
-(`fs`, `path`, `http`, `child_process`, ...), add `node_modules/**` to
-`.vscodeignore` and ship none of it. A dependency that is only reached through a
-**guarded dynamic `import()` disabled inside the extension host** is dead weight
-— e.g. `@github/copilot-sdk` pulls a ~285MB `@github/copilot` tree that kept one
-VSIX at 181MB; excluding `node_modules` produced an identical-functioning ~45KB
-build.
-
-### Always list every entry, not just the size
-
-```powershell
-# Enumerate all VSIX entries and flag leaked temp files
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-$z = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path my-extension-1.0.0.vsix))
-$z.Entries | Sort-Object FullName | ForEach-Object { '{0,8}  {1}' -f $_.Length, $_.FullName }
-$z.Dispose()
-```
-
-Block the build if temp runner scripts (`_*.ps1`), logs, or stray `*.vsix`
-leaked in, and add the matching ignore patterns (`*.ps1`, `*.log`, `*.vsix`) to
-`.vscodeignore`. Compare the new VSIX size against the previous version: an
-unexpectedly large or unchanged-huge size means `.vscodeignore` is not excluding
-`node_modules`.
+Use `npx @vscode/vsce ls` for the pre-package view and open the built VSIX as a ZIP to list every entry. Whether `node_modules/**` can be excluded, the ZIP enumeration snippet and the size-regression check are owned by [Publishing](publishing.md#judging-node_modules-exclusion). Block the build if temp runner scripts (`_*.ps1`), logs, or stray `*.vsix` leaked in.
 
 ## Publishing Errors
 
-| Symptom             | Cause                  | Solution                                 |
-| ------------------- | ---------------------- | ---------------------------------------- |
-| PAT invalid         | Wrong scope or expired | Regenerate with Marketplace Manage scope |
-| Publisher not found | ID mismatch            | Verify publisher ID matches exactly      |
-| Version exists      | Already published      | Increment version number                 |
-| README not showing  | Wrong filename case    | Must be `README.md` not `README.MD`      |
+See [Publishing → Common Errors](publishing.md#common-errors).
 
 ## Runtime Errors
 
@@ -176,25 +127,9 @@ Do not assume the installed editor version exists as an `@types/vscode` package.
 
 ## Debug Tips
 
-### Enable Verbose Logging
-
-```typescript
-const outputChannel = vscode.window.createOutputChannel("My Extension");
-outputChannel.appendLine("Debug message");
-outputChannel.show();
-```
-
-Keep runtime diagnostics behind a small logger wrapper so tests can assert the logging route and production code does not accumulate stray `console.log` calls.
-
-### Extension Host Logs
-
-1. **Help** → **Toggle Developer Tools**
-2. **Console** tab
-3. Filter by your extension name
-
-### Reload Without Restart
-
-- **Ctrl+Shift+P** → "Developer: Reload Window"
+- Keep runtime diagnostics behind a small Output Channel logger wrapper so tests can assert the logging route and production code does not accumulate stray `console.log` calls.
+- Activation errors also appear in the **Output** panel → **Extension Host** channel and in **Help** → **Toggle Developer Tools** → **Console**.
+- **Developer: Reload Window** reloads without restarting VS Code.
 
 ## Driving Copilot Chat From an Extension
 
@@ -230,19 +165,14 @@ npx @vscode/vsce ls
 
 ## Webview 真っ白 / SyntaxError
 
-| 症状                               | 原因                               | 解決策                                        |
-| ---------------------------------- | ---------------------------------- | --------------------------------------------- |
-| 画面真っ白                         | JavaScript SyntaxError             | Webview DevTools Console でエラー確認         |
-| `Invalid regular expression: /^*/` | 正規表現のバックスラッシュが消えた | テンプレート内で二重エスケープ (`\\d`, `\\s`) |
-| `Unexpected token`                 | minify時にクォートが崩れた         | `data-action` + イベント委譲パターンに変更    |
-| ボタンが反応しない                 | innerHTML後の onclick が効かない   | `document.addEventListener` で委譲            |
+| 症状                               | 原因                                 | 解決策                                        |
+| ---------------------------------- | ------------------------------------ | --------------------------------------------- |
+| 画面真っ白                         | JavaScript SyntaxError               | Webview DevTools Console でエラー確認         |
+| `Invalid regular expression: /^*/` | 正規表現のバックスラッシュが消えた   | テンプレート内で二重エスケープ (`\\d`, `\\s`) |
+| `Unexpected token`                 | minify時にクォートが崩れた           | `data-action` + イベント委譲パターンに変更    |
+| ボタンが反応しない                 | inline `onclick` が CSP で拒否される | `document.addEventListener` で委譲            |
 
-### デバッグ手順
-
-1. **Developer: Open Webview Developer Tools** を実行
-2. Console タブでエラーを確認
-3. ビルド出力 `out/extension.js` で該当行を検索
-4. ソースの正規表現/クォートを修正し再ビルド
+詳細と対策は [Webview](webview.md#inline-script-gotchas) を参照。確認は **Developer: Toggle Developer Tools** の Console（active frame を Webview に切り替える）で行い、ビルド出力 `out/extension.js` で該当行を検索する。
 
 ## 命名の不一致
 

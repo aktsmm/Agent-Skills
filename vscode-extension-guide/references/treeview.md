@@ -1,6 +1,6 @@
 # TreeView Implementation
 
-Create sidebar views for your VS Code extension.
+Sidebar entry points and tree views for a VS Code extension.
 
 ## package.json Configuration
 
@@ -40,114 +40,14 @@ Create sidebar views for your VS Code extension.
 - Preserve existing view IDs when relocating a view. VS Code may retain customized placements: offer Move View or enabling a hidden Activity Bar item first. Reset View Locations affects all views; explain its scope and never invoke it silently.
 - Test manifest/container/view agreement and real container-open/view-focus commands in an isolated Extension Host. Opening navigation must not execute user tasks. A source edit is not an installed update; verify the intended installed version before diagnosing a missing icon.
 
-## TreeDataProvider Implementation
+## Implementation Notes
 
-```typescript
-import * as vscode from "vscode";
+The `TreeDataProvider` / `createTreeView` API follows the official [Tree View guide](https://code.visualstudio.com/api/extension-guides/tree-view). Project rules:
 
-// Tree item class
-class MyItem extends vscode.TreeItem {
-  constructor(
-    public readonly label: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    public readonly children?: MyItem[],
-  ) {
-    super(label, collapsibleState);
-    this.tooltip = this.label;
-    this.contextValue = "myItem"; // For context menu
-  }
-}
-
-// Provider class
-class MyTreeProvider implements vscode.TreeDataProvider<MyItem> {
-  // Event emitter for refresh
-  private _onDidChangeTreeData = new vscode.EventEmitter<MyItem | undefined>();
-  readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
-
-  private data: MyItem[] = [
-    new MyItem("Parent", vscode.TreeItemCollapsibleState.Expanded, [
-      new MyItem("Child 1", vscode.TreeItemCollapsibleState.None),
-      new MyItem("Child 2", vscode.TreeItemCollapsibleState.None),
-    ]),
-  ];
-
-  refresh(): void {
-    this._onDidChangeTreeData.fire(undefined);
-  }
-
-  getTreeItem(element: MyItem): vscode.TreeItem {
-    return element;
-  }
-
-  getChildren(element?: MyItem): MyItem[] {
-    return element ? element.children || [] : this.data;
-  }
-}
-```
-
-## Registration in extension.ts
-
-```typescript
-export function activate(context: vscode.ExtensionContext) {
-  const provider = new MyTreeProvider();
-
-  // Register provider
-  vscode.window.registerTreeDataProvider("myExtView", provider);
-
-  // Or use createTreeView for more control
-  const treeView = vscode.window.createTreeView("myExtView", {
-    treeDataProvider: provider,
-    showCollapseAll: true,
-  });
-  context.subscriptions.push(treeView);
-
-  // Refresh command
-  context.subscriptions.push(
-    vscode.commands.registerCommand("myExt.refresh", () => provider.refresh()),
-  );
-}
-```
-
-## Item Customization
-
-```typescript
-class MyItem extends vscode.TreeItem {
-  constructor(label: string, isFolder: boolean) {
-    super(
-      label,
-      isFolder
-        ? vscode.TreeItemCollapsibleState.Collapsed
-        : vscode.TreeItemCollapsibleState.None,
-    );
-
-    // Icon (codicon or file path)
-    this.iconPath = new vscode.ThemeIcon(isFolder ? "folder" : "file");
-
-    // Click action
-    this.command = {
-      command: "myExt.openItem",
-      title: "Open",
-      arguments: [this],
-    };
-
-    // Description (gray text after label)
-    this.description = "(modified)";
-  }
-}
-```
-
-## Context Menu
-
-```json
-"contributes": {
-  "menus": {
-    "view/item/context": [{
-      "command": "myExt.delete",
-      "when": "view == myExtView && viewItem == myItem"
-    }]
-  }
-}
-```
+- Prefer `vscode.window.createTreeView(id, { treeDataProvider, showCollapseAll })` over `registerTreeDataProvider` when you need `visible`, `reveal` or selection; push it to `context.subscriptions`.
+- Refresh through an `EventEmitter` exposed as `onDidChangeTreeData`.
+- Use codicons via `new vscode.ThemeIcon("<name>")` for item icons.
+- Context menus go under `menus["view/item/context"]` with `when: "view == <viewId> && viewItem == <contextValue>"`.
 
 ## Production Contracts
 

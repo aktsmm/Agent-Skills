@@ -56,7 +56,7 @@ Use this order every time:
 
 ## Hard Line Limits
 
-Some skills ship a validator that hard-enforces the SKILL.md line count (see `opportunity-factory/scripts/validate_factory_skill.py` with a ~150-line cap). When adding several new sections would blow past the cap:
+Some skills ship a validator that hard-enforces the SKILL.md line count (for example, a `scripts/validate_*.py` with a ~150-line cap). When adding several new sections would blow past the cap:
 
 - Do not silently delete existing sections to make room
 - Compress the added block into a single summary table with `references/<detail>.md` pointers, instead of expanding each new subsection inline
@@ -68,13 +68,13 @@ Some skills ship a validator that hard-enforces the SKILL.md line count (see `op
 
 When a section that lists hard rules, invariant items, or blocking gates keeps growing, expanding it inline pushes SKILL.md over the cap and creates duplication risk. Prefer externalization:
 
-- Move the authoritative list to a `references/*.md` file (typically the same file that defines the domain, e.g. `references/rubber-duck-review.md` for blocking gates, `references/tunable-defaults.md` for hard rules)
+- Move the authoritative list to a `references/*.md` file (typically the same file that defines the domain, e.g. `references/review-gates.md` for blocking gates, `references/defaults.md` for hard rules)
 - Leave one short paragraph in SKILL.md that names the concept and points to the reference. Two or three sentences is enough
 - Never duplicate the list in both places; other references consume the SSOT via a see-also link, not a copy
 - When the SSOT changes, only one file needs updating; consumers stay valid automatically
 - This trades SKILL.md surface visibility for durability. Only externalize items the reader can safely follow a link for. Keep 5–7 core row concepts inline as the operating table
 
-Example applied in opportunity-factory: hard rule list, Layer 3 blocking gate list, and reference default catalog are each SSOT in one references file. SKILL.md keeps a 3-line pointer instead of a 14-line bullet expansion, protecting the 150-line cap
+Example: a skill with a 150-line cap keeps its hard rule list, blocking gate list, and default catalog each as SSOT in one references file. SKILL.md keeps a 3-line pointer instead of a 14-line bullet expansion
 
 ## Keep vs Move
 

@@ -31,17 +31,7 @@ Keep prerequisites short and explicit.
 4. Sign in to Graph
 5. Perform a read test before a write test
 
-## Write Test Note
+## Write Test And Admin Approval
 
-- A successful delegated sign-in does not guarantee write access.
-- Live mail and calendar writes can still fail with `403 ErrorAccessDenied` if the current client app or tenant policy does not allow the requested write scopes.
-- If that happens, use a custom Entra ID app registration or a tenant-approved client configuration for live write validation.
-
-## Admin Approval Note
-
-- If the sign-in screen says that administrator approval is required for Microsoft Graph Command Line Tools, the tenant is blocking consent for the current client app.
-- In that case, re-signing alone is not enough.
-- Use one of these paths:
-  - ask a tenant admin to approve the app and required delegated scopes
-  - switch the runner to a tenant-approved custom app registration
-- Use [New-GraphGatewayAppConfig.ps1](../scripts/New-GraphGatewayAppConfig.ps1) or [custom-app.env.example](../assets/custom-app.env.example) to prepare the environment for a custom app quickly.
+A successful delegated sign-in does not guarantee write access. For `403 ErrorAccessDenied` on writes or an "administrator approval required" sign-in page, see [Troubleshooting](troubleshooting.md); re-signing alone is not enough.
+Prepare a tenant-approved custom app with [New-GraphGatewayAppConfig.ps1](../scripts/New-GraphGatewayAppConfig.ps1) or [custom-app.env.example](../assets/custom-app.env.example).

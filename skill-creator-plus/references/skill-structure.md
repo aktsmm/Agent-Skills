@@ -23,7 +23,7 @@ skill-name/
 
 Every SKILL.md consists of:
 
-- **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields Claude reads to determine when the skill gets used.
+- **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields the model reads to determine when the skill gets used.
 - **Body** (Markdown): Instructions and guidance. Only loaded AFTER the skill triggers.
 
 ## Bundled Resources
@@ -40,7 +40,7 @@ Executable code for tasks requiring deterministic reliability or repeatedly rewr
 
 Documentation loaded as needed into context.
 
-- **When to include**: Documentation Claude should reference while working
+- **When to include**: Documentation the model should reference while working
 - **Examples**: `references/schema.md`, `references/api_docs.md`
 - **Best practice**: If files are large (>10k words), include grep search patterns in SKILL.md
 - **Avoid duplication**: Information should live in ONE place only
@@ -108,7 +108,7 @@ bigquery-skill/
     └── product.md
 ```
 
-When user asks about sales, Claude only reads sales.md.
+When user asks about sales, the model only reads sales.md.
 
 ### Pattern 3: Variant-based organization
 

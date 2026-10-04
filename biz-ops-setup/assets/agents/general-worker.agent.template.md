@@ -7,7 +7,7 @@ tools:
     "edit/editFiles",
     "search/fileSearch",
     "search/textSearch",
-    "run/terminal",
+    "execute/runInTerminal",
     "workiq/*",
   ]
 ---

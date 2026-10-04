@@ -36,7 +36,7 @@ A reusable command or code excerpt
 ## References
 
 - Page Title - https://example.com/article
-- Related File - C:/work/other-repo/path/to/file.md
+- Related File - <other-workspace>/path/to/file.md
 
 ## Next Steps
 

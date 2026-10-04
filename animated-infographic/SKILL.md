@@ -16,7 +16,7 @@ metadata:
 - カード移動、ランキング、比較棒、状態遷移をアニメーションで見せる。
 - 数値の正確性と、演出時間・実測時間の区別が重要な記事 / SNS資産を作る。
 
-静止PNGだけなら`visualize-as-infographic`、既存動画の分析なら`video-watch`、編集可能な構成図ならdraw.io系workflowを使う。
+対象外: 静止PNGだけのインフォグラフィック、既存動画の分析、編集可能な構成図。
 
 ## Inputs
 
@@ -31,37 +31,41 @@ metadata:
 ## Workflow
 
 1. **Freeze the evidence**
-  - source artifact、取得日時、対象件数、測定境界を固定する。
-  - latencyは`1 request`、`serial total`、`fresh-process end to end`など、何を測った値か決める。
-  - 外部mediaを加工する場合は元URL、取得日、source相対path、SHA-256をmanifestへ記録し、生成前にhashを照合する。
+   - source artifact、取得日時、対象件数、測定境界を固定する。
+   - latencyは`1 request`、`serial total`、`fresh-process end to end`など、何を測った値か決める。
+   - 外部mediaを加工する場合は元URL、取得日、source相対path、SHA-256をmanifestへ記録し、生成前にhashを照合する。
 2. **Design the story**
-  - 1 GIFは1つの主張に絞る。長文説明は本文へ戻す。
-  - 入力 → 判断 → 次処理、before → after、比較 → 結論など、読み順を固定する。
-  - 狭いdecision gateが主題なら、accent色、太いoutline、中央配置、calloutのいずれかで視覚階層の主役にする。入力と出力を両側に置き、gateが決める値を箱内へ書く。
-  - 公式用語と作者独自の層・分類を同じ見た目で断定しない。独自モデルはasset内で`この記事での整理`などscopeを示し、製品包含や成熟度に見える矢印・入れ子を避ける。
+   - 1 GIFは1つの主張に絞る。長文説明は本文へ戻す。
+   - 入力 → 判断 → 次処理、before → after、比較 → 結論など、読み順を固定する。
+   - 狭いdecision gateが主題なら、accent色、太いoutline、中央配置、calloutのいずれかで視覚階層の主役にする。入力と出力を両側に置き、gateが決める値を箱内へ書く。
+   - 公式用語と作者独自の層・分類を同じ見た目で断定しない。独自モデルはasset内で`この記事での整理`などscopeを示し、製品包含や成熟度に見える矢印・入れ子を避ける。
 3. **Localize before rendering**
-  - 説明UI、status、captionは読者言語へ合わせる。日本語記事に汎用英語UIを残さない。
-  - 製品名、API field、model IDなどの固有名詞は公式表記を保つ。
-  - 直訳調を避ける。例: `段階で採点`ではなく`定義した基準のどの段階に近いか`。
+   - 説明UI、status、captionは読者言語へ合わせる。日本語記事に汎用英語UIを残さない。
+   - 製品名、API field、model IDなどの固有名詞は公式表記を保つ。
+   - 直訳調を避ける。例: `段階で採点`ではなく`定義した基準のどの段階に近いか`。
 4. **Make timing explicit inside the asset**
-  - `illustrative`: `カード移動は演出（実測速度ではありません）`を表示する。
-  - `measured`: 測定境界と単位を表示し、frame durationを実測値から作る。
-  - `mixed`: `表示値は実測 / 棒・カードの動きは演出`の両方を書く。
+   - `illustrative`: `カード移動は演出（実測速度ではありません）`を表示する。
+   - `measured`: 測定境界と単位を表示し、frame durationを実測値から作る。
+   - `mixed`: `表示値は実測 / 棒・カードの動きは演出`の両方を書く。
 5. **Generate reproducibly**
-  - generator script、GIF、静止fallback、必要ならsource snapshotを残す。
-  - 数値を手入力せずsource artifactから読む。
-  - 第三者動画は主張に必要な最小frame（例: before / operation / after）へ絞り、無関係なbrowser chromeを除く。出典と、ダミーデータ・未送信・筆者追加注記などの誤読防止情報をasset内で区別して表示する。
+   - generator script、GIF、静止fallback、必要ならsource snapshotを残す。
+   - 数値を手入力せずsource artifactから読む。
+   - 第三者動画は主張に必要な最小frame（例: before / operation / after）へ絞り、無関係なbrowser chromeを除く。出典と、ダミーデータ・未送信・筆者追加注記などの誤読防止情報をasset内で区別して表示する。
 6. **Validate mechanically**
-  ```powershell
-  python scripts/validate_animation.py output.gif `
-    --expected-width 1200 --expected-height 675 `
-    --timing-mode illustrative `
-    --contact-sheet output-contact.jpg `
-    --report output-validation.json
-  ```
+
+   ```powershell
+   python scripts/helper.py output.gif `
+     --expected-width 1200 --expected-height 675 `
+     --timing-mode illustrative `
+     --contact-sheet output-contact.jpg `
+     --report output-validation.json
+   ```
+
+   - `--timing-mode measured` also requires `--measured-ms <total>`; `--duration-tolerance` defaults to 0.1. Pillow is required.
+
 7. **Inspect visually**
-  - 開始・中間・終了frameを原寸とtarget embed幅（mobileは約360px）で確認する。
-  - text overlap、clip、順序、空白、読めない注記、英語UI残存を直して再生成する。
+   - 開始・中間・終了frameを原寸とtarget embed幅（mobileは約360px）で確認する。
+   - text overlap、clip、順序、空白、読めない注記、英語UI残存を直して再生成する。
 
 ## Timing Rules
 

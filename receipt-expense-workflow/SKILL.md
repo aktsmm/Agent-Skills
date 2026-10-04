@@ -1,6 +1,6 @@
 ---
 name: receipt-expense-workflow
-description: "Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment. Use when sorting company expense receipts, organizing travel expense files, OCR renaming, receipt sorting, レシート仕分け, D365経費カテゴリマッピング, or D365経費精算."
+description: "Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment. Use when sorting company expense receipts, organizing travel expense files, OCR renaming, receipt sorting, expense sorting, レシート仕分け, 出張経費バッチ, D365経費仕分け, D365経費カテゴリマッピング, or D365経費精算. Not for personal or sole-proprietor tax receipts (確定申告)."
 argument-hint: "仕分けたい領収書フォルダ、対象プロジェクト、必要な出力"
 user-invocable: true
 license: CC BY-NC-SA 4.0

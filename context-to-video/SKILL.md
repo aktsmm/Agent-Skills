@@ -21,27 +21,27 @@ metadata:
 
 ## Input Sources (any of these works)
 
-| 入力 | 取り方 |
-|---|---|
-| ブログ/記事 URL | `web_fetch` で本文取得 |
-| 貼り付けテキスト | そのまま要約 |
+| 入力             | 取り方                      |
+| ---------------- | --------------------------- |
+| ブログ/記事 URL  | `web_fetch` で本文取得      |
+| 貼り付けテキスト | そのまま要約                |
 | PR / commit diff | `gh pr view` + `gh pr diff` |
-| 議事録・設計メモ | ファイル読み込み |
-| リリースノート | URL or Markdown |
-| 自由プロンプト | LLM に直接構成依頼 |
+| 議事録・設計メモ | ファイル読み込み            |
+| リリースノート   | URL or Markdown             |
+| 自由プロンプト   | LLM に直接構成依頼          |
 
 → ソース取得後の処理は共通(LLM が `notes/script.json` を書く)。
 
 ## Stack (all free, local)
 
-| 役割 | ツール |
-|---|---|
-| 台本生成 | LLM (このスキル呼び出し元) |
-| スライド | Pillow (BIZ UDGothic 等) |
-| ナレーション | `edge-tts` (Edge の Neural 音声・無料・非公式) |
-| 動画合成 | `ffmpeg` (`imageio-ffmpeg` 同梱バイナリ可) |
-| 字幕 | `.srt` 自動生成 |
-| **アバター (任意)** | **SadTalker** (GPU推奨) + ffmpeg 楕円マスク |
+| 役割                | ツール                                         |
+| ------------------- | ---------------------------------------------- |
+| 台本生成            | LLM (このスキル呼び出し元)                     |
+| スライド            | Pillow (BIZ UDGothic 等)                       |
+| ナレーション        | `edge-tts` (Edge の Neural 音声・無料・非公式) |
+| 動画合成            | `ffmpeg` (`imageio-ffmpeg` 同梱バイナリ可)     |
+| 字幕                | `.srt` 自動生成                                |
+| **アバター (任意)** | **SadTalker** (GPU推奨) + ffmpeg 楕円マスク    |
 
 ## Quick Workflow (no avatar)
 
@@ -49,7 +49,7 @@ metadata:
 pip install edge-tts imageio-ffmpeg pillow
 # 1. 入力からscript.json生成 (LLM)
 # 2. 動画生成
-python scripts\build_video.py --project D:\path\to\project
+python scripts\build_video.py --project <project-dir>
 # → output\final.mp4 + final.srt
 ```
 
@@ -62,9 +62,9 @@ GPU(VRAM 8GB+)があるなら、SadTalkerで右下にアバターを足せる。
 
 ```powershell
 # 既存動画 + 8音声 → アバター合成
-python scripts\add_avatar.py --project D:\path\to\project --face D:\path\to\face.jpg
+python scripts\add_avatar.py --project <project-dir> --face <face.jpg>
 # 楕円マスク版を作る
-python scripts\ellipse_overlay.py --project D:\path\to\project
+python scripts\ellipse_overlay.py --project <project-dir>
 # → output\final_with_avatar.mp4 と final_with_avatar_ellipse.mp4
 ```
 
@@ -102,6 +102,7 @@ python scripts\ellipse_overlay.py --project D:\path\to\project
 ## Production Use
 
 無料 `edge-tts` は **非公式・SLA なし・商用グレー**。顧客配布や常時運用には:
+
 - ナレーション → **Azure Speech (Neural TTS)** に差し替え
 - アバター付き商用 → **Azure TTS Avatar** (Lisa等・公式・$0.30/分〜)
 

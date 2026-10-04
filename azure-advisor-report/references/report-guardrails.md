@@ -33,7 +33,7 @@
 
 ### 通貨
 
-- Cost Management API は **JPY** で返す（日本リージョン）
+- Cost Management API はリージョンではなく請求通貨で返す（日本の契約なら通常 JPY）。応答の `Currency` / `billingCurrency` で確認する
 - レポート内で通貨を必ず明示し、混在させない
 
 ### 変動率
@@ -133,12 +133,6 @@ Executive Summary と推奨アクションでは、単に Advisor 件数を並�
 - **推奨アクション**: 具体的に何をすればよいか
 
 これにより発表者がスライドを説明する際の補足情報として活用できる。
-
-```python
-# python-pptx でのノート追加例
-notes = slide.notes_slide
-notes.notes_text_frame.text = "ノートテキスト"
-```
 
 ### 複数サブスクリプションの PPTX 構成
 

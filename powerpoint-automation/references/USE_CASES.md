@@ -45,8 +45,6 @@ DONE → Open PowerPoint
   - 3 image slides (screenshots)
   - Summary slide
 
-**Time**: ~3-5 minutes
-
 ---
 
 ## 2. English PPTX → Japanese Translation
@@ -100,8 +98,6 @@ DONE → 120-slide Japanese PPTX
 - Automatic layout selection
 - AutoFit control (prevent text spacing issues)
 - Position adjustment for Japanese text
-
-**Time**: ~15-20 minutes for 120 slides
 
 ---
 
@@ -163,8 +159,6 @@ The Brainstormer agent asks:
 4. Tone (formal/casual)?
 5. Any topics to avoid?
 
-**Time**: ~10 minutes (including brainstorming)
-
 ---
 
 ## 4. Technical Documentation → Training Material
@@ -217,8 +211,6 @@ DONE → Training material PPTX
 - Custom diagram positioning
 - Fine-grained control over layout
 
-**Time**: ~8-10 minutes
-
 ---
 
 ## 5. Architecture Diagram + Presentation
@@ -251,30 +243,7 @@ MERGE → insert_diagram_slides.py
 DONE → Combined PPTX
 ```
 
-**Diagram Creation** (pptxgenjs):
-
-```javascript
-// Azure components
-slide.addShape(pptx.ShapeType.rect, {
-  x: 1,
-  y: 2,
-  w: 2,
-  h: 1,
-  fill: "0078D4", // Azure blue
-  line: { color: "FFFFFF" },
-});
-
-// Arrows
-slide.addShape(pptx.ShapeType.rightArrow, {
-  x: 3.5,
-  y: 2.3,
-  w: 1,
-  h: 0.4,
-  fill: "505050",
-});
-```
-
-**Time**: ~5 minutes
+PptxGenJS option pitfalls: [IMPLEMENTATION_PATTERNS.md](IMPLEMENTATION_PATTERNS.md#pptxgenjs-hardening).
 
 ---
 
@@ -298,10 +267,9 @@ slide.addShape(pptx.ShapeType.rightArrow, {
 ```
 EXTRACT → reconstruct_analyzer.py
     ↓
-SUMMARIZE → summarize_content.py
-          → AI combines related slides
-          → Keeps key visuals
-          → Merges bullet points
+SUMMARIZE → summarize_content.py analyze
+          → Summarizer agent writes content_summary.json
+          → summarize_content.py validate
     ↓
 BUILD → create_from_template.py
     ↓
@@ -317,8 +285,6 @@ DONE → 20-slide condensed version
 - Preserve key images
 - Combine related bullet points
 - Maintain logical flow
-
-**Time**: ~10 minutes
 
 ---
 
@@ -359,53 +325,25 @@ DONE → 3 language versions
 - Japanese: Meiryo, Yu Gothic
 - Chinese: Microsoft YaHei, SimHei
 
-**Time**: ~20 minutes for 3 languages
-
 ---
 
 ## Quick Reference
 
-| Use Case         | Input          | Method                      | Time      | Output       |
-| ---------------- | -------------- | --------------------------- | --------- | ------------ |
-| **Blog → PPTX**  | URL            | EXTRACT → BUILD             | 3-5 min   | 15-20 slides |
-| **EN → JA**      | PPTX           | EXTRACT → TRANSLATE → BUILD | 15-20 min | Same design  |
-| **Report**       | Notes + Images | BRAINSTORM → BUILD          | 10 min    | 25 slides    |
-| **Training**     | Docs + Code    | EXTRACT → BUILD (pptxgenjs) | 8-10 min  | 20 slides    |
-| **Diagram**      | Components     | DIAGRAM → MERGE             | 5 min     | 1 diagram    |
-| **Summarize**    | 60 slides      | EXTRACT → SUMMARIZE → BUILD | 10 min    | 20 slides    |
-| **Multilingual** | content.json   | TRANSLATE × N → BUILD × N   | 20 min    | N versions   |
+| Use Case         | Input          | Method                      | Output       |
+| ---------------- | -------------- | --------------------------- | ------------ |
+| **Blog → PPTX**  | URL            | EXTRACT → BUILD             | 15-20 slides |
+| **EN → JA**      | PPTX           | EXTRACT → TRANSLATE → BUILD | Same design  |
+| **Report**       | Notes + Images | BRAINSTORM → BUILD          | 25 slides    |
+| **Training**     | Docs + Code    | EXTRACT → BUILD (pptxgenjs) | 20 slides    |
+| **Diagram**      | Components     | DIAGRAM → MERGE             | 1 diagram    |
+| **Summarize**    | 60 slides      | EXTRACT → SUMMARIZE → BUILD | 20 slides    |
+| **Multilingual** | content.json   | TRANSLATE × N → BUILD × N   | N versions   |
 
 ---
 
-## Tips & Best Practices
+## Tips
 
-### For Blog Conversions
-
-- Prefer standard detail (option 2) for balance
-- Always include images from the article
-- Use method D (first template) for professional look
-
-### For Translations
-
-- Use method A (template inheritance) to maintain design
-- Review speaker notes carefully
-- Check for technical term consistency
-
-### For Technical Content
-
-- Use pptxgenjs (method B) for code-heavy slides
-- Limit code blocks to 10 lines per slide
-- Include comments in code for clarity
-
-### For Business Reports
-
-- Use formal templates
-- Include agenda and summary slides
-- Add speaker notes for presenter guidance
-- Keep bullet points to 5-8 items max
-
-### For Diagrams
-
-- Use pptxgenjs for custom shapes
-- Match template colors (read from master)
-- Position diagrams at "right" or "bottom" for text space
+- Blog: standard detail (option 2), include article images, method D (first template)
+- Translation: method A (template inheritance) to keep design
+- Code-heavy: pptxgenjs (method B), max 10 code lines per slide
+- Diagrams: match template colors read from the master; place at "right" or "bottom" to keep text space

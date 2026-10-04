@@ -14,16 +14,11 @@ Comprehensive review checklist for agent workflows. Includes anti-pattern detect
 | Premature Complexity | Complex design from the start                                      | Simplicity First                                                                   |
 | Black Box            | Internal state invisible                                           | Transparency                                                                       |
 | Tight Coupling       | Tight coupling between agents                                      | Loose Coupling                                                                     |
-| Hallucination        | Fabricating unverified info                                        | No Hallucination principle                                                         |
+| Hallucination        | Fabricating unverified info                                        | Source verification (see Hallucination Check)                                      |
 | False Negative       | Treating "no results" as "empty"                                   | Re-query with explicit params                                                      |
 | Unmeasured Gate      | Promoting a detection rule to a blocking gate without measuring it | Measure precision on the real corpus first; keep low-precision signals report-only |
 
-## How to Use
-
-1. Review this checklist after completing workflow design
-2. Mark each item as ✅ or ❌
-3. If there are ❌ items, consider solutions
-4. Improve until all items are ✅
+Rationale for each principle: [design-principles.md](design-principles.md). Mark items ✅/❌ after design and resolve ❌ before approval.
 
 ---
 
@@ -74,10 +69,10 @@ Minimum items to verify:
 ## Common Anti-patterns
 
 - [ ] ❌ "You can use sub-agents if needed" (too vague)
-- [ ] ❌ "Process in parallel" (not supported as of 2025/12)
+- [ ] ❌ Assuming parallel sub-agent execution without checking the harness (see [deep-agent-patterns.md](deep-agent-patterns.md#parallel-execution))
 - [ ] ❌ Orchestrator reading files directly instead of delegating
-- [ ] ❌ Missing subagent tool in tools: property
-- [ ] ❌ Nested sub-agent calls (sub-agents cannot call agent)
+- [ ] ❌ Missing subagent tool in tools: property (`agent` tool set; required when `agents:` is set)
+- [ ] ❌ Nested sub-agent calls without `chat.subagents.allowInvocationsFromSubagents` (VS Code Local: off by default, max depth 5)
 
 ## Correct Pattern Example
 
@@ -184,9 +179,7 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 ```markdown
 ## SSOT (Single Source of Truth)
 
-- [ ] Is the same information defined in multiple places?
-- [ ] Is configuration/context centrally managed?
-- [ ] Is there a mechanism to reflect updates across the entire system?
+- [ ] Is the same information defined in only one place?
 - [ ] When a current schedule or config changes, are executable policy, prerequisites, tests, and current docs synchronized without rewriting historical evidence or stable analytics keys?
 - [ ] Are central rules (AGENTS.md, shared config) propagated to each worker `.agent.md`?
 - [ ] When a central rule is added/changed, are all referencing files updated simultaneously?
@@ -195,70 +188,34 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 - [ ] Does each `SSOT is X` chain terminate at a file that holds the definition, instead of forwarding back to the caller?
 - [ ] When an entry delegates its rubric, is the fix applied to the binding rubric rather than to the entry's own fallback checklist?
 
-## SRP (Single Responsibility Principle)
+## SRP / Simplicity First
 
-- [ ] Is each agent focused on a single responsibility?
-- [ ] Are responsibility boundaries clear?
-- [ ] Is there role overlap between agents?
+- [ ] Does each agent have one responsibility, with no role overlap between agents?
+- [ ] Are there unnecessary agents or steps that a simpler primitive could replace?
 
-## Simplicity First
+## Fail Fast / Iterative / Feedback Loop
 
-- [ ] Is this the simplest possible solution?
-- [ ] Are there unnecessary agents or steps?
-- [ ] Could this be achieved with a simpler approach?
-
-## Fail Fast
-
-- [ ] Can errors be detected immediately?
-- [ ] Can the system stop appropriately on errors?
-- [ ] Are error messages clear?
-
-## Iterative Refinement
-
-- [ ] Is it divided into small steps?
-- [ ] Can each step be verified?
-- [ ] Is the structure suitable for gradual improvement?
-
-## Feedback Loop
-
-- [ ] Can results be verified at each step?
-- [ ] Can feedback be applied to the next step?
-- [ ] Is there a structure for improvement cycles?
+- [ ] Are structural faults (missing artifacts, unmapped inputs, renamed bindings) detected before work starts?
+- [ ] Is each small step verified against environment ground truth before the next one?
 ```
 
 ### Quality Principles Check
 
 ```markdown
-## Transparency
+## Transparency / Gate/Checkpoint
 
-- [ ] Are plans and progress visualized?
-- [ ] Is it clear to users what's happening?
-- [ ] Are logs being output sufficiently?
-
-## Gate/Checkpoint
-
-- [ ] Is validation performed at each step?
-- [ ] Are conditions for proceeding clearly defined?
-- [ ] Is handling for validation failures defined?
+- [ ] Are plan and step progress visible to the user?
+- [ ] Does each step have explicit pass conditions and failure handling?
 - [ ] If `0 new items` is a valid outcome, is that state shown separately from the latest published artifact date so normal no-op runs do not look stale?
 
-## DRY (Don't Repeat Yourself)
+## DRY / ISP
 
-- [ ] Are common processes being reused?
-- [ ] Are prompt templates being utilized?
-- [ ] Is there duplication of the same logic?
-
-## ISP (Interface Segregation Principle)
-
-- [ ] Is only the minimum necessary information being passed?
-- [ ] Is unnecessary context being included?
-- [ ] Is required information for each agent clear?
+- [ ] Is shared prompt logic templated instead of copy-pasted into each agent?
+- [ ] Does each agent receive only task-relevant context?
 
 ## Idempotency
 
-- [ ] Is it safe to retry?
-- [ ] Does executing the same operation multiple times produce the same result?
-- [ ] Are side effects being managed?
+- [ ] Is a retry safe (no duplicated side effects)?
 - [ ] For Issue/PR-driven automation, does retry logic reuse existing queue artifacts instead of spawning duplicates?
 - [ ] Are stale blocker labels and stale request Issues cleaned up or safely resumed under explicit conditions when no open PR remains?
 ```
@@ -303,7 +260,7 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 
 ## Related File Simplicity Check
 
-**NEW:** Verify that referenced Markdown files, scripts, and assets are simple and maintainable.
+Verify that referenced Markdown files, scripts, and assets are simple and maintainable.
 
 ```markdown
 ## Documentation (references/, .md files)
@@ -335,134 +292,12 @@ Deterministic offload (script + IR + hook) keeps the agent focused on judgment, 
 
 ---
 
-## Anti-Pattern Detection
+## Always-Loaded Entry Smells
 
-Detect and fix common workflow anti-patterns:
-
-### God Agent
-
-**Problem:** All responsibilities packed into one agent
-
-```
-❌ Bad:  Agent handles "search + analyze + report + email"
-✅ Good: Separate agents for each responsibility
-```
-
-**Solution:** Split with SRP
-
----
-
-### Context Overload
-
-**Problem:** Passing excessive unnecessary information
-
-```
-❌ Bad:  Pass all files, entire history, all config
-✅ Good: Pass only task-relevant data
-```
-
-**Solution:** Minimize with ISP
-
----
-
-### Silent Failure
-
-**Problem:** Ignoring errors and continuing
-
-```python
-# ❌ Bad
-try:
-    result = agent.execute()
-except:
-    pass  # Silent failure
-
-# ✅ Good
-try:
-    result = agent.execute()
-except AgentError as e:
-    log.error(f"Agent failed: {e}")
-    raise  # Stop immediately
-```
-
-**Solution:** Fail Fast
-
----
-
-### Infinite Loop
-
-**Problem:** Loops without termination conditions
-
-```python
-# ❌ Bad
-while not evaluator.is_satisfied():
-    result = generator.generate()
-    # No termination condition
-
-# ✅ Good
-MAX_ITERATIONS = 5
-for i in range(MAX_ITERATIONS):
-    result = generator.generate()
-    if evaluator.is_satisfied():
-        break
-else:
-    log.warning("Max iterations reached")
-```
-
-**Solution:** Set maximum iterations
-
----
-
-### Big Bang
-
-**Problem:** Building everything at once
-
-```
-❌ Bad:  Design all → Implement all → Test at end
-✅ Good: Design 1 → Implement 1 → Test → Repeat
-```
-
-**Solution:** Iterative Refinement
-
----
-
-### Premature Complexity
-
-**Problem:** Complex design from the start
-
-```
-❌ Bad:  Start with 10-agent workflow
-✅ Good: Start with 1 agent, add complexity as needed
-```
-
-**Solution:** Simplicity First
-
-> See [design-principles.md > Simplicity First](design-principles.md#3-simplicity-first) for Anthropic's recommendation.
-
----
-
-### Black Box
-
-**Problem:** Internal state invisible
-
-```
-❌ Bad:  Agent processes silently, user sees nothing
-✅ Good: "Step 1/3: Fetching data..." → "Step 2/3: Analyzing..."
-```
-
-**Solution:** Transparency
-
----
-
-### Tight Coupling
-
-**Problem:** Changes to one agent cascade to many others
-
-```
-❌ Bad:  Change Agent A's output → B, C, D all break
-✅ Good: Standardized interfaces, independent testing
-```
-
-**Solution:** Loose Coupling
+- **Instruction elevation**: strong imperative wording in an always-loaded entry promotes the catalog, reference list, workflow map, or rule inventory below it into the conversation's priority layer.
+- **Entry budget**: always-loaded entries hold only conversation boundaries and minimal guardrails; move catalogs, detailed procedures, and broad reference lists to docs, README, or task-specific assets.
+- **Runtime boundary**: review assets improve design quality; default conversational behavior is controlled by always-loaded entries.
+- **Casual input safety**: greetings, short Q&A, and numeric-only replies are not force-routed into task intake unless the task context is explicit.
 
 ---
 
@@ -554,7 +389,7 @@ Check for Single Source of Truth violations and unnecessary duplication:
 
 - [ ] Same table/logic appears in only one file? (no duplicate tables)
 - [ ] Definitions referenced from other files have SSOT markers?
-- [ ] Cross-file references use standard format: `> **SSOT**: See [file](path)`?
+- [ ] Cross-file references use the standard SSOT reference format? (see [design-principles.md](design-principles.md#ssot-implementation-patterns))
 
 ## View vs Master Separation
 
@@ -574,7 +409,7 @@ Check for Single Source of Truth violations and unnecessary duplication:
 ✅ Good:
 
 - Master file defines full rule
-- Other files: `> **SSOT**: See [master.md](path) for details`
+- Other files: `> **SSOT**: See master.md for details` (as a relative link)
 - Changes only needed in one place
 ```
 

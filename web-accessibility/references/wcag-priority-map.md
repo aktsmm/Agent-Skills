@@ -7,7 +7,7 @@ Web product 実装でまず見るべき順番を、WCAG 2.2 AA ベースで圧�
 - Target: WCAG 2.2 AA
 - Legal shorthand:
   - EAA: EU 向け digital product なら無視しにくい前提
-  - ADA Title II: 公共系では 2026 以降さらに重い
+  - ADA Title II: 米国の州・地方政府は WCAG 2.1 AA が要件。遵守期限は 2026-04 の DOJ 暫定最終規則で延長され、人口 5 万以上は 2027-04-26、未満は 2028-04-26（[ADA.gov](https://www.ada.gov/resources/web-rule-first-steps/)）
   - Section 508: 米国 federal 調達文脈では継続して意識が必要
 
 ## Priority Order
@@ -36,7 +36,7 @@ Web product 実装でまず見るべき順番を、WCAG 2.2 AA ベースで圧�
 ### P2: Quality improvements
 
 - `prefers-reduced-motion` への追従
-- target size と spacing の改善
+- target size と spacing の改善（2.5.8 Target Size (Minimum) は 2.2 AA 要件。24×24 CSS px 未満で間隔もない場合は P1 扱い）
 - redundant ARIA の削減
 - heading の細かな階層改善
 

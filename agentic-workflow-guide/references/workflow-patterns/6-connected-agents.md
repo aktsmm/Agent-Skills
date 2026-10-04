@@ -4,98 +4,26 @@
 
 > Back to [overview.md](overview.md)
 
-## Diagram
+> Naming: this is the generic shared-context (blackboard) pattern. It is **not** the Microsoft Foundry "Connected Agents" feature.
+>
+> Foundry Connected Agents is a main agent calling sub-agents as tools (closer to [Orchestrator-Workers](4-orchestrator-workers.md)), documented under Foundry (classic): [Connected Agents (classic)](https://learn.microsoft.com/ja-jp/azure/foundry-classic/agents/how-to/connected-agents).
 
-```mermaid
-graph TD
-    A[Shared Context] --> B[Agent 1: Research]
-    A --> C[Agent 2: Design]
-    A --> D[Agent 3: Implementation]
-    B --> E[Update Context]
-    C --> E
-    D --> E
-    E --> A
-    E --> F[Final Output]
-```
+Use when specialized agents must build on each other's decisions across steps or sessions. Do not use when agents work independently ([Parallelization](3-parallelization.md)) or when one orchestrator can hold the state ([Orchestrator-Workers](4-orchestrator-workers.md)).
 
-## Characteristics
+## VS Code Implementation
 
-| Aspect        | Description                                          |
-| ------------- | ---------------------------------------------------- |
-| **Structure** | Multiple agents with shared state/context            |
-| **Benefits**  | Agents build on each other's work, emergent insights |
-| **Use Cases** | Complex projects requiring diverse expertise         |
-
-## When to Use
-
-- Task requires multiple specialized capabilities
-- Agents need to build on each other's outputs
-- Collaboration yields better results than isolation
-- Context sharing reduces redundant work
-
-## Implementation Example
-
-```
-Shared Context (Memory/Database):
-  ├─ Project goals
-  ├─ Decisions made
-  ├─ Resources created
-  └─ Current state
-
-Agent 1 (Research):
-  - Reads context
-  - Gathers information
-  - Updates context with findings
-
-Agent 2 (Design):
-  - Reads research findings from context
-  - Creates architecture
-  - Updates context with design
-
-Agent 3 (Implementation):
-  - Reads design from context
-  - Implements solution
-  - Updates context with code
-```
-
-## Key Principles
-
-| Principle                 | Description                                   |
-| ------------------------- | --------------------------------------------- |
-| **Shared State**          | Central repository for context and decisions  |
-| **Read-Update Cycle**     | Each agent reads latest state, then updates   |
-| **Specialization**        | Each agent has distinct expertise             |
-| **Coordination Protocol** | Clear rules for context access and updates    |
-| **Conflict Resolution**   | Handle concurrent updates or conflicting data |
+- The shared context is a file in the workspace (e.g. `tmp/project-context.json` or a Markdown state file), not chat history; subagents run in an isolated context and see only what their prompt or the file gives them.
+- Every agent reads the file at start and writes its decision / artifact path at end. Instruct this in each agent body.
+- Default to turn-taking (handoffs or sequential subagent calls). Subagents share one file system, so parallel writers to the same context file race.
+- Keep current state and history in separate regions; extract current state by boundary, not keyword search (see [ir-architecture.md](ir-architecture.md#current-state-in-append-only-documents)).
 
 ## Coordination Strategies
 
-### 1. Sequential (Turn-Taking)
-
-```
-Agent 1 completes → Agent 2 starts → Agent 3 starts
-```
-
-**Pros:** Simple, no conflicts  
-**Cons:** Slower, no parallelism
-
-### 2. Parallel with Merge
-
-```
-Agent 1, 2, 3 work simultaneously → Merge updates
-```
-
-**Pros:** Fast  
-**Cons:** Merge conflicts possible
-
-### 3. Leader-Follower
-
-```
-Leader Agent coordinates → Assigns tasks to followers
-```
-
-**Pros:** Clear control flow  
-**Cons:** Leader bottleneck
+| Strategy            | Trade-off                                         |
+| ------------------- | ------------------------------------------------- |
+| Sequential          | No conflicts; slowest. Default choice             |
+| Parallel with merge | Fast; needs per-agent output files then one merge |
+| Leader-follower     | Clear control; leader becomes the bottleneck      |
 
 ## Context Format Example
 
@@ -124,66 +52,12 @@ Leader Agent coordinates → Assigns tasks to followers
 }
 ```
 
-## Benefits
+## Failure Modes
 
-| Benefit               | Description                                |
-| --------------------- | ------------------------------------------ |
-| **Knowledge Sharing** | Agents leverage each other's work          |
-| **Consistency**       | Single source of truth prevents divergence |
-| **Auditability**      | Shared context provides complete history   |
-| **Flexibility**       | Add/remove agents without restructuring    |
-
-## Challenges
-
-| Challenge            | Mitigation                                  |
-| -------------------- | ------------------------------------------- |
-| **State Complexity** | Use structured context format (JSON/YAML)   |
-| **Race Conditions**  | Implement locking or turn-taking protocol   |
-| **Context Bloat**    | Prune old/irrelevant data periodically      |
-| **Debugging**        | Log all context reads/writes with timestamp |
-
-## When NOT to Use
-
-- Single-domain task (use Orchestrator-Workers instead)
-- Agents work independently (use Parallelization)
-- No need for context sharing (use Routing)
-
-## Implementation Checklist
-
-```markdown
-- [ ] Define shared context schema
-- [ ] Establish read/write protocols
-- [ ] Implement conflict resolution strategy
-- [ ] Set up context persistence (file/database)
-- [ ] Add logging for all context modifications
-- [ ] Define agent responsibilities clearly
-- [ ] Test concurrent access scenarios
-```
-
-## Real-World Example: Software Development
-
-```
-Context: GitHub Issue + PR + Discussion Thread
-
-├─ Code Agent:
-│    - Reads issue requirements
-│    - Implements solution
-│    - Updates PR with code
-
-├─ Test Agent:
-│    - Reads code changes from PR
-│    - Generates test cases
-│    - Updates PR with tests
-
-├─ Review Agent:
-│    - Reads code and tests
-│    - Provides feedback
-│    - Updates discussion thread
-
-└─ Documentation Agent:
-     - Reads final implementation
-     - Updates README and docs
-     - Commits to repo
-```
-
-Each agent operates on shared artifacts (code, PR, docs) and can see what others have contributed.
+| Failure                                 | Mitigation                                                      |
+| --------------------------------------- | --------------------------------------------------------------- |
+| Two agents overwrite the context file   | Turn-taking, or per-agent output files merged by one owner      |
+| Old decision revived as current         | Separate current-state region from append-only history          |
+| Context file grows until agents skim it | Prune or archive superseded decisions; keep current state short |
+| Cannot tell who changed what            | Each write records `agent`, `timestamp`, and artifact path      |
+| Agent claims an update it never wrote   | Next agent verifies the file changed before using it            |

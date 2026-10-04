@@ -4,18 +4,18 @@ Use this guide before recommending a skill.
 
 ## Decide Whether the User Needs a Skill
 
-| User Intent                          | Best Fit        |
-| ------------------------------------ | --------------- |
-| "いつもこのルールで動いて"           | Instruction     |
-| "この slash task を作りたい"         | Prompt or Skill |
-| "専用 persona で動かしたい"          | Agent           |
-| "危険コマンドを止めたい"             | Hook            |
-| "再利用できる workflow を配布したい" | Skill           |
+| User Intent                          | Best Fit    |
+| ------------------------------------ | ----------- |
+| "いつもこのルールで動いて"           | Instruction |
+| "この slash task を作りたい"         | Skill       |
+| "専用 persona で動かしたい"          | Agent       |
+| "危険コマンドを止めたい"             | Hook        |
+| "再利用できる workflow を配布したい" | Skill       |
 
 ## Fast Rules
 
 - If the user asks for a reusable package with references, scripts, or templates, recommend a skill.
-- If the user only needs a focused slash command, recommend a prompt first.
+- If the user only needs a focused slash command, recommend a skill (skills appear as slash commands). Prompt files load only on the Local harness and are deprecated for Agent Host sessions.
 - If the user mainly needs role boundaries or tool restrictions, recommend an agent.
 - If the user wants behavior enforced automatically, recommend a hook.
 

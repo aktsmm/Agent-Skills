@@ -116,7 +116,7 @@ FxTwitter API を起点に公開投稿を収集し、一次情報 URL、関連 G
 - `tmp/*.json` に途中結果を保存して取り直しを避ける
 - ローカル分類を先にやって、外部 fetch はその後
 - 公式 blog の横断記事があるなら、それを hub にして個別記事へ降りる
-- browser 固有 tips は抱え込みすぎない。必要なら `browser-max-automation` を使う
+- browser 固有 tips は抱え込みすぎない。X のブラウザ操作や汎用ブラウザ自動化はこのスキルの対象外
 
 ## Example Prompts
 

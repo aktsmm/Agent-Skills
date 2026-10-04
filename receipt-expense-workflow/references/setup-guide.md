@@ -59,27 +59,18 @@ Skill の `references/receipt_sorter.py` にリファレンスコピーがある
 
 ## Step 6: Intake Folder を決める
 
-未分類の生ファイルは、workspace root に置かず専用の intake folder に集約する。
-
-例:
-
-```text
-incoming/unassigned/
-```
-
-- 案件が確定しているファイルは intake folder を経由せず、対象の project folder に直接置いてよい
-- dry-run 用のコピーや検証入力は一時フォルダで扱い、完了後に削除する
+未分類の生ファイルは専用の intake folder（例: `incoming/unassigned/`）に集約する。運用ルールは SKILL.md の Intake Pattern を参照。
 
 ## 環境変数
 
-| 変数           | 値                 | 説明                  |
-| -------------- | ------------------ | --------------------- |
-| `PYTHONUTF8`   | `1`                | Python UTF-8 出力強制 |
-| `UV_CACHE_DIR` | `C:\Temp\uv_cache` | キャッシュ先（任意）  |
+| 変数           | 値                   | 説明                  |
+| -------------- | -------------------- | --------------------- |
+| `PYTHONUTF8`   | `1`                  | Python UTF-8 出力強制 |
+| `UV_CACHE_DIR` | `$env:TEMP\uv_cache` | キャッシュ先（任意）  |
 
 ```powershell
 $env:PYTHONUTF8='1'
-$env:UV_CACHE_DIR='C:\Temp\uv_cache'
+$env:UV_CACHE_DIR="$env:TEMP\uv_cache"
 ```
 
 ## トラブルシューティング

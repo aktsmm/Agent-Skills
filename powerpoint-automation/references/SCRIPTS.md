@@ -11,10 +11,10 @@ Complete documentation of all scripts in the PowerPoint Automation pipeline.
 **Usage**:
 
 ```powershell
-python scripts/classify_input.py input/file_or_url
+python scripts/classify_input.py input/file_or_url --output output_manifest/{base}_classification.json
 ```
 
-**Output**: `output_manifest/{base}_classification.json`
+**Output**: JSON to stdout, or the `--output` file. Other options: `--purpose report|lt|incident|blog|custom`, `--detect-language`, `--validate <classification.json>`
 
 ### `extract_images.py`
 
@@ -58,7 +58,7 @@ python scripts/reconstruct_analyzer.py input/presentation.pptx output_manifest/{
 **Usage**:
 
 ```powershell
-python scripts/analyze_template.py templates/template.pptx
+python scripts/analyze_template.py assets/template.pptx [output.json]
 ```
 
 **Output**: `output_manifest/{template}_layouts.json`
@@ -72,7 +72,7 @@ python scripts/analyze_template.py templates/template.pptx
 **Usage**:
 
 ```powershell
-python scripts/diagnose_template.py templates/template.pptx
+python scripts/diagnose_template.py assets/template.pptx [--json]
 ```
 
 **Detects**:
@@ -89,7 +89,7 @@ python scripts/diagnose_template.py templates/template.pptx
 **Usage**:
 
 ```powershell
-python scripts/clean_template.py input/template.pptx output/clean_template.pptx
+python scripts/clean_template.py input/template.pptx output/clean_template.pptx [--keep-first-master] [--keep-metadata]
 ```
 
 **Actions**:
@@ -127,8 +127,10 @@ python scripts/create_clean_template.py input/presentation.pptx output/template.
 **Usage**:
 
 ```powershell
-python scripts/create_from_template.py templates/template.pptx output_manifest/{base}_content.json output_ppt/{base}.pptx
+python scripts/create_from_template.py assets/template.pptx output_manifest/{base}_content.json output_ppt/{base}.pptx
 ```
+
+Options: `--config <layouts.json>`, `--list-layouts`, `--force`, `--auto-clean`, `--no-signature`.
 
 **Features**:
 
@@ -139,7 +141,7 @@ python scripts/create_from_template.py templates/template.pptx output_manifest/{
 - AutoFit control
 - Empty placeholder cleanup
 
-**Configuration**: Reads `output_manifest/{template}_layouts.json` for layout mapping
+**Configuration**: Uses `--config`, otherwise auto-reads `output_manifest/{template}_layouts.json` if present
 
 ### `create_ja_pptx.py`
 
@@ -160,7 +162,7 @@ python scripts/create_ja_pptx.py output_manifest/{base}_content.json output_ppt/
 **Usage**:
 
 ```bash
-node scripts/create_pptx.js
+node scripts/create_pptx.js output_manifest/{base}_content.json output_ppt/{base}_diagrams.pptx [--no-signature]
 ```
 
 **When to Use**:
@@ -217,12 +219,14 @@ python scripts/insert_diagram_slides.py base.pptx diagrams.pptx output.pptx --co
 
 ### `summarize_content.py`
 
-**Purpose**: Reduce slide count using AI summarization
+**Purpose**: Helper for the Summarizer agent (the script does not summarize by itself)
 
 **Usage**:
 
 ```powershell
-python scripts/summarize_content.py output_manifest/{base}_content.json --target-slides 15
+python scripts/summarize_content.py analyze output_manifest/{base}_content.json [--json]
+# Summarizer agent writes {base}_content_summary.json
+python scripts/summarize_content.py validate output_manifest/{base}_content_summary.json
 ```
 
 **When to Use**: Converting long presentations to shorter versions
@@ -294,7 +298,7 @@ python scripts/review_pptx.py output_ppt/{base}.pptx
 **Usage**:
 
 ```powershell
-python scripts/reorder_slides.py input.pptx output.pptx --order 0,1,1,2,5
+python scripts/reorder_slides.py input.pptx output.pptx 0,1,1,2,5
 ```
 
 ### `extract_shapes.py`
@@ -304,7 +308,7 @@ python scripts/reorder_slides.py input.pptx output.pptx --order 0,1,1,2,5
 **Usage**:
 
 ```powershell
-python scripts/extract_shapes.py input.pptx output_manifest/{base}_inventory.json
+python scripts/extract_shapes.py input.pptx output_manifest/{base}_inventory.json [--issues-only]
 ```
 
 **Use Case**: Analysis for text replacement workflows
@@ -333,12 +337,16 @@ python scripts/apply_content.py input.pptx output_manifest/{base}_replacements.j
 
 ### `workflow_tracer.py`
 
-**Purpose**: Generate workflow trace logs
+**Purpose**: Generate workflow trace logs (Python module; running the file directly only writes a demo trace)
 
 **Usage**:
 
-```powershell
-python scripts/workflow_tracer.py {base} {phase} {status}
+```python
+from workflow_tracer import WorkflowTracer
+tracer = WorkflowTracer("{base}")
+tracer.start_phase("EXTRACT")
+tracer.end_phase("EXTRACT", status="success")
+tracer.save()
 ```
 
 **Output**: `output_manifest/{base}_trace.jsonl`
@@ -350,26 +358,16 @@ python scripts/workflow_tracer.py {base} {phase} {status}
 **Usage**:
 
 ```powershell
-python scripts/resume_workflow.py {base} --from REVIEW_JSON [--reset-retry]
+python scripts/resume_workflow.py {base} --from REVIEW_JSON [--skip-validation] [--template <template.pptx>]
 ```
+
+`--from`: INIT, PLAN, EXTRACT, TRANSLATE, REVIEW_JSON, BUILD, REVIEW_PPTX, DONE.
 
 ---
 
 ## Script Dependencies
 
-### Python Requirements
-
-See `scripts/requirements.txt`:
-
-- python-pptx
-- Pillow (image processing)
-- jsonschema (validation)
-
-### Node.js Requirements
-
-See `scripts/package.json`:
-
-- pptxgenjs (diagram generation)
+Packages: `scripts/requirements.txt`, `scripts/package.json`. Script-to-script dependencies: [script-dependencies.instructions.md](instructions/script-dependencies.instructions.md).
 
 ### Installation
 
@@ -391,7 +389,7 @@ npm install --prefix scripts
 # 1. Extract (manual content creation)
 # 2. Translate (Localizer agent)
 # 3. Generate
-python scripts/create_from_template.py templates/template.pptx output_manifest/{base}_content_ja.json output_ppt/{base}.pptx
+python scripts/create_from_template.py assets/template.pptx output_manifest/{base}_content_ja.json output_ppt/{base}.pptx
 ```
 
 ### English PPTX → Japanese
@@ -411,8 +409,8 @@ python scripts/create_from_template.py input/en.pptx output_manifest/{base}_cont
 
 ```powershell
 # 1. Generate diagrams
-node scripts/create_pptx.js  # → diagrams.pptx
+node scripts/create_pptx.js output_manifest/{base}_content.json diagrams.pptx
 
 # 2. Merge
-python scripts/merge_slides.py templates/template.pptx diagrams.pptx output_ppt/{base}.pptx --clear-template
+python scripts/merge_slides.py assets/template.pptx diagrams.pptx output_ppt/{base}.pptx --clear-template
 ```

@@ -83,3 +83,11 @@ Examples:
 
 - Use: `GCS から Azure Blob Storage への移行予定がなければ直接影響は限定的です。`
 - Avoid: `現行の {SYSTEM} で GCS 利用がなければ直接影響は限定的です。`
+
+## MCP Boundary
+
+Moved from SKILL.md "MCP Boundary".
+
+- Scripts do not call MCP directly; Copilot / agent steps write MCP-sourced content to `{date}/manifest/*.json`.
+- PowerShell scripts consume manifest JSON and mutate PPTX deterministically. Adapt `assets/mcp.sample.json` to the host MCP server if needed.
+- For each Azure Updates item, store the announcement URL as `sourceUrl` and search Microsoft Learn / Docs MCP for the closest official service document. Put that URL in `learnUrl` when a relevant first-party page exists.

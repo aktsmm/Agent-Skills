@@ -63,7 +63,7 @@ uv pip install "transformers<5.0" --python C:\Users\<USERNAME>\ocr_env\Scripts\p
 ```bash
 # CLI
 python scripts/ocr_helper.py image.png
-python scripts/ocr_helper.py document.pdf -l ja en -o result.txt
+python scripts/ocr_helper.py document.pdf -o result.txt
 
 # Or use surya directly
 surya_ocr image.png --output_dir ./results
@@ -118,14 +118,14 @@ surya_ocr image.png
 
 ## Troubleshooting
 
-| エラー                                                                                           | 原因                                | 対処                                                                              |
-| ------------------------------------------------------------------------------------------------ | ----------------------------------- | --------------------------------------------------------------------------------- |
-| `RecognitionPredictor.__init__() missing 1 required positional argument: 'foundation_predictor'` | v0.13+ でAPIが変更                  | `found_pred = FoundationPredictor()` を作成して引数に渡す                         |
-| `TypeError: __call__() got an unexpected keyword argument 'langs'`                               | v0.17.x で `langs` 引数廃止         | `langs` 引数を削除する                                                            |
-| `AttributeError: 'SuryaDecoderConfig' object has no attribute 'pad_token_id'`                    | `transformers 5.x` との非互換       | `pip install "transformers<5.0"` でダウングレード                                 |
-| `failed to hardlink file ... OneDrive` (uv, os error 396)                                        | OneDrive のハードリンク制限         | `--link-mode=copy` を付けてインストール＋`UV_CACHE_DIR` をOneDrive外に設定        |
-| `UnicodeEncodeError: 'cp932' codec can't encode character`                                       | Windows のCP932デフォルトエンコード | `sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')` を先頭に追加 |
-| `PdfDocument` does not support the context manager protocol | Installed pypdfium2 API differs | Use explicit `try/finally` cleanup and close bitmap, page, and document after copying the rendered image; verify against the installed version. |
+| エラー                                                                                           | 原因                                | 対処                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RecognitionPredictor.__init__() missing 1 required positional argument: 'foundation_predictor'` | v0.13+ でAPIが変更                  | `found_pred = FoundationPredictor()` を作成して引数に渡す                                                                                       |
+| `TypeError: __call__() got an unexpected keyword argument 'langs'`                               | v0.17.x で `langs` 引数廃止         | `langs` 引数を削除する                                                                                                                          |
+| `AttributeError: 'SuryaDecoderConfig' object has no attribute 'pad_token_id'`                    | `transformers 5.x` との非互換       | `pip install "transformers<5.0"` でダウングレード                                                                                               |
+| `failed to hardlink file ... OneDrive` (uv, os error 396)                                        | OneDrive のハードリンク制限         | `--link-mode=copy` を付けてインストール＋`UV_CACHE_DIR` をOneDrive外に設定                                                                      |
+| `UnicodeEncodeError: 'cp932' codec can't encode character`                                       | Windows のCP932デフォルトエンコード | `sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')` を先頭に追加                                                               |
+| `PdfDocument` does not support the context manager protocol                                      | Installed pypdfium2 API differs     | Use explicit `try/finally` cleanup and close bitmap, page, and document after copying the rendered image; verify against the installed version. |
 
 ## License Note
 

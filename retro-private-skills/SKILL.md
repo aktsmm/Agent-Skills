@@ -1,6 +1,6 @@
 ---
 name: "retro-private-skills"
-description: "Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Use when: skill retro, private skill authoring, skill repository fix, create or update SKILL.md."
+description: "Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for ~/.copilot personal assets, VS Code User Data assets, or workspace/repository assets. Use when: skill retro, private skill authoring, skill repository fix, create or update SKILL.md."
 argument-hint: "反映したい学び、対象 skill 名、private repo path、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -42,7 +42,7 @@ Never write to these targets for this workflow unless the user explicitly asks t
 - workspace `.github/**`, `AGENTS.md`, or repository-specific instructions
 - memories, public sync output or remote targets other than the verified private origin authorized by safe-auto
 
-If the best target appears to be an instruction, prompt, memory, or agent, stop with `scope 不一致`. For this skill, `New Skill Proposal` means a proposed or created `.github/skills/<new-skill>/SKILL.md`, not an instruction file. Content written back to a skill must be self-contained and portable; do not depend on a workspace file, memory note, local absolute path, or environment-specific ledger remaining available.
+If the best target appears to be an instruction, prompt, memory, or agent, stop with `scope 不一致`. For this skill, `New Skill Proposal` means a proposed or created `.github/skills/<new-skill>/SKILL.md`, not an instruction file. Content written back to a skill must be self-contained and portable; do not depend on a workspace file, memory note, local absolute path, or environment-specific ledger remaining available, and do not name another skill or delegate rules to it (describe out-of-scope work generically).
 
 ## Intake Pre-Step (optional)
 
@@ -66,11 +66,8 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 - In `safe-auto`, edit directly when scope is clear, the safety gate passes, and the change is small or medium
 - Confirm unclear scope, new privileges/destinations/visibility/defaults, destructive deletion or uncertain sensitive data. Otherwise use safe-auto without reapproval; read-only and holds take precedence.
 - In `safe-auto`, create a focused local commit and push it in the same run. There is no ahead-count threshold: several PCs share this repo, so a local commit left behind means the next machine starts from a stale tree. Invoking this skill counts as the push approval. To keep a draft local instead, use `review-only` or `dry-run`.
-- Fetch once and classify dirty/ahead paths in one batched command before editing. If the original checkout is clean and current, edit it directly; isolate only when unrelated dirty or divergence exists (prefer `git worktree add --detach` over a full clone). Verify private remote/allowed commits, integrate behind/divergence before push and revalidate. In `HEAD...refs/remotes/origin/<branch>`, left is ahead/right behind. After interruption, fetch/read back before retrying; never resend reflected commits.
-- If Git repeats a `HEAD.lock` / `couldn't set HEAD` rename failure twice, answer `n` and stop retrying. Preserve uncommitted work; inspect HEAD, status, diffs, rebase metadata, and lock ownership. Restore index/worktree only when HEAD is unchanged and the half-applied tree is proven to match the fetched remote, then use a verified merge path that does not detach HEAD. Never `reset --hard`, force push, or delete locks blindly.
-- Verify the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
-- Treat dirty primary changes as authoring/intake material. Commit by owning skill; combine its related small edits and relevant formatting in one commit. Keep unrelated skills/paths separate and untouched.
-- Do not run public, internal, or EMU sync from this skill. If distribution is needed, hand off the primary to `sync-public-skills` in the completion report.
+- Git gate: fetch once, classify dirty/ahead, isolate unrelated dirty, and verify the push sends only private-skill commits; stop after two `HEAD.lock` failures; never `reset --hard`, force push, public/internal/EMU sync, release, or tag without explicit instruction. Details: [Git Safety Procedure](references/git-safety.md).
+- Do not run public, internal, or EMU sync from this skill. If distribution is needed, state in the completion report that a separate distribution sync is needed and leave it to the repository's sync workflow.
 
 ## Routing Rules
 
@@ -78,26 +75,18 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 2. Prioritize by `Impact x Recurrence` as P1/P2/P3.
 3. Inspect existing private skills before creating anything.
 4. Route to the most specific existing skill when one clearly owns the behavior.
-4b. **Multi-target case**: when a learning is a cross-cutting principle that several skills must own independently to stay Self-Contained (for example: tool-platform constraints, push-threshold rules, gate items that each skill verifies locally), apply it to every affected skill as a 1-line gate. Each copy must be a tiny independent SSOT, not a hard reference to a primary; same wording across files is allowed when portability requires it. Do not copy the same long block — keep each insertion to one line of judgment.
-4c. **Multi-learning case**: when one incident produces several independent learnings with different owning skills, split them and update each owning skill in the same retro turn. Do not force all learnings into the first plausible skill. Example: deck artifact folder design belongs to planning/workspace skills, while generation/editing mechanics belong to automation skills.
+   4b. **Multi-target case**: when a learning is a cross-cutting principle that several skills must own independently to stay Self-Contained (for example: tool-platform constraints, push-threshold rules, gate items that each skill verifies locally), apply it to every affected skill as a 1-line gate. Each copy must be a tiny independent SSOT, not a hard reference to a primary; same wording across files is allowed when portability requires it. Do not copy the same long block — keep each insertion to one line of judgment.
+   4c. **Multi-learning case**: when one incident produces several independent learnings with different owning skills, split them and update each owning skill in the same retro turn. Do not force all learnings into the first plausible skill. Example: deck artifact folder design belongs to planning/workspace skills, while generation/editing mechanics belong to automation skills.
 5. If no existing skill owns the behavior and the learning is reusable as a workflow, create a new private skill folder.
 6. If the learning is workspace/customer/project-specific, abstract it before writing; if it cannot be safely abstracted, stop with `scope 不一致` and suggest a workspace-scoped record or workflow instead.
 
 ## Edit Rules
 
 - Prefer improving existing text over appending duplicate guidance.
-- Before writing a new rule, check whether the repository already implements the same decision in scripts, generated assets, or another skill. A rule that contradicts working code makes the next run "fix" assets that were already correct.
-- A single negative observation is not a rule. Before writing "the feature is absent here", rule out authentication state, extension activation, and mode: a half-initialised client renders its surrounding UI while omitting the entries you were looking for. If you cannot rule them out, record the observation with its conditions rather than as an absolute.
-- Compaction targets the minimum information the model needs to act; human readability is secondary.
-- Use this refactor order: delete stale text -> merge/compact duplicates -> move long detail to `references/` -> add missing guidance.
-- Keep `SKILL.md` lean; move detailed procedures, command examples, and examples to `references/*`.
-- Treat `SKILL.md` as an entry point, not a general tutorial.
-- Do not add generic or obvious process advice; prefer gotchas, verification checks, and failure-avoidance rules that change future behavior.
-- Preserve non-obvious decision criteria, gotchas, done criteria, and failure-avoidance rules.
-- Do not repeat the same `Learning / Evidence / Impact` in different wording.
+- Authoring rules (refactor order, single-observation rule, compaction): see [Authoring Rules](references/authoring-rules.md#edit-rules).
+- Keep `SKILL.md` a lean entry point, not a general tutorial; move detailed procedures, command examples, and examples to `references/*`.
 - Do not store secrets, customer data, tenant-specific IDs, local absolute paths, tokens, or `/memories/**` content in the private skill repo.
 - If a local absolute path is necessary as an example, replace it with a placeholder such as `<private-repo>`.
-- Before any `git add` / `git commit` / `git push`, set the working directory to the private repo root explicitly (`Set-Location <private-repo>` or `git -C <private-repo>`). Do not rely on inherited cwd from a previous tool call. After `commit` / `push`, re-confirm `git status --short --branch` to detect cwd mismatches early.
 
 ## Procedure
 
@@ -105,10 +94,9 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
 
 - Resolve private repo root.
 - Verify `.github/skills/` exists.
-- Fetch before checking status/ahead/behind. Classify dirty and queued paths, isolate unrelated dirty only when present, integrate behind/divergence in the clean execution checkout, and never stage unrelated paths. Batch preflight, scope and push-gate checks into single commands and avoid re-verifying state already read this run.
-- Treat an isolated checkout of the verified private remote as the execution repo for path/clean checks. If approved dirty input is copied there, report the original copy as retained, not newly pending work; compare against the confirmed commit before suggesting another intake.
+- Run the Git preflight in [Git Safety Procedure](references/git-safety.md#resolve-and-inspect).
 - List candidate skills and read the most likely `SKILL.md` files. For large repos or thorough audits, delegate this inventory step to a sub-agent so scope is settled before extracting learnings.
-- If a `skill-creator-plus` skill exists in the private repo, follow its structure and review guidance for new or heavily changed skills.
+- If the private repo has its own skill authoring guide, follow its structure and review guidance for new or heavily changed skills.
 
 ### 2. Decide Target
 
@@ -123,10 +111,8 @@ Choose exactly one:
 
 - Edit only under `<private-repo>/.github/skills/<skill>/`.
 - Keep the diff focused and small.
-- For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
+- New-skill frontmatter and formatter-drift handling: see [Authoring Rules](references/authoring-rules.md#apply-details).
 - Add `references/` only when detail would bloat `SKILL.md`.
-- Verify table/formatter drift; group relevant formatting with the owning skill's small change. Separate unrelated normalization; never blanket-stage or split one bounded improvement into repeated pushes.
-- In `safe-auto`, make a focused local commit when the scope is clear and all changed paths are intended, then push it in the same run after the automatic-push checks pass.
 
 ### 4. Bloat Check
 
@@ -140,21 +126,11 @@ Before final response:
 - Check no forbidden target was changed.
 - Parse YAML frontmatter for every changed `SKILL.md`, even one-line edits. Check `name` against the folder, `description` triggers and `argument-hint` against the current use case, and `user-invocable`, `license`, and `metadata.author` against repo conventions; metadata lint alone cannot detect a stale hint.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added. Scan added lines or the staged target content; do not scan unchanged diff context, which can trigger false positives on pre-existing terms.
-- Commit/push intended private skill changes in safe-auto after remote/scope checks. Done means the execution checkout is clean with ahead/behind `0/0`; original unrelated dirty is preserved and reported, not a completion blocker.
+- Commit/push intended private skill changes in safe-auto only when scope is clear, all changed paths are intended, and remote/scope checks pass. Done means the execution checkout is clean with ahead/behind `0/0`; original unrelated dirty is preserved and reported, not a completion blocker.
 - List up to three read-only candidates: dirty -> Retro; pending private commits -> ahead-range review; committed public-safe gap -> separately requested sync. Honor holds/visibility; never expand operations or offer private/internal/denied content for public sync.
 
 ## Output
 
-Use this compact report:
-
-```markdown
-# Retro: [Title]
-- Target: <private-repo>/.github/skills/<skill>/...
-- Learnings: <what changed behavior>
-- Changes: <files changed>
-- Commit: <hash or none>
-- Gate: pass / stop reason
-```
+Use the compact report in [Authoring Rules](references/authoring-rules.md#report-template).
 
 Stop reasons: `入力不足` / `private repo 未解決` / `scope 不一致` / `Safety Gate 失敗` / `actionable な知見なし` / `新規 skill 候補` / `review-only`.
-

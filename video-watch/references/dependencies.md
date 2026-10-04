@@ -19,8 +19,8 @@
 Run:
 
 ```powershell
-python .github/skills/video-watch/scripts/preflight.py
-python .github/skills/video-watch/scripts/preflight.py --url-mode
+python <skill-dir>/scripts/preflight.py
+python <skill-dir>/scripts/preflight.py --url-mode
 ```
 
 `yt-dlp` is not required when using an external transcript with `--detail transcript --metadata-only --transcript-file <path>` because no URL captions or video download are attempted.

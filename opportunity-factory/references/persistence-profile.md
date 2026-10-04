@@ -1,6 +1,6 @@
 # Persistence Profile
 
-Task 単位で「どこまで粘るか」を制御する profile。goal-loop の Persistence Profile を opportunity-factory に取り込み、worker 増殖と cost 暴走を抑えつつ、大事な task はしっかり粘る。
+Task 単位で「どこまで粘るか」を制御する profile。worker 増殖と cost 暴走を抑えつつ、大事な task はしっかり粘る。
 
 ## Profile 定義
 

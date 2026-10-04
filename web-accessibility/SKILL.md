@@ -59,9 +59,9 @@ Product 実装や UI レビューで、a11y を後付けの監査ではなく設
 
 ## Escalation Paths
 
-- 深い設計レビューや WCAG 観点の広い棚卸しが必要なら `Accessibility Expert` を使う
-- Browser 上の keyboard flow、dialog、focus return、live region を証跡付きで確認したいなら `Accessibility Runtime Tester` を使う
-- Markdown 文書の読みやすさや GitHub 上の文書 a11y が主題なら `markdown-accessibility` を使う
+- 深い設計レビューや WCAG 観点の広い棚卸しが必要なら、[WCAG priority map](references/wcag-priority-map.md) を基準に criterion 単位で棚卸しする
+- keyboard flow、dialog、focus return、live region は静的レビューで確定せず、実ブラウザで操作して証跡（操作手順・スクリーンショット・読み上げ結果）を残す
+- Markdown 文書の読みやすさや GitHub 上の文書 a11y はこの skill の対象外
 
 ## Expected Output
 

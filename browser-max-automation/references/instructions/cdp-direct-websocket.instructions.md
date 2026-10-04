@@ -30,7 +30,7 @@ Rules:
 - `--remote-debugging-port=<port>` exposes the CDP endpoint.
 - `--remote-allow-origins=*` avoids WebSocket `403 Forbidden` in environments that enforce origin checks.
 - `--restore-last-session` is useful when the existing tab/session matters.
-- If only one browser profile has the right login state, keep the default browser user data and pin `--profile-directory=<known profile>` instead of creating an ad-hoc `--user-data-dir`.
+- Chrome 136+ ignores `--remote-debugging-port` on its default user-data-dir, so pinning `--profile-directory` there does not open CDP. Follow the profile rules in [Existing Browser CDP](cdp-existing-browser.md#authentication-gotchas) and verify other Chromium browsers separately.
 - Use a separate port when Playwright MCP already owns another CDP endpoint.
 
 ## Direct WebSocket Connection
@@ -210,33 +210,7 @@ Rules:
 
 ## Azure Portal OOPIF and Trusted Event Notes
 
-Azure Portal often renders blade content inside `sandbox-*.reactblade.portal.azure.net` iframe targets. In CDP, these can appear as separate `type=iframe` targets.
-
-```python
-targets = cdp(browser_ws, 'Target.getTargets')['result']['targetInfos']
-portal_iframes = [
-  t for t in targets
-  if t.get('type') == 'iframe' and 'reactblade.portal.azure.net' in (t.get('url') or '')
-]
-```
-
-If outer-frame DOM inspection cannot see the content, attach directly to the iframe target:
-
-```python
-attach = cdp(browser_ws, 'Target.attachToTarget', {
-  'targetId': iframe_target_id,
-  'flatten': True,
-})
-session_id = attach['result']['sessionId']
-
-cdp(browser_ws, 'Runtime.enable', session_id=session_id)
-```
-
-Important:
-
-- Some Azure Portal actions call internal SDK methods such as `openBlade()`.
-- You may be able to inspect React handlers or invoke `onClick`, but blade navigation can still fail because the Portal expects a **trusted user event**.
-- When iframe text is visible but programmatic click / handler invocation does not navigate, treat this as a Portal constraint and switch the last click to a human.
+See [Azure Portal](azure-portal.md): blade content can be a separate `type=iframe` target (`sandbox-*.reactblade.portal.azure.net`); attach with `Target.attachToTarget` (`flatten: true`) and send commands with the returned `sessionId`. Blade navigation such as `openBlade()` may still require a trusted user event.
 
 ## Authenticated API Handoff
 
@@ -328,18 +302,18 @@ if sys.stderr.encoding and sys.stderr.encoding.lower() != 'utf-8':
 
 ## Troubleshooting
 
-| Symptom                                     | Likely Cause                               | Fix                                                              |
-| ------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------- |
-| WebSocket `403 Forbidden`                   | Missing `--remote-allow-origins=*`         | Restart browser with the flag                                    |
-| Playwright assertion / service worker crash | Extension service worker targets           | Use direct WebSocket CDP                                         |
-| `Runtime.evaluate` timeout                  | Domain not enabled or event stream ignored | `Runtime.enable` and filter responses by `id`                    |
-| Session resets after navigation             | Full page reload in SPA                    | Use hash or in-app navigation                                    |
-| Click does nothing in virtual scroll        | DOM reference lost or wrong target node    | Use one async eval and ancestor clickable search                 |
-| Later modal operations fail                 | Overlay state is stale                     | Close overlays and reopen from a known state                     |
-| `UnicodeEncodeError: cp932`                 | Windows default console encoding           | Set `chcp 65001`, `PYTHONIOENCODING`, and stdout/stderr encoding |
-| CDP connects to wrong tab (e.g. `sw.js`)   | SPA registers service worker tabs          | Filter `/json` results: exclude `sw.js` URLs and `type !== "page"` tabs. Pass verified `webSocketDebuggerUrl` or filter in helper |
-| Date-click or `select_date` fails silently  | SPA updated CSS classes for date buttons   | Do not rely on fixed CSS class selectors (e.g. `.carousel-date-btn`). Match buttons by visible `innerText` with day number + weekday pattern instead |
-| `SyntaxError: Identifier '<x>' has already been declared` on the 2nd evaluate | Repeated `Runtime.evaluate` share one live execution context | Wrap any multi-statement snippet that declares top-level `const` / `let` in an IIFE |
-| `innerText` contains element-like words such as `article`, `edit`, `delete` | Icon fonts (Material Icons and friends) store the ligature name as a real text node | Do not use those words as selectors or as list-item markers. Anchor on a stable attribute such as `a[href*="/drafts/"]` and walk up to the card |
-| `json.loads` on an evaluate result fails with `Unterminated string` | A large `returnByValue` payload is truncated mid-string | Slice every field inside `JSON.stringify` and keep one response to a few KB. Fetch HTML dumps in a separate call |
-| An in-page `fetch` mutation returns 404 but the change actually happened | SPA internal endpoints do not always follow REST semantics | Never judge success from the response. Re-read the list or the target state after the call and compare counts |
+| Symptom                                                                       | Likely Cause                                                                        | Fix                                                                                                                                                  |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WebSocket `403 Forbidden`                                                     | Origin check on the WebSocket handshake                                             | Connect with `suppress_origin=True`; relaunch with `--remote-allow-origins=*` only if that is not possible                                           |
+| Playwright assertion / service worker crash                                   | Extension service worker targets                                                    | Use direct WebSocket CDP                                                                                                                             |
+| `Runtime.evaluate` timeout                                                    | Domain not enabled or event stream ignored                                          | `Runtime.enable` and filter responses by `id`                                                                                                        |
+| Session resets after navigation                                               | Full page reload in SPA                                                             | Use hash or in-app navigation                                                                                                                        |
+| Click does nothing in virtual scroll                                          | DOM reference lost or wrong target node                                             | Use one async eval and ancestor clickable search                                                                                                     |
+| Later modal operations fail                                                   | Overlay state is stale                                                              | Close overlays and reopen from a known state                                                                                                         |
+| `UnicodeEncodeError: cp932`                                                   | Windows default console encoding                                                    | Set `chcp 65001`, `PYTHONIOENCODING`, and stdout/stderr encoding                                                                                     |
+| CDP connects to wrong tab (e.g. `sw.js`)                                      | SPA registers service worker tabs                                                   | Filter `/json` results: exclude `sw.js` URLs and `type !== "page"` tabs. Pass verified `webSocketDebuggerUrl` or filter in helper                    |
+| Date-click or `select_date` fails silently                                    | SPA updated CSS classes for date buttons                                            | Do not rely on fixed CSS class selectors (e.g. `.carousel-date-btn`). Match buttons by visible `innerText` with day number + weekday pattern instead |
+| `SyntaxError: Identifier '<x>' has already been declared` on the 2nd evaluate | Repeated `Runtime.evaluate` share one live execution context                        | Wrap any multi-statement snippet that declares top-level `const` / `let` in an IIFE                                                                  |
+| `innerText` contains element-like words such as `article`, `edit`, `delete`   | Icon fonts (Material Icons and friends) store the ligature name as a real text node | Do not use those words as selectors or as list-item markers. Anchor on a stable attribute such as `a[href*="/drafts/"]` and walk up to the card      |
+| `json.loads` on an evaluate result fails with `Unterminated string`           | A large `returnByValue` payload is truncated mid-string                             | Slice every field inside `JSON.stringify` and keep one response to a few KB. Fetch HTML dumps in a separate call                                     |
+| An in-page `fetch` mutation returns 404 but the change actually happened      | SPA internal endpoints do not always follow REST semantics                          | Never judge success from the response. Re-read the list or the target state after the call and compare counts                                        |

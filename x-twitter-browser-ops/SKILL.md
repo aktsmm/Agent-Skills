@@ -1,6 +1,6 @@
 ---
 name: "x-twitter-browser-ops"
-description: "X/Twitter browser operations. Use for X browsing, analysis, bookmark management, content and profile operations, or browser-driven troubleshooting. Require explicit confirmation for outbound posts, DMs, engagement, follows, blocks, mutes, and list edits."
+description: "X/Twitter browser operations. Use for X browsing, analysis, bookmark management, content and profile operations, or browser-driven troubleshooting. Require explicit confirmation for outbound posts, DMs, engagement, follows, blocks, mutes, and list edits. Out of scope: keyword/hashtag research of public posts traced to primary sources."
 argument-hint: "対象のX画面、実行したい操作、対象アカウントまたは投稿"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -90,7 +90,7 @@ X changes DOM structure and GraphQL response shapes without notice. Re-verify th
 - Sort descending by `legacy.followers_count` / `followers_count`.
 - Output rank, display name, handle, follower count, and profile URL.
 - For Top 100, verify there are at least 100 rows; if fewer, say how many were collected.
-- For HTML dashboards, delegate visual artifact styling to `web-artifacts-builder` when appropriate.
+- For HTML dashboards, keep styling minimal; polished visual artifact design is out of scope.
 - For PowerShell-generated HTML, embed JSON safely: use `ConvertTo-Json -Compress`, place it in `<script type="application/json">`, and escape JSON `<`, `>`, and `&` as `\u003c`, `\u003e`, and `\u0026`. Do not HTML-encode JSON as `&quot;` before `JSON.parse`.
 
 ## Verification Checklist

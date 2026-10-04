@@ -19,27 +19,25 @@ context が膨らんだときも、まずは split / compact / reference 化を�
 
 Do not start with multi-agent by default.
 
-- Single focused slash task -> **Prompt**
+- Single focused slash task -> **Prompt** (Local harness only; prompt files are deprecated for Agent Host sessions, so prefer a **Skill** for new slash workflows)
 - Always-on or file-scoped guidance -> **Instruction**
 - Reusable workflow with bundled assets -> **Skill**
 - Persona, tool restrictions, delegation, or handoffs -> **Agent**
-- Deterministic enforcement -> **Hook**
+- Deterministic enforcement -> **Hook** (Preview; events and config differ by harness)
 
 If the ask does not require an **Agent**, stop and use the simpler primitive.
-
-> この primitive 選択表が SSOT。skill-creator-plus / skill-finder などの判定表は「そのスキルを使うべきか」の即時ゲートとして扱い、基準がずれたらここに合わせる。
 
 Selection details: [references/customization-decision.md](references/customization-decision.md)
 
 ## When to Use
 
-| Action     | Triggers                                                                      |
-| ---------- | ----------------------------------------------------------------------------- |
+| Action     | Triggers                                                                                 |
+| ---------- | ---------------------------------------------------------------------------------------- |
 | **Create** | New `.agent.md`, `.instructions.md`, `.prompt.md`, `AGENTS.md`, or workflow architecture |
-| **Review** | Orchestrator not delegating, design principle check, context overflow         |
-| **Update** | Adding Handoffs, improving delegation, tool configuration                     |
-| **Debug**  | Agent not found, subagent not working, picker visibility, access control      |
-| **Decide** | Determining whether multi-agent is justified or a simpler primitive is enough |
+| **Review** | Orchestrator not delegating, design principle check, context overflow                    |
+| **Update** | Adding Handoffs, improving delegation, tool configuration                                |
+| **Debug**  | Agent not found, subagent not working, picker visibility, access control                 |
+| **Decide** | Determining whether multi-agent is justified or a simpler primitive is enough            |
 
 ## Core Principles
 
@@ -53,32 +51,14 @@ Principle details: [references/design-principles.md](references/design-principle
 
 ## Pattern Selection
 
-- **Prompt Chaining**: 順序のある段階処理
-- **Routing**: 入力タイプで分岐する処理
-- **Parallelization**: 独立タスクを並列で進める処理
-- **Orchestrator-Workers**: 動的に subtasks を分解する処理
-- **Evaluator-Optimizer**: 品質基準を満たすまで反復する処理
-
-Every loop needs explicit stop conditions.
-
-Pattern details: [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md)
+Name the pattern explicitly when complexity rises, using the selector in [references/workflow-patterns/overview.md](references/workflow-patterns/overview.md). Every loop needs explicit stop conditions.
 
 ## Design Workflow
 
-1. **Extract from conversation**
-   Repeated behavior, tool preferences, workflow shape, and obvious specialization を先に拾う。
-2. **Choose primitive + scope**
-   Prompt / instruction / skill / agent / hook と workspace / profile を決める。
-3. **Clarify only the gaps**
-   挙動を変える曖昧さだけ聞く。
-4. **Check escalation**
-   agent や multi-agent が本当に必要か確認する。
-5. **Choose pattern**
-   complexity が上がるなら pattern を明示して設計する。
-6. **Review before expanding**
-   split / compact / reference 化で済まないかを見る。
-7. **Implement and iterate**
-   最初から完成形を狙わず、弱い箇所を見つけて詰める。
+1. Extract repeated behavior, tool preferences, and workflow shape from the conversation.
+2. Choose primitive + scope (workspace / profile); ask only about ambiguities that change behavior.
+3. Escalate only when split / compact / reference-ization cannot solve it, then pick a pattern.
+4. Implement the smallest version and tighten the weakest parts.
 
 ## Rule Placement
 
@@ -86,18 +66,11 @@ Pattern details: [references/workflow-patterns/overview.md](references/workflow-
 - repo local の `.instructions.md` には workspace 固有の差分だけを残す。差分が無い generic instruction は merge back して削除候補にする。
 - IR は原則 in-memory で扱う。validator、script、deterministic handoff が必要な場合だけ中間 file を materialize し、不要になったら片付ける。
 - scheduler / service / config など決定論的な state mutation は、AI/UI loop ではなく direct script / API で現状確認 -> 最小変更 -> live read-back まで行う。LLM は scope と整合対象の判断に限定する。
-- For model allocation, trace actual producer/reviewer responsibilities, verify live availability and applicable pricing, and show current-to-proposed assignments with quality/cost tradeoffs before mutation; use [scheduled runtime bindings](references/scheduled-runtime-bindings.md). Try the cheapest capable model first when a human can check the result quickly; after a stronger model completes a task once, capture its steps and checks as a prompt or skill, route repeats to the cheaper model, and fall back when the steps fail.
+- For model allocation reviews, use [scheduled runtime bindings](references/scheduled-runtime-bindings.md#model-allocation-reviews).
 
 ## Escalation Rules
 
-- **L0**: Single Prompt
-- **L1**: Prompt + Instructions
-- **L2**: Single Agent
-- **L3**: Multi-Agent
-
-Prefer the lowest level that solves the problem cleanly.
-
-Quick signals:
+Prefer the lowest level (L0 prompt → L1 + instructions → L2 single agent → L3 multi-agent) that solves the problem cleanly. Quick signals to split:
 
 - Prompt > 50 lines
 - Steps > 5
@@ -107,28 +80,10 @@ Quick signals:
 
 Threshold details: [references/splitting-criteria.md](references/splitting-criteria.md)
 
-## Entry Boundary Smells
-
-### Instruction Elevation Smell
-
-always-loaded entry において、強い命令語が直下の catalog、reference list、workflow map、rule inventory を会話の優先レイヤーへ昇格させる状態。
-
-### Always-Loaded Entry Budget
-
-always-loaded entry は会話境界と最小 guardrail のみを持つ。catalog、詳細手順、広い参照一覧は docs、README、task-specific assets へ退避する。
-
-### Runtime Boundary Rule
-
-Review assets improve design quality and detect structural problems. Default conversational behavior is controlled by always-loaded entries.
-
-### Casual Input Safety Check
-
-Lightweight inputs such as greetings, short Q&A, and numeric-only replies should not be force-routed into task intake unless the task context is explicit.
-
 ## Review Gates
 
 - [ ] Primitive choice is simpler than agent if possible
-- [ ] Placement is appropriate and always-loaded entry files stay thin
+- [ ] Placement is appropriate and always-loaded entry files stay thin (entry boundary smells: [review-checklist.md](references/review-checklist.md#always-loaded-entry-smells))
 - [ ] New additions are proposed only after delete / merge / split / move options are checked
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early
@@ -143,20 +98,14 @@ Core references: [primitive decision](references/customization-decision.md), [de
 
 For scheduled workflows, use [scheduled runtime bindings](references/scheduled-runtime-bindings.md). For delegated evidence and append-only current-state extraction, see [orchestrator-workers](references/workflow-patterns/4-orchestrator-workers.md) and [IR architecture](references/workflow-patterns/ir-architecture.md).
 
-## agent Quick Fix
-
-When an orchestrator promises delegation but works directly, make the delegation requirement explicit and verifiable. See [agent-guide.md](references/agent-guide.md).
-
-## Tools Reference
-
-Use [references/agent-template.md](references/agent-template.md) for tool mapping and stable agent scaffold details.
+When an orchestrator promises delegation but works directly, make the delegation requirement explicit and verifiable ([agent-guide.md](references/agent-guide.md)). Tool mapping and agent scaffold: [agent-template.md](references/agent-template.md).
 
 ## Done Criteria
 
 - [ ] Primitive and scope selected intentionally
 - [ ] Workflow pattern selected and confirmed with user
 - [ ] New or updated assets have clear Role/Workflow/Done Criteria where applicable
-- [ ] Design principles checklist passed
+- [ ] Review Gates passed
 - [ ] Recommendations are classified as delete / merge / split / move / add / keep where applicable
 - [ ] Always-on instruction boundaries and DRY / SSOT risks are explicitly reviewed when `copilot-instructions.md` or `AGENTS.md` are in scope
 - [ ] New agent / workflow assets are registered in the appropriate catalog or docs when needed

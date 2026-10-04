@@ -11,7 +11,7 @@ If the visible asset started from manual SVG cleanup or hand-authored layout twe
 
 After any `.drawio` layout or label edit, regenerate the paired `.drawio.svg` from its source and verify both rendering and re-opening as an editable draw.io SVG. Do not treat manual `content` metadata edits as the normal sync path; exporter formatting is implementation-specific.
 
-For draw.io Desktop CLI exports on Windows, use absolute source/output paths and wait for the spawned process. A running GUI instance can make a direct CLI call return before the files appear. Gate delivery on exit code `0`, output existence, and an output timestamp newer than the source edit. If source and delivery timestamps are ambiguous, re-export to a temporary file and compare hashes before upload or publication.
+For draw.io Desktop CLI exports on Windows (a running GUI instance can make the CLI return before files appear), see the `CLI returns but PNG / SVG is missing or stale` row in [troubleshooting.md](troubleshooting.md).
 
 ## Recommended Markdown Pattern
 

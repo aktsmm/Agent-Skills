@@ -4,40 +4,16 @@
 
 > Back to [overview.md](overview.md)
 
-## Diagram
+Use when the step order is fixed and each step's output is the next step's input.
 
-```mermaid
-graph LR
-    A[Input] --> B[Step 1]
-    B --> C{Gate}
-    C -->|Pass| D[Step 2]
-    C -->|Fail| E[Handle Error]
-    D --> F[Step 3]
-    F --> G[Output]
-```
+## VS Code Implementation
 
-## Characteristics
+- Human-driven chain: one custom agent per step, linked with `handoffs` (`send: false` keeps the user as the gate). See [handoffs-guide.md](../handoffs-guide.md).
+- Autonomous chain: one agent body with numbered steps, each followed by a gate checked against a file or command result (tests, validator, schema), not the model's own claim.
+- Pass state between steps through files (e.g. `tmp/step1-output.json`), not conversation memory; later steps and resumed sessions can then re-read it.
 
-| Aspect        | Description                                              |
-| ------------- | -------------------------------------------------------- |
-| **Structure** | Serial processing, output of each step is input for next |
-| **Gate**      | Can set validation gates after each step                 |
-| **Use Cases** | Document translation, code generation - review - fix     |
+## Gate Rules
 
-## When to Use
-
-- Task can be decomposed into clear subtasks
-- Each step output is needed for the next step
-- Intermediate result validation is important
-
-## Implementation Example
-
-```
-Step 1: Analyze requirements
-    (Gate: Are requirements clear?)
-Step 2: Create design
-    (Gate: Is design valid?)
-Step 3: Implement
-    (Gate: Tests passing?)
-Step 4: Create documentation
-```
+- Each gate names the artifact and the pass condition (`tests pass`, `schema valid`, `file exists and non-empty`).
+- On FAIL: fix and re-run that step only; do not continue with a failed intermediate.
+- An empty extraction must fail the gate, not pass a "no violations found" check downstream.

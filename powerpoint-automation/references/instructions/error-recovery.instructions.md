@@ -17,20 +17,20 @@
 
 ## Fallback Matrix
 
-| Phase          | Failure Type         | Fallback To      | Action                           |
-| -------------- | -------------------- | ---------------- | -------------------------------- |
-| REVIEW(JSON)   | Schema violation     | EXTRACT          | Re-run `reconstruct_analyzer.py` |
-| REVIEW(JSON)   | Empty slides         | EXTRACT          | Fix content.json                 |
-| REVIEW(JSON)   | Image path missing   | EXTRACT          | Re-run `extract_images.py`       |
-| REVIEW(JSON)   | Translation error    | TRANSLATE        | Re-run Localizer                 |
-| REVIEW(PPTX)   | Slide count mismatch | BUILD            | Re-run `create_from_template.py` |
-| REVIEW(PPTX)   | Layout issues        | PREPARE_TEMPLATE | Re-diagnose template             |
-| REVIEW(PPTX)   | Literal escape text in user-facing text | BUILD | Fix source quoting and rebuild from a fresh temp PPTX; if COM is unavailable, repair exact `<a:t>` nodes only on a temp copy, then validate ZIP and slide count before canonical replacement |
-| EXPORT(PDF)    | `ExportAsFixedFormat` COM type error | EXPORT | Copy source to local temp and use `SaveAs(pdfPath, 32)` |
-| EXPORT(PDF)    | Page count mismatch  | REVIEW(PPTX)     | Check hidden-slide/export settings, then re-export from a fresh temp copy |
-| BUILD          | Template load error  | PREPARE_TEMPLATE | Run `diagnose_template.py`       |
-| BUILD          | Slide paste fails (all) | BUILD         | Switch to `Slides.InsertFromFile` (clipboard-independent) |
-| **3 failures** | Any                  | **ESCALATE**     | Wait for human intervention      |
+| Phase          | Failure Type                            | Fallback To      | Action                                                                                                                                                                                       |
+| -------------- | --------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| REVIEW(JSON)   | Schema violation                        | EXTRACT          | Re-run `reconstruct_analyzer.py`                                                                                                                                                             |
+| REVIEW(JSON)   | Empty slides                            | EXTRACT          | Fix content.json                                                                                                                                                                             |
+| REVIEW(JSON)   | Image path missing                      | EXTRACT          | Re-run `extract_images.py`                                                                                                                                                                   |
+| REVIEW(JSON)   | Translation error                       | TRANSLATE        | Re-run Localizer                                                                                                                                                                             |
+| REVIEW(PPTX)   | Slide count mismatch                    | BUILD            | Re-run `create_from_template.py`                                                                                                                                                             |
+| REVIEW(PPTX)   | Layout issues                           | PREPARE_TEMPLATE | Re-diagnose template                                                                                                                                                                         |
+| REVIEW(PPTX)   | Literal escape text in user-facing text | BUILD            | Fix source quoting and rebuild from a fresh temp PPTX; if COM is unavailable, repair exact `<a:t>` nodes only on a temp copy, then validate ZIP and slide count before canonical replacement |
+| EXPORT(PDF)    | `ExportAsFixedFormat` COM type error    | EXPORT           | Copy source to local temp and use `SaveAs(pdfPath, 32)`                                                                                                                                      |
+| EXPORT(PDF)    | Page count mismatch                     | REVIEW(PPTX)     | Check hidden-slide/export settings, then re-export from a fresh temp copy                                                                                                                    |
+| BUILD          | Template load error                     | PREPARE_TEMPLATE | Run `diagnose_template.py`                                                                                                                                                                   |
+| BUILD          | Slide paste fails (all)                 | BUILD            | Switch to `Slides.InsertFromFile` (clipboard-independent)                                                                                                                                    |
+| **3 failures** | Any                                     | **ESCALATE**     | Wait for human intervention                                                                                                                                                                  |
 
 ---
 
@@ -80,8 +80,8 @@ Move to **ESCALATE** phase and wait for human intervention when:
 # After escalation, resume after manual fix
 python scripts/resume_workflow.py 20251214_example_report --from REVIEW_JSON
 
-# Force resume from specific phase (reset retry count)
-python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --reset-retry
+# Resume from an earlier phase with a specific template
+python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --template assets/template.pptx
 ```
 
 ---
@@ -116,12 +116,12 @@ python scripts/resume_workflow.py 20251214_example_report --from EXTRACT --reset
 
 ### Causes
 
-| Cause            | Description                 |
-| ---------------- | --------------------------- |
-| OneDrive sync    | File incomplete during sync |
-| Git autocrlf     | Binary treated as text      |
-| Partial download | Network interruption        |
-| COM save mode    | PowerPoint saved a `.pptx` path as legacy/OLE body |
+| Cause               | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| OneDrive sync       | File incomplete during sync                            |
+| Git autocrlf        | Binary treated as text                                 |
+| Partial download    | Network interruption                                   |
+| COM save mode       | PowerPoint saved a `.pptx` path as legacy/OLE body     |
 | Open read-only deck | Read-only review still held a OneDrive/PowerPoint lock |
 
 ### Recovery: Normalize Before Package Edits
@@ -148,17 +148,7 @@ Rules:
 
 ### Recovery: Use Your Own Template
 
-If bundled template is corrupted, use any PPTX as template:
-
-```powershell
-# Analyze user's PPTX → auto-generates layouts.json
-python scripts/analyze_template.py "user_presentation.pptx"
-
-# Use as template
-python scripts/create_from_template.py "user_presentation.pptx" `
-    "output_manifest/content.json" "output_ppt/result.pptx" `
-    --config "output_manifest/user_presentation_layouts.json"
-```
+If the bundled template is corrupted, use any PPTX as template: see [template.instructions.md](template.instructions.md#auto-template-from-users-pptx).
 
 ### Recovery: Scratch Build (no template at all)
 
@@ -202,7 +192,7 @@ rebuilt file with `Start-Process`.
 Symptoms: each insert retries then skips, leaving a template-only deck.
 
 - Default to `Slides.InsertFromFile(path, index, start, end)` — clipboard-independent.
-  Insert happens *after* `index`, so pass `insertPos - 1`.
+  Insert happens _after_ `index`, so pass `insertPos - 1`.
 - Read the source from a **local temp copy** (`[IO.File]::ReadAllBytes` then write to
   `$env:TEMP`), not the COM-opened presentation. Avoids OneDrive hydration stalls and
   file-lock contention in one step.

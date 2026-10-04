@@ -1,17 +1,17 @@
 # Copilot Cloud Agent CI/CD Pitfalls
 
-GitHub Actions で Copilot Cloud Agent の自動 PR パイプラインを組むときの落とし穴と対策。
+GitHub Actions で Copilot cloud agent の自動 PR パイプラインを組むときの落とし穴と対策。
 
 ## Token Anti-Recursion
 
-GitHub App トークン（Copilot Cloud Agent 含む）で作成・push した PR は、`pull_request` イベントで後続ワークフローをトリガーしない。GitHub の再帰防止ルール。
+後続ワークフローが自動で走らない原因は 2 つある。
 
-- `GITHUB_TOKEN` でも同様
-- `pull_request_target` は制限を受けない
+- `GITHUB_TOKEN` による event は、`workflow_dispatch` / `repository_dispatch` を除き新しい workflow run を作らない（`pull_request_target` も同様）
+- Copilot cloud agent が PR に push しても、既定では GitHub Actions workflow は走らず、write 権限者の **Approve and run workflows** が必要。リポジトリ設定の **Require approval for workflow runs** を無効化すると自動実行できるが、未レビューのコードが secrets / 書き込み権限に触れるリスクを受け入れることになる
 
 ### 対策
 
-後続ワークフロー（validate、auto-merge 等）は `pull_request_target` をトリガーにする。
+後続ワークフロー（validate、auto-merge 等）は `pull_request_target` をトリガーにする運用実績がある。ただし上記の承認ゲートを回避できるかは公式に未確認のため、導入時に Copilot の push で実際に起動するか実測する。
 
 ```yaml
 on:
@@ -58,8 +58,9 @@ if (pullRequests.length === 0 && context.payload.workflow_run.head_branch) {
 
 ### 参照
 
-- [GitHub Docs: Automatic token authentication](https://docs.github.com/en/actions/security-guides/automatic-token-authentication)
-- [GitHub Docs: pull_request_target](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request_target)
+- [GitHub Docs: Automatic token authentication](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token)
+- [GitHub Docs: pull_request_target](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request_target)
+- [GitHub Docs: Configuring settings for Copilot cloud agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/cloud-agent/configuring-agent-settings)
 
 ## Self-Healing Reconcile Pattern
 

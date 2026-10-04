@@ -1,6 +1,6 @@
 ---
 name: visualize-as-infographic
-description: "Create colorful infographic PNGs from a conversation, topic, file, skill, or workflow. Use when: インフォグラフィック, 図解, 挿絵, 章扉, X投稿用画像, OGP, HTML→PNG, visualize session, poster image. Produces 2-3 self-contained HTML patterns, renders PNGs, and verifies every image visually before reporting."
+description: "Create colorful infographic PNGs from a conversation, topic, file, skill, or workflow. Use when: インフォグラフィック, 図解, 挿絵, 章扉, X投稿用画像, OGP, HTML→PNG, visualize session, poster image. Produces 2-3 self-contained HTML patterns, renders static PNGs, and verifies every image visually before reporting. Not for animated GIFs, architecture/sequence/flow diagrams (editable .drawio or interactive HTML), or HTML slide decks."
 argument-hint: "図示する対象、用途（X投稿/章扉/ブログOGP等）、比率やパターン数の希望"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -90,13 +90,12 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 Provide a compact table:
 
 | PNG | Size | Pattern | Best use |
-| --- | --- | --- | --- |
+| --- | ---- | ------- | -------- |
 
 Then recommend one image to use first and explain why in one sentence.
 
 ## Do Not
 
-- Do not report completion after generating PNGs but before inspecting them.
 - Do not leave a known-bad PNG as a recommended output.
 - Do not invent numeric claims, quotes, or external facts that are not in the source material.
 - Do not use hardcoded local absolute paths inside generated HTML.

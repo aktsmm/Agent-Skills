@@ -2,7 +2,7 @@
 
 ## Deployment Constraint Branches
 
-- `VpnGw1-5 non-AZ not allowed`: switch to an AZ SKU such as `VpnGw1AZ`.
+- `VpnGw1-5 non-AZ not allowed`: switch to an AZ SKU such as `VpnGw1AZ` (non-AZ VpnGw1-5 creation is blocked since 2025-11-01; [SKU consolidation](https://learn.microsoft.com/azure/vpn-gateway/gateway-sku-consolidation)).
 - `Public IPs must have zones configured`: recreate Standard Public IPs with zones.
 - VNet overlap: reassign spoke address spaces.
 - `useRemoteGateways` fails early: apply it only after the hub gateway is complete.

@@ -1,6 +1,6 @@
 ---
 name: retro-workspace
-description: Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Use when running a workspace/repo retro from CLI or Scout. Detects whether a project folder exists and, if not, asks before creating one. Triggers on "retro workspace", "repo retro", "workspace cleanup", "ワークスペース知見反映".
+description: Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Not for ~/.copilot personal assets, VS Code User Data assets, or a private skills repository. Use when running a workspace/repo retro from CLI or Scout. Detects whether a project folder exists and, if not, asks before creating one. Triggers on "retro workspace", "repo retro", "workspace cleanup", "ワークスペース知見反映".
 argument-hint: "反映したい学び、エラーログ/git diff/会話要約、対象 workspace、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -17,7 +17,7 @@ metadata:
 - 使う: バグ解決後 / 再発時 / workspace 設計ギャップ発見時
 - 使う: 既存手順より安全・再現可能・高速な script / task / helper へ昇格すべき改善を見つけたとき
 - 使う: `.github/**`、`AGENTS.md`、repo 固有 instructions / prompts / agents / hooks、scripts、tasks への反映
-- 使わない: typo のみ / 環境固有問題のみ / User Data / `~/.copilot`（個人グローバルは別の retro が担当）
+- 使わない: typo のみ / 環境固有問題のみ / `~/.copilot` personal assets / VS Code User Data assets / private skills repository の `.github/skills/**`（いずれもそのスコープ向けの retro workflow へ渡す）
 
 ## 入力
 
@@ -98,6 +98,7 @@ List up to three scoped read-only follow-ups: dirty authoring/private-push/distr
 
 ```markdown
 # Retro: [Title]
+
 - Target workspace: <repo root | 新規作成したフォルダ | handoff>
 - Learnings: ...
 - Changes: ...
@@ -105,4 +106,3 @@ List up to three scoped read-only follow-ups: dirty authoring/private-push/distr
 ```
 
 Stop: 知見なし / ユーザー拒否 / Gate 失敗 / handoff-required / review-only / workspace 未確定
-

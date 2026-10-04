@@ -48,16 +48,13 @@ org-owned internal repo（env `SYNC_INTERNAL_SKILLS_GIM_REPO`、例: `<internal-
 
 - Broad/push paths require a clean/current execution branch. Dirty intake remains separate from sync; preserve unrelated original dirty. Internal mirrors require explicit `-SyncEmu` / `-SyncInternal` and the full configured set.
 - Probe the installed committed runner before using relaxed primary-only: it must support `-PrimarySkills`, mandatory audited `-SourceCommit` / `-ExpectedSourceOrigin`, same-SHA policy, selected dirty/unpushed refusal, private source preservation and public index/tree/scope verification. Parameter names alone do not prove those gates; inspect their implementation or trusted tests.
-- If these capabilities are missing, report the unsupported runner and hand off its update. Do not execute new flags, bypass the legacy classification/master/clean gates, invent a temporary sync variant or silently broaden the selected set.
-- Only with that capability-verified runner, audit/pin selected blobs/config at the fetched remote SHA/origin and re-audit after advancement. Its read-only source may be behind/detached; run matching code from a clean audited checkout if needed, with temporary Process source env and finally restoration. Legacy primary/broad retains master/clean/current and cannot make the pin/pre-push-tree guarantee.
+- If missing, report the unsupported runner and hand off its update; do not execute new flags, bypass the legacy classification/master/clean gates, invent a temporary sync variant or silently broaden the selected set. Pinning/re-audit and full-mirror rules: SKILL.md `Sync Strategy` / `Gotchas`.
 - internal API syncはretry＋空SHA fail-fastを使い、stale skill pathを削除する。ref更新後のremote treeでMissing / Mismatch / Extraが0にならなければ失敗とする
-- internal同期はdistribution configの全集合をfull mirrorする。subset指定は他Skill削除につながるため拒否する
-- 公開可否・internal振り分けの判断基準はSKILL（と同名prompt）が持ち、確定結果はdistribution configへ保存する。scriptはconfigを機械適用する
-- push はこの skill が明示実行され、`review-only` / `dry-run` でない場合だけ行う。VS Code では同名 prompt を使う
+- 公開可否・internal振り分けの判断基準はSKILLが持ち、確定結果はdistribution configへ保存する。scriptはconfigを機械適用する
 
 ## Incident Recovery（internal content が public へ漏れた後）
 
-History rewriting, force push or destructive cleanup in this section requires explicit recovery approval and preservation of unrelated work; an ordinary sync request grants none of these operations.
+History rewriting, force push or destructive cleanup in this section requires explicit recovery approval and preservation of unrelated work; an ordinary sync request grants none of these operations. Verify the actual bad/public state first and prefer a normal revert commit when possible.
 
 prevention gate を通り抜けて漏洩した場合の復旧手順。internal skill が public へ漏洩した incident（2026-06-24）の実対応から。
 
@@ -74,4 +71,4 @@ prevention gate を通り抜けて漏洩した場合の復旧手順。internal s
 
 - **env stale → public 全削除**: repo path / repo 名を rename した後、rename 前に起動した既存ターミナルは古い `SYNC_PUBLIC_SKILLS_PRIVATE_REPO` を保持する。`$DevRepo` が存在しない旧パスに解決され、source skill 0 件 → コピー 0 件 → 削除ループで public 全 skill が消える。対策として script に **DevRepo 健全性 Guard**（Step 0.0: source skill 数が下限 `$MinSourceSkills` 未満なら abort）と **削除 abort Guard**（コピー 0 件なら public 削除を中止）の二重防御を実装済み。rename 後は新ターミナルで env を読み直すか、プロセスに `$env:...` で明示注入してから sync する
 - **pwsh 7 専用**: `Sync-AndPush.ps1` は PowerShell 7 構文を使う。Windows PowerShell 5.1 で起動すると 40+ の parse error で落ちる。必ず `pwsh` で実行する（`powershell.exe` ではない）
-- **Destructive recovery**: verify the actual bad/public state and preserve unrelated work first. `reset --hard` or force-pushing a prior commit requires explicit history-rewrite approval; prefer a normal revert commit when possible. Never infer rewrite approval from an ordinary sync request.
+- **Destructive recovery**: `reset --hard` or force-pushing a prior commit follows the Incident Recovery approval rule above.

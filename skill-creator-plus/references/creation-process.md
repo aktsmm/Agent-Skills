@@ -34,15 +34,7 @@ Source inspiration: Anthropic, "Lessons from building Claude Code: how we use sk
 
 ## Step 1: Understanding with Concrete Examples
 
-To create an effective skill, clearly understand concrete examples of how the skill will be used.
-
-**Questions to ask:**
-
-- "What functionality should this skill support?"
-- "Can you give some examples of how this skill would be used?"
-- "What would a user say that should trigger this skill?"
-
-**Tip:** Avoid asking too many questions in a single message. Start with the most important questions.
+Collect 2-3 concrete usage examples and the phrases a user would say to trigger the skill. Ask the most important question first rather than a long questionnaire.
 
 ## Step 2: Planning Reusable Contents
 
@@ -69,7 +61,7 @@ Prefer code or structured files when they reduce repeated reasoning:
 - `assets/` for templates, starter files, or reusable output shapes
 - `config.json` when the skill needs user-specific setup such as channels, environments, or default destinations
 - append-only logs when previous runs are part of the workflow contract, such as standups or recurring reports
-- named skill dependencies only when another installed skill owns a separate responsibility; include a fallback if it may be missing
+- optional external capabilities described generically (not by another skill's name), with a fallback when they are missing
 
 ## Step 3: Initializing the Skill
 
@@ -142,14 +134,7 @@ The script:
 
 ## Step 6: Iterate
 
-**Iteration workflow:**
-
-1. Use the skill on real tasks
-2. Notice struggles or inefficiencies
-3. Identify needed updates
-4. Implement changes and test again
-
-When updating, prefer adding one precise gotcha or one verification helper over broad reminders. The strongest skill updates usually come from observed misses, not generic best practices.
+Use the skill on real tasks and update it from observed misses. Prefer adding one precise gotcha or one verification helper over broad reminders.
 
 For skills where routing quality matters, optionally track lightweight usage signals:
 

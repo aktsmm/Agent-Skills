@@ -1,51 +1,27 @@
 # Publishing to Marketplace
 
-Complete guide for publishing your VS Code extension.
+Publisher creation, `vsce` basics and the manifest fields follow the official [Publishing Extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension) guide. This file keeps release gates and verified gotchas.
 
-## Prerequisites
+## Authentication
 
-1. **Publisher account** at [marketplace.visualstudio.com/manage](https://marketplace.visualstudio.com/manage)
-2. **Personal Access Token (PAT)** from Azure DevOps
-3. **vsce CLI** installed: `npm install -g @vscode/vsce`
-
-## Creating a Publisher
-
-1. Go to [marketplace.visualstudio.com/manage](https://marketplace.visualstudio.com/manage)
-2. Sign in with Microsoft account
-3. Click "Create publisher"
-4. Fill in:
-   - **ID**: Unique identifier (used in extension ID)
-   - **Name**: Display name
-   - **Description**: Optional
-
-## Getting Personal Access Token (PAT)
-
-1. Go to [dev.azure.com](https://dev.azure.com)
-2. Sign in → User Settings (top right) → **Personal access tokens**
-3. Click **New Token**
-4. Configure:
-
-- **Name**: "VS Code Marketplace" (or any descriptive name)
-- **Organization**: **All accessible organizations** ← Critical!
+- The CLI package is `@vscode/vsce` (`npx --yes @vscode/vsce ...`); do not use the old unscoped `vsce` package.
+- Global Azure DevOps PATs (organization = **All accessible organizations**, which Marketplace publishing has required) are retired on **2026-12-01**. Re-check the official page before relying on the PAT steps below after that date.
+- For automated publishing, prefer Microsoft Entra ID with a managed identity / workload identity federation: add the identity to the publisher (Contributor) and run `vsce publish --azure-credential` (vsce >= 2.26.1).
+- PAT settings when still used: **All accessible organizations**; **Scopes** → Show all scopes → **Marketplace > Manage** (`Publish` alone may be rejected by some publish API paths even when `verify-pat` succeeds); a 401/403 on publish is usually a single-organization token or a wrong scope.
 - **Expiration**: Pick a real future date such as `1 year`. The `Custom defined` field defaults to today's date in some Azure DevOps UIs, so a token issued without changing it is valid only for the current day — `vsce verify-pat` passes the same day, but `vsce publish` fails with `Access Denied: The Personal Access Token used has expired.` the moment the day rolls over.
-- **Scopes**: Click **Show all scopes** if `Marketplace` is hidden, then under **Marketplace** check **Manage** (preferred — `Publish` alone may be rejected by some publish API paths even when `verify-pat` succeeds)
-
-5. Click **Create** and **copy token immediately** (shown only once)
 
 Before publishing, verify the token against the manifest's publisher from the same terminal session that will run `vsce`:
 
 ```powershell
-npx --yes vsce verify-pat <publisher-id> -p "$env:VSCE_PAT"
+npx --yes @vscode/vsce verify-pat <publisher-id> -p "$env:VSCE_PAT"
 ```
 
 If `verify-pat` fails but `VSCE_PAT` exists in the User environment, reload it into the current process before retrying:
 
 ```powershell
 $env:VSCE_PAT = [System.Environment]::GetEnvironmentVariable("VSCE_PAT", "User")
-npx --yes vsce verify-pat -p "$env:VSCE_PAT"
+npx --yes @vscode/vsce verify-pat <publisher-id> -p "$env:VSCE_PAT"
 ```
-
-If you control the repository workflow, prefer a wrapper script over repeating manual environment-variable recovery steps. A small PowerShell wrapper can validate the current Process `VSCE_PAT` first, automatically fall back to the User-scoped `VSCE_PAT` when VS Code is still holding an expired process value, and then forward `vsce verify-pat`, `vsce show`, or `vsce publish` with the resolved token. This avoids the common failure mode where the User environment is correct but VS Code child processes still inherit a stale token from the older process environment.
 
 Publisher authorization failure is not proof that the token expired. Verify permissions for the intended publisher; switching to another authorized publisher changes the extension ID and requires approval. Then synchronize manifest, activation-test IDs and listing links.
 
@@ -56,16 +32,9 @@ In CI, a nonempty secret is not proof of a valid PAT. Verify publisher authoriza
 ```bash
 # Login (first time or when token expires)
 npx @vscode/vsce login <publisher-id>
-# Paste PAT when prompted
-
-# Verify login
-npx @vscode/vsce ls-publishers
 
 # Verify the PAT used by this terminal before publish
-npx --yes vsce verify-pat -p "$env:VSCE_PAT"
-
-# Publish new version
-npx @vscode/vsce publish
+npx --yes @vscode/vsce verify-pat <publisher-id> -p "$env:VSCE_PAT"
 
 # Publish an already-built VSIX (prevents packaging the wrong artifact)
 npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix
@@ -73,57 +42,15 @@ npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix
 # Resume an explicitly requested publish idempotently, not as a read-only check
 npx @vscode/vsce publish -i ./my-extension-1.0.0.vsix --skip-duplicate
 
-# Publish with version bump
-npx @vscode/vsce publish minor  # 0.1.0 → 0.2.0
-npx @vscode/vsce publish patch  # 0.1.0 → 0.1.1
+# Pre-release channel (same flag for package)
+npx @vscode/vsce publish --pre-release
 ```
 
 > `vsce` option names vary by version. For an existing VSIX, prefer the documented `-i` input option. If syntax must be checked, run help only in a process without `VSCE_PAT`; the help output itself can disclose the effective token, including to private tool logs.
 
-## Pre-publish Checklist
-
-| Item                        | Check                               |
-| --------------------------- | ----------------------------------- |
-| `publisher` in package.json | Matches your publisher ID           |
-| `version`                   | Incremented from previous           |
-| `README.md`                 | Exists (lowercase!) and has content |
-| `LICENSE`                   | Included                            |
-| `icon`                      | 128x128 PNG, path in package.json   |
-| `.vscodeignore`             | Excludes unnecessary files          |
-
-## package.json Requirements
-
-```json
-{
-  "name": "my-extension",
-  "displayName": "My Extension",
-  "description": "Brief description for Marketplace",
-  "version": "1.0.0",
-  "publisher": "your-publisher-id",
-  "icon": "images/icon.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/user/repo"
-  },
-  "categories": ["Other"],
-  "keywords": ["keyword1", "keyword2"]
-}
-```
-
-## Valid Categories
-
-```
-Programming Languages, Snippets, Linters, Themes, Debuggers,
-Formatters, Keymaps, SCM Providers, Other, Extension Packs,
-Language Packs, Data Science, Machine Learning, Visualization,
-Notebooks, Education, Testing, AI, Chat
-```
-
-## Version Constraints
-
-- ✅ Valid: `1.0.0`, `1.2.3`, `0.0.1`
-- ❌ Invalid: `1.0.0-beta.1`, `1.0.0-rc1` (prerelease tags rejected)
-- Use GitHub Releases for beta distribution instead
+- `vsce publish patch|minor|major|<x.y.z>` edits `package.json` and, inside a git repo, also creates a version commit **and tag** via `npm version`. Do not use it when the repository's release flow owns tagging; bump the version yourself and publish the verified VSIX.
+- Versions must be plain `major.minor.patch`; semver pre-release tags (`1.0.0-beta.1`) are rejected. Use `--pre-release` with a distinct version (convention: odd minor for pre-release, even minor for release) and `engines.vscode >= 1.63.0`.
+- Manifest/listing basics: `publisher` matches the publisher ID, `README.md` / `LICENSE` / `CHANGELOG.md` at the root, `icon` is a PNG of at least 128x128 (SVG icons and non-trusted SVG badges/images are rejected), README/CHANGELOG image URLs resolve to `https`, at most 30 `keywords`. See the official manifest reference for valid `categories`.
 
 ## Inspect Package Before Publishing
 
@@ -235,15 +162,7 @@ Require the exact lowercase `<publisher>.<name>@<version>` line. A strong local 
 
 ## Local VSIX Artifact Hygiene
 
-Store generated `.vsix` files under `artifacts/vsix/` rather than the repository root. This keeps the root readable, makes cleanup scriptable, and reduces the chance of attaching or inspecting the wrong local file.
-
-```powershell
-New-Item -ItemType Directory -Force artifacts/vsix | Out-Null
-npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
-npx @vscode/vsce publish -i ./artifacts/vsix/my-extension-1.0.0.vsix
-```
-
-When you keep historical local builds, set a retention rule and prune old archives automatically. Keeping only the latest 10 local VSIX files is usually enough for rollback and spot-checking.
+Store generated `.vsix` files under `artifacts/vsix/` (see SKILL.md) and prune old local builds automatically; keeping the latest 10 is usually enough for rollback and spot-checking.
 
 ```powershell
 $vsixDir = "artifacts/vsix"
@@ -255,62 +174,23 @@ Get-ChildItem $vsixDir -Filter "my-extension-*.vsix" |
 
 If the project ships multiple package variants such as a release VSIX and a dev/coexistence VSIX, keep **all** of them under `artifacts/vsix/` except the one release artifact you intentionally attach. Apply the same hygiene checks to every variant so the smaller test build does not silently diverge from the release payload.
 
-## .vscodeignore
+## Unpublishing and Removal
 
-Minimize package size:
+These are external, hard-to-reverse operations: get explicit user approval first.
 
-```ignore
-**
-!package.json
-!README.md
-!LICENSE
-!CHANGELOG.md
-!out/**
-!images/icon.png
-
-src/**
-test/**
-node_modules/**
-*.ts
-tsconfig*.json
-.github/**
-.vscode/**
-*.vsix
-artifacts/**
-```
-
-## Updating Published Extensions
-
-```bash
-# Increment version and publish
-npx @vscode/vsce publish patch
-
-# Or manually update version first
-npm version patch
-npx @vscode/vsce publish
-```
-
-## Unpublishing
-
-```bash
-# Unpublish specific version
-npx @vscode/vsce unpublish <publisher>.<extension> --version <version>
-
-# Unpublish entire extension (use with caution!)
-npx @vscode/vsce unpublish <publisher>.<extension>
-```
+- Marketplace portal **Unpublish** hides the extension but keeps statistics.
+- `vsce unpublish <publisher>.<extension>` and portal **Remove** delete the extension and its statistics irreversibly; the extension name is permanently reserved and cannot be reused.
+- A specific version can be deleted only from the portal (Reports → Manage → Delete this version). The latest version cannot be deleted, and a deleted version number cannot be reused.
 
 ## Common Errors
 
 | Error                                   | Cause                                                                                                                                                                                                                                                        | Fix                                                                                                                                                                        |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Missing publisher`                     | No publisher in package.json                                                                                                                                                                                                                                 | Add `"publisher": "your-id"`                                                                                                                                               |
-| `Personal Access Token...`              | PAT invalid or expired                                                                                                                                                                                                                                       | Regenerate PAT with correct scopes                                                                                                                                         |
+| `401` / `403` on publish                | PAT bound to one organization instead of All accessible organizations, or scope is not `Marketplace (Manage)`                                                                                                                                                | Reissue the PAT with the correct organization and scope, or move to Entra ID publishing                                                                                    |
 | `Access Denied... PAT used has expired` | The current `VSCE_PAT` value is expired, the open terminal still has an old value, the PAT was issued with `Custom defined` expiration defaulting to today, or the PAT lacks `Marketplace > Manage` scope (so `verify-pat` passes but `publish` is rejected) | Regenerate the PAT with a real future expiration and `Marketplace > Manage` scope, update `VSCE_PAT`, reload the current process, and run `vsce verify-pat` before publish |
-| `version already exists`                | Same version published                                                                                                                                                                                                                                       | Increment version number                                                                                                                                                   |
-| `README not found`                      | File missing or wrong case                                                                                                                                                                                                                                   | Create `README.md` (lowercase)                                                                                                                                             |
-| `invalid prerelease`                    | Version like `1.0.0-beta`                                                                                                                                                                                                                                    | Use standard version format                                                                                                                                                |
-| `unknown option`                        | Local `vsce` version differs                                                                                                                                                                                                                                 | Check `vsce <command> --help` and use supported flags                                                                                                                      |
+| `version already exists`                | Same version published (or a deleted version number)                                                                                                                                                                                                         | Increment version number                                                                                                                                                   |
+| `invalid prerelease`                    | Version like `1.0.0-beta`                                                                                                                                                                                                                                    | Use `major.minor.patch` plus `--pre-release`                                                                                                                               |
+| `unknown option`                        | Local `vsce` version differs                                                                                                                                                                                                                                 | Check `vsce <command> --help` (without `VSCE_PAT` in the process) and use supported flags                                                                                  |
 
 ## Release Completion Contract
 
@@ -379,7 +259,6 @@ Contract passes; do not use duplicate-safe publish as a verification command.
 
 - **Your extensions**: `https://marketplace.visualstudio.com/manage/publishers/<publisher-id>`
 - **Published extension**: `https://marketplace.visualstudio.com/items?itemName=<publisher>.<extension>`
-- **Statistics**: Available in manage portal after publish
 
 ## PAT Security & Persistence
 
@@ -396,10 +275,9 @@ $env:VSCE_PAT = "<your-pat>"
 if ($env:VSCE_PAT) { "present (length: $($env:VSCE_PAT.Length))" } else { "missing" }
 ```
 
-> ⚠️ `SetEnvironmentVariable` does **not** update already-open terminals.
-> Open a new terminal (or restart VS Code) after persisting.
+> ⚠️ `SetEnvironmentVariable` does **not** update already-open terminals or VS Code child processes; reload the value as shown in [Authentication](#authentication).
 
-If a publish command still uses an expired token after you update the User environment, the current terminal probably kept the old process value. Reassign `$env:VSCE_PAT` from the User value in that terminal, then run `verify-pat` again.
+If you control the repository workflow, a small wrapper script can validate the Process `VSCE_PAT`, fall back to the User value when VS Code still holds a stale one, and then forward `verify-pat` / `show` / `publish`.
 
 ### If the PAT was accidentally exposed
 
@@ -453,7 +331,8 @@ images/demo-animated.gif
 ```
 
 > **Tip**: Run `npx @vscode/vsce ls` to preview exactly what will be packaged
-> before running `vsce package` or `vsce publish`.
+> before running `vsce package` or `vsce publish`. Packages listed only in
+> `devDependencies` are excluded automatically.
 
 > **Gotcha**: `vsce ls --packagePath foo.vsix` does not enumerate entries; for
 > packaged VSIX verification (e.g. confirming `node_modules/**` is excluded),
@@ -486,17 +365,17 @@ excluding `node_modules/**`.
 
 ### Marketplace auto-resolves relative-path images
 
-When the README references images by relative path (e.g. `![demo](images/demo.gif)`),
-the Marketplace web view and the in-VS Code extension details pane both resolve
-those paths against `repository.url` in `package.json` and fetch the file from
-`raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>`. So as long as the
-repository is public and the image is pushed to the default branch, you can keep it **out of
-the VSIX** to drop multi-megabyte demo media without breaking the listing.
+When the README references images by relative path (e.g. `![demo](images/demo.gif)`)
+and `repository` points to a public GitHub repository, `vsce` rewrites those paths
+to `raw.githubusercontent.com/<owner>/<repo>/<branch>/<path>` at package time
+(`main` by default; override with `--githubBranch` or `--baseImagesUrl`). So as long
+as the image is pushed to that branch, you can keep it **out of the VSIX** to drop
+multi-megabyte demo media without breaking the listing.
 
-This auto-resolution applies to **images**, not to arbitrary Markdown links. If
-you exclude secondary documents such as `README_ja.md` from the VSIX, link to
-them with an absolute GitHub URL from the primary `README.md` instead of a
-relative Markdown link to a publicly readable document.
+Relative Markdown links are rewritten the same way (`--baseContentUrl`), so they
+only work for readers when the target exists on that public branch. If you exclude
+secondary documents such as `README_ja.md` from the VSIX, prefer an explicit
+absolute GitHub URL from the primary `README.md` to a publicly readable document.
 
 Marketplace publication does not authorize making a private source repository
 public. Private raw GitHub image URLs will not serve anonymous readers: use

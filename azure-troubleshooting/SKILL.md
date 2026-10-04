@@ -47,9 +47,7 @@ Azure の障害調査、切り分け、初動確認、復旧確認を read-only 
 - 現在も障害中か、過去に発生して既に復旧したのかを最初に切り分ける
 - Microsoft / Azure の意味づけは公式 Docs で裏付ける
 - 障害調査レポートは `Troubleshooting/` を正本にし、`Answer/` と重複保存しない
-- Load Balancer 系では Resource Health が復旧済みでも `VipAvailability` と `DipAvailability` を確認する
-- `DipAvailability` の `BackendPort` と `BackendIPAddress` は別次元集計として扱い、直接の 1 台 1 ポート値として書かない
-- VPN Gateway や BGP flap 疑いでは、Activity Log だけで `瞬断なし` と断定せず、RouteDiagnosticLog / TunnelDiagnosticLog / BGP 系メトリクスの有無も確認する
+- Load Balancer は Resource Health 復旧後も `VipAvailability` / `DipAvailability` を確認し、VPN / BGP flap は Activity Log だけで `瞬断なし` と断定しない（詳細は [service-branches.md](references/service-branches.md)）
 - 報告書では「報告書としては」のようなメタ表現を避け、判断文そのものへ落とす
 - 破壊的操作、構成変更、再起動、フェールオーバーはこの skill の範囲外
 

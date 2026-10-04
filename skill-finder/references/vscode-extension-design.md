@@ -4,6 +4,8 @@
 
 Agent Skill の「skill-finder」を VS Code 拡張機能化する設計仕様書。
 
+> 注記 (2026-10 確認): VS Code / Copilot は `.github/skills/`・`.claude/skills/`・`.agents/skills/`（personal は `~/.copilot/skills/` 等）をネイティブに発見し、skill は slash command としても出る。instruction file への登録は必須ではなく、拡張から配布する場合は `contributes.chatSkills` を使う。出典: https://code.visualstudio.com/docs/agent-customization/agent-skills
+
 ## Why Extension?
 
 | 項目             | Agent Skill                          | VS Code 拡張機能             |
@@ -16,19 +18,19 @@ Agent Skill の「skill-finder」を VS Code 拡張機能化する設計仕様�
 
 ## Core Concept
 
-拡張機能が「スキルのインストーラー」兼「Copilot への登録係」になる。
+拡張機能が「スキルのインストーラー」になる。発見は VS Code / Copilot の native skill discovery に任せ、instruction file への登録は任意（legacy 互換）とする。
 
 ```
-ユーザー: "pdf スキル入れて"
+ユーザー: "<skill> スキル入れて"
      ↓
 ┌─────────────────────────────────────────┐
 │  VS Code 拡張機能                        │
-│  1. skill-index.json から pdf を検索     │
-│  2. GitHub から .github/skills/pdf/ DL   │
-│  3. instruction file にスキル参照を追加   │
+│  1. skill-index.json から <skill> を検索 │
+│  2. GitHub から skills/<skill>/ を DL    │
+│  3. .github/skills/<skill>/ へ配置       │
 └─────────────────────────────────────────┘
      ↓
-Copilot: agents.md 読む → pdf スキル認識 → 使える！
+Copilot: native discovery で SKILL.md を認識 → slash command としても使える
 ```
 
 ---
@@ -40,7 +42,7 @@ Copilot: agents.md 読む → pdf スキル認識 → 使える！
 - [ ] QuickPick 検索
 - [ ] skill-index.json プレインストール
 - [ ] .github/skills/ へインストール
-- [ ] instruction file へ自動登録
+- [ ] （任意・legacy）instruction file への登録。native discovery では不要
 
 ### Phase 2: UX 改善
 
@@ -83,46 +85,46 @@ skill-finder-vscode/
 {
   "skillFinder.instructionFile": {
     "type": "string",
-    "default": ".github/agents.md",
+    "default": "AGENTS.md",
     "enum": [
-      ".github/agents.md",
+      "AGENTS.md",
       ".github/copilot-instructions.md",
-      ".claude/CLAUDE.md",
-      "custom"
+      "CLAUDE.md",
+      "custom",
     ],
     "enumDescriptions": [
-      "GitHub Copilot Agents (default)",
+      "AGENTS.md (default)",
       "GitHub Copilot Instructions",
       "Claude Code",
-      "Specify custom path"
+      "Specify custom path",
     ],
-    "description": "File to register installed skills"
+    "description": "File to register installed skills (optional; native discovery does not need it)",
   },
   "skillFinder.customInstructionPath": {
     "type": "string",
     "default": "",
-    "description": "Custom path when 'custom' is selected"
+    "description": "Custom path when 'custom' is selected",
   },
   "skillFinder.skillsDirectory": {
     "type": "string",
     "default": ".github/skills",
-    "description": "Directory to install skills"
+    "description": "Directory to install skills",
   },
   "skillFinder.autoUpdateInstruction": {
     "type": "boolean",
-    "default": true,
-    "description": "Automatically update instruction file on install/uninstall"
+    "default": false,
+    "description": "Automatically update instruction file on install/uninstall",
   },
   "skillFinder.autoCheckUpdates": {
     "type": "boolean",
     "default": true,
-    "description": "Check for index updates on startup"
+    "description": "Check for index updates on startup",
   },
   "skillFinder.updateCheckInterval": {
     "type": "number",
     "default": 7,
-    "description": "Days between update checks"
-  }
+    "description": "Days between update checks",
+  },
 }
 ```
 
@@ -163,8 +165,8 @@ skill-finder-vscode/
 
 The following skills are available in this workspace.
 
-- [pdf](.github/skills/pdf/SKILL.md) - PDF processing and manipulation
-- [docx](.github/skills/docx/SKILL.md) - Word document handling
+- [skill-a](.github/skills/skill-a/SKILL.md) - Example skill A
+- [skill-b](.github/skills/skill-b/SKILL.md) - Example skill B
 
 <!-- SKILL-FINDER-END -->
 
@@ -180,11 +182,11 @@ The following skills are available in this workspace.
 
 ### Active
 
-- [pdf](.github/skills/pdf/SKILL.md) - PDF processing
+- [skill-a](.github/skills/skill-a/SKILL.md) - Example skill A
 
 ### Disabled
 
-<!-- - [docx](.github/skills/docx/SKILL.md) - Word documents -->
+<!-- - [skill-b](.github/skills/skill-b/SKILL.md) - Example skill B -->
 
 <!-- SKILL-FINDER-END -->
 ```
@@ -244,12 +246,11 @@ interface UserData {
 
 ## Agent Compatibility Matrix
 
-| Agent                | Instruction File                  | Skills Directory  |
-| -------------------- | --------------------------------- | ----------------- |
-| **Copilot**          | `.github/agents.md`               | `.github/skills/` |
-| **Copilot (legacy)** | `.github/copilot-instructions.md` | `.github/skills/` |
-| **Claude Code**      | `.claude/CLAUDE.md`               | `.claude/skills/` |
-| **Custom**           | User-defined                      | User-defined      |
+| Agent           | Instruction File                                            | Skills Directory                                        |
+| --------------- | ----------------------------------------------------------- | ------------------------------------------------------- |
+| **Copilot**     | `AGENTS.md` or `.github/copilot-instructions.md` (optional) | `.github/skills/`, `.claude/skills/`, `.agents/skills/` |
+| **Claude Code** | `CLAUDE.md` / `.claude/CLAUDE.md` (optional)                | `.claude/skills/`                                       |
+| **Custom**      | User-defined                                                | User-defined                                            |
 
 ---
 
@@ -285,9 +286,3 @@ interface UserData {
 - `vscode.workspace.fs` - ファイル操作
 - `vscode.ExtensionContext.globalStorageUri` - ユーザーデータ保存
 - `vscode.workspace.getConfiguration()` - 設定取得
-
----
-
-## Author
-
-yamapan (https://github.com/aktsmm)

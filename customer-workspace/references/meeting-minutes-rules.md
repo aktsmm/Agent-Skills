@@ -4,20 +4,7 @@
 
 ## 処理フロー
 
-```mermaid
-graph TD
-    A[ユーザー入力] --> B{日付指定あり?}
-    B -->|あり| C[指定日付を使用]
-    B -->|なし| D[今日の日付を取得]
-    C --> E{同日の meeting note あり?}
-    D --> E
-    E -->|なし| F[テンプレートから新規ファイル作成]
-    E -->|あり| G[既存ファイルを更新]
-    F --> G
-    G --> H[Teams AI議事録をパース]
-    H --> I[テンプレート形式に変換]
-    I --> J[meeting-notes/ へ保存]
-```
+日付指定がなければ今日の日付を取得する。同日の meeting note があれば更新し、なければテンプレートから作成してから、入力をパースして `meeting-notes/` に保存する。
 
 ## 検出パターン
 
@@ -45,7 +32,7 @@ graph TD
 | 担当者が自社名             | 自社 持ち帰り                |
 | 担当者がお客様名           | お客様 持ち帰り              |
 
-「自社 / お客様」の振り分けは、`_customer/profile.md` の **「自社チーム」 セクション** を SSOT として参照する。表にない名前が出てきたら推測せずユーザーに確認し、確定後に profile へ追記してから議事録を仕上げる。フル名だけでなく姓のみ・ニックネーム（やまぱん など）も取りこぼさない。
+「自社 / お客様」の振り分けは、`_customer/profile.md` の **「自社チーム」 セクション** を SSOT として参照する。表にない名前が出てきたら推測せずユーザーに確認し、確定後に profile へ追記してから議事録を仕上げる。フル名だけでなく姓のみ・ニックネーム（`<nickname>` など）も取りこぼさない。
 
 会議中に共有された顧客の組織体制、ベンダー体制、ライセンス規模などの基礎情報は、議事録本文に埋めず `_customer/profile.md` へ転記する。転記時は、出典（どの画面・資料か）、**資料自身の as-of 日付**、未検証である旨、証跡画像への相対リンクを併記する。会議日と資料の日付は一致しないことが多く、会議日で保存すると古い体制を最新として扱う事故になる。読み取りベースの氏名・役職は `要確認` を残し、潰れた文字を推測で確定しない。
 
@@ -87,15 +74,16 @@ graph TD
 
 ルール:
 
-- 共有用は断定・合意済み・実他既事だけで埋める。内部推測や `要確認` は入れない。
+- 共有用は確定・合意済み・実施済みの事項だけで埋める。内部推測や `要確認` は入れない。
 - 内部ファイルパス、`_customer/`, `_meetings/`, `next-actions/` などのワークスペース内リンクは含めない。
-- **担当者の名前表記は `会社名 (姓)` 形式を默認にする** (例: `Microsoft (山本)`, `パートナー名 (沼尻)`)。内部 handle / first name (`Tatsumi`, `yamapan`) やエンゲージメント内の肊書き (`Azure CSA`, `M365 CSA`) は顧客共有ブロックに入れない。顧客側は「さん / 様」付けを保持する。
-- 同日付される議題や未合意項は共有用にを入れない (社内メモに残す)。
+- **担当者の名前表記は `会社名 (姓)` 形式を既定にする** (例: `Microsoft (山田)`, `パートナー名 (鈴木)`)。内部 handle / first name (`<first-name>`, `<handle>`) やエンゲージメント内の肩書き (`Azure CSA`, `M365 CSA`) は顧客共有ブロックに入れない。顧客側は「さん / 様」付けを保持する。
+- 当日結論が出なかった議題や未合意事項は共有用に入れない (社内メモに残す)。
 - Tier / 契約時間 / SKU / 有償メニュー構成 / 工数消化などの商流・契約条件は Internal として扱い、共有用ブロックにも共有用テーブルにも入れない。台帳は `_customer/profile.md` に内部限定で持つ。
 
 ## 品質ゲート
 
-- 人名、時刻、製品名、モデル名、価格、サポート境界などが文字起こし由来で怪しい場合は、本文で断定せず `要確認` に残す。- 音声書き起こしは、短い技術略語 / 時間単位 / エンゲージメント名 / 固有名詞を特に聞き違える。例: `2H` が `EDE (Enhanced Delivery Engagement) 時間`、`SES` が `CES` / `SES`、`Entra ID` が `エントラID` になるなど。文脈と合わない短いトークンは推測で確定せず、ユーザーに確認するか `要確認` で残す。
+- 人名、時刻、製品名、モデル名、価格、サポート境界などが文字起こし由来で怪しい場合は、本文で断定せず `要確認` に残す。
+- 音声書き起こしは、短い技術略語 / 時間単位 / エンゲージメント名 / 固有名詞を特に聞き違える。例: `2H` が `EDE (Enhanced Delivery Engagement) 時間`、`SES` が `CES` / `SES`、`Entra ID` が `エントラID` になるなど。文脈と合わない短いトークンは推測で確定せず、ユーザーに確認するか `要確認` で残す。
 - Cross-check AI follow-ups against the available transcript and record its coverage range. Keep unsupported owners, deadlines, and deliverables provisional; do not treat a partial transcript as full-meeting verification or internal proposals as customer-agreed homework.
 - Exclude credentials and token-bearing image URLs from saved source text; note the omission without reproducing sensitive values. Preserve ordinary meeting links under the record's sharing boundary.
 - 未回答事項、宿題、次回確認事項は `_questions/{YYYY-MM}.md` にも抽出する。
@@ -113,17 +101,12 @@ graph TD
 
 ## 汎用知見の抽出（opt-in）
 
-- 会議ログから得た再利用可能な判断基準、Gotcha、設計パターン、検証観点は、ユーザーが明示したときだけ `_knowledge/` に抽出する。
-- `_knowledge/` には短い一般化済みの知見だけを書く。長文分析や詳細レポートは `research-reports/` に置き、必要なら `_knowledge/` からリンクする。
-- 顧客名、人物名、チケットID、ローカルパス、未公開情報、内部限定スコアは入れない。抽象化できない内容は `_knowledge/` に入れない。
-- Microsoft 製品仕様、価格、課金、サポート境界、ロードマップは、公式URLで確認済みでなければ `official confirmation: required` と明記する。
+ユーザーが明示したときだけ `_knowledge/` に抽出し、[Knowledge Ledger Rules](knowledge-ledger-rules.md) に従う。
 
 ## 会議中の画像・スクリーンショット
 
-- 会議中に画像やスクリーンショットが貼られたら、チャット内だけで終わらせず会議素材として保存する。
-- 顧客・相手から受領した原本は `_received/mtg-YYYY-MM-DD-name/images/`、内部調査用スクショは `_working/mtg-YYYY-MM-DD-name/screenshots/`、顧客共有用に加工した画像は `_provided/mtg-YYYY-MM-DD-name/` に置く。
+- 会議中に貼られた画像やスクリーンショットは、チャット内だけで終わらせず会議素材として保存する（受領原本 `_received/mtg-YYYY-MM-DD-name/images/`、内部スクショ `_working/mtg-YYYY-MM-DD-name/screenshots/`、共有用加工 `_provided/mtg-YYYY-MM-DD-name/`）。`attachments.md` は [Customer Material Lifecycle](material-lifecycle.md) に従う。
 - ファイル名は `YYYY-MM-DD_topic_kind-NN.ext` を基本にする。例: `2026-07-02_sr-review_screenshot-01.png`。
-- 必要に応じて同じ素材フォルダに `attachments.md` を置き、出どころ、感度、説明、関連する議事録やレポートを記録する。
 
 ## ファイル確認と連携判定
 

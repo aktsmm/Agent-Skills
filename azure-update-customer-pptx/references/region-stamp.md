@@ -34,7 +34,8 @@ Use text as the primary signal; do not rely on small check/cross marks or color 
 | Offer Availability (purchasable countries) | where you can buy/contract the service  | ❌ never         |
 | Deploy Region                              | where the resource is actually deployed | ✅ judge by this |
 
-Watch: Azure AI Foundry / Azure OpenAI (judge by Hub/Project deploy region), Marketplace services
+Watch: Microsoft Foundry (formerly Azure AI Foundry) / Azure OpenAI (judge by the Foundry resource /
+project deploy region; hub-based projects are Foundry (classic)), Marketplace services
 (availability ≠ deploy region), Global Standard deployments (broad offer, limited deploy), Hybrid /
 migration management services (check data path & target constraints if the resource region is only
 control/metadata).
@@ -157,3 +158,13 @@ Optional display fields: `displayHeadline`, `displayDetail`. Require both plus a
 11. Region-expansion updates ("GA in {region}") stamped 日本リージョン未対応 read as "the service is unavailable in Japan". State in `evidence` that only this update's target regions exclude Japan and the service itself already ships there.
 12. Per-feature region matrices can split within one service (Azure Databricks `feature-region-support`: `japaneast` ✓ / `japanwest` blank for Unity AI Gateway and Lakeflow Connect managed connectors). Read the exact feature column, not the service row.
 13. `verified` / `source` / `evidence` gates are presence checks only, so a green gate never proves semantic verification. Keep the per-item judgement inputs in an authored map (`status` + `source` + `evidence` per update id) and generate `region_info_reviewed.json` from it; a status-only map forces generic evidence text that hides guesses.
+
+## Japan Region Rendering Flow
+
+Moved from SKILL.md "Japan Region Rendering (可視スライド)".
+
+### 判定フロー（必須）
+
+1. クライアント／IDE／CLI／SDKなどリージョン非依存のものはグローバルとして扱う。
+2. 公式Docsにdeploy regionの表・列挙があれば、Japan East / Westの有無と近隣regionを確認する。
+3. 表がない判定はoverview / reliability / whats-new / regionsのうち最低2種類を確認してから行う。

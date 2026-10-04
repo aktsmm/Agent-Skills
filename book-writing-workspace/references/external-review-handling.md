@@ -116,7 +116,7 @@ Decide the axes once and reply in bulk. Two axes that hold up in practice: wheth
 
 Reviewers quote whatever page they landed on. Official documentation contradicts itself more often than expected, so find the source of truth before deciding.
 
-1. Prefer the page that exists to define the thing over the page that mentions it in passing. A per-role permission matrix outranks a one-line "who can use this feature" note in a how-to page.
+1. Match each source's conditions to its product, feature subtype, client surface, and version; do not extend a subset's limits to the whole product. Prefer the page that exists to define the thing over the page that mentions it in passing. A per-role permission matrix outranks a one-line "who can use this feature" note in a how-to page. If observed controls conflict with an overview, inspect that surface's dedicated how-to before ruling.
 2. Go under the rendered page. Docs sites are generated; the same table often lives in a data file that several pages include. Reading that file removes ambiguity about which page is stale.
 3. Extract structured content mechanically instead of reading it. Check marks and matrix cells are rendered as icons with accessibility labels, so pull the labels rather than eyeballing the table.
 4. Date the conflicting statements. Line-level history tells you which wording has been maintained and which has sat untouched since a beta launch.
@@ -160,15 +160,11 @@ Pick the surviving form from an external orthography standard first and manuscri
 
 ## Applying fixes without breaking aligned tables
 
-Manuscripts with mixed-width text keep Markdown tables padded to a common column width. Editing one cell silently breaks the alignment, and hand-counting spaces fails repeatedly on wide characters.
-
-Compute display width instead: wide characters count as two columns, everything else as one. Then take the widest cell per column and repad every row, including the separator. Verify by comparing total row widths, which must all be equal.
-
-Recompute after every edit pass. Shortening the longest cell shrinks the whole column, so rows that were correct before the edit become wrong.
+Padded Markdown tables with mixed-width text break when one cell changes, and hand-counting spaces fails on wide characters. Compute display width (wide characters = 2 columns), repad every row including the separator to the widest cell per column, and verify that all row widths are equal. Recompute after every edit pass, because shortening the longest cell shrinks the whole column.
 
 ## Close the loop
 
-Reply, then close. An issue that was fixed but left open reads as ignored, and the reviewer has no way to tell the difference.
+Reply, then close; a fixed-but-open issue reads as ignored.
 
 Before closing, regenerate affected question digests and counts and run the manuscript gates. A reference URL change must preserve support for the answer and use a reachable, specific source. Compare each question's reference format separately from the chapter's supplementary reference heading when aligning books. If an explicitly requested source triggers a duplicate limit, report that conflict; do not substitute a weaker source or relax the gate merely to pass.
 

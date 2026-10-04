@@ -24,9 +24,7 @@ This memo format is optimized for Japanese sole-proprietor or side-business expe
 
 ## Cash Withdrawals
 
-- Personal cash withdrawn from a bank account recorded as business `普通預金` is `事業主貸`, not `対象外`. Record the source account and `借方: 事業主貸 / 貸方: 普通預金` in the notes.
-- Do not create a bookkeeping entry for a withdrawal from an unbooked personal account; retain it as `対象外` only when the evidence is useful.
-- Ask before updating the memo when the withdrawal's source account or use is unclear.
+- Classify per [filename-rules.md](filename-rules.md#cash-withdrawal-classification). In the memo notes, record the source account and the journal entry (e.g. `借方: 事業主貸 / 貸方: 普通預金`).
 
 ## Personal Funding and Advance Payments
 

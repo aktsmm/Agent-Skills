@@ -52,7 +52,7 @@ Lane が全消化 (10 個全部 skip か完了) されたら:
 
 ## Blocker Test (Genuine Blocker Gate)
 
-Task が failed / stall した瞬間に blocker 認定せず、以下 4 問 gate を通す (goal-loop 由来):
+Task が failed / stall した瞬間に blocker 認定せず、以下 4 問 gate を通す:
 
 1. 外部 signal (verify 出力、test 結果、real-world response) で失敗を確認したか
 2. Persistence profile 相当の **異なる approach** を N 個試したか (Standard=4 / Persistent=6 / Exhaustive=8)

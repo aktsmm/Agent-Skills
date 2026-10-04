@@ -1,6 +1,6 @@
 ---
 name: receipt-tax-ocr
-description: "Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos. Use for 領収書, レシート, receipt, OCR, リネーム, 確定申告, 勘定科目, 経費, subscription receipts, or payment-method change history. For company/D365 travel expenses, use receipt-expense-workflow."
+description: "Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos. Use for 領収書, レシート, receipt, OCR, リネーム, 確定申告, 勘定科目, 経費, subscription receipts, or payment-method change history. Not for company/D365 travel expense claims."
 argument-hint: "Receipt files or service, period, payment-method change, and save scope"
 user-invocable: true
 license: CC BY-NC-SA 4.0

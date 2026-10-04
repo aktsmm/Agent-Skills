@@ -12,7 +12,7 @@ Create the standard workspace folders: `ActivityReport/`, `Customers/`, `Tasks/`
 
 ## Phase 3: Agents and Prompts
 
-Deploy the orchestrator, report, task, data, 1on1, availability, customer-health, and proposal agents. Deploy daily, weekly, monthly, and operations prompts when the workspace uses them.
+Deploy the bundled agents from `assets/agents/` (orchestrator, report-generator, report-reviewer, task-manager, data-collector, work-inventory, 1on1-assistant, availability-finder, general-worker) and the daily, weekly, monthly, and review-report prompts from `assets/prompts/`. Prompt files load only in the VS Code Local agent, so keep the matching agents usable on their own.
 
 ## Phase 4: Customer Workspaces
 

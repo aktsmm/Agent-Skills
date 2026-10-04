@@ -45,7 +45,7 @@ npm init -y && npm install -D typescript @types/vscode
 
 ```
 my-extension/
-├── package.json          # Extension manifest (CRITICAL)
+├── package.json          # Extension manifest
 ├── src/extension.ts      # Entry point
 ├── out/                  # Compiled JS (gitignore)
 ├── artifacts/vsix/       # Keep local VSIX archives out of the repo root
@@ -74,11 +74,11 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 ## Quick Troubleshooting
 
-| Symptom               | Fix                                    |
-| --------------------- | -------------------------------------- |
-| Extension not loading | Add `activationEvents` to package.json |
-| Command not found     | Match command ID in package.json/code  |
-| Shortcut not working  | Remove `when` clause, check conflicts  |
+| Symptom               | Fix                                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Extension not loading | Check `main`/`engines.vscode`; contributed commands/views activate implicitly (1.74+), add `activationEvents` only for other triggers |
+| Command not found     | Match command ID in package.json/code                                                                                                 |
+| Shortcut not working  | Remove `when` clause, check conflicts                                                                                                 |
 
 ## Reference Map
 
@@ -92,7 +92,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 | Testing             | [references/testing.md](references/testing.md)                                                                      |
 | Publishing          | [references/publishing.md](references/publishing.md)                                                                |
 | Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)                                                      |
-| Notifications       | [references/notification-normalization.md](references/notification-normalization.md)                               |
+| Notifications       | [references/notification-normalization.md](references/notification-normalization.md)                                |
 
 ## Best Practices
 

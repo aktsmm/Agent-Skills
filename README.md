@@ -45,7 +45,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [goal-loop](goal-loop/) | Run an explicit end-to-end goal loop with frozen Scope/criteria, worker delegation, external verification, evaluator review, and bounded retries |
 | [humanize-writing](humanize-writing/) | Remove AI-generated tone and make writing sound more human in Japanese and English |
 | [local-media-transcription](local-media-transcription/) | Transcribe local MP4/M4A/MP3/WAV/WEBM audio or video with ffmpeg and Whisper, then optionally produce diarized transcripts, customer-facing meeting minutes, action items, and PP... |
-| [microsoft-graph-gateway](microsoft-graph-gateway/) | Route Microsoft Graph work in this workspace |
+| [microsoft-graph-gateway](microsoft-graph-gateway/) | Route Microsoft Graph work from VS Code |
 | [ocr-super-surya](ocr-super-surya/) | GPU-optimized OCR using Surya |
 | [opportunity-factory](opportunity-factory/) | Run a reusable opportunity-to-artifact workflow: discover unmet needs, set up workspace factories, schedule recurring commander/worker/reporter prompts, batch-refine many items,... |
 | [packet-capture-analysis](packet-capture-analysis/) | Use when analyzing pcap or pcapng files, triaging network captures, labeling IPs with evidence, generating PNG charts, or writing packet analysis reports. Keywords: pcap, pcapng... |
@@ -57,9 +57,9 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [receipt-expense-workflow](receipt-expense-workflow/) | Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment |
 | [receipt-tax-ocr](receipt-tax-ocr/) | Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
-| [retro-copilot](retro-copilot/) | Run a retro for ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks |
-| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push |
-| [retro-workspace](retro-workspace/) | Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks) |
+| [retro-copilot](retro-copilot/) | Run a retro for personal global ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Not for workspace/r... |
+| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for ~/.copilot personal assets, VS Code User Dat... |
+| [retro-workspace](retro-workspace/) | Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Not for ~/.copilot personal assets,... |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
 | [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree |
 | [session-handoff](session-handoff/) | Create a compact handoff note so a new chat/session can first acknowledge the current state before work resumes |

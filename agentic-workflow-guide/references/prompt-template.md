@@ -46,7 +46,7 @@ Use a minimal, high-signal prompt structure. Keep only what the task needs.
 - **Examples**: 1-3 representative examples are more effective than lengthy explanations
 - **Validation**: Define measurable success criteria upfront
 - **Escape Hatch**: Prevent hallucination by providing explicit fallback behavior
-- **description (REQUIRED)**: Every `.prompt.md` must have a `description` in YAML frontmatter — it appears in the VS Code prompt picker UI and helps both humans and AI identify the prompt's purpose
+- **description (always include)**: VS Code treats it as optional, but it is what the prompt picker shows and how humans and AI identify the prompt's purpose
 
 ```yaml
 ---
@@ -63,13 +63,13 @@ VS Code validates frontmatter strictly. Only use supported fields — unsupporte
 - When possible, verify support mechanically with the local validator or current product docs instead of assuming one repo's convention is authoritative.
 
 - The opening `---` must be the very first bytes in the file. Any stray characters or BOM-like garbage before it can prevent the prompt from being discovered in the slash prompt picker.
-- `agent` is optional for `.prompt.md`. If omitted, VS Code uses the current agent/mode. Use `agent: agent` when a prompt must consistently run in Agent mode, or `agent: <custom-agent-name>` when it should bind to a specific custom agent. Use `agent: ask` or `agent: plan` only when the prompt should avoid autonomous edit/execute behavior.
+- `agent` is optional for `.prompt.md`. If omitted, VS Code uses the current agent (or `agent` when `tools` is set). Values: `ask`, `agent`, `plan`, or a custom agent name. Use `agent: ask` or `agent: plan` only when the prompt should avoid autonomous edit/execute behavior.
 
 | File type          | Supported fields                                                  | Notes                                                       |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `.prompt.md`       | `agent`, `argument-hint`, `description`, `model`, `name`, `tools` | `author`, `copyright`, `license` etc. are **NOT** supported |
-| `.instructions.md` | `applyTo`                                                         | All other fields are **NOT** supported                      |
-| `.skill.md`        | `name`, `description`, `license`, `metadata`                      | Supports nested `metadata:` block                           |
+| `.instructions.md` | `name`, `description`, `applyTo`                                  | All other fields are **NOT** supported                      |
+| `SKILL.md`         | `name`, `description`, `license`, `metadata`                      | Supports nested `metadata:` block                           |
 
 ### Recommended `.prompt.md` frontmatter shapes
 
@@ -111,10 +111,10 @@ Use `agent:` only when the prompt should consistently route through a specific b
 
 Both `agent` and `tools` are **restrictive** by default. Specifying them narrows what the prompt can do.
 
-| Field   | Effect when present                                         | Effect when absent                              |
-| ------- | ----------------------------------------------------------- | ----------------------------------------------- |
-| `agent` | Routes execution through that built-in mode or custom agent | Uses the current agent/mode                     |
-| `tools` | **Only** listed tools are available during execution        | All tools the selected/current agent can access |
+| Field   | Effect when present                                    | Effect when absent                              |
+| ------- | ------------------------------------------------------ | ----------------------------------------------- |
+| `agent` | Routes execution through that built-in or custom agent | Current agent (`agent` if `tools` is set)       |
+| `tools` | **Only** listed tools are available during execution   | All tools the selected/current agent can access |
 
 **Design rule**: Use these fields only when you want to _restrict_, not to _describe_.
 
@@ -128,7 +128,7 @@ In VS Code, prompt-level `tools:` can also surface as a current-chat-session-onl
 
 ### Tool priority
 
-When both a prompt and a referenced custom agent define tools, the prompt-level tool configuration wins.
+With the Local agent, the priority is prompt file tools > referenced custom agent tools > the selected agent's default tools. Agent Host sessions do not load prompt files.
 
 Use that sparingly. If the prompt always needs a narrower tool set than the agent, it may be a sign that the agent boundary is wrong.
 
@@ -146,11 +146,11 @@ description: "What this prompt does"
 <!-- copyright: Copyright (c) 2025 yourname -->
 ```
 
-If a prompt does not need a specific sub-agent binding, omit `agent` entirely and keep the frontmatter minimal.
-
 ## Prompt vs Skill vs Agent
 
-Use a prompt when the task is a single focused request with parameterized input.
+> **Deprecation**: Prompt files are not loaded by Agent Host sessions (e.g. Copilot) and work only with the Local agent, which is planned for removal. For new reusable slash workflows that must run in Agent Host, use an agent skill (skills also appear as slash commands; VS Code offers prompt → skill migration).
+
+Use a prompt when the task is a single focused request with parameterized input and Local-only use is acceptable.
 
 | Need                                    | Best fit |
 | --------------------------------------- | -------- |

@@ -41,7 +41,7 @@ metadata:
 PowerShell 7 (`pwsh`) で実行する。
 
 ```powershell
-$script = '.github/skills/teams-desktop-automation/scripts/Set-TeamsDesktopDraft.ps1'
+$script = '<skill-dir>/scripts/Set-TeamsDesktopDraft.ps1'
 
 & $script -Mode Open `
   -RecipientDisplayName '<display-name>' `
@@ -71,7 +71,7 @@ $script = '.github/skills/teams-desktop-automation/scripts/Set-TeamsDesktopDraft
 ## Validation
 
 ```powershell
-& .github/skills/teams-desktop-automation/scripts/Test-TeamsDesktopDraft.ps1
+& <skill-dir>/scripts/Test-TeamsDesktopDraft.ps1
 ```
 
 実機テストは既存チャットを壊さないよう、`Inspect` を先に実行する。`Draft` は実際にユーザーへ見せる本文が確定している場合だけ使う。

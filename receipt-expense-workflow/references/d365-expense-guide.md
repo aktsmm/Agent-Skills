@@ -48,7 +48,7 @@ Receipt OCR Sorter でリネームしたファイルを D365 Finance Expense Rep
 
 ## Create Expense Report
 
-Open expenses から新規 report を作る場合は、対象行だけを選択し、ダイアログで `Expenses = Add selected (N)` と `Receipts = Add none` を確認してから `Create` する。`Receipts = Add all` が既定で選ばれることがあり、古い未紐付け receipt を report-level に混入させる原因になる。
+Open expenses から新規 report を作る場合は、対象行だけを選択し、ダイアログで `Expenses = Add selected (N)` と `Receipts = Add none` を確認してから `Create` する。`Receipts = Add all` が既定で選ばれることがあり、古い未紐付け receipt を report-level に混入させる原因になる。行 checkbox の連続クリックで選択数がずれることがあるため、`Add selected (N)` の N も対象行数と照合する。
 
 新規 report 作成ダイアログでは、`Create` 前に prefilled の approver / Cost Center / Internal Order と、提案する report title / business purpose をユーザーへ一度だけ提示して確認する。明示確認または修正反映が終わるまで report を作成しない。
 
@@ -64,7 +64,7 @@ Open expenses から新規 report を作る場合は、対象行だけを選択�
 4. `Description of Business Purpose` は出張や費用発生の目的を短く書く
 5. `OK` 後、header 表示で title / business purpose が変わったことを確認する
 
-Report metadata は line description や OCR ファイル名とは別の要約。固有名詞や実態はユーザー提供値を正とし、曖昧なら保存前に確認する。
+Report metadata は line description や OCR ファイル名とは別の要約。
 
 ## Imported Corporate Card Lines
 
@@ -73,6 +73,14 @@ Corporate card / AMEX 由来の未添付 expense がある場合は、新規 out
 - Exact amount + exact date が一致する imported card line は、report に追加して receipt を紐付ける
 - 近い候補（例: 数日差、同額、同 merchant）は、勝手に採用せず候補としてユーザーへ確認する
 - imported card line の amount / date / merchant / payment method は変更しない
+
+## Card Statement Reconciliation
+
+- 予約系（スマートEX、宿泊予約サイト）は利用日ではなく予約・変更・払戻の操作日に決済される。D365 の日付でなく、領収書の乗車日・宿泊日で出張へ割り当てる
+- スマートEX の予約変更は「購入 → 取消（マイナス）→ 再購入」の別取引になる。ご利用履歴の折り畳みを展開し、お預かり番号単位で D365 の件数・金額と突合する。件数が合わないときは、変更時の決済カード切替や一部の私用カード決済を疑う
+- 日本の Amex 法人カードは、スマートEX 上の取扱カード会社が「ＪＣＢ」と表示されることがある。カード名ではなく金額と操作日で突合する
+- スマートEX の「EXご利用票」は領収書ではない。Web 領収書を宛名入り（入力欄は1つ目だけ埋める。2つ目も埋めると宛名が二重に印字される）で「印刷」レイアウトから PDF 化する
+- 法人カードで決済した私費は、カテゴリを `Personal Expenses` にして単独レポートにする。このカテゴリでは右ペインの Country/region が非表示のまま必須エラーになるため、先に別カテゴリで JPN / 2J を保存してから切り替える。「Policy information only」は個人負担の告知なので正常
 
 ## Hotel Itemization
 
@@ -93,6 +101,8 @@ Corporate card / AMEX 由来の未添付 expense がある場合は、新規 out
 5. Expense lines に戻り、その行の `Receipts attached = Yes` を確認する
 
 Upload 後は toast だけで成功扱いにしない。`Receipts -> Edit` の一覧に表示される `File name` が対象ファイルであること、かつ grid の対象行が `Receipts attached = Yes` になったことを確認する。
+
+ファイルは `Browse` のファイル選択ダイアログ経由で渡す。hidden input への直接セットは D365 側がファイルを認識しない。
 
 ### Line-Level Receipt Matching
 
@@ -151,6 +161,13 @@ attachment statusが曖昧、または1つのreceiptを複数lineで共有して
 
 カテゴリ選択では、まず過去 report の同 vendor / 同用途の category を優先する。履歴がない場合だけ標準マッピングを使う。Dropdown は先頭候補に飛びつかず、候補一覧を一度確認してから選ぶ。
 
+### Category Input Gotchas
+
+- 右ペインの行編集ボタン（controlname `EditExpense`）で Edit expense を開く。汎用の `Edit` ボタンの先頭は Bulk edit を開くことがある
+- Category は Ctrl+A → Delete → 入力 → Alt+ArrowDown → Enter で選ぶ。fill だけだと既存値に追記される
+- カテゴリ変更で form が再描画され、Notes が消えたり form が自動で閉じたりする。カテゴリだけ form で変え、Description / Country/region / 税グループは右ペインで入力して `Save and continue` し、保存後の値を読み戻す
+- 必須エラーが出ている行では Edit expense form が開かない。右ペインで埋めてから保存する
+
 ### Required Line Fields
 
 Expense line は1行単位で、以下を全部そろえてから保存する。部分保存や高速連続操作は、validation や別フィールドへの誤入力を起こしやすい。
@@ -198,7 +215,7 @@ Node.js 18+ と Playwright を利用できる環境では、bundle済みchecker�
 
 ```powershell
 $env:D365_CDP_URL = 'http://localhost:9222' # 既定値。必要な場合だけ変更
-node scripts/inspect-d365-expense.mjs --report <REPORT_NUMBER>
+node <skill-dir>/scripts/inspect-d365-expense.mjs --report <REPORT_NUMBER>
 ```
 
 出力はreport status、全lineのcategory / amount / receipt / policy、全receipt cardのfile name / attachment status / 選択状態、重複候補を含む。`safeDuplicateCandidates` は正規のattached cardと完全同名かつstatus空のcardだけ、旧名などは `reviewCandidates` として分離する。checkerは画面遷移とtab切替以外の書き込みを行わず、候補を自動削除しない。
@@ -221,8 +238,16 @@ D365 のブラウザ操作は MCP Playwright tools (`browser_type` / `browser_cl
 
 - checkbox 選択と右ペインの active row は別物。編集前に Amount / Merchant / date-category が対象行と一致することを screenshot または DOM で確認する
 - `fastEditRailsMode`、`ShellBlockingDiv`、`Your last action is still being worked on` が見える間は次の操作へ進まない。Wait / overlay 消失 / 値反映を確認する
-- 右ペインの receipt summary は stale になり得る。line-level の証跡検証は Expense lines の `Receipts attached`、必要なら該当行の Receipts Edit の file name で確認する
-- receipt 差し替え後の正本確認は、右ペイン summary ではなく該当行の `Receipts` -> `Edit` に表示される `File name` で行う。summary が前行や古い添付を表示することがある
+- 右ペインの receipt summary は前行や古い添付を表示することがある。添付・差し替え後の正本確認は Expense lines の `Receipts attached` と、該当行の `Receipts` -> `Edit` に表示される `File name` で行う
 - Document Type は既存 receipt 一覧で編集できないことがある。画像 receipt はアップロード時に `Image` を選択するのが望ましいが、D365 の combobox が `File` へ戻る場合は upload を止めず、File name / Notes / line-level `Receipts attached` を主証跡として確認する
 - category / Country / tax group / Description を直した後、policy アイコンが stale なことがある。`Save and continue` 後に再読取し、`This expense does not have any policy violations.` へ変わったか確認する
 - receipt 修正中は `Submit` を進捗確認や保存代わりに押さない。明示指示がない限り、保存は `Save and continue` までに留める
+- 右ペインの値は `input[name="AmountCurrWithCurrencyCode_Tile"]` / `input[name="MerchantId"]` で読む。`aria-label="Merchant"` は grid セルにもあり、先頭行の値を拾う
+- `Save and continue` は次の行へ自動で移る。保存直後の必須エラーは次の行のもの
+
+## Unattached Receipt Cleanup
+
+- Workspace の Receipts タブに残る未紐付け receipt は、明細への添付やり直しで生じた重複・旧名（`-1`、`outbound` 等）が中心。削除前に日付を Reports タブの report と突合し、対応 report が `Processed for payment` で明細側に receipt が添付済みのものだけを対象にする。対応が取れないものは残す
+- カード一覧は仮想化されている。カードは `scrollIntoView` してから選び、`dyn-activeRowCell` のカード名が対象と一致することを確認してからボタンを押す。一致しないまま `Open` / `Delete` すると前の選択カードが対象になる
+- 削除は複数カードをまとめて行う。各カードの checkbox（`title` に「Select or unselect <ファイル名>」、ファイル名欄の下に隠れるので title 照合後に force click）を2〜5件ずつ入れ、`Delete` → `Yes` を1回押して件数の減少まで待つ。1件ずつだと1件ごとに約1分、14件一括は7分以上進まなかった。確認ダイアログは数秒遅れて出るので、件数確認のための試し押しはしない。チェック直後は「still being worked on」や透明な覆いで Delete が押せないことがあり、`Wait` で処理完了を待ち、ボタン中心の要素（`elementFromPoint`）がボタン自身になってから押す
+- カードの `Open` での保存は不安定（保存後に消える、完了待ちで操作が止まる）。退避はローカル控えのないものだけに絞り、2回止まったら手動保存か退避省略をユーザーに確認する

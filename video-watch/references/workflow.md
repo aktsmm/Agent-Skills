@@ -18,40 +18,25 @@ The script creates one run directory containing:
 ## Standard Run
 
 ```powershell
-python .github/skills/video-watch/scripts/video_watch.py "<url-or-path>" --question "<question>"
+python <skill-dir>/scripts/video_watch.py "<url-or-path>" --question "<question>"
 ```
 
 Use an existing transcript from another tool or speech backend:
 
 ```powershell
-python .github/skills/video-watch/scripts/video_watch.py "<url-or-path>" --transcript-file "<transcript.txt>" --question "<question>"
+python <skill-dir>/scripts/video_watch.py "<url-or-path>" --transcript-file "<transcript.txt>" --question "<question>"
 ```
 
 Use `--start` and `--end` when the user names a moment:
 
 ```powershell
-python .github/skills/video-watch/scripts/video_watch.py "<url-or-path>" --start 2:15 --end 2:45 --question "what changes here?"
+python <skill-dir>/scripts/video_watch.py "<url-or-path>" --start 2:15 --end 2:45 --question "what changes here?"
 ```
 
 ## Copilot Consumption Pattern
 
-1. Read `manifest.json` and note warnings.
-2. Read `prompt.md` to preserve the user's question.
-3. Read `transcript.md` for spoken content.
-4. Read `frame-index.md` and inspect `contact-sheet.jpg`.
-5. Inspect individual frames only when the contact sheet points to relevant timestamps.
-6. Answer with evidence boundaries: transcript-only, frame-only, sparse sampling, or missing captions.
+Follow the artifact read order and evidence-boundary rule in SKILL.md Core Workflow steps 3-4.
 
 ## Review Checkpoints
 
-Use a producer/critic loop when changing this skill:
-
-1. Producer drafts the plan or implementation.
-2. Critic reviews read-only for primitive choice, scope, artifact order, safety boundary, dependency boundary, self-contained resources, and validation.
-3. Producer fixes blocking findings and reruns the smallest relevant validation.
-4. Repeat until PASS or PASS_WITH_NOTES, with a maximum of 2 critic rounds per checkpoint unless the user asks for more.
-
-Checkpoint targets:
-
-- Plan review: before adding or changing workflow behavior.
-- Implementation review: after editing `SKILL.md`, scripts, or references.
+SKILL.md Rubber Duck Checkpoints owns the review loop. Stop at PASS or PASS_WITH_NOTES, with at most 2 critic rounds per checkpoint unless the user asks for more.

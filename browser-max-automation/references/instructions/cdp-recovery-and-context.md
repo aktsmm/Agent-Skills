@@ -70,3 +70,19 @@ Safe selection:
 3. Verify login, authorization, origin, resource route, and required controls after loading; generic titles or header/footer-only frames are inconclusive. Pin that context and target ID for the run.
 4. Before writes, re-check route, resource/item identity, and absence of competing user editing. Pause on drift or ownership uncertainty; do not silently choose another matching tab.
 5. If identity or readiness cannot be established, return a compact stopped state with sanitized URL/title and reason. After a crash, rebind explicitly instead of pretending the old target ID is still valid.
+
+## ローカルファイルを MCP で開く
+
+Playwright MCP は `file:` を拒否する（`Access to "file:" protocol is blocked`）。ローカル HTML を開いて検証・計測したいときは、そのフォルダーを `python -m http.server <port> --bind 127.0.0.1` で配信して `http://127.0.0.1:<port>/...` を開く。
+
+MCP は既存ブラウザーの CDP に attach するだけなので、ユーザーがそのブラウザーを閉じると途中で `Target page, context or browser has been closed` になり、再 navigate も debug port への `ECONNREFUSED` で失敗する。**計測は 1 回の `browser_evaluate` で取り切る**。二分探索や全要素走査を複数 call に分けると、途中で失われて最初からやり直しになる。
+
+## 破綻しやすい場面
+
+- modal overlay が snapshot に出ない
+- file chooser が残って後続操作を塞ぐ
+- CDP 二重接続で入力先が混線する
+- CDP の別 context/page を使い、未ログイン画面や別アカウントを操作してしまう
+- 「見えているがクリックできない」状態を無理に通常 click で押し切る
+- 座標クリックが成功を返すのに何も起きない（要素が実ウィンドウ外にいる）
+- ページは正常なのに特定の widget だけ、一定回数の操作後に無反応になる

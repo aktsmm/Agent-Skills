@@ -29,12 +29,8 @@ Durable mode でも hidden runtime state を操作したと主張しない。フ
 - Next action: <worker / verifier / replan / handoff>
 ```
 
-Status rules:
+Status rules（status 定義は [steering-and-final-gates.md](./steering-and-final-gates.md#status-taxonomy)）:
 
-- `complete`: 外部検証または rubric evidence がある。
-- `blocked`: 自力で制御できない外的障害。未解決のまま final complete しない。
-- `review_blocked`: final gate / independent review が non-clean。blocker 解消サブゴールを追加して続行する。
-- `superseded`: steering で置き換えられた。削除せず audit-visible に残す。
 - primary verifier が必要なゴールでは、supporting checks だけで `complete` にしない。
 - Deferred / Next Actions に保留項目が残り、それが must AC または primary verifier に必要なら、全体 status は
   `complete` ではなく HITL / partial handoff にする。
@@ -85,8 +81,7 @@ Status rules:
 | 2   | revise_pending_wording | G003   | rejected | none        | criteria 緩和に当たる | <optional>      |
 ```
 
-Allowed kinds: `add_subgoal`, `split_subgoal`, `reorder_pending`, `revise_pending_wording`, `annotate_ledger`,
-`mark_blocked_superseded`。
+Allowed kinds: [steering-and-final-gates.md](./steering-and-final-gates.md#dynamic-steering) を参照。
 
 ## Event Log（durable mode 用）
 

@@ -126,30 +126,7 @@ Effective agent evaluation goes beyond simple success/fail metrics. It requires 
 
 #### Test Data Generation Process
 
-```
-Step 1: Identify Agent's Domain
-  - What tasks does it handle?
-  - What tools does it use?
-
-Step 2: Create Baseline Scenarios
-  - 10-20 typical use cases
-  - Cover main functionality
-
-Step 3: Add Variation
-  - Ambiguous phrasing
-  - Missing information
-  - Conflicting requirements
-
-Step 4: Include Edge Cases
-  - Boundary values (empty, max size)
-  - Unusual file types or formats
-  - Concurrent requests
-
-Step 5: Simulate Failures
-  - Tool unavailability
-  - Partial results
-  - Timeout scenarios
-```
+Start from 10-20 baseline use cases for the agent's domain and tools, then add phrasing variations, missing or conflicting information, boundary inputs, and simulated tool failures (unavailable, partial, timeout).
 
 #### Example Test Set (Code Review Agent)
 
@@ -192,40 +169,16 @@ test_cases:
 
 ### 2. Evaluation Rubric
 
-**Score each dimension on a scale**
+Score each metric 0-5 instead of pass/fail:
 
-#### Intent Resolution Rubric
+| Score | Intent Resolution                      | Tool Call Accuracy                       | Task Adherence                         |
+| ----- | -------------------------------------- | ---------------------------------------- | -------------------------------------- |
+| **5** | Correct, with proactive clarification  | Optimal tools and parameters, error-free | Respects all constraints               |
+| **3** | Mostly correct, minor misunderstanding | Mostly correct, some suboptimal choices  | Some scope creep or missed constraints |
+| **1** | Misunderstood intent, wrong direction  | Wrong or hallucinated tools              | Major violations, ignores instructions |
+| **0** | No engagement with the request         | Tool calls fail, agent cannot proceed    | Disregards requirements                |
 
-| Score | Description                                           |
-| ----- | ----------------------------------------------------- |
-| **5** | Perfect understanding, proactive clarification        |
-| **4** | Correct interpretation, addresses need                |
-| **3** | Mostly correct, minor misunderstanding                |
-| **2** | Partially correct, significant gaps                   |
-| **1** | Misunderstood intent, wrong direction                 |
-| **0** | Complete failure to understand or engage with request |
-
-#### Tool Call Accuracy Rubric
-
-| Score | Description                                      |
-| ----- | ------------------------------------------------ |
-| **5** | Optimal tool selection and usage, error-free     |
-| **4** | Correct tools, minor inefficiencies              |
-| **3** | Mostly correct, some suboptimal choices          |
-| **2** | Significant tool misuse, works but inefficient   |
-| **1** | Wrong tools or hallucinations, barely functional |
-| **0** | Tool calls fail, agent cannot proceed            |
-
-#### Task Adherence Rubric
-
-| Score | Description                                   |
-| ----- | --------------------------------------------- |
-| **5** | Perfect compliance, respects all constraints  |
-| **4** | Minor deviations, core requirements met       |
-| **3** | Some scope creep or missed constraints        |
-| **2** | Significant violations, partial deliverables  |
-| **1** | Major violations, ignores instructions        |
-| **0** | Completely off-track, disregards requirements |
+Scores 4 and 2 are the intermediate levels.
 
 ### 3. Automated Testing
 
@@ -266,31 +219,7 @@ Avoid:
 | **Creativity**           | Innovation and problem-solving approach       |
 | **Edge Case Handling**   | Appropriateness of fallback strategies        |
 
-#### Automation Example (Python)
-
-```python
-def evaluate_tool_calls(log_file, expected_tools):
-    """
-    Evaluate tool call accuracy from execution logs.
-    """
-    with open(log_file) as f:
-        logs = json.load(f)
-
-    tool_calls = [entry for entry in logs if entry["type"] == "tool_call"]
-
-    metrics = {
-        "total_calls": len(tool_calls),
-        "unique_tools": len(set(call["tool_name"] for call in tool_calls)),
-        "hallucinated": sum(1 for call in tool_calls
-                           if call["tool_name"] not in expected_tools),
-        "failed": sum(1 for call in tool_calls
-                     if call["status"] == "error"),
-    }
-
-    metrics["accuracy"] = 1 - (metrics["hallucinated"] / metrics["total_calls"])
-
-    return metrics
-```
+For tool-call automation, parse the execution log and count total calls, calls to tools outside the expected set (hallucinated), and failed calls.
 
 ---
 
@@ -316,54 +245,15 @@ After Optimization (v1.1)
 
 ### 2. Diverse Test Set
 
-| Principle             | Rationale                                        |
-| --------------------- | ------------------------------------------------ |
-| **Coverage**          | Test all major features and edge cases           |
-| **Realism**           | Use real-world scenarios, not synthetic examples |
-| **Difficulty Range**  | Include easy, medium, and hard tasks             |
-| **Failure Scenarios** | Don't just test happy paths                      |
-| **User Language**     | Use actual phrasing users would employ           |
+Cover all major features with real user phrasing, a range of difficulty, and failure scenarios, not only happy paths.
 
 ### 3. Iterative Improvement
 
-```mermaid
-graph LR
-    A[Baseline] --> B[Identify Weaknesses]
-    B --> C[Implement Fix]
-    C --> D[Re-evaluate]
-    D --> E{Improved?}
-    E -->|Yes| F[Deploy]
-    E -->|No| G[Different Approach]
-    G --> C
-```
+Baseline → identify weaknesses → fix → re-evaluate; deploy only on improvement, otherwise try a different approach.
 
 ### 4. Log Everything
 
-**Comprehensive logging enables debugging and improvement**
-
-```json
-{
-  "test_id": "happy-001",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "user_input": "Review src/auth.py",
-  "agent_plan": "1. Read file 2. Scan for patterns 3. Report",
-  "tool_calls": [
-    {
-      "tool": "read",
-      "params": { "file": "src/auth.py" },
-      "status": "success"
-    },
-    { "tool": "grep", "params": { "pattern": "eval\\(" }, "status": "success" }
-  ],
-  "output": "Found 2 security issues...",
-  "scores": {
-    "intent_resolution": 5,
-    "tool_accuracy": 5,
-    "task_adherence": 5
-  },
-  "evaluator_notes": "Excellent handling, proactive security scan"
-}
-```
+Per test run, log `test_id`, timestamp, user input, agent plan, each tool call (`tool`, `params`, `status`), output, per-metric scores, and evaluator notes.
 
 Logs are valuable inputs for designing evals, but they should not become the assertion wholesale. Use logs to discover robust checks, then reduce them to stable criteria.
 
@@ -382,57 +272,15 @@ Logs are valuable inputs for designing evals, but they should not become the ass
 
 ## Common Evaluation Pitfalls
 
-### 1. Overfitting to Test Set
+| Pitfall                     | Countermeasure                                                    |
+| --------------------------- | ----------------------------------------------------------------- |
+| Overfitting to the test set | Held-out set; refresh scenarios; add user-reported issues         |
+| Ignoring user feedback      | Review real usage logs and qualitative feedback alongside metrics |
+| Binary pass/fail            | Graded rubric across multiple dimensions                          |
+| Testing only happy paths    | Simulate timeouts, missing resources, malformed inputs            |
+| No regression testing       | Keep the suite and rerun it before each release                   |
 
-**Problem:** Agent performs well on tests but poorly on real tasks.
-
-**Solution:**
-
-- Use held-out test set
-- Regularly refresh test scenarios
-- Include user-reported issues
-
-### 2. Ignoring User Feedback
-
-**Problem:** Metrics look good, users are unhappy.
-
-**Solution:**
-
-- Collect qualitative feedback
-- Review actual usage logs
-- User interviews/surveys
-
-### 3. Binary Pass/Fail
-
-**Problem:** Doesn't capture nuance or areas for improvement.
-
-**Solution:**
-
-- Use rubrics with gradations
-- Track multiple dimensions
-- Identify specific failure modes
-
-### 4. Testing Only Happy Paths
-
-**Problem:** Agent fails when things go wrong.
-
-**Solution:**
-
-- Systematically test error conditions
-- Simulate timeouts, missing resources
-- Test with malformed inputs
-
-### 5. Lack of Regression Testing
-
-**Problem:** New features break existing functionality.
-
-**Solution:**
-
-- Maintain test suite
-- Run before each release
-- Automate where possible
-
-### 6. Brittle Recorded Evaluations
+### Brittle Recorded Evaluations
 
 **Problem:** A recorded test only passes for the original session because it encodes one temporary path or one exact output.
 

@@ -70,24 +70,7 @@ worker を増やす前に **計画そのものを疑う**（Magentic-One の tas
 
 ## Dynamic Steering（サブゴール変更）
 
-replan でサブゴール列を変えるときは、criteria を緩めるのでなく steering として扱う。
-
-許可する mutation:
-
-- `add_subgoal`
-- `split_subgoal`
-- `reorder_pending`
-- `revise_pending_wording`
-- `annotate_ledger`
-- `mark_blocked_superseded`
-
-Steering invariants:
-
-- original brief、Acceptance Criteria、must NOT、quality gate、completion status は変更しない。
-- hard-delete / auto-complete / verification 弱体化 / silent mutation は禁止。
-- accepted / rejected の両方を ledger に証跡付きで残す。
-- `superseded` goal は scheduling から外してよいが、監査可能な状態で残す。
-- replacements なしの `blocked` は final completion をブロックする。
+replan でサブゴール列を変えるときは、criteria を緩めるのでなく steering として扱う。許可する mutation と invariants は [steering-and-final-gates.md](./steering-and-final-gates.md#dynamic-steering) を正とする。
 
 ## Small-Bet-First（大きな変更の前に）
 

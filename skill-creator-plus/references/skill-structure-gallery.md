@@ -16,10 +16,10 @@ Use when:
 
 Recommended shape:
 
-| Category | Signal | Action |
-| -------- | ------ | ------ |
-| Tone     | Repeated filler opener | Remove or replace with concrete statement |
-| Structure | Three identical sentence starts | Vary subject or sentence form |
+| Category  | Signal                          | Action                                    |
+| --------- | ------------------------------- | ----------------------------------------- |
+| Tone      | Repeated filler opener          | Remove or replace with concrete statement |
+| Structure | Three identical sentence starts | Vary subject or sentence form             |
 
 Why it works:
 
@@ -44,9 +44,9 @@ Use when:
 
 Recommended shape:
 
-| Mode | Best For | Pros | Cons |
-| ---- | -------- | ---- | ---- |
-| Managed mode | First-time setup | Simpler defaults | Less control |
+| Mode          | Best For                   | Pros                 | Cons               |
+| ------------- | -------------------------- | -------------------- | ------------------ |
+| Managed mode  | First-time setup           | Simpler defaults     | Less control       |
 | Attached mode | Existing environment reuse | Reuses login/session | More prerequisites |
 
 Why it works:
@@ -106,12 +106,12 @@ Use when:
 
 Recommended shape:
 
-| Score | Action |
-| ----- | ------ |
-| 90-100 | Proceed |
-| 70-89 | Fix and retry |
-| 50-69 | Simplify |
-| 0-49 | Ask user |
+| Score  | Action        |
+| ------ | ------------- |
+| 90-100 | Proceed       |
+| 70-89  | Fix and retry |
+| 50-69  | Simplify      |
+| 0-49   | Ask user      |
 
 Why it works:
 
@@ -152,11 +152,10 @@ YYYY-MM-DD-type-subject.ext
 
 And, if needed, a taxonomy table:
 
-| Code | Meaning | Trigger |
-| ---- | ------- | ------- |
-| doc  | Formal document | invoice, contract |
-| img  | Screenshot/image | png, jpg |
-```
+| Code | Meaning          | Trigger           |
+| ---- | ---------------- | ----------------- |
+| doc  | Formal document  | invoice, contract |
+| img  | Screenshot/image | png, jpg          |
 
 Why it works:
 
@@ -170,12 +169,12 @@ Avoid when:
 
 ## Quick Selection Guide
 
-| If the skill needs... | Start with... |
-| --------------------- | ------------- |
-| Repeated review signals | Signal Detection Matrix |
-| A user-facing branch choice | Mode Selection Table |
-| Multiple coordinated deliverables | Output Pair and Variant Naming |
-| Retry thresholds or escalation | Quality Gates and Score Bands |
-| A multi-stage file/data pipeline | Architecture Sketch and Naming Taxonomy |
+| If the skill needs...             | Start with...                           |
+| --------------------------------- | --------------------------------------- |
+| Repeated review signals           | Signal Detection Matrix                 |
+| A user-facing branch choice       | Mode Selection Table                    |
+| Multiple coordinated deliverables | Output Pair and Variant Naming          |
+| Retry thresholds or escalation    | Quality Gates and Score Bands           |
+| A multi-stage file/data pipeline  | Architecture Sketch and Naming Taxonomy |
 
 Use one or two patterns first. If the structure starts looking like a dashboard, the skill is probably over-designed.

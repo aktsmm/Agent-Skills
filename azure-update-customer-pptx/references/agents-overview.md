@@ -13,3 +13,11 @@ Agent steps handle judgment and MCP research. Scripts handle deterministic appli
 | Finalize     | Run Verify, open the deck, and report script exit codes     |
 
 Do not hard-code customer values in agent definitions. Use workspace config and manifests.
+
+## Agent Registry
+
+Moved from SKILL.md "Agent Registry".
+
+- Skill `agents/` is the role-definition source for this workflow.
+- Copy agents to workspace `.github/agents/` only when the host requires a workspace agent registry.
+- Copied workspace agents are derived artifacts; do not hard-code customer values in them.

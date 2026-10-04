@@ -1,42 +1,15 @@
 # Testing VS Code Extensions
 
-Set up and run tests using @vscode/test-electron.
+Integration tests run in an Extension Development Host. Follow the official [Testing Extensions](https://code.visualstudio.com/api/working-with-extensions/testing-extension) guide for boilerplate; this file keeps the project rules and gotchas.
 
 ## Setup
 
-```bash
-npm install -D @vscode/test-electron mocha @types/mocha glob
-```
+- Default: the test CLI. `npm install -D @vscode/test-cli @vscode/test-electron`, set `"test": "vscode-test"`, and configure `.vscode-test.mjs` (Mocha under the hood; `--label` selects one configuration).
+- Use a custom `runTests` runner from `@vscode/test-electron` only for custom setup (installing a VSIX first, patching a downloaded archive, multiple launch variants).
+- Running tests from the CLI fails if the same VS Code build is already running; run them against a different build/channel or from the debug launch configuration.
+- If `capabilities.untrustedWorkspaces` is declared, run separate trusted/untrusted configurations (trust cannot be toggled from a test); give the untrusted run its own `--user-data-dir`.
 
-## Project Structure
-
-```
-my-extension/
-├── src/
-│   └── extension.ts
-├── test/
-│   ├── runTest.ts           # Test runner entry
-│   └── suite/
-│       ├── index.ts         # Mocha configuration
-│       └── extension.test.ts # Test file
-├── tsconfig.json
-└── tsconfig.test.json
-```
-
-## tsconfig.test.json
-
-```json
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "out"
-  },
-  "include": ["src/**/*", "test/**/*"]
-}
-```
-
-## test/runTest.ts
+## Engine Floor
 
 Treat `engines.vscode` as the supported API/runtime floor, not the developer's
 installed version. Pin `@types/vscode` to that floor; derive test-host and
@@ -49,127 +22,24 @@ before lowering it. Newer versions inside the declared range need no blanket
 untested-version warning; report actual failures with a manual, data-free Issue
 link instead of uploading diagnostics automatically.
 
-```typescript
-import * as path from "path";
+```javascript
+// .vscode-test.mjs
+import { defineConfig } from "@vscode/test-cli";
 import { readFileSync } from "node:fs";
-import { runTests } from "@vscode/test-electron";
 
-async function main() {
-  try {
-    const extensionDevelopmentPath = path.resolve(__dirname, "../../");
-    const extensionTestsPath = path.resolve(__dirname, "./suite/index");
-    const manifest = JSON.parse(
-      readFileSync(path.join(extensionDevelopmentPath, "package.json"), "utf8"),
-    );
-    const range = manifest.engines?.vscode;
-    if (typeof range !== "string" || !/^\^\d+\.\d+\.\d+$/.test(range)) {
-      throw new Error("This runner requires a simple caret engine range.");
-    }
-
-    await runTests({
-      extensionDevelopmentPath,
-      extensionTestsPath,
-      version: range.slice(1),
-      // Optional: open specific workspace
-      // launchArgs: ['--disable-extensions', path.resolve(__dirname, '../../test-workspace')],
-    });
-  } catch (err) {
-    console.error("Failed to run tests");
-    process.exit(1);
-  }
+const range = JSON.parse(readFileSync("package.json", "utf8")).engines?.vscode;
+if (typeof range !== "string" || !/^\^\d+\.\d+\.\d+$/.test(range)) {
+  throw new Error("This config requires a simple caret engine range.");
 }
 
-main();
-```
-
-## test/suite/index.ts
-
-```typescript
-import * as path from "path";
-import Mocha from "mocha";
-import { glob } from "glob";
-
-export async function run(): Promise<void> {
-  const mocha = new Mocha({
-    ui: "tdd",
-    color: true,
-    timeout: 10000,
-    failZero: true,
-  });
-
-  const testsRoot = path.resolve(__dirname, ".");
-  const files = await glob("**/**.test.js", { cwd: testsRoot });
-
-  files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
-
-  return new Promise((resolve, reject) => {
-    mocha.run((failures) => {
-      if (failures > 0) {
-        reject(new Error(`${failures} tests failed.`));
-      } else {
-        resolve();
-      }
-    });
-  });
-}
-```
-
-## test/suite/extension.test.ts
-
-```typescript
-import * as assert from "assert";
-import * as vscode from "vscode";
-
-suite("Extension Test Suite", () => {
-  vscode.window.showInformationMessage("Start all tests.");
-
-  test("Extension should be present", () => {
-    const ext = vscode.extensions.getExtension("publisher.extension-name");
-    assert.ok(ext, "Extension not found");
-  });
-
-  test("Extension should activate", async () => {
-    const ext = vscode.extensions.getExtension("publisher.extension-name");
-    await ext?.activate();
-    assert.ok(ext?.isActive, "Extension not activated");
-  });
-
-  test("Command should be registered", async () => {
-    const commands = await vscode.commands.getCommands();
-    assert.ok(commands.includes("myExt.hello"), "Command not registered");
-  });
-
-  test("Command should execute without error", async () => {
-    await assert.doesNotReject(vscode.commands.executeCommand("myExt.hello"));
-  });
+export default defineConfig({
+  files: "out/test/**/*.test.js",
+  version: range.slice(1),
+  mocha: { ui: "tdd", timeout: 20000 },
 });
 ```
 
-## package.json Scripts
-
-```json
-{
-  "scripts": {
-    "compile": "tsc -p ./",
-    "compile-tests": "tsc -p tsconfig.test.json",
-    "pretest": "npm run compile && npm run compile-tests",
-    "test": "node ./out/test/runTest.js"
-  }
-}
-```
-
-## Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Tests will:
-# 1. Download VS Code (if needed)
-# 2. Launch VS Code with extension loaded
-# 3. Execute test suite
-# 4. Exit with result code
-```
+In a custom runner, pass the same derived value as `runTests({ version })` and set Mocha `failZero: true` so an empty test glob fails.
 
 ## Risk-Based Regression Checks
 
@@ -186,7 +56,7 @@ If the isolated account does not expose the target model or capability, report t
 | Runtime logging / diagnostics                 | Verify logs go through an Output Channel logger instead of direct `console.*` calls in extension runtime paths                                                                                                                                       |
 | Resource scanners / providers                 | Test with extension-host APIs available and with missing/empty roots; avoid relying on local filesystem guesses; if you scan installed extensions, cover both known `resources/*` roots and manifest-declared `chatAgents` / `chatPromptFiles` paths |
 | Selectors / quick actions / saved options     | Hide internal, test, deprecated, stale, or unsupported candidates; preserve newly introduced normal candidates; confirm hidden saved values do not reappear from settings, cache, or fallback paths                                                  |
-| Chat / LM Tools / model configuration         | Query the installed tool catalog, create only disabled disposable state, execute one explicit ID, observe the actual response, and confirm selected model/configuration plus disabled-state persistence                                                 |
+| Chat / LM Tools / model configuration         | Query the installed tool catalog, create only disabled disposable state, execute one explicit ID, observe the actual response, and confirm selected model/configuration plus disabled-state persistence                                              |
 | Installer / updater / index merge logic       | Run focused regression scripts plus a broader smoke test because these paths often cross manifest, filesystem, and network boundaries                                                                                                                |
 | Generated marker sections                     | Test duplicate marker handling and confirm the final file contains exactly one generated section pair                                                                                                                                                |
 | Worker or secondary module entry points       | Guard that the runtime path (for example `path.join(__dirname, "x.js")`) resolves to a real source file, a compiled output, and an entry in the packaged payload allowlist; packaging can pass while analysis fails only at runtime                  |
@@ -224,56 +94,6 @@ for (const folderArgs of [[extensionDevelopmentPath], []]) {
 
 Treat the archive patch as test infrastructure with static guards: assert cache containment, the single-candidate product lookup, and both workspace/empty-window launches. The main-process log can still print a harmless instance-mutex warning; completion is decided by extension-host assertions and exit code.
 
-## Common Test Patterns
-
-### Testing with Documents
-
-```typescript
-test("Should modify document", async () => {
-  const doc = await vscode.workspace.openTextDocument({
-    content: "hello",
-    language: "plaintext",
-  });
-  const editor = await vscode.window.showTextDocument(doc);
-
-  await editor.edit((editBuilder) => {
-    editBuilder.insert(new vscode.Position(0, 5), " world");
-  });
-
-  assert.strictEqual(doc.getText(), "hello world");
-});
-```
-
-### Testing Settings
-
-```typescript
-test("Should read configuration", () => {
-  const config = vscode.workspace.getConfiguration("myExt");
-  const value = config.get<string>("greeting");
-  assert.strictEqual(value, "Hello");
-});
-```
-
-### Waiting for Events
-
-```typescript
-test("Should handle file save", async () => {
-  const doc = await vscode.workspace.openTextDocument({ content: "test" });
-
-  const savePromise = new Promise<void>((resolve) => {
-    const disposable = vscode.workspace.onDidSaveTextDocument((saved) => {
-      if (saved === doc) {
-        disposable.dispose();
-        resolve();
-      }
-    });
-  });
-
-  await doc.save();
-  await savePromise;
-});
-```
-
 ## Terminal Readiness and Owned Cleanup
 
 - Diagnose `terminal.shellIntegration`, its `cwd`, and `terminal.state.shell` separately. Active integration does not guarantee a detected shell type; log only readiness flags and an allowlisted shell label, not commands, output or environment values.
@@ -283,21 +103,4 @@ test("Should handle file save", async () => {
 
 ## CI Integration
 
-**.github/workflows/test.yml:**
-
-```yaml
-name: Test
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: xvfb-run -a npm test
-```
-
-Note: `xvfb-run` is required on Linux for headless VS Code testing.
+On Linux runners, wrap the test command with `xvfb-run -a` (for example `xvfb-run -a npm test`) because the Extension Host needs a display.

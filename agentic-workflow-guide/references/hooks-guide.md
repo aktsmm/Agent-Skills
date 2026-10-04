@@ -1,6 +1,8 @@
 # Hooks Guide
 
-Hooks are deterministic lifecycle automation for agent sessions.
+Hooks are deterministic lifecycle automation for agent sessions. VS Code hooks are Preview; this guide follows the **Local harness** ([VS Code hooks docs](https://code.visualstudio.com/docs/agent-customization/hooks), verified 2026-10).
+
+The selected harness (Local / Copilot / Claude / Codex on Agent Host) owns events, payloads, and output decisions. A shared file such as `.github/hooks/*.json` does not make behavior identical across harnesses; test in the destination harness before reusing a hook.
 
 Use hooks when workflow behavior must run, block, ask, or inject context at a known event. Do not use hooks for guidance that can remain conversational.
 
@@ -28,26 +30,32 @@ Use hooks when workflow behavior must run, block, ask, or inject context at a kn
 
 If the requirement includes "always block", "must ask", "auto-run", or "inject at session start", evaluate Hook first.
 
-## Locations
+## Locations (Local harness)
 
-| Path                   | Scope     |
-| ---------------------- | --------- |
-| `.github/hooks/*.json` | Workspace |
+| Path                                                   | Scope                                                                    |
+| ------------------------------------------------------ | ------------------------------------------------------------------------ |
+| `.github/hooks/*.json`                                 | Workspace (subject to Workspace Trust)                                   |
+| `.claude/settings.json`, `.claude/settings.local.json` | Workspace, Claude format (needs `chat.useClaudeHooks`; matchers ignored) |
+| `~/.copilot/hooks/*.json`                              | User                                                                     |
+| `~/.claude/settings.json`                              | User, Claude format (needs `chat.useClaudeHooks`)                        |
+| `hooks:` in `.agent.md` frontmatter                    | Custom agent only (Preview, Local only)                                  |
+
+`chat.useHooks` (default on) controls Local hook execution; `chat.hookFilesLocations` adds or disables locations. These settings do not configure Agent Host harnesses.
 
 Prefer workspace hooks for team policy. Keep personal automation outside the repo when it should not be shared.
 
 ## Lifecycle Events
 
-| Event              | Trigger                          |
-| ------------------ | -------------------------------- |
-| `SessionStart`     | First prompt of a new session    |
-| `UserPromptSubmit` | User submits a prompt            |
-| `PreToolUse`       | Before tool invocation           |
-| `PostToolUse`      | After successful tool invocation |
-| `PreCompact`       | Before context compaction        |
-| `SubagentStart`    | Subagent starts                  |
-| `SubagentStop`     | Subagent ends                    |
-| `Stop`             | Agent session ends               |
+| Event              | Trigger                                                                      |
+| ------------------ | ---------------------------------------------------------------------------- |
+| `SessionStart`     | First prompt of a new session                                                |
+| `UserPromptSubmit` | User submits a prompt                                                        |
+| `PreToolUse`       | Before tool invocation                                                       |
+| `PostToolUse`      | After successful tool invocation                                             |
+| `PreCompact`       | Before context compaction                                                    |
+| `SubagentStart`    | Subagent starts                                                              |
+| `SubagentStop`     | Subagent is about to stop                                                    |
+| `Stop`             | Current agent execution is about to stop (not necessarily the whole session) |
 
 ## Minimal Shape
 
@@ -65,7 +73,21 @@ Prefer workspace hooks for team policy. Keep personal automation outside the rep
 }
 ```
 
-Each command can define platform-specific overrides, `cwd`, `env`, and `timeout`.
+Native format uses PascalCase event names and `command`, OS overrides (`windows`, `linux`, `osx`), and `timeout`. The hook receives JSON on stdin and may write JSON to stdout to add context or block/ask; see the [Local hooks reference](https://code.visualstudio.com/docs/agents/reference/hooks-reference) for the full schema and exit codes.
+
+### Agent-scoped hooks (Preview, Local only)
+
+```yaml
+---
+name: Strict Formatter
+hooks:
+  PostToolUse:
+    - type: command
+      command: "./scripts/format-changed-files.sh"
+---
+```
+
+They run in addition to user/workspace hooks, require `chat.useHooks` and a trusted workspace, and a subagent's `Stop` hook fires as `SubagentStop`.
 
 ## Decision Heuristic
 
@@ -100,7 +122,7 @@ Use `SessionStart` when the agent should receive deterministic context before no
 
 ### Session-scoped guardrails
 
-If the platform supports hooks that are activated only for a specific skill, command, or session, use them for safeguards that would be too noisy as always-on policy.
+For safeguards that would be too noisy as always-on policy, prefer agent-scoped hooks (above) on the agent that does the risky work.
 
 Good fits:
 

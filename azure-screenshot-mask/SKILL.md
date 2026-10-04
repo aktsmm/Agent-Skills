@@ -40,17 +40,13 @@ Azure Portal のスクリーンショットに残る環境固有情報を、公�
 - **アカウント表示の onmicrosoft ドメイン**
 - **リソース名**（Storage Account 名、task 名、assignment 名など）ユニークな文字列は先頭数文字だけ残してマスクする
 
-逆に、汎用の lab 用に作った storage account 名や resource 名でも、ユニークな文字列は特定可能なのでマスク推奨。
-
 ## Default Workflow
 
 1. **対象画像を 1 フォルダにまとめる**
-
    - 記事に貼る画像を `images/<platform>/<article>/` 配下に集約しておく
    - 同じ Portal 解像度 (viewport 幅) で揃っていると、領域指定を使い回せる
 
 2. **右上テナント帯だけでよいか確認する**
-
    - フォルダ内の代表 1 枚を開き、右上の組織表示・アバターだけが env-sensitive か確認する
    - 本文側に subscription 名 / ID / RG 名が見えていれば、その行も対象にする
 
@@ -70,12 +66,10 @@ Azure Portal のスクリーンショットに残る環境固有情報を、公�
    ```
 
 4. **目視で検証する**
-
    - 上記チェックリスト項目が読めなくなっているか、画像ビューアで確認する
    - 1 枚でも残っていれば、その画面だけ `--region` を足して再実行する
 
 5. **記事側のテキストも合わせて整える**
-
    - 本文に `<顧客名>-sub` のような subscription 名や顧客固有名が出ていたら削除する
    - 「環境固有情報はスクリーンショット上でマスクしています」のような 1 行を入れておくと、読者が画像のモザイクを誤読しない
 
@@ -95,8 +89,4 @@ before / after比較では、確認済みbboxへ赤枠を付ける。マスク�
 
 - viewportを揃え、代表画像で決めた座標を再利用しても全画像を目視する。
 - 単発の塗りつぶしで済む場合は通常の画像注釈ツールを使う。詳細は [Advanced Azure Screenshot Masking](references/advanced-masking.md) を参照する。
-
-## Related Skills
-
-- `humanize-writing`: 本文のサニタイズや AI 感の除去。同じ「公開前の最終チェック」フローで一緒に走らせると効率がよい
-- `packet-capture-analysis`: pcap の中身を画像化する際の env-sensitive 領域マスクは別 skill。本スキルは Azure Portal キャプチャに特化
+- 対象は Azure Portal キャプチャ。本文のサニタイズや pcap 由来の画像は対象外。

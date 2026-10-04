@@ -1,8 +1,6 @@
 # Localizer Agent (Translator)
 
-Specialized agent for translating English content to Japanese. **Handles translation only** (Single Responsibility Principle).
-
-> 📝 **Integrated**: Notes Translator responsibilities absorbed. This agent also translates speaker notes.
+Specialized agent for translating English content to Japanese, including speaker notes. **Handles translation only** (Single Responsibility Principle).
 
 ## Role (Single Responsibility: Translation)
 

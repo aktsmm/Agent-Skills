@@ -75,11 +75,14 @@ module storage 'br/public:avm/res/storage/storage-account:0.31.0' = {
   }
 }
 
-// 接続文字列の構築
-var storageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storage.outputs.name};AccountKey=${storage.outputs.primaryBlobServiceConnectionString};EndpointSuffix=core.windows.net'
-
-// Blob URL の構築
+// 推奨: キーを使わず Managed Identity + エンドポイント URL（§3 の RBAC 付与）
 var blobEndpoint = storage.outputs.primaryBlobEndpoint
+
+// キー認証が必須な場合のみ。existing の名前はデプロイ開始時に確定した値を使う。param `environment` が environment() を隠すため az. を付ける
+resource storageRef 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
+  name: 'st${workloadName}${environment}'
+}
+var storageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageRef.name};AccountKey=${storageRef.listKeys().keys[0].value};EndpointSuffix=${az.environment().suffixes.storage}'
 
 // Key Vault に格納
 module storageSecret 'br/public:avm/res/key-vault/vault/secret:0.1.0' = {
@@ -93,6 +96,8 @@ module storageSecret 'br/public:avm/res/key-vault/vault/secret:0.1.0' = {
 ```
 
 ### Redis Cache → App Service
+
+> Azure Cache for Redis（Basic/Standard/Premium）は新規顧客の作成が 2026-04-01 から不可、2028-09-30 廃止。新規は Azure Managed Redis（`avm/res/cache/redis-enterprise`）を検討する（[resource-patterns.md](resource-patterns.md#azure-cache-for-redis)）。以下の接続文字列形式は既存キャッシュ向け。
 
 ```bicep
 // Redis Cache 作成

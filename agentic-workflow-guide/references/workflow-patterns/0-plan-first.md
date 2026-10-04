@@ -1,82 +1,29 @@
 # Pattern 0: Plan-First (Meta-Pattern)
 
-**Always create a plan before execution**
+**Plan and get approval before non-trivial execution**
 
 > Back to [overview.md](overview.md)
 
-## Diagram
+Use for multi-step, costly, hard-to-reverse, or ambiguous work. Skip for one-line or obviously local changes.
 
-```mermaid
-graph LR
-    A[Task Request] --> B[Create Plan]
-    B --> C[User Reviews Plan]
-    C -->|Approved| D[Execute]
-    C -->|Changes Needed| B
-    D --> E[Track Progress]
-    E --> F[Complete]
-```
+## VS Code Implementation
 
-## Characteristics
+- Built-in `plan` agent: set `agent: plan` in a prompt file, or hand off from a custom planner agent with `handoffs` (see [handoffs-guide.md](../handoffs-guide.md)).
+- Collect approval or missing inputs with `vscode/askQuestions` in one batch, not per phase.
+- Track execution with the `todos` tool so progress survives long sessions.
+- Planner agents should be read-only (`tools: ["read", "search", "web"]`) so planning cannot mutate files before approval.
 
-| Aspect        | Description                                             |
-| ------------- | ------------------------------------------------------- |
-| **Purpose**   | Ensure alignment before investing effort in execution   |
-| **Structure** | Plan -> Review -> Execute                               |
-| **Benefits**  | Avoids wasted work, enables early course correction     |
-| **Use Cases** | Any non-trivial task with multiple steps or uncertainty |
+## Plan Contents (minimum)
 
-## When to Use
+- Goal and done criteria (how completion is verified)
+- Steps with dependencies; mark which are parallelizable
+- High-impact operations needing approval (delete, push, external send, deploy) listed up front
+- Stop-state: what is left and how to resume if execution halts
 
-- Task is complex or multi-step
-- Execution is costly (time, resources, or reversibility)
-- Ambiguity exists in requirements
-- Risk of misunderstanding user intent
+## Failure Modes
 
-## Implementation Pattern
-
-```
-Step 1: Analyze Request
-  - Understand goal and constraints
-  - Identify subtasks and dependencies
-
-Step 2: Generate Plan
-  - List concrete steps with rationale
-  - Estimate effort/time per step
-  - Identify risks and alternatives
-
-Step 3: Present for Approval
-  - Show plan in clear format
-  - Ask: "Does this plan meet your expectations?"
-
-Step 4: Execute (only after approval)
-  - Follow plan systematically
-  - Report progress at key milestones
-```
-
-## Plan Format Example
-
-```markdown
-## Plan for [Task Name]
-
-**Goal:** [Clear statement of what will be accomplished]
-
-**Steps:**
-1. [Action] - [Rationale] (Est: [time/effort])
-2. [Action] - [Rationale] (Est: [time/effort])
-
-**Risks:**
-- [Risk 1]: [Mitigation approach]
-
-**Approval Needed:** Please confirm before I proceed.
-```
-
-## Why This Matters
-
-From vscode-ai-toolkit best practices:
-
-> "Generate a plan first and ask the user for approval. This prevents wasted effort on the wrong approach."
-
-## Anti-Pattern: Plan-Free Execution
-
-Bad: Jump straight to implementation without discussing approach
-Good: Propose plan, get feedback, adjust, then execute
+| Failure                             | Fix                                                       |
+| ----------------------------------- | --------------------------------------------------------- |
+| Executes before approval            | Planner without edit/execute tools; approval gate in body |
+| Re-asks approval at every phase     | Ask once, listing every high-impact action in the plan    |
+| Plan drifts from execution silently | Update the todo list / plan file when scope changes       |

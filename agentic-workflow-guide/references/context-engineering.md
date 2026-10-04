@@ -21,15 +21,7 @@ Strategies for curating and managing context in long-running AI agents.
 
 ### Context Rot
 
-As tokens increase, recall accuracy decreases. This is called **context rot**.
-
-```
-Token Count vs. Recall Accuracy
-
-Low tokens   ████████████████ High accuracy
-Medium       ██████████░░░░░░ Moderate
-High tokens  ████░░░░░░░░░░░░ Low accuracy (context rot)
-```
+As tokens increase, recall accuracy decreases (**context rot**), even on simple tasks.
 
 ### Key Insight
 
@@ -53,21 +45,7 @@ High tokens  ████░░░░░░░░░░░░ Low accuracy (cont
 
 #### Implementation
 
-```
-Original Context (90% full):
-- System prompt
-- 50 conversation turns
-- 100 tool call results
-- Accumulated state
-
-    ↓ Compaction
-
-Compacted Context (30% full):
-- System prompt (preserved)
-- Summary of key decisions
-- Unresolved issues
-- 5 most recent files/resources
-```
+Keep the system prompt, a summary of key decisions, unresolved issues, and the few most recent files/resources; drop the rest.
 
 #### What to Keep vs. Discard
 
@@ -96,42 +74,9 @@ Compacted Context (30% full):
 
 #### Implementation Patterns
 
-```
-Pattern A: File-based Memory
-└── NOTES.md or TODO.md persisted to disk
-
-Pattern B: Structured JSON
-└── state.json with typed fields
-
-Pattern C: Key-Value Store
-└── Database or MCP memory tool
-```
-
-#### Example: NOTES.md
-
-```markdown
-# Agent Notes
-
-## Current Objective
-
-Training Pikachu to level 25 in Route 1
-
-## Progress
-
-- Steps completed: 1,234
-- Pikachu level: 18 → 23 (+5)
-- Remaining: 2 levels
-
-## Learned Strategies
-
-- Thunder Shock effective vs. Pidgey
-- Avoid Rattata (wastes HP)
-
-## Next Actions
-
-1. Continue grinding until level 25
-2. Move to Route 2
-```
+- File-based memory: `NOTES.md` / `TODO.md` with sections for current objective, progress, learned strategies, and next actions
+- Structured JSON: `state.json` with typed fields
+- Key-value store: database or an MCP / host memory tool
 
 #### Benefits
 
@@ -200,30 +145,7 @@ For narrow checks, constrain the target, fields, count, and range before each co
 
 ### Pattern
 
-```
-Traditional (Pre-load):
-1. Load all relevant files into context
-2. Process
-3. Respond
-→ Wastes context on unused information
-
-Just-in-Time:
-1. Keep lightweight references (file paths, queries, links)
-2. Load specific data when needed
-3. Discard after use
-→ Efficient, focused context
-```
-
-### Implementation
-
-```python
-# Instead of loading entire codebase:
-context = read_all_files("src/")  # ❌ Wasteful
-
-# Use just-in-time retrieval:
-relevant_files = grep_search("function_name")  # ✅ Targeted
-context = read_file(relevant_files[0])         # ✅ On-demand
-```
+Keep lightweight references (file paths, queries, links), load specific data only when needed (search first, then read the matching range), and discard it after use.
 
 ### Progressive Disclosure
 
@@ -301,31 +223,9 @@ For always-loaded workspace entry files such as `.github/copilot-instructions.md
 ## Long-Horizon Task Checklist
 
 ```markdown
-## Context Engineering Checklist
-
-### Before Starting
-
-- [ ] Is this a long-horizon task (>30 min continuous work)?
-- [ ] Will context window likely fill up?
-- [ ] Are there clear milestones to track?
-
-### Technique Selection
-
-- [ ] **Compaction**: Set up summarization trigger at 70% context
-- [ ] **Note-taking**: Create NOTES.md or state file
-- [ ] **Sub-agents**: Identify tasks suitable for delegation
-
-### During Execution
-
-- [ ] Monitor context usage
-- [ ] Write notes at milestones
-- [ ] Compact when needed
-- [ ] Use just-in-time retrieval for large data
-
-### After Completion
-
-- [ ] Archive notes for future reference
-- [ ] Document lessons learned
+- [ ] Long-horizon task (>30 min) likely to fill the context window? Pick compaction trigger (~70%), a notes/state file, and delegable sub-tasks up front
+- [ ] During execution: write notes at milestones, compact when needed, retrieve large data just in time
+- [ ] After completion: archive notes and record lessons learned
 ```
 
 ---
@@ -334,7 +234,7 @@ For always-loaded workspace entry files such as `.github/copilot-instructions.md
 
 **Reduce token cost of definition files that are loaded into every session.**
 
-`.instructions.md`, `.prompt.md`, `.agent.md` are loaded in full on every conversation turn. Verbose files waste tokens before the task even starts.
+Always-applied instructions (`copilot-instructions.md`, `AGENTS.md`, `applyTo`-matched `.instructions.md`) and the selected agent's body are sent with every request; prompt files load only when invoked. Verbose always-loaded files waste tokens before the task even starts.
 
 ### What to Keep vs. Remove
 
@@ -347,13 +247,15 @@ For always-loaded workspace entry files such as `.github/copilot-instructions.md
 
 ### Loading Locations (VS Code Copilot)
 
-| Scope     | Path                                              |
-| --------- | ------------------------------------------------- |
-| Global    | `%APPDATA%/Code/User/prompts/*.instructions.md`   |
-| Workspace | `.github/copilot-instructions.md`                 |
-| Workspace | `.github/instructions/**/*.instructions.md`       |
-| Workspace | `.github/prompts/*.prompt.md / *.agent.md`        |
-| Workspace | `.vscode/settings.json` (`github.copilot.chat.*`) |
+| Scope     | Path                                           |
+| --------- | ---------------------------------------------- |
+| User      | VS Code profile user data `prompts/` folder    |
+| Workspace | `.github/copilot-instructions.md`, `AGENTS.md` |
+| Workspace | `.github/instructions/**/*.instructions.md`    |
+| Workspace | `.github/prompts/*.prompt.md`                  |
+| Workspace | `.github/agents/*.agent.md`                    |
+
+Check what actually loaded via Chat view right-click > Diagnostics.
 
 Duplicate content across global and workspace scopes doubles token cost.
 

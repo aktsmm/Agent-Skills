@@ -1,6 +1,6 @@
 ---
 name: retro-copilot
-description: "Run a retro for ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Triggers on retro, retrospective, incident learning, error analysis, copilot setup, instructions update, インシデント, and 知見反映."
+description: "Run a retro for personal global ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Not for workspace/repository assets, VS Code User Data assets, or a private skills repository. Triggers on retro, retrospective, incident learning, error analysis, copilot setup, instructions update, インシデント, and 知見反映."
 argument-hint: "エラーログ、diff、会話要約、既存 .copilot 資産、またはインシデント内容"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -17,8 +17,9 @@ metadata:
 - 使う: バグ解決後 / 再発発生時 / レビューで `.copilot` 配下の個人用資産の設計ギャップが見つかったとき
 - 使う: `~/.copilot/copilot-instructions.md`、`~/.copilot/instructions/**`、`~/.copilot/skills/**`、`~/.copilot/agents/**`、`~/.copilot/hooks/**` へ反映すべき運用知見があるとき
 - 使わない: typo など軽微修正のみ / 環境固有問題のみ
-- 使わない: workspace / repository 固有の内容。代わりに `retro-workspace` を使う
-- 使わない: VS Code User Data の内容。代わりに `retro-user` を使う
+- 使わない: workspace / repository 固有の内容（workspace/repository assets 向けの retro workflow へ渡す）
+- 使わない: VS Code User Data の内容（VS Code User Data assets 向けの retro workflow へ渡す）
+- 使わない: private skills repository の `.github/skills/**`（private skills repository 向けの retro workflow へ渡す）
 
 ## Core Rules
 
@@ -27,7 +28,6 @@ metadata:
 - 既定モードは `safe-auto`。`.copilot` scope が明確で、Safety & Scope Gate を通過し、既存資産への小〜中規模な統合・更新で済む場合は、確認なしで反映まで実行してよい
 - `review-only` / `確認だけ` / `dry-run` / `プレビュー` が明示された場合だけ、変更案の提示で停止する
 - Confirm only unclear scope, new privileges/destinations/visibility/defaults, destructive deletion or uncertain sensitive data; otherwise use safe-auto without reapproval. Read-only and holds take precedence.
-- 新規ファイル作成より既存ファイルへの統合を優先する
 - Match committed implementation, not local drafts; defer unsupported operations rather than inventing capabilities.
 - List up to three scoped read-only follow-ups: authoring/private-push/distribution gaps. Honor holds and visibility; never widen actions or audits from a suggestion.
 - 他スコープの内容なら自分で編集せず handoff する
@@ -45,7 +45,6 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
 - 既定の反映スコープ
   - `~/.copilot` 配下の個人グローバルカスタマイズ資産を優先する
   - workspace / repository や VS Code User Data へ反映すべき知見はこの skill では扱わず、handoff を提案する。workspace handoff は host が提供する active workspace を指定し、外部の新規プロジェクトフォルダを作成・提案しない
-  - memory 系スコープは反映先にしない
 - ターミナル観点
   - Exit Code != 0
   - Ctrl+C（中断）
@@ -87,10 +86,7 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
 ## Refactor Context Rules
 
 - SSOT を守る。重複定義は統合する
-- 新規ファイル作成より既存ファイルへの統合を優先する
-- 既存ファイルに 1 セクション追加や 1 ルール追記で済むなら、新規ファイルを作らない
-- 単一ルール追加や導線追加は catch-all な既存ファイルを優先し、新規ファイルは最後の手段にする
-- 新規ファイルは、既存ファイルの役割に収まらず `Target Rationale` で必要性を説明できる場合だけ許可する
+- 新規ファイル作成より既存ファイルへの統合を優先する。1 セクション / 1 ルール / 導線の追加は catch-all な既存ファイルに入れ、新規ファイルは既存の役割に収まらず `Target Rationale` で必要性を説明できる場合だけ許可する
 - 50 行以下の小さいファイルは、明確な価値がない限り変更不要または最小差分とする
 - 冗長説明は圧縮するが、根拠 URL・非自明な手順・運用メタコメントは消さない
 - `Target Rationale` では「なぜ新規作成でなく既存統合か」を必ず説明する
@@ -126,12 +122,8 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
 
 ## Decision Rules
 
-- まず既存 `.copilot` 資産へ統合できないかを見る
 - instructions は原則、skills はタスク手順、agents は役割分離、hooks は決定的自動化の棲み分けで選ぶ
-- 新規作成は既存の役割に収まらない場合だけ
-- workspace / repository へ反映すべき内容は `retro-workspace` に handoff する
-- VS Code User Data へ反映すべき内容は `retro-user` に handoff する
-- memory 系スコープは反映先にしない
+- handoff 先: workspace / repository、VS Code User Data、private skills repository の知見は、そのスコープ向けの retro workflow へ渡す（このスキルでは編集しない）
 - 最小差分で反映する
 
 ## Output Requirements

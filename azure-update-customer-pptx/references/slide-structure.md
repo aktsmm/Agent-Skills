@@ -217,10 +217,7 @@ protocol names, and read the Azure Updates body plus Microsoft Learn before a pl
 feature effect does not change. The raw title, status, and announcement URL remain available through
 `title`, `label`, and `sourceUrl` for notes and audit.
 
-If `titleJa` is changed after Prepare, regenerate the classification-derived notes and reviewed-region
-artifacts before Build. Do not replace or freely edit `title`, because scripts use it as the join key.
-Titles must be unique and must not be prefix-related after 12 normalized characters so prefix matching cannot attach
-the wrong slide, note, or region entry.
+Rerun rules after a `titleJa` change and the uniqueness / 12-character prefix rule: [mcp-sourced-content.md › Title fields](mcp-sourced-content.md#title-fields).
 
 ### Table splitting
 

@@ -61,12 +61,7 @@ Avoid source monoculture. If all evidence comes from builders talking to builder
 
 ## 6. Search and Fetch Are Different
 
-Treat keyword search as discovery and page fetch as evidence reading.
-
-- Search finds candidate sources.
-- Fetch/read extracts claims, numbers, quotes, constraints, and contradictions.
-
-Do not let search snippets become final evidence for market, legal, or platform decisions.
+Search only finds candidate sources; market, legal, or platform decisions need the fetched page, never the snippet.
 
 ## 7. Review Gates Are Separate Thinking Modes
 
@@ -97,17 +92,7 @@ A practical threshold is three similar blockers, but tune it by domain risk.
 
 ## 9. Notification Compression
 
-High-frequency worker loops should not notify on every run.
-
-Report periodically with:
-
-- queue health
-- promising opportunities
-- stale or rejected items
-- repeated blockers
-- next-cycle focus
-
-Why: too much notification trains humans to ignore the system.
+High-frequency worker loops should not notify on every run. Report periodically with queue health, promising opportunities, stale or rejected items, repeated blockers, and next-cycle focus.
 
 ## 10. Metrics Need Provenance
 

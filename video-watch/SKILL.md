@@ -29,10 +29,10 @@ This skill is inspired by `bradautomates/claude-video`, but it targets GitHub Co
 ## Core Workflow
 
 1. Run preflight if dependencies are uncertain:
-   `python .github/skills/video-watch/scripts/preflight.py`
-   Use `python .github/skills/video-watch/scripts/preflight.py --url-mode` for URL inputs.
+   `python <skill-dir>/scripts/preflight.py`
+   Use `python <skill-dir>/scripts/preflight.py --url-mode` for URL inputs.
 2. Produce artifacts:
-   `python .github/skills/video-watch/scripts/video_watch.py <url-or-path> --question "<what to answer>"`
+   `python <skill-dir>/scripts/video_watch.py <url-or-path> --question "<what to answer>"`
    Use `--transcript-file <path>` when another tool, Azure Speech, or Speech Translator Desktop Plus already produced a transcript.
    For private or authenticated media, prefer `--detail transcript --metadata-only --transcript-file <path>` and do not pass cookies, bearer tokens, or signed URL credentials.
 3. Read artifacts in this order:

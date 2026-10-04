@@ -8,7 +8,7 @@ Choose the right customization primitive before creating files.
 | --------------------------------------------------------------------------- | ---------------------- | --------------------------------------------------------- | --------------------------------------------------- |
 | Project-wide defaults that should apply to most work                        | Workspace instructions | Always-on guidance with low ceremony                      | The rule only matters for one task or one file type |
 | File-scoped or task-scoped guidance                                         | File instructions      | On-demand discovery or `applyTo` matching                 | The content is really a reusable workflow           |
-| Single focused slash command                                                | Prompt                 | Fast invocation with optional parameters                  | The task needs bundled scripts or rich assets       |
+| Single focused slash command (Local harness only)                           | Prompt                 | Fast invocation with optional parameters                  | Agent Host sessions (not loaded); bundled assets    |
 | Reusable multi-step workflow with bundled scripts, templates, or references | Skill                  | Best balance of reuse, discovery, and progressive loading | You only need a one-off command or always-on rule   |
 | Persona with tool restrictions, delegation, or handoffs                     | Custom agent           | Lets you control role boundaries and tools                | The need is procedural, not persona-based           |
 | Deterministic enforcement or lifecycle automation                           | Hook                   | Runtime guarantees, blocking, auto-validation             | Simple instructions are sufficient                  |
@@ -35,7 +35,7 @@ Default to workspace only when the behavior should be shared through version con
 ## Fast Rules of Thumb
 
 - If the request starts with "always", it is usually an instruction.
-- If the request starts with "when I type /", it is usually a prompt or skill.
+- If the request starts with "when I type /", it is usually a skill (skills appear as slash commands). Prompt files are deprecated for Agent Host sessions and work only with the Local harness; prefer migrating them to skills.
 - If the request needs scripts, templates, or structured references, lean toward a skill.
 - If the request is about a specialist persona or safe tool boundaries, lean toward a custom agent.
 - If a prompt only lists tools to make them available, remove `tools:`. Prompt-level `tools:` narrows availability; it does not request tools opportunistically.

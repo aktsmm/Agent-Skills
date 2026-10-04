@@ -19,10 +19,16 @@
 edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;
 ```
 
-### Curved
+### Elbow (rounded corners)
 
 ```
 edgeStyle=elbowEdgeStyle;elbow=horizontal;rounded=1;
+```
+
+### Curved
+
+```
+edgeStyle=orthogonalEdgeStyle;curved=1;
 ```
 
 ### Straight
@@ -142,9 +148,7 @@ When a small service icon sits close to a busy connector or arrow:
 
 ### Alignment
 
-- Align nodes in grid (gridSize=10)
-- Center labels in nodes
-- Use consistent node sizes
+- Align nodes to the grid (gridSize=10)
 - **Container with children** → `verticalAlign=top;spacingTop=5;` to keep the label above child nodes
 - **Standalone box (no children)** → `verticalAlign=middle;` to center text and avoid lopsided whitespace
 
@@ -197,13 +201,7 @@ Always shrink-wrap: set page width/height to tightest bounding box + 20px margin
 
 ## Editable Source Policy
 
-- Treat `.drawio` as the editable source of truth for documentation diagrams.
-- Treat `.drawio.svg` as the delivery/render artifact for Markdown and web embedding.
-- When the user explicitly needs to edit the diagram, ship and link the `.drawio` first; preview SVG/PNG is optional and must not replace the editable source.
-- Do not label a plain SVG as `.drawio.svg`. That suffix is reserved for metadata-embedded SVG exports that Draw.io can reopen.
-- If a diagram required manual SVG-level cleanup, recreate or preserve the equivalent `.drawio` source before calling it done.
-- Do not leave a documentation diagram as SVG-only unless the user explicitly asked for a disposable one-off artifact.
-- If the editor keeps resolving a stale path or refuses to open a file that exists, it is acceptable to create short alias filenames such as `current-understanding.drawio` and `current-understanding.svg`, then repoint local links to the alias pair.
+`.drawio` is the editable SSOT and `.drawio.svg` is the embed artifact; naming, pairing and re-export rules live in [delivery-patterns.md](delivery-patterns.md). When the user needs to edit the diagram, ship and link the `.drawio` first.
 
 ## Font Settings
 

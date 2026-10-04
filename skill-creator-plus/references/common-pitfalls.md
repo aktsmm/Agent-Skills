@@ -6,17 +6,7 @@ These issues often cause silent failures or poor skill routing.
 
 ### Weak Description
 
-Bad descriptions explain what the skill is, but not when it should trigger.
-
-```yaml
-description: "Helpful skill for productivity"
-```
-
-Prefer explicit trigger phrases and task context.
-
-```yaml
-description: "Create and review Agent Skills. Use when creating a new skill, updating SKILL.md, or fixing weak skill triggers."
-```
+A description that says what the skill is but not when to trigger it. Bad/good examples: [skill-review-checklist.md](skill-review-checklist.md#issue-2-vague-description).
 
 ### Missing User Phrases
 
@@ -31,7 +21,7 @@ Add phrases users actually say: file names, verbs, and common shorthand.
 
 Skill names that foreground an implementation detail (tool, input format, intermediate artifact) make slash commands harder to find and reuse. Lead with the user-visible task or outcome; keep techniques in `description` and `## When to Use`.
 
-Example: `review-security-structure` for a security review skill — mention AST, structure maps, call graphs, Source/Sink in description only.
+Example: name a security review skill after the outcome (e.g. `review-code-security`), not the technique — mention AST, structure maps, call graphs, Source/Sink in description only.
 
 ## YAML and Frontmatter
 
@@ -66,7 +56,7 @@ prove strict common-spec compliance.
 
 ### Accidental Prompt Tool Restrictions
 
-In VS Code prompt files, `tools:` is not harmless metadata. It overrides the default agent's enabled tools for that prompt run and can appear in the tools picker as a current-session-only configuration.
+In VS Code prompt files (Local harness only; Agent Host does not load them), `tools:` is not harmless metadata. It overrides the default agent's enabled tools for that prompt run and can appear in the tools picker as a current-session-only configuration.
 
 Use `tools:` in `*.prompt.md` only when the prompt must deliberately narrow capabilities. If the prompt should inherit the user's normal Agent tools, omit `tools:` entirely.
 
@@ -76,7 +66,7 @@ Prefer custom agents for stable role/tool boundaries. Use prompt-level `tools:` 
 
 ### Monolithic SKILL.md
 
-If the body grows past the quick-start workflow, move details into `references/`.
+See [skill-review-checklist.md](skill-review-checklist.md#issue-1-skillmd-too-long).
 
 ### Wrong Primitive
 
@@ -125,6 +115,14 @@ Prefer:
 Tests can leave `__pycache__`, `.pyc`, `.pyo`, `.DS_Store`, or `Thumbs.db` inside
 a skill folder. Exclude them in the packager itself and inspect archive entries;
 manual pre-package cleanup is not a reliable distribution contract.
+
+### Drifted Script Names
+
+A scaffolded helper (`scripts/helper.py`) is often documented later under a different name such as `scripts/validate_*.py`. The SKILL.md command then points to a file that does not exist while bundled tests still pass. Rename the file and its test import, or fix the docs, and check every mentioned path and flag against the bundled scripts.
+
+### Formatter-Broken Nesting
+
+Prettier un-nests bullets and code blocks indented 2 spaces under a numbered list item, splitting one numbered workflow into separate lists on save. Indent content under numbered items by 3 spaces.
 
 ## Review Smells
 

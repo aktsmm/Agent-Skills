@@ -52,6 +52,4 @@ PowerShell 7 is the common execution layer across Windows, macOS, and Linux for 
 
 This skill currently documents and scaffolds the runner contract. It does not yet provision runner binaries, app registrations, or tenant consent flows automatically.
 
-The installer helper downloads the preferred runner, but it still leaves authentication and tenant consent as explicit operator steps.
-
-If a live `/me` read succeeds but live mail or calendar writes return `403 ErrorAccessDenied`, treat tenant consent and app registration as a real prerequisite for write validation.
+The installer helper downloads the preferred runner, but it still leaves authentication and tenant consent as explicit operator steps. For write-time `403 ErrorAccessDenied`, see [Troubleshooting](troubleshooting.md).

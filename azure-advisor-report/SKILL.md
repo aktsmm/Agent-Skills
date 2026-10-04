@@ -46,7 +46,7 @@ Azure Advisor 推奨事項・コスト推移を分析し、顧客向けの簡易
 
 [Markdown テンプレート](./assets/report-template.md) をベースに生成。
 
-出力先: 任意のパス（例: `{customer}/monthly-report_{YYYYMMDD}.md`）
+出力先: 任意のパス（例: `{customer}/Azure-Brief-{YYYYMMDD}.md`。命名は guardrails に従う）
 
 ### Phase 3: PowerPoint レポート生成
 
@@ -54,8 +54,10 @@ Azure Advisor 推奨事項・コスト推移を分析し、顧客向けの簡易
 複数サブスクリプションの場合は Subscription ID ごとに章を分ける。重要な推奨事項は個別ページを作り、英語原文、日本語訳、リスク、推奨アクション、メリット / デメリット、是正手順、Microsoft Learn URL を入れる。
 Executive Summary と推奨アクションでは、必要に応じて WAF / CAF の観点も添える。
 
+スクリプトはテンプレート。先頭の CONFIG / DATA セクションを実データで書き換えてから実行する（引数は `--output` のみ）。
+
 ```powershell
-py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.pptx
+py -3 scripts/generate_pptx.py --output report.pptx
 ```
 
 ### Phase 4: 検証
@@ -100,7 +102,10 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 
 ### PPTX 生成のルール
 
-汎用 PPTX 衛生ルール（スライドノート必須、フォント下限、テーブル列幅、`.tmp.pptx` で生成して PermissionError 回避、ヘルパー関数の扱いなど）は **powerpoint-automation** skill を SSOT とする。本レポート固有のルールのみ以下に残す。
+- **スライドノート必須**: 全スライドに speaker notes を入れる
+- **フォント下限**: 本文・表の文字を小さくしすぎない（目安 10pt 以上）
+- **テーブル列幅**: 列幅を内容に合わせて明示設定し、折り返しで行が潰れないようにする
+- **一時ファイルで生成**: `.tmp.pptx` に書き出してから置き換え、開いている PPTX との PermissionError を避ける
 
 - **既存フル構成の継承**: 既存顧客に過去の完成度が高い PPTX / generator がある場合、別の薄い新規 deck を作らず、既存のフル構成へ最新データを差し替える。比較軸・カテゴリ別章・speaker notes が落ちると前回品質より劣化するため
 - **データソース取得日必須**: 表紙または補足で各データソースの取得日を明示する（Cost=JPY / 顧客ダッシュボード=USD のように通貨も併記）
@@ -108,5 +113,4 @@ py -3 generate_pptx.py --title "顧客名" --data-dir ./output --output report.p
 
 ### Advisor データ取得のルール
 
-- **全 4 カテゴリを必ず取得**: Cost, Security, HighAvailability, **OperationalExcellence**
-- 「未取得」「次回予定」は禁止。結果が 0 件なら 「0件（推奨なし）」 と記載
+- **全 4 カテゴリを必ず取得**: Cost, Security, HighAvailability, **OperationalExcellence**（0 件時の書き方は上記 7 を参照）

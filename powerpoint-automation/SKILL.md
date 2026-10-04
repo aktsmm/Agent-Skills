@@ -46,11 +46,11 @@ Edit the currently open PowerPoint deck with COM Automation and verify RefURL, n
 TRIAGE → PLAN → PREPARE_TEMPLATE → EXTRACT → TRANSLATE → BUILD → REVIEW → DONE
 ```
 
-| Phase   | Main Actor                | Purpose                          |
-| ------- | ------------------------- | -------------------------------- |
-| EXTRACT | `extract_images.py`       | Source -> content.json           |
-| BUILD   | `create_from_template.py` | content.json -> PPTX             |
-| REVIEW  | PPTX Reviewer             | Overflow / consistency / quality |
+| Phase   | Main Actor                | Purpose                                                   |
+| ------- | ------------------------- | --------------------------------------------------------- |
+| EXTRACT | `reconstruct_analyzer.py` | Source -> content.json (+ `extract_images.py` for images) |
+| BUILD   | `create_from_template.py` | content.json -> PPTX                                      |
+| REVIEW  | PPTX Reviewer             | Overflow / consistency / quality                          |
 
 ## Core Assets
 
@@ -138,4 +138,3 @@ Use [Implementation Patterns](references/IMPLEMENTATION_PATTERNS.md) for shape d
 - visual QA はレンダー画像で行い、修正後に該当スライドを再確認している
 - 表は本文 16pt 以上を原則とし、header は中央揃え・中段揃えで視認性を確認している
 - build 後に overflow / consistency / hyperlink をレビューできている
-

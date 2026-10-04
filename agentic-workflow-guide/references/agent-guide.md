@@ -14,19 +14,11 @@ Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 - [Handoffs vs agent](#handoffs-vs-agent) - Comparison
 - [Checklist](#checklist) - Implementation checklist
 
-> **Platform Note (2026/02 Updated)**:
+> **Platform Note (2026/10 verified)**:
 >
-> - **VS Code Copilot**: Use `agent` in `tools:` and `#tool:agent` in prompts (`runSubagent` is a legacy alias)
+> - **VS Code Copilot (Local harness)**: Put the `agent` tool set in `tools:` (individual tool id: `agent/runSubagent`) and reference it as `#tool:agent` in the body
 > - **Claude Code**: Use `Task` in `tools:`
-
-### Legacy call patterns (avoid in new docs)
-
-The following legacy forms may still work but should not be used in new documentation:
-
-- `tools: ["runSubagent"]` → use `tools: ["agent"]`
-- `#tool:runSubagent` → use `#tool:agent`
-- `runSubagent({ ... })` → use `agent({ ... })`
-- `agent/runSubagent` (old tool path) → use `agent`
+> - Do not write the old flat name `tools: ["runSubagent"]` in new docs
 
 ## What is agent?
 
@@ -34,14 +26,14 @@ The `agent` tool launches an independent agent with a **clean context window** t
 
 ### Key Characteristics
 
-| Aspect        | Description                                                       |
-| ------------- | ----------------------------------------------------------------- |
-| **Context**   | Each sub-agent has its own context window (isolated from main)    |
-| **Execution** | Synchronous - main agent waits for result (NOT async/background)  |
-| **Stateless** | One-shot execution - no follow-up conversation possible           |
-| **Return**    | Only final summary returns to main agent                          |
-| **Parallel**  | ✅ Supported (2026/01+) - multiple sub-agents can run in parallel |
-| **Nesting**   | ❌ NOT supported - sub-agents cannot call agent                   |
+| Aspect        | Description                                                                           |
+| ------------- | ------------------------------------------------------------------------------------- |
+| **Context**   | Each sub-agent has its own context window (isolated from main)                        |
+| **Execution** | Synchronous - main agent waits for result (NOT async/background)                      |
+| **Stateless** | One-shot execution - no follow-up conversation possible                               |
+| **Return**    | Only final summary returns to main agent                                              |
+| **Parallel**  | ✅ Supported (2026/01+) - multiple sub-agents can run in parallel                     |
+| **Nesting**   | ⚠️ Off by default (see [Pitfall 3](#pitfall-3-nested-sub-agent-calls-off-by-default)) |
 
 ### Primary Purpose
 
@@ -92,7 +84,7 @@ When a workflow matches these scenarios or the thresholds in [splitting-criteria
 # VS Code Copilot
 ---
 name: Orchestrator
-tools: ["agent", "web/fetch", "readFile"]
+tools: ["agent", "web/fetch", "read"]
 ---
 # Claude Code
 ---
@@ -122,10 +114,8 @@ For each file, launch a sub-agent to analyze and return findings.
 
 1. Analyze requirements
 2. For each identified file:
-
-- Call #tool:agent with prompt:
-  "Read [filename], identify issues, suggest fixes"
-
+   - Call #tool:agent with prompt:
+     "Read [filename], identify issues, suggest fixes"
 3. Synthesize all sub-agent results
 ```
 
@@ -147,14 +137,13 @@ When calling `agent`, your **prompt** parameter must include:
 
 ### Zenn-compliant minimal template
 
+`MyOrchestrator.agent.md`:
+
 ```markdown
-# MyOrchestrator.agent.md
-
 ---
-
 name: MyOrchestrator
-tools: ['agent']
-
+tools: ["agent"]
+agents: ["Researcher"]
 ---
 
 #tool:agent を使用して、Researcher エージェントを呼び出してください。
@@ -218,43 +207,37 @@ Main Agent (Orchestrator)
 
 **Orchestrator Agent Definition:**
 
-```yaml
+````markdown
 ---
 name: Code Review Orchestrator
 description: Reviews code changes across multiple files using sub-agents
-tools: ["agent", "read_file", "grep_search"]
+tools: ["agent", "read", "search", "search/changes"]
 ---
+
 # Code Review Orchestrator
 
 ## Workflow
 
 1. **Identify changed files**
-- Use grep_search or read_file to list modified files
+   - Use #tool:search/changes to list modified files
+2. **Dispatch review sub-agents** (MUST use #tool:agent)
+   For each file, call #tool:agent with prompt:
 
-2. **Dispatch review sub-agents** ⚠️ MUST USE agent
-For each file, call #tool:agent with prompt:
-```
-
-Review the file at [filepath]:
-
-- Security issues (HIGH/MEDIUM/LOW)
-- Logic bugs
-- Style violations
-  Return as structured JSON: {security: [], bugs: [], style: []}
-
-```
+   ```text
+   Review the file at [filepath]:
+   - Security issues (HIGH/MEDIUM/LOW)
+   - Logic bugs
+   - Style violations
+   Return as structured JSON: {security: [], bugs: [], style: []}
+   ```
 
 3. **Synthesize results**
-- Aggregate all sub-agent outputs
-- Prioritize by severity
-- Generate final review report
+   - Aggregate all sub-agent outputs, prioritize by severity, generate the final report
 
-## CRITICAL: Sub-agent Dispatch
+## Sub-agent Dispatch
 
-You MUST use #tool:agent for file reviews.
-Do NOT review files directly in main context.
-Each sub-agent keeps file content isolated.
-```
+Use #tool:agent for file reviews. Do not review files directly in the main context.
+````
 
 ---
 
@@ -304,13 +287,13 @@ For EACH file → agent with specific prompt.
 # to reduce overhead while maintaining context isolation
 ```
 
-### Pitfall 3: Nested Sub-agent Calls (Not Supported)
+### Pitfall 3: Nested Sub-agent Calls (Off by Default)
 
-❌ **Problem:** Sub-agent tries to call another sub-agent
+❌ **Problem:** Sub-agent tries to call another sub-agent and silently does the work itself
 
-**Reality:** Sub-agents cannot call `agent` themselves. Nesting is not supported.
+**Reality:** Local subagents cannot invoke further subagents by default. Nesting requires `chat.subagents.allowInvocationsFromSubagents: true` (max depth 5) and `agent` in the subagent's `tools`. A self-referential agent (listing itself in `agents`) also needs this setting.
 
-**Solution:** Keep hierarchy flat:
+**Solution:** Keep hierarchy flat unless recursion is intentional; if enabled, include a stopping condition:
 
 ```
 ✅ Correct:
@@ -318,8 +301,8 @@ Orchestrator → Worker A
             → Worker B
             → Worker C
 
-❌ Wrong:
-Orchestrator → Worker A → Sub-Worker (NOT ALLOWED)
+⚠️ Only with the nesting setting enabled:
+Orchestrator → Worker A → Sub-Worker
 ```
 
 ### Pitfall 4: Vague Sub-agent Prompts
@@ -336,26 +319,17 @@ Return as:
 - Recommendation: (1 sentence)
 ```
 
-### Pitfall 5: Sub-agent Handoff to Named Agents
+### Pitfall 5: Named Custom Agent Not Invoked
 
-❌ **Problem:** Trying to use `subagentType=my-agent` doesn't work
+❌ **Problem:** The orchestrator names a worker agent but a generic subagent runs instead, or the call fails
 
-**Reality:** agent creates fresh agents, cannot handoff to existing agent definitions.
+**Causes:** Agent names are case-sensitive (use the exact `name`); the worker has `disable-model-invocation: true`; the coordinator's `agents` list does not include it.
 
-**Solution:** Define sub-agent behavior in the prompt parameter, not in separate files.
+**Solution:** Use the exact name, check the coordinator's `agents` list, and confirm in Chat view > right-click > Diagnostics that the worker loaded without errors.
 
-### Pitfall 6: Custom Agent as Sub-agent (Experimental)
+### Pitfall 6: Custom Agent as Sub-agent
 
-⚠️ **Experimental Feature:** As of 2026/01, you can invoke custom agents as sub-agents with additional configuration.
-
-**Enable in VS Code:**
-
-```json
-// settings.json
-{
-  "chat.customAgentInSubagent.enabled": true
-}
-```
+Custom agents can run as subagents without any extra setting (the old `chat.customAgentInSubagent.enabled` setting is no longer needed).
 
 **Usage:**
 
@@ -366,18 +340,20 @@ Return as:
 - agentName: my-custom-agent
 ```
 
-**Limitations:**
+**Controls:**
 
-- Custom agent must NOT have `disable-model-invocation: true` (default: `false`)
-  - ℹ️ `infer:` は deprecated。`user-invocable` / `disable-model-invocation` を使用すること
-- Sub-agent cannot access main session context
-- Parallel execution available (2026/01+) but with overhead
+- `user-invocable: false` hides the worker from the agents dropdown only; it stays callable as a subagent
+- `disable-model-invocation: true` blocks subagent invocation, but explicitly listing the agent in a coordinator's `agents` overrides it
+- `agents: [...]` on the coordinator restricts allowed workers (`['*']` or omitted = all, `[]` = none); include `agent` in its `tools`
+- `infer:` は deprecated。`user-invocable` / `disable-model-invocation` を使用すること
+- Model order: explicit `model` in the call > worker's `model` > main model. A model above the main model's cost tier makes the subagent fail
+- Sub-agent cannot access main session history; ask-question and todo tools are unavailable to Local subagents
 
 ### Pitfall 7: Restricting Orchestrator's tools Breaks Sub-agents
 
 ❌ **Problem:** Orchestrator の `tools:` から `edit` を外してSRPを強制 → サブエージェント（Writer等）が `edit` を使えなくなる
 
-**Reality:** 親エージェントの `tools:` はサブエージェントの**ツール上限（ceiling）**として機能する。親で許可されていないツールは、サブエージェントでも使用不可。
+**Reality:** custom agent を指定しない汎用サブエージェントは、親の instructions と選択済みツールを継承する（公式 docs）。そのため親の `tools:` が実質的な上限になる。custom agent の worker は自分の `tools:` で上書きできると docs にあるが、親の制限を超えられるかは未検証のため、親で外したツールを worker に期待しない。
 
 ```
 ❌ Wrong: Orchestratorで edit を制限
@@ -403,20 +379,20 @@ description: サブエージェントに作業を委譲
 
 ---
 
-## Inline Sub-agent Pattern (Recommended)
+## Inline Sub-agent Pattern (One-off Tasks)
 
-Instead of referencing external `.agent.md` files, embed the sub-agent's role definition directly in the prompt.
+For one-off delegation, embed the sub-agent's role definition directly in the prompt instead of creating an `.agent.md` file.
 
-### Why Inline?
+### Inline vs Named Custom Agent
 
-| Approach                                    | Pros                     | Cons                              |
-| ------------------------------------------- | ------------------------ | --------------------------------- |
-| External reference (`agentName: developer`) | Reusable, DRY            | May not work reliably, dependency |
-| **Inline definition**                       | Self-contained, reliable | Slightly longer prompts           |
+| Approach                                    | Pros                               | Cons                                  |
+| ------------------------------------------- | ---------------------------------- | ------------------------------------- |
+| Named custom agent (`agentName: developer`) | Reusable, own tools/model          | Needs exact name, discoverable file   |
+| **Inline definition**                       | Self-contained, no file dependency | Inherits parent tools; longer prompts |
 
 ### Example: Inline Developer Sub-agent
 
-`markdown
+```markdown
 #tool:agent を使用してサブエージェントを起動してください。
 
 **prompt**: 以下の内容を渡す
@@ -441,13 +417,7 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 ## タスク
 
 {具体的な修正内容}
-`
-
-### Benefits
-
-1. **Reliability**: No dependency on external files
-2. **Portability**: Single file works anywhere
-3. **Clarity**: Sub-agent behavior is explicit in the orchestrator
+```
 
 ## Token Efficiency
 
@@ -476,12 +446,12 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 ## Handoffs vs agent
 
-| Feature          | Handoffs                  | agent                   |
-| ---------------- | ------------------------- | ----------------------- |
-| **Context**      | Shared (via prompt)       | Isolated (clean window) |
-| **User Control** | Manual approval           | Automatic execution     |
-| **Use Case**     | Phase transitions         | Context isolation       |
-| **Workflow**     | Plan → Implement → Review | Research, log analysis  |
+| Feature          | Handoffs                                | agent                   |
+| ---------------- | --------------------------------------- | ----------------------- |
+| **Context**      | Shared conversation + pre-filled prompt | Isolated (clean window) |
+| **User Control** | Manual approval                         | Automatic execution     |
+| **Use Case**     | Phase transitions                       | Context isolation       |
+| **Workflow**     | Plan → Implement → Review               | Research, log analysis  |
 
 **Recommendation:**
 
@@ -497,7 +467,7 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 ### Agent Definition
 
-- [ ] tools includes "agent"
+- [ ] tools includes "agent" (required when `agents:` is set)
 - [ ] Explicit instructions to USE sub-agents (not just "can use")
 - [ ] Sub-agent prompt template defined
 
@@ -510,9 +480,9 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 ### Anti-patterns Avoided
 
-- [ ] No "process in parallel" expectations
+- [ ] Parallel sub-agents only for truly independent tasks
 - [ ] No vague "analyze this" prompts
-- [ ] No reliance on handoff to named agents
+- [ ] Named workers: exact name, coordinator `agents` list, `disable-model-invocation` checked
 - [ ] Orchestrator doesn't do sub-agent work itself
 
 ### Testing
@@ -526,43 +496,23 @@ Instead of referencing external `.agent.md` files, embed the sub-agent's role de
 
 ## References
 
-- [Chat in IDE - GitHub Docs](https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide#using-subagents)
-- [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents)
+- [Use subagents in VS Code](https://code.visualstudio.com/docs/agents/run/subagents)
+- [Custom Agents in VS Code](https://code.visualstudio.com/docs/agent-customization/custom-agents)
+- [Chat in IDE - GitHub Docs](https://docs.github.com/en/copilot/how-tos/copilot-in-your-ide/chat-with-copilot/chat-in-ide#using-subagents)
 - [GitHub Copilot agent (旧 runSubagent) - Zenn](https://zenn.dev/openjny/articles/2619050ec7f167)
-- [Context Engineering for Agents - LangChain Blog](https://blog.langchain.com/context-engineering-for-agents/)- [Handoffs Guide](handoffs-guide.md) - Alternative for human-in-the-loop workflows
+- [Context Engineering for Agents - LangChain Blog](https://www.langchain.com/blog/context-engineering-for-agents)
+- [Handoffs Guide](handoffs-guide.md) - Alternative for human-in-the-loop workflows
 - [Splitting Criteria](splitting-criteria.md) - When to use sub-agents
 
 ---
 
-## ⚠️ tools 形式の注意点（2026/02 Updated）
+## tools 形式の注意点
 
-VS Code Copilot のカスタムエージェントで正しくサブエージェントを呼び出すには、以下の形式を守る必要があります。
+ツール名・エイリアス・形式は [agent-template.md の Recommended tools style](agent-template.md#recommended-tools-style-for-agentmd) を SSOT とする。サブエージェント関連で非自明な点だけ残す。
 
-### 正しいツールエイリアス
-
-| エイリアス | 説明                     | 間違い例              |
-| ---------- | ------------------------ | --------------------- |
-| agent      | サブエージェント呼び出し | runSubagent           |
-| read       | ファイル読み取り         | read/readFile         |
-| edit       | ファイル編集             | edit/editFiles        |
-| search     | 検索                     | search/textSearch     |
-| execute    | コマンド実行             | execute/runInTerminal |
-| todo       | タスク管理               | todos                 |
-
-> **参考:** [GitHub Docs - Custom agents configuration](https://docs.github.com/en/copilot/reference/custom-agents-configuration#tools)
-
-### JSON配列形式を推奨
-
-YAML配列形式は動作しない場合があります。JSON配列形式を使用してください。
-
-正しい形式:
-tools: ["agent", "read", "edit", "search", "execute", "todo"]
-
-間違い形式:
-tools:
-
-- agent
-- read
+- `agent` tool set を入れ忘れると `agents:` を書いても委譲されない
+- 旧フラット名（`runSubagent`, `readFile`, `fetch` 等）ではなく tool set（`read`）か `<set>/<tool>`（`read/readFile`, `web/fetch`）で書く
+- 公式例に合わせ flow 形式（`tools: ["agent", "read", "search"]`）で書く
 
 ### シンプルなプロンプト構造
 

@@ -136,22 +136,7 @@ Present options to user and get approval before proceeding.
 
 ## Error Handling
 
-### Retry Policy
-
-- Max 3 retries per phase
-- On failure: Identify issue, attempt fix, retry
-- After 3 failures: ESCALATE to human intervention
-
-### Fallback Matrix
-
-| Phase          | Failure Type         | Fallback To      | Action                      |
-| -------------- | -------------------- | ---------------- | --------------------------- |
-| REVIEW(JSON)   | Schema violation     | EXTRACT          | Re-run reconstruct          |
-| REVIEW(JSON)   | Empty slides         | EXTRACT          | Fix content.json            |
-| REVIEW(JSON)   | Translation error    | TRANSLATE        | Re-run Localizer            |
-| REVIEW(PPTX)   | Slide count mismatch | BUILD            | Re-run create_from_template |
-| BUILD          | Template load error  | PREPARE_TEMPLATE | Run diagnose_template       |
-| **3 failures** | Any                  | **ESCALATE**     | Human intervention          |
+Max 3 retries per phase, then ESCALATE. Fallback matrix and escalation output: [error-recovery.instructions.md](../instructions/error-recovery.instructions.md) (SSOT).
 
 ---
 

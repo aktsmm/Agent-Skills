@@ -25,27 +25,12 @@ Basic IP 移行について - https://learn.microsoft.com/ja-jp/azure/vpn-gatewa
 {
   "type": "content",
   "title": "参考URL一覧",
-  "bullets": [
-    {
-      "text": "VPN Gateway の新機能 - https://learn.microsoft.com/ja-jp/azure/vpn-gateway/whats-new",
-      "level": 0
-    },
-    {
-      "text": "Basic IP 移行について - https://learn.microsoft.com/ja-jp/azure/vpn-gateway/basic-public-ip-migrate-about",
-      "level": 0
-    }
+  "items": [
+    "VPN Gateway の新機能 - https://learn.microsoft.com/ja-jp/azure/vpn-gateway/whats-new",
+    "Basic IP 移行について - https://learn.microsoft.com/ja-jp/azure/vpn-gateway/basic-public-ip-migrate-about"
   ]
 }
 ```
-
-### Why This Format?
-
-| Aspect        | Benefit                                 |
-| ------------- | --------------------------------------- |
-| Readability   | Title provides context before URL       |
-| Clickability  | URL is clearly separated and clickable  |
-| Consistency   | Uniform style across all presentations  |
-| Accessibility | Screen readers can announce title first |
 
 ### Anti-patterns (Avoid)
 
@@ -76,6 +61,8 @@ Avoid thin patterns unless the missing object/action is added:
 
 ### Hierarchy Levels
 
+> ⚠️ `items` (string array) is the schema format. `bullets` with `{text, level}` objects is accepted by `create_from_template.py` but fails `validate_content.py` / `schemas/content.schema.json` for `content` slides. Use it only when sub-levels are required, and expect to skip or adapt schema validation for those slides.
+
 | Level | Use Case       | Example                  |
 | ----- | -------------- | ------------------------ |
 | 0     | Main points    | Key feature descriptions |
@@ -100,37 +87,7 @@ Avoid thin patterns unless the missing object/action is added:
 
 ## Image References
 
-### Local Images
-
-```json
-{
-  "image": {
-    "path": "images/architecture.png",
-    "position": "right",
-    "width_percent": 45
-  }
-}
-```
-
-### Remote Images
-
-```json
-{
-  "image": {
-    "url": "https://example.com/diagram.png",
-    "position": "bottom",
-    "height_percent": 50
-  }
-}
-```
-
-### Position Options
-
-| Position | Description                  |
-| -------- | ---------------------------- |
-| `right`  | Image on right, text on left |
-| `bottom` | Image below text             |
-| `full`   | Full-slide image             |
+`image` field options (`path` / `url`, `position`, `width_percent` / `height_percent`): [template-content-json.instructions.md](instructions/template-content-json.instructions.md#image-embedding).
 
 ## URL Priority (Japanese First)
 
@@ -237,30 +194,17 @@ gh api "repos/MicrosoftDocs/azure-docs/commits?path=articles/{service}/{file}.md
 {
   "type": "content",
   "title": "Document Update History (GitHub)",
-  "bullets": [
-    { "text": "Recent changes to whats-new.md", "level": 0 },
-    { "text": "2026-01-30: Active-Passive GA, deadline extended", "level": 1 },
-    { "text": "Source: MicrosoftDocs/azure-docs", "level": 0 }
+  "items": [
+    "Recent changes to whats-new.md",
+    "2026-01-30: Active-Passive GA, deadline extended",
+    "Source: MicrosoftDocs/azure-docs"
   ]
 }
 ```
 
 ## Slide Numbers
 
-### Enable in content.json
-
-```json
-{
-  "title": "Presentation Title",
-  "settings": {
-    "slide_numbers": true,
-    "date_footer": "2026-02-03"
-  },
-  "slides": [...]
-}
-```
-
-> ⚠️ If slide numbers don't appear, enable them in the template via "Insert → Header and Footer".
+The bundled scripts do not read a `settings.slide_numbers` / `date_footer` field. Enable slide numbers and date footer in the template (Insert → Header and Footer) or set them via COM after build.
 
 ## Technical Capability Claims
 
@@ -286,78 +230,6 @@ When a presentation claims that AI, agents, automation, or a platform can perfor
 4. Agent loads vN.pptx (NOT the original) → applies next fix → saves as vN+1.pptx
 ```
 
-## COM Layout: Dynamic Sizing (sw/sh Based)
-
-Fixed pixel values for left/width often overflow on 16:9 slides (sw=720, sh=450).
-Always compute widths relative to slide dimensions.
-
-### Anti-pattern
-
-```python
-# BAD: right edge = 500 + 420 = 920 > sw(720)
-rect(slide, 500, 120, 420, 220, WHITE)
-```
-
-### Correct Pattern
-
-```python
-ml = 56       # left margin
-mr = 48       # right margin
-gap = 24
-total_w = sw - ml - mr
-card_w = (total_w - gap) / 2
-left1 = ml
-left2 = ml + card_w + gap
-```
-
-> Also applies to text width when images occupy part of the slide:
-> `text_w = sw - left_margin - image_width - gap`
-
-## Overlay Opacity for Text on Background Images
-
-When placing text over a background image with a semi-transparent overlay:
-
-| Overlay Alpha | Result                                   |
-| ------------- | ---------------------------------------- |
-| 0.50–0.60     | Background bleeds through, low contrast  |
-| **0.70–0.80** | **Recommended for body text**            |
-| 0.85+         | Background barely visible, may look flat |
-
-- Use `alpha=0.75` as a starting point
-- Sub-text (SKY/MUTED colors) needs higher alpha than white headings
-- Always verify with a contrast checker
-
-## Mascot / Illustration Placement Variety
-
-Repeating the same character position on every slide looks monotonous.
-Vary position and size per slide:
-
-| Slide Purpose | Position                      | Size             |
-| ------------- | ----------------------------- | ---------------- |
-| Cover / Title | Bottom-right                  | Large (200+)     |
-| Content       | Bottom-right or Top-right     | Small (110–160)  |
-| Closing       | Right-center or Center-bottom | Medium (170–200) |
-| Appendix      | Left side                     | Large (180+)     |
-
-> Always verify the image doesn't overlap text boxes
-> (use the overlap detection pattern below).
-
-## Operational Text Goes in Slide Notes
-
-Instructions like 「FIXED」「REPLACE EACH EVENT」「差し替えてください」 must **not** appear on slide faces.
-Use `set_notes()` (COM) or `slide.notes_slide.notes_text_frame` (python-pptx)
-to store per-slide operational notes:
-
-```python
-# COM pattern
-slide.NotesPage.Shapes.Placeholders(2).TextFrame.TextRange.Text = (
-    "【運営ノート】\n"
-    "■ 差し替え箇所: タイトル, 日付\n"
-    "■ 固定要素: ブランド画像, 配色\n"
-    "■ 進行メモ: 開場BGMを流しながら表示"
-)
-```
-
 **Anti-pattern**:
 
 ```
@@ -373,10 +245,7 @@ files = sorted(glob.glob('*_v*.pptx'), key=os.path.getmtime, reverse=True)
 latest = files[0]  # Use this as base
 ```
 
-**PowerPoint Sections**: 「セクション」（左ペインの区切り）はPowerPoint独自メタデータ。
-
-- XML直編集は無視されることがあるため、基本はPowerPoint上で追加/編集して確認
-- 自動化する場合も「ファイル内でPowerPointが使っているURI」に合わせる（環境差あり）
+**PowerPoint Sections**: 自動化手順は [IMPLEMENTATION_PATTERNS.md](IMPLEMENTATION_PATTERNS.md#section-headers-slide-sorter-groups) を参照。
 
 ---
 
@@ -412,17 +281,7 @@ for para in tf.paragraphs:
             r.text = ""
 ```
 
-### Best Practice: Use Script Files
-
-Inline Python in terminal commands has escaping issues. Always write `.py` files:
-
-```python
-# ❌ NG: Inline Python with f-string escaping issues
-python -c "print(f'{\"|\".join(items)}')"
-
-# ✅ OK: Write to .py file and execute
-python fix_script.py
-```
+Run-level edits with nontrivial logic belong in a `.py` file, not inline `python -c` (shell escaping breaks f-strings and pipes).
 
 ## Factual Accuracy in Technical Content (★ Important)
 

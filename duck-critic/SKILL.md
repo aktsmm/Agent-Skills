@@ -1,6 +1,6 @@
 ---
 name: duck-critic
-description: "Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes. Use when asked for rubber duck, ラバーダック, 別モデルレビュー, second opinion, critic, code review, design review, plan critique, or review by another model/agent harness."
+description: "Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes. Use when asked for rubber duck, ラバーダック, 別モデルレビュー, second opinion, critic, or a different-model code review, design review, plan critique, or review by another model/agent harness. Not for readability refactoring or code cleanup alone."
 argument-hint: "レビュー対象の計画/差分/コード/テスト、観点、使いたいハーネス"
 user-invocable: true
 license: CC BY-NC-SA 4.0

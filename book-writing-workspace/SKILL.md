@@ -56,20 +56,10 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 Use the setup script only when creating a new workspace or adding missing structure deliberately.
 
 ```powershell
-python scripts/setup_workspace.py `
-  --name "project-name" `
-  --title "Book Title" `
-  --path "D:\target\path" `
-  --chapters 8
-
-# Include Re:VIEW/PDF scaffolding only when needed.
-python scripts/setup_workspace.py `
-  --name "project-name" `
-  --title "Book Title" `
-  --path "D:\target\path" `
-  --chapters 8 `
-  --with-review
+python scripts/setup_workspace.py --name "project-name" --title "Book Title" --path "<parent-dir>" --chapters 8  # add --with-review only when Re:VIEW/PDF is needed
 ```
+
+All options: [references/setup-workflow.md](references/setup-workflow.md).
 
 1. **Gather info**: Project name, title, location, chapter count
 2. **Run script**: `scripts/setup_workspace.py`
@@ -85,7 +75,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 - Manuscript folders under `keypoints/`, `sections/`, and `images/`
 - AI workflow files under `.github/agents/` and `.github/instructions/`
 - Project docs such as `README.md`, `docs/reader-personas.md`, `docs/page-allocation.md`, `docs/schedule.md`, and `docs/release-readiness-record.md`
-- Helper scripts such as `scripts/count_chars.py`
+- Helper scripts such as `scripts/count_chars.py` (copied from this skill's `templates/scripts/`)
 - Optional Re:VIEW scripts and metadata when `--with-review` is used
 
 ## Recommended Writing Unit
@@ -96,30 +86,30 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 
 ## Agents Overview
 
-| Agent               | Role                          | Default |
-| ------------------- | ----------------------------- | ------- |
-| `@writing`          | Write and edit manuscripts    | Yes     |
-| `@writing-reviewer` | Review manuscripts (P1/P2/P3) | Yes     |
+| Agent               | Role                          | Default                   |
+| ------------------- | ----------------------------- | ------------------------- |
+| `@writing`          | Write and edit manuscripts    | Yes                       |
+| `@writing-reviewer` | Review manuscripts (P1/P2/P3) | Yes                       |
 | `@converter`        | Convert Markdown to Re:VIEW   | Only with `--with-review` |
 
 ## Dependencies
 
-| Tool        | Purpose           | Required |
-| ----------- | ----------------- | -------- |
-| Python 3.8+ | Scripts           | Yes      |
-| Git         | Version control   | Yes      |
+| Tool        | Purpose           | Required                            |
+| ----------- | ----------------- | ----------------------------------- |
+| Python 3.8+ | Scripts           | Yes                                 |
+| Git         | Version control   | Yes                                 |
 | Docker      | Re:VIEW PDF build | Optional, only with `--with-review` |
 
 ## Reference Map
 
-| Topic                | Reference                                                                |
-| -------------------- | ------------------------------------------------------------------------ |
-| Folder structure     | [references/folder-structure.md](references/folder-structure.md)         |
-| Setup workflow       | [references/setup-workflow.md](references/setup-workflow.md)             |
-| Customization points | [references/customization-points.md](references/customization-points.md) |
+| Topic                | Reference                                                                        |
+| -------------------- | -------------------------------------------------------------------------------- |
+| Folder structure     | [references/folder-structure.md](references/folder-structure.md)                 |
+| Setup workflow       | [references/setup-workflow.md](references/setup-workflow.md)                     |
+| Customization points | [references/customization-points.md](references/customization-points.md)         |
 | External review      | [references/external-review-handling.md](references/external-review-handling.md) |
-| Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)           |
-| Screenshot capture   | [references/screenshot-capture.md](references/screenshot-capture.md)     |
+| Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)                   |
+| Screenshot capture   | [references/screenshot-capture.md](references/screenshot-capture.md)             |
 | Release readiness    | [references/release-readiness-review.md](references/release-readiness-review.md) |
 
 ## Optional Build Pipeline

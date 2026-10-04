@@ -25,7 +25,7 @@
 
 - `classify_input.py`: Input classification, method selection → classification.json
 - `reconstruct_analyzer.py`: English PPTX → content.json (auto slide type detection, notes extraction)
-  - `--classification` option to reference classification.json
+  - `--context <classification.json>` to reference classification.json; `--layouts <layouts.json>` for layout mapping
 - `extract_images.py`: Extract images from PPTX → images/slide\_{nn}.png/jpg
 
 ### Template Processing
@@ -33,7 +33,7 @@
 - `analyze_template.py`: Layout analysis → layouts.json (first time only)
 - `diagnose_template.py`: Template quality diagnosis (backgrounds, broken refs)
 - `clean_template.py`: Remove backgrounds and problem elements
-- `create_clean_template.py`: **Auto-generate clean template from source PPTX** ★ NEW
+- `create_clean_template.py`: **Auto-generate clean template from source PPTX**
 
 ### Validation
 
@@ -48,7 +48,7 @@
   - `--force` for warning-only forced generation
 - `create_ja_pptx.py`: JSON → new PPTX (python-pptx)
 - `merge_slides.py`: Merge pptxgenjs diagrams into template
-- `insert_diagram_slides.py`: Insert diagram slides at correct position/layout ★ NEW
+- `insert_diagram_slides.py`: Insert diagram slides at correct position/layout
 
 ---
 
@@ -139,7 +139,7 @@ Code blocks in articles go in content.json `code` field:
 | ---------------------------- | ------------------ | ----------------------- |
 | `create_from_template.py`    | ✅ Supported       | Dark bg + Consolas font |
 | `create_pptx.js` (pptxgenjs) | ✅ Supported       | Native support          |
-| `create_ja_pptx.py`          | ⚠️ To be added     | Future support          |
+| `create_ja_pptx.py`          | ❌ Not supported   | `code` field is ignored |
 
 ---
 
@@ -194,8 +194,7 @@ $base = "20251216_azure_diagram"
 $template = "assets/template.pptx"
 
 # 1. Generate diagram with pptxgenjs (shapes, arrows)
-node scripts/create_azure_diagram.js
-# → output_ppt/${base}_diagram.pptx
+node scripts/create_pptx.js "output_manifest/${base}_content.json" "output_ppt/${base}_diagram.pptx"
 
 # 2. Merge into template (inherit master)
 python scripts/merge_slides.py $template "output_ppt/${base}_diagram.pptx" "output_ppt/${base}.pptx" --clear-template

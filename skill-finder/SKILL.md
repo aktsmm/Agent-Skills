@@ -22,21 +22,9 @@ Full-featured Agent Skills management tool.
 
 ## Recommendation Gate
 
-Before searching, check whether the user really wants a **skill**.
+Before searching, check whether the ask really calls for a **skill** rather than a prompt, instruction, agent, or hook. If not, explain that first instead of forcing a skill recommendation.
 
-| If the ask sounds like...              | Prefer...   |
-| -------------------------------------- | ----------- |
-| Single slash task                      | Prompt      |
-| Always-on or file-scoped guidance      | Instruction |
-| Persona, tool restrictions, delegation | Agent       |
-| Deterministic enforcement              | Hook        |
-| Reusable packaged workflow             | Skill       |
-
-If the answer is not **Skill**, explain that first instead of forcing a skill recommendation.
-
-> 上表は「skill を勧めるべきか」の即時ゲート。primitive 選択の詳細 SSOT は **agentic-workflow-guide** skill。
-
-→ **[references/customization-routing.md](references/customization-routing.md)** for routing patterns
+→ **[references/customization-routing.md](references/customization-routing.md)** for routing patterns.
 
 ## Features
 
@@ -107,8 +95,8 @@ python scripts/search_skills.py --add-source https://github.com/owner/repo
 ### Core Rules
 
 - Use "Do it? Yes/No?" style proposals
-- **NEVER** show commands to users - execute silently
-- **ALWAYS** include proposal block after search results
+- Run commands yourself instead of showing them to users
+- Include the proposal block after search results
 
 ### Search Response Format
 

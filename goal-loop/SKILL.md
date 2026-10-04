@@ -23,7 +23,7 @@ metadata:
 
 - 1 ファイル・自明・低リスクの修正。通常 agent が直接実行する。
 - 普通の相談、計画だけ、コードレビューだけ、事実確認だけ。
-- skill / prompt / instruction / agent 自体の設計レビュー。まず `skill-creator-plus` や `agentic-workflow-guide` を使う。
+- skill / prompt / instruction / agent 自体の設計レビュー。この skill の対象外。
 
 ## Execution Contract
 

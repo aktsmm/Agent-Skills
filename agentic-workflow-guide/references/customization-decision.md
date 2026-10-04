@@ -4,13 +4,13 @@ Choose the simplest customization primitive that can solve the problem.
 
 ## Decision Matrix
 
-| Need                                                             | Best Fit    | Why                                     | Avoid When                                            |
-| ---------------------------------------------------------------- | ----------- | --------------------------------------- | ----------------------------------------------------- |
-| One focused slash task                                           | Prompt      | Fastest path, minimal ceremony          | The task needs bundled scripts or reusable references |
-| Always-on or file-scoped guidance                                | Instruction | Loads automatically or on demand        | The behavior is really a workflow                     |
-| Reusable workflow with bundled scripts, references, or templates | Skill       | Best for repeatable task packages       | The ask is only persona or tool restrictions          |
-| Persona, tool restrictions, delegation, or handoffs              | Agent       | Gives role boundaries and orchestration | The task can be solved without role isolation         |
-| Deterministic blocking, validation, or auto-execution            | Hook        | Enforces behavior at runtime            | Guidance alone is enough                              |
+| Need                                                                                                 | Best Fit    | Why                                                                | Avoid When                                                                              |
+| ---------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| One focused slash task (Local agent only)                                                            | Prompt      | Fastest path, minimal ceremony                                     | It must run in Agent Host sessions (use a skill), or needs bundled scripts / references |
+| Always-on or file-scoped guidance                                                                    | Instruction | Loads automatically or on demand                                   | The behavior is really a workflow                                                       |
+| Reusable workflow with bundled scripts, references, or templates; or a slash workflow for Agent Host | Skill       | Best for repeatable task packages; also appears as a slash command | The ask is only persona or tool restrictions                                            |
+| Persona, tool restrictions, delegation, or handoffs                                                  | Agent       | Gives role boundaries and orchestration                            | The task can be solved without role isolation                                           |
+| Deterministic blocking, validation, or auto-execution                                                | Hook        | Enforces behavior at runtime                                       | Guidance alone is enough                                                                |
 
 ## Guidance vs Enforcement
 
@@ -32,7 +32,7 @@ Examples:
 
 Use complexity only when required.
 
-1. Prompt
+1. Prompt (Local only; prompt files are deprecated for Agent Host sessions — start at a minimal skill when the workflow must run there)
 2. Prompt + instructions
 3. Skill or single agent
 4. Multi-agent workflow
@@ -48,21 +48,20 @@ Use complexity only when required.
 
 ## Scope Guidance
 
-| Scope        | Use When                               |
-| ------------ | -------------------------------------- |
-| Workspace    | Shared with the team or tied to a repo |
-| User profile | Personal preference across repos       |
+| Scope        | Use When                                                                                                                      |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Workspace    | Shared with the team or tied to a repo                                                                                        |
+| User profile | Personal preference across repos (Agent Host reads host folders such as `~/.copilot/agents`; Local reads the VS Code profile) |
 
 ## Overdesign Smells
 
 - Multi-agent proposed before confirming a single agent is insufficient
 - Agent created only to hold long instructions
-- Skill created even though there are no bundled assets or reusable resources
+- Skill created even though there are no bundled assets or reusable resources (exception: replacing a prompt file so it works in Agent Host)
 - Hook proposed for guidance that could stay as instructions
 - Workspace asset proposed for a purely personal preference
 - Questions asked before extracting obvious specialization from the conversation
 - Hook proposed before confirming a lifecycle event or deterministic need
-- Prompt file lists tools only to make them available; in VS Code `tools:` is an allowlist and should be omitted unless narrowing is intentional
 
 ## Prompt Tool Boundary Rule
 
@@ -72,15 +71,7 @@ If tool boundaries are stable and role-like, prefer a custom agent over prompt-l
 
 ## Creation Loop
 
-Built-in customization flows follow a lightweight loop that is worth reusing:
-
-1. Extract the reusable pattern from the conversation
-2. Clarify only the missing ambiguity
-3. Draft the customization file directly
-4. Identify the weakest or most ambiguous part
-5. Iterate and then suggest the next adjacent customization
-
-Use this loop for prompt / instruction / skill / agent / hook creation unless the task is already fully specified.
+Extract → clarify only the missing ambiguity → draft → review the weakest part → iterate. Details: [builtin-customization-patterns.md](builtin-customization-patterns.md#6-minimal-reusable-loop).
 
 ## Output Pattern
 

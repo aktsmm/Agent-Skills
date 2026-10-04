@@ -2,168 +2,37 @@
 
 ブラウザ拡張機能のテスト戦略（Vitest + Playwright）。
 
----
-
-## テスト戦略
-
 | テスト種別     | ツール     | 対象                                    |
 | -------------- | ---------- | --------------------------------------- |
 | ユニットテスト | Vitest     | ユーティリティ、ロジック、状態管理      |
-| 統合テスト     | Vitest     | コンポーネント、Chrome API モック       |
+| 統合テスト     | Vitest     | コンポーネント、拡張 API を使うロジック |
 | E2Eテスト      | Playwright | 拡張機能全体、実際のブラウザ操作        |
 
----
+## Vitest（WXT）
 
-## Vitest セットアップ
-
-### インストール
-
-```bash
-npm install -D vitest jsdom @testing-library/react @testing-library/jest-dom
-```
-
-### 設定
+`chrome` を手書きで `vi.stubGlobal` するより、WXT の Vitest プラグインを使う（[Unit Testing](https://wxt.dev/guide/essentials/unit-testing)）。
 
 ```typescript
 // vitest.config.ts
 import { defineConfig } from "vitest/config";
+import { WxtVitest } from "wxt/testing/vitest-plugin";
 
 export default defineConfig({
-  test: {
-    environment: "jsdom",
-    include: ["**/*.test.ts", "**/*.test.tsx"],
-    globals: true,
-    setupFiles: ["./test/setup.ts"],
-  },
+  plugins: [WxtVitest()],
 });
 ```
 
-### セットアップファイル
+- `browser` が `@webext-core/fake-browser` のインメモリ実装で polyfill されるので、`storage` などはモックせずに実際の挙動で検証できる。テストごとに `fakeBrowser.reset()`（`wxt/testing/fake-browser`）。
+- `wxt.config.ts` の Vite 設定、auto-import、`import.meta.env.BROWSER` などのグローバル、`@/*` エイリアスも反映される。
+- `#imports` 由来の関数をモックするときは実パスを指定する（例: `vi.mock("wxt/utils/inject-script")`）。実パスは `.wxt/types/imports-module.d.ts` で確認する（無ければ `wxt prepare`）。
+- fake browser は実ブラウザの制約（シリアライズ、権限、SW 終了）を再現しない。境界は E2E で確認する（下記）。
 
-```typescript
-// test/setup.ts
-import "@testing-library/jest-dom";
+## Playwright E2E
 
-// Chrome API モック
-const chromeMock = {
-  storage: {
-    local: {
-      get: vi.fn(),
-      set: vi.fn(),
-    },
-    sync: {
-      get: vi.fn(),
-      set: vi.fn(),
-    },
-    onChanged: {
-      addListener: vi.fn(),
-    },
-  },
-  runtime: {
-    sendMessage: vi.fn(),
-    onMessage: {
-      addListener: vi.fn(),
-    },
-  },
-  tabs: {
-    query: vi.fn(),
-    sendMessage: vi.fn(),
-  },
-};
-
-vi.stubGlobal("chrome", chromeMock);
-```
-
-### テスト例
-
-```typescript
-// utils/storage.test.ts
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { saveSettings, getSettings } from "./storage";
-
-describe("Storage Utils", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("should save settings to local storage", async () => {
-    const settings = { theme: "dark" };
-    await saveSettings(settings);
-
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({ settings });
-  });
-
-  it("should get settings from local storage", async () => {
-    vi.mocked(chrome.storage.local.get).mockResolvedValue({
-      settings: { theme: "light" },
-    });
-
-    const result = await getSettings();
-
-    expect(result).toEqual({ theme: "light" });
-  });
-});
-```
-
----
-
-## React コンポーネントテスト
-
-```typescript
-// components/Popup.test.tsx
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
-import { Popup } from "./Popup";
-
-describe("Popup Component", () => {
-  it("should render correctly", () => {
-    render(<Popup />);
-    expect(screen.getByText("Settings")).toBeInTheDocument();
-  });
-
-  it("should toggle theme on button click", async () => {
-    render(<Popup />);
-
-    const button = screen.getByRole("button", { name: /toggle theme/i });
-    fireEvent.click(button);
-
-    expect(chrome.storage.local.set).toHaveBeenCalled();
-  });
-});
-```
-
----
-
-## Playwright E2E テスト
-
-### インストール
-
-```bash
-npm install -D @playwright/test
-npx playwright install chromium
-```
-
-### 設定
-
-```typescript
-// playwright.config.ts
-import { defineConfig } from "@playwright/test";
-
-export default defineConfig({
-  testDir: "./e2e",
-  use: {
-    headless: false, // 拡張機能テストは headless: false 必須
-  },
-  projects: [
-    {
-      name: "chromium",
-      use: { browserName: "chromium" },
-    },
-  ],
-});
-```
-
-### 拡張機能読み込み
+- 拡張は `launchPersistentContext` でのみ読み込める。Chrome / Edge 本体はサイドロード用フラグを削除済みなので、Playwright 同梱の Chromium を使う。
+- `channel: "chromium"` を指定すれば headless でも拡張が動く（headed も可）。
+- 拡張 ID は SW の URL から取る（`context.serviceWorkers()` が空なら `waitForEvent("serviceworker")`）。
+- MV3 SW は約 30 秒で停止・再起動されるが、Playwright の Worker ハンドルは再起動をまたいで有効。停止の瞬間に実行中だった `evaluate()` は `Service worker restarted` で失敗し得る。
 
 ```typescript
 // e2e/fixtures.ts
@@ -177,7 +46,7 @@ export const test = base.extend<{
   context: async ({}, use) => {
     const pathToExtension = path.join(__dirname, "../.output/chrome-mv3");
     const context = await chromium.launchPersistentContext("", {
-      headless: false,
+      channel: "chromium",
       args: [
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
@@ -187,114 +56,21 @@ export const test = base.extend<{
     await context.close();
   },
   extensionId: async ({ context }, use) => {
-    // 拡張機能のService Worker URLから ID を取得
-    let [background] = context.serviceWorkers();
-    if (!background) {
-      background = await context.waitForEvent("serviceworker");
-    }
-    const extensionId = background.url().split("/")[2];
-    await use(extensionId);
+    let [sw] = context.serviceWorkers();
+    if (!sw) sw = await context.waitForEvent("serviceworker");
+    await use(sw.url().split("/")[2]);
   },
 });
-
 export const expect = test.expect;
 ```
 
-### E2E テスト例
-
-```typescript
-// e2e/popup.spec.ts
-import { test, expect } from "./fixtures";
-
-test("popup should open and display content", async ({
-  context,
-  extensionId,
-}) => {
-  // ポップアップページを開く
-  const popupPage = await context.newPage();
-  await popupPage.goto(`chrome-extension://${extensionId}/popup.html`);
-
-  // 要素を確認
-  await expect(popupPage.locator("h1")).toContainText("My Extension");
-});
-
-test("content script should inject into page", async ({ context }) => {
-  const page = await context.newPage();
-  await page.goto("https://example.com");
-
-  // Content Script が注入した要素を確認
-  const injectedElement = page.locator("[data-extension-injected]");
-  await expect(injectedElement).toBeVisible();
-});
-```
-
-### サイドパネルテスト
-
-```typescript
-// e2e/sidepanel.spec.ts
-import { test, expect } from "./fixtures";
-
-test("side panel should display", async ({ context, extensionId }) => {
-  // サイドパネルページを直接開く（実際のサイドパネル操作は制限あり）
-  const page = await context.newPage();
-  await page.goto(`chrome-extension://${extensionId}/sidepanel.html`);
-
-  await expect(page.locator("main")).toBeVisible();
-});
-```
-
----
-
-## CI/CD 設定
-
-### GitHub Actions
-
-```yaml
-# .github/workflows/test.yml
-name: Test
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - run: npm ci
-
-      - name: Run unit tests
-        run: npm run test
-
-      - name: Build extension
-        run: npm run build
-
-      - name: Install Playwright
-        run: npx playwright install chromium
-
-      - name: Run E2E tests
-        run: npm run test:e2e
-        env:
-          # E2Eテストは headless: false が必要なため xvfb を使用
-          DISPLAY: ":99"
-
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-report
-          path: playwright-report/
-```
-
----
+- ポップアップやサイドパネルは `chrome-extension://<id>/<page>.html` を直接開いて検証する。実際のサイドパネル UI の開閉は自動化に制約がある。
+- CI では `npm run build` の後に E2E を走らせ、失敗時は `playwright-report/` を artifact として保存する。
 
 ## WXT Typecheck
 
 WXT の生成型を含めた型検査は、root `tsconfig.json` や `.wxt/tsconfig.json` だけでは不足することがある。専用 `tsconfig.typecheck.json` を用意し、`.wxt/wxt.d.ts` と必要な browser API 型を include する。
+
 ```json
 {
   "extends": "./tsconfig.json",
@@ -306,21 +82,10 @@ WXT の生成型を含めた型検査は、root `tsconfig.json` や `.wxt/tsconf
   "include": ["**/*.ts", "**/*.tsx", ".wxt/wxt.d.ts"]
 }
 ```
+
 `entrypoints/` 配下に補助 `.d.ts` を置くと WXT が entrypoint と誤認することがあるため、shim は root か型専用フォルダに置く。
+
 ## テスト Tips
-
-
-### Chrome API の詳細モック
-
-```typescript
-// 詳細なモック設定
-vi.mocked(chrome.storage.local.get).mockImplementation(async (keys) => {
-  if (keys.includes("settings")) {
-    return { settings: { theme: "dark" } };
-  }
-  return {};
-});
-```
 
 ### 実ブラウザ境界のテスト
 

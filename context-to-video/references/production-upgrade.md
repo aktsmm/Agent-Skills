@@ -4,13 +4,13 @@
 
 ## なぜ差し替えるか
 
-| 項目 | edge-tts | Azure Speech 正規 |
-|---|---|---|
-| 認証 | なし (匿名) | サブスクキー or Entra ID |
-| SLA | なし | 99.9% |
-| 商用利用 | グレー | 明示OK |
-| 安定性 | エンドポイント変更で突然停止リスク | 公式 |
-| 機能 | Neural voices | + HD voices / Custom Neural Voice / **TTS Avatar** |
+| 項目     | edge-tts                           | Azure Speech 正規                                  |
+| -------- | ---------------------------------- | -------------------------------------------------- |
+| 認証     | なし (匿名)                        | サブスクキー or Entra ID                           |
+| SLA      | なし                               | 99.9%                                              |
+| 商用利用 | グレー                             | 明示OK                                             |
+| 安定性   | エンドポイント変更で突然停止リスク | 公式                                               |
+| 機能     | Neural voices                      | + HD voices / Custom Neural Voice / **TTS Avatar** |
 
 ## Azure Speech (TTS) に差し替え
 
@@ -34,7 +34,7 @@ def tts_azure(text: str, out_path: str, voice: str = "ja-JP-NanamiNeural"):
 
 `scripts/build_video.py` の `tts()` をこれに差し替えるだけ。声名は edge-tts と同じものが多くそのまま使える。
 
-参考: https://learn.microsoft.com/azure/ai-services/speech-service/
+参考: https://learn.microsoft.com/ja-jp/azure/ai-services/speech-service/
 
 ## Azure TTS Avatar (アバター動画)
 
@@ -50,7 +50,7 @@ ffmpeg -i slides_video.mp4 -i avatar.mp4 -filter_complex \
   -map 0:a -c:a copy out.mp4
 ```
 
-公式: https://learn.microsoft.com/azure/ai-services/speech-service/text-to-speech-avatar/what-is-text-to-speech-avatar
+公式: https://learn.microsoft.com/ja-jp/azure/ai-services/speech-service/text-to-speech-avatar/what-is-text-to-speech-avatar
 
 ## Entra ID 認証 (会社サブで disableLocalAuth=true の場合)
 

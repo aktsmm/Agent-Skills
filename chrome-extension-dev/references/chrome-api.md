@@ -1,353 +1,88 @@
 # Chrome API Reference
 
-Chrome拡張機能で使用する主要APIの詳細ガイド。
+主要 API の基本的な呼び出し方は公式 [API Reference](https://developer.chrome.com/docs/extensions/reference/api) に従う。ここでは権限・上限・踏みやすい挙動だけを扱う（2026-09 時点の公式 docs で確認）。
 
----
+- Chrome 148+ は標準化された `browser.*` 名前空間もサポートする。WXT は `browser` を提供するため、WXT プロジェクトではそちらに揃える。
 
-## chrome.tabs API
+## chrome.tabs
 
-タブの作成・変更・再配置など、ブラウザのタブシステムを操作。
+- `tabs` 権限は `url` / `title` / `favIconUrl` を読むときだけ必要。ユーザー操作時に現在タブへ一時アクセスするだけなら `activeTab` で足りる。
+- `tabs.captureVisibleTab()` は呼び出し頻度に上限がある（`MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND`）。スクロールしながら連続撮影する処理は間隔を空け、quota エラーを再試行で吸収する。
 
-### 権限
+## chrome.storage
 
-```json
-{
-  "permissions": ["tabs"],        // url, title等のセンシティブ情報
-  "permissions": ["activeTab"],   // ユーザー操作時の一時的アクセス
-  "host_permissions": ["*://*/*"] // ホストへの完全アクセス
-}
-```
+| エリア    | 容量                                                       | コンテンツスクリプトへの公開 | 用途 / 注意                                                       |
+| --------- | ---------------------------------------------------------- | ---------------------------- | ----------------------------------------------------------------- |
+| `local`   | 10MB（`unlimitedStorage` で解除）                          | 既定で公開                   | 大きなデータ。拡張削除でクリア                                    |
+| `sync`    | 約 100KB、1 item 8KB、512 items、120 書込/分・1800 書込/時 | 既定で公開                   | ユーザー設定。同期オフ時は local と同じ挙動。機密データは置かない |
+| `session` | 10MB（メモリ）                                             | 既定で非公開                 | SW の一時状態。無効化・再読込・更新・ブラウザ再起動でクリア       |
+| `managed` | -                                                          | 既定で公開                   | 企業ポリシー（読取専用）                                          |
 
-### よく使うメソッド
+- 公開範囲は `chrome.storage.<area>.setAccessLevel()` で変える。
+- `localStorage` は使わない: SW で使えず、コンテンツスクリプトではホストページと共有し、閲覧履歴削除で消える。
+- 上限超過は即座に失敗（Promise reject）。高頻度書き込みは debounce する。
 
-```typescript
-// 現在のタブを取得
-async function getCurrentTab() {
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    lastFocusedWindow: true,
-  });
-  return tab;
-}
+## chrome.cookies
 
-// 新しいタブを作成
-chrome.tabs.create({ url: "https://example.com" });
+- `cookies` 権限に加え、対象ドメインの `host_permissions` が必要。
+- `cookies.set` の `expirationDate` は UNIX 秒（ミリ秒ではない）。
 
-// タブにメッセージを送信
-const response = await chrome.tabs.sendMessage(tabId, { type: "getData" });
+## chrome.offscreen
 
-// タブを更新
-await chrome.tabs.update(tabId, { url: "https://new-url.com" });
+SW から DOM API を使うための隠しドキュメント（Chrome 109+、`offscreen` 権限）。
 
-// タブを閉じる
-await chrome.tabs.remove(tabId);
-```
-
-### イベント
+- 同時に開けるのは拡張ごとに 1 つだけ（incognito split モードでは通常/シークレットで各 1 つ）。作成前に存在確認し、並行作成を Promise で直列化する。
+- オフスクリーンドキュメント内で使える拡張 API は `chrome.runtime` だけ。結果はメッセージで SW に返す。
+- `reasons` は用途に合うものを選び、`justification` を必ず書く。主な値: `DOM_PARSER`、`DOM_SCRAPING`、`IFRAME_SCRIPTING`、`CLIPBOARD`、`BLOBS`、`AUDIO_PLAYBACK`（30 秒無音で自動終了）、`USER_MEDIA`、`DISPLAY_MEDIA`、`WEB_RTC`、`LOCAL_STORAGE`、`WORKERS`、`MATCH_MEDIA`、`GEOLOCATION`、`BATTERY_STATUS`、`TESTING`。
 
 ```typescript
-// タブがアクティブになった時
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  console.log("Tab activated:", activeInfo.tabId);
-});
+let creating: Promise<void> | null = null;
 
-// タブが更新された時
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete") {
-    console.log("Tab loaded:", tab.url);
-  }
-});
-
-// タブが閉じられた時
-chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  console.log("Tab closed:", tabId);
-});
-```
-
----
-
-## chrome.storage API
-
-ユーザーデータの保存・取得・変更追跡。
-
-### 権限
-
-```json
-{
-  "permissions": ["storage"]
-}
-```
-
-### Storage エリア
-
-| エリア    | 容量             | 同期 | 用途                       |
-| --------- | ---------------- | ---- | -------------------------- |
-| `local`   | 10MB             | ❌   | 大きなデータ               |
-| `sync`    | 100KB (8KB/item) | ✅   | ユーザー設定               |
-| `session` | 10MB             | ❌   | 一時データ（メモリ）       |
-| `managed` | -                | -    | 管理者ポリシー（読取専用） |
-
-### 使用例
-
-```typescript
-// ローカルストレージに保存
-await chrome.storage.local.set({ key: "value" });
-
-// 取得
-const result = await chrome.storage.local.get(["key"]);
-console.log(result.key);
-
-// Sync ストレージ（ブラウザ間同期）
-await chrome.storage.sync.set({ settings: { theme: "dark" } });
-
-// Session ストレージ（メモリ、再起動でクリア）
-await chrome.storage.session.set({ tempData: {} });
-
-// 変更を監視
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
-    console.log(`${key} changed from ${oldValue} to ${newValue}`);
-  }
-});
-```
-
-### ⚠️ 注意: localStorage は使わない
-
-- Service Worker で使用不可
-- Content Script はホストページとストレージを共有
-- ブラウザ履歴削除でデータ消失
-
----
-
-## chrome.cookies API
-
-Cookieの取得・設定・変更通知。
-
-### 権限
-
-```json
-{
-  "permissions": ["cookies"],
-  "host_permissions": ["*://*.example.com/"]
-}
-```
-
-### 使用例
-
-```typescript
-// Cookie取得
-const cookie = await chrome.cookies.get({
-  url: "https://example.com",
-  name: "session_id",
-});
-
-// 全Cookie取得
-const cookies = await chrome.cookies.getAll({ domain: "example.com" });
-
-// Cookie設定
-await chrome.cookies.set({
-  url: "https://example.com",
-  name: "my_cookie",
-  value: "my_value",
-  expirationDate: Date.now() / 1000 + 3600,
-});
-
-// Cookie削除
-await chrome.cookies.remove({
-  url: "https://example.com",
-  name: "my_cookie",
-});
-
-// 変更監視
-chrome.cookies.onChanged.addListener((changeInfo) => {
-  console.log("Cookie changed:", changeInfo.cookie.name, changeInfo.cause);
-});
-```
-
----
-
-## chrome.offscreen API
-
-Service WorkerでDOM操作が必要な場合に使用。
-
-### 権限
-
-```json
-{
-  "permissions": ["offscreen"]
-}
-```
-
-### 使用理由
-
-| 理由             | 説明                  |
-| ---------------- | --------------------- |
-| `CLIPBOARD`      | クリップボードAPI使用 |
-| `DOM_PARSER`     | DOMParser使用         |
-| `DOM_SCRAPING`   | iframe内のDOM取得     |
-| `AUDIO_PLAYBACK` | 音声再生              |
-| `USER_MEDIA`     | getUserMedia()        |
-| `WEB_RTC`        | WebRTC使用            |
-
-### 使用例
-
-```typescript
-// オフスクリーンドキュメントが存在するか確認
 async function setupOffscreenDocument(path: string) {
-  const existingContexts = await chrome.runtime.getContexts({
+  const existing = await chrome.runtime.getContexts({
     contextTypes: ["OFFSCREEN_DOCUMENT"],
     documentUrls: [chrome.runtime.getURL(path)],
   });
+  if (existing.length > 0) return;
 
-  if (existingContexts.length > 0) return;
-
-  await chrome.offscreen.createDocument({
-    url: path,
-    reasons: ["CLIPBOARD"],
-    justification: "クリップボード操作のため",
-  });
-}
-
-// 使用
-await setupOffscreenDocument("offscreen.html");
-await chrome.runtime.sendMessage({ type: "copy", data: "text" });
-```
-
----
-
-## chrome.runtime API
-
-拡張機能のライフサイクル・メッセージング。
-
-### メッセージング
-
-```typescript
-// メッセージ送信
-const response = await chrome.runtime.sendMessage({
-  type: "getData",
-  key: "foo",
-});
-
-// メッセージ受信
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "getData") {
-    sendResponse({ value: "bar" });
-  }
-  return true; // 非同期レスポンス用
-});
-```
-
-### インストール・更新イベント
-
-```typescript
-chrome.runtime.onInstalled.addListener(({ reason }) => {
-  if (reason === "install") {
-    chrome.tabs.create({ url: "onboarding.html" });
-  }
-  if (reason === "update") {
-    console.log("Extension updated");
-  }
-});
-```
-
----
-
-## chrome.scripting API
-
-Content Script やCSSの動的注入。
-
-### 権限
-
-```json
-{
-  "permissions": ["scripting"],
-  "host_permissions": ["<all_urls>"]
-}
-```
-
-### 使用例
-
-```typescript
-// スクリプト注入
-await chrome.scripting.executeScript({
-  target: { tabId: tabId },
-  func: () => {
-    document.body.style.backgroundColor = "red";
-  },
-});
-
-// CSS注入
-await chrome.scripting.insertCSS({
-  target: { tabId: tabId },
-  css: "body { background: blue !important; }",
-});
-```
-
----
-
-## chrome.action API
-
-ツールバーアイコンの制御。
-
-### 使用例
-
-```typescript
-// バッジテキスト設定
-await chrome.action.setBadgeText({ text: "5" });
-await chrome.action.setBadgeBackgroundColor({ color: "#FF0000" });
-
-// アイコン変更
-await chrome.action.setIcon({ path: "icons/active.png" });
-
-// ポップアップ変更
-await chrome.action.setPopup({ popup: "popup2.html" });
-
-// クリックイベント（ポップアップなしの場合）
-chrome.action.onClicked.addListener((tab) => {
-  console.log("Action clicked on tab:", tab.id);
-});
-```
-
----
-
-## chrome.sidePanel API
-
-サイドパネルの表示制御。
-
-### 権限
-
-```json
-{
-  "permissions": ["sidePanel"]
-}
-```
-
-### マニフェスト設定
-
-```json
-{
-  "side_panel": {
-    "default_path": "sidepanel.html"
+  if (creating) {
+    await creating;
+  } else {
+    creating = chrome.offscreen.createDocument({
+      url: path,
+      reasons: ["CLIPBOARD"],
+      justification: "クリップボード操作のため",
+    });
+    await creating;
+    creating = null;
   }
 }
 ```
 
-### 使用例
+`runtime.getContexts()` は Chrome 116+。それ以前を対象にするなら `clients.matchAll()` で代替する。
 
-```typescript
-// サイドパネルを開く
-await chrome.sidePanel.open({ windowId: windowId });
+## chrome.runtime
 
-// 特定タブでパネル変更
-await chrome.sidePanel.setOptions({
-  tabId: tabId,
-  path: "custom-panel.html",
-  enabled: true,
-});
-```
+- `onMessage` で非同期に `sendResponse` するときはリスナーから `true` を返す。返さないとメッセージチャネルが閉じ、送信側は `undefined` を受け取る。
+- `onInstalled` は初回インストール、拡張更新、Chrome 更新で発火する。コンテキストメニュー作成など 1 回限りの初期化はここで行う。
 
----
+## chrome.scripting
+
+- `scripting` 権限と対象の host 権限（または `activeTab`）が必要。
+- `executeScript({ func, args })` の `args` は JSON シリアライズ可能な値だけ。`undefined` などで実ブラウザが失敗し得る（mock では再現しない）。
+- `world: "MAIN"` で注入したコードは拡張 API にアクセスできない。
+
+## chrome.action
+
+- `default_popup` を設定している間は `action.onClicked` が発火しない。
+
+## chrome.sidePanel
+
+- Chrome 114+、`sidePanel` 権限と manifest の `side_panel.default_path`。
+- `sidePanel.open()`（Chrome 116+）はユーザー操作（アクションのクリック、ショートカット、コンテキストメニュー、拡張ページ/コンテンツスクリプトでのジェスチャー）に応じてのみ呼べる。`windowId` か `tabId` のどちらかが必須。
+- アクションアイコンで開くなら `sidePanel.setPanelBehavior({ openPanelOnActionClick: true })`。
+- タブ単位の有効/無効やパス切替は `setOptions({ tabId, path, enabled })`。
 
 ## 外部リソース
 
-- [Chrome API Reference](https://developer.chrome.com/docs/extensions/reference)
+- [Chrome API Reference](https://developer.chrome.com/docs/extensions/reference/api)

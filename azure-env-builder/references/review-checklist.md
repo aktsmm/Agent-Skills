@@ -32,7 +32,7 @@
 
 - [ ] SQL Database: TDE / 監査設定が有効
 - [ ] Cosmos DB: パーティションキー設計が適切
-- [ ] Redis: TLS 1.2 以上、AAD 認証が有効
+- [ ] Redis: TLS 1.2 以上、Microsoft Entra 認証が有効（新規は Azure Managed Redis。Azure Cache for Redis は 2028-09-30 廃止）
 - [ ] バックアップ / リテンション設定が要件を満たす
 
 ## コンピュート

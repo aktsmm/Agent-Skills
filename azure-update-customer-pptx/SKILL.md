@@ -36,14 +36,7 @@ Portable MCP-first toolkit for turning Azure Updates into a customer-facing Azur
 
 ## Execution Model
 
-This skill is a toolkit, not a standalone runner. It carries scripts, references, starter config, and a neutral template. A usable workspace must have:
-
-- `.config/config.json`
-- `.config/customer-keywords.json`, `.config/customer-profile.md`, `.config/exclude-keywords.json`
-- `scripts/*.ps1` and `scripts/PptxCommon.psm1`
-- Python engine only: `scripts/python/build_customer_pptx.py`, dependency lock, template contract, and render style
-- `template/*.pptx`
-- `{MMDD}/manifest/` and `{MMDD}/logs/`
+This skill is a toolkit, not a standalone runner. It carries scripts, references, starter config, and a neutral template. Required files: [Pre-check › Workspace Contract](references/pre-check.md#workspace-contract).
 
 If any workspace contract file is missing, do not build. Run Bootstrap first, then fill `.config`.
 
@@ -61,30 +54,16 @@ it fails closed and never silently falls back to COM. See [Python Build Engine](
 
 ## MCP Boundary
 
-- Scripts do not call MCP directly; Copilot / agent steps write MCP-sourced content to `{date}/manifest/*.json`.
-- PowerShell scripts consume manifest JSON and mutate PPTX deterministically. Adapt `assets/mcp.sample.json` to the host MCP server if needed.
-- For each Azure Updates item, store the announcement URL as `sourceUrl` and search Microsoft Learn / Docs MCP for the closest official service document. Put that URL in `learnUrl` when a relevant first-party page exists.
+- Script/MCP split and `sourceUrl` / `learnUrl` rules: [MCP-sourced Content › MCP Boundary](references/mcp-sourced-content.md#mcp-boundary).
 - Slide-visible manifest fields, including `title` and `titleJa`, must stay reusable and customer-neutral. Customer/system-specific impact belongs in `notes.json` or review notes, not in visible body fields such as `customerImpact`, `background`, `before`, `after`, `pricing`, or `keypoint`.
 
 ## Previous Delivery Diff (必須)
 
-新しい `{date}` フォルダを作るときは、前回 delivery からの差分を必ず MCP で確認する。抜けを見つけたら、そのまま今回に追加するか次回へ持ち越すかをユーザーに確認する。
-
-1. `previousDate` を決める: 直近の `{MMDD}/manifest/classification.json` を持つフォルダ。 fetched-updates.json が無い場合は `{date}/logs/` や README の「対象週」記述から範囲を割り出す。
-2. `previousEndDate` を出す: 前回inventoryの全itemから`created`最大日を算出する。会議日、フォルダ名、PPTX日付を取得終端とみなさない。
-3. 今回 Fetch 範囲を `created ge <previousEndDate+1> and created le <today>` にする。Days ベースの fallback ではなく、前回終端を必ず使う。
-4. **必須の二重チェック**: `mcp_releasecommun_get_recent_azure_updates` で `created ge <previousEndDate> and created le <newStartDate-1>` を投げて 0 件になることを確認する（境界日で漏れが出やすい）。
-5. 見つけた抜け item を `{date}/logs/diff-check.md` に「id / title / created / 追加 or 次回持ち越し」で残す。
+新しい `{date}` フォルダを作るときは、前回 delivery からの差分を必ず MCP で確認する。抜けを見つけたら、そのまま今回に追加するか次回へ持ち越すかをユーザーに確認する。手順（`previousEndDate` 起点の Fetch 範囲、境界日の二重チェック、`logs/diff-check.md`）: [Previous Delivery Diff](references/delivery-diff.md#steps)。
 
 ## Japan Region Rendering (可視スライド)
 
-`item.japanRegion` は可視スライド本文へ直接表示される。判定は [Region Stamp Definition](references/region-stamp.md) を SSOT とし、必ず次の3分類を通す。
-
-### 判定フロー（必須）
-
-1. クライアント／IDE／CLI／SDKなどリージョン非依存のものはグローバルとして扱う。
-2. 公式Docsにdeploy regionの表・列挙があれば、Japan East / Westの有無と近隣regionを確認する。
-3. 表がない判定はoverview / reliability / whats-new / regionsのうち最低2種類を確認してから行う。
+`item.japanRegion` は可視スライド本文へ直接表示される。判定は [Region Stamp Definition](references/region-stamp.md) を SSOT とし、必ず次の3分類を通す: [Region Stamp Definition › Japan Region Rendering Flow](references/region-stamp.md#japan-region-rendering-flow)。
 
 overview未確認の保守判定と、クライアントツールの日本未対応判定は禁止する。可視文言、近隣regionの優先順、URL伝搬、reviewed JSON schemaは [Region Stamp Definition](references/region-stamp.md) に従う。
 
@@ -96,9 +75,7 @@ From a blank workspace, run:
 & ".\.github\skills\azure-update-customer-pptx\scripts\Initialize-AzureUpdateWorkspace.ps1" -TargetRoot "." -UpdateScripts
 ```
 
-If you also want a ready-to-use VS Code workspace MCP config, add `-CopyMcpSample`. This writes `.vscode/mcp.json` with the Microsoft Learn Docs and MRC remote MCP endpoints unless the file already exists.
-
-Rules: keep existing customer config by default, write starter conflicts as `.new`, use `-UpdateScripts` for runtime script refresh, and use `-ForceConfig` only for intentional config replacement.
+Options (`-CopyMcpSample`, `.new` conflicts, `-ForceConfig`): [Pre-check › Bootstrap Options](references/pre-check.md#bootstrap-options).
 
 After Bootstrap, ask for missing customer values before generating a deck: customer/system name, filename year/pattern, template/branding, priority services, in-use or monitored SKUs, Appendix categories, and tenant/subscription references when needed.
 
@@ -115,29 +92,17 @@ New-Item -ItemType Directory -Force "$d\manifest", "$d\logs" | Out-Null
 # Agent step: inspect generated deck quality before reporting done
 ```
 
-Fast re-apply after manifest-only changes:
+Fast re-apply after manifest-only changes (`-SkipBuild`): [Pre-check › Fast Re-apply](references/pre-check.md#fast-re-apply).
 
-```powershell
-& ".\scripts\Run-CustomerPptxPipeline.ps1" -DateFolder ".\0704" -SkipBuild
-```
-
-Template setup is intentionally separate from regular generation. See `references/template-lifecycle.md` before automating a new customer template.
+Template setup is intentionally separate from regular generation. See [Template Lifecycle](references/template-lifecycle.md) before automating a new customer template.
 
 ## Gotchas
 
-- **Close the target deck before any COM write.** A deck left open in PowerPoint plus cloud-sync AutoSave produces a conflict-merge that duplicates the whole Weekly slice, drops the section list, and leaves `<name> (N).pptx` copies. `Run-CustomerPptxPipeline.ps1` closes it via `Close-OpenPptxPresentation`; any other script that mutates the deck must do the same instead of asking the user to close it. Delete stray `(N)` copies before reporting done.
-- **Do not inspect a same-named stale deck.** SharePoint/OneDrive can leave an older URL-backed presentation open beside the canonical local output. Before treating notes, slide count, or rendering as evidence, confirm the open presentation's `FullName`/`Name`, expected slide count, and one representative note length. Close only the matched target; never close unrelated presentations to release a lock.
-- **Isolate COM sessions per output file.** When a host produces general/AI or other separate decks, release the PowerPoint session after each saved output. A post-save RPC cleanup failure can otherwise prevent later outputs even though the earlier `SaveCopyAs` succeeded; verify every saved deck independently.
-- **Rebuilding the Weekly slice destroys section membership.** Deleting and re-adding Weekly slides empties the Weekly section, and the preceding summary section silently absorbs every slide. `Verify-Pptx.ps1` only checks section *order*, so this passes the gate. Re-apply all sections from actual slide positions at the end of any rebuild step, anchoring the Weekly start on the first body-layout slide.
-- **Re-sort manifest arrays after appending items.** Adding entries to `classification.json` Weekly/Appendix arrays without re-sorting by label priority then title fails the slide-order gate, because the build sorts slides but the manifest keeps insertion order.
+- Close the target deck before any COM write, and re-apply all sections after any Weekly rebuild. Details and other COM pitfalls: [Validation Rules › COM Write Gotchas](references/validation-rules.md#com-write-gotchas).
 
 ## Validation
 
-Run preflight before build/re-apply:
-
-```powershell
-& ".\scripts\Test-AzureUpdateWorkspace.ps1" -TargetRoot "." -DateFolder ".\0704"
-```
+Run preflight (`Test-AzureUpdateWorkspace.ps1`) before build/re-apply: [Pre-check › Preflight Command](references/pre-check.md#preflight-command).
 
 Final script success is `scripts/Verify-Pptx.ps1` exit code `0`. Do not report final done until the quality review below also passes or the remaining issue is explicitly reported.
 
@@ -151,14 +116,12 @@ Skill/runtime ownership and refresh rules are defined in [Dependencies](referenc
 
 ## Agent Registry
 
-- Skill `agents/` is the role-definition source for this workflow.
-- Copy agents to workspace `.github/agents/` only when the host requires a workspace agent registry.
-- Copied workspace agents are derived artifacts; do not hard-code customer values in them.
+Skill `agents/` is the role-definition source; workspace copies are derived. Rules: [Agents Overview › Agent Registry](references/agents-overview.md#agent-registry).
 
 ## References
 
 - Preflight/template: `pre-check.md`, `template-lifecycle.md`, `template-requirements.md`
-- Content/validation: `mcp-sourced-content.md`, `validation-rules.md`, `slide-structure.md`, `region-stamp.md`
+- Content/validation: `mcp-sourced-content.md`, `validation-rules.md`, `slide-structure.md`, `region-stamp.md`, `delivery-diff.md`
 - Operation/migration: `customer-profile.md`, `agents-overview.md`, `dependencies.md`, `migration-map.md`
 
 ## Done Criteria

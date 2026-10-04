@@ -2,7 +2,7 @@
 
 Checklist for reviewing and improving SKILL.md files.
 
-## Quick Check (5 items)
+## Quick Check
 
 ```markdown
 - [ ] SKILL.md is under 150 lines? (GitHub guideline: "2 pages or less")
@@ -10,7 +10,9 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Self-authored skills have confirmed license + `metadata.author`?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
-- [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere?
+- [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere? No other skill is named or used as SSOT?
+- [ ] Every script, path, and CLI flag mentioned in SKILL.md exists in the skill and matches the script's argument parser?
+- [ ] references/ reviewed too, not only SKILL.md? Stale facts and duplication accumulate there.
 - [ ] No README.md or auxiliary docs in skill folder?
 - [ ] The skill fits one primary archetype, or the split is intentional?
 - [ ] Non-obvious gotchas are captured where they affect correctness?
@@ -58,7 +60,7 @@ Before reviewing wording, identify the primary kind of skill:
 - Runbook / debugging
 - Infrastructure operations
 
-If it claims several at once, split it or move secondary behavior into references. A skill can depend on another skill, but its own responsibility should stay crisp.
+If it claims several at once, split it or move secondary behavior into references. Keep its own responsibility crisp and self-contained rather than delegating parts to another skill.
 
 ### Frontmatter
 
@@ -68,7 +70,7 @@ name: skill-name # Required
 description: "..." # Required - include trigger conditions
 license: CC BY-NC-SA 4.0 # Required for self-authored skills
 metadata: # Required for self-authored skills
-  author: yamapan (https://github.com/aktsmm)
+  author: <author> (<profile-url>)
 ---
 ```
 
@@ -185,12 +187,14 @@ Good examples:
 
 **Allowed:**
 
-- Loose reference by skill name as a string (registry / denylist patterns). Loss of the named skill should degrade gracefully, not crash.
+- Skill names as plain strings only in catalogs, registries, or denylists. For routing boundaries, describe the out-of-scope work generically instead of naming another skill.
 - Links to files **inside the skill folder** (`./scripts/`, `./references/`, `./assets/`).
 
 **Not allowed:**
 
 - `../other-skill/...` links
+- Naming another skill in the description, "When NOT to use", or Related Skills, or delegating rules to another skill as SSOT. Inline the few rules the skill needs instead.
+- Hardcoded self paths such as `.github/skills/<this-skill>/scripts/...`; use `<skill-dir>/...` or a path relative to the file
 - Absolute paths (`D:\...`, `/Users/...`)
 - Customer / tenant / personal identifiers without abstraction (use `<placeholder>`)
 - "See instruction X in the workspace" without bundling the content here

@@ -190,3 +190,24 @@ Some enterprise forms keep a separate active-row state, right-pane state, and pe
 - Do not infer success from a button click, toast, or report-level summary. Verify the durable cell/status that represents the real outcome.
 - If a pending overlay such as `fastEditRailsMode`, `ShellBlockingDiv`, or `Your last action is still being worked on` appears, stop issuing new writes until it disappears.
 - Prefer screenshots plus targeted DOM reads for verification. Large snapshots can be stale or too noisy, while DOM-only reads can miss visually obvious row/detail mismatches.
+
+## Virtualized feeds and per-item mutations
+
+- For infinite-scroll feeds, collect a stable item ID or canonical URL for the current batch, then re-resolve that item immediately before each mutation. Do not retain a locator or accessibility ref across a scroll or another item mutation; virtualized DOM nodes are routinely recycled.
+- Treat a missing picker option, modal, or navigation as **unknown**, not success. Confirm the persistent assignment state (or an equivalent destination-specific DOM state) before recording an item as done; distinguish an already-assigned item from a picker-render failure.
+- Process one bounded batch, persist its completed stable IDs in the active run, then scroll until new IDs appear. End only after several end-of-feed scrolls yield no new stable IDs, and report any unverified items separately.
+
+## handler が何回走ったかを数えるとき
+
+Instrument the listener and compare isolated runs before diagnosing duplicate binding. `locator.click()`, `el.click()`, and `dispatchEvent()` have different event sequences and trust semantics; none is a universal oracle for a real user's click. Verify the resulting state, and never replay a possibly successful write merely to compare methods.
+
+## Content-Filter Preflight
+
+外部プラットフォームは、認証や前後の書き込みが正常でも、送信内容が攻撃 payload に似ているという理由で 403 を返したり書き込みを拒否したりする。技術・セキュリティ内容を繰り返し／一括送信する前に:
+
+- run a deterministic checker for platform-known blocked signatures across **every field included in the request body**, not only the visible field being edited;
+- on rejection, capture the failed POST status and response body, then compare same-session successful controls that vary one feature at a time before changing content;
+- URL-like text can enter a dedicated link-warning path or return 400 even when nearby plain text succeeds. Use the platform's supported confirmation path or semantically equivalent non-URL wording, preserving meaning and never inserting invisible characters;
+- keep one-item rejection isolated so independent later items still run, but keep the overall result non-PASS until the rejected item is fixed or explicitly waived;
+
+信頼できる preflight がない場合は、使い捨て draft / canary target または可逆な 1 件 pilot を使う。成功した probe を同じ経路で復元できない production target 上で mutation の binary search をしない。

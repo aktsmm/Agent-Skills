@@ -12,7 +12,7 @@ Guided sequential workflows with human-in-the-loop control between agents.
 - [Best Practices](#best-practices) - Tips for effective handoffs
 - [Troubleshooting](#troubleshooting) - Common issues
 
-> **VS Code Version:** Handoffs are available in VS Code 1.106+ (January 2026)
+> **Spec source:** [Custom agents - Handoffs](https://code.visualstudio.com/docs/agent-customization/custom-agents#_handoffs) (verified 2026-10)
 
 ---
 
@@ -25,7 +25,7 @@ Handoffs enable **guided sequential workflows** that transition between agents w
 | Aspect              | Description                                    |
 | ------------------- | ---------------------------------------------- |
 | **User Control**    | Human approves each transition (button click)  |
-| **Context Passing** | Relevant context passed via pre-filled prompt  |
+| **Context Passing** | Conversation context + pre-filled prompt       |
 | **Visibility**      | User can review/edit prompt before submitting  |
 | **Auto-submit**     | Optional: `send: true` for automatic execution |
 
@@ -83,17 +83,19 @@ handoffs:
     agent: <target-agent-name>
     prompt: <pre-filled-prompt>
     send: <true|false>
+    model: <Model Name (vendor)>
 ---
 ```
 
 ### Properties
 
-| Property | Required | Type    | Description                                    |
-| -------- | -------- | ------- | ---------------------------------------------- |
-| `label`  | ✅       | string  | Button text displayed to user                  |
-| `agent`  | ✅       | string  | Target agent identifier (filename without .md) |
-| `prompt` | ❌       | string  | Pre-filled prompt for target agent             |
-| `send`   | ❌       | boolean | Auto-submit prompt (default: `false`)          |
+| Property | Required | Type    | Description                                                                       |
+| -------- | -------- | ------- | --------------------------------------------------------------------------------- |
+| `label`  | ✅       | string  | Button text displayed to user                                                     |
+| `agent`  | ✅       | string  | Target agent identifier (the target's `name`; file name if `name` is omitted)     |
+| `prompt` | ❌       | string  | Pre-filled prompt for target agent                                                |
+| `send`   | ❌       | boolean | Auto-submit prompt (default: `false`)                                             |
+| `model`  | ❌       | string  | Model for the handoff, qualified as `Model Name (vendor)`, e.g. `GPT-5 (copilot)` |
 
 ### Complete Example
 
@@ -101,7 +103,7 @@ handoffs:
 ---
 name: Planner
 description: Generate implementation plans for features
-tools: ['textSearch', 'fetch', 'readFile']
+tools: ['search', 'web/fetch', 'read']
 handoffs:
   - label: Start Implementation
     agent: implementer
@@ -162,7 +164,7 @@ Generate detailed implementation plans for new features.
 ---
 name: test-writer
 description: Write failing tests first (TDD)
-tools: ["readFile", "edit/editFiles", "execute/runInTerminal"]
+tools: ["read", "edit/editFiles", "execute/runInTerminal"]
 handoffs:
   - label: Make Tests Pass
     agent: implementer
@@ -177,7 +179,7 @@ handoffs:
 ---
 name: implementer
 description: Implement code to pass tests
-tools: ["readFile", "edit/editFiles", "execute/runInTerminal"]
+tools: ["read", "edit/editFiles", "execute/runInTerminal"]
 handoffs:
   - label: Request Code Review
     agent: reviewer
@@ -192,7 +194,7 @@ handoffs:
 ---
 name: researcher
 description: Research a topic thoroughly
-tools: ["web/fetch", "textSearch", "readFile"]
+tools: ["web/fetch", "search", "read"]
 handoffs:
   - label: Write Document
     agent: writer
@@ -211,7 +213,7 @@ Single agent with multiple possible next steps:
 ---
 name: analyzer
 description: Analyze issues and suggest next steps
-tools: ["readFile", "textSearch", "problems"]
+tools: ["read", "search", "read/problems"]
 handoffs:
   - label: Fix Issues
     agent: fixer
@@ -232,14 +234,14 @@ handoffs:
 
 ## Handoffs vs agent
 
-| Feature          | Handoffs               | agent                   |
-| ---------------- | ---------------------- | ----------------------- |
-| **Execution**    | User clicks button     | Automatic               |
-| **Context**      | Shared via prompt      | Isolated (clean window) |
-| **User Control** | ✅ Human-in-the-loop   | ❌ Automatic            |
-| **Visibility**   | User sees/edits prompt | Results only            |
-| **Use Case**     | Phase transitions      | Context-heavy tasks     |
-| **Nesting**      | ✅ Sequential chain    | ❌ No nesting allowed   |
+| Feature          | Handoffs               | agent                                  |
+| ---------------- | ---------------------- | -------------------------------------- |
+| **Execution**    | User clicks button     | Automatic                              |
+| **Context**      | Conversation + prompt  | Isolated (clean window)                |
+| **User Control** | ✅ Human-in-the-loop   | ❌ Automatic                           |
+| **Visibility**   | User sees/edits prompt | Results only                           |
+| **Use Case**     | Phase transitions      | Context-heavy tasks                    |
+| **Nesting**      | ✅ Sequential chain    | ⚠️ Off by default (setting, depth ≤ 5) |
 
 ### Decision Matrix
 
@@ -322,27 +324,24 @@ prompt: |
 **Causes:**
 
 1. `handoffs` not in YAML frontmatter
-2. Target agent file doesn't exist
-3. VS Code version < 1.106
+2. Target agent not discovered (wrong location or load error; check Chat view > right-click > Diagnostics)
+3. Old VS Code version
 
 **Solution:**
 
-```bash
-# Check VS Code version
+```powershell
 code --version
-
-# Verify target agent exists
-ls .github/agents/implementer.agent.md
+Test-Path .github/agents/implementer.agent.md
 ```
 
 ### Wrong Agent Invoked
 
 **Cause:** Agent name mismatch
 
-**Solution:** Ensure `agent:` matches the target agent's filename (without `.agent.md`):
+**Solution:** Ensure `agent:` matches the target's `name` (or its file name when `name` is omitted):
 
 ```
-File: .github/agents/implementer.agent.md
+File: .github/agents/implementer.agent.md (no name field)
 Agent name in handoffs: agent: implementer  ✅
 ```
 
@@ -362,9 +361,9 @@ prompt: |
 
 ## References
 
-- [Custom Agents in VS Code](https://code.visualstudio.com/docs/copilot/customization/custom-agents#_handoffs)
+- [Custom Agents in VS Code](https://code.visualstudio.com/docs/agent-customization/custom-agents#_handoffs)
 - [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
-- [agent Guide (legacy: runSubagent)](agent-guide.md) - Alternative for context isolation
+- [agent Guide](agent-guide.md) - Alternative for context isolation
 - [Workflow Patterns Overview](workflow-patterns/overview.md) - Pattern selection guide
 
 ---

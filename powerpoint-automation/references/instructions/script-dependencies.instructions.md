@@ -94,34 +94,17 @@ Use `extract_parallel.ps1` for automated parallel execution.
 
 ## Required Packages
 
-### Python (requirements.txt)
-
-```
-python-pptx>=0.6.21
-Pillow>=9.0.0
-jsonschema>=4.0.0
-requests>=2.28.0
-```
-
-### Node.js (package.json)
-
-```json
-{
-  "dependencies": {
-    "pptxgenjs": "^3.12.0"
-  }
-}
-```
+See `scripts/requirements.txt` (python-pptx, Pillow, jsonschema, ...) and `scripts/package.json` (pptxgenjs, ...). Do not copy version pins here; they drift.
 
 ---
 
 ## Exit Codes
 
-| Script                    | 0       | 1     | 2            |
-| ------------------------- | ------- | ----- | ------------ |
-| `validate_content.py`     | PASS    | FAIL  | WARN         |
-| `validate_pptx.py`        | PASS    | FAIL  | WARN         |
-| `create_from_template.py` | Success | Error | Empty slides |
+| Script                    | 0       | 1                                                  | 2    |
+| ------------------------- | ------- | -------------------------------------------------- | ---- |
+| `validate_content.py`     | PASS    | FAIL                                               | WARN |
+| `validate_pptx.py`        | PASS    | FAIL                                               | WARN |
+| `create_from_template.py` | Success | Error or empty `content` slides (unless `--force`) | -    |
 
 ---
 
@@ -130,6 +113,7 @@ requests>=2.28.0
 ### Problem: `pip install` fails
 
 Errors like:
+
 - `ModuleNotFoundError: No module named 'xxx'`
 - `error: externally managed`
 - `Failed to inspect Python interpreter from virtual environment`
@@ -147,7 +131,7 @@ uv venv .venv
 .\.venv\Scripts\Activate.ps1
 
 # 4. Install packages
-uv pip install python-pptx Pillow jsonschema requests
+uv pip install -r scripts/requirements.txt
 ```
 
 ### Why uv?
@@ -173,7 +157,7 @@ Get-Content "assets/template.pptx" -TotalCount 1
 Always specify venv Python explicitly:
 
 ```powershell
-& "d:\project\.venv\Scripts\python.exe" create_from_template.py template.pptx content.json output.pptx
+& "<workspace-root>\.venv\Scripts\python.exe" scripts/create_from_template.py template.pptx content.json output.pptx
 ```
 
 ### Package Installation Priority
@@ -181,4 +165,3 @@ Always specify venv Python explicitly:
 1. **VS Code tool `install_python_packages`** - Try first
 2. **uv venv + uv pip** - Most reliable
 3. **pip install** - Last resort (environment-dependent)
-

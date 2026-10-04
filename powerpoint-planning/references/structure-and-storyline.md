@@ -4,18 +4,7 @@ Use this reference when shaping the deck before writing slide details.
 
 ## Briefing Questions
 
-- What is the deck about?
-- Who will read it?
-- Where and how will it be used?
-- What should the reader understand, decide, agree to, or do after reading it?
-- What is the main claim?
-- What topics, expressions, or risks should be avoided?
-- What slide count and density are expected?
-- What source materials, URLs, files, or data are available?
-- Which mode fits: `consulting` or `internal-friendly`?
-- Is there a brand, Corporate Brand, template, or tone constraint?
-
-If the request is vague, propose 2-3 storyline options and help the user choose.
+Beyond the SKILL.md Workflow step 1 (Brief) items, confirm the main claim and any brand / Corporate Brand / template / tone constraint. If the request is vague, propose 2-3 storyline options and help the user choose.
 
 ## Experience-Based Narrative Gate
 
@@ -87,22 +76,7 @@ For executive, customer-facing, or decision decks, define the slide message befo
 
 ## Slide Planning Fields
 
-For each slide, define:
-
-- Section name
-- Slide title
-- Lead sentence
-- Primary message
-- Main evidence
-- Secondary information
-- De-emphasized notes
-- Recommended layout
-- Visual entry point
-- Reading path
-- What to make prominent
-- What to make quiet
-
-Each slide should work as a reading document, not only as speaker support.
+For each slide, define the fields in SKILL.md Workflow step 4 (Slide Planning) plus section name, what to make prominent, and what to make quiet. Each slide should work as a reading document, not only as speaker support.
 
 ## Planning Artifacts
 
@@ -174,7 +148,7 @@ Rationale: スライド本文は「Y/N/不明 チェックボックス + メモ�
   - 「今のところ一番心配な点は何ですか?」
   - 「この進め方で、人 / 時間 / 予算面で問題になりそうな点は?」
   - 「以前やった似た作業でハマったことは?」
-- 拾ったリスクは会議後にリスク台帳化し、Next Steps の「MS 側 next actions」へ「今日拾ったリスクのうち MS 側で受け止めるもの」項目で流し込む
+- 拾ったリスクは会議後にリスク台帳化し、Next Steps の「自社側 next actions」へ「今日拾ったリスクのうち自社側で受け止めるもの」項目で流し込む
 - Section は Next Steps と同じ「本日のアクション」区分に入れる
 
 Rationale: 「顧客に懸念を聞く時間」を明示的に slide として確保することで、facilitator の力量に依らず必ず回収できる。フリー記述の見た目 (空 bullet 6 行) は顧客に「今書いていい場」と伝わる。

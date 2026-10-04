@@ -22,20 +22,18 @@ Enterprise Azure environment builder skill.
 
 ## When NOT to Use
 
-- 使い捨ての検証 lab を作って機能・制約・route 挙動を試し、cleanup まで回したいとき
-  - → `azure-infra-validation`
-- 本番障害を read-only で切り分けたいとき
-  - → `azure-troubleshooting`
+- 使い捨ての検証 lab を作って機能・制約・route 挙動を試し、cleanup まで回したいとき（対象外）
+- 本番障害を read-only で切り分けたいとき（対象外）
 
 ## Features
 
-| Category       | Capabilities                       |
-| -------------- | ---------------------------------- |
-| Architecture   | Hub-Spoke, Web+DB, AKS, AI Foundry |
-| AVM Modules    | 200+ Azure Verified Modules        |
-| VM Init        | Squid, Nginx, Docker, IIS setup    |
-| Config Linking | SQL/Storage/Redis, Managed ID RBAC |
-| CI/CD          | GitHub Actions / Azure Pipelines   |
+| Category       | Capabilities                                                 |
+| -------------- | ------------------------------------------------------------ |
+| Architecture   | Hub-Spoke, Web+DB, AKS, AI Foundry                           |
+| AVM Modules    | 200+ Azure Verified Modules                                  |
+| VM Init        | Squid, Nginx, Docker, IIS setup                              |
+| Config Linking | SQL/Storage/Redis, Managed ID RBAC                           |
+| CI/CD          | GitHub Actions / Azure Pipelines                             |
 | Ops Demo       | Low-cost app, alert, log, and control-plane failure patterns |
 
 ## Workflow
@@ -85,7 +83,7 @@ microsoft_docs_search(query: "Private Endpoint Bicep")
 
 ```powershell
 # Scaffold environment folder
-pwsh scripts/scaffold_environment.ps1 -Environment <env> -Location <region>
+pwsh scripts/scaffold_environment.ps1 -Environment <env> -Location <region> -DeploymentMode <CLI|Bicep|Both>
 
 # Validate
 az deployment group what-if --resource-group <rg> --template-file main.bicep
@@ -96,15 +94,15 @@ az deployment group create --resource-group <rg> --template-file main.bicep
 
 ## Key References
 
-| File                                                                  | Purpose                |
-| --------------------------------------------------------------------- | ---------------------- |
-| [architecture-patterns.md](references/architecture-patterns.md)       | Architecture patterns  |
-| [avm-modules.md](references/avm-modules.md)                           | AVM module catalog     |
-| [vm-app-scripts.md](references/vm-app-scripts.md)                     | VM init scripts        |
-| [app-deploy-patterns.md](references/app-deploy-patterns.md)           | App deploy patterns    |
+| File                                                                  | Purpose                   |
+| --------------------------------------------------------------------- | ------------------------- |
+| [architecture-patterns.md](references/architecture-patterns.md)       | Architecture patterns     |
+| [avm-modules.md](references/avm-modules.md)                           | AVM module catalog        |
+| [vm-app-scripts.md](references/vm-app-scripts.md)                     | VM init scripts           |
+| [app-deploy-patterns.md](references/app-deploy-patterns.md)           | App deploy patterns       |
 | [low-cost-ops-demo.md](references/low-cost-ops-demo.md)               | Low-cost operations demos |
-| [service-config-templates.md](references/service-config-templates.md) | Service config linking |
-| [cicd-templates/](references/cicd-templates/)                         | CI/CD templates        |
+| [service-config-templates.md](references/service-config-templates.md) | Service config linking    |
+| [cicd-templates/](references/cicd-templates/)                         | CI/CD templates           |
 
 ## Done Criteria
 

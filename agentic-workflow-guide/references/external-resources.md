@@ -6,14 +6,15 @@ AI エージェント開発に役立つ外部リソース集。
 
 まず最初に当たるリンク。設計判断や platform behavior を確認したいときはここから入る。
 
-| リソース                                     | 説明                                                  | URL                                                                                             |
-| -------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| **GitHub Docs: Chat in IDE**                 | Copilot Chat / IDE 内での基本動作                     | https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide                        |
-| **VS Code: Custom Agents**                   | VS Code 側の custom agents 全体像                     | https://code.visualstudio.com/docs/copilot/customization/custom-agents                          |
-| **GitHub Docs: Create Custom Agents**        | GitHub Copilot agents の作成手順                      | https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents |
-| **Anthropic: Building Effective Agents**     | workflow pattern と agent 設計の基本原則              | https://www.anthropic.com/engineering/building-effective-agents                                 |
-| **Anthropic: Effective Context Engineering** | context engineering / compaction / retrieval の考え方 | https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents               |
-| **Anthropic: Writing Tools for Agents**      | agent 向け tool 設計                                  | https://www.anthropic.com/engineering/writing-tools-for-agents                                  |
+| リソース                                     | 説明                                                  | URL                                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **GitHub Docs: Chat in IDE**                 | Copilot Chat / IDE 内での基本動作                     | https://docs.github.com/en/copilot/how-tos/copilot-in-your-ide/chat-with-copilot/chat-in-ide                              |
+| **VS Code: Custom Agents**                   | VS Code 側の custom agents 全体像                     | https://code.visualstudio.com/docs/agent-customization/custom-agents                                                      |
+| **VS Code: Subagents**                       | subagent の呼び出し・制限・ネスト設定                 | https://code.visualstudio.com/docs/agents/run/subagents                                                                   |
+| **GitHub Docs: Create Custom Agents**        | Copilot cloud agent 向け custom agents の作成手順     | https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/create-custom-agents |
+| **Anthropic: Building Effective Agents**     | workflow pattern と agent 設計の基本原則              | https://www.anthropic.com/engineering/building-effective-agents                                                           |
+| **Anthropic: Effective Context Engineering** | context engineering / compaction / retrieval の考え方 | https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents                                         |
+| **Anthropic: Writing Tools for Agents**      | agent 向け tool 設計                                  | https://www.anthropic.com/engineering/writing-tools-for-agents                                                            |
 
 ## Deep References
 
@@ -24,26 +25,27 @@ AI エージェント開発に役立つ外部リソース集。
 | リソース                   | 説明                              | URL                                                 |
 | -------------------------- | --------------------------------- | --------------------------------------------------- |
 | **Awesome Copilot**        | GitHub 公式コミュニティプロンプト | https://github.com/github/awesome-copilot           |
-| **Awesome Claude Prompts** | Claude 向けプロンプト集 (4.2k★)   | https://github.com/langgptai/awesome-claude-prompts |
+| **Awesome Claude Prompts** | Claude 向けプロンプト集           | https://github.com/langgptai/awesome-claude-prompts |
 | **Awesome Reviewers**      | 3000+ コードレビュープロンプト    | https://github.com/baz-scm/awesome-reviewers        |
 
 ## Claude Code 関連
 
 | リソース                                                | 説明                                                        | URL                                                                         |
 | ------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **Awesome Claude Code**                                 | スキル・フック・コマンド集 (22k★)                           | https://github.com/hesreallyhim/awesome-claude-code                         |
-| **Anthropic: Lessons from building Claude Code skills** | skill の分類、配布、計測、progressive disclosure の運用知見 | https://claude.com/blog/lessons-from-building-claude-code-how-we-use-skills |
+| **Awesome Claude Code**                                 | スキル・フック・コマンド集                                  | https://github.com/hesreallyhim/awesome-claude-code                         |
+| **Anthropic: Lessons from building Claude Code skills** | skill の分類、配布、計測、progressive disclosure の運用知見 | https://claude.dev/blog/lessons-from-building-claude-code-how-we-use-skills |
 | **Claude Code System Prompts**                          | 公式システムプロンプト抽出                                  | https://github.com/Piebald-AI/claude-code-system-prompts                    |
 | **Claude Code Docs Mirror**                             | Anthropic ドキュメントミラー                                | https://github.com/ericbuess/claude-code-docs                               |
 
 ## VS Code カスタマイズ
 
-| リソース                        | 説明             | URL                                                                          |
-| ------------------------------- | ---------------- | ---------------------------------------------------------------------------- |
-| **VS Code Custom Instructions** | 公式ドキュメント | https://code.visualstudio.com/docs/copilot/customization/custom-instructions |
-| **VS Code Prompt Files**        | 公式ドキュメント | https://code.visualstudio.com/docs/copilot/customization/prompt-files        |
-| **VS Code Custom Agents**       | 公式ドキュメント | https://code.visualstudio.com/docs/copilot/customization/custom-agents       |
-| **VS Code Agent Skills**        | 公式ドキュメント | https://code.visualstudio.com/docs/copilot/customization/agent-skills        |
+| リソース                        | 説明                                                            | URL                                                                        |
+| ------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **VS Code Custom Instructions** | 公式ドキュメント                                                | https://code.visualstudio.com/docs/agent-customization/custom-instructions |
+| **VS Code Prompt Files**        | 公式ドキュメント（Agent Host では非対応、skill への移行が推奨） | https://code.visualstudio.com/docs/agent-customization/prompt-files        |
+| **VS Code Custom Agents**       | 公式ドキュメント                                                | https://code.visualstudio.com/docs/agent-customization/custom-agents       |
+| **VS Code Agent Skills**        | 公式ドキュメント                                                | https://code.visualstudio.com/docs/agent-customization/agent-skills        |
+| **VS Code Hooks**               | 公式ドキュメント（Preview）                                     | https://code.visualstudio.com/docs/agent-customization/hooks               |
 
 ## ツール・ユーティリティ
 

@@ -85,17 +85,17 @@ discover -> research -> evaluate -> design -> build -> review -> launch/track ->
 
 ## AI-Autonomous Operation
 
-AUTO 既定、承認は `security-approve` のみ。Skill には **hard rule (変更不可)** と **reference default (workspace が実運用で改善可)** が混在、詳細は §Tunable vs Hard Rules。詳細は各 references。
+AUTO 既定、承認は `security-approve` のみ。hard rule と reference default の区別は §Tunable vs Hard Rules、詳細は各 references。
 
-| # | 章 | 骨子 | 詳細 |
-| --- | --- | --- | --- |
-| A | Approval Policy | 2 バケット (`auto` / `security-approve`)。金銭発生は後者の 1 例。AI usage は skill 対象外。Backup-First で reversible は auto。 | `references/approval-policy.md` |
-| B | Autonomy Mode | Normal / **AUTO 既定** / FULL / ALL の 4 段階。setup Phase 0 で mode 未指定なら AUTO 提案 + 確認。secret 露出等は全 mode で対象外。 | `references/runtime-modes.md` (`ai-autonomous` preset) |
-| C | Fallback Lane | blocked/stall/idle 時 10 lane 順次 auto-dequeue (1 Portfolio → 2 Prompt review → 3 Advisory Critic → 4 Anti-pattern → 5 Discovery → 6 Small-Bet → 7 Learning → 8 Cleanup → 9 Real-surface RO → 10 Digest)。Discovery Floor 5 サイクル。browser 書込みは defer。 | `references/fallback-lane.md` |
-| D | Genuine Blocker Test | failed/stall で即 blocker 認定せず 4 問 gate (外部 signal 確認 / 別 approach N / replan / 制御不能)。4/4 Yes のみ HITL、以外は fallback へ。 | `references/fallback-lane.md` |
-| E | Persistence Profile | Standard / **Persistent (既定)** / Exhaustive。task class 別マッピング。cost/quota は skill 対象外 (adapter 任せ)。worker は自分で approach 増やさず commander が replan。 | `references/persistence-profile.md` |
-| F | Cadence + Adapter | worker=hourly / workflow-review=weekly + ad-hoc trigger / digest=daily。per-hour override 可。Adapter は環境依存 (Copilot Scheduler / Scout / OpenClaw / Copilot App / GH Actions / Task Scheduler / cron)。Push cadence は setup で 1 度質問、既定 manual。 | `references/runtime-modes.md` |
-| G | Goal + Focus Theme | 無限稼働、停止は user 明示のみ。Setup で north-star + focus theme (3 ヶ月、workspace override 可) の 2 段合意。Theme apply は Layer 3 blocking critic gate (hard rule)。Candidate 完了 = Top-N 自然消滅 + shipped 明示。 | `references/workspace-setup.md` + `references/rubber-duck-review.md` |
+| #   | 章                   | 骨子                                                                                                                                                                                                                                                            | 詳細                                                                 |
+| --- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| A   | Approval Policy      | 2 バケット (`auto` / `security-approve`)。金銭発生は後者の 1 例。AI usage は skill 対象外。Backup-First で reversible は auto。                                                                                                                                 | `references/approval-policy.md`                                      |
+| B   | Autonomy Mode        | Normal / **AUTO 既定** / FULL / ALL の 4 段階。setup Phase 0 で mode 未指定なら AUTO 提案 + 確認。secret 露出等は全 mode で対象外。                                                                                                                             | `references/runtime-modes.md` (`ai-autonomous` preset)               |
+| C   | Fallback Lane        | blocked/stall/idle 時 10 lane 順次 auto-dequeue (1 Portfolio → 2 Prompt review → 3 Advisory Critic → 4 Anti-pattern → 5 Discovery → 6 Small-Bet → 7 Learning → 8 Cleanup → 9 Real-surface RO → 10 Digest)。Discovery Floor 5 サイクル。browser 書込みは defer。 | `references/fallback-lane.md`                                        |
+| D   | Genuine Blocker Test | failed/stall で即 blocker 認定せず 4 問 gate (外部 signal 確認 / 別 approach N / replan / 制御不能)。4/4 Yes のみ HITL、以外は fallback へ。                                                                                                                    | `references/fallback-lane.md`                                        |
+| E   | Persistence Profile  | Standard / **Persistent (既定)** / Exhaustive。task class 別マッピング。cost/quota は skill 対象外 (adapter 任せ)。worker は自分で approach 増やさず commander が replan。                                                                                      | `references/persistence-profile.md`                                  |
+| F   | Cadence + Adapter    | worker=hourly / workflow-review=weekly + ad-hoc trigger / digest=daily。per-hour override 可。Adapter は環境依存 (Copilot Scheduler / Scout / OpenClaw / Copilot App / GH Actions / Task Scheduler / cron)。Push cadence は setup で 1 度質問、既定 manual。    | `references/runtime-modes.md`                                        |
+| G   | Goal + Focus Theme   | 無限稼働、停止は user 明示のみ。Setup で north-star + focus theme (3 ヶ月、workspace override 可) の 2 段合意。Theme apply は Layer 3 blocking critic gate (hard rule)。Candidate 完了 = Top-N 自然消滅 + shipped 明示。                                        | `references/workspace-setup.md` + `references/rubber-duck-review.md` |
 
 ### Tunable vs Hard Rules
 

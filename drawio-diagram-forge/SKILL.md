@@ -28,6 +28,7 @@ Choose this skill when the result will need later **GUI editing** in draw.io, cl
 - One-off text-native diagrams where manual GUI adjustment is not expected
 - Charts or infographics that require exact axes, data binding, typography, or scripted regeneration
 - Large multilingual label sets whose font rendering must be identical across platforms
+- Interactive or animated HTML diagrams, or Mermaid beautification (out of scope)
 
 ## Prerequisites
 
@@ -79,10 +80,10 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 
 | Score  | Action        |
 | ------ | ------------- |
-| 90-100 | Proceed       |
+| 85-100 | Proceed       |
 | 70-84  | Fix and retry |
 | 50-69  | Simplify      |
-| 0-29   | Ask user      |
+| 0-49   | Ask user      |
 
 When the deliverable is headed for print, gate it on the Monochrome Print Profile and the Pre-delivery Geometry Sweep in [style-guide.md](references/style-guide.md) before any visual review.
 
@@ -100,13 +101,13 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 
 ## References
 
-| File                                                  | Description              |
-| ----------------------------------------------------- | ------------------------ |
-| [mxcell-structure.md](references/mxcell-structure.md) | mxCell XML structure     |
-| [cloud-icons.md](references/cloud-icons.md)           | Azure/AWS icon guide     |
-| [style-guide.md](references/style-guide.md)           | Node colors, edge styles |
+| File                                                    | Description                                |
+| ------------------------------------------------------- | ------------------------------------------ |
+| [mxcell-structure.md](references/mxcell-structure.md)   | mxCell XML structure                       |
+| [cloud-icons.md](references/cloud-icons.md)             | Azure/AWS icon guide                       |
+| [style-guide.md](references/style-guide.md)             | Node colors, edge styles                   |
 | [delivery-patterns.md](references/delivery-patterns.md) | Editable + embed pair, Qiita, multilingual |
-| [troubleshooting.md](references/troubleshooting.md)   | Full troubleshooting (21 items) |
+| [troubleshooting.md](references/troubleshooting.md)     | Full troubleshooting (24 items)            |
 
 ## Scripts
 
@@ -118,11 +119,11 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 
 頻度高トップ 4 件を下記に掲載。全一覧（フレーム/エッジ/余白/PDF 出力、レジェンド位置、エスケープ層、CLI の export オプション 等 24 項目）は [references/troubleshooting.md](references/troubleshooting.md)。
 
-| Issue | Solution |
-| --- | --- |
-| Blank in draw.io | Check `content` attribute |
-| Edges not visible | Verify node IDs |
-| Icons missing | Enable Azure/AWS shapes (+ More Shapes → Azure / AWS) |
+| Issue                          | Solution                                                                                    |
+| ------------------------------ | ------------------------------------------------------------------------------------------- |
+| Blank in draw.io               | Check `content` attribute                                                                   |
+| Edges not visible              | Verify node IDs                                                                             |
+| Icons missing                  | Enable Azure/AWS shapes (+ More Shapes → Azure / AWS)                                       |
 | Text overlaps near outer frame | Inset top callout 16–24px, increase height, wrap to 3–4 lines; review at actual embed width |
 
 ## Done Criteria

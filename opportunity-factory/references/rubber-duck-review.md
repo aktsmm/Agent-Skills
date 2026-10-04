@@ -257,7 +257,7 @@ Finding IDs remain stable across workflow rounds. A changed hash is necessary bu
 同じ LLM が producer と critic を演じても、context 分離が不十分だと bias が残る。
 
 - Critic dispatch 時は **完全に新規 context** (chat thread 切替 or subagent 呼び出し) で起動
-- Persistence = Exhaustive の task では **duck-critic skill 経由の別モデル critic** を default
+- Persistence = Exhaustive の task では **別モデル（別ファミリ）の critic** を default
 - **Layer 3 は別モデルファミリの critic を必須とする** (context 分離だけでは不十分)。同一 model が producer と critic を兼ねると、自分の成果物は価値あるように見えて gate が室温化する。同じ family 内の別 tier (例: Opus と Sonnet) も同一扱いとする
 - **Producer / critic の model 名と family 判定結果を `critic-report.md` と `criticLog` に記録する** (`producerModel` / `criticModel` / `producerFamily` / `criticFamily` / `familyResolver` / `independenceVerdict`)。自己申告の文字列一致ではなく family 判定で見る。family 不定の model (auto / router 系) は critic に使えない
 - **Layer 3 は fail-closed**。`independenceVerdict` が `different-family` 以外 (`same-family` / `unresolved` / `degraded`) のとき、Layer 3 は **verdict = pass を出せない** (= proceed 不可)。独立性は rubric severity とは別の前提条件で、verdict 語彙を増やさない。`degraded` は Layer 2 専用で、Layer 3 では user 明示 override (security-approve 経由) がない限り進めない

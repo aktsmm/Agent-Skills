@@ -11,7 +11,7 @@ description: 顧客向け Azure Update PowerPoint 作成ワークフローの全
 
 > 🎯 **重要**: オーケストレーターは**作業を行わない**。サブエージェントへ委譲する。
 
-**設計パターン**: Orchestrator-Workers（パターン解説は [../references/dependencies.md](../references/dependencies.md) の agentic-workflow-guide スキル節を参照）
+**設計パターン**: Orchestrator-Workers（パターン解説は [../references/dependencies.md](../references/dependencies.md) の Orchestration pattern 節を参照）
 
 ```
 Orchestrator の責務:

@@ -22,10 +22,7 @@ Slide creation guide for incident reports and postmortems.
 
 ## Tone Guidelines
 
-- **Factual**: Stick to facts, avoid blame
-- **Chronological**: Clear timeline
-- **Action-oriented**: Focus on solutions
-- **Transparent**: Acknowledge issues honestly
+Factual and blameless, chronological, action-oriented.
 
 ---
 

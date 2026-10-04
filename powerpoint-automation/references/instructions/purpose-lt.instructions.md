@@ -40,68 +40,14 @@ Add:
 
 ## Design Principles
 
-### 🎯 Less is More
-
 - **Big fonts**: Title 44pt+, Body 28pt+
 - **Minimal text**: Max 3 bullet points
-- **Strong visuals**: 1 image > 10 words
 - **High contrast**: Dark background OK for LT
-
-### 🚀 High Impact
-
-- **Bold opening**: Hook in 10 seconds
-- **One message**: Repeat it
-- **Strong close**: Clear CTA
-
----
-
-## What to Avoid
-
-| Avoid            | Instead             |
-| ---------------- | ------------------- |
-| Long paragraphs  | 3-5 word bullets    |
-| Complex diagrams | Simple icons        |
-| Multiple topics  | One focused message |
-| "Thank you" only | CTA + Thank you     |
-| Reading slides   | Speak naturally     |
+- **Title**: short hook (≤ 2 lines), no emoji on slides; avoid long descriptive titles
+- **Close**: CTA + Thank you, not "Thank you" only
 
 ---
 
 ## Speaker Notes for LT
 
-Keep notes minimal:
-
-- Timing cues: "(30 sec)"
-- Key points to hit
-- Transition phrases
-- Joke/anecdote reminders
-
----
-
-## Example Title Slides
-
-**Good:**
-
-```
-🚀 Ship Code 10x Faster
-with GitHub Copilot
-
-@yourhandle
-```
-
-**Avoid:**
-
-```
-An Introduction to Improving Developer
-Productivity Using AI-Powered Code
-Completion Tools in Modern IDEs
-```
-
----
-
-## Timing Tips
-
-- Practice with timer
-- Mark 2-minute warning point
-- Prepare 1 slide to skip if running late
-- End early rather than rushing
+Keep notes minimal: timing cues such as "(30 sec)", key points, transitions. Mark one slide that can be skipped if running late.

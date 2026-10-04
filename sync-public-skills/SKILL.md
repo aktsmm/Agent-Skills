@@ -26,6 +26,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 - `SYNC_INTERNAL_SKILLS_EMU_REPO`: EMU private repo
 - `SYNC_INTERNAL_SKILLS_GIM_REPO`: GIM internal repo
 - いずれも Process scope 優先、無ければ User scope で解決する（`[System.Environment]::GetEnvironmentVariable($name,'User')`）
+- 本文の `scripts/...`（`Commit-DirtySkills.ps1`、`skill-distribution.json`、`Sync-AndPush.ps1` 等）は skill 同梱ではなく private repo ルート相対の外部依存。存在しなければ実行せず停止する
 
 ## Mode
 
@@ -64,11 +65,12 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 ## Destination Audits and Gates
 
 Destination 別の判定（公開可否 / 除外リスト / repo visibility / sensitive scan）はこの SKILL が決める。詳細手順と既定リストは [references/instructions/audits-and-gates.md](references/instructions/audits-and-gates.md)。
+
 - **Runner capability gate**: relaxed primary-only requires committed audited-SHA/origin, same-SHA policy, scoped audits, source preservation and public tree/scope checks. Local drafts are not support. Otherwise use no new flags/relaxation and hand off the update; legacy broad may retain its existing full gates.
 - **New Skill Classification Gate**: with that runner, primary-only audits selected skills and defers unselected dirty/unknowns without copying them; broad/all retains whole-repo classification. Legacy runners retain their existing stop conditions.
 - **Agent Discovery Gate**: ask classification only for an unknown selected skill. Never infer public permission or use `-AllowUnknownSkills` as a bypass. "Not this run" excludes that skill temporarily; it is neither permanent deny nor publication approval.
 - **Copilot-Skills Private Inventory Gate**: `.copilot` 由来ミラーは license に関係なく public 対象外とし、private repo 内だけに保持する
-- **EMU Private Sync Gate**: visibility `PRIVATE`/`INTERNAL` 確認、secret 連を placeholder 化
+- **EMU Private Sync Gate**: visibility `PRIVATE`/`INTERNAL` 確認、secret 類を placeholder 化
 - **GIM Internal Sync Gate**: org-owned internal へ MS 社内向け skill を集約。既定 internal セット SSOT
 - **Incident Recovery**: prevention gate を抜けて public へ漏れた場合の復旧（filter-repo の限界、GitHub Sensitive Data Removal 申請、fork purge、rename vs delete、robocopy move の罠）は references の Incident Recovery 節を参照
 
@@ -89,12 +91,12 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 1. private / public / script、必要なら EMU / GIM repo を解決し、`primary`・branch / remote・ahead/behind・dirty 状態を確認する
 2. Check capabilities and selected readiness/classification/content diff. Only capable primary-only defers unselected authoring; legacy/broad/all retains full stop gates. Never skip selected license, secret, deletion or mirror checks.
 3. `all` 指定時は、`Commit-DirtySkills.ps1`のdry-run→`-Apply`でskill単位にcommitする。skill以外のdirtyはNot Doneに残し、同期scriptはprivate dirtyを暗黙commitしない
-  - In safe-auto all, verify private origin/visibility and the entire ahead range, isolate unrelated dirty, integrate behind/divergence, validate and push only the authorized intake commits before sync. If isolation or scope cannot be established, stop that pre-step; never let `-SkipDevPush` hide pending commits.
-  - Legacy/broad distribution must execute from a verified clean/current checkout with its Process source env temporarily aligned and restored afterward; otherwise hold distribution, not unrelated authoring.
+   - In safe-auto all, verify private origin/visibility and the entire ahead range, isolate unrelated dirty, integrate behind/divergence, validate and push only the authorized intake commits before sync. If isolation or scope cannot be established, stop that pre-step; never let `-SkipDevPush` hide pending commits.
+   - Legacy/broad distribution must execute from a verified clean/current checkout with its Process source env temporarily aligned and restored afterward; otherwise hold distribution, not unrelated authoring.
 4. safe path を選ぶ
-  - legacy primary-only: retain the old gates or hand off the runner update when relaxed behavior is required; never substitute broad to bypass a selected-scope stop.
-  - capability-verified primary-only: `Sync-AndPush.ps1 -PrimarySkills <skill-name...> -SourceCommit <audited-full-sha> -ExpectedSourceOrigin <approved-origin-url> -Message "sync: <skill summary>" -SkipDevPush`
-  - broad: `Sync-AndPush.ps1 -Message "sync: <summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
+   - legacy primary-only: retain the old gates or hand off the runner update when relaxed behavior is required; never substitute broad to bypass a selected-scope stop.
+   - capability-verified primary-only: `Sync-AndPush.ps1 -PrimarySkills <skill-name...> -SourceCommit <audited-full-sha> -ExpectedSourceOrigin <approved-origin-url> -Message "sync: <skill summary>" -SkipDevPush`
+   - broad: `Sync-AndPush.ps1 -Message "sync: <summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
    - EMU private: `Sync-AndPush.ps1 -SyncEmu [-EmuDryRun]`
    - GIM internal: `Sync-AndPush.ps1 -SyncInternal [-InternalDryRun]`
 5. Confirm only the approved destination set changed. Primary-only never pushes private source; any separately requested private push must have a scoped ahead range, clean execution checkout and integrated remote updates.
@@ -115,4 +117,3 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 
 - Summary / Primary / Path Chosen / Audit / Private Sync / EMU / GIM / Public Sync / Verify / Not Done / Next Suggestions
 - List up to three read-only candidates from Git state/committed differences: dirty -> Retro; pending -> private range review; public-safe gap -> separately requested sync. Honor holds/visibility; no unknown/private/internal/denied public proposals, extra mutations or unsolicited full audits.
-

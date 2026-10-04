@@ -42,7 +42,7 @@ Best when you need curated productivity tools for:
 
 ## Not A Primary Substrate
 
-### Microsoft MCP Server for Enterprise
+### Microsoft MCP Server for Enterprise (Preview)
 
 Useful as a read-only supplement for directory and Entra questions, but not as the main execution substrate for Outlook and productivity writes.
 

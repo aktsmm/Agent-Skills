@@ -1,18 +1,18 @@
 # 環境定義テンプレート
 
-環境フォルダ (`Az-env/<environment>/`) を構成するためのテンプレート。
+環境フォルダ (`env/<environment>/`) を構成するためのテンプレート。`scripts/scaffold_environment.ps1` が `README.md` としてコピーし、`<!-- ... -->` を環境名・リージョンで置換する。
 
 ## 基本情報
 
 ```markdown
-| 項目               | 値                           |
-| ------------------ | ---------------------------- |
-| 環境名             |                              |
-| リソースグループ   |                              |
-| Azure リージョン   |                              |
-| サブスクリプション |                              |
-| デプロイ方式       | Bicep / Azure CLI            |
-| スコープ           | ResourceGroup / Subscription |
+| 項目               | 値                                  |
+| ------------------ | ----------------------------------- |
+| 環境名             | <!-- dev / staging / prod など -->  |
+| リソースグループ   |                                     |
+| Azure リージョン   | <!-- japaneast / japanwest など --> |
+| サブスクリプション |                                     |
+| デプロイ方式       | Bicep / Azure CLI                   |
+| スコープ           | ResourceGroup / Subscription        |
 ```
 
 ## 構成概要
@@ -32,17 +32,17 @@
 ## フォルダ構造
 
 ```
-Az-env/<environment>/
-├── README.md          # この環境の概要
-├── bicep/
-│   ├── main.bicep     # メインテンプレート
-│   ├── main.bicepparam # パラメータファイル
-│   └── modules/       # モジュール (オプション)
-├── config/
-│   └── parameters.json # 環境固有の値
-└── scripts/
-    ├── deploy.ps1     # デプロイスクリプト
-    └── validate.ps1   # 検証スクリプト
+env/<environment>/
+├── README.md               # この環境の概要
+├── cli/                    # DeploymentMode CLI / Both
+│   ├── deploy.ps1
+│   └── config/config.json
+├── bicep/                  # DeploymentMode Bicep / Both
+│   ├── main.bicep
+│   ├── scope.json
+│   ├── parameters/<environment>.json
+│   └── modules/resources.bicep
+└── logs/                   # what-if / preview ログ
 ```
 
 ## 接続パターン
@@ -71,7 +71,7 @@ Az-env/<environment>/
 
 ## 使い方
 
-1. このテンプレートを `Az-env/<environment>/README.md` にコピー
+1. `scaffold_environment.ps1` が `env/<environment>/README.md` として生成（手動ならコピー）
 2. [hearing-checklist.md](hearing-checklist.md) でヒアリング実施
 3. [resource-patterns.md](resource-patterns.md) から Bicep パターンを参照
 4. `bicep/` フォルダにテンプレートを配置

@@ -44,8 +44,6 @@ Agent definitions for PPTX automation pipeline.
 | **JSON Reviewer** | `agents/json-reviewer.agent.md` | content.json review (translation, structure) |
 | **PPTX Reviewer** | `agents/pptx-reviewer.agent.md` | PPTX review (visual, notes, CTA quality)     |
 
-> ⚠️ `reviewer.agent.md` was renamed and split into `json-reviewer.agent.md`.
-
 ## Script List
 
 | Script                     | Purpose                            | Auto-Fix Features                  |
@@ -69,55 +67,7 @@ Agent definitions for PPTX automation pipeline.
 
 ## Standard Workflow
 
-### Main Flow (★ Always start from Orchestrator)
-
-```
-                                    ┌─────────────────────────────────────────┐
-                                    │     TRIAGE (Orchestrator decides)       │
-                                    └──────────────┬──────────────────────────┘
-                                                   │
-                    ┌──────────────────────────────┼──────────────────────────────┐
-                    │                              │                              │
-                    ▼                              ▼                              ▼
-          ┌─────────────────┐           ┌─────────────────┐           ┌─────────────────┐
-          │ A: Needs        │           │ B: Input        │           │ C: Resume       │
-          │    Brainstorm   │           │    Provided     │           │    Workflow     │
-          │ → BRAINSTORM    │           │ → INIT          │           │ → Target Phase  │
-          └────────┬────────┘           └────────┬────────┘           └────────┬────────┘
-                   │                              │                              │
-                   ▼                              │                              │
-          proposal.json                           │                              │
-                   │                              │                              │
-                   └──────────────────────────────┴──────────────────────────────┘
-                                                  │
-                                                  ▼
-          ┌───────────────────────────────────────────────────────────────────────┐
-          │ INIT → PLAN(confirm) → PREPARE_TEMPLATE → EXTRACT → [SUMMARIZE]       │
-          │      → TRANSLATE → REVIEW(JSON) → BUILD → REVIEW(PPTX) → DONE         │
-          │                                     │                    │            │
-          │                    └────(FAIL → fix, max 3×)─────────────┘            │
-          │                                     ↓                                 │
-          │                                ESCALATE (>3 failures)                 │
-          └───────────────────────────────────────────────────────────────────────┘
-```
-
-### Phase Details
-
-| Phase            | Owner                   | Description                                      |
-| ---------------- | ----------------------- | ------------------------------------------------ |
-| **TRIAGE**       | **Orchestrator**        | Input detection, workflow branching (★ first)    |
-| **BRAINSTORM**   | Brainstormer            | Interactive → proposal.json (optional)           |
-| INIT             | classify_input.py       | Input detection → classification.json            |
-| PLAN             | Orchestrator            | Present options, get user approval (★ required)  |
-| PREPARE_TEMPLATE | create_clean_template   | Template diagnosis, cleaning, position fix       |
-| EXTRACT          | Script group            | Image extraction + content.json (parallelizable) |
-| SUMMARIZE        | Summarizer              | Slide count reduction only: summarize            |
-| TRANSLATE        | Localizer               | content.json → content_ja.json                   |
-| **REVIEW(JSON)** | **JSON Reviewer**       | content.json quality check → pass/fail           |
-| BUILD            | create_from_template.py | PPTX generation (auto position, AutoFit)         |
-| **REVIEW(PPTX)** | **PPTX Reviewer**       | Visual, notes, CTA quality review → pass/fail    |
-| DONE             | Orchestrator            | Open PowerPoint (optional)                       |
-| ESCALATE         | workflow_tracer.py      | Human escalation after 3 failures                |
+Always start from the Orchestrator. Main flow, phase owners, PLAN options, retry policy (max 3, then ESCALATE), and fallback matrix: [agents/orchestrator.agent.md](agents/orchestrator.agent.md).
 
 ### Auto-Fixes in PREPARE_TEMPLATE
 
@@ -154,12 +104,7 @@ Agent definitions for PPTX automation pipeline.
 
 ## Method Selection
 
-| Use Case               | Recommended Method                      | Rating     |
-| ---------------------- | --------------------------------------- | ---------- |
-| **EN PPTX → Japanese** | reconstruct + create_from_template      | ⭐⭐⭐⭐⭐ |
-| **With Template**      | analyze_template + create_from_template | ⭐⭐⭐⭐⭐ |
-| From scratch           | create_ja_pptx.py                       | ⭐⭐⭐⭐   |
-| Code-heavy content     | pptxgenjs                               | ⭐⭐⭐⭐   |
+See [tools-reference.instructions.md](instructions/tools-reference.instructions.md#method-selection) (SSOT).
 
 ---
 

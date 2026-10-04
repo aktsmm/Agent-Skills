@@ -1,6 +1,6 @@
 ---
 name: repurpose-deck-from-reference
-description: Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources. Use when "this Scout deck → make a GitHub Copilot app deck", "use this deck as template for new topic", "参照デックの体裁で別内容を作る", "既存 PPTX を流用して別テーマで作り直す". Different from translation (use powerpoint-automation) and from-scratch generation.
+description: Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources. Use when "use this product deck's look for a different product deck", "use this deck as template for new topic", "参照デックの体裁で別内容を作る", "既存 PPTX を流用して別テーマで作り直す". Not for deck translation, from-scratch generation, or outline-only planning.
 argument-hint: "<reference.pptx> と <new topic> + 一次情報 URL / 出典"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -20,9 +20,10 @@ metadata:
 - セクション構成も新トピックに合わせて再設計してよい
 
 Use a different skill if:
-- 翻訳・content.json 抽出ベースで作りたい → **powerpoint-automation**
-- ゼロから作る → **powerpoint-automation** の create-from-template
-- 設計・骨子だけ作りたい → **powerpoint-planning**
+
+- 翻訳・content.json 抽出ベースで作りたい（対象外）
+- テンプレートからゼロから作る（対象外）
+- 設計・骨子だけ作りたい（対象外）
 
 ## Workflow
 
@@ -30,21 +31,21 @@ Use a different skill if:
 COPY → RESEARCH → PLAN → WIPE → BUILD → SCREENSHOTS → QA → POLISH
 ```
 
-| Phase | 目的 | 主な落とし穴 |
-| --- | --- | --- |
-| **COPY** | 参照 deck を新ファイル名でコピー、編集対象を固定 | 参照を破壊しない |
-| **RESEARCH** | 一次情報を `web_fetch` で複数 ドキュメント / repo README / changelog を取得 | スニペットだけで決めない、最新版を確認 |
-| **PLAN** | セクション構成と各スライド要旨を SQL todos か markdown で先に固める | 参照のセクション数に縛られない |
-| **WIPE** | 各スライドの shape を整理。layout を「白紙」に揃え、layout 由来 `p:bg` を除去 | hidden slide の扱いに注意 |
-| **BUILD** | スライドごとに add_shape / add_textbox で再構築。footer ロゴ・ページ番号を付与 | 負数 width/height で COM open 不能になる |
-| **SCREENSHOTS** | 実機の UI を `PrintWindow` でキャプチャ、PII を mask して挿入 | 個人 PJ 名・リポ名・ユーザー名を必ず黒塗り |
-| **QA** | 全スライド PNG 化して **sub-agent で批評** させる、自分で見ずに済まさない | "looks fine" の自己評価は禁止 |
-| **POLISH** | QA 結果を 1 ファイルにまとめて一括反映、再 QA | カードに空白多すぎ / 色 system 揺れを必ず潰す |
+| Phase           | 目的                                                                           | 主な落とし穴                                  |
+| --------------- | ------------------------------------------------------------------------------ | --------------------------------------------- |
+| **COPY**        | 参照 deck を新ファイル名でコピー、編集対象を固定                               | 参照を破壊しない                              |
+| **RESEARCH**    | 一次情報を `web_fetch` で複数 ドキュメント / repo README / changelog を取得    | スニペットだけで決めない、最新版を確認        |
+| **PLAN**        | セクション構成と各スライド要旨を SQL todos か markdown で先に固める            | 参照のセクション数に縛られない                |
+| **WIPE**        | 各スライドの shape を整理。layout を「白紙」に揃え、layout 由来 `p:bg` を除去  | hidden slide の扱いに注意                     |
+| **BUILD**       | スライドごとに add_shape / add_textbox で再構築。footer ロゴ・ページ番号を付与 | 負数 width/height で COM open 不能になる      |
+| **SCREENSHOTS** | 実機の UI を `PrintWindow` でキャプチャ、PII を mask して挿入                  | 個人 PJ 名・リポ名・ユーザー名を必ず黒塗り    |
+| **QA**          | 全スライド PNG 化して **sub-agent で批評** させる、自分で見ずに済まさない      | "looks fine" の自己評価は禁止                 |
+| **POLISH**      | QA 結果を 1 ファイルにまとめて一括反映、再 QA                                  | カードに空白多すぎ / 色 system 揺れを必ず潰す |
 
 ## Core Rules
 
 - **One file, not multiple drafts.** 参照を直接コピーして、その 1 ファイルを iterate する。古い draft は残さない。
-- **Lock-first.** 編集前に必ず `Get-Process POWERPNT | Stop-Process -Id`。OneDrive 同期完了を待つ。
+- **Lock-first.** 編集前に対象 PPTX を開いている PowerPoint を確認し、未保存の変更がないことをユーザーに確認してから閉じる（確認なしに `Stop-Process` で強制終了しない）。OneDrive 同期完了を待つ。
 - **Layout reset.** 参照のコンテンツスライドは原則「白紙」レイアウトに切替＋`<p:bg>` 除去。これをやらないと旧テンプレの装飾が透けて見える。
 - **No negative dimensions.** `Emu(w - X)` で X > w の状況を作らない。`max(min_h, h - margin)` でクランプ。
 - **COM cache bypass.** 直近編集ファイルを COM で開くと古いコンテンツが返る場合あり。**毎回別ファイル名にコピーしてから Open**。

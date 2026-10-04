@@ -136,18 +136,13 @@ When extracting from web sources, explicitly list and retrieve all these element
 
 **Emoji is prohibited in PPTX slides.**
 
-| Location      | Emoji | Reason                          |
-| ------------- | ----- | ------------------------------- |
-| Slide title   | ❌    | Font compatibility issues       |
-| Bullet items  | ❌    | May not render correctly        |
+| Location      | Emoji | Reason                              |
+| ------------- | ----- | ----------------------------------- |
+| Slide title   | ❌    | Font compatibility issues           |
+| Bullet items  | ❌    | May not render correctly            |
 | Speaker notes | ⚠️ OK | Internal use, not shown to audience |
 
-### Why No Emoji?
-
-- PowerPoint fonts may not support all emoji
-- Different OS versions render emoji differently
-- Professional presentations should avoid emoji
-- Use icons from template instead
+Use template icons instead of emoji.
 
 ---
 
@@ -221,15 +216,15 @@ for i, (txt, size, bold) in enumerate(lines):
 
 Symptom of the bug: cover subtitle renders at ~12pt even when the code sets `Pt(20)`. Cause: the shape still has the layout's original run with its own rPr, and the new setter appends without overriding.
 
-### MSO_AUTO_SIZE enum: only `NONE` / `SHAPE_TO_FIT_TEXT` are supported
+### MSO_AUTO_SIZE: `TEXT_TO_FIT_SHAPE` does not shrink by itself
 
-python-pptx が公開している `MSO_AUTO_SIZE` は **`NONE` と `SHAPE_TO_FIT_TEXT`** の 2 値のみ。PowerPoint COM 由来の名前 `TEXT_TO_SHAPE_ON_OVERFLOW` (テキストを枠に合わせて縮小) は **存在しない**。誤って使うと `AttributeError: type object 'MSO_AUTO_SIZE' has no attribute 'TEXT_TO_SHAPE_ON_OVERFLOW'` で build 失敗。
+python-pptx 1.0.x の `MSO_AUTO_SIZE` は `NONE` / `SHAPE_TO_FIT_TEXT` / `TEXT_TO_FIT_SHAPE` / `MIXED`。PowerPoint COM 由来の名前 `TEXT_TO_SHAPE_ON_OVERFLOW` は **存在しない**（`AttributeError` で build 失敗）。
 
 使い分け:
 
 - `tf.auto_size = MSO_AUTO_SIZE.SHAPE_TO_FIT_TEXT`: 枠の height を text 量に合わせて伸ばす。テキスト増減が読めない slide 向け
 - `tf.auto_size = MSO_AUTO_SIZE.NONE` (default): 枠固定、はみ出し時はクリップ
-- 「テキストを枠内に自動縮小」は python-pptx では未実装。必要なら pywin32 経由で `TextFrame.AutoSize = 2` (msoAutoSizeTextToFitShape) を build 後に COM で設定する
+- `TEXT_TO_FIT_SHAPE` は autofit フラグを書くだけで、縮小率は python-pptx が計算しない（PowerPoint でテキストを再編集するまで縮まない）。確実に縮めるなら `tf.fit_text(...)`（フォントファイル指定が必要）か、build 後に COM で `TextFrame2.AutoSize = 2` (msoAutoSizeTextToFitShape) を設定する
 
 ### xfrm 4-Attribute Rule
 
@@ -275,10 +270,4 @@ When adding a table to a slide with an existing body placeholder (idx=1), move t
 
 ### Section Rebuild After Dynamic Slide Addition
 
-When dynamically adding slides from a template, the template's original section definitions remain stale. **Delete all sections and rebuild** before saving:
-
-```python
-# Remove old sectionLst from extLst
-# Create new sectionLst with sections matching actual slide order
-# Each section maps to a range of slide IDs
-```
+When dynamically adding slides from a template, the template's original section definitions remain stale. **Delete all sections and rebuild** before saving. Procedure (COM and XML): [IMPLEMENTATION_PATTERNS.md](../IMPLEMENTATION_PATTERNS.md#section-headers-slide-sorter-groups).

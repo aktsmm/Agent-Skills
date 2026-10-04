@@ -42,7 +42,5 @@ draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
 
 ## Practical Tips
 
-- Keep viewport dimensions stable before reusing regions.
-- Determine coordinates on one representative image, then visually verify every image.
-- Use a normal image annotation tool when only one or two images need a solid cover; the script is most useful for repeatable batches.
+- Script is most useful for repeatable batches; for one or two images a normal annotation tool is enough.
 - Investigate IP ownership before deciding whether an IP address is safe to publish.

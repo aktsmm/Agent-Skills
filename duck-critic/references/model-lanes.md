@@ -90,11 +90,4 @@ Model diversity is only one axis of independence. The other is instruction indep
 | `standard` | Normal implementation or test review                            | Findings by severity plus next actions                    |
 | `deep`     | Multi-file, architecture, deploy, security, or repeated failure | Lane-specific critique with explicit assumptions and gaps |
 
-Default to `standard`. Use `deep` only when the extra cost is justified. Use `quick` for a bounded low-risk judgment or deterministic gate audit; do not dispatch an LLM merely to repeat an established low-risk checker.
-
-## Avoid
-
-- Do not choose a more expensive model for trivial edits.
-- Do not run many reviewer lanes just to increase confidence.
-- Do not accept comments that are only stylistic unless they affect correctness, security, or verification.
-- Do not hide model uncertainty. If the model could not be controlled, say so.
+Default to `standard`. Use `deep` only when the extra cost is justified. Use `quick` for a bounded low-risk judgment or deterministic gate audit; do not dispatch an LLM merely to repeat an established low-risk checker, and do not pick a more expensive model or add lanes for trivial edits just to increase confidence.

@@ -4,41 +4,23 @@
 
 > Back to [overview.md](overview.md)
 
-## Overview
-
-This advanced pattern is particularly effective for document generation, code transformation, and any task where deterministic output is critical.
-
-## Two-Stage Architecture
+Use for document generation, code transformation, report generation, and template filling where the same input must give the same output. Not for creative writing, exploratory analysis, or adaptive conversation.
 
 ```
-Input → IR (Intermediate Representation) → Output
+Input → Generate IR → Validate IR → Transform → Render → Output
+                          └─ invalid → reject / fix (no auto-completion)
 ```
 
-```mermaid
-graph LR
-    A[Input] --> B[Generate IR]
-    B --> C[Validate IR]
-    C -->|Valid| D[Transform]
-    C -->|Invalid| E[Reject/Fix]
-    D --> F[Render Output]
-```
+## Stage Responsibilities
 
-## Core Principles
+| Stage         | Role                                   | Creativity            | VS Code implementation                      |
+| ------------- | -------------------------------------- | --------------------- | ------------------------------------------- |
+| **Generate**  | Create IR from input                   | High (interpretation) | LLM agent; writes IR to a file              |
+| **Validate**  | Verify IR completeness and correctness | None (rule-based)     | Script / schema check, not an LLM judgement |
+| **Transform** | Convert IR to output format            | None (mechanical)     | Script or template engine                   |
+| **Render**    | Format final output                    | Low (formatting only) | Script; LLM only for prose polish           |
 
-| Principle                  | Description                                                       |
-| -------------------------- | ----------------------------------------------------------------- |
-| **Separation of Concerns** | Split responsibility: Generate, Validate, Transform, Render       |
-| **Strict Validation**      | Validate IR structure strictly; do not auto-complete missing data |
-| **Determinism**            | Same IR → Same output. No creativity in transformation phase      |
-
-## Separation of Concerns
-
-| Responsibility | Agent Role                             | Creativity Level      |
-| -------------- | -------------------------------------- | --------------------- |
-| **Generate**   | Create IR from input                   | High (interpretation) |
-| **Validate**   | Verify IR completeness and correctness | None (rule-based)     |
-| **Transform**  | Convert IR to output format            | None (mechanical)     |
-| **Render**     | Format final output                    | Low (formatting only) |
+Keeping Validate and Transform deterministic is what makes failures inspectable: same IR → same output, and a bad result is traced to either the IR or the transformer.
 
 ## IR Specification Guidelines
 
@@ -57,43 +39,6 @@ When one document contains both current state and history, do not search the ent
 4. Exclude the history region by construction, not with a growing list of old statuses.
 
 This prevents an old `pending` record from being revived as current work.
-
-## When to Use
-
-- Document generation (specs → documentation)
-- Code transformation (one language → another)
-- Report generation (data → formatted report)
-- Template-based output (variables → filled template)
-
-## When NOT to Use
-
-- Creative tasks (writing, brainstorming)
-- Exploratory analysis
-- Tasks requiring adaptive responses
-
-## Implementation Example
-
-**Document Generation Workflow:**
-
-```
-Step 1: Generate IR
-  Input: User requirements
-  Output: Structured document spec (JSON)
-
-Step 2: Validate IR
-  - All required sections present?
-  - Data types correct?
-  - References valid?
-  → Reject if invalid
-
-Step 3: Transform
-  IR → Markdown/HTML/PDF
-  (Deterministic, no creativity)
-
-Step 4: Render
-  Apply styling, formatting
-  Output final document
-```
 
 ## Example IR Schema
 
@@ -117,11 +62,4 @@ Step 4: Render
 }
 ```
 
-## Benefits
-
-| Benefit             | Description                            |
-| ------------------- | -------------------------------------- |
-| **Reproducibility** | Same IR always produces same output    |
-| **Debuggability**   | Can inspect IR to understand failures  |
-| **Testability**     | Can unit test each stage independently |
-| **Reusability**     | Same IR can render to multiple formats |
+Test each stage independently: fixtures of IR → expected output for Transform, invalid IR → rejection for Validate.

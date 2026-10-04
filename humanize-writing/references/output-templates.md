@@ -63,9 +63,3 @@ This file holds the long-form output templates, anti-patterns, self-scoring rubr
 - `生成指示モードで、次の記事の指示プロンプトを作って`
 - `つまり・要は・かなり・十分 の残りを全部探して`
 - `説明文ではなく、判断の跡が残る文章にして`
-
-## Standard Output Modes
-
-- 監査: `AI-likeness Audit`
-- 変換: before / after または修正文
-- 生成指示: 文体指示プロンプト

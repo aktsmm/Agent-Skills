@@ -1,6 +1,6 @@
 # COM and XML Pitfalls
 
-`repurpose-deck-from-reference` フローで踏みやすい既知の罠と回避策。
+このスキルのフローで踏みやすい既知の罠と回避策。
 
 ## 1. Negative dimension corruption
 
@@ -77,12 +77,12 @@ OneDrive の `FileCoAuth.exe` が同期中にファイルをロックしてい�
 ### 回避
 
 ```powershell
-Get-Process POWERPNT, FileCoAuth -ErrorAction SilentlyContinue |
-  ForEach-Object { Stop-Process -Id $_.Id -Force }
+Get-Process FileCoAuth -ErrorAction SilentlyContinue |
+  ForEach-Object { Stop-Process -Id $_.Id }
 Start-Sleep 5
 ```
 
-それでも駄目なら OneDrive 同期一時停止。
+PowerPoint 側のロックは、未保存の変更がないことをユーザーに確認してから対象プレゼンだけを閉じる（`POWERPNT` を強制終了しない）。それでも駄目なら OneDrive 同期一時停止。
 
 ## 4. XML escape in section names
 

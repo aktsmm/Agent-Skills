@@ -1,28 +1,6 @@
 # Routing And Safety
 
-## Read Responsibility
-
-- Prefer WorkIQ for common read requests that map naturally to inbox, meetings, and file discovery.
-- Use Microsoft Graph when WorkIQ cannot answer, lacks detail, or the user needs exact Graph semantics.
-- Go directly to Graph for:
-  - endpoint discovery
-  - permission lookup
-  - exact filters or projections
-  - directory, Teams, Planner, To Do, reports, or schema-heavy requests
-
-## Write Responsibility
-
-- All writes go through Microsoft Graph.
-- Treat the following as writes even if they feel lightweight:
-  - send
-  - create
-  - update
-  - reply
-  - forward
-  - move
-  - upload
-  - respond
-  - assign
+Read / write routing is defined in SKILL.md "Routing Rules". Writes additionally include `forward` and any action visible to other people.
 
 ## Confirmation Policy
 

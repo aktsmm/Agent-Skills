@@ -1,53 +1,20 @@
 # Workflow Patterns
 
-Six fundamental patterns for agent workflows, plus IR Architecture and Connected Agents.
+Selector only. Each file keeps the VS Code / Copilot implementation notes, stop conditions, and failure modes; the generic pattern theory is in the Anthropic article below.
 
-## Quick Reference
+Pick the simplest pattern that fits; combine only when one pattern cannot express the flow.
 
-| Pattern                  | When to Use                       |
-| ------------------------ | --------------------------------- |
-| **Plan-First**           | Meta-pattern: Always start here   |
-| **Prompt Chaining**      | Sequential tasks with validation  |
-| **Routing**              | Processing varies by input type   |
-| **Parallelization**      | Independent tasks run together    |
-| **Orchestrator-Workers** | Dynamic task decomposition        |
-| **Evaluator-Optimizer**  | Repeat until quality criteria met |
-| **Connected Agents**     | Shared context collaboration      |
-
-## Pattern Selection Flowchart
-
-```
-What's the nature of the task?
-│
-├─ Sequential processing needed (clear step ordering)
-│   └─→ Prompt Chaining
-│
-├─ Multiple independent tasks (no mutual impact)
-│   └─→ Parallelization
-│
-├─ Dynamic number of tasks (not predetermined)
-│   └─→ Orchestrator-Workers
-│
-├─ Repeat until quality criteria met
-│   └─→ Evaluator-Optimizer
-│
-└─ Processing varies significantly by input
-    └─→ Routing
-```
-
-## Pattern Details
-
-| #   | Pattern              | File                                                                   |
-| --- | -------------------- | ---------------------------------------------------------------------- |
-| 0   | Plan-First           | [0-plan-first.md](0-plan-first.md)                                     |
-| 1   | Prompt Chaining      | [1-prompt-chaining.md](1-prompt-chaining.md)                           |
-| 2   | Routing              | [2-routing.md](2-routing.md)                                           |
-| 3   | Parallelization      | [3-parallelization.md](3-parallelization.md)                           |
-| 4   | Orchestrator-Workers | [4-orchestrator-workers.md](4-orchestrator-workers.md)                 |
-| 5   | Evaluator-Optimizer  | [5-evaluator-optimizer.md](5-evaluator-optimizer.md)                   |
-| 6   | Connected Agents     | [6-connected-agents.md](6-connected-agents.md)                         |
-| -   | IR Architecture      | [ir-architecture.md](ir-architecture.md) (Advanced transformation)    |
-| -   | Combining Patterns   | [combining-patterns.md](combining-patterns.md) (Real-world workflows) |
+| Pattern              | Choose when                                                        | File                                                   |
+| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
+| Plan-First (meta)    | Multi-step, costly, or ambiguous work before any execution         | [0-plan-first.md](0-plan-first.md)                     |
+| Prompt Chaining      | Fixed step order; each output feeds the next and needs a gate      | [1-prompt-chaining.md](1-prompt-chaining.md)           |
+| Routing              | Processing differs clearly by input category                       | [2-routing.md](2-routing.md)                           |
+| Parallelization      | Independent tasks with no shared files, COM, or data dependency    | [3-parallelization.md](3-parallelization.md)           |
+| Orchestrator-Workers | Subtask count is only known at runtime; delegated evidence matters | [4-orchestrator-workers.md](4-orchestrator-workers.md) |
+| Evaluator-Optimizer  | Explicit quality criteria; iterate with a retry cap                | [5-evaluator-optimizer.md](5-evaluator-optimizer.md)   |
+| Connected Agents     | Agents build on a shared, persisted context (blackboard)           | [6-connected-agents.md](6-connected-agents.md)         |
+| IR Architecture      | Deterministic transformation; append-only current-state extraction | [ir-architecture.md](ir-architecture.md)               |
+| Combining Patterns   | Real workflows that need more than one of the above                | [combining-patterns.md](combining-patterns.md)         |
 
 ## References
 

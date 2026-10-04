@@ -41,6 +41,8 @@ Public owner names that a signed-out visitor would also see are fine. Private or
 
 Signed-in and signed-out states render different controls, so capture in the state the prose describes.
 
+Identify whether a visible control filters a list, changes a setting, or starts an action. An annotation highlights the control; it does not prove a selection changed, a setting was saved, or a task ran.
+
 ## Size the capture to the printed width
 
 Printed width is fixed, so the printed text size inside a screenshot is set by how many CSS pixels were packed into it: density = CSS pixel width / printed width in millimetres.

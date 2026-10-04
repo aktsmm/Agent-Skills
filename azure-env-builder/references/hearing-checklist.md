@@ -18,7 +18,7 @@ Azure 環境構築時に確認すべき項目一覧。
 
 ```markdown
 - [ ] Azure サブスクリプション ID: \_\_\_
-- [ ] Azure AD テナント: \_\_\_
+- [ ] Microsoft Entra テナント: \_\_\_
 - [ ] 環境名: [ ] dev [ ] staging [ ] prod [ ] その他: \_\_\_
 - [ ] リージョン: [ ] japaneast [ ] japanwest [ ] その他: \_\_\_
 - [ ] デプロイ方式: [ ] Bicep [ ] Azure CLI
@@ -67,11 +67,11 @@ Azure 環境構築時に確認すべき項目一覧。
 
 ```markdown
 - [ ] VPN Gateway
-  - SKU: [ ] VpnGw1 [ ] VpnGw2 [ ] VpnGw2AZ
+  - SKU: [ ] VpnGw1AZ [ ] VpnGw2AZ [ ] VpnGw3AZ（非 AZ SKU は新規作成不可）
   - [ ] Active-Active
   - [ ] P2S (Point-to-Site)
 - [ ] ExpressRoute Gateway
-  - SKU: [ ] Standard [ ] HighPerf [ ] UltraPerf
+  - SKU: [ ] ErGw1AZ [ ] ErGw2AZ [ ] ErGw3AZ [ ] ErGwScale [ ] Standard/HighPerf/UltraPerf（非 AZ）
 - [ ] Virtual WAN
 ```
 
@@ -92,13 +92,6 @@ Azure 環境構築時に確認すべき項目一覧。
   - [ ] WAF 必要
 - [ ] Azure Front Door
 - [ ] Traffic Manager
-```
-
-→ MCP で最新スキーマ取得:
-
-```
-mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.Network/virtualNetworks")
-microsoft_code_sample_search(query: "VNet Bicep", language: "bicep")
 ```
 
 ---
@@ -145,13 +138,6 @@ microsoft_code_sample_search(query: "VNet Bicep", language: "bicep")
 - [ ] ACI
 ```
 
-→ MCP で最新スキーマ取得:
-
-```
-mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.Web/sites")
-mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.ContainerService/managedClusters")
-```
-
 ---
 
 ## データ・ストレージ
@@ -174,8 +160,7 @@ mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.Contain
 - [ ] Cosmos DB
   - API: [ ] NoSQL [ ] MongoDB [ ] Cassandra [ ] Gremlin
   - 容量: [ ] Serverless [ ] Provisioned [ ] Autoscale
-- [ ] Redis Cache
-  - SKU: [ ] Basic [ ] Standard [ ] Premium
+- [ ] Azure Managed Redis（Azure Cache for Redis は 2028-09-30 廃止、新規顧客は作成不可）
 ```
 
 ### ストレージ
@@ -197,13 +182,6 @@ mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.Contain
 - [ ] Event Hubs
 ```
 
-→ MCP で最新スキーマ取得:
-
-```
-mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.Storage/storageAccounts")
-mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.DocumentDB/databaseAccounts")
-```
-
 ---
 
 ## 監視・可観測性
@@ -218,13 +196,6 @@ mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.Documen
 - [ ] アラートルール: \_\_\_
 ```
 
-→ MCP で最新スキーマ取得:
-
-```
-mcp_bicep_experim_get_az_resource_type_schema(azResourceType: "Microsoft.OperationalInsights/workspaces")
-microsoft_code_sample_search(query: "Log Analytics Workspace Bicep", language: "bicep")
-```
-
 ---
 
 ## セキュリティ
@@ -236,7 +207,7 @@ microsoft_code_sample_search(query: "Log Analytics Workspace Bicep", language: "
 - [ ] Managed Identity
   - [ ] SystemAssigned
   - [ ] UserAssigned
-- [ ] Azure AD 認証
+- [ ] Microsoft Entra 認証
 - [ ] Defender for Cloud
 ```
 
@@ -261,5 +232,5 @@ microsoft_code_sample_search(query: "Log Analytics Workspace Bicep", language: "
 
 1. 該当項目にチェックを入れる
 2. 必要な値を記入
-3. MCP ツールで最新スキーマを取得
+3. MCP ツールで最新スキーマを取得（[SKILL.md](../SKILL.md) の Required: MCP Tools）
 4. Bicep 実装に進む

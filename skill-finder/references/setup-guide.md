@@ -20,31 +20,7 @@ Requirements and setup instructions for Skill Finder.
 
 ## Installation
 
-### 1. Install GitHub CLI
-
-```bash
-# Windows (winget)
-winget install GitHub.cli
-
-# macOS (Homebrew)
-brew install gh
-
-# Linux (apt)
-sudo apt install gh
-```
-
-### 2. Authenticate
-
-```bash
-gh auth login
-```
-
-### 3. Verify
-
-```bash
-gh --version
-curl --version
-```
+Install GitHub CLI (e.g. `winget install GitHub.cli` / `brew install gh`), then run `gh auth login`.
 
 ### Verify Dependencies
 
@@ -63,12 +39,10 @@ pwsh scripts/Search-Skills.ps1 -Check
 
 ## Troubleshooting
 
-| Issue                   | Solution                                    |
-| ----------------------- | ------------------------------------------- |
-| `gh: command not found` | Install GitHub CLI and add to PATH          |
-| `gh auth login` fails   | Run `gh auth login` and follow prompts      |
-| Rate limit exceeded     | Wait or use authenticated requests          |
-| curl SSL errors         | Update curl or check network/proxy settings |
+| Issue               | Solution                                    |
+| ------------------- | ------------------------------------------- |
+| Rate limit exceeded | Wait or use authenticated requests          |
+| curl SSL errors     | Update curl or check network/proxy settings |
 
 ## Popular Repositories
 

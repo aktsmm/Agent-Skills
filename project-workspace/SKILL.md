@@ -1,6 +1,6 @@
 ---
 name: project-workspace
-description: "Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a project workspace, cost comparison workspace, or project meeting notes. Triggers on プロジェクトワークスペース, 検証フォルダ, PoC ワークスペース, トピック別作業フォルダ, プロジェクトの議事メモ."
+description: "Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a project workspace, cost comparison workspace, or project meeting notes. Triggers on プロジェクトワークスペース, 検証フォルダ, PoC ワークスペース, トピック別作業フォルダ, プロジェクトの議事メモ. Not for ongoing customer account operations or book manuscripts."
 argument-hint: "プロジェクト名・検証テーマ、または既存プロジェクトの議事メモ"
 user-invocable: true
 license: CC BY-NC-SA 4.0

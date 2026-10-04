@@ -1,6 +1,6 @@
 # Design Principles
 
-A collection of principles for designing agent workflows.
+Rationale for agent-workflow design. Textbook definitions (SRP, DRY, KISS, idempotency, etc.) are assumed knowledge; each section keeps only the agent-workflow-specific rule and non-obvious gotchas. Review questions live in [review-checklist.md](review-checklist.md).
 
 ## Table of Contents
 
@@ -10,6 +10,7 @@ A collection of principles for designing agent workflows.
 - [Tier 3: Scale Principles](#tier-3-scale-principles-advanced) - Human-in-the-Loop, KISS, Loose Coupling, Graceful Degradation
 - [ACI Design](#aci-design-agent-computer-interface) - Tool design guidelines
 - [File Organization](#file-organization-principles) - Instructions organization, naming conventions
+- [SSOT Implementation Patterns](#ssot-implementation-patterns) - Reference format, View vs Master
 
 ---
 
@@ -17,64 +18,23 @@ A collection of principles for designing agent workflows.
 
 ### 1. SSOT (Single Source of Truth)
 
-**Manage information in one place**
+Centralize context, configuration, and state; agents must not each keep their own copy of shared settings.
 
-| Aspect                   | Description                                          |
-| ------------------------ | ---------------------------------------------------- |
-| **Definition**           | Don't define the same information in multiple places |
-| **Workflow Application** | Centralize context, configuration, and state         |
-| **Violation Example**    | Each agent maintains the same settings separately    |
-| **Solution**             | Use shared context or configuration files            |
-
-**Multi-Agent Propagation Rule:**
-
-In Orchestrator-Workers patterns, writing a rule only in the central document (e.g., `AGENTS.md`) is not enough.
-Worker agents may not read or follow central rules unless they are **explicitly referenced or duplicated** in each `.agent.md`.
-
-| Symptom                            | Cause                                            | Fix                                             |
-| ---------------------------------- | ------------------------------------------------ | ----------------------------------------------- |
-| Workers ignore central conventions | Rule exists only in orchestrator-level doc       | Add rule reference in each worker definition    |
-| Inconsistent output locations      | Output path defined centrally but not in workers | Include output path in worker prompt/definition |
-
-> **Lesson:** When adding shared rules to a central SSOT, always propagate to worker definitions simultaneously.
-> Update checklist: central doc + each `.agent.md` + scripts + instructions.
+**Multi-Agent Propagation Rule:** In Orchestrator-Workers patterns, a rule written only in the central document (e.g., `AGENTS.md`) is often ignored by workers. Reference or include it in each worker `.agent.md` (output paths in particular). When adding a shared rule, update the central doc + each `.agent.md` + scripts + instructions together.
 
 ### 2. SRP (Single Responsibility Principle)
 
-**1 Agent = 1 Responsibility**
-
-| Aspect                   | Description                                       |
-| ------------------------ | ------------------------------------------------- |
-| **Definition**           | Each agent focuses on a single responsibility     |
-| **Workflow Application** | Clearly separate tasks and assign to each agent   |
-| **Violation Example**    | One agent handles "search + analysis + reporting" |
-| **Solution**             | Split agents by role                              |
+1 agent = 1 responsibility. Split an agent that handles "search + analysis + reporting" by role.
 
 ### 3. Simplicity First
 
-**Start with the simplest solution**
+Try a single prompt or agent first; add agents only when evaluation shows the simpler setup falls short.
 
-| Aspect                   | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| **Definition**           | Keep complexity to what's necessary and sufficient             |
-| **Workflow Application** | Try with a single agent first. Add complexity only when needed |
-| **Violation Example**    | Designing a 10-agent workflow from the start                   |
-| **Solution**             | Start minimal, extend gradually                                |
-
-**Anthropic's Recommendation:**
-
-> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short."
+> "Start with simple prompts, optimize them with comprehensive evaluation, and add multi-step agentic systems only when simpler solutions fall short." — Anthropic
 
 ### 4. Fail Fast
 
-**Detect and fix errors early**
-
-| Aspect                   | Description                                       |
-| ------------------------ | ------------------------------------------------- |
-| **Definition**           | Detect errors early and handle immediately        |
-| **Workflow Application** | Validate at each step, stop immediately if issues |
-| **Violation Example**    | Ignoring errors and continuing to the end         |
-| **Solution**             | Set up Gates/Checkpoints                          |
+Validate at each step and stop on issues (Gates/Checkpoints) instead of continuing to the end.
 
 **Contract Binding Liveness:**
 
@@ -87,31 +47,13 @@ Paths, schema fields, CLI flags, IDs, and state keys referenced by policies, orc
 
 ### 5. Iterative Refinement
 
-**Build small, improve repeatedly**
-
-| Aspect                   | Description                                           |
-| ------------------------ | ----------------------------------------------------- |
-| **Definition**           | Prefer small improvements over large changes          |
-| **Workflow Application** | MVP → verify → feedback → improve                     |
-| **Violation Example**    | Implementing all features at once, testing at the end |
-| **Solution**             | Implement and verify one task at a time               |
-
-**Related Pattern:** Evaluator-Optimizer
+MVP → verify → improve, one task at a time. Related pattern: Evaluator-Optimizer.
 
 ### 6. Feedback Loop
 
-**Verify results at each step → adjust**
+Evaluate each step against environment ground truth (tool results, tests) and re-execute if needed; avoid one-way flows.
 
-| Aspect                   | Description                                        |
-| ------------------------ | -------------------------------------------------- |
-| **Definition**           | Get feedback from execution results, apply to next |
-| **Workflow Application** | Evaluate agent output, re-execute if needed        |
-| **Violation Example**    | One-way flow without result verification           |
-| **Solution**             | Incorporate evaluation steps                       |
-
-**Anthropic's Recommendation:**
-
-> "During execution, it's crucial for the agents to gain 'ground truth' from the environment at each step to assess its progress."
+> "During execution, it's crucial for the agents to gain 'ground truth' from the environment at each step to assess its progress." — Anthropic
 
 ---
 
@@ -119,62 +61,23 @@ Paths, schema fields, CLI flags, IDs, and state keys referenced by policies, orc
 
 ### 7. Transparency
 
-**Show plans and progress explicitly**
-
-| Aspect                   | Description                                        |
-| ------------------------ | -------------------------------------------------- |
-| **Definition**           | Make what's happening visible                      |
-| **Workflow Application** | Show start/end of each step, display progress      |
-| **Violation Example**    | Black box with no visibility into what's happening |
-| **Solution**             | Use logs, progress display, TodoWrite              |
-
-**Anthropic's Recommendation:**
-
-> "Prioritize transparency by explicitly showing the agent's planning steps."
+Show the plan and step progress (e.g., a todo list: VS Code `todos`, Claude Code `TodoWrite`). Anthropic: "Prioritize transparency by explicitly showing the agent's planning steps."
 
 ### 8. Gate/Checkpoint
 
-**Validation gates at each step**
-
-| Aspect                   | Description                                   |
-| ------------------------ | --------------------------------------------- |
-| **Definition**           | Validate before proceeding to the next step   |
-| **Workflow Application** | Don't proceed unless quality criteria are met |
-| **Violation Example**    | Passing through all steps without validation  |
-| **Solution**             | Quality checks with conditional branching     |
+Define pass criteria and failure handling for each step; do not proceed until they are met.
 
 ### 9. DRY (Don't Repeat Yourself)
 
-**Eliminate duplication, promote reuse**
-
-| Aspect                   | Description                                |
-| ------------------------ | ------------------------------------------ |
-| **Definition**           | Don't repeat the same logic                |
-| **Workflow Application** | Template common processes, reuse prompts   |
-| **Violation Example**    | Copy-pasting the same prompt to each agent |
-| **Solution**             | Create common prompt templates             |
+Share common processing as prompt templates or skills instead of copy-pasting the same prompt into each agent. See [SSOT Implementation Patterns](#ssot-implementation-patterns).
 
 ### 10. ISP (Interface Segregation Principle)
 
-**Minimal context only**
-
-| Aspect                   | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| **Definition**           | Pass only necessary information to each agent  |
-| **Workflow Application** | Excessive context becomes noise                |
-| **Violation Example**    | Passing all information to all agents          |
-| **Solution**             | Select and pass only task-relevant information |
+Pass each agent only task-relevant information; excess context is noise. See [context-engineering.md](context-engineering.md).
 
 ### 11. Idempotency
 
-**Safe to retry**
-
-| Aspect                   | Description                                               |
-| ------------------------ | --------------------------------------------------------- |
-| **Definition**           | Same operation produces same result regardless of retries |
-| **Workflow Application** | Design to allow retries on failure                        |
-| **Violation Example**    | Retrying causes data duplication                          |
-| **Solution**             | State checking, use unique IDs                            |
+Retries must not duplicate side effects: check current state first and use unique IDs.
 
 **Queue Hygiene for Issue/PR Automation:**
 
@@ -186,67 +89,18 @@ For workflows that create or resume work through Issues, labels, and PRs, retry 
 
 ### 12. Observability
 
-**Record decisions and make progress visible**
-
-| Aspect                   | Description                                              |
-| ------------------------ | -------------------------------------------------------- |
-| **Definition**           | Make agent decisions and progress traceable              |
-| **Workflow Application** | Log key decisions as Issue comments, files, or documents |
-| **Violation Example**    | No visibility into why agent made a decision             |
-| **Solution**             | Decision logs, regular status reports for long tasks     |
+Record key decisions (Issue comments, files, a `Time | Decision | Rationale` log) and report progress on long tasks.
 
 **Idle State Visibility:**
 
 If `0 new items` is a valid and healthy result, surface that state separately from `latest published artifact date`.
 Otherwise, users may misread a normal no-op run as a stale deployment or failed automation.
 
-**Elapsed Time Tracking:**
-
-For multi-step workflows, record start/end timestamps to measure performance:
-
-```json
-// manifest/status.json
-{
-  "startedAt": "2026-05-08T04:37:00+09:00",
-  "completedAt": "2026-05-08T04:50:00+09:00",
-  "elapsedMinutes": 13.0
-}
-```
-
-This enables:
-
-- Performance regression detection across runs
-- User-facing elapsed time reports
-- Bottleneck identification (which step takes longest)
-
-**Decision Log Example:**
-
-```markdown
-| Time  | Decision                      | Rationale                  |
-| ----- | ----------------------------- | -------------------------- |
-| 10:00 | Delegate to @impl for task-01 | Code change required       |
-| 10:05 | Skip task-02                  | File already up-to-date    |
-| 10:10 | Escalate to human             | Requires production access |
-```
+**Elapsed Time Tracking:** For multi-step workflows, record `startedAt` / `completedAt` / `elapsedMinutes` in a status file (e.g., `manifest/status.json`) to detect regressions and bottlenecks across runs.
 
 ### 13. Reasoning Before Conclusions
 
-**Show your thinking, then provide the answer**
-
-| Aspect                   | Description                                            |
-| ------------------------ | ------------------------------------------------------ |
-| **Definition**           | Generate reasoning steps before jumping to conclusions |
-| **Workflow Application** | Use chain-of-thought prompting, allow "scratch space"  |
-| **Violation Example**    | Agent provides answer without explaining logic         |
-| **Solution**             | Structure prompts to encourage step-by-step reasoning  |
-
-**Why This Matters:**
-
-LLMs perform better when they can "think out loud" before committing to an answer. This principle improves accuracy and makes agent decisions auditable.
-
-**Prompt Design:**
-
-✅ **Encourage reasoning:**
+Structure prompts so the agent analyzes and compares options before deciding, with space to reason before the final output. This makes decisions auditable.
 
 ```markdown
 Before selecting a workflow pattern:
@@ -255,59 +109,6 @@ Before selecting a workflow pattern:
 2. List applicable patterns with pros/cons
 3. Recommend the best fit based on your analysis
 ```
-
-❌ **Discourage reasoning:**
-
-```markdown
-Select the best workflow pattern for this task.
-```
-
-**Implementation Techniques:**
-
-| Technique                  | Description                               |
-| -------------------------- | ----------------------------------------- |
-| **Chain-of-Thought (CoT)** | Prompt: "Let's think step by step..."     |
-| **Scratch Space**          | Allow working area for calculations/notes |
-| **Explicit Steps**         | Require "Analysis → Options → Decision"   |
-| **Self-Verification**      | Ask agent to check its own reasoning      |
-
-**Example Output:**
-
-```markdown
-## Analysis
-
-- Task requires processing 10 files
-- Files are independent
-- No interdependencies detected
-
-## Options Considered
-
-1. Prompt Chaining: ❌ Sequential would be slow
-2. Parallelization: ✅ Files are independent
-3. Orchestrator-Workers: ⚠️ Overkill for fixed task count
-
-## Decision
-
-Use Parallelization pattern (Pattern 3)
-
-## Implementation Plan
-
-[Detailed steps...]
-```
-
-**Benefits:**
-
-| Benefit             | Description                                     |
-| ------------------- | ----------------------------------------------- |
-| **Higher Accuracy** | Reduces hallucination and logical errors        |
-| **Debuggability**   | Trace reasoning when output is wrong            |
-| **Transparency**    | Users understand why agent chose action         |
-| **Self-Correction** | Agent catches its own mistakes during reasoning |
-
-**References:**
-
-- [Chain-of-Thought Prompting - Google Research](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
-- [vscode-ai-toolkit Prompt Generation Best Practices](https://github.com/microsoft/vscode-ai-toolkit)
 
 ---
 
@@ -322,43 +123,12 @@ Core principle: **Same IR → Same Output.** No creativity in transformation pha
 
 ## Tier 3: Scale Principles (Advanced)
 
-### 14. Human-in-the-Loop
-
-**Human confirmation at critical points**
-
-| Aspect                   | Description                                          |
-| ------------------------ | ---------------------------------------------------- |
-| **Definition**           | Balance automation with human judgment               |
-| **Workflow Application** | Confirm before important decisions, risky operations |
-| **Application Example**  | Before production deploy, before mass deletion       |
-
-### 15. KISS (Keep It Simple, Stupid)
-
-**Keep it simple**
-
-| Aspect                   | Description                                      |
-| ------------------------ | ------------------------------------------------ |
-| **Definition**           | Avoid unnecessary complexity                     |
-| **Workflow Application** | Sufficient number of agents, simple coordination |
-
-### 16. Loose Coupling
-
-**Loose coupling between agents**
-
-| Aspect                   | Description                             |
-| ------------------------ | --------------------------------------- |
-| **Definition**           | Minimize dependencies between agents    |
-| **Workflow Application** | Each agent can operate independently    |
-| **Benefits**             | Limit impact of changes, easier testing |
-
-### 17. Graceful Degradation
-
-**Continue operation despite partial failures**
-
-| Aspect                   | Description                                    |
-| ------------------------ | ---------------------------------------------- |
-| **Definition**           | Maintain overall function even when parts fail |
-| **Workflow Application** | Fallback processing, skippable steps           |
+| Principle                | Agent-workflow rule                                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| **Human-in-the-Loop**    | Confirm before high-risk or irreversible operations (production deploy, mass deletion, external send)      |
+| **KISS**                 | Use the sufficient number of agents and the simplest coordination that works                               |
+| **Loose Coupling**       | Standardize agent inputs/outputs so each agent can be changed and tested independently                     |
+| **Graceful Degradation** | Provide fallbacks or skippable steps so a partial failure doesn't stop everything; report what was skipped |
 
 ---
 
@@ -440,129 +210,10 @@ Choose formats that minimize cognitive load for LLMs:
 
 ## File Organization Principles
 
-### Instructions Organization
-
-**Group related instructions by domain/genre**
-
-| Aspect                   | Description                                               |
-| ------------------------ | --------------------------------------------------------- |
-| **Definition**           | Organize instruction files into logical folder categories |
-| **Workflow Application** | Categorize `.github/instructions/` by domain              |
-| **Violation Example**    | All files flat in one directory                           |
-| **Solution**             | Create genre-based folders (azure/, git/, skills/, etc.)  |
-
-**Why This Matters:**
-
-- Easier navigation for both humans and agents
-- Related instructions stay together
-- Reduces cognitive load when searching
-- Enables folder-level `.gitignore` or permissions
-
-**Recommended Structure:**
-
-```
-.github/instructions/
-├── azure/
-│   ├── bicep-style.instructions.md
-│   ├── naming-conventions.instructions.md
-│   └── resource-tagging.instructions.md
-├── git/
-│   ├── commit-message.instructions.md
-│   ├── branch-naming.instructions.md
-│   └── pr-contribution.instructions.md
-├── code/
-│   ├── python-style.instructions.md
-│   ├── typescript-style.instructions.md
-│   └── testing-guidelines.instructions.md
-├── skills/
-│   └── skill-creator.instructions.md
-└── global.instructions.md  # Cross-cutting rules
-```
-
-**Benefits:**
-
-| Benefit              | Description                                         |
-| -------------------- | --------------------------------------------------- |
-| **Discoverability**  | Find related files quickly                          |
-| **Scoped Loading**   | Load only relevant folder for specific tasks        |
-| **Team Ownership**   | Assign folder ownership to domain experts           |
-| **Reduced Conflict** | Parallel edits in different folders avoid conflicts |
-
-### Naming Conventions
-
-**Use consistent, descriptive file names**
-
-| Aspect                   | Description                                      |
-| ------------------------ | ------------------------------------------------ |
-| **Definition**           | Follow predictable naming patterns               |
-| **Workflow Application** | File names convey purpose without opening        |
-| **Violation Example**    | `notes.md`, `stuff.md`, `doc1.md`                |
-| **Solution**             | Use descriptive kebab-case with file type suffix |
-
-#### File Naming Rules
-
-| Rule                    | Good Example                            | Bad Example         |
-| ----------------------- | --------------------------------------- | ------------------- |
-| **Kebab-case**          | `commit-message.instructions.md`        | `commitMessage.md`  |
-| **Include type suffix** | `azure-deploy.instructions.md`          | `azure-deploy.md`   |
-| **Be descriptive**      | `pr-contribution-guide.instructions.md` | `pr.md`             |
-| **Avoid generic names** | `bicep-naming-conventions.md`           | `conventions.md`    |
-| **Use lowercase**       | `github-actions.md`                     | `GitHub-Actions.md` |
-
-#### Suffix Conventions
-
-| Suffix             | Usage                           | Example                       |
-| ------------------ | ------------------------------- | ----------------------------- |
-| `.instructions.md` | Agent/Copilot instruction files | `code-review.instructions.md` |
-| `.prompt.md`       | Reusable prompt templates       | `summarize-pr.prompt.md`      |
-| `.agent.md`        | Agent definition files          | `code-reviewer.agent.md`      |
-| `.md`              | General documentation           | `architecture-overview.md`    |
-
-#### Folder Naming Rules
-
-| Rule                   | Good Example                          | Bad Example       |
-| ---------------------- | ------------------------------------- | ----------------- |
-| **Singular or plural** | `skills/` or `skill/` (be consistent) | Mixed usage       |
-| **Lowercase**          | `azure/`                              | `Azure/`          |
-| **No spaces**          | `code-style/`                         | `code style/`     |
-| **Domain-based**       | `infrastructure/`                     | `misc/`, `other/` |
-
-#### Agent/Prompt File Naming
-
-For `.agent.md` and `.prompt.md` files, use action-oriented names:
-
-```
-✅ Good:
-- code-reviewer.agent.md
-- pr-summarizer.agent.md
-- test-generator.prompt.md
-- refactor-suggestions.prompt.md
-
-❌ Bad:
-- agent1.agent.md
-- my-agent.agent.md
-- prompt.prompt.md
-- test.prompt.md
-```
-
-#### Versioning in Names (When Needed)
-
-If maintaining multiple versions:
-
-```
-feature-flags-v1.instructions.md
-feature-flags-v2.instructions.md
-```
-
-Or use folders:
-
-```
-feature-flags/
-├── v1/
-│   └── implementation.instructions.md
-└── v2/
-    └── implementation.instructions.md
-```
+- Once `.github/instructions/` becomes hard to scan, group files into domain folders (e.g., `azure/`, `git/`, `code/`) and keep at most one cross-cutting file. Confirm the host actually discovers subfolders (Chat Diagnostics) before moving files.
+- File names are lowercase kebab-case, descriptive, and carry the type suffix: `.instructions.md`, `.prompt.md`, `.agent.md`, `SKILL.md`. Avoid generic names such as `notes.md`, `conventions.md`, `agent1.agent.md`, `test.prompt.md`.
+- Agent and prompt names are role- or action-oriented (`code-reviewer.agent.md`, `summarize-pr.prompt.md`).
+- Prompt files are not loaded by Agent Host sessions; prefer skills for new reusable slash-invoked workflows (see [customization-decision.md](customization-decision.md)).
 
 ---
 
@@ -570,8 +221,6 @@ feature-flags/
 
 - [Building Effective Agents - Anthropic](https://www.anthropic.com/engineering/building-effective-agents)
 - [Writing tools for AI agents - Anthropic](https://www.anthropic.com/engineering/writing-tools-for-agents)
-- [SOLID Principles](https://en.wikipedia.org/wiki/SOLID)
-- [12-Factor App](https://12factor.net/)
 
 ---
 
@@ -579,38 +228,15 @@ feature-flags/
 
 ### SSOT Reference Pattern
 
-When referencing shared definitions across multiple files, use this standard format:
-
-**Format:**
+When referencing shared definitions across multiple files, use this standard format, replacing `<file>` with a relative Markdown link to the SSOT file:
 
 ```markdown
-> **SSOT**: See [file](path) section "Section Name" for details
+> **SSOT**: See <file> section "Section Name" for details
 ```
 
 The referenced heading MUST exist in the target file, and the target MUST hold the definition itself. A pointer to a section that only forwards elsewhere leaves the rule undefined while every checker still reports the link as valid.
 
-**Anti-pattern (Before):**
-
-- Same logic duplicated in 3+ files (e.g., holiday check, validation rules)
-- Requires updating all files when logic changes
-- Inconsistencies emerge over time
-
-**Best Practice (After):**
-
-- Define authoritative rule in one file (e.g., `instructions.md`)
-- Other files reference SSOT with link only
-- Changes propagate automatically
-
-**Example:**
-
-```markdown
-### Step 0-2: Holiday Check
-
-> **SSOT**: See [copilot-instructions.md](../copilot-instructions.md) section "Holiday Rules"
-
-1. Check holiday calendar
-2. If holiday: skip and notify
-```
+Anti-pattern: the same logic (e.g., holiday check, validation rules) duplicated in 3+ files drifts over time. Define it once and reference it, e.g. a step that says `> **SSOT**: See copilot-instructions.md section "Holiday Rules"` and then only applies the rule.
 
 ### View vs Master Separation
 

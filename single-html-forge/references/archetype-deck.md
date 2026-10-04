@@ -92,7 +92,9 @@ Notes live inside the slide:
 
 They are hidden in the deck and surfaced only in the overlay.
 
-**A separate presenter window is not available in v1.** Populating a second window needs `document.write` or `innerHTML`, which the runtime invariants forbid — that is the same restriction that makes the closed-world check sound. A same-window overlay gives the same information without reopening that surface.
+**The deck runtime has no separate presenter window.** Populating a second window needs `document.write` or `innerHTML`, which the runtime invariants forbid — that is the same restriction that makes the closed-world check sound. A same-window overlay gives the same information without reopening that surface.
+
+A second-window presenter view exists only in the review wrapper built by `build_review_viewer.py`, which is outside the verifier.
 
 ## Outline layout
 
@@ -118,7 +120,7 @@ Press `O` or use the 目次 button to collapse the sidebar and give the stage th
 
 ### Chapter groups
 
-For multi-section review decks, group the outline by the source's chapters rather than listing all slides as peers. Runtime/CSS v4 supports `details[data-shf-section]` groups with native keyboard-accessible `summary` controls:
+For multi-section review decks, group the outline by the source's chapters rather than listing all slides as peers. Runtime/CSS v4 and later support `details[data-shf-section]` groups with native keyboard-accessible `summary` controls:
 
 ```html
 <details data-shf-section="introduction" open="open">

@@ -76,15 +76,15 @@ python scripts/diagnose_template.py templates/sample.pptx
 
 ### Detection Items
 
-| Issue               | Description                    | Resolution               |
-| ------------------- | ------------------------------ | ------------------------ |
+| Issue               | Description                    | Resolution                                       |
+| ------------------- | ------------------------------ | ------------------------------------------------ |
 | Background images   | Images in the wrong surface    | classify as reusable layout art vs slide content |
-| Broken references   | Invalid blip references        | clean_template           |
-| External links      | Broken links                   | Manual removal           |
-| Narrow placeholders | Title width too narrow         | Auto-fix or alt template |
-| Dark backgrounds    | Insufficient contrast          | Different template       |
-| viewProps settings  | Opens in master view           | Auto-normalization       |
-| Embedded fonts      | Font missing warnings possible | Specify fallback         |
+| Broken references   | Invalid blip references        | clean_template                                   |
+| External links      | Broken links                   | Manual removal                                   |
+| Narrow placeholders | Title width too narrow         | Auto-fix or alt template                         |
+| Dark backgrounds    | Insufficient contrast          | Different template                               |
+| viewProps settings  | Opens in master view           | Auto-normalization                               |
+| Embedded fonts      | Font missing warnings possible | Specify fallback                                 |
 
 ---
 
@@ -147,13 +147,13 @@ Create a clean template file with:
 
 Keep the first version small. A useful internal template usually needs only:
 
-| Layout | Purpose |
-| --- | --- |
-| `Internal Title Slide` | Cover |
-| `Internal Section Header` | Section divider |
-| `Internal Title and Content` | Normal body slide |
-| `Internal Process` | Simple flow / process diagram |
-| `Internal References` | Page title + URL reference list |
+| Layout                       | Purpose                         |
+| ---------------------------- | ------------------------------- |
+| `Internal Title Slide`       | Cover                           |
+| `Internal Section Header`    | Section divider                 |
+| `Internal Title and Content` | Normal body slide               |
+| `Internal Process`           | Simple flow / process diagram   |
+| `Internal References`        | Page title + URL reference list |
 
 ### Procedure
 
@@ -192,24 +192,7 @@ Also avoid the opposite failure mode: deleting too aggressively until the layout
 
 ## PREPARE_TEMPLATE Phase (Required)
 
-When using external templates, always execute:
-
-```powershell
-$base = "20251214_example"
-$input = "input/external_template.pptx"
-
-# 1. Diagnose
-python scripts/diagnose_template.py $input
-
-# 2. Clean (if issues found)
-python scripts/clean_template.py $input "output_manifest/${base}_clean.pptx"
-$template = "output_manifest/${base}_clean.pptx"
-
-# 3. Analyze layout
-python scripts/analyze_template.py $template
-
-# 4. Add content_with_image to layouts.json (manually if needed)
-```
+When using external templates, always run diagnose → clean (if needed) → analyze → add `content_with_image`. Commands and issue table: [tools-reference.instructions.md](tools-reference.instructions.md#prepare_template-phase--required).
 
 > ⚠️ Skipping this causes background image duplication and layout issues.
 

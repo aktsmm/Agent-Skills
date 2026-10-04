@@ -34,44 +34,13 @@
 
 ## ZIP パッケージ作成
 
-### WXT の場合
-
-```bash
-# プロダクションビルド
-npm run build
-
-# ZIP 生成
-npm run zip
-# → .output/[name]-[version]-chrome.zip が生成される
-```
-
-### 手動の場合
-
-```powershell
-# PowerShell
-Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
-```
+WXT では `npm run build` → `npm run zip`（`.output/<name>-<version>-chrome.zip`）。Edge は Chrome の ZIP を再利用できる。手動なら `.output/chrome-mv3/*` を ZIP する。
 
 ---
 
 ## Chrome Web Store Developer Dashboard
 
-### アカウント設定
-
-1. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole) にアクセス
-2. 初回は $5 の登録料が必要
-3. デベロッパーアカウントを設定
-
-### 新規アイテム追加
-
-1. 「新しいアイテム」をクリック
-2. ZIP ファイルをアップロード
-3. ストアリスティング情報を入力:
-   - 詳細説明
-   - カテゴリ
-   - 言語
-   - スクリーンショット
-   - プライバシーポリシー URL
+初回は登録料（$5）が必要。新規アイテムは ZIP アップロード後、ストア掲載情報（説明、カテゴリ、言語、スクリーンショット）と Privacy タブ（単一目的、権限ごとの正当化、remote code 宣言、データ種別、ポリシー URL）を入力する。
 
 ### 権限の正当化
 
@@ -89,7 +58,7 @@ Compress-Archive -Path ".output/chrome-mv3/*" -DestinationPath "extension.zip"
 
 ## 審査プロセス
 
-### 審査期間
+### 審査期間（目安・未保証）
 
 - 通常: 1〜3 営業日
 - 複雑な権限を使用する場合: 1〜2 週間
@@ -188,24 +157,7 @@ Google 経由で商標侵害を申し立てると、7 日以内に是正しな�
 
 ## アップデート公開
 
-### バージョン更新
-
-```typescript
-// wxt.config.ts
-export default defineConfig({
-  manifest: {
-    version: "1.1.0", // バージョンを更新
-  },
-});
-```
-
-### 更新手順
-
-1. `npm run zip` で新しいZIPを生成
-2. Developer Dashboard で該当アイテムを選択
-3. 「パッケージ」タブで新しいZIPをアップロード
-4. 変更履歴を入力
-5. 送信して審査を待つ
+`wxt.config.ts`（または `package.json`）の version を上げ、`npm run zip` → Dashboard の「パッケージ」で新 ZIP をアップロード → 送信。審査中は掲載情報を編集できない（下記 Artifact Hygiene）。
 
 ---
 
@@ -226,75 +178,24 @@ export default defineConfig({
 
 ## 自動パブリッシング
 
-### WXT Auto-Publishing
+WXT 標準の `wxt submit` を使う（[WXT Publishing](https://wxt.dev/guide/essentials/publishing)）。初回の掲載作成は手動で行う必要がある。
 
 ```bash
-# Chrome Web Store API を設定
-npm install -D chrome-webstore-upload-cli
-
-# 環境変数設定
-export EXTENSION_ID="your-extension-id"
-export CLIENT_ID="your-client-id"
-export CLIENT_SECRET="your-client-secret"
-export REFRESH_TOKEN="your-refresh-token"
-
-# アップロード＆公開
-npx chrome-webstore-upload upload --source .output/*-chrome.zip --auto-publish
+npx wxt submit init          # secrets を対話設定し .env.submit を作成（commit しない）
+npm run zip
+npx wxt submit --dry-run --chrome-zip .output/<name>-<version>-chrome.zip
+npx wxt submit --chrome-zip .output/<name>-<version>-chrome.zip
 ```
 
-### GitHub Actions 自動公開
-
-```yaml
-# .github/workflows/publish.yml
-name: Publish to Chrome Web Store
-
-on:
-  release:
-    types: [created]
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - run: npm ci
-      - run: npm run build
-      - run: npm run zip
-
-      - name: Upload to Chrome Web Store
-        uses: mnao305/chrome-extension-upload@v5.0.0
-        with:
-          file-path: .output/*-chrome.zip
-          extension-id: ${{ secrets.EXTENSION_ID }}
-          client-id: ${{ secrets.CLIENT_ID }}
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-          refresh-token: ${{ secrets.REFRESH_TOKEN }}
-```
+- 初回や手順変更後は必ず `--dry-run` で secrets を検証してから本実行する。
+- CI では `CHROME_EXTENSION_ID` / `CHROME_CLIENT_ID` / `CHROME_CLIENT_SECRET` / `CHROME_REFRESH_TOKEN` を repository secrets から submit ステップに渡す。Edge / Firefox も同じコマンドで `--edge-zip` / `--firefox-zip`（Firefox は `--firefox-sources-zip` も）を指定できる。
 
 ---
 
 ## 非公開配布
 
-### 開発者モード（ローカル）
-
-1. `chrome://extensions` を開く
-2. 「デベロッパーモード」を有効化
-3. 「パッケージ化されていない拡張機能を読み込む」
-4. ビルドフォルダを選択
-
-### CRX パッケージ（社内配布）
-
-```bash
-# Chrome で CRX を生成
-# chrome://extensions → パック拡張機能
-# または
-npx crx pack .output/chrome-mv3 -o extension.crx
-```
+- 開発時は `chrome://extensions` → デベロッパーモード → 「パッケージ化されていない拡張機能を読み込む」でビルドフォルダ（`.output/chrome-mv3`）を選ぶ。
+- 通常の Chrome はストア外 CRX のインストールを受け付けない環境が多い。社内配布はストアの限定公開（Unlisted / Private）か、管理ポリシーによる強制インストールで行う。
 
 ---
 

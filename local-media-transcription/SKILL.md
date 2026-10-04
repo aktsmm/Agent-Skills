@@ -36,47 +36,32 @@ metadata:
 ## Workflow
 
 1. **入力確認**
-
-- 対象ファイルが存在するか確認する
-- 長さ、サイズ、更新日時を確認する
-
+   - 対象ファイルが存在するか確認する
+   - 長さ、サイズ、更新日時を確認する
 2. **ツール確認**
-
-- `ffmpeg`, `ffprobe`, `whisper` CLI が使えるか確認する
-- 使えない場合は、ローカル書き起こしは中断して代替案を提示する
-
+   - `ffmpeg`, `ffprobe`, `whisper` CLI が使えるか確認する
+   - 使えない場合は、ローカル書き起こしは中断して代替案を提示する
 3. **メディア確認**
-
-- `ffprobe` で duration を取得する
-- 長時間録画なら処理時間を見積もる
-
+   - `ffprobe` で duration を取得する
+   - 長時間録画なら処理時間を見積もる
 4. **文字起こし実行**
+   - 日本語会議なら以下を基本形とする
 
-- 日本語会議なら以下を基本形とする
-
-```powershell
-$env:PYTHONIOENCODING='utf-8'
-whisper "<media-file>" --language Japanese --task transcribe --model turbo --fp16 False --verbose False --output_format txt --output_dir "<output-dir>"
-```
+   ```powershell
+   $env:PYTHONIOENCODING='utf-8'
+   whisper "<media-file>" --language Japanese --task transcribe --model turbo --fp16 False --verbose False --output_format txt --output_dir "<output-dir>"
+   ```
 
 5. **品質確認**
-
-- 出力 `.txt` の先頭数十行を読んで破綻していないか確認する
-- 最低限、発話として読めるか、ファイルが空でないかを確認する
-
+   - 出力 `.txt` の先頭数十行を読んで破綻していないか確認する
+   - 最低限、発話として読めるか、ファイルが空でないかを確認する
 6. **必要に応じて話者分離**
-
-- 話者分離が必要なら、利用可能な diarization 手段を確認する
-- 使える場合は話者ラベル付きの書き起こしを生成する
-- 使えない場合は、話者分離なしで進めるか、制約を明示して中断する
-
+   - 話者分離が必要なら、利用可能な diarization 手段を確認する
+   - 使える場合は話者ラベル付きの書き起こしを生成する
+   - 使えない場合は、話者分離なしで進めるか、制約を明示して中断する
 7. **必要に応じて整形**
-
-- 議事録
-- 顧客向け清書版議事録
-- アクションアイテム
-- PPT要点
-- 断定しすぎず、音声認識揺れを補正して整理する
+   - 議事録 / 顧客向け清書版議事録 / アクションアイテム / PPT要点
+   - 断定しすぎず、音声認識揺れを補正して整理する
 
 ## Decision Points
 

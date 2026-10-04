@@ -16,7 +16,7 @@ metadata:
 - prompt cache の read / write を区別し、cache-offを主張できるか確認する。
 - fresh process、temporary home、instruction/tool isolationを揃えた再現可能なbenchmarkを作る。
 
-過去sessionの事後分析だけなら`analyze-copilot-sessions`を使う。このskillは比較条件の設計、実行、証拠化を担当する。
+過去sessionの事後分析だけなら対象外。このskillは比較条件の設計、実行、証拠化を担当する。
 
 ## Cache Boundaries
 
@@ -28,28 +28,32 @@ metadata:
 ## Workflow
 
 1. **Freeze the task**
-  - dataset、expected labels、prompt、schema、input order、model、reasoningを固定し、hashを取る。
-  - accuracyと性能を同時に比較する場合、同じ合格条件を全providerへ適用する。
+   - dataset、expected labels、prompt、schema、input order、model、reasoningを固定し、hashを取る。
+   - accuracyと性能を同時に比較する場合、同じ合格条件を全providerへ適用する。
 2. **Define measurement boundaries**
-  - `one request`、`serial total`、`fresh-process end to end`を区別する。
-  - API直呼びとCLI起動込み時間を`model speed`として並べない。
+   - `one request`、`serial total`、`fresh-process end to end`を区別する。
+   - API直呼びとCLI起動込み時間を`model speed`として並べない。
 3. **Isolate each CLI**
-  - repo外のowned temp directory、fresh process、一時`COPILOT_HOME` / auth-only `CODEX_HOME`を使う。
-  - custom instructions、tools、MCP、session reuseを無効にし、secretを子processとlogへ渡さない。
+   - repo外のowned temp directory、fresh process、一時`COPILOT_HOME` / auth-only `CODEX_HOME`を使う。
+   - custom instructions、tools、MCP、session reuseを無効にし、secretを子processとlogへ渡さない。
 4. **Observe cache; do not assume control**
-  - 必要ならprompt先頭へ一意nonceを入れ、nonce本体ではなくhashだけ保存する。
-  - zero-cache-read gateは診断用。失敗はprovider cacheの観測であり、benchmark失敗として隠さない。
+   - 必要ならprompt先頭へ一意nonceを入れ、nonce本体ではなくhashだけ保存する。
+   - zero-cache-read gateは診断用。失敗はprovider cacheの観測であり、benchmark失敗として隠さない。
 5. **Record raw categories**
-  - normal input、cache read、cache write、output、reasoningを別fieldで保存する。
-  - provider schemaで包含・排他関係を確認するまでtoken区分を足さない。
+   - normal input、cache read、cache write、output、reasoningを別fieldで保存する。
+   - provider schemaで包含・排他関係を確認するまでtoken区分を足さない。
 6. **Repeat before claiming performance**
-  - 単発差をcacheの因果効果にしない。median / p95 / rangeとaccuracyを報告する。
+   - 単発差をcacheの因果効果にしない。median / p95 / rangeとaccuracyを報告する。
 7. **Validate the artifact**
-  ```powershell
-  python scripts/validate_benchmark.py result.json `
-    --require-cache-metadata `
-    --report validation.json
-  ```
+
+   ```powershell
+   python scripts/helper.py result.json `
+     --require-cache-metadata `
+     --report validation.json
+   ```
+
+   - Required shape: `test_design.prompt_sha256`, optional `test_design.cache_observation` (`nonce_added_at_prompt_start`, `nonce_sha256`), and `providers[]` with `provider`, `elapsed_ms`, `passed`, `cases`, `usage` (`input_tokens`, `cached_input_tokens`, `cache_write_tokens`, `output_tokens`, optional `reasoning_tokens`).
+   - Add `--require-zero-cache-read` only for the diagnostic gate in step 4.
 
 ## Reporting Rules
 

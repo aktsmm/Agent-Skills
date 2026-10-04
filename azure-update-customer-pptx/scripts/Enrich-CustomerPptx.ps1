@@ -73,7 +73,7 @@ function Resolve-ClassificationItemForSlide {
 }
 
 # region_info.json / region_info_reviewed.json を読み込み（リージョン情報を正確に取得）
-# 📌 SSOT: スキーマ定義は .github/skills/azure-update-customer-pptx/references/region-stamp.md を参照
+# 📌 SSOT: スキーマ定義はこの skill の references/region-stamp.md を参照
 # 形式: { "regions": { "タイトル": { "japanEast": bool, "japanWest": bool, "status": "...", ... } } }
 $regionInfo = @{}
 if (Test-Path $regionInfoPath) {

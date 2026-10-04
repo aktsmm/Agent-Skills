@@ -21,7 +21,7 @@ tools: ["search", "web/fetch", "agent", "edit/editFiles", "todo"]
 ---
 ```
 
-## Four Phases
+## Phases
 
 | Phase                | Purpose            | Key Actions                                      |
 | -------------------- | ------------------ | ------------------------------------------------ |

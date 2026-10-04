@@ -1,10 +1,8 @@
 # VS Code Custom Agents — 配置・アクセス制御リファレンス
 
-> Merged from former `vscode-custom-agents` skill (2026-02-26)
-
 ## 配置ルール（Critical）
 
-### `.github/agents/` は直下のみスキャンされる
+### `.github/agents/` は直下に置く
 
 ```
 ✅ 認識される
@@ -21,17 +19,21 @@
     └── quality.reviewer.md   ← 無視される
 ```
 
-> **根拠**: VS Code 公式ドキュメント (2026-02 時点)
-> `"VS Code detects any .md files in the .github/agents folder of your workspace as custom agents."`
-> サブディレクトリの再帰スキャンは非対応（実証テスト済み）。
+> **根拠**: 公式は `"VS Code detects any .md files in the .github/agents folder of your workspace as custom agents."` とだけ記載。
+> サブディレクトリが認識されない点は 2026-02 の実証テストによる（instructions は再帰スキャンされるので混同しない）。
 
 ### 配置場所の選択肢
 
-| 場所                               | 用途                                       |
-| ---------------------------------- | ------------------------------------------ |
-| `.github/agents/` (ワークスペース) | チーム共有。そのワークスペースでのみ有効   |
-| ユーザープロファイル               | 個人用。全ワークスペースで有効             |
-| `chat.agentFilesLocations` 設定    | 追加パスを指定。サブフォルダ指定にも使える |
+| 場所                                     | 用途                                                          |
+| ---------------------------------------- | ------------------------------------------------------------- |
+| `.github/agents/` (ワークスペース)       | チーム共有。そのワークスペースでのみ有効                      |
+| `.claude/agents/` (ワークスペース)       | Claude 形式（`name` 必須、`tools` はカンマ区切り文字列）      |
+| `~/.copilot/agents` / `~/.claude/agents` | 個人用。全ワークスペースで有効                                |
+| GitHub organization                      | `github.copilot.chat.organizationCustomAgents.enabled` で検出 |
+
+- Agent Host セッション（Copilot 等）は user agent を VS Code profile ではなく host のフォルダー（上表）から読む。profile 内の旧 user agent は migration が必要。
+- `chat.agentFilesLocations` / `chat.modeFilesLocations` は非推奨（Local agent のみ参照）。追加パスやサブフォルダ指定に使わず、上表の場所へ移す。
+- monorepo で親 repo の agent を使うには `chat.useCustomizationsInParentRepositories` を有効にする。
 
 ### ファイル拡張子
 
@@ -72,11 +74,13 @@ disable-model-invocation: true
 
 ### ⚠️ Deprecated プロパティ
 
-| 旧               | 新                                  | 移行方法           |
-| ---------------- | ----------------------------------- | ------------------ |
-| `infer: true`    | `user-invocable: true` (デフォルト) | 行を削除するか置換 |
-| `infer: false`   | `user-invocable: false`             | 置換               |
-| `target: vscode` | —                                   | 削除（不要）       |
+| 旧             | 新                                                         | 移行方法                                                   |
+| -------------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| `infer: true`  | `user-invocable: true` (デフォルト)                        | 行を削除するか置換                                         |
+| `infer: false` | `user-invocable: false` / `disable-model-invocation: true` | 隠したいのがピッカーか subagent 呼び出しかで選ぶ（両方可） |
+| `.chatmode.md` | `.agent.md`                                                | リネームして対応場所へ                                     |
+
+`target` は非推奨ではない（`vscode` / `github-copilot`）。GitHub Copilot cloud agent 向けに `mcp-servers` を使うときは `target: github-copilot`。
 
 ## Orchestrator + Workers パターン
 
@@ -86,7 +90,7 @@ disable-model-invocation: true
 name: orchestrator
 user-invocable: true
 disable-model-invocation: true
-tools: ["codebase", "terminal", "agent"] # "agent" が必須
+tools: ["search", "execute", "agent"] # "agent" が必須
 agents:
   - coding-executor
   - quality-reviewer
@@ -98,7 +102,7 @@ agents:
 ---
 name: coding-executor
 user-invocable: false
-tools: ["codebase", "terminal"]
+tools: ["search", "execute"]
 ---
 ```
 
@@ -107,7 +111,8 @@ tools: ["codebase", "terminal"]
 - orchestrator に `agent` ツールを含めないとサブエージェント呼び出しが機能しない
 - `agents` リストで呼び出せるサブエージェントを制限する
 - `agents: []` で全サブエージェント利用を禁止
-- `agents: '*'` で全許可（デフォルト）
+- `agents: ['*']` または省略で全許可
+- agent 名は大文字小文字を区別する（`name` と完全一致）
 
 ## トラブルシューティング
 
@@ -121,6 +126,6 @@ tools: ["codebase", "terminal"]
 
 ## デバッグ方法
 
-1. **Chat Diagnostics**: チャットビューで右クリック → Diagnostics で認識エージェント一覧を確認
+1. **Chat Diagnostics**: チャットビューで右クリック → Diagnostics で認識エージェント一覧とエラーを確認（詳細は Agent Debug Logs）
 2. **`runSubagent` テスト**: サブエージェントを直接呼び出して応答確認
 3. **セッションコンテキスト確認**: `<agents>` タグに何が注入されているかで認識状態を判定

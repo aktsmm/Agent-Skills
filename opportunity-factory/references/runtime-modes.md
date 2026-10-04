@@ -109,6 +109,7 @@ Rules:
 
 - Run worker prompts in isolated sessions when possible.
 - Give each specialist worker a narrow capability or task kind.
+- Map `commander` and `reporter-learner` to the orchestrator/reporting agent and `worker` to specialist agents; keep worker outputs artifact-only and shared state single-writer. The skill must not require OpenClaw; without it, keep the same contracts on another runner.
 - Keep external publish, paid actions, account creation, and secret access behind human approval.
 
 ### Hosted Agent Scheduler
@@ -145,7 +146,8 @@ Settings and task options to verify:
 
 - Task scope is workspace, not global, unless intentionally shared.
 - Prompt templates point to local `.github/prompts/*.md`, the configured global prompts folder, or inline prompt text.
-- **Do not assume per-task model selection exists.** Verify the task schema. In at least one observed extension version it is absent, so scheduled runs resolve the model from the editor's current default and model choice has to happen inside the prompt by launching subagents with an explicit model. Record the adapter version and the observed model-resolution behavior in the setup output rather than trusting this note.
+- **Verify per-task model selection on the installed version.** Recent versions accept a per-task model id from the extension's own model list; older ones resolved the editor's current default, so model choice had to happen inside the prompt via subagents with an explicit model.
+- Read the task back after setting the model, and record the adapter version and observed model-resolution behavior in the setup output.
 - `Max Runs/Day`, allowed time window, jitter, and minimum interval warnings are configured.
 - Notification mode and execution history are configured for low noise.
 - `auto-mode` or autonomous-execution hints are enabled only after preflight passes.
@@ -289,15 +291,6 @@ Workflow-review が weekly + ad-hoc で以下 invariant を check、違反検出
 
 詳細と対処: `references/tunable-defaults.md` "Hard Rule 誤変更抑止 (Invariant Check)" 節。
 
-### See Also
-
-- `references/tunable-defaults.md`: reference default 一覧 + hard rules + Autonomy Mode 別動作
-- `references/approval-policy.md`: 2 バケット詳細
-- `references/rubber-duck-review.md`: Layer 3 gate SSOT
-- `references/fallback-lane.md`: fallback lane / Discovery Floor / Auto-Refill
-- `references/persistence-profile.md`: 3 profile / class mapping
-- `references/dashboard-state.md`: tuningLog / hardRuleViolationLog schema
-
 ## Runaway Controls
 
 Every scheduled setup should define these controls in state or scheduler configuration:
@@ -314,20 +307,6 @@ Every scheduled setup should define these controls in state or scheduler configu
 | `notifyOnlyOn`         | compresses notifications                    | reporter, repeated-blocker, high-value-decision                                                                                                                                       |
 
 Commander must not add work when limits are exceeded. Reporter-learner should surface limit hits and recommend lowering cadence, increasing budget, or pruning stale work.
-
-## OpenClaw-Specific Behavior
-
-OpenClaw can run this as unattended cron pulses, but the skill must not require OpenClaw.
-
-When OpenClaw is present:
-
-- map `commander` to the orchestrator agent
-- map `worker` to one or more specialist agents
-- map `reporter-learner` to the reporting/orchestrator agent
-- keep worker outputs artifact-only
-- keep shared state updates single-writer
-
-When OpenClaw is absent, preserve the same contracts and run the prompts through whatever execution mechanism is available.
 
 ## Stop and Ask
 

@@ -37,25 +37,13 @@ Phase 5（評価）で使う。評価の信頼性が低いとループ全体が�
 
 ## Final Quality Gate（大きな変更だけ）
 
-次の順で evidence を集める。小さい低リスク変更では省略可。
-
-1. targeted verification: 変更対象に対応する test / lint / build / schema を実行する。
-2. cleanup: formatter、lint fix、不要生成物削除、AI っぽい冗長文の整理を changed files に限定して行う。
-3. post-cleanup verification: cleanup 後に同じ検証を再実行する。
-4. invariant audit: invariant ごとに implementation evidence / test evidence / review evidence を出す。
-5. independent review: 可能なら生成者と別 role / subagent で review し、non-clean なら `review_blocked` とする。
+Gate の順序・invariant audit 形式・non-clean 時の扱いは [steering-and-final-gates.md](./steering-and-final-gates.md#final-quality-gate) を正とする。小さい低リスク変更では省略可。cleanup は formatter、lint fix、不要生成物削除、冗長文の整理を changed files に限定する。
 
 Clean の条件:
 
 - targeted verification と post-cleanup verification が PASS。
 - すべての required invariant が proved。
 - independent review が APPROVE / CLEAR 相当。
-
-Non-clean の扱い:
-
-- 完了扱いにしない。
-- review finding を evidence として、blocker 解消サブゴールを追加してループ継続する。
-- 自力で解消できない外的 blocker だけ Phase 6 の HITL へ回す。
 
 ## Capability Gap Rule
 

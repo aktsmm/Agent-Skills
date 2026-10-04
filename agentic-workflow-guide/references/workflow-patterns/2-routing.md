@@ -4,90 +4,36 @@
 
 > Back to [overview.md](overview.md)
 
-## Diagram
+Use when inputs fall into clear categories that need different handling, and misclassification is cheap to detect.
 
-```mermaid
-graph TD
-    A[Input] --> B{Router}
-    B -->|Type A| C[Handler A]
-    B -->|Type B| D[Handler B]
-    B -->|Type C| E[Handler C]
-    B -->|Unclassified| F[Default Handler]
-    C --> G[Output]
-    D --> G
-    E --> G
-    F --> G
-```
-
-## Characteristics
-
-| Aspect        | Description                              |
-| ------------- | ---------------------------------------- |
-| **Structure** | Classifier + specialized handlers        |
-| **Benefits**  | Each handler can be optimized            |
-| **Use Cases** | Customer support, inquiry classification |
-
-## When to Use
-
-- Input has clear categories
-- Different processing is optimal per category
-- Classification accuracy is sufficiently high
-
-## Implementation Example
-
-```
-Router: Determine inquiry type
-├─ Technical question → Technical Support Agent
-├─ Billing related → Billing Support Agent
-├─ General question → FAQ Agent
-└─ Unclassified → Default Handler
-```
-
-## Default Handler (Fallback Route)
-
-Handle inputs that don't match any defined category:
-
-```mermaid
-graph TD
-    A[Input] --> B{Router}
-    B -->|Confidence > 80%| C[Specialized Handler]
-    B -->|Confidence < 80%| D[Default Handler]
-    D --> E{Can Help?}
-    E -->|Yes| F[Direct Response]
-    E -->|No| G[Escalate / Clarify]
-```
-
-**When to Route to Default:**
-
-| Condition                     | Action                       |
-| ----------------------------- | ---------------------------- |
-| Low classification confidence | Route to Default Handler     |
-| Unknown category              | Route to Default Handler     |
-| Ambiguous input               | Ask clarifying question      |
-| Out of scope                  | Politely decline or escalate |
-
-**Implementation Example:**
+## VS Code Implementation
 
 ```yaml
 ---
 name: Support Router
-tools: ["agent"]
+description: Classify a request and delegate it to the matching specialist agent
+tools: ["agent", "read", "search"]
+agents: ["Tech Support", "Billing", "FAQ", "General Assistant"]
 ---
-
-# Support Router
-
 ## Routing Rules
 
-1. Technical keywords detected → Tech Support Agent
-2. Billing/payment keywords → Billing Agent
-3. FAQ match found → FAQ Agent
-4. **Otherwise → Default Handler**
-
-## Default Handler Behavior
-
-- Attempt general assistance first
-- If unable to help: "I'll connect you with a specialist"
-- Log unclassified inputs for future category expansion
+1. Technical keywords → Tech Support
+2. Billing/payment keywords → Billing
+3. FAQ match → FAQ
+4. Otherwise or low confidence → General Assistant (default route)
 ```
 
-**⚠️ Important:** Default Handler should log unclassified inputs. Frequent patterns may indicate a missing specialized handler.
+- `agents` restricts which subagents the router may call; when it is set, `agent` must be in `tools`.
+- Specialists that should only be reached through the router: set `user-invocable: false` (hidden from the picker). Do not use the deprecated `infer`.
+- For user-chosen routing instead of model routing, offer `handoffs` buttons from the router.
+
+## Default Route Rules
+
+| Condition                     | Action                              |
+| ----------------------------- | ----------------------------------- |
+| Low confidence / unknown type | Default handler (General Assistant) |
+| Ambiguous input               | Ask one clarifying question         |
+| Out of scope                  | Decline or escalate                 |
+
+- Log unclassified inputs; repeated patterns signal a missing specialist.
+- The default route must not absorb work that a specialist exists for.

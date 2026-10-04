@@ -29,10 +29,10 @@ Template-based PPTX generation rules.
 
 Before authoring, distinguish the requested deliverable:
 
-| User intent | Deliverable | Work to do |
-| --- | --- | --- |
-| "Create the next meeting deck" / "make slides from this content" | A populated presentation deck | Fill audience-ready slides from content and validate visuals |
-| "Create a reusable template" / "make the slide master" | A template PPTX | Create/clean slide master and reusable custom layouts; sample slides are only previews |
+| User intent                                                      | Deliverable                   | Work to do                                                                             |
+| ---------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------- |
+| "Create the next meeting deck" / "make slides from this content" | A populated presentation deck | Fill audience-ready slides from content and validate visuals                           |
+| "Create a reusable template" / "make the slide master"           | A template PPTX               | Create/clean slide master and reusable custom layouts; sample slides are only previews |
 
 Do not drift from deck creation into template authoring unless the user explicitly asks for a reusable template or slide master. Conversely, when the user asks for a template, do not stop at sample slides; verify the slide master and custom layouts are actually reusable.
 
@@ -320,7 +320,7 @@ Practical rules:
 ```python
 import win32com.client
 
-template = r"C:\path\to\template_master.pptx"
+template = r"<workspace-root>\assets\template_master.pptx"
 app = win32com.client.DispatchEx("PowerPoint.Application")
 app.Visible = True
 pres = app.Presentations.Open(template, False, False, False)
@@ -406,11 +406,7 @@ Both files below must carry an explicit JP typeface:
 - `ppt/slideMasters/slideMaster1.xml`
   - Every `<a:defRPr>` under `<p:txStyles>` (titleStyle / bodyStyle / otherStyle × all `<a:lvlNpPr>`) needs `<a:ea typeface="BIZ UDPGothic" panose="020B0400000000000000" pitchFamily="50" charset="-128"/>` inserted immediately before `<a:latin/>`. Missing this makes each generated slide need per-run font correction — the exact anti-pattern the JP template font default rule tries to prevent.
 
-Quick audit:
-
-```powershell
-python -c "import zipfile,re; x=zipfile.ZipFile('t.pptx').read('ppt/theme/theme1.xml').decode('utf-8'); print('ea:', re.findall(r'<a:ea typeface=\"[^\"]*\"', x)); print('Jpan:', re.findall(r'<a:font script=\"Jpan\" typeface=\"[^\"]*\"', x))"
-```
+Quick audit: use the theme `Jpan` / `ea` detection snippet in [quality-guidelines.instructions.md](quality-guidelines.instructions.md#theme-font-resolution--critical) (ZIP fix code is there too).
 
 ### Lift Duplicated Brand Shapes to Slide Master
 
@@ -418,7 +414,7 @@ If the same background art / brand block / accent bar appears on every custom la
 
 - Detection: iterate `SlideMaster.CustomLayouts` (COM) or `master.slide_layouts` (python-pptx) and group shapes by `Name`. Any name that appears on ≥ 2 layouts with the same `left/top/width/height` is a lift candidate.
 - Placement: insert the shape into the master's `spTree` **immediately after `<p:grpSpPr>`** so it sits behind placeholders (background layer). Then delete the copy from every layout.
-- Ordering: keep layout-specific chrome (e.g. an accent line only on section-header layouts) on the layout. Only shapes shared by *all* layouts belong on the master.
+- Ordering: keep layout-specific chrome (e.g. an accent line only on section-header layouts) on the layout. Only shapes shared by _all_ layouts belong on the master.
 - Verify: a new blank slide from any layout still shows the brand shape; every layout's XML no longer contains the lifted shape name. Render each layout to PNG via COM (`Slide.Export("out.png", "PNG", 1280, 720)` with `WithWindow=False`) to confirm.
 
 ### Template Metadata Hygiene
@@ -462,4 +458,4 @@ PowerPoint re-instruments these every time the template is opened from OneDrive 
 - Quality guidelines: [quality-guidelines.instructions.md](quality-guidelines.instructions.md)
 - Naming rules: [common.instructions.md](common.instructions.md)
 - Tool flow: [tools-reference.instructions.md](tools-reference.instructions.md)
-- Sample: `schemas/content.example.json`
+- Schema: `schemas/content.schema.json`

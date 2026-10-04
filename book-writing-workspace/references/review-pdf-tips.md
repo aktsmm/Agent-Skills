@@ -119,12 +119,7 @@ That produces headings like `第4章 第7章 ...` when chapter numbering is also
 
 - Treat chapter numbering as a build concern, not as a hard-coded H1 prefix in generated output
 - If author-facing Markdown keeps `第N章` for readability, strip that prefix in the Markdown-to-Re:VIEW converter for level-1 headings
-- Do not patch generated `.re` files by hand; fix the converter or source side instead
-
-### Why This Matters
-
-The duplication is easy to miss in raw Markdown because it only appears after Re:VIEW numbering is applied.
-Fixing it in the converter prevents the same problem from reappearing across PDF, EPUB, and TOC output.
+- Do not patch generated `.re` files by hand; fix the converter or source side instead, so PDF, EPUB, and TOC output all stay fixed
 
 ### Problem 2: Partial Builds Renumber Chapters
 
@@ -136,12 +131,7 @@ This is correct for the temporary partial catalog, but misleading for final numb
 
 - Use partial conversion/builds for fast iteration on layout, wording, and local rendering issues
 - Do not treat chapter numbers or TOC numbering from a partial catalog as the final source of truth
-- For chapter-number review, regenerate the full catalog and rebuild the full book range
-
-### Why This Matters
-
-Partial build output is useful for speed, but it can make a later chapter look like `Chapter 1`
-simply because the catalog was narrowed for debugging. Without an explicit rule, reviewers often misdiagnose the problem as a heading bug instead of a catalog-range effect.
+- For chapter-number review, regenerate the full catalog and rebuild the full book range; a later chapter shown as `Chapter 1` in a partial build is a catalog-range effect, not a heading bug
 
 ## Header/Footer Customization
 
@@ -223,15 +213,7 @@ emits a bare `@<href>{url}`:
 
 ### Where to Add
 
-Place these lines in `review-custom.sty` or the build script's custom sty injection point.
-Do **not** edit `sty/review-jsbook.cls` directly — the build script overwrites `sty/`
-from the gem defaults on every run.
-
-### Notes
-
-- `xurl` is included in TeX Live and does not require separate installation in the Docker image
-- `\emergencystretch=3em` gives LaTeX extra flexibility when it cannot find good break points
-- `xurl` alone is **not enough** — the `inline_href` override is essential because Re:VIEW uses `\href{\texttt{}}` not `\url{}`
+Place these lines in `review-custom.sty` or the build script's custom sty injection point, not in `sty/` (see LaTeX Style Injection Point in [customization-points.md](customization-points.md)). `xurl` ships with TeX Live, so the Docker image needs no extra install.
 
 ## Debugging
 
@@ -498,7 +480,7 @@ the marker may disappear, remain inline, or fail to render as a normal bottom no
 - If a note applies to the whole table, do not place the footnote marker inside a table cell
 - Do not rely on table-header footnote markers for bottom-of-page notes
 - Add one short prose sentence immediately before or after the table, and attach the footnote marker there
-- Write the footnote body so it explicitly says the note applies to the table
+- Write the footnote body so it explicitly says the note applies to the table; markers in normal prose survive Re:VIEW and LaTeX reliably
 
 ### Example Strategy
 
@@ -524,12 +506,6 @@ Avoid this:
 | -------------- | ----------- |
 | Agreements     | ...         |
 ```
-
-### Why This Works
-
-- The note still reads as table-specific to the human reader
-- The footnote marker stays in normal prose, which Re:VIEW and LaTeX handle more reliably
-- The final PDF is less likely to lose the note or render it in an unexpected place
 
 ## Odd/Even Running Headers and Side Markers
 
@@ -595,12 +571,6 @@ build succeeded, which makes it look as though the latest style change had no ef
 - Check the updated file timestamp after each build
 - If the workflow archives previous builds into timestamped directories, compare against the newly archived copy as well
 - When a result seems unchanged, verify the generated `.re` or `.tex` snippet before assuming the style edit failed
-
-### Verification
-
-- Confirm the output PDF modification time changed
-- Open the latest archived/timestamped PDF when available
-- Compare one representative `.re` snippet to the PDF page before continuing with further style changes
 
 ## Explicit Blank Lines Between Paragraphs
 
@@ -709,6 +679,22 @@ as layout metadata, not as visible caption text.
 - Use the Markdown image title only for layout metadata such as `scale=0.80`
 - If no caption is provided, let the converter fall back to the file stem or another deterministic rule
 
+### Recommended Pattern
+
+```markdown
+![Agent モードの選択](images/docmng_img02.png "scale=0.80")
+```
+
+This should become a Re:VIEW image block where caption = `Agent モードの選択` and metric = `scale=0.80`.
+
+### Anti-Patterns
+
+```markdown
+![Image: Agent モードの選択](images/docmng_img02.png)
+![図 01. Agent モードの選択](images/docmng_img02.png)
+![Agent モードの選択](images/docmng_img02.png "図 01")
+```
+
 ## Markdown Tables Need `//tsize` for PDF Wrapping
 
 ### Problem
@@ -748,27 +734,6 @@ Emit a LaTeX-specific `//tsize` immediately before the generated `//table{}` blo
 Even if the manuscript source looks fine in Markdown, the PDF builder only wraps table cells when
 the LaTeX column spec supports wrapping. If a project relies on auto-generated Re:VIEW, table layout
 must be handled in the converter, not left to authors to patch by hand after every build.
-
-### Recommended Pattern
-
-```markdown
-![Agent モードの選択](images/docmng_img02.png "scale=0.80")
-```
-
-This should become a Re:VIEW image block where:
-
-- caption = `Agent モードの選択`
-- metric = `scale=0.80`
-
-### Anti-Patterns
-
-```markdown
-![Image: Agent モードの選択](images/docmng_img02.png)
-![図 01. Agent モードの選択](images/docmng_img02.png)
-![Agent モードの選択](images/docmng_img02.png "図 01")
-```
-
-These patterns make later conversion and numbering brittle.
 
 ## Chapter Illustration on Blank Pages
 

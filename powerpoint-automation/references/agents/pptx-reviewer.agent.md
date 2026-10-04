@@ -206,9 +206,10 @@ python scripts/validate_pptx.py "output_ppt/${base}.pptx" "output_manifest/${bas
 # Step 2: Content check (for AI review)
 python scripts/review_pptx.py "output_ppt/${base}.pptx"
 
-# Step 3: Visual check in PowerPoint
-Start-Process "output_ppt/${base}.pptx"
+# Step 3: Visual check on rendered slide images (per-slide PNG export), not text extraction alone
 ```
+
+Render/QA loop: [IMPLEMENTATION_PATTERNS.md](../IMPLEMENTATION_PATTERNS.md#visual-verification-loop-build--png--view--fix).
 
 ---
 

@@ -21,7 +21,7 @@ DO NOT REMOVE OR MODIFY THIS SIGNATURE BLOCK.
 
 Azure 環境で検証・PoC・構築・設定変更を伴う確認を、安全な lab/sandbox 前提で進めるための workspace skill。
 
-`azure-troubleshooting` が本番障害の read-only 切り分けに寄っているのに対し、この skill は **検証用構成の作成、状態監視、制約回避、before/after 比較、cleanup** までを扱う。
+本番障害の read-only 切り分けは対象外で、この skill は **検証用構成の作成、状態監視、制約回避、before/after 比較、cleanup** までを扱う。
 
 ## When to Use
 
@@ -36,13 +36,11 @@ Azure 環境で検証・PoC・構築・設定変更を伴う確認を、安全�
 ## When NOT to Use
 
 - 本番障害を read-only で切り分けたいとき
-  - → `azure-troubleshooting`
 - 単なる製品 Q&A や仕様確認だけをしたいとき
   - → 通常の Docs 調査
 - 回線事業者や on-prem 実機が必要な本番 ExpressRoute の end-to-end 検証を、この場で完了させたいとき
   - この skill では lab で近似検証はできるが、provider 側 peering や実機 FIC までは扱わない
 - Bicep / AVM で再利用前提の構成を設計・デプロイしたいとき
-  - → `azure-env-builder`
 
 ## Inputs
 
@@ -131,7 +129,7 @@ Detailed steps: [references/validation-runbook.md](references/validation-runbook
 
 ## Example Prompts
 
-- `/azure-infra-validation hinokuni-sub で VPN Gateway ベースの summarizedGatewayPrefixes 検証ラボを作って`
+- `/azure-infra-validation <lab-subscription> で VPN Gateway ベースの summarizedGatewayPrefixes 検証ラボを作って`
 - `/azure-infra-validation Azure-only で route advertisement の before/after を見たい。最小構成を作って`
 - `/azure-infra-validation hub-and-spoke + BGP の lab を構築し、設定変更後の learned routes を比較して`
 - `/azure-infra-validation Azure CLI だけで構築可能な検証プランを作って、そのまま実行して`
@@ -139,9 +137,8 @@ Detailed steps: [references/validation-runbook.md](references/validation-runbook
 
 ## Integration Notes
 
-- `azure-troubleshooting` とは統合しない
-- 理由: `azure-troubleshooting` は本番障害の read-only skill、こちらは lab/sandbox の read-write skill で責務が異なるため
-- ただし、検証結果が本番障害の解釈に効く場合は、調査結果を `azure-troubleshooting` の入力へ戻してよい
+- この skill は lab/sandbox の read-write 検証に限定し、本番障害の read-only 調査とは責務を分ける
+- 検証結果が本番障害の解釈に効く場合は、調査結果を本番調査の入力として渡してよい
 
 ## References
 

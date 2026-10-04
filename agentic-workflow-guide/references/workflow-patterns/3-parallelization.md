@@ -4,49 +4,11 @@
 
 > Back to [overview.md](overview.md)
 
-## Diagram
+Use for independent tasks (sectioning) or several independent judgments on the same input (voting).
 
-```mermaid
-graph TD
-    A[Input] --> B[Task 1]
-    A --> C[Task 2]
-    A --> D[Task 3]
-    B --> E[Aggregator]
-    C --> E
-    D --> E
-    E --> F[Output]
-```
+## VS Code Copilot: Parallel Subagent Calls
 
-## Characteristics
-
-| Aspect         | Description                                           |
-| -------------- | ----------------------------------------------------- |
-| **Structure**  | Split → parallel execution → aggregate                |
-| **Benefits**   | Reduced processing time, robustness from independence |
-| **Variations** | Sectioning (division), Voting (majority decision)     |
-
-## When to Use
-
-- Tasks are independent (no shared state)
-- Parallel execution can reduce time
-- Multiple perspectives/results are desired
-
-## Implementation Example
-
-```
-Input: Document
-├─ Agent 1: Grammar check
-├─ Agent 2: Content accuracy check
-└─ Agent 3: Style check
-    ↓
-Aggregator: Integrate all results
-```
-
-## VS Code Copilot: runSubagent Parallel Invocation
-
-### Key Finding
-
-`runSubagent` calls can be invoked **simultaneously** from an Orchestrator agent. The runtime executes them concurrently and returns all results before the Orchestrator proceeds.
+An orchestrator with the `agent` tool set (`agent/runSubagent`) can issue several subagent calls in one turn; they run concurrently and all results return before the orchestrator continues. Each subagent has its own context window, but **not** its own file system, terminal, or COM session.
 
 ### Safety Requirements
 
@@ -60,16 +22,12 @@ Before parallelizing, verify **all three conditions**:
 
 ### Implementation Pattern
 
-```yaml
-# In Orchestrator agent definition:
-# Call all three runSubagent simultaneously
-
-runSubagent("Review",          prompt: "...", description: "Review: MCP verification")
-runSubagent("Build PPTX",      prompt: "...", description: "Build: slide insertion")
-runSubagent("Notes Generator", prompt: "...", description: "Notes: speaker notes generation")
-
-# All three execute concurrently. Results return together.
-# Orchestrator then verifies all succeeded before proceeding.
+```text
+# Orchestrator body: issue all three subagent calls in the same turn
+runSubagent(agentName: "Review",          description: "Review: MCP verification",  prompt: "...")
+runSubagent(agentName: "Build PPTX",      description: "Build: slide insertion",    prompt: "...")
+runSubagent(agentName: "Notes Generator", description: "Notes: speaker notes",      prompt: "...")
+# Then verify every output (Gate below) before the next step.
 ```
 
 ### Dependency Table Template
@@ -97,15 +55,13 @@ Gate: All parallel agents completed
   → FAIL: identify which agent failed, retry only that one
 ```
 
-### Performance Impact
-
-Parallel execution reduces wall-clock time from `sum(A, B, C)` to `max(A, B, C)`, typically **30-40% faster** for 3 parallel agents.
+Wall-clock time drops from `sum(A, B, C)` toward `max(A, B, C)`; measure before claiming a speedup.
 
 ### Anti-Patterns
 
-| ❌ Anti-Pattern                                          | ✅ Correct Approach                  |
-| -------------------------------------------------------- | ------------------------------------ |
-| Two agents writing to same file                          | Separate output files per agent      |
-| Two agents using COM simultaneously                      | Only one COM agent in parallel group |
-| Agent B reads Agent A's output                           | Sequential execution, not parallel   |
-| Parallel agents calling `run_in_terminal` simultaneously | Stagger or isolate terminal usage    |
+| ❌ Anti-Pattern                                       | ✅ Correct Approach                  |
+| ----------------------------------------------------- | ------------------------------------ |
+| Two agents writing to same file                       | Separate output files per agent      |
+| Two agents using COM simultaneously                   | Only one COM agent in parallel group |
+| Agent B reads Agent A's output                        | Sequential execution, not parallel   |
+| Parallel agents using `execute/runInTerminal` at once | Stagger or isolate terminal usage    |

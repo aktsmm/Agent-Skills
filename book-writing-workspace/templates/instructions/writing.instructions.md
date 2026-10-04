@@ -39,7 +39,7 @@ Guidelines for manuscript writing style and quality.
 
 ## Source Confidence
 
-- Do not write feature behavior, limits, UI paths, metrics, or procedures from guesswork.
+- Verify feature behavior, limits, UI paths, metrics, and procedures for the specific product, subtype, surface, and version. Do not apply one subtype's conditions to the whole product or fill gaps with guesswork.
 - If a point is not verified, do not smooth it into final prose with plausible wording.
 - Keep unresolved items in outline or key-points notes as explicit verification tasks, not as normal explanatory sentences.
 - Final manuscript files should contain only verified statements or clearly attributed interpretation.
@@ -59,6 +59,8 @@ Guidelines for manuscript writing style and quality.
 - Practical next step
 - Lingering thought or question
 - Bridge to next chapter
+
+Comparison tables are optional. Omit one that repeats the prose or glossary without adding a distinct decision criterion; retain its unique required knowledge in the body before removing it.
 
 ## Figures and Lists
 

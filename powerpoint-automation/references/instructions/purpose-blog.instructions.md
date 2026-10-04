@@ -46,34 +46,8 @@ Rules for converting blog articles to presentations.
 
 ## Image Handling
 
-### Extraction
-
-```powershell
-$base = "20251212_example_blog"
-$url = "https://zenn.dev/xxx/articles/yyy"
-
-# Fetch HTML source
-$html = curl -s $url
-
-# Extract image URLs
-$imageUrls = [regex]::Matches($html, 'https://[^"]+\.(png|jpg|jpeg|gif|webp)')
-
-# Download images
-$i = 1
-foreach ($imgUrl in $imageUrls) {
-    curl -s -o "images/${base}/$('{0:D2}' -f $i)_image.png" $imgUrl
-    $i++
-}
-```
-
-### Placement
-
-| Image Type   | position | width_percent | Notes             |
-| ------------ | -------- | ------------- | ----------------- |
-| Architecture | `right`  | 50-55         | Side-by-side text |
-| Screenshot   | `right`  | 55-60         | Visible detail    |
-| Flowchart    | `full`   | -             | Full slide        |
-| Icon/Logo    | `right`  | 25-30         | Keep small        |
+- Extraction commands (`fetch_webpage` may omit image URLs): [tools-reference.instructions.md](tools-reference.instructions.md#image-extraction-rules-web-source)
+- Placement (`position` / `width_percent` by image type): [template-content-json.instructions.md](template-content-json.instructions.md#image-placement-best-practices)
 
 ---
 
@@ -87,14 +61,7 @@ foreach ($imgUrl in $imageUrls) {
 
 ### Format in content.json
 
-```json
-{
-  "type": "content",
-  "title": "Implementation Example",
-  "items": ["Point 1", "Point 2"],
-  "code": "<button hx-get=\"/api/data\">Fetch</button>"
-}
-```
+Use the `code` field ([template-content-json.instructions.md](template-content-json.instructions.md#code-blocks)).
 
 ### Guidelines
 

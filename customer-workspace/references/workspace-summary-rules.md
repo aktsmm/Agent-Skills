@@ -35,9 +35,7 @@
 
 ### Material-Heavy Workspaces
 
-- If customer-shared files such as diagrams, decks, schedules, or comparison tables are part of the ongoing work, split folders by lifecycle first: `_received/`, `_working/`, `_provided/`.
-- Within those folders, use `overall-architecture/` for cross-meeting baseline material and `mtg-YYYY-MM-DD-name/` only for truly meeting-scoped material.
-- In summaries, link the ledger README or index file rather than only a deep file path when the material set is still growing.
+- Follow [Customer Material Lifecycle](material-lifecycle.md) for folder layout. In summaries, link the ledger README or index file rather than only a deep file path while the material set is still growing.
 
 ## Writing Rules
 
@@ -51,12 +49,12 @@
 ```markdown
 ## 関連ファイルパス
 
-- Customers/contoso/workspace-summary.md
+- workspace-summary.md
   - 起点メモ。最初に読むファイル
-- Customers/contoso/profile.md
+- \_customer/profile.md
   - 顧客の基本情報。正本
-- Customers/contoso/\_meetings/2026-05-20.md
+- meeting-notes/2026-05-20_regular.md
   - 直近会議の要点と宿題
-- Tasks/active.md
-  - 全体タスクの確認先。必要なら顧客該当箇所を抜粋
+- next-actions/README.md
+  - 未完了アクションの確認先
 ```

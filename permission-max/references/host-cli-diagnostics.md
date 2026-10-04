@@ -23,8 +23,12 @@ Also inspect the installed CLI help instead of assuming flags:
 
 ```powershell
 copilot --help
-copilot -p "help" --help
+copilot help config
 ```
+
+Copilot CLI 1.0.91 (`copilot help config`) documents these permission-related keys in the global `~/.copilot/config.json`: `trustedFolders` (folders granted read/execute), `allowedUrls` / `deniedUrls`, and `defaultPermissionMode` (`manual` default / `assisted` / `allow-all`).
+
+`allow-all` is ignored when policy disables bypass mode, on resumed sessions, and outside interactive runs. Re-check the help on the installed version before editing.
 
 Only edit a discovered approval, confirmation, workspace trust, or tool allow-list setting after explaining the scope to the user. If the host manages the guard and exposes no setting, report that limitation instead of claiming completion.
 
@@ -37,7 +41,7 @@ copilot -p "<prompt>" `
   --silent
 ```
 
-These flags apply to that subprocess. They do not necessarily change Scout or the current host session.
+Path-level `Read` / `Write` confirmations are covered by `--allow-all-paths`; `--allow-all` (alias `--yolo`) combines tools, paths, and URLs. Narrower options are `--allow-tool` / `--deny-tool` (e.g. `'shell(git:*)'`) and `--allow-url` / `--deny-url`; deny wins. These flags apply to that subprocess. They do not necessarily change Scout or the current host session.
 
 ## Limitation Report
 

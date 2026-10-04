@@ -30,7 +30,7 @@ Azure インシデント調査で、共通の live fact collection の後に分�
 
 ### Report Notes
 
-- `10.186.80.198:59502` のような直接値として書かず、「別次元の集計値」と明記する
+- `<backend-ip>:<backend-port>` の組み合わせを直接観測した値のように書かず、「別次元の集計値」と明記する
 - 会話メタではなく、「本事象は〜と評価する」のような判断文へ落とす
 
 ## Shared Network / DNS / Azure Firewall / ExpressRoute

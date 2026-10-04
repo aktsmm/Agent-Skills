@@ -142,4 +142,4 @@ Detailed specification for replacements.json used in Localizer method (text repl
 ## References
 
 - Basic flow: [template.instructions.md](template.instructions.md)
-- Example: `schemas/replacements.example.json`
+- Implementation: `scripts/apply_content.py`

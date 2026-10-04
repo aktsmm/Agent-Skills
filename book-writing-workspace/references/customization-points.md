@@ -35,11 +35,6 @@ If the workspace uses both outline files and final manuscript files, define earl
 - Use diagrams for flow, direction, sequence, hierarchy, or source/target relationships
 - Do not leave comparison-heavy sections as long bullet lists if a table would let the reader re-scan faster
 
-### Why This Matters
-
-Diagram needs are often discovered too late if they are deferred until section drafting.
-Likewise, comparison-heavy sections become harder to read when they stay as prose or bullets instead of being normalized into tables.
-
 ## Verification and Diagram Language Rules
 
 Before large-scale drafting begins, decide two policy points explicitly.
@@ -50,11 +45,6 @@ Before large-scale drafting begins, decide two policy points explicitly.
 - Do not let unresolved facts drift into final prose as plausible-sounding explanation
 - Decide whether diagrams should default to the manuscript language, and document the limited cases where original-language labels stay visible
 - Keep operation names or official feature names in their original language only when readers are expected to recognize them that way
-
-### Why This Matters
-
-Speculative prose becomes expensive to detect once it has spread across multiple chapters.
-Likewise, diagrams often drift into all-English labeling even when the manuscript is written for another language audience, which creates avoidable reading friction.
 
 ## Review-Issue Fix Hygiene
 
@@ -71,12 +61,6 @@ When applying reviewer feedback to final manuscript files, treat the cited line 
 - If a fix changes a repeated chapter title or representative term, also check synchronized assets such as the chapter map/file map, chapter-end question digest, and progress or page-allocation tracker in the same task
 - When a visual conflicts with the body, decide which case it is: the visual merely omits something, so the sentence that introduces it should state the visual's scope; or the visual asserts an order, scope, or label the body denies, so update the visual source and regenerate the derived output. After regenerating, re-check every label against the whole chapter, not only the introducing paragraph
 - If review fixes arrive through stacked pull requests, inspect commit ancestry and changed files before deciding merge order or judging overlap; when later PRs already include earlier commits, merge the older layer first or restack before review
-
-### Why This Matters
-
-Reviewer issues often reveal a repeated authoring artifact, not just a single typo.
-Stopping at the quoted sentence leaves near-duplicates in other sections, while editing every search hit blindly can remove useful reader-facing navigation.
-Review comments can also expose scope boundaries: some belong in the current patch, while others should be preserved as separate follow-up work so the review trail stays understandable.
 
 ## Automation
 
@@ -101,10 +85,6 @@ If the workspace uses a shared metadata layer for Re:VIEW/PDF output, separate s
 - If the repo contains a series, compare title patterns across books before finalizing one book's `booktitle` or `subtitle`
 - Regenerate `config.yml` and cover assets from the metadata layer instead of editing generated files by hand
 
-### Why This Matters
-
-People, publisher details, title wording, and cover readability vary per project. If they are stored in a common metadata file or fixed only in exported images, they leak across projects and are easy to forget during setup or retrofits.
-
 ## LaTeX Style Injection Point
 
 Build scripts that use `vvakame/review` Docker images typically copy the gem's default
@@ -116,12 +96,7 @@ Build scripts that use `vvakame/review` Docker images typically copy the gem's d
 - Place all LaTeX customizations in the **custom sty content** that the build script injects as `sty/review-custom.sty`
 - In PowerShell build scripts, this is typically a heredoc variable (e.g. `$customStyContent`) written to a file before the Docker run
 - In shell-based workflows, append to `sty/review-style.sty` **after** the gem copy step
-
-### Why This Matters
-
-If you add `\usepackage{xurl}` or other fixes directly to `sty/review-jsbook.cls`,
-the next build silently reverts those changes. The fix appears to work in manual testing
-but fails in CI or clean builds.
+- A direct edit to `sty/` appears to work in a manual build, then the next build silently reverts it
 
 ## Heading Rename Safety
 
@@ -134,12 +109,7 @@ do not stop at the first rename.
 - Check that the old folder or file no longer exists physically
 - Grep the old chapter title after the rename to catch leftovers in docs, agents, or instructions
 - Check whether the title's source of truth is a generator script or config module rather than the manuscript; a regenerated artifact that shows no diff after the rename means the generator still holds the old value
-- Rebuild Re:VIEW/PDF output and confirm the old path is not still being converted
-
-### Why This Matters
-
-If the old chapter path remains on disk, build scripts may pick up both old and new files.
-That can produce duplicated chapters or stale generated output that is hard to diagnose from PDF alone.
+- Rebuild Re:VIEW/PDF output and confirm the old path is not still being converted; a leftover old path makes the build convert both and duplicate the chapter
 
 ## Sync-Back from Final Manuscripts to Author Drafts
 
@@ -171,14 +141,4 @@ but the author draft keeps the image next to the draft file:
 ![Azure Ops Dashboard GUI](image.png)
 ```
 
-then sync the prose but preserve the draft-local image path instead of copying the final path verbatim.
-
-### Why This Matters
-
-Draft folders often serve as working sources for individual authors. They may have:
-
-- different relative paths
-- rough notes not intended for final manuscript
-- additional sibling files such as keypoints or partial section drafts
-
-Treat sync-back as a selective editorial sync, not as a raw mirror operation.
+then sync the prose but preserve the draft-local image path instead of copying the final path verbatim. Treat sync-back as a selective editorial sync, not a raw mirror.

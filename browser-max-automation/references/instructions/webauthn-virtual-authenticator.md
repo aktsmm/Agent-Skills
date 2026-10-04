@@ -48,10 +48,10 @@ CDP の `WebAuthn` domain で **仮想認証機** を有効化し、passkey / FI
 ## Gotchas
 
 - **仮想認証機は tab 単位**。`enable` した tab を閉じると `authenticatorId` 失効。register / login script 実行後は同じ tab で操作する
-- **`rpId` は host ベース**。`site2.sbisec.co.jp` で登録した credential は `m.sbisec.co.jp` でも `rpId=sbisec.co.jp` であれば assertion 可。サブドメインを跨いで使うときは登録時の rpId を必ず確認する
+- **`rpId` は登録可能ドメイン単位**。`site2.example.com` で登録した credential は `m.example.com` でも `rpId=example.com` であれば assertion 可。サブドメインを跨いで使うときは登録時の rpId を必ず確認する
 - **attach 先タブを正しく選ぶ**。仮想認証機は attach した page target でしか効かない。assertion 用は `#pk-btn` を持つ login タブ、register 用は `sw_page=RegPasskey` のような登録 URL のタブを最優先で掴む。同一サービスで認証済みドメイン (`site2.example.com`) と未認証 login ドメイン (`login.example.com`) のタブが共存しがちで、認証済み側に attach すると assertion ボタンが見つからず OS 生体認証 (Windows Hello / Touch ID) に fallback する。tab 解決は `期待 URL を含むタブ最優先 → 既存タブを navigate → 新規タブで開く` の順で fallback する
 - **attach と `#pk-btn` click は同じ helper context で連続実行する**。「ready で停止して click は外部 (MCP / 手動 / 別 prompt) に委任」する設計は、login タブ取り違えと CDP target lifetime で簡単に壊れる。同じ WebSocket 内で `Runtime.evaluate` → URL change poll まで完結させる
-- **登録上限**: 多くのサービスでパスキー登録は数件まで（SBI 証券は 3 件）。古い credential が残ると登録が拒否されるので、UI 側で削除してから新規 register する
+- **登録上限**: 多くのサービスでパスキー登録は数件まで（3 件程度のサービスもある）。古い credential が残ると登録が拒否されるので、UI 側で削除してから新規 register する
 - **既存 CDP セッションと併用可**: raw WebSocket と同じ性質。MCP Playwright が active な tab に attach しても競合しない
 
 ## Credential JSON 永続化
@@ -59,7 +59,7 @@ CDP の `WebAuthn` domain で **仮想認証機** を有効化し、passkey / FI
 - `getCredentials` の返却に `privateKey` (PKCS#8 base64url) が含まれる。盗まれれば誰でも assertion できる
 - 保存先は `secrets/<site>_passkey.json` 等にし、**必ず gitignore**。クラウド同期・USB 持ち出し禁止
 - バックアップせず、失効したら register し直す運用が安全
-- 失効検知: 期待通り login が走った後に `dump` で `signCount` が増えているかを確認する。停滞していれば SBI 側で credential 解除疑い
+- 失効検知: 期待通り login が走った後に `dump` で `signCount` が増えているかを確認する。停滞していればサービス側で credential 解除疑い
 
 ## 動作確認 smoke
 

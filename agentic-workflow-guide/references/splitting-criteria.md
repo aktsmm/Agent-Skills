@@ -24,13 +24,13 @@ When a simple approach isn't working, escalate to the next level.
 
 Before escalating into agent design, confirm that the ask is not better served by another primitive.
 
-| If the need is... | Prefer... |
-| ----------------- | --------- |
-| One slash-invoked task | Prompt |
-| Always-on guidance | Instruction |
-| Reusable packaged workflow | Skill |
-| Persona or delegation | Agent |
-| Deterministic enforcement | Hook |
+| If the need is...          | Prefer...   |
+| -------------------------- | ----------- |
+| One slash-invoked task     | Prompt      |
+| Always-on guidance         | Instruction |
+| Reusable packaged workflow | Skill       |
+| Persona or delegation      | Agent       |
+| Deterministic enforcement  | Hook        |
 
 Only continue with the ladder below if an **Agent** is truly required.
 
@@ -139,7 +139,7 @@ Once at L2/L3, use these criteria to decide sub-agent boundaries.
 
 ## Part 3: Quick Split Check
 
-### 5-Item Checklist
+### Quick Split Checklist
 
 Run this check when creating or reviewing prompts/agents:
 
@@ -200,7 +200,7 @@ Sub-agents have overhead. Avoid when: ✅ [^1] 📊 [^4]
 
 ## Part 5: Customizing Thresholds
 
-Default thresholds can be overridden in `.github/copilot-instructions.md`:
+Default thresholds can be overridden in a workspace `.instructions.md` scoped to agent-design work (keep the always-loaded `.github/copilot-instructions.md` thin):
 
 ```markdown
 ## Splitting Criteria Overrides

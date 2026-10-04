@@ -5,7 +5,7 @@
 ## 目次
 
 1. [Landing Zone (Hub-Spoke)](#1-landing-zone-hub-spoke)
-2. [Web + DB (3 層アーキテクチャ)](#2-web--db-3層アーキテクチャ)
+2. [Web + DB (3 層アーキテクチャ)](#2-web--db-3-層アーキテクチャ)
 3. [コンテナ基盤 (AKS / Container Apps)](#3-コンテナ基盤)
 4. [AI/ML 基盤](#4-aiml-基盤)
 5. [データ分析基盤](#5-データ分析基盤)
@@ -148,7 +148,7 @@ module sqlServer 'br/public:avm/res/sql/server:0.21.1' = {
 | ソース       | ターゲット | 連携内容                    |
 | ------------ | ---------- | --------------------------- |
 | SQL Server   | Web App    | 接続文字列 (Key Vault 経由) |
-| App Insights | Web App    | InstrumentationKey          |
+| App Insights | Web App    | 接続文字列 (iKey は非推奨)  |
 | Storage      | Web App    | Blob 接続文字列             |
 
 ---
@@ -239,28 +239,29 @@ module aksCluster 'br/public:avm/res/container-service/managed-cluster:0.11.1' =
 
 ### 概要
 
-Azure AI Foundry (旧 Azure Machine Learning) を中心とした AI 開発環境。
+Microsoft Foundry（旧 Azure AI Foundry / Azure AI Studio）を中心とした AI 開発環境。現行は hub ではなく Foundry resource + project 構成。
 
 ### AVM モジュール
 
 ```bicep
-// AI Foundry
-module aiFoundry 'br/public:avm/ptn/ai-ml/ai-foundry:0.6.0' = {
+// Microsoft Foundry (account + project)。params は AVM README（2026-10-04 確認）準拠
+module aiFoundry 'br/public:avm/ptn/ai-ml/ai-foundry:0.7.0' = {
   name: 'aiFoundryDeployment'
   params: {
-    name: 'aif-${workloadName}-${environment}'
-    projectName: 'project-${workloadName}'
-    // Cognitive Services (OpenAI) を自動作成
-    cognitiveServicesAccountName: 'cog-${workloadName}-${environment}'
-    cognitiveServicesDeployments: [
-      { name: 'gpt-4o', model: { name: 'gpt-4o', version: '2024-08-06' }, sku: { name: 'Standard', capacity: 10 } }
-      { name: 'text-embedding-3-large', model: { name: 'text-embedding-3-large', version: '1' }, sku: { name: 'Standard', capacity: 10 } }
+    baseName: '${workloadName}${environment}'
+    aiFoundryConfiguration: {
+      project: { name: 'project-${workloadName}' }
+    }
+    aiModelDeployments: [
+      { name: 'gpt-4o', model: { format: 'OpenAI', name: 'gpt-4o', version: '2024-11-20' }, sku: { name: 'Standard', capacity: 10 } }
     ]
-    storageAccountName: 'st${workloadName}${environment}'
-    keyVaultName: 'kv-${workloadName}-${environment}'
+    // Key Vault / AI Search / Storage / Cosmos DB を同時作成（既存は *Configuration.existingResourceId）
+    includeAssociatedResources: true
   }
 }
 ```
+
+モデル名・版は廃止予定が頻繁に変わるため、生成前に Foundry のモデル廃止スケジュールで確認する。
 
 ### OpenAI Service 単体
 
@@ -447,7 +448,7 @@ module identity 'br/public:avm/res/managed-identity/user-assigned-identity:0.4.3
   }
 }
 
-// SQL Server への RBAC 付与
+// SQL Server への RBAC 付与（管理プレーンのみ。DB データアクセスは Entra 認証の contained user を別途作成）
 module sqlRoleAssignment 'br/public:avm/res/authorization/role-assignment/rg-scope:0.1.1' = {
   name: 'sqlRoleAssignmentDeployment'
   params: {
@@ -477,6 +478,6 @@ module privateDnsZones 'br/public:avm/ptn/network/private-link-private-dns-zones
 
 ## 次のステップ
 
-1. [VM アプリケーションスクリプト](vm-app-scripts/) - Squid, Nginx 等の初期化スクリプト
+1. [VM アプリケーションスクリプト](vm-app-scripts.md) - Squid, Nginx 等の初期化スクリプト
 2. [サービス設定テンプレート](service-config-templates.md) - 連携設定のテンプレート
 3. [AVM モジュール一覧](avm-modules.md) - 推奨モジュールカタログ

@@ -102,7 +102,7 @@ def upload_caption(yt, video_id, srt_path, lang="ja", name="日本語", replace=
 
 - `sync=False` + `.srt` のタイムコードをそのまま使う（`sync=True` は字幕本文だけ渡して YT 側で時刻推定する別用途）。
 - アップロード後の確認は `captions().list`。手動トラックは `ja/standard/<name>`、自動は `ja/asr/` として両方並ぶ（共存して良い）。
-- クォータ: `captions.insert` ≈ 400 units/本（video.insert 1,600 よりずっと軽い）。
+- クォータ: `captions.insert` = 400 units/本（通常バケット 10,000 units/日から消費）。
 
 ## カスタムサムネは別の認証ゲート
 
@@ -114,15 +114,16 @@ VOICEVOX 等の**合成音声 + イラストキャラ + AI 制作支援(台本/�
 
 ## クォータと制約
 
-| 項目 | 値 |
-|---|---|
-| 1日のクォータ | **10,000 units** (デフォルト) |
-| video.insert | 1,600 units/本 → **約 6 本/日** |
-| thumbnail.set | 50 units |
-| 動画あたり最大 | 256GB or 12時間 |
-| **新規 / 未認証チャンネル** | private/unlisted 限定 (申請で解除) |
+| 項目                          | 値                                                                                                                |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 1日のクォータ                 | **10,000 units** (デフォルト、`videos.insert` と `search.list` 以外)                                              |
+| videos.insert                 | 専用バケット **100 回/日** (1 回 1 消費)                                                                          |
+| thumbnails.set                | 50 units                                                                                                          |
+| captions.insert               | 400 units                                                                                                         |
+| 動画あたり最大                | 256GB or 12時間                                                                                                   |
+| **未監査の API プロジェクト** | 2020-07-28 以降に作成した未監査プロジェクトからのアップロードは private 固定 (監査申請で解除。予約公開も効かない) |
 
-→ 週1〜3本のチャンネルなら問題なし。それ以上はクォータ増加申請。
+→ 週1〜3本のチャンネルなら問題なし。最新値は https://developers.google.com/youtube/v3/determine_quota_cost で確認。
 
 ## 公開時刻の指定 (JST → UTC 変換)
 
@@ -138,14 +139,14 @@ publish_at_utc = target_jst.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S
 
 ## メタデータのベストプラクティス
 
-| 項目 | 戦略 |
-|---|---|
-| タイトル | 60字以内、`【AI週報 #12】` 等の固定 prefix で連番感 |
-| 概要欄 | 1行目で結論、2行目以降にタイムスタンプ + 元URLリスト |
-| タグ | 5〜15個。固定 ("AI","Copilot","Azure") + 当週固有 |
-| categoryId | `28` = Science & Technology |
-| defaultLanguage | `ja` |
-| AI 生成明示 | 概要欄に「※AIナレーション含む」を入れる (YouTube ポリシー) |
+| 項目              | 戦略                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| タイトル          | 60字以内、`【AI週報 #12】` 等の固定 prefix で連番感                       |
+| 概要欄            | 1行目で結論、2行目以降にタイムスタンプ + 元URLリスト                      |
+| タグ              | 5〜15個。固定 ("AI","Copilot","Azure") + 当週固有                         |
+| categoryId        | `28` = Science & Technology                                               |
+| defaultLanguage   | `ja`                                                                      |
+| AI/合成音声の明示 | 概要欄クレジットで任意に明示。YouTube の開示要否は上の「AI 開示」節で判定 |
 
 ## タイムスタンプ自動生成 (SRTから)
 
@@ -165,28 +166,30 @@ YouTube は概要欄に `00:00 〜` 形式があると**自動でチャプター
 
 ## 失敗時のフェイルセーフ
 
-| 失敗箇所 | 対処 |
-|---|---|
-| OAuth token 期限切れ | `creds.refresh(Request())` で自動更新。失敗時はフロー再実行 |
-| upload 中ネットワーク断 | `resumable=True` で resumable upload。`req.next_chunk()` でリトライ |
-| クォータ超過 (403) | 24h 待機 / 翌日に回す / クォータ増加申請 |
-| メタデータ拒否 (400) | タイトル 100字超 / カテゴリ無効 等。lint してから insert |
-| 動画削除されたい | `yt.videos().delete(id=video_id).execute()` (1日のクォータ 50 units) |
+| 失敗箇所                | 対処                                                                 |
+| ----------------------- | -------------------------------------------------------------------- |
+| OAuth token 期限切れ    | `creds.refresh(Request())` で自動更新。失敗時はフロー再実行          |
+| upload 中ネットワーク断 | `resumable=True` で resumable upload。`req.next_chunk()` でリトライ  |
+| クォータ超過 (403)      | 24h 待機 / 翌日に回す / クォータ増加申請                             |
+| メタデータ拒否 (400)    | タイトル 100字超 / カテゴリ無効 等。lint してから insert             |
+| 動画削除されたい        | `yt.videos().delete(id=video_id).execute()` (1日のクォータ 50 units) |
 
 ## 通知
 
-成功/失敗を Teams Webhook で投げる:
+成功/失敗を Teams に投げる場合は Workflows の webhook を使う（旧 Office 365 コネクタの Incoming Webhook は 2026-04-30 に廃止）。payload は Adaptive Card:
 
 ```python
 import requests
-requests.post(TEAMS_WEBHOOK, json={
-    "text": f"📺 公開予約完了: {title}\nhttps://youtube.com/watch?v={video_id}\n予定: {publish_at_jst}"
-})
+card = {"type": "AdaptiveCard", "version": "1.4", "body": [
+    {"type": "TextBlock", "wrap": True,
+     "text": f"公開予約完了: {title}\nhttps://youtube.com/watch?v={video_id}\n予定: {publish_at_jst}"}]}
+requests.post(TEAMS_WORKFLOW_URL, json={"type": "message", "attachments": [
+    {"contentType": "application/vnd.microsoft.card.adaptive", "content": card}]})
 ```
 
 ## 倫理 / コンプライアンス
 
-- **AI 生成だと冒頭またはタイトル/概要で明示**
+- AI 制作であることを概要欄で明示する（誠実性のため。YouTube の開示義務とは別）
 - 元記事 URL を概要欄に必ず掲載
 - 本文丸読みは避けて要約 + 引用範囲に留める
 - 顧客名・社内情報を含めない

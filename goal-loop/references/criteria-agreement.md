@@ -87,10 +87,7 @@ Scope Terminus / Autonomy Mode / Persistence Profile は Phase 1 の有人 gate�
 
 ## Persistence Profile（粘り強さ。起動時に明示がなければ聞く）
 
-- profile: <Standard / Persistent / Exhaustive>
-  - Standard: 通常。max iteration 12 / stall→replan 4 / replan→HITL 4 / blocker 前の別 approach 4。
-  - Persistent: なるべく何度も試す既定。max iteration 20 / stall→replan 5 / replan→HITL 5 / blocker 前の別 approach 6。
-  - Exhaustive: 重要・難所向け。max iteration 30 / stall→replan 6 / replan→HITL 6 / blocker 前の別 approach 8。durable ledger 推奨。
+- profile: <Standard / Persistent / Exhaustive>（閾値は loop-control.md の Persistence Profile 表）
 - 明示回答が無い場合は Persistent として Task Ledger に固定する。
 
 ## Stop Conditions

@@ -23,81 +23,24 @@ graph TD
     H -->|OK| J[Complete]
 ```
 
-## Patterns Used
+Routing picks the path, Orchestrator-Workers implements per file, Evaluator-Optimizer loops review → fix with a retry cap.
 
-| Pattern                  | Role in Workflow                         |
-| ------------------------ | ---------------------------------------- |
-| **Routing**              | Branch processing by requirement type    |
-| **Orchestrator-Workers** | Implement changes per file               |
-| **Evaluator-Optimizer**  | Review → fix loop until quality is met   |
+## VS Code Constraints When Nesting
 
-## Combination Guidelines
-
-### 1. Sequential Combination
-
-Chain patterns where output of one becomes input for next:
-
-```
-Routing → Prompt Chaining → Evaluator-Optimizer
-```
-
-### 2. Nested Combination
-
-Embed one pattern inside another:
-
-```
-Orchestrator
-├─ Worker 1 (uses Prompt Chaining internally)
-├─ Worker 2 (uses Evaluator-Optimizer internally)
-└─ Worker 3 (uses Routing internally)
-```
-
-### 3. Parallel Combination
-
-Run different patterns simultaneously on different inputs:
-
-```
-Input
-├─ Path A: Routing → Handler A
-└─ Path B: Parallelization → Aggregator
-    ↓
-    Merge results
-```
+- Nested combination (a worker that itself orchestrates or loops) means a subagent calling subagents. That requires `chat.subagents.allowInvocationsFromSubagents`; without it, flatten the nesting into the top-level orchestrator.
+- Each added layer adds a context boundary: pass state through files and keep the [delegated evidence contract](4-orchestrator-workers.md#delegated-evidence-contract) at every layer.
+- Every loop inside the combination needs its own stop condition; a global cap alone lets one inner loop consume the budget.
 
 ## Common Combinations
 
-| Combination                             | Use Case                              |
-| --------------------------------------- | ------------------------------------- |
-| Routing + Orchestrator-Workers          | Multi-type tasks with dynamic subtasks|
-| Prompt Chaining + Evaluator-Optimizer   | Sequential with quality gates         |
-| Parallelization + Evaluator-Optimizer   | Parallel execution with voting        |
-| Connected Agents + IR Architecture      | Shared context with structured output |
+| Combination                           | Use Case                               |
+| ------------------------------------- | -------------------------------------- |
+| Routing + Orchestrator-Workers        | Multi-type tasks with dynamic subtasks |
+| Prompt Chaining + Evaluator-Optimizer | Sequential with quality gates          |
+| Parallelization + Evaluator-Optimizer | Parallel execution with voting         |
+| Connected Agents + IR Architecture    | Shared context with structured output  |
 
 ## Anti-Patterns
 
-❌ **Over-engineering:** Don't combine patterns unnecessarily
-
-```
-Simple translation task:
-  ❌ Routing → Orchestrator → Workers → Evaluator
-  ✅ Prompt Chaining (sufficient for linear task)
-```
-
-❌ **Pattern mismatch:** Don't force incompatible patterns
-
-```
-Independent tasks:
-  ❌ Prompt Chaining (forces serial execution)
-  ✅ Parallelization (allows concurrent execution)
-```
-
-## Decision Framework
-
-| Question                               | Yes → Pattern              | No → Alternative           |
-| -------------------------------------- | -------------------------- | -------------------------- |
-| Tasks must be sequential?              | Prompt Chaining            | Parallelization            |
-| Input needs classification?            | Routing                    | Direct processing          |
-| Task count unknown until runtime?      | Orchestrator-Workers       | Static worker assignment   |
-| Quality requires iteration?            | Evaluator-Optimizer        | Single-pass processing     |
-| Agents need shared context?            | Connected Agents           | Independent agents         |
-| Deterministic output required?         | IR Architecture            | Direct generation          |
+- Over-engineering: a linear translation task does not need Routing → Orchestrator → Workers → Evaluator; Prompt Chaining is enough.
+- Pattern mismatch: forcing independent tasks through Prompt Chaining serializes them for no reason; use Parallelization.

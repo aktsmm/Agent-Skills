@@ -53,6 +53,8 @@ cp references/cicd-templates/azure-pipelines.yml azure-pipelines.yml
 
 ## サービスプリンシパル作成
 
+> 同梱テンプレートは SP + シークレット（`AZURE_CREDENTIALS`）方式。Microsoft Learn ではこの方式を非推奨とし、OIDC（federated credential）を推奨している（[Use GitHub Actions to connect to Azure](https://learn.microsoft.com/azure/developer/github/connect-from-azure)）。新規構築では `azure/login@v2` を `client-id` / `tenant-id` / `subscription-id` 指定に、job に `permissions: id-token: write` を足して使う。
+
 ```bash
 # Contributor ロールでサービスプリンシパル作成
 az ad sp create-for-rbac \

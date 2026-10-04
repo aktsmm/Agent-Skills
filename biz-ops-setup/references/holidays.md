@@ -15,13 +15,15 @@ Daily reports are not generated on holidays.
 
 ## Japan Holidays (2026)
 
+These tables are year-specific. Before a new year, replace them from the official source (Japan: Cabinet Office national holiday list; US: OPM federal holidays) and verify each weekday.
+
 ```markdown
 # 日本の祝日 2026
 
 | 日付       | 祝日名       |
 | ---------- | ------------ |
 | 2026-01-01 | 元日         |
-| 2026-01-13 | 成人の日     |
+| 2026-01-12 | 成人の日     |
 | 2026-02-11 | 建国記念の日 |
 | 2026-02-23 | 天皇誕生日   |
 | 2026-03-20 | 春分の日     |
@@ -83,14 +85,7 @@ Daily reports are not generated on holidays.
 
 ### Data Collection Policy
 
-All activities, including those outside business hours, are recorded for the following reasons:
-
-- **Flexible remote work** - Activities may occur at non-traditional hours
-- **Time zone coordination** - International collaboration across time zones
-- **Emergency response** - On-call duties and urgent issues
-- **Self-development** - Technical blogging, OSS contributions, learning activities
-
-By recording all activities, work inventory and analysis can accurately reflect the true scope of work, including weekend deployments, after-hours support, and personal development efforts.
+Record all activities, including those outside business hours (remote work, time zones, on-call, self-development), so work inventory reflects the true scope of work.
 
 ### Important Distinction
 
@@ -118,13 +113,6 @@ Activities performed on weekends or holidays are **rolled into the next business
 | Sunday        | Blog post writing       | Monday's report    |
 | Holiday       | Customer email response | Next business day  |
 | Friday 23:00  | Late-night deployment   | Friday's report    |
-
-**Rationale:**
-
-- Avoid skipping weekend/holiday contributions
-- Maintain visibility of all work efforts
-- Provide complete context for the next business day
-- Ensure weekend deployments and on-call work are recognized
 
 **Implementation:**
 When generating a business day report, include activities from:

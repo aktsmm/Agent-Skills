@@ -16,17 +16,17 @@ Design and review reusable skills that trigger reliably and stay lean.
 
 Start by deciding whether the user really needs a skill.
 
-| Need                                                                        | Use              |
-| --------------------------------------------------------------------------- | ---------------- |
-| Reusable multi-step workflow with bundled scripts, references, or templates | **Skill**        |
-| Single focused slash task with parameterized input                          | **Prompt**       |
-| Always-on or file-scoped guidance                                           | **Instruction**  |
-| Persona, tool restrictions, delegation, or handoffs                         | **Custom Agent** |
-| Deterministic enforcement or lifecycle automation                           | **Hook**         |
+| Need                                                                                               | Use              |
+| -------------------------------------------------------------------------------------------------- | ---------------- |
+| Reusable multi-step workflow with bundled scripts, references, or templates                        | **Skill**        |
+| Single focused slash task with parameterized input (Local harness only; deprecated for Agent Host) | **Prompt**       |
+| Always-on or file-scoped guidance                                                                  | **Instruction**  |
+| Persona, tool restrictions, delegation, or handoffs                                                | **Custom Agent** |
+| Deterministic enforcement or lifecycle automation                                                  | **Hook**         |
 
 If the answer is not **Skill**, stop and create the right primitive instead.
 
-> 上表は「skill にすべきか」の即時ゲート。primitive 選択の詳細 SSOT は **agentic-workflow-guide** skill。
+> 上表は「skill にすべきか」の即時ゲート。
 
 → **[references/customization-primitives.md](references/customization-primitives.md)** for the full selection guide
 
@@ -68,21 +68,21 @@ required; Python helpers and packaging are conditional.
 - `quick_validate.py` compares `LICENSE.txt` **content exactly** against the rendered template and requires `metadata.author` to equal `authorAttribution.value` character for character. Never hand-edit `LICENSE.txt`; regenerate it with the tool and copy the result over.
 - **A passing gate proves consistency, not correctness.** The manifest hashes whatever the template rendered, so a broken template yields a broken notice that still validates. Read the rendered `LICENSE.txt` once after scaffolding.
 - Classification turns on whether the **source** is independently authored, not on the act of copying. Reusing your own material stays `self-authored`; `PROVENANCE.md` and `upstreamAttributions` are required only for `third-party` and `derivative`.
-- A Skill with no `skill-license.json` is treated as legacy and skips the content comparison, so repairing a shared template does not invalidate older Skills.
+- A Skill with no `skill-license.json` is treated as legacy and skips the content comparison, so repairing a shared template does not invalidate older Skills. Skills that do have a manifest fail with `profile snapshot disagrees` after a template change: re-render `LICENSE.txt` and the profile snapshot (self-authored) or refresh only the snapshot (derivative) with the toolchain.
 - When importing a Skill into another repository, regenerate `LICENSE.txt` and `skill-license.json` with **that** repository's toolchain. The manifest pins the template hash, so a copied pair fails validation there.
 - Before uploading to Microsoft 365 Agent Builder (Preview, Frontier-only), desk-check against the documented limits: 8 skills per agent, zip 50 MB, `SKILL.md` under 20,000 characters, directory depth 3, 350 files, scripts only `.py .js .mjs .cjs .ts .mts .sh .bash` (no `.ps1`) with no network or installs in the sandbox. `package_skill.py` nests files under `<skill_name>/` while the documented example has `SKILL.md` at the zip root; import of either layout is untested, so do not promise it. Source: learn.microsoft.com/microsoft-365/copilot/extensibility/declarative-agent-skills
 
 ## Core Principles
 
-| Principle                  | Description                                                          |
-| -------------------------- | -------------------------------------------------------------------- |
-| **Concise is Key**         | Context window is shared. Only add what Claude doesn't already know. |
-| **Discovery First**        | The description is the routing surface. Triggers must be explicit.   |
-| **Degrees of Freedom**     | Match specificity to task fragility (high/medium/low freedom)        |
-| **Progressive Disclosure** | Split into 3 levels: Metadata → Body → References                    |
-| **Integrate Before Add**   | Update, merge, or replace existing guidance before appending more.   |
-| **Right Primitive**        | A good skill is not a fallback for prompt/agent/instruction design.  |
-| **Scope Before File**      | Decide workspace vs profile before creating anything.                |
+| Principle                  | Description                                                                                                                                                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Concise is Key**         | Context window is shared. Only add what Claude doesn't already know.                                                                                                                                                                      |
+| **Discovery First**        | The description is the routing surface. Triggers must be explicit.                                                                                                                                                                        |
+| **Degrees of Freedom**     | Match specificity to task fragility (high/medium/low freedom)                                                                                                                                                                             |
+| **Progressive Disclosure** | Split into 3 levels: Metadata → Body → References                                                                                                                                                                                         |
+| **Integrate Before Add**   | Update, merge, or replace existing guidance before appending more.                                                                                                                                                                        |
+| **Right Primitive**        | A good skill is not a fallback for prompt/agent/instruction design.                                                                                                                                                                       |
+| **Scope Before File**      | Decide workspace vs profile before creating anything.                                                                                                                                                                                     |
 | **Self-Contained**         | The skill must carry its own knowledge. Bundle into references/scripts; do not just link to workspace files (instructions, memory, ledgers) that die when copied elsewhere. Abstract env-specific values (paths, names) into args/config. |
 
 > **Default assumption:** Claude is already very smart. Challenge each piece: "Does this justify its token cost?"
@@ -97,13 +97,7 @@ Keep routing and decisions in `SKILL.md`; put deterministic helpers in `scripts/
 
 Use [Creation Process](references/creation-process.md): choose primitive and scope, extract the reusable workflow, plan resources, implement, validate, and test real trigger prompts.
 
-## Clarify if Needed
-
-- What outcome should this skill produce?
-- Should it live in workspace scope or personal scope?
-- Is a short checklist enough, or does it need a full multi-step workflow?
-
-### Refactor Order
+## Refactor Order
 
 When improving an existing skill, use this order:
 
@@ -129,10 +123,6 @@ Detailed review criteria: [references/skill-review-checklist.md](references/skil
 1. Draft the skill and save it.
 2. Identify the weakest or most ambiguous parts.
 3. Tighten those parts, then summarize what the skill produces and example prompts to try.
-
-## Review Checklist
-
-Use [references/skill-review-checklist.md](references/skill-review-checklist.md). For bloat review, use [references/skill-bloat-review.md](references/skill-bloat-review.md).
 
 ## Key References
 

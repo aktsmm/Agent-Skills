@@ -35,12 +35,11 @@ metadata:
 ## WXT クイックスタート
 
 ```bash
-# 新規プロジェクト作成
-npm create wxt@latest
+# 新規プロジェクト作成（対話式）
+npx wxt@latest init
 
-# テンプレート指定
-npm create wxt@latest -- --template react-ts
-npm create wxt@latest -- --template vue-ts
+# テンプレート指定（vanilla / vue / react / svelte / solid、全て TypeScript）
+npx wxt@latest init my-extension -t react
 
 # 開発コマンド
 npm run dev    # HMR付き開発サーバー

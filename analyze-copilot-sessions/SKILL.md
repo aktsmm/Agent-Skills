@@ -40,7 +40,6 @@ Use [prune_chat_sessions.py](scripts/prune_chat_sessions.py) for workspace-scope
    - Identify the sessions, analysis focus, task kind, and workload unit.
    - Bind each target to an explicit session ID or path and verify at least two independent anchors, such as workspace, creation window, or first-request task marker. Treat the current chat, `--recent`, and log modification time as candidate discovery only.
    - For comparisons, also identify revision and workflow/rubric versions.
-   - Ask only for missing values that could change the result.
 2. **Choose input**
    - Raw debug log: use [extract_session_metrics.py](scripts/extract_session_metrics.py) to create aggregate JSON.
    - Existing metrics JSON: pass it directly to the analyzer.
@@ -78,11 +77,11 @@ python <skill-dir>/scripts/analyze_session_metrics.py `
   --json-only --strict-exit-codes
 
 python <skill-dir>/scripts/prune_chat_sessions.py `
-   --workspace <workspace-root> --older-than-hours 36
+  --workspace <workspace-root> --older-than-hours 36
 
 python <skill-dir>/scripts/prune_chat_sessions.py `
-   --workspace <workspace-root> --older-than-hours 36 `
-   --protect-session-id <active-session-id> --apply
+  --workspace <workspace-root> --older-than-hours 36 `
+  --protect-session-id <active-session-id> --apply
 ```
 
 Pass metrics JSON as positional inputs when no quality manifest is needed. Add `--weights '{"cost":1,"time":1,"quality":1}'` only when the user explicitly requests a weighted overall ranking.

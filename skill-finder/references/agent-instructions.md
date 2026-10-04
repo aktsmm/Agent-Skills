@@ -1,6 +1,6 @@
 # Agent Instructions
 
-> ⚠️ **CRITICAL**: AI agents MUST follow these instructions. Prefer action proposals over verbose explanations.
+Prefer action proposals over verbose explanations.
 
 ## Core Principle
 
@@ -40,18 +40,10 @@ When the user asks what to add, promote, or clean up in a skill collection:
 
 ## Skill Search Workflow
 
-0. **Classify the ask first**
-   - If the user wants always-on rules → suggest **instruction**
-   - If the user wants persona or tool boundaries → suggest **agent**
-   - If the user wants deterministic enforcement → suggest **hook**
-   - If the user wants a packaged reusable workflow → continue with skill search
+0. **Classify the ask first**: if a non-skill primitive fits better, say so before searching ([customization-routing.md](customization-routing.md)); otherwise continue.
 
-   → See [customization-routing.md](customization-routing.md)
-
-1. **Search ALL sources in local index**
-   - Read `references/skill-index.json`
-   - **ALWAYS search ALL sources**
-   - Check `lastUpdated` field
+1. **Search all sources in the local index**
+   - Read `references/skill-index.json` and check its `lastUpdated` field
 
 2. **🌟 Recommend from results (when 3+ hits)**
 
@@ -73,7 +65,7 @@ When the user asks what to add, promote, or clean up in a skill collection:
    → GitHub: https://github.com/search?q=path%3A**%2FSKILL.md+{query}&type=code
    ```
 
-4. **🚨 MANDATORY: Propose next actions**
+4. **Propose next actions**
 
    | Situation            | Proposal                                     |
    | -------------------- | -------------------------------------------- |
@@ -82,9 +74,9 @@ When the user asks what to add, promote, or clean up in a skill collection:
    | lastUpdated > 7 days | "⚠️ Index outdated. Update?"                 |
    | Better non-skill fit | "Use prompt/instruction/agent/hook instead?" |
 
-## 🚨 Mandatory Proposal Block
+## Proposal Block
 
-**ALWAYS include at the end of every search response:**
+End every search response with:
 
 ```
 **Next?**
@@ -98,7 +90,7 @@ When the user asks what to add, promote, or clean up in a skill collection:
 
 ## Search Summary Format
 
-**ALWAYS start with:**
+Start with:
 
 ```
 🔎 {N} リポジトリ、{M} スキルから検索しました（最終更新: {date}）
@@ -135,29 +127,7 @@ Dynamically generate from skill-index.json `sources` array.
 
 ## Agent Behavior Rules
 
-**Commands are for agents to execute, NOT to show users.**
-
-- ❌ NEVER show commands like `python scripts/search_skills.py --install`
-- ❌ NEVER say "以下のコマンドを実行..."
-- ✅ ALWAYS execute scripts silently when user approves
-- ✅ ALWAYS present options as numbered menu
-- ✅ ALWAYS report results after execution
-
-**Bad:**
-
-```
-📦 インストールする？
-python scripts/search_skills.py --install docx  ← NG!
-```
-
-**Good:**
-
-```
-📦 インストールする？（どのスキル？）
-```
-
-→ User: "docx お願い"
-→ Agent: (executes silently) → "✅ docx をインストールしました！"
+Commands are for the agent to execute after user approval, not to show the user. Present options as a numbered menu, run the script silently once approved, and report the result (e.g. User: "docx お願い" → "✅ docx をインストールしました！").
 
 ## Checklist Before Responding
 

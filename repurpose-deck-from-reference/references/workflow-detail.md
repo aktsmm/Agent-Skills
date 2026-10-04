@@ -14,7 +14,7 @@ Copy-Item -LiteralPath $src -Destination $dst -Force
 
 ## RESEARCH
 
-公式 docs / repo / changelog を `web_fetch` で複数取得し、対象機能と最新仕様を把握。
+公式 docs / repo / changelog を Web fetch ツール（Copilot CLI `web_fetch` / VS Code `web/fetch`）で複数取得し、対象機能と最新仕様を把握。
 
 - 製品公式 docs（概念・howto・getting-started）
 - 公式 GitHub repo の README
@@ -31,7 +31,7 @@ web_fetch https://github.com/github/app/blob/main/changelog.md
 
 ## PLAN
 
-SQL `todos` or `new_deck` テーブルに 1-N 枚分の `(slide_idx, title, source)` を入れる。
+SQL `todos` or `new_deck` テーブルに 1-N 枚分の `(slide_idx, title, source)` を入れる（SQL ツールがない host では Markdown 表で代替）。
 
 ```sql
 CREATE TABLE new_deck (idx INT PRIMARY KEY, title TEXT, source TEXT);
@@ -65,7 +65,7 @@ INSERT INTO new_deck VALUES
 
 ## QA
 
-`task` ツールで sub-agent (`general-purpose`) に全スライド PNG を見せて、issues を列挙させる。
+サブエージェント（Copilot CLI `task` の `general-purpose` / VS Code `agent/runSubagent`）に全スライド PNG を見せて、issues を列挙させる。
 
 ```text
 You are a strict visual designer. Inspect each slide image carefully.

@@ -94,12 +94,12 @@ Ad hoc の `_update_agenda.py` を毎回書くのはあり (1 回で捨てる想
 
 ### Recommended Flow
 
-1. `thumbnail.py` でレイアウトの見た目を確認する
+1. layout ごとのレンダー画像（thumbnail / PNG export）で見た目を確認する
 2. `markitdown` などで placeholder / 残存テキストを確認する
 3. content section ごとに slide layout を割り当てる
 4. slide の削除、複製、並び替えなどの構造変更を先に完了する
 5. その後で slide XML のテキストや画像を差し替える
-6. `clean.py` / pack / render QA の順に確認する
+6. 孤立 part の cleanup / 再 pack 後に render QA で確認する
 
 ### Layout Mapping Rules
 
@@ -113,7 +113,7 @@ Ad hoc の `_update_agenda.py` を毎回書くのはあり (1 回で捨てる想
 - slide の追加・削除・移動と text replacement を同じ pass で混ぜる
 - template の 4 枠に対して source が 3 件なのに 4 枠目の文字だけを消す
 - numbered steps や複数 section を 1 paragraph に詰め込む
-- `thumbnail.py` の overview だけで visual QA を完了扱いにする
+- thumbnail の overview だけで visual QA を完了扱いにする
 
 ### Rebuild Discipline
 
@@ -163,7 +163,7 @@ python-pptx で組んだ pptx は、フォント幅による改行位置 / shape
 Loop:
 
 1. `python build_deck.py` で pptx 出力
-2. pywin32 経由で `Presentation.Export("<out_dir>", "PNG")` を呼び、各 slide を PNG 化 (会議想定なら 1600x900 以上)
+2. pywin32 経由で各 slide を `Slide.Export(path, "PNG", 1600, 900)` で PNG 化 (会議想定なら 1600x900 以上。理由は下記 tips)
 3. AI (view_image tool) または人間で全枚数を目視。判定観点は下記
 4. 問題があれば build script を修正し 1 に戻る
 
@@ -265,24 +265,7 @@ Symptom: 生成した slide を PowerPoint で開くと、本文のテキスト�
 
 ## Hyperlink Batch Processing
 
-URL を含むランや appendix の参考 URL は、生成後に一括で linkify する。
-
-### Basic Pattern
-
-```python
-import re
-
-url_pattern = re.compile(r'(https?://[^\s\)）]+)')
-for slide in prs.slides:
-    for shape in slide.shapes:
-        if not shape.has_text_frame:
-            continue
-        for para in shape.text_frame.paragraphs:
-            for run in para.runs:
-                for url in url_pattern.findall(run.text):
-                    if not (run.hyperlink and run.hyperlink.address):
-                        run.hyperlink.address = url.rstrip('/')
-```
+URL を含むランや appendix の参考 URL は、生成後に一括で linkify する。手順・コード・件数検証は [content-guidelines.md](content-guidelines.md#batch-hyperlink--title-assignment) を正とする。
 
 ### When `run.hyperlink.address` Fails
 
@@ -310,7 +293,7 @@ python-pptx は section API や安全な layout swap を持たない。必要な
 
 ### COM Section Rebuild (Build End)
 
-スライド挿入順や hidden 化で位置が動く生成系は、静的 section 定義より **Build 末尾での動的再構築**が安定する。`SectionProperties.Delete()` で全削除後、`AddBeforeSlide($pos, $name)` を順番に呼ぶ。`$pos` はシェイプ名（例: 表紙群を判定する独自 `CoverPanel` のような名前付き shape）で動的検出し、固定値を避ける。
+スライド挿入順や hidden 化で位置が動く生成系は、静的 section 定義より **Build 末尾での動的再構築**が安定する。手順は [Section Headers](#section-headers-slide-sorter-groups) と同じで、`$pos` はシェイプ名（例: 表紙群を判定する独自 `CoverPanel` のような名前付き shape）で動的検出し、固定値を避ける。
 
 ### Slow Master Cleanup on OneDrive
 
@@ -480,7 +463,7 @@ OneDrive 上で生成済みスライドのシェイプを per-shape ループし
 
 - 推奨: フォント設定は **テンプレ側 (`SlideMaster.CustomLayouts` のプレースホルダ)** で 1 回適用し、生成スライド側の per-shape ループは行わない
 - どうしても per-shape 設定が必要なら、OneDrive 同期を一時停止してから実行
-- `AutoSize=2` (`ppAutoSizeTextToFitShape`) を本文 placeholder に設定すれば、フォント縮小は自動化される。per-shape のフォントサイズ走査ループは不要になることが多い
+- `TextFrame2.AutoSize = 2` (`msoAutoSizeTextToFitShape`) を本文 placeholder に設定すれば、フォント縮小は自動化される。per-shape のフォントサイズ走査ループは不要になることが多い
 
 ## Manual Bullet Normalization
 
@@ -562,7 +545,7 @@ PPTX の最終確認は XML や text extraction だけで終えない。必ず�
 
 - `TextRange.Text` の 1 shot 代入で `"対象：${value}"` のように先頭にラベルを含めて書く
 - ラベル文字列だけを `Characters($pos+1, $len)` で取り出して `Font.Bold = -1` + 色変更し、ラベルだけ強調する
-- 値が長い時は値だけ折り返し、ラベルは行頭から始まる。`AutoSize=2` と組み合わせると枠内に確実に収まる
+- 値が長い時は値だけ折り返し、ラベルは行頭から始まる。`TextFrame2.AutoSize = 2` と組み合わせると枠内に確実に収まる
 
 ## Status Badge Overlay
 

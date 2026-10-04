@@ -4,47 +4,15 @@
 
 > Back to [overview.md](overview.md)
 
-## Diagram
+Use only when quality criteria are explicit enough for an evaluator to return PASS/FAIL per item. Without criteria, the loop never converges.
 
-```mermaid
-graph TD
-    A[Input] --> B[Generator]
-    B --> C[Output v1]
-    C --> D[Evaluator]
-    D -->|Not Good| E[Feedback]
-    E --> B
-    D -->|Good| F[Final Output]
-```
+## VS Code Implementation
 
-## Characteristics
+- Make the evaluator a separate custom agent with read-only tools (`["read", "search"]`) so it cannot "fix" what it reviews.
+- Set a different `model` on the evaluator agent when self-review bias matters (same-model review tends to approve its own output).
+- Evaluator returns a structured verdict (`{item, pass, reason}`); the generator receives only failed items as feedback.
 
-| Aspect        | Description                                 |
-| ------------- | ------------------------------------------- |
-| **Structure** | Generator + evaluator + feedback loop       |
-| **Benefits**  | Improves until quality criteria are met     |
-| **Use Cases** | Translation, code review, text proofreading |
-
-## When to Use
-
-- Clear quality criteria exist
-- Iterative improvement increases quality
-- Want to mimic human feedback
-
-## Implementation Example
-
-```
-Generator: Generate translation
-    ↓
-Evaluator:
-  - Is the nuance accurate?
-  - Is the grammar correct?
-  - Does it reflect the original intent?
-    ↓
-  ├─ OK → Complete
-  └─ NG → Regenerate with feedback
-```
-
-## Real-World Example: Error-Fixer Agent
+## Example: Error-Fixer Agent
 
 A practical implementation combining Evaluator-Optimizer with Human-in-the-Loop:
 
@@ -75,7 +43,7 @@ flowchart TD
 | **No Repeat Fixes** | Track attempt history, try different approaches       |
 | **Escalation**      | After 3 failures, report to user with recommendations |
 
-### Stop Conditions (MANDATORY)
+### Stop Conditions (required)
 
 - ✅ All verification items PASS
 - ⛔ Max 3 retries reached → Escalate

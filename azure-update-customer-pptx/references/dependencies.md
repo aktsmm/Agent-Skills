@@ -1,20 +1,20 @@
-# Dependencies (related skills — do not duplicate)
+# Dependencies and scope
 
 This skill focuses on the **Azure Update customer-deck workflow** (classification, region stamps,
 UPDATE Points table, notes, validation gate, MCP sourcing). It deliberately does not re-document general
-PowerPoint mechanics. Reference these instead.
+PowerPoint mechanics.
 
-## powerpoint-automation skill
+## PowerPoint COM (generic behavior)
 
-General PPTX engineering. Use it for the underlying COM / python-pptx mechanics this workflow builds on:
+This skill's scripts already implement the COM / python-pptx operations the workflow needs. Generic
+behaviors they rely on:
 
-- COM Automation against an open PowerPoint (win32com), target-only close, restore
-- RefURL pattern (bottom-left "page title + URL" text boxes with shape-level hyperlinks)
-- Overflow review, autofit, text-frame handling
-- Translating / editing existing decks, screenshots, icons, video
+- COM Automation against an open PowerPoint (win32com): close only the target presentation, never other open decks
+- RefURL pattern: bottom-left "page title + URL" text boxes with shape-level hyperlinks
+- Overflow is checked by the validation gate; fix text length rather than relying on autofit
 
-This skill's scripts already implement the Azure-Update-specific COM operations; when you need to debug
-COM behavior, autofit, or hyperlink mechanics generally, defer to `powerpoint-automation`.
+Out of scope: general deck translation / editing, screenshots, icons, video, and debugging generic COM,
+autofit, or hyperlink mechanics outside this workflow.
 
 ## Python build engine
 
@@ -25,16 +25,13 @@ Python-engine customer distribution additionally uses pinned `pypdf` to extract 
 not a build dependency, but the distribution gate fails closed when it is unavailable.
 Pipeline and verifier wrappers require PowerShell 7 (`pwsh`); Windows PowerShell 5.1 is not supported.
 
-## agentic-workflow-guide skill
+## Orchestration pattern
 
-The SSOT for primitive selection (prompt vs instruction vs skill vs agent vs hook) and multi-agent
-design. This skill's pipeline uses the **Orchestrator-Workers** pattern (a coordinator that delegates
-to parallel workers and joins their outputs — see [agents-overview.md](agents-overview.md)). Use the
-guide when:
+This skill's pipeline uses the **Orchestrator-Workers** pattern (a coordinator that delegates
+to parallel workers and joins their outputs — see [agents-overview.md](agents-overview.md)).
 
-- deciding whether a new piece of this workflow should be an agent, a script, or a reference
-- reviewing or refactoring the 7-agent orchestration
-- judging whether the orchestration is over-engineered for a given run
+Out of scope: general workflow-design questions such as whether a new piece should be an agent, a
+script, or a reference, or whether the orchestration is over-engineered.
 
 ## Microsoft docs / Azure Updates MCP
 
@@ -58,6 +55,5 @@ Two MCP servers are used. Tool name prefixes vary by host (e.g. `mcp_releasecomm
 | Need                                                              | Where                    |
 | ----------------------------------------------------------------- | ------------------------ |
 | Azure Update classification / region stamp / UPDATE Points / gate | **this skill**           |
-| Generic COM / RefURL / overflow / translate                       | powerpoint-automation    |
-| Should this be an agent/script/reference?                         | agentic-workflow-guide   |
 | Region / status / body facts                                      | docs & Azure Updates MCP |
+| Generic deck editing / translation / workflow design              | out of scope             |

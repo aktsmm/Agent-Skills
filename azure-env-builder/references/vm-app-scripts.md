@@ -406,9 +406,7 @@ write_files:
 
 ```yaml
 # サンプル Docker Compose ファイル
-# /opt/app/docker-compose.yaml として配置
-
-version: "3.8"
+# /opt/app/docker-compose.yaml として配置（Compose v2 ではトップレベル version は不要）
 
 services:
   web:
@@ -418,7 +416,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - REDIS_URL=${REDIS_URL}
-      - APPINSIGHTS_INSTRUMENTATIONKEY=${APPINSIGHTS_KEY}
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=${APPINSIGHTS_CONNECTION_STRING}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
@@ -465,8 +463,9 @@ Install-WindowsFeature -Name Web-Server -IncludeManagementTools
 Install-WindowsFeature -Name Web-Asp-Net45
 Install-WindowsFeature -Name Web-WebSockets
 
-# ASP.NET Core Hosting Bundle ダウンロード
-$hostingBundleUrl = "https://download.visualstudio.microsoft.com/download/pr/hosting-bundle-$DotNetVersion-latest.exe"
+# ASP.NET Core Hosting Bundle ダウンロード（current 版の公式 permalink。特定版は dotnet.microsoft.com/download/dotnet から URL を取得）
+# IIS より後に入れる（先に入れた場合は再実行で repair が必要）
+$hostingBundleUrl = "https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer"
 $hostingBundlePath = "$env:TEMP\hosting-bundle.exe"
 
 Write-Host "Downloading ASP.NET Core Hosting Bundle..." -ForegroundColor Yellow

@@ -70,7 +70,7 @@ def label(draw, x, y, text, fill=(0xC9, 0xD1, 0xD9), size=12, bold=False):
 
 ### What to mask (always)
 
-- Personal project / repository name (`aktsmm/<repo>`)
+- Personal project / repository name (`<owner>/<repo>`)
 - Issue titles, issue numbers, PR titles
 - Conversation body (free-text content)
 - Sidebar session names (chat history shows topics)

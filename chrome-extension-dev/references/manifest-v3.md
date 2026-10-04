@@ -1,8 +1,12 @@
 # Manifest V3 ガイド
 
-Manifest V3（MV3）は2025年以降の必須標準。
+MV3 の前提と、実装で踏みやすい制約だけをまとめる。マニフェストの基本構成と WXT 設定は SKILL.md と [WXT 公式ドキュメント](https://wxt.dev) を参照。
 
----
+## MV2 の状況（2026-10 確認）
+
+- Chrome 138（2025-07）で全チャネルの MV2 拡張が無効化され、再有効化不可。Chrome 139 で企業ポリシー `ExtensionManifestV2Availability` も削除。
+- 2026-08-31 に残りの MV2 拡張は Chrome Web Store から削除済み。新規・更新は MV3 のみ。
+- 出典: [Manifest V2 support timeline](https://developer.chrome.com/docs/extensions/develop/migrate/mv2-deprecation-timeline)
 
 ## MV2 → MV3 主要変更点
 
@@ -14,151 +18,30 @@ Manifest V3（MV3）は2025年以降の必須標準。
 | コード実行             | `eval()` 許可              | **禁止**                  |
 | CSP                    | 柔軟                       | **厳格化**                |
 
----
+## Service Worker のライフサイクル
 
-## Service Worker 制限事項
+Chrome は次のいずれかで拡張 SW を終了する（[lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle)）。
 
-| 制限               | 内容                         | 対処法                           |
-| ------------------ | ---------------------------- | -------------------------------- |
-| 30秒タイムアウト   | イベント処理後30秒でスリープ | `chrome.alarms` でウェイクアップ |
-| DOMアクセス不可    | `document`/`window` 不可     | `chrome.offscreen` を使用        |
-| 永続化なし         | 変数はスリープ時にクリア     | `chrome.storage.session` を使用  |
-| eval()禁止         | 動的コード実行不可           | 事前にバンドル                   |
-| リモートコード禁止 | CDNからのスクリプト不可      | 全コードをバンドル               |
+- 30 秒間イベントも拡張 API 呼び出しもない（Chrome 110+ は API 呼び出しでもタイマーがリセットされる）
+- 1 つのイベント/API 呼び出しの処理が 5 分を超える
+- `fetch()` の応答到着に 30 秒以上かかる
 
-### 30秒タイムアウト対策
+| 制約                   | 対処                                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| グローバル変数が消える | `chrome.storage.session`（メモリ、10MB）か `storage.local` に保存。SW では `localStorage` 不可                         |
+| 定期処理               | `chrome.alarms`（Chrome 120+ は最小 30 秒）。SW を無期限に延命する keep-alive は避け、終了されても再開できる設計にする |
+| 長時間接続             | Chrome 116+ はアクティブな WebSocket の送受信でアイドルタイマーがリセットされる                                        |
+| DOM が必要             | `chrome.offscreen`（詳細は [chrome-api.md](chrome-api.md#chromeoffscreen)）                                            |
+| 動的コード             | `eval()` / リモートスクリプト不可。すべてバンドルする                                                                  |
 
-```typescript
-// chrome.alarms でウェイクアップ
-chrome.alarms.create("keepAlive", { periodInMinutes: 0.5 });
+- リスナーはトップレベルで同期的に登録する。`await` の後で登録すると SW 再起動時のイベントを取りこぼす。
+- 起動時に storage から読み込む値は Promise で保持し、各ハンドラで `await` してから使う。
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "keepAlive") {
-    // 定期的な処理
-  }
-});
-```
+## 権限
 
-### DOMアクセスが必要な場合
-
-```typescript
-// offscreen ドキュメントを使用
-await chrome.offscreen.createDocument({
-  url: "offscreen.html",
-  reasons: ["DOM_PARSER"],
-  justification: "HTML解析のため",
-});
-
-// offscreen.js 内でDOM操作
-const parser = new DOMParser();
-const doc = parser.parseFromString(html, "text/html");
-```
-
-### 状態の永続化
-
-```typescript
-// ❌ グローバル変数（スリープでクリア）
-let counter = 0;
-
-// ✅ storage.session を使用
-await chrome.storage.session.set({ counter: 0 });
-
-const { counter } = await chrome.storage.session.get("counter");
-await chrome.storage.session.set({ counter: counter + 1 });
-```
-
----
-
-## マニフェスト構成
-
-### 基本構成
-
-```json
-{
-  "manifest_version": 3,
-  "name": "Extension Name",
-  "version": "1.0.0",
-  "description": "説明文",
-  "icons": {
-    "16": "icons/16.png",
-    "48": "icons/48.png",
-    "128": "icons/128.png"
-  },
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/16.png",
-      "48": "icons/48.png"
-    }
-  },
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ],
-  "permissions": ["storage", "activeTab"],
-  "host_permissions": ["<all_urls>"]
-}
-```
-
-### WXT での設定
-
-```typescript
-// wxt.config.ts
-import { defineConfig } from "wxt";
-
-export default defineConfig({
-  manifest: {
-    name: "Extension Name",
-    permissions: ["storage", "activeTab", "scripting"],
-    host_permissions: ["<all_urls>"],
-  },
-});
-```
-
----
-
-## 権限のベストプラクティス
-
-### 最小権限の原則
-
-```json
-{
-  // ❌ 過剰な権限
-  "permissions": ["tabs", "history", "bookmarks"],
-  "host_permissions": ["<all_urls>"]
-}
-
-{
-  // ✅ 必要最小限
-  "permissions": ["activeTab"],
-  "host_permissions": ["*://*.example.com/*"]
-}
-```
-
-### オプショナル権限
-
-```json
-{
-  "optional_permissions": ["tabs", "history"],
-  "optional_host_permissions": ["*://*.newsite.com/*"]
-}
-```
-
-```typescript
-// 必要時にリクエスト
-const granted = await chrome.permissions.request({
-  permissions: ["tabs"],
-  origins: ["*://*.newsite.com/*"],
-});
-```
-
----
+- `host_permissions` と `permissions` は最小にし、ユーザー操作時だけでよい場合は `activeTab` を使う。
+- 後から必要になる権限は `optional_permissions` / `optional_host_permissions` に置き、`chrome.permissions.request()` をユーザー操作の中で呼ぶ。
+- 権限の追加はユーザーに再承認を求め、承認まで拡張が無効化されることがある。更新前に影響を確認する。
 
 ## MV3 移行時の一般的な問題
 
@@ -170,68 +53,12 @@ const granted = await chrome.permissions.request({
 | localStorage 使用不可                | SW で Web Storage API 不可  | `chrome.storage` に移行           |
 | `eval()` エラー                      | 動的コード実行禁止          | 事前コンパイル                    |
 
----
-
 ## declarativeNetRequest
 
-ネットワークリクエストのルールベース制御。
-
-### 権限
-
-```json
-{
-  "permissions": ["declarativeNetRequest"],
-  "host_permissions": ["<all_urls>"]
-}
-```
-
-### ルール定義
-
-```json
-// rules.json
-[
-  {
-    "id": 1,
-    "priority": 1,
-    "action": { "type": "block" },
-    "condition": {
-      "urlFilter": "*://ads.example.com/*",
-      "resourceTypes": ["script", "image"]
-    }
-  },
-  {
-    "id": 2,
-    "priority": 1,
-    "action": {
-      "type": "redirect",
-      "redirect": { "url": "https://example.com/blocked.html" }
-    },
-    "condition": {
-      "urlFilter": "*://blocked.com/*"
-    }
-  }
-]
-```
-
-### マニフェスト設定
-
-```json
-{
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "ruleset_1",
-        "enabled": true,
-        "path": "rules.json"
-      }
-    ]
-  }
-}
-```
-
----
+- 静的ルールは manifest の `declarative_net_request.rule_resources` で JSON ファイルを宣言し、`declarativeNetRequest` 権限を付ける。対象サイトへの host 権限が必要なアクション（redirect、header 変更）がある点に注意。
+- ルール構文と上限は公式 [declarativeNetRequest](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest) を参照。
 
 ## 外部リソース
 
 - [Migrate to Manifest V3](https://developer.chrome.com/docs/extensions/develop/migrate)
-- [Service Worker Lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers)
+- [Service Worker Lifecycle](https://developer.chrome.com/docs/extensions/develop/concepts/service-workers/lifecycle)

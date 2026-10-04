@@ -42,7 +42,7 @@ Use provided structure artifacts first, then inspect the smallest code/config ra
 
 ## Structure Map Build
 
-同等の成果物がない場合は、findings review に入る前に最小で read-only の structure map を作る。手順（8 steps）と minimum map contract (entry_points / files / symbols / imports / call_edges / complexity / sources / sinks / sanitizers / scan_limits) は [references/structure-map.md](references/structure-map.md)。生成ができない場合は Structure Map Summary に blocker と limits を記録する。
+同等の成果物がない場合は、findings review に入る前に最小で read-only の structure map を作る。手順（7 steps）と minimum map contract (entry_points / files / symbols / imports / call_edges / complexity / sources / sinks / sanitizers / scan_limits) は [references/structure-map.md](references/structure-map.md)。生成ができない場合は Structure Map Summary に blocker と limits を記録する。
 
 ## Review Flow
 

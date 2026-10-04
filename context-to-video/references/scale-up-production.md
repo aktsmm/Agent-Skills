@@ -53,21 +53,21 @@
 
 ## 設計原則
 
-| レイヤ | 役割 | 注意 |
-|---|---|---|
-| `episodes/` | 各話の成果物 + メタ | 1話 = 1ディレクトリ。次の話に影響させない |
-| `assets/` | 再利用部品 | チャンネル全体の一貫性 (マスコット顔・配色等) |
-| `scripts/` | 実行コード | 単一実装、`--project` 引数で各 episode を処理 |
-| `db/` | 状態管理 | SQLite で重複・進捗・公開状況 |
-| `secrets/` | 認証情報 | `.gitignore` 必須 |
-| `sources/` | 入力スナップショット | 週次の RSS/API 取得結果。後で再現可能に |
-| `notes/` | 人間向け企画 | 戦略・分析・進捗ログ |
+| レイヤ      | 役割                 | 注意                                          |
+| ----------- | -------------------- | --------------------------------------------- |
+| `episodes/` | 各話の成果物 + メタ  | 1話 = 1ディレクトリ。次の話に影響させない     |
+| `assets/`   | 再利用部品           | チャンネル全体の一貫性 (マスコット顔・配色等) |
+| `scripts/`  | 実行コード           | 単一実装、`--project` 引数で各 episode を処理 |
+| `db/`       | 状態管理             | SQLite で重複・進捗・公開状況                 |
+| `secrets/`  | 認証情報             | `.gitignore` 必須                             |
+| `sources/`  | 入力スナップショット | 週次の RSS/API 取得結果。後で再現可能に       |
+| `notes/`    | 人間向け企画         | 戦略・分析・進捗ログ                          |
 
 ## マイグレーション手順
 
 ```powershell
 # 1. 新ワークスペース作成
-$new = 'D:\projects\<channel>'
+$new = '<projects-root>\<channel>'
 @('episodes','assets\mascot','assets\templates','assets\bgm','scripts','sources','db','secrets','notes') |
   ForEach-Object { New-Item -ItemType Directory -Force -Path "$new\$_" | Out-Null }
 
@@ -116,7 +116,7 @@ out = args.project / "output"
 
 これで全 episode に同じスクリプトを使い回せる。
 
-## メタデータ JSON スキーマ (episodes/*/metadata.json)
+## メタデータ JSON スキーマ (episodes/\*/metadata.json)
 
 ```json
 {
@@ -161,20 +161,21 @@ CREATE TABLE topics_used (
 python scripts\orchestrate.py --from 2 --to 5 --upload
 ```
 
-中で各 episode に対して `build_video.py` → `add_avatar.py` → `ellipse_overlay.py` → (任意で) `upload_youtube.py` を順に呼ぶ。
+中で各 episode に対して `build_video.py` → `add_avatar.py` → `ellipse_overlay.py` → (任意で) `upload_youtube.py` を順に呼ぶ。`orchestrate.py` と `upload_youtube.py` は本スキル未同梱で、チャンネル側に自作する想定。
 
 ## 旧 PoC の扱い
 
 昇格後も PoC ワークスペースは**消さずアーカイブとして残置**:
+
 - 過去の検証ログ・ノートが価値情報
 - 比較リファレンスとして有用
 - README に「アーカイブ・新規制作は <new path>」と明記
 
 ## 落とし穴
 
-| 症状 | 原因 / 対処 |
-|---|---|
-| 「PoCのコードコピペで動かない」 | 絶対パスがハードコードされてる。`--project` 引数で抽象化 |
-| 「マスコットが話によって変わる」 | `assets/mascot/` から固定的に読まない。各 episode 直下に置いて編集してしまう |
-| 「同じトピックを2週連続で扱った」 | `db/topics_used` テーブルでチェックする習慣を入れる |
+| 症状                                    | 原因 / 対処                                                                         |
+| --------------------------------------- | ----------------------------------------------------------------------------------- |
+| 「PoCのコードコピペで動かない」         | 絶対パスがハードコードされてる。`--project` 引数で抽象化                            |
+| 「マスコットが話によって変わる」        | `assets/mascot/` から固定的に読まない。各 episode 直下に置いて編集してしまう        |
+| 「同じトピックを2週連続で扱った」       | `db/topics_used` テーブルでチェックする習慣を入れる                                 |
 | 「secrets を git に push してしまった」 | `.gitignore` 設定済みでも `git rm --cached` で履歴清掃。token は速やかに失効/再発行 |

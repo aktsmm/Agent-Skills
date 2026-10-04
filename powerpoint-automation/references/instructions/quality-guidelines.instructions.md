@@ -175,17 +175,17 @@ with zipfile.ZipFile('output.pptx') as z:
         # If Jpan contains 游ゴシック → fix required
 ```
 
-    ---
+---
 
-    ## PowerPoint UI Sections (★★ Critical)
+## PowerPoint UI Sections (★★ Critical)
 
-    **Note**: PowerPointの「セクション」（左ペインで折りたためる区切り）は、`type: "section"` スライドとは別物。
+**Note**: PowerPointの「セクション」（左ペインで折りたためる区切り）は、`type: "section"` スライドとは別物。COM で付与できるなら [IMPLEMENTATION_PATTERNS.md](../IMPLEMENTATION_PATTERNS.md#section-headers-slide-sorter-groups) を優先する。XML で扱う場合:
 
-    - 直接XML編集は壊れやすい（例: lxml再シリアライズで `xmlns=""` 混入→PowerPointが無視）
-    - `ppt/presentation.xml` の `<p:extLst>` 内 `p14:sectionLst` が実体
-    - **URIが複数あり得る**ため、ファイル内でPowerPointが作っているURIに合わせる（観測例: `{521415D9-36F7-43E2-AB2F-B90AF26B5E84}`）
-    - 既存の `p14:sectionLst` を全削除→1つだけ注入、で整合性を保つ
-    - 反映確認は「PowerPointで開いて左ペインにセクション名が出るか」
+- 直接XML編集は壊れやすい（例: lxml再シリアライズで `xmlns=""` 混入→PowerPointが無視）
+- `ppt/presentation.xml` の `<p:extLst>` 内 `p14:sectionLst` が実体
+- **URIが複数あり得る**ため、ファイル内でPowerPointが作っているURIに合わせる（観測例: `{521415D9-36F7-43E2-AB2F-B90AF26B5E84}`）
+- 既存の `p14:sectionLst` を全削除→1つだけ注入、で整合性を保つ
+- 反映確認は「PowerPointで開いて左ペインにセクション名が出るか」
 
 ---
 
@@ -348,23 +348,13 @@ for slide in prs.slides:
                 break
 ```
 
+> ⚠️ Direct `rel._target` swaps can leave duplicate parts in the ZIP. For decks that will be edited further, prefer the add → move → hide → cleanup flow in [IMPLEMENTATION_PATTERNS.md](../IMPLEMENTATION_PATTERNS.md#safe-layout-change).
+
 ### Empty Placeholder Cleanup (★ Important)
 
 **Problem**: Even after changing layouts, empty placeholders inherited from the original layout remain in the slide XML and display ghost text from the layout definition.
 
-**Fix — Remove empty placeholders**:
-
-```python
-for slide in prs.slides:
-    to_remove = []
-    for shape in slide.shapes:
-        if shape.is_placeholder:
-            txt = ''.join(r.text for p in shape.text_frame.paragraphs for r in p.runs).strip()
-            if not txt:
-                to_remove.append(shape)
-    for shape in to_remove:
-        shape._element.getparent().remove(shape._element)
-```
+**Fix**: Use the `strip_empty_placeholders` pattern in [common.instructions.md](common.instructions.md#strip_empty_placeholders-keep_idx-should-still-drop-when-empty) (placeholders only; never master/layout decorations).
 
 > ⚠️ Always run this AFTER layout change, as placeholder inheritance depends on the layout.
 

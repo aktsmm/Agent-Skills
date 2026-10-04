@@ -77,34 +77,13 @@ Advisor 取得も、コスト取得と同様に **subscription 可視性と取�
 
 ### Step 3.1: Advisor preflight
 
-```powershell
-az account list --all --query "[?id=='{subscriptionId}'].{name:name,id:id,tenantId:tenantId,state:state}" -o json
-az account set --subscription {subscriptionId}
-az account show --query "{name:name,id:id,tenantId:tenantId}" -o json
-```
-
-- 空配列なら tenant を見直す
-- `az account set --subscription {subscriptionId}` が失敗しても、対象 tenant の ARM token が取れる場合は REST 経路で続行できる
-- CLI 経路で取得する場合は、取得前に subscription context がズレていないことを毎回確認する
+Step 2.5.1 と同じ可視性チェックを使う。CLI 経路で取得する場合は、取得前に `az account show` で subscription context がズレていないことを毎回確認する。
 
 ### Step 3.2: CLI と REST の役割分担
 
-- `az advisor recommendation list` は手軽だが、CLI help 上の `--category` は `Cost`, `HighAvailability`, `Performance`, `Security` しか出ない
-- 一方、REST の recommendation list は `OperationalExcellence` を正式サポートする
-- **4 カテゴリ完全取得が必要なこの skill では、REST を正本の取得経路とする**
-
-> 実績ベースの知見: CLI help に `OperationalExcellence` が出ないため、CLI だけに依存すると OpEx を取り漏らすリスクがある。
-
-各カテゴリごとに取得:
-
-```powershell
-az advisor recommendation list --category Cost -o json > advisor-cost.json
-az advisor recommendation list --category Security -o json > advisor-security.json
-az advisor recommendation list --category HighAvailability -o json > advisor-reliability.json
-az advisor recommendation list --category OperationalExcellence -o json > advisor-opex.json
-```
-
-> ただし `OperationalExcellence` は CLI help と不整合があるため、実運用では下記 REST helper を優先する。
+- `az advisor recommendation list --category` の accepted values は `Cost`, `HighAvailability`, `Performance`, `Security` のみ（[CLI リファレンス](https://learn.microsoft.com/cli/azure/advisor/recommendation?view=azure-cli-latest)、2026-10-04 確認）
+- REST の recommendation list は `OperationalExcellence` を正式サポートする
+- **4 カテゴリ完全取得が必要なこの skill では、REST を正本の取得経路とする**（CLI だけでは OpEx を取り漏らす）
 
 ### Step 3.3: 推奨取得（推奨: REST helper）
 
@@ -216,10 +195,10 @@ $bodyFile = Join-Path $env:TEMP "cost-query.json"
 
 az rest --method post `
     --url "https://management.azure.com/subscriptions/$subId/providers/Microsoft.CostManagement/query?api-version=2025-03-01" `
-    --body "@$bodyFile" --headers "Content-Type=application/json" -o json > cost-monthly.json
+    --body "@$bodyFile" --headers "Content-Type=application/json" -o json > "cost-{YYYY-MM}.json"
 ```
 
-> 通貨は日本リージョンの場合 **JPY** で返る。
+> 通貨はリージョンではなく請求通貨（日本の契約なら通常 **JPY**）。`Currency` 列で確認する。
 > 既存環境で `2025-03-01` が通らない場合は `2023-11-01` または `2023-03-01` を試す。
 
 ### Step 4.2: 上位リソース分析（ResourceId + 種類の併記）
@@ -399,17 +378,15 @@ py -3 .\scripts\get-legacy-usage-summary.py {subscriptionId} {YYYY-MM-01} {YYYY-
 
 ### 月別合計の集計
 
+Step 4.1 の月ごとファイル（`granularity=None` + ServiceName）を合算する。列位置は `properties.columns` から引く。
+
 ```powershell
-$raw = Get-Content "cost-monthly.json" -Raw | ConvertFrom-Json
-$monthly = @{}
-foreach ($row in $raw.properties.rows) {
-    $month = ($row[1] -split ' ')[0]
-    $cost = [double]$row[0]
-    if ($monthly.ContainsKey($month)) { $monthly[$month] += $cost }
-    else { $monthly[$month] = $cost }
-}
-$monthly.GetEnumerator() | Sort-Object Name | ForEach-Object {
-    Write-Host ("{0}: {1:N0}" -f $_.Name, $_.Value)
+Get-ChildItem cost-????-??.json | Sort-Object Name | ForEach-Object {
+    $raw = Get-Content $_.FullName -Raw | ConvertFrom-Json
+    $names = [string[]]@($raw.properties.columns.name)
+    $i = [array]::FindIndex($names, [Predicate[string]]{ param($n) $n -in 'PreTaxCost', 'Cost', 'totalCost' })
+    $sum = ($raw.properties.rows | ForEach-Object { [double]$_[$i] } | Measure-Object -Sum).Sum
+    Write-Host ("{0}: {1:N0}" -f $_.BaseName.Substring(5), $sum)
 }
 ```
 

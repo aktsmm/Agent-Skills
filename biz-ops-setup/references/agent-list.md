@@ -17,16 +17,19 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 
 ### Agent Templates
 
-| Template File                               | Deploy To                                  | Role                              |
-| ------------------------------------------- | ------------------------------------------ | --------------------------------- |
-| `agents/orchestrator.agent.template.md`     | `.github/agents/orchestrator.agent.md`     | Coordination, task routing        |
-| `agents/report-generator.agent.template.md` | `.github/agents/report-generator.agent.md` | Daily/weekly/monthly reports      |
-| `agents/report-reviewer.agent.template.md`  | `.github/agents/report-reviewer.agent.md`  | IMPACT framework review           |
-| `agents/task-manager.agent.template.md`     | `.github/agents/task-manager.agent.md`     | Task CRUD, progress tracking      |
-| `agents/data-collector.agent.template.md`   | `.github/agents/data-collector.agent.md`   | Data collection, customer routing |
-| `agents/work-inventory.agent.template.md`   | `.github/agents/work-inventory.agent.md`   | Work analysis, manager PR         |
-| `agents/1on1-assistant.agent.template.md`   | `.github/agents/1on1-assistant.agent.md`   | 1on1 prep, action item extraction |
-| `agents/general-worker.agent.template.md`   | `.github/agents/general-worker.agent.md`   | Fallback for unclassified tasks   |
+| Template File                                  | Deploy To                                     | Role                              |
+| ---------------------------------------------- | --------------------------------------------- | --------------------------------- |
+| `agents/orchestrator.agent.template.md`        | `.github/agents/orchestrator.agent.md`        | Coordination, task routing        |
+| `agents/report-generator.agent.template.md`    | `.github/agents/report-generator.agent.md`    | Daily/weekly/monthly reports      |
+| `agents/report-reviewer.agent.template.md`     | `.github/agents/report-reviewer.agent.md`     | IMPACT framework review           |
+| `agents/task-manager.agent.template.md`        | `.github/agents/task-manager.agent.md`        | Task CRUD, progress tracking      |
+| `agents/data-collector.agent.template.md`      | `.github/agents/data-collector.agent.md`      | Data collection, customer routing |
+| `agents/work-inventory.agent.template.md`      | `.github/agents/work-inventory.agent.md`      | Work analysis, manager PR         |
+| `agents/1on1-assistant.agent.template.md`      | `.github/agents/1on1-assistant.agent.md`      | 1on1 prep, action item extraction |
+| `agents/general-worker.agent.template.md`      | `.github/agents/general-worker.agent.md`      | Fallback for unclassified tasks   |
+| `agents/availability-finder.agent.template.md` | `.github/agents/availability-finder.agent.md` | Calendar free-slot search         |
+
+`Deploy-BizOpsTemplates.ps1` deploys every `agents/*.template.md`, so the table and the folder must stay in sync.
 
 ### Prompt Templates
 
@@ -35,6 +38,9 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 | `prompts/daily-report.prompt.template.md`   | `.github/prompts/daily-report.prompt.md`   | Daily report format   |
 | `prompts/weekly-report.prompt.template.md`  | `.github/prompts/weekly-report.prompt.md`  | Weekly report format  |
 | `prompts/monthly-report.prompt.template.md` | `.github/prompts/monthly-report.prompt.md` | Monthly report format |
+| `prompts/review-report.prompt.template.md`  | `.github/prompts/review-report.prompt.md`  | IMPACT report review  |
+
+> Prompt files load only in the VS Code Local agent; Agent Host sessions do not load them. Keep the report agents usable directly (`@report-generator`, `@report-reviewer`) instead of relying on the prompts as the only entry point.
 
 ### Configuration Templates
 
@@ -45,20 +51,6 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 | `copilot-instructions.template.md`     | `.github/copilot-instructions.md` | Workspace rules        |
 | `AGENTS.template.md`                   | `AGENTS.md`                       | Workspace description  |
 | `DASHBOARD.template.md`                | `DASHBOARD.md`                    | Daily hub              |
-
-## Agent Details
-
-| Agent                   | Role                                                           |
-| ----------------------- | -------------------------------------------------------------- |
-| **orchestrator**        | Coordination, task routing, pre-flight report check            |
-| **report-generator**    | Automated generation of daily/weekly/monthly reports           |
-| **report-reviewer**     | Results-oriented review (IMPACT framework)                     |
-| **task-manager**        | Task creation, updates, classification, progress management    |
-| **data-collector**      | Data collection, normalization, customer/internal auto-routing |
-| **work-inventory**      | Work inventory, analysis, manager PR material creation         |
-| **1on1-assistant**      | 1on1 meeting prep, activity summary, action item extraction    |
-| **general-worker**      | Fallback handler for unclassified tasks, pattern detection     |
-| **availability-finder** | Calendar analysis, free slot extraction, scheduling messages   |
 
 ## IMPACT Framework (Review Criteria)
 
@@ -73,21 +65,7 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 
 ## workIQ Data Sources (Optional)
 
-> Note: workIQ is optional. System works without it using workspace data.
-
-Data retrieved from workIQ for report generation and task updates:
-
-| Data Source             | Priority | Purpose                  |
-| ----------------------- | -------- | ------------------------ |
-| 📅 Meetings & Calendar  | ⭐⭐⭐   | Attended meetings        |
-| ✉️ Sent Emails          | ⭐⭐⭐   | Emails sent by you       |
-| 📥 Received Emails (To) | ⭐⭐     | Emails addressed to you  |
-| 💬 Teams Mentions       | ⭐⭐⭐   | Mentions directed to you |
-| 💬 Teams Posts          | ⭐⭐     | Messages posted by you   |
-| 📄 Edited Files         | ⭐⭐     | Word/Excel/PDF           |
-| 📊 PowerPoint Updates   | ⭐⭐     | PPTX edit history        |
-| 📝 OneNote              | ⭐       | Note updates             |
-| 💬 Teams Meeting Notes  | ⭐⭐     | AI meeting minutes       |
+workIQ is optional; the system works from workspace data without it. The source list, priorities, and fallback methods are in [external-datasources.md](external-datasources.md).
 
 ## Automatic Routing Rules
 

@@ -60,20 +60,22 @@ To embed images in slides, use the `image` field.
 
 ### Image Options
 
-| Property         | Description                          | Example                           |
-| ---------------- | ------------------------------------ | --------------------------------- |
-| `path`           | Local image path (relative/absolute) | `"images/diagram.png"`            |
-| `url`            | Image URL (auto-downloaded)          | `"https://example.com/image.png"` |
-| `position`       | Image placement                      | `"right"` / `"bottom"` / `"full"` |
-| `width_percent`  | Width (% of slide width)             | `45`                              |
-| `height_percent` | Height (for position=bottom)         | `50`                              |
+| Property         | Description                          | Example                                         |
+| ---------------- | ------------------------------------ | ----------------------------------------------- |
+| `path`           | Local image path (relative/absolute) | `"images/diagram.png"`                          |
+| `url`            | Image URL (auto-downloaded)          | `"https://example.com/image.png"`               |
+| `position`       | Image placement                      | `right` / `left` / `bottom` / `center` / `full` |
+| `width_percent`  | Width (% of slide width)             | `45`                                            |
+| `height_percent` | Height (for position=bottom)         | `50`                                            |
 
 ### Position Behavior
 
 | position | Behavior                            |
 | -------- | ----------------------------------- |
 | `right`  | Image on right, text on left        |
+| `left`   | Image on left, text on right        |
 | `bottom` | Image at bottom, text at top        |
+| `center` | Centered image                      |
 | `full`   | Image covers entire slide (no text) |
 
 ---
@@ -91,35 +93,9 @@ To embed images in slides, use the `image` field.
 
 ## Web Image Extraction Workflow
 
-When generating PPTX from blog articles or technical docs, extract and place images automatically.
+When generating PPTX from blog articles or technical docs, extract images first. URL extraction and download commands: [tools-reference.instructions.md](tools-reference.instructions.md#image-extraction-rules-web-source).
 
-### 1. Extract Image URLs
-
-```powershell
-$base = "20251212_example_blog"
-$url = "https://example.com/blog-post"
-
-# Extract image URLs
-$html = Invoke-WebRequest -Uri $url -UseBasicParsing
-$html.Images | Select-Object -ExpandProperty src | Where-Object { $_ -match "image" }
-```
-
-### 2. Download Images
-
-```powershell
-New-Item -ItemType Directory -Path "images/${base}" -Force
-
-$images = @(
-    @{url="https://example.com/image1.png"; name="01_architecture.png"},
-    @{url="https://example.com/image2.png"; name="02_workflow.png"}
-)
-foreach ($img in $images) {
-    $outPath = "images/${base}/$($img.name)"
-    Invoke-WebRequest -Uri $img.url -OutFile $outPath -UseBasicParsing
-}
-```
-
-### 3. Place in content.json
+### Place in content.json
 
 ```json
 {
@@ -187,4 +163,3 @@ Use `type: "two_column"` for comparisons:
 
 - Basic flow: [template.instructions.md](template.instructions.md)
 - Schema: `schemas/content.schema.json`
-- Example: `schemas/content.example.json`

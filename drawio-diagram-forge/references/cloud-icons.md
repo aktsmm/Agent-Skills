@@ -34,20 +34,20 @@ Azure/AWS アイコンを使うには、**事前にシェイプライブラリ�
 3. **「図形」ダイアログ**が開く
 4. 「ネットワーク」カテゴリで以下にチェック：
    - ✅ **Azure** - Azure アイコン
-   - ✅ **AWS17** / **AWS18** / **AWS 2026** - AWS アイコン（用途に応じて）
+   - ✅ **AWS17** / **AWS18** / **AWS &lt;年&gt;**（最新版、年は draw.io の実行年） - AWS アイコン（用途に応じて）
    - ✅ **AWS 3D** - 3D 表現が必要な場合
 5. **「設定を保存」** にチェック（次回以降も有効）
 6. **「適用」** をクリック
 
 ### 推奨設定
 
-| ライブラリ | 用途                     | 推奨    |
-| ---------- | ------------------------ | ------- |
-| Azure      | Azure サービスアイコン   | ✅ 必須 |
-| AWS 2026   | 最新 AWS アイコン        | ✅ 推奨 |
-| AWS18      | AWS アイコン（安定版）   | ⚪ 任意 |
-| AWS17      | AWS アイコン（レガシー） | ⚪ 任意 |
-| AWS 3D     | 3D アイコン              | ⚪ 任意 |
+| ライブラリ     | 用途                     | 推奨    |
+| -------------- | ------------------------ | ------- |
+| Azure          | Azure サービスアイコン   | ✅ 必須 |
+| AWS &lt;年&gt; | 最新 AWS アイコン        | ✅ 推奨 |
+| AWS18          | AWS アイコン（安定版）   | ⚪ 任意 |
+| AWS17          | AWS アイコン（レガシー） | ⚪ 任意 |
+| AWS 3D         | 3D アイコン              | ⚪ 任意 |
 
 > **Note**: 設定は `.drawio` ファイルごとではなく、VS Code 全体で保存される。一度設定すれば他のファイルでも有効。
 
@@ -62,7 +62,7 @@ Azure/AWS アイコンを使うには、**事前にシェイプライブラリ�
 | VM Scale Sets          | `img/lib/azure2/compute/VM_Scale_Sets.svg`                             | compute               |
 | App Service            | `img/lib/azure2/compute/App_Services.svg`                              | compute               |
 | Function Apps          | `img/lib/azure2/compute/Function_Apps.svg`                             | compute               |
-| AKS                    | `img/lib/azure2/compute/Azure_Kubernetes_Service.svg`                  | compute               |
+| AKS                    | `img/lib/azure2/compute/Kubernetes_Services.svg`                       | compute               |
 | Container Instances    | `img/lib/azure2/compute/Container_Instances.svg`                       | compute               |
 | Disks                  | `img/lib/azure2/compute/Disks.svg`                                     | compute               |
 | Batch Accounts         | `img/lib/azure2/compute/Batch_Accounts.svg`                            | compute               |
@@ -118,6 +118,7 @@ Azure/AWS アイコンを使うには、**事前にシェイプライブラリ�
 | API Management         | `img/lib/azure2/integration/API_Management_Services.svg`               | integration           |
 | Logic Apps             | `img/lib/azure2/integration/Logic_Apps.svg`                            | integration           |
 | Service Bus            | `img/lib/azure2/integration/Service_Bus.svg`                           | integration           |
+| App Configuration      | `img/lib/azure2/integration/App_Configuration.svg`                     | integration           |
 | **Analytics**          |                                                                        |                       |
 | Event Hubs             | `img/lib/azure2/analytics/Event_Hubs.svg`                              | analytics             |
 | Databricks             | `img/lib/azure2/analytics/Azure_Databricks.svg`                        | analytics             |
@@ -129,7 +130,7 @@ Azure/AWS アイコンを使うには、**事前にシェイプライブラリ�
 | Cognitive Services     | `img/lib/azure2/ai_machine_learning/Cognitive_Services.svg`            | ai_machine_learning   |
 | Machine Learning       | `img/lib/azure2/ai_machine_learning/Machine_Learning.svg`              | ai_machine_learning   |
 | Bot Services           | `img/lib/azure2/ai_machine_learning/Bot_Services.svg`                  | ai_machine_learning   |
-| AI Studio              | `img/lib/azure2/ai_machine_learning/AI_Studio.svg`                     | ai_machine_learning   |
+| Foundry (旧 AI Studio) | `img/lib/azure2/ai_machine_learning/AI_Foundry.svg`                    | ai_machine_learning   |
 | Speech Services        | `img/lib/azure2/ai_machine_learning/Speech_Services.svg`               | ai_machine_learning   |
 | Computer Vision        | `img/lib/azure2/ai_machine_learning/Computer_Vision.svg`               | ai_machine_learning   |
 | Form Recognizer        | `img/lib/azure2/ai_machine_learning/Form_Recognizers.svg`              | ai_machine_learning   |
@@ -168,7 +169,7 @@ img/lib/azure2/
 ├── ai_machine_learning/    # Azure ML, Cognitive Services
 ├── analytics/              # Synapse, Event Hubs
 ├── compute/                # VM, App Service, Functions, AKS
-├── containers/             # Container Instances
+├── containers/             # Container Registry, OpenShift, Kubernetes_Services
 ├── databases/              # SQL, Cosmos DB, Redis
 ├── devops/                 # Azure DevOps
 ├── identity/               # Azure AD / Entra ID
@@ -183,12 +184,13 @@ img/lib/azure2/
 
 ### ⚠️ Common Mistakes (Verified against GitHub)
 
-| サービス      | ❌ 間違いやすいパス       | ✅ 正しいパス                       |
-| ------------- | ------------------------- | ----------------------------------- |
-| VPN Gateway   | `VPN_Gateway.svg`         | `Virtual_Network_Gateways.svg`      |
-| Azure Monitor | `Azure_Monitor.svg`       | `Monitor.svg`                       |
-| App Gateway   | `Application_Gateway.svg` | `Application_Gateways.svg` (複数形) |
-| Backup        | `Backup.svg`              | `Recovery_Services_Vaults.svg`      |
+| サービス      | ❌ 間違いやすいパス                    | ✅ 正しいパス                       |
+| ------------- | -------------------------------------- | ----------------------------------- |
+| VPN Gateway   | `VPN_Gateway.svg`                      | `Virtual_Network_Gateways.svg`      |
+| AKS           | `compute/Azure_Kubernetes_Service.svg` | `compute/Kubernetes_Services.svg`   |
+| Azure Monitor | `Azure_Monitor.svg`                    | `Monitor.svg`                       |
+| App Gateway   | `Application_Gateway.svg`              | `Application_Gateways.svg` (複数形) |
+| Backup        | `Backup.svg`                           | `Recovery_Services_Vaults.svg`      |
 
 ### 🚫 Non-Existent Icons & Alternatives
 
@@ -202,8 +204,7 @@ img/lib/azure2/
 | **Private DNS Zones**       | `networking/Private_DNS_Zones.svg`             | `networking/DNS_Zones.svg`                                                     |
 | **GitHub / GitHub Actions** | `other/GitHub.svg` `devops/GitHub_Actions.svg` | 濃灰の角丸ボックス + テキスト（ライブラリに存在しない）                        |
 | **Internet**                | `networking/Internet.svg`                      | `shape=cloud` (汎用雲形状)                                                     |
-| **App Configuration**       | `integration/App_Configuration.svg`            | テキストのみ or `management_governance/Automation_Accounts.svg`                |
-| **Static Web Apps**         | `web/Static_Web_Apps.svg`                      | `app_services/Static_Apps.svg` (要確認)                                        |
+| **Static Web Apps**         | `web/Static_Web_Apps.svg`                      | `preview/Static_Apps.svg`                                                      |
 
 ### 🔍 `other/` カテゴリに注目
 
@@ -343,7 +344,7 @@ AWS 図を Azure 化する際のサービス対応表：
 | RDS              | Azure SQL / Cosmos DB  | `img/lib/azure2/databases/SQL_Database.svg`              |
 | S3               | Storage Account (Blob) | `img/lib/azure2/storage/Storage_Accounts.svg`            |
 | Lambda           | Function Apps          | `img/lib/azure2/compute/Function_Apps.svg`               |
-| EKS              | AKS                    | `img/lib/azure2/compute/Azure_Kubernetes_Service.svg`    |
+| EKS              | AKS                    | `img/lib/azure2/compute/Kubernetes_Services.svg`         |
 | ALB/NLB          | Load Balancer          | `img/lib/azure2/networking/Load_Balancers.svg`           |
 | CloudFront       | Front Door / CDN       | `img/lib/azure2/networking/Front_Doors.svg`              |
 | Route 53         | Azure DNS              | `img/lib/azure2/networking/DNS_Zones.svg`                |
@@ -367,10 +368,7 @@ AWS 図を Azure 化する際のサービス対応表：
 
 ### Conversion Commands
 
-```bash
-# sed での一括置換例（旧形式 → 新形式は手動対応推奨）
-sed -i 's/mxgraph\.azure3\./mxgraph.azure./g' diagram.drawio
-```
+旧形式 `mxgraph.azure.*` / `mxgraph.azure3.*` と `img/lib/azure2/` は 1:1 対応しないため sed で一括置換しない。上の表でサービスごとに置換する。
 
 ```python
 # ID重複チェック（編集時に発生しやすい）

@@ -41,16 +41,6 @@ Each section should have:
 
 ## Data Presentation
 
-### Charts and Graphs
-
-| Data Type        | Recommended Chart          |
-| ---------------- | -------------------------- |
-| Trends over time | Line chart                 |
-| Comparisons      | Bar chart                  |
-| Proportions      | Pie chart (max 5 segments) |
-| Correlations     | Scatter plot               |
-| Progress         | Progress bar / gauge       |
-
 ### Tables
 
 - Max 5 columns, 7 rows per slide
@@ -61,26 +51,8 @@ Each section should have:
 
 ## Tone Guidelines
 
-### Formal Reports
-
-- Professional language
-- Third person preferred
-- Data-driven statements
-- Clear recommendations
-
-### Progress Reports
-
-- Status indicators (✅ 🟡 ❌)
-- Metrics with targets
-- Blockers highlighted
-- Action items clear
-
-### Proposals
-
-- Problem → Solution structure
-- Benefits quantified
-- Risks addressed
-- Clear ask/CTA
+- Progress reports: status indicators via template icons or colored shapes (no emoji on slides; see [common.instructions.md](common.instructions.md#emoji-usage--important)), metrics with targets, blockers highlighted
+- Proposals: problem → solution, quantified benefits, risks addressed, clear ask/CTA
 
 ---
 
@@ -92,17 +64,6 @@ For reports and proposals:
 2. **Data sources**: Where numbers come from
 3. **Anticipated questions**: Pre-prepared answers
 4. **Discussion points**: What to emphasize
-
----
-
-## Visual Guidelines
-
-| Element      | Guideline                    |
-| ------------ | ---------------------------- |
-| Company logo | Title and closing only       |
-| Charts       | Consistent colors throughout |
-| Icons        | Simple, professional         |
-| Photos       | High quality, relevant       |
 
 ---
 
