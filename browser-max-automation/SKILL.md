@@ -25,14 +25,14 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 - **API / CLI を先に検討**: 公式 API（YouTube Data API、Microsoft Graph、GitHub API 等）や CLI で read/write が完結するならそちらを優先し、UI が脆い兆候（native file chooser / shadow DOM / 多段ウィザード / レンダラーを止める modal）で固執せず切り替える（例: YouTube Studio UI → `captions.insert`）
 - **URL の生存確認は HTTP client で行うが、dead 判定だけはブラウザまでエスカレートする**。確実な消失の証拠は HTTP 404 / 410 だけ。403 は bot ブロック、timeout は一過性、SSL の `unable to get local issuer certificate` は中間 CA を返さないサーバーで起きる（ブラウザと .NET/schannel は AIA で自動補完するが Python `ssl` はしない）。`Invoke-WebRequest -Uri <url> -Method Get` またはブラウザで裏取りしてから結論を出す
 - PowerPoint / Loop / Dynamics 365 の expense entry 画面など専用 skill がある UI は、該当 skill の操作ルールを優先する
-- 認証情報、秘密情報、MFA 応答をチャットで受け取らない。必要な入力はブラウザ上でユーザーに処理してもらう
+- 認証情報、秘密情報、MFA 応答をチャットで受け取らない。必要な入力はブラウザ上でユーザーに処理してもらう。ユーザー操作の後は、リカバリーコード・token・password を表示し得る画面の本文を読まず URL（`/json/list`）だけで状態を確かめる。「完了」の申告後も確定前の秘密表示画面が残っていることがある
 - 例外: 対象サイトが passkey / FIDO2 / WebAuthn 対応なら、CDP 仮想認証機で完全無人化できる。優先順位は **passkey (仮想認証機) > メール OTP > SMS > 物理キー / 生体**。詳細は [references/instructions/webauthn-virtual-authenticator.md](references/instructions/webauthn-virtual-authenticator.md) を参照する
 
 ## Choose Mode First
 
 - Default to a visible, headed browser. Use headless only when explicitly requested, never as an automatic recovery path. Reuse a verified authenticated session and an owned work tab when possible; a new profile does not imply reusable authentication. When a dedicated launch is already authorized, an absent session calls for an owned launch, not an unavailable verdict.
 - Preserve the OS foreground window and the user's selected tab. Do not routinely call `bring_to_front`, `Page.bringToFront`, `Target.activateTarget`, or native focus/keystroke helpers. This applies to browser launch, tab creation, navigation, capture, and recovery, not just clicks.
-- If a necessary operation cannot avoid activation, explain why and which bounded step needs it before proceeding. Do not force focus back afterward: the user may have switched applications meanwhile. Credentials and MFA remain user-entered.
+- If a necessary operation cannot avoid activation, explain why and which bounded step needs it before proceeding. Do not force focus back afterward: the user may have switched applications meanwhile. Credentials and MFA remain user-entered. When handing a step to the user, give the window title and confirm the window is on the primary monitor (multi-monitor setups hide it otherwise).
 - Identify the work tab, goal, and authorized side effects. Browser access or drafting permission does not authorize sending messages, purchases, trades, cancellations, or contract changes; bind approval to the destination and exact content/action. Read-only helpers must not submit or select settings options; menu expansion is allowed, but choosing an item may auto-save. Report attempted writes, including blocked ones. Pause on user editing, target drift, or lost ownership; viewing a tab does not permit discarding it.
 - Prefer API/CLI helpers for supported data operations, but preserve UI execution when the goal is a demo, UI verification, or observation of the browser workflow.
 

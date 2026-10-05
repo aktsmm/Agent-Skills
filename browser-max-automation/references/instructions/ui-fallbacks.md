@@ -98,7 +98,7 @@ Keep ordinary scoped click/fill as the default. Only choose JS click as the sing
 
 ## Text locator matches hidden or whitespace-shifted rows
 
-- Do not fix a text locator to `.first` when duplicate hidden and visible nodes can coexist. Enumerate matches and act on the first candidate with a non-empty visible bounding box.
+- Do not fix any locator (text, `name`/attribute, or the first `querySelector` match) to the first hit when duplicate hidden and visible nodes can coexist. Enumerate matches and act on the first candidate with a non-empty visible bounding box. Forms that toggle read/edit modes keep both copies; pressing the hidden copy sends no request and logs no error, which looks like a silently ignored control.
 - Rich-text APIs and list DOMs can represent the same text differently: an API may fold `<br>` into spaces while `innerText` joins the boundary without a space. If ordinary text matching finds no visible row, compare whitespace-stripped text and choose the smallest visible container containing the target, rather than a broad ancestor.
 - A fallback match only identifies a row to open. Before filling or saving, compare the opened editor's complete normalized text with the expected item; reject a shared prefix or section label so a whitespace-tolerant click cannot overwrite a neighboring row.
 
@@ -130,6 +130,7 @@ A concrete gesture case: a button that calls `window.open` (new tab/popup) does 
 - A background tab can make `Page.captureScreenshot` time out or leave a spinner in the capture. Check `document.visibilityState`; in a browser the run owns, select the owned tab once (`/json/activate/<id>`) and re-check instead of retrying the capture.
 - Wrap `/json/list` results in `@(...)` before filtering (a single page unwraps to a scalar) and match tabs by full URL. A path fragment such as `/agents/new` can match two apps.
 - Do not treat an empty `[role=dialog]` / `aria-live` query as "no message". Error banners often render outside those roles, so search `document.body.innerText` for the expected text and read the screenshot.
+- Do not conclude a documented control is missing until gating steps are done. Progressive forms reveal later sections (for example a payment-method choice) only after earlier sections are saved; read the page's own hint ("Add X in order to ...") and prior run records first.
 
 ## Hiding sensitive UI before a capture
 
