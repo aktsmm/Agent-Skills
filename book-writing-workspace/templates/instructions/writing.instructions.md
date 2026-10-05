@@ -28,6 +28,8 @@ Guidelines for manuscript writing style and quality.
 - Explain technical terms on first use
 - Format: Japanese（English） - e.g., 機密性（Confidentiality）
 - Use consistent terminology throughout
+- Glossary entries define the headword itself; when the headword names a result or state, do not define the setting that controls it instead
+- For general terms outside the product, confirm the direction of meaning in the standard glossary of that field (e.g., ISTQB: false positive = defect reported that does not exist; false negative = existing defect missed)
 - Establish the parent concept before introducing a subtype, exception, or limitation.
 - For a feature that is retired or scheduled for retirement, keep the explanation but remove it from tables, figures, and decision lists that present currently selectable options.
 
@@ -55,7 +57,7 @@ Guidelines for manuscript writing style and quality.
 
 ## Summary Pattern
 
-- Key point recap
+- Key judgment points in 2-3 sentences grounded in the body, not a restatement of the chapter outline; keep the scope limits the body states
 - Practical next step
 - Lingering thought or question
 - Bridge to next chapter

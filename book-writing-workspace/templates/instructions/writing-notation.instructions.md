@@ -8,12 +8,13 @@ Consistent notation and terminology rules.
 
 ## Numbers
 
-| Type        | Rule           | Example     |
-| ----------- | -------------- | ----------- |
-| Quantities  | Half-width     | 100個、5章  |
-| Years       | Half-width     | 2024年      |
-| Percentages | Half-width + % | 80%、50%    |
-| Ranges      | Half-width + ~ | 1~10、5~6章 |
+| Type           | Rule                                                     | Example                           |
+| -------------- | -------------------------------------------------------- | --------------------------------- |
+| Quantities     | Half-width                                               | 100個、5章                        |
+| Years          | Half-width                                               | 2024年                            |
+| Percentages    | Half-width + %                                           | 80%、50%                          |
+| Ranges         | Half-width + ~                                           | 1~10、5~6章                       |
+| Counting words | Half-width; idioms and number-bound compounds stay kanji | 4つ、3段階 / 一般、一度、三段構え |
 
 ## Punctuation
 
