@@ -52,7 +52,12 @@ On an optimistic-concurrency rejection, re-read the task before exactly one retr
 ## Controller Waiting And Handoff
 
 - A scheduled controller that waits for background workers inside one chat re-sends its growing context on every check. Measure input per request before you choose a waiting mode.
-- The alternative is to end the run after launching workers and let a later scheduled run adopt them. Latency is then at most the interval, and cost is the no-op run's fixed context times the number of runs. A shorter interval pays off only when no-op runs exit early with a small fixed context.
+- The alternative is to end the run after launching workers and let a later scheduled run adopt them. Latency is then at most the interval, and cost is the no-op run's fixed context times the number of runs.
+- Split the check from the work. A frequent watcher task on a cheap model runs a read-only, deterministic check script. Only when work exists does it start the expensive controller task through the scheduler.
+  - The script decides, not the model, and the watcher takes no lease.
+  - Keep a sparse fallback schedule on the controller.
+  - Escalate by starting a task, not by calling a subagent, because a child cannot exceed its parent's cost tier.
+  - A watcher run still pays the fixed context, so trim always-loaded instructions too.
 - Before ending a run while workers continue, verify two things:
   - Each worker survives the host session ending, because it runs in its own console or process group and is not attached to the chat terminal.
   - The next run can adopt work owned by the previous run: the lease is released, and owner fields are not enforced or can be transferred explicitly.
