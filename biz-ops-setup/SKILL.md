@@ -88,6 +88,10 @@ Collect the following information:
 
 Use the deployed task-manager, data-collector, and report-generator for their respective workflows. Keep original evidence authoritative; reports and indexes summarize or link instead of copying source content. workIQ is optional and missing data is not evidence of no activity. `Customers/{id}/` is a lightweight BizOps record, not a full per-customer workspace; do not run any other workspace initializer (such as a dedicated customer workspace setup) inside it. Link to a separately managed customer workspace when one exists. Do not treat a customer project thread as a separate project workspace unless the user explicitly requests one.
 
+- Select external rechecks from current owner-relevant actions, due dates, and changed evidence or restart conditions. Do not reopen completed details or expand unchanged blocked items into queries; count candidates and actual calls separately.
+- Retain original query/response evidence and its acquisition time. Saving or copying evidence is not a new query; unknown acquisition time must stay explicit.
+- Where independent review is required, retain a separate reviewer's original verdict against the exact artifact version. Producer self-assessment or validation PASS is not approval; quality approval does not make incomplete data complete. Substantive post-review changes require another review.
+
 ## Review / Handoff
 
 Read `DASHBOARD.md`, `Tasks/active.md`, recent `ActivityReport/` entries, and only relevant `Customers/` records. Report the source of the current status, owner, next action, and any unavailable or unconfirmed information; do not fill gaps by rerunning setup.
