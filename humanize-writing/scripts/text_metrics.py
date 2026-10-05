@@ -4,6 +4,7 @@
 Thresholds are discovery heuristics, not verdicts. Report findings as signals and
 judge them in context (genre, quoted text, tables, numbered procedures).
 Soft line wraps are joined per paragraph, so wrapping does not change the numbers.
+Link targets and bare URLs are dropped (link text is kept) so link-heavy articles are not inflated.
 Known limit: a heading or table indented inside a list item ends that item's paragraph.
 """
 import argparse
@@ -13,6 +14,8 @@ import sys
 
 BOLD = re.compile(r"(?<!\*)\*\*(?=\S)(?:(?!\*\*).)+?(?<=\S)\*\*(?!\*)|(?<!_)__(?=\S)(?:(?!__).)+?(?<=\S)__(?!_)")
 INLINE_CODE = re.compile(r"`+[^`\n]*`+")
+LINK = re.compile(r"!?\[([^\]]*)\]\([^)\s]*[^)]*\)")
+BARE_URL = re.compile(r"https?://\S+")
 BULLET = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 FENCE_OPEN = re.compile(r"^\s*(`{3,}|~{3,})")
 # Pictographs, flags and ZWJ sequences count as one; ballot boxes and plain symbols do not.
@@ -88,7 +91,7 @@ def paragraphs(lines):
 
 def measure(text):
     units = list(paragraphs(list(prose_lines(text))))
-    cleaned = [(b, INLINE_CODE.sub("", t)) for b, t in units]
+    cleaned = [(b, INLINE_CODE.sub("", BARE_URL.sub("", LINK.sub(r"\1", t)))) for b, t in units]
     chars = sum(len(t) for _, t in cleaned) or 1
     bullets = sum(1 for b, _ in cleaned if b)
     bold = sum(len(BOLD.findall(t)) for _, t in cleaned)
