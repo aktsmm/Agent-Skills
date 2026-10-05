@@ -26,6 +26,12 @@ liveness.
 Do not classify state from the active chat, directory recency, UI spinner, or
 log modification time alone.
 
+## Cost Attribution
+
+- Sum `inputTokens`, `cachedTokens`, and `outputTokens` from every `llm_request` in the session's main log, and separately from each child-subagent log. Report child critics or workers as their own rows.
+- The first request's `inputTokens` is the fixed context: instructions, memory listings, and tool definitions. A no-op scheduled run costs roughly that fixed context times its few requests. Shrinking the fixed context lowers every run.
+- A long session that waits in-chat re-sends its grown context on every check. Input then dominates while output stays tiny. Report average input per request and the share spent waiting before you recommend a model change.
+
 ## Confidence
 
 | Confidence | Conditions                                                                   |

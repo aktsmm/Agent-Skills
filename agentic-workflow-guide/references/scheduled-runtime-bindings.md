@@ -49,6 +49,15 @@ On an optimistic-concurrency rejection, re-read the task before exactly one retr
 - Cache completed reviews by source hash, image/input hashes, rubric version, role and model. Skip expensive worker dispatch for unchanged or ineligible work, but include the scheduled controller's remaining overhead in cost estimates.
 - Keep a blocked production task linked to the pilot's explicit adoption state. Only evidence-backed adoption unblocks that same task; failed calibration records replan or capability-blocked, not a silent model fallback, duplicate queue item or owner-test request.
 
+## Controller Waiting And Handoff
+
+- A scheduled controller that waits for background workers inside one chat re-sends its growing context on every check. Measure input per request before you choose a waiting mode.
+- The alternative is to end the run after launching workers and let a later scheduled run adopt them. Latency is then at most the interval, and cost is the no-op run's fixed context times the number of runs. A shorter interval pays off only when no-op runs exit early with a small fixed context.
+- Before ending a run while workers continue, verify two things:
+  - Each worker survives the host session ending, because it runs in its own console or process group and is not attached to the chat terminal.
+  - The next run can adopt work owned by the previous run: the lease is released, and owner fields are not enforced or can be transferred explicitly.
+- If workers compare the main repository state before and after, record operator changes made during a worker run where the controller reads them. Otherwise the comparison flags them as unexplained.
+
 ## Scheduled Run Outcome Triage
 
 - For a scheduled run, use the command exit/output and expected artifact as primary result signals. Scheduler history and terminal/PTY warnings are corroborating signals.

@@ -22,6 +22,10 @@ Rubber duck your plan before implementation.
 
 Do not inline a large Markdown body into `copilot -p`, and do not use `--attachment` for `.md`. Send a short native Rubber Duck prompt naming one exact workspace-relative file, run Copilot CLI with `--available-tools=view --allow-tool=view`, and state: review only that file; do not inspect Git, `git diff`, `git status`, or other files. This avoids Windows command-line length limits while preserving the critic's read-only, artifact-scoped boundary; when the review requires supporting material, name each additional exact path instead of enabling broad tools. Reuse the same boundary for revision rounds.
 
+### Working directory and readable paths
+
+The Copilot CLI `view` tool reads only inside the working directory and `--add-dir` paths. Any other file returns permission denied. Repository hooks load from the working directory's repository, and a hook whose launcher is missing in that checkout errors and denies every tool call. When every `view` was denied, the critic reviewed nothing: record the round as BLOCKED (not reviewed), not as FAIL. Re-run from a working directory with no failing hooks, and add `--add-dir` for the reviewed tree.
+
 If native Rubber Duck is unavailable or does not trigger:
 
 - Use a read-only custom critic agent if one exists.

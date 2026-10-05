@@ -265,6 +265,13 @@ Duplicate content across global and workspace scopes doubles token cost.
 - [ ] No duplicate content between global and workspace scopes
 - [ ] All `.prompt.md` files have a `description` frontmatter
 - [ ] Stale IDs, paths, or settings removed
+- [ ] Long-lived attached addenda are pruned by lifecycle state:
+  - Delete only items whose outcome is verified.
+  - An implemented-but-unverified item keeps its requirements as proof obligations.
+  - Keep modal verbs and scope limits exact.
+  - Point to the previous full text in version control instead of adding a history file.
+  - Have a different reviewer compare the old and new text.
+- [ ] A host memory store that lists every file in each session holds only cross-run knowledge. Per-run notes go to that run's report, because the listing grows and is paid on every request.
 - [ ] No conflicting instructions across files
 - [ ] Workspace entry files still read like a short routing layer, not like a full operating manual
 
