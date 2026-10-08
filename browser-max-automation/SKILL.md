@@ -54,7 +54,7 @@ Browser automation via Playwright MCP, existing-browser CDP, and direct CDP help
 4. Read back the durable result before retrying or moving to the next item.
 ```
 
-Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read.
+Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read. Never batch input or editing actions (typing, key presses, clicks that change the draft) into one parallel call group: they interleave and corrupt the text; run them one at a time and read the field back.
 
 For downloads, save a durable extension-bearing copy before context/runner cleanup and verify its bytes/content, not its browser-history name or icon; see [download handling](references/instructions/ui-fallbacks.md#durable-downloads-and-guid-filenames).
 

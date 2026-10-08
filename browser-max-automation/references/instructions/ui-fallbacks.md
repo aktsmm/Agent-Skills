@@ -64,7 +64,7 @@ Intercept it instead of letting the OS dialog open:
 
 For raw CDP-controlled download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downloadPath: <dir>, eventsEnabled: true})` before clicking. Do not override download behavior underneath a Playwright-controlled context; use its download API instead.
 
-With Playwright MCP, a chooser opened inside `browser_run_code_unsafe` becomes MCP modal state instead of reaching the script's `waitForEvent('filechooser')`; finish it with `browser_file_upload`. Its allowed-root check compares the drive letter case literally, so pass the path in the same case as the reported root (for example `c:\...`). Some apps (e.g. D365) ignore `setInputFiles` on the hidden input and only accept the chooser route; verify the app's own "selected file" field before continuing.
+With Playwright MCP, a chooser opened inside `browser_run_code_unsafe` becomes MCP modal state instead of reaching the script's `waitForEvent('filechooser')`; finish it with `browser_file_upload`. Its allowed-root check compares the drive letter case literally, so pass the path in the same case as the reported root (for example `c:\...`). The allowed roots depend on the harness: the VS Code Playwright MCP accepts files under the open workspace (no copy needed), while another harness's MCP may reject the same path as outside its roots (try the path first; copy to an allowed root only after a rejection, and verify the copy's hash against the original). Some apps (e.g. D365) ignore `setInputFiles` on the hidden input and only accept the chooser route; verify the app's own "selected file" field before continuing.
 
 ## Playwright MCP run_code Files and PDF Capture
 
@@ -95,6 +95,8 @@ In Angular-Material / web-component UIs (GCP Console, YouTube Studio), many butt
 Background/minimized rendering can contribute to actionability timeouts, but it is not a universal failure mode. Inspect readiness, overlays, and current target state with a bounded query; successful reads or fills do not prove a click can succeed.
 
 Keep ordinary scoped click/fill as the default. Only choose JS click as the single recovery when its semantics are acceptable and any prior write is known not to have applied. Synthetic events are not equivalent to trusted input. Verify durable state; an ambiguous timeout stops writes rather than triggering another click method or automatic foreground activation.
+
+A broad locator (for example `aria-label*="Attach"`) can start matching extra elements after the page state changes (a "Remove attachment" button appears once a file is attached) and then fails with a strict-mode violation. Pin the exact `aria-label` or role name.
 
 ## Text locator matches hidden or whitespace-shifted rows
 
@@ -131,12 +133,15 @@ A concrete gesture case: a button that calls `window.open` (new tab/popup) does 
 - Wrap `/json/list` results in `@(...)` before filtering (a single page unwraps to a scalar) and match tabs by full URL. A path fragment such as `/agents/new` can match two apps.
 - Do not treat an empty `[role=dialog]` / `aria-live` query as "no message". Error banners often render outside those roles, so search `document.body.innerText` for the expected text and read the screenshot.
 - Do not conclude a documented control is missing until gating steps are done. Progressive forms reveal later sections (for example a payment-method choice) only after earlier sections are saved; read the page's own hint ("Add X in order to ...") and prior run records first.
+- A per-item control repeated in a feed (reply, edit, delete) must be found inside the smallest container that holds the target item's heading and no other item's heading. Picking it with `last()`, `[1]`, or a whole-feed text match opens another item's editor. After the click, check by screenshot that the opened editor sits under the intended item before typing anything.
 
 ## Hiding sensitive UI before a capture
 
 When a selector suppresses something that must not appear in a published image (account avatar, notification badge, tenant name), a zero-match must be an error. Helpers that loop over `querySelectorAll` and hide each hit succeed silently on zero elements, so a renamed class ships the very thing you meant to remove. Return the match count and fail the run when it is 0. Split the selectors into must-hide and optional so localization or A/B variants that legitimately lack an element do not fail every run.
 
 Prefer `visibility: hidden` over `display: none` so the surrounding layout does not reflow; neighbouring content you wanted to keep stays where the recorded crop expects it.
+
+Playwright MCP `browser_take_screenshot` resolves a relative `filename` against the working directory (the workspace root when run from VS Code), not the tool's output folder. Save checkpoint images under a git-ignored folder (for example `tmp/x.png`) and delete them explicitly after the check, or they can be committed by accident.
 
 ## VS Code Web (Codespaces, github.dev)
 
@@ -166,7 +171,7 @@ Rules:
 
 ## Rich-text Editor Replacement
 
-- In TipTap/contenteditable fields, `.fill()` may append to the old text. Before saving, read back the entire field, check the old anchor is absent, and use the site's own length counter rather than `innerText.length` for limits.
+- In TipTap/contenteditable fields, `.fill()` may append to the old text. Before saving, read back the entire field, check the old anchor is absent, and use the site's own length counter rather than `innerText.length` for limits. In an editor that holds inline chips (mentions, tags), `.fill()` replaces the whole content and deletes the chips already inserted: type each line with `slowly` (sequential key input), insert a mention by typing `@name`, waiting for the suggestion list, and clicking a candidate by its unique text (such as the email); with same-name candidates, pick the one with the requested affiliation. Read back the editor's paragraphs after each step. In chat or reply composers use Shift+Enter for a newline (Enter may submit); Shift+Enter starts a new paragraph without sending.
 - If concatenated, focus only that editor, use Ctrl+A then Backspace, verify the field and counter are empty, refill, and read back before saving. Preserve unrelated paragraphs when changing only one claim.
 - Click-to-edit `<textarea>` bound to a framework (rendered block turns into a textarea + Save): if the block's click times out, dispatch one `click` event on it, then set the value with the native setter (`Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(el, v)`) and dispatch `input`/`change`; a plain `el.value =` may be ignored. Edit by string replace on the value just read, aborting unless the anchor occurs exactly once and the new text is absent, then press that form's own Save.
 - When Save publishes immediately (no draft/preview), treat it as the publish write: show the exact body first, click once, and read back the public page with a cache-busting query instead of the editor state.
