@@ -157,7 +157,7 @@ Require the exact lowercase `<publisher>.<name>@<version>` line. A strong local 
 
 - Apply the **Release Completion Contract** below; use read-only checks, never another publish command to prove existence.
 - If an artifact audit is required, use `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/<publisher>/vsextensions/<extension>/<version>/vspackage`. A `405` from `HEAD` is inconclusive; download via `GET` directly to a temporary file and inspect the actual ZIP.
-- Compare size and SHA256 with the local VSIX or GitHub Release asset when exact-byte provenance was required before publication. Otherwise treat additional downloads as follow-up audit, not a new completion gate.
+- When exact public-byte provenance is an agreed gate, compare the version-specific Marketplace GET with the same GitHub Release asset: HTTP success, nonempty size and SHA256 must match. Compare a separately rebuilt local ZIP by runtime bytes and structural manifest, not its archive hash; ZIP timestamps can differ. Retain the verified public package as the canonical artifact and use those same bytes for isolated install. Otherwise do not add optional downloads as new completion gates.
 - If a pushed release tag fails CI before publication, keep the failed tag as provenance. Fix the issue, bump to a new patch version, synchronize package/lock/changelog/spec files, and publish a new tag; do not move or reuse the pushed tag.
 
 ## Local VSIX Artifact Hygiene
@@ -217,6 +217,12 @@ an explicit deadline and resumable status; never republish merely to check.
 Once these checks and the pre-agreed quality gates pass, report publication
 complete and stop. Extra screenshots, repeated page loads and optional package
 hash comparisons are follow-up audits, not reasons to withhold completion.
+
+Report linked Issue follow-up separately from publication. Read existing
+comments before an authorized release reply, link the published version and
+state verified behavior versus guarded gaps; close only covered acceptance
+criteria. Release authority is not blanket Issue-posting/closure authority,
+and an unrelated unfinished integration stays open.
 If a repository explicitly required exact artifact equality before publication,
 retain that gate; do not invent or relax gates mid-run. Update local state and
 task status without reopening completed verification.

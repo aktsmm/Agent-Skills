@@ -22,6 +22,11 @@ before lowering it. Newer versions inside the declared range need no blanket
 untested-version warning; report actual failures with a manual, data-free Issue
 link instead of uploading diagnostics automatically.
 
+If an optional integration needs a newer host, distinguish its feature minimum
+from the extension's base minimum. Detect/gate the optional API and test the
+unavailable-feature path without breaking existing functionality; disclose both
+requirements rather than silently raising the entire extension floor.
+
 ```javascript
 // .vscode-test.mjs
 import { defineConfig } from "@vscode/test-cli";
@@ -49,6 +54,13 @@ Extension Host assertions, command resolution, CI success and package identity d
 
 If the isolated account does not expose the target model or capability, report that path as unverified and keep a static guard; do not select a hidden model or treat a nearby model's successful smoke as proof for it.
 
+For configurable model integrations, use a synthetic provider to capture exact
+received options and a Low/High/Low round trip to detect cross-request bleed and
+verify immutable binding reuse. Assert one dispatch per explicit request, typed
+numeric/string values, unchanged shared settings, and no credential copies.
+This proves the host/request route, not real-provider network inference or
+proposed-only message support; test those separately with authorized accounts.
+
 | Change area                                   | Extra checks                                                                                                                                                                                                                                         |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Commands / settings / views in `package.json` | Verify manifest consistency, command IDs, setting keys, menu `when` clauses, and README setting tables                                                                                                                                               |
@@ -67,6 +79,10 @@ For shared manifest, installer, updater or scanner changes, add a focused regres
 
 ## Reliability Gotchas
 
+- Recheck cancellation after every asynchronous preparation step, before downstream calls, and after response/empty-stream/token-count completion. Use deferred or cancelling dependencies: preparation cancellation means zero downstream calls; already-started cancellation means no success result or resend. A source merely receiving the token is not this proof.
+- Treat collaborator selectors as requests, not validation of their returned values. Assert exact returned provider/model and any pinned version before send/count, and verify the registered forwarding model too. Unknown/ambiguous sources fail without alias or default-model fallback.
+- Preserve absent, empty, explicit and invalid/future option maps as distinct states. Retain invalid values per record during load/edit/heal, block their execution, and repair only explicitly; `Object.assign({}, null)` is destructive normalization. Validate before mutating other fields; reselecting identical identity retains options, actual identity changes clear unspecified overrides, full reset clears display metadata too. Test unrelated edits, duplicate/reload and unchanged memory/disk after rejection.
+- A provider-advertised numeric zero or sentinel must remain the raw request value without creating a zero-token forwarding model. Test the source input budget separately from the option payload; reject unknown values rather than guessing their meaning.
 - Execute actual Webview submit/source-change handlers, not only source-token assertions. Textareas normalize CRLF to LF; normalize comparisons without inferring a provenance change. Keep file-to-inline conversion explicit, disable hidden required fields, and focus validation errors on visible controls.
 - Test rejected create/update requests with multiple changed fields and invalid paths, including NUL in cached local/global references. Assert that memory, persisted payload and metadata remain unchanged; read-time path rejection does not prove that invalid input cannot be saved.
 - A synchronous storage mock cannot prove queued persistence ordering. Hold the first write with a deferred promise, enqueue the next, and assert it cannot start or read stale state before the first settles. Cover rejected-write recovery, preserved entries and direct versus best-effort error propagation; release and await all pending work before fixture cleanup, without sleeps.
