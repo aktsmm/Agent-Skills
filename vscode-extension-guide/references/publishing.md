@@ -25,6 +25,12 @@ npx --yes @vscode/vsce verify-pat <publisher-id> -p "$env:VSCE_PAT"
 
 Publisher authorization failure is not proof that the token expired. Verify permissions for the intended publisher; switching to another authorized publisher changes the extension ID and requires approval. Then synchronize manifest, activation-test IDs and listing links.
 
+For GitHub workflow authorization failures, recheck the current CLI identity as
+well as permissions; another session can change the shared keyring's active
+account. Use the intended account's credential only in the owning operation and
+restore its prior environment afterward. Do not switch shared accounts or expose
+tokens merely to recover a release.
+
 In CI, a nonempty secret is not proof of a valid PAT. Verify publisher authorization using the job's secret without printing it. Local Process/User environment values and repository/environment secrets are separate stores: a local refresh does not repair CI. A `publish=false` build validates no credentials unless it explicitly runs that read-only check. On authentication failure, retain the artifact and commit/tag identity; report publication and downstream GitHub Release as blocked and request owner-side secret repair, never the token in chat.
 
 ## Login and Publish
@@ -204,19 +210,24 @@ are done or explicitly blocked:
 4. Follow the repository's single publication route. For tag-triggered CI, first validate the candidate commit with an explicit non-publishing branch run, then push its matching tag and let CI publish and attach the same VSIX. Do not publish locally first and make CI collide with an existing version.
 5. For manual publication, publish the verified VSIX, push the matching tag and attach that VSIX to the GitHub Release; ensure the tag does not independently trigger a second publish.
 6. Keep manual workflow dispatch non-publishing by default and serialize runs capable of publishing the same package, including branch and tag routes. Check both the dispatch input and ref: a tag condition can override `publish=false`. Never move a published tag; follow the repository's version/retry policy after failure.
-7. Confirm the public item page is accessible and the public gallery API or
-   `vsce show --json` returns the intended publisher, extension and version.
-   Confirm the GitHub Release asset is uploaded, the tag resolves to the release
-   commit, and the intended branch is synchronized with its remote.
+7. Confirm the item page is accessible and public availability identifies the
+   intended publisher, extension and version. Use gallery metadata or inspect a
+   version-specific Marketplace VSIX when latest metadata is stale; HTTP 200
+   alone is insufficient. Verify the actual package's manifest/runtime and
+   isolated install, retaining any agreed asset size/SHA256 equality gate.
+   Confirm the GitHub Release asset, tag's release commit and synchronized branch.
 
-Successful submission can precede Marketplace validation and public visibility.
-While the page or API is stale, use authenticated read-only status when available
-to distinguish pending validation from rejection. Use one bounded watcher with
-an explicit deadline and resumable status; never republish merely to check.
+Separate submission, version-specific public availability and latest-page/catalog
+propagation. A verified package can be public while latest still shows an older
+version. If public bytes are unavailable, use read-only publishing status to
+distinguish pending validation from rejection. Bound watching and retries; if
+metadata stays unchanged, record that display gap and its read-only resume
+condition. Never republish, retag or bump a version merely to check visibility.
 
 Once these checks and the pre-agreed quality gates pass, report publication
-complete and stop. Extra screenshots, repeated page loads and optional package
-hash comparisons are follow-up audits, not reasons to withhold completion.
+complete with any remaining display gap named separately, then stop. Extra
+screenshots, repeated page loads and hashes beyond the agreed package gates are
+follow-up audits, not reasons to reopen publication.
 
 Report linked Issue follow-up separately from publication. Read existing
 comments before an authorized release reply, link the published version and

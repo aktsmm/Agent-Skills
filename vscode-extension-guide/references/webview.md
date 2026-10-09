@@ -156,21 +156,17 @@ case "createTask": {
 
 ### Language Model List Fallback
 
-`vscode.lm.selectChatModels()` is a stable API, but it can return an empty array (no Copilot sign-in, no consent, no matching model) or throw. Guard both cases and show a fallback list; no `as any` cast or feature detection is needed when `engines.vscode` already includes the API.
+`vscode.lm.selectChatModels()` can return an empty array or throw. Reconcile both
+states; display fallbacks must not silently replace an explicitly selected
+execution model/provider. Do not feature-detect a stable API already covered by
+`engines.vscode`; separately gate newer configuration capabilities.
 
-```typescript
-async function getModels(): Promise<Model[]> {
-  try {
-    const available = await vscode.lm.selectChatModels({});
-    if (available.length > 0) {
-      return available.map((m) => ({ id: m.id, name: m.name || m.family }));
-    }
-  } catch {
-    // Model access can be unavailable or denied.
-  }
-  return getFallbackModels();
-}
-```
+- Derive option controls and preview notices from the selected model's current schema and host support, not a global experiment flag. If each option can inherit shared settings, omit a redundant enable checkbox unless OFF has a distinct required meaning.
+- Preserve enum values and numeric types. Migrate only schema-confirmed equivalents; do not infer speed or compound modes from effort alone. Explicit new options replace inherited legacy fields, but reject explicitly conflicting old/new inputs. Retain invalid or future values until explicit repair.
+- Use one reconciliation path for empty catalogs, unavailable saved selections, refresh failures and normal changes. Remove stale editable choices/notices without deleting saved identity or overrides; restore typed values when advertised choices return.
+- Pass selected variant identity and options through the resolver before rendering; do not lose the chosen value by redrawing from an empty selection or inheritance default.
+- Before replacing or hiding controls, move focus only when the active element is inside them, to a stable visible control. Cover both schema fields and legacy variant fields; never steal unrelated focus.
+- Test available -> empty/unavailable -> restored transitions, typed values, selected options and actual keyboard focus with production handlers. Extracted-code real-DOM fixtures are component evidence, not full host or screen-reader proof.
 
 ### Path Consistency
 
