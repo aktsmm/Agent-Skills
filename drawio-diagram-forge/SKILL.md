@@ -78,12 +78,8 @@ USER INPUT → ORCHESTRATOR → MANIFEST GATEWAY → SVG FORGE → COMPLETED
 
 ### Quality Gates
 
-| Score  | Action        |
-| ------ | ------------- |
-| 85-100 | Proceed       |
-| 70-84  | Fix and retry |
-| 50-69  | Simplify      |
-| 0-49   | Ask user      |
+- Proceed only when the manifest matches confirmed requirements, structural validation passes, the editable file opens, and the render passes the target-medium checks in Done Criteria. Record evidence for each gate, not a self-assigned score.
+- Fix structural or visual defects within the revision limits below. Simplify only when confirmed requirements remain intact; ask the user about unresolved content or scope choices. An exhausted limit or unverified gate ends in a blocked/partial result, not completion.
 
 When the deliverable is headed for print, gate it on the Monochrome Print Profile and the Pre-delivery Geometry Sweep in [style-guide.md](references/style-guide.md) before any visual review.
 
@@ -134,7 +130,7 @@ Use [Cloud Icons Reference](references/cloud-icons.md). Azure diagrams must use 
 - [ ] All nodes and edges visible
 - [ ] User-facing links point to the editable `.drawio` when editability is expected
 - [ ] Decision flows avoid long return/merge lines that bundle branch outputs back into one sink
-- [ ] Quality gate score ≥ 85
+- [ ] Manifest matches confirmed requirements and `scripts/validate_drawio.py` passes on the editable source
 - [ ] If diagram is referenced from documentation, both editable source and embeddable image are provided
 - [ ] Render review completed at the target embed width: no text overlap, clipping, or border collisions, no edges overlapping on one line, no edge endpoint buried inside a filled box, no label riding on a box or another label, no node outside the page
 - [ ] After any edge or label layout change, re-export the delivery asset for the target medium (SVG for web, PNG or the final PDF for print) and inspect it; structural validation alone does not prove visual routing quality

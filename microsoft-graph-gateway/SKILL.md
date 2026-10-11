@@ -29,7 +29,7 @@ This skill does not try to abstract all of Microsoft Graph into a fixed checklis
 ### Read Routing
 
 - Prefer WorkIQ first for common read scenarios such as inbox checks, meeting lookups, file discovery, and lightweight summaries.
-- Use Microsoft Graph for gap-read scenarios when WorkIQ cannot answer, returns insufficient detail, or the user asks for exact Graph semantics.
+- Use Microsoft Graph for gap-read scenarios when WorkIQ lacks the required capability or detail, or the user asks for exact Graph semantics. Authentication, consent, or permission refusal is not a capability gap: stop the affected operation, report the required authorization, and do not switch routes to bypass it. An ambiguous failure does not establish a gap.
 - Go straight to Microsoft Graph when the user asks for:
   - exact endpoint names or raw REST calls
   - precise properties, `$select`, `$filter`, `$expand`, or API version control

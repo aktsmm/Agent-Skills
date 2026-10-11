@@ -100,6 +100,12 @@ For always-loaded entry files such as `copilot-instructions.md` and `AGENTS.md`,
 - Does this teach the operating shape of the skill, or just document background detail?
 - If this were removed from the main file, would the skill still route and operate correctly?
 
+## Semantic Preservation
+
+- Compare scope, permissions, requirements, prohibitions, exceptions, and verification or stop conditions before and after edits. State applicability within rules; later steps must not silently override routing or constraints.
+- Compare decisions for applicable normal, exception, and stop cases. Separate authorized behavior changes from compression; retained keywords alone do not prove equivalence.
+- Treat character and line counts as cost indicators, not proof of quality. Review short assets too; preserve explicit validator limits without deleting non-obvious requirements just to meet them.
+
 ## Done Criteria
 
 - Main SKILL still exposes the routing surface clearly

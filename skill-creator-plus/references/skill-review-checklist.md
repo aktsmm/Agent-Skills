@@ -13,6 +13,7 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere? No other skill is named or used as SSOT?
 - [ ] Every script, path, and CLI flag mentioned in SKILL.md exists in the skill and matches the script's argument parser?
 - [ ] references/ reviewed too, not only SKILL.md? Stale facts and duplication accumulate there.
+- [ ] Compression preserves decisions, not just keywords? Apply [semantic preservation checks](skill-bloat-review.md#semantic-preservation).
 - [ ] No README.md or auxiliary docs in skill folder?
 - [ ] The skill fits one primary archetype, or the split is intentional?
 - [ ] Non-obvious gotchas are captured where they affect correctness?

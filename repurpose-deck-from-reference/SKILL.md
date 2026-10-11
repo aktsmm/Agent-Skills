@@ -48,7 +48,7 @@ COPY → RESEARCH → PLAN → WIPE → BUILD → SCREENSHOTS → QA → POLISH
 - **Lock-first.** 編集前に対象 PPTX を開いている PowerPoint を確認し、未保存の変更がないことをユーザーに確認してから閉じる（確認なしに `Stop-Process` で強制終了しない）。OneDrive 同期完了を待つ。
 - **Layout reset.** 参照のコンテンツスライドは原則「白紙」レイアウトに切替＋`<p:bg>` 除去。これをやらないと旧テンプレの装飾が透けて見える。
 - **No negative dimensions.** `Emu(w - X)` で X > w の状況を作らない。`max(min_h, h - margin)` でクランプ。
-- **COM cache bypass.** 直近編集ファイルを COM で開くと古いコンテンツが返る場合あり。**毎回別ファイル名にコピーしてから Open**。
+- **COM cache bypass.** 編集正本は1ファイルのまま、COM Open / Export は毎回別名の検証専用コピーで行う。コピーを編集・次の正本にせず、検証結果を保存して閉じた後、自分が作ったコピーだけを削除する。
 - **Primary source over memory.** 仕様・対象プラン・価格は memory に頼らず必ず一次情報を `web_fetch`。例: GitHub Copilot app の対象プランは公式 README で "Pro / Pro+ / Max / Business / Enterprise" と最新化されている。
 - **Section list = raw XML.** `python-pptx` は PowerPoint セクションをサポートしない。`presentation.xml` に `p14:sectionLst` を直接挿入する。**`&` は必ず `&amp;` にエスケープ**しないと COM 開けない。
 - **Layout consistency before content polish.** 18 枚作って 6 セクション正しく入る、ページ番号通る、フッター揃う、を先に確認してからコンテンツ詳細を直す。
@@ -56,8 +56,8 @@ COPY → RESEARCH → PLAN → WIPE → BUILD → SCREENSHOTS → QA → POLISH
 ## Hard Gotchas
 
 - **Negative dim corruption**: `add_textbox(..., h=h-650000)` で h が 650000 未満になると、python-pptx は保存できるが PowerPoint COM Open が失敗する。GUI からは開ける。バイセクションでスライド単位の犯人探しが必要になる。
-- **COM Export cache**: `app.Presentations.Open(SAME_PATH)` を連続で叩くと、PowerPoint 内部が古い CRC を持つ場合あり、Export 画像が更新後の中身を反映しない。**新しいファイル名へ copy してから Open**。
-- **OneDrive 同期と Office lock**: OneDrive 配下 PPTX の編集中、`FileCoAuth` が `PackageNotFoundError` を起こすことがある。`Stop-Process -Id <FileCoAuth_PID>` で解放。
+- **COM Export cache**: 同じpathの連続Openは古い内容を返すことがある。Core Rulesの検証専用コピーで回避する。
+- **OneDrive 同期と Office lock**: `PackageNotFoundError` だけでlockと断定しない。対象ファイルと所有process、未保存変更・同期状態、他のOffice処理への影響を確認する。通常の保存・終了を優先し、強制停止は対象と影響を示して明示承認を得た場合だけ。確認できなければ停止し、無関係processを終了しない。
 - **Section XML escape**: `<p14:section name="D. Customize & Collaborate">` は `&` で XML 不正。`&amp;` に escape。
 - **Hidden slide page numbering**: `show="0"` のスライドをスキップしてページ番号を振ると、見えないスライド以降の番号が前にずれる。**hidden を含めた絶対インデックス** で振る方が一貫する。
 
