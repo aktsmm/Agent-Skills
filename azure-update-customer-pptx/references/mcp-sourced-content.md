@@ -89,5 +89,6 @@ Examples:
 Moved from SKILL.md "MCP Boundary".
 
 - Scripts do not call MCP directly; Copilot / agent steps write MCP-sourced content to `{date}/manifest/*.json`.
+- Check parent and worker MCP availability before delegation. If a worker lacks the required tools, the capable parent retrieves each source once and passes retained originals; do not reacquire the whole inventory or infer missing content. If neither can retrieve it, record affected IDs and missing facts and stop that lane.
 - PowerShell scripts consume manifest JSON and mutate PPTX deterministically. Adapt `assets/mcp.sample.json` to the host MCP server if needed.
 - For each Azure Updates item, store the announcement URL as `sourceUrl` and search Microsoft Learn / Docs MCP for the closest official service document. Put that URL in `learnUrl` when a relevant first-party page exists.

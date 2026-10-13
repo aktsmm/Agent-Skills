@@ -99,6 +99,7 @@ Template setup is intentionally separate from regular generation. See [Template 
 ## Gotchas
 
 - Close the target deck before any COM write, and re-apply all sections after any Weekly rebuild. Details and other COM pitfalls: [Validation Rules › COM Write Gotchas](references/validation-rules.md#com-write-gotchas).
+- Preflight PASS means ready, not running. Report execution from current launch/progress evidence; after interruption, reconcile owned processes and artifact hashes before restarting. See [Resume Evidence](references/pre-check.md#resume-evidence).
 
 ## Validation
 

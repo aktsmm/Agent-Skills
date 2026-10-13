@@ -131,6 +131,7 @@ Minimum items to verify:
 - [ ] Is there a mechanical scan for both missing and unsupported keys?
 - [ ] For `.prompt.md`, is `tools:` omitted unless the prompt deliberately needs an allowlisted tool set?
 - [ ] If a prompt references an agent, does it avoid overriding that agent's tools accidentally?
+- [ ] Before narrowing or moving an instruction's `applyTo`, was the whole instruction read, and was each rule checked against the files that would stop loading it?
 ```
 
 ### Primitive Fit Check
@@ -157,6 +158,8 @@ LLM / agent に任せている処理のうち、決定論的に書ける部分�
 
 - [ ] Does an agent's responsibility include extract / count / validate / diff / format / parse / lint?
       → Offload to a script (regex / parser / JSON schema validator), keep the agent for judgment only
+- [ ] Does an agent procedure drive a UI or manual route for work that an existing script / CLI already performs, or contradict the SSOT instruction's script route?
+      → Make the script the primary path, keep the UI steps as reference only, and align the agent's tools and permissions with it
 - [ ] Are LLM generation and deterministic transformation packed into the same agent?
       → Insert an IR boundary and split into two stages (see workflow-patterns/ir-architecture.md)
 - [ ] Is LLM output consumed directly without an IR + script gate?

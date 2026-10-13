@@ -84,7 +84,7 @@ Threshold details: [references/splitting-criteria.md](references/splitting-crite
 
 - [ ] Primitive choice is simpler than agent if possible
 - [ ] Placement is appropriate and always-loaded entry files stay thin (entry boundary smells: [review-checklist.md](references/review-checklist.md#always-loaded-entry-smells))
-- [ ] Delete unnecessary or self-evident text before shortening, only if normal/exception/stop decisions stay unchanged; then consider merge / split / move before additions. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected.
+- [ ] Delete unnecessary or self-evident text, including rationale sentences that do not change a decision, before shortening, only if normal/exception/stop decisions stay unchanged; then consider merge / split / move before additions. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected.
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early
 - [ ] Verify actual producer-to-consumer dataflow, not only fixtures injected into a validator; cover empty results and meaningful state transitions. Repeating unchanged input proves idempotency, not the full lifecycle.
