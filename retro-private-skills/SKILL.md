@@ -116,7 +116,7 @@ Choose exactly one:
 
 ### 4. Bloat Check
 
-After editing, check for duplicate rules, repeated definitions, and long examples. Compact, delete, or move detail to `references/` before reporting done.
+After editing, delete unnecessary, self-evident or duplicate text before shortening, only if normal/exception/stop decisions stay unchanged; compact remaining detail or move it to `references/`. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected.
 
 ### 5. Validate
 

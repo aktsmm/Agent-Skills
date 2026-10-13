@@ -101,7 +101,7 @@ Use [Creation Process](references/creation-process.md): choose primitive and sco
 
 When improving an existing skill, use this order:
 
-1. Delete stale or low-value guidance
+1. Delete unnecessary or self-evident text before shortening, only if normal/exception/stop decisions stay unchanged. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected.
 2. Merge duplicate rules
 3. Move long detail to `references/`
 4. Add genuinely missing guidance last

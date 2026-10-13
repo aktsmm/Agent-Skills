@@ -54,7 +54,7 @@ CLI / Scout は VS Code のアクティブ workspace を常に取得できない
 - For an explicitly authorized push, fetch, inspect the permitted ahead range and integrate behind/divergence in the clean execution checkout first; never use force or stale tracking refs.
 - After moving a multi-paragraph Markdown section, verify heading order, exactly one occurrence of the moved heading and its first content line, and `git diff --check`; delete-plus-insert moves can otherwise leave an omission or duplicate.
 - 圧縮は AI が判断できる最小情報を主目的にし、人間向け可読性は二次とする
-- 冗長説明は圧縮するが、根拠 URL と非自明手順は残す
+- 正常・例外・停止時の判断を変えない不要・自明・重複の説明は先に削除し、必要な残りだけ圧縮する。根拠 URL・非自明な手順・承認範囲・未検証要件・停止／復旧条件・必要な実例・metadataは残す。履歴は古さだけで削らず、原文の保存を確認し、未保存の追記は保持する
 - 同じ Learning / Evidence / Impact を言い換えて繰り返さず、1 論点 1 塊でまとめる
 - `AGENTS.md` と `.github/copilot-instructions.md` のような入口ファイルは役割過多を先に疑う
 - script / task 化は、再利用価値・検証可能性・影響範囲の狭さが揃う場合を優先する
