@@ -65,6 +65,8 @@ it fails closed and never silently falls back to COM. See [Python Build Engine](
 
 `item.japanRegion` は可視スライド本文へ直接表示される。判定は [Region Stamp Definition](references/region-stamp.md) を SSOT とし、必ず次の3分類を通す: [Region Stamp Definition › Japan Region Rendering Flow](references/region-stamp.md#japan-region-rendering-flow)。
 
+可視スライドに「未確認 / 記載なし / 要確認」等の内部メモ文言を出さない（確認できれば書く、できなければ要素ごと省く）。
+
 overview未確認の保守判定と、クライアントツールの日本未対応判定は禁止する。可視文言、近隣regionの優先順、URL伝搬、reviewed JSON schemaは [Region Stamp Definition](references/region-stamp.md) に従う。
 
 ## Bootstrap
@@ -122,7 +124,7 @@ Skill `agents/` is the role-definition source; workspace copies are derived. Rul
 ## References
 
 - Preflight/template: `pre-check.md`, `template-lifecycle.md`, `template-requirements.md`
-- Content/validation: `mcp-sourced-content.md`, `validation-rules.md`, `slide-structure.md`, `region-stamp.md`, `delivery-diff.md`
+- Content/validation: `mcp-sourced-content.md`, `validation-rules.md`, `slide-structure.md`, `one-update-slide-pattern.md`, `region-stamp.md`, `delivery-diff.md`
 - Operation/migration: `customer-profile.md`, `agents-overview.md`, `dependencies.md`, `migration-map.md`
 
 ## Done Criteria

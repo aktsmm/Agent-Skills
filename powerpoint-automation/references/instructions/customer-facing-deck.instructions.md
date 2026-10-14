@@ -6,6 +6,7 @@ Use these rules when creating or revising decks intended to be shown directly to
 
 - Slide surfaces must contain only audience-ready content.
 - Do not show internal talk tracks, "avoid saying" guidance, dry-run findings, validation notes, file-purpose labels, or implementation/debug notes on visible slides.
+- Never print internal-state wording on a slide (未確認 / 記載なし / 要確認 / 推定 / 未発表 / 判定保留). Verify and state the fact, or omit the element (for example, draw no region stamp when it cannot be confirmed). Gate it with a forbidden-phrase check over all rendered text.
 - Put presenter guidance and supporting detail in notes, but keep conditions that change an answer visible with its claim. Exclude material the recipient may not receive from the whole file; hidden slides and notes are not access controls.
 - Speaker note citations must include usable URLs, not just source names. Example: `Source: Microsoft Scout overview - https://...`.
 - A presenter-only slide may be hidden or moved into notes only if its contents may also be received by the audience; otherwise keep it in a separate restricted file.
@@ -30,6 +31,8 @@ Use these rules when creating or revising decks intended to be shown directly to
 - Each visible URL must be a real PowerPoint hyperlink, not plain text.
 - Use neutral source labels for customer-facing decks. Avoid internal or overly personal labels unless the user wants them.
 - Verify hyperlink count after generation.
+- For detail links, prefer the Japanese (`ja-jp`) page when it exists, cap them at about three official pages, and never pad with unrelated product landing pages.
+- When slides are rendered from HTML/PDF, detect overflow by geometry (card bottom vs footer top, scrollHeight vs clientHeight), shrink the font in steps, and split detail panels to a continuation page only as a last resort. When merging pages made by different generators, normalise the page size first (Chrome writes 1280x720 px as 960x540 pt) and inspect the merged file's page sizes.
 - If a claim comes from a private customer notification, email, or tenant message, label it as such and do not imply that a public URL proves the exact notification text or date. Separate visible wording into: `Notification says ...` and `Public docs confirm ...`.
 - Put the first-party announcement beside the change's background and the applicable specification beside its limits or recommended action. On those main slides show a linked source title and publication/check date; an appendix list does not replace this evidence. Keep case-specific evidence distinct from general product documentation.
 - Presenter notes should use the deck language unless the user asks otherwise. For Japanese customer decks, do not leave English notes such as `Presenter guidance` or `Slide purpose`; localize notes before handoff.

@@ -68,11 +68,13 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 - For executive or customer-facing decks, make the slide message short, position-taking, and readable at a glance; split the slide if that cannot be done.
 - Use narrative lead sentences, not teaser copy.
 - Keep assumptions and hypotheses distinct from confirmed facts.
+- Verification states (未確認 / 記載なし / 要確認 / 推定) are working notes only: never render them on a slide. Confirmed → write it; unconfirmable → omit the element.
 - Let slide count increase when section dividers or split slides improve comprehension.
 - Use visual hierarchy deliberately: one entry point, clear reading path, quiet caveats.
 - Do not make every card, icon, text box, and color equally loud.
 - Do not shrink text to hide overload; reduce wording, split the slide, or simplify the layout.
 - For customer-facing, executive-facing, legal, brand, pricing, staffing, timeline, commitment, or customer-specific content, require human review before final use.
+- On customer-facing slides, never leave internal-state wording (未確認 / 記載なし / 要確認 / 推定): verify and state it, or omit the element.
 
 ## References
 

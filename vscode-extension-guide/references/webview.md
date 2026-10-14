@@ -161,12 +161,13 @@ states; display fallbacks must not silently replace an explicitly selected
 execution model/provider. Do not feature-detect a stable API already covered by
 `engines.vscode`; separately gate newer configuration capabilities.
 
-- Derive option controls and preview notices from the selected model's current schema and host support, not a global experiment flag. If each option can inherit shared settings, omit a redundant enable checkbox unless OFF has a distinct required meaning.
+- Derive option controls from the selected model's schema and effective execution prerequisites, not a global experiment flag or declaration alone. Keep legacy compatibility paths separate. Unavailable/invalid schema must explain the failure even on authorized hosts; valid empty schema is different. Never invent inputs or discard stored values. If each option can inherit shared settings, omit a redundant enable checkbox unless OFF has a distinct required meaning.
+- For declared but unauthorized optional APIs, show localized prerequisites and a fixed setup-command action that only opens settings. Undeclared/unsupported builds show limitations, not a misleading activation button. Recheck eligibility in the host handler; never accept arbitrary commands, edit permissions automatically, or conflate model consent with host authorization.
 - Preserve enum values and numeric types. Migrate only schema-confirmed equivalents; do not infer speed or compound modes from effort alone. Explicit new options replace inherited legacy fields, but reject explicitly conflicting old/new inputs. Retain invalid or future values until explicit repair.
 - Use one reconciliation path for empty catalogs, unavailable saved selections, refresh failures and normal changes. Remove stale editable choices/notices without deleting saved identity or overrides; restore typed values when advertised choices return.
 - Pass selected variant identity and options through the resolver before rendering; do not lose the chosen value by redrawing from an empty selection or inheritance default.
-- Before replacing or hiding controls, move focus only when the active element is inside them, to a stable visible control. Cover both schema fields and legacy variant fields; never steal unrelated focus.
-- Test available -> empty/unavailable -> restored transitions, typed values, selected options and actual keyboard focus with production handlers. Extracted-code real-DOM fixtures are component evidence, not full host or screen-reader proof.
+- Rescue focus from rebuilt inputs or disappearing actions only; retain focus on an unchanged visible setup button across refresh. Cover schema fields, legacy variants and explicit-reset actions without stealing unrelated focus.
+- Test authorized/unauthorized restoration, unavailable/invalid/valid-empty schemas, typed values, command failure and actual focus with production handlers. Clear stale guidance on model loss. Extracted-code real-DOM fixtures are component evidence, not full host or screen-reader proof.
 
 ### Path Consistency
 

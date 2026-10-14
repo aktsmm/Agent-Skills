@@ -60,6 +60,14 @@ npx @vscode/vsce publish --pre-release
 
 ## Inspect Package Before Publishing
 
+### Proposed APIs And GitHub-only Preview
+
+- Separate a manifest's proposed-API declaration, the host's effective authorization, and source-model access consent. Installation, a model-access dialog, or a pre-release label does not grant host permission. Check the effective runtime proposal set rather than treating the original declaration as authorization.
+- Marketplace `--pre-release` changes the update channel, not proposed-API eligibility. Default `vsce publish` rejects unallowed proposals; do not silently add verification exceptions. Follow the [proposed API distribution guidance](https://code.visualstudio.com/api/advanced-topics/using-proposed-api) and resolve the destination before publishing.
+- For GitHub-only Preview, use a dedicated branch/tag route that never reads Marketplace credentials or publishes there, rejects manual Marketplace requests from Preview, and creates `prerelease=true` without changing the latest stable release. Test both release routes and tag/version matching.
+- Explain manual VSIX installation, same-extension-ID replacement of stable in that profile, explicit runtime activation/full restart, and rollback. Verify the public asset's size/digest and install those exact bytes; do not claim ordinary-profile execution from development-host or synthetic evidence.
+- A development-branch push does not update its released VSIX. Report branch SHA, immutable release tag and distributed version separately; validate shared fixes under both channel manifests before a new version/tag. Update download/rollback links to the intended artifact, and disclose fixed links that still target an older valid release instead of claiming every installed channel is updated.
+
 ```bash
 # List files that will be included
 npx @vscode/vsce ls
@@ -104,6 +112,7 @@ Do not add Marketplace/version/install badges that imply publication before the 
 
 ## Packaging Runner Gotchas
 
+- If a HEAD transition repeatedly fails, stop retries and verify HEAD/refs/index/diff, lock state and ownership before another write. Preserve dirty work; never edit HEAD directly or force-close an unknown holder. An approved release may proceed from a separate worktree containing only scoped changes. Record its real branch/SHA and preserved original state; worktree success is not proof the lock was resolved. Remove only owned diagnostic files/test caches and identify retained worktrees.
 - If packaging rejects versions that already have a release tag, keep its tests independent of the repository's current release state. Test the untagged-success path in a temporary Git work tree, and test tagged-version rejection separately. A test that expects the manifest's current version to be untagged passes before release and fails immediately after the tag is created.
 - Create the parent directory passed to `--out` before invoking `vsce`; the CLI can enumerate a valid package and still fail at the final write with `ENOENT`.
 - On Windows, spawning `npx.cmd` directly from Node can fail with `EINVAL`. In an **npm-managed** project, invoke `process.env.npm_execpath` through `process.execPath` and use `npm exec --package=@vscode/vsce@<version-from-one-project-constant> -- vsce ...`; validate `npm_execpath` exists and is npm's CLI before spawning. For pnpm/yarn projects, use that manager's native exec command instead of forcing npm.
