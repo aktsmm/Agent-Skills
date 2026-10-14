@@ -159,12 +159,14 @@ Google 経由で商標侵害を申し立てると、7 日以内に是正しな�
 
 `wxt.config.ts`（または `package.json`）の version を上げ、`npm run zip` → Dashboard の「パッケージ」で新 ZIP をアップロード → 送信。審査中は掲載情報を編集できない（下記 Artifact Hygiene）。
 
+API v2 は OAuth ではなく GCP サービスアカウント（client email + private key）と publisher ID（`publish-extension init`）で認証する。設定前は Dashboard で提出できる: 専用プロファイルのブラウザーを `--remote-debugging-port` 付きで起動し（既存セッションは使わない）、ログインだけユーザーに依頼 → Package → 「新しいパッケージをアップロード」→ ダイアログの「ファイルを選択」（file chooser）→ ドラフトの version 確認 → 掲載情報タブの「審査のため送信」を1回 → 確認ダイアログ（自動公開 checkbox は既定のまま）→ 一覧で version と「審査待ち」を確認。終了後はそのブラウザーとプロファイルを削除する。公開中の版は公開ページ（`chromewebstore.google.com/detail/<id>`）の manifest version からも確認できる。
+
 ---
 
 ## Artifact Hygiene
 
 - ZIP の中身を列挙し、`src/`, `tests/`, `.github/`, `.vscode/`, `store-assets/`, `*.map`, log が入っていないことを確認する。ロゴやタイルなどの掲載専用画像も同様で、**パッケージ内に置かない**。manifest が参照しないファイルを弾く readiness checker を使っている場合は、そこで落ちる。
-- OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可する。廃止済み OOB redirect を使わず、通常ブラウザーの承認と state + PKCE 付き loopback callback を使う。auth code / refresh token はチャットやログへ貼らず、更新後は token exchange と item read の成功だけ確認する。
+- OAuth `invalid_grant` は refresh token 失効として扱い、同じ ZIP を保持したまま再認可する（v1.1 は 2026-10-15 に廃止済みのため、以後は再認可せず v2 かダッシュボード提出）。廃止済み OOB redirect を使わず、通常ブラウザーの承認と state + PKCE 付き loopback callback を使う。auth code / refresh token はチャットやログへ貼らず、更新後は token exchange と item read の成功だけ確認する。
 - `.env.submit` / `.env*` / token / client secret / auth code を grep や全文検索の対象にしない。存在確認、キー名確認、dry-run 成功、CWS API の `crxVersion` / `itemError` だけを証跡にする。
 - live retry 前に利用中 CLI の package/repository/help を確認する。手順書の旧 CLI 名や存在しない dry-run option を推測で実行せず、upload と publish が分離できる CLI では upload → DRAFT 版確認 → publish の順にする。
 - CWS publish が止まった場合でも、ZIP と SHA256 を GitHub Release に残して再開可能にする。

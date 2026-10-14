@@ -2,6 +2,10 @@
 
 Practical tips for customizing PDF output with Re:VIEW 5.x and the `vvakame/review` Docker image.
 
+## Keep Inline Markup Flat
+
+Keep bold and inline-code spans separate, and do not put Markdown links inside code spans. Re:VIEW cannot parse nested inline commands such as `@<b>{@<code>{...}}` or `@<code>{@<href>{...}}`. Write a command name as code outside the bold span; fix the Markdown source, then reconvert and build rather than patching generated files.
+
 ## Measuring Actual Page Counts
 
 Page budgets are usually planned from character counts, but only the built PDF settles the question. Measure it before acting on a budget overrun.

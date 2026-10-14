@@ -91,6 +91,7 @@ WXT の生成型を含めた型検査は、root `tsconfig.json` や `.wxt/tsconf
 
 - `chrome.scripting.executeScript({ args })` に `undefined` を渡すと実 MV3 では引数のシリアライズで失敗し得る。mock の成功だけで完了にせず、未承認操作を含む実拡張テストで注入できることを確かめる。
 - `chrome.downloads.download()` が返す ID は保存完了ではない。対象 ID の `onChanged` と初期 `search` で `complete` / `interrupted` を判定し、期限を設ける。E2E では保存本文と推奨ファイル名を確認し、一時ブラウザの GUID 名や汎用アイコンで利用者プロファイルの保存結果を判定しない。
+- E2E フィクスチャが `chrome.storage` へ入れる初期値は現行スキーマに合わせる。保存形式を変えたら、旧形式の移行は単体テスト、新形式は E2E で確かめる。古い種はアプリではなく文言の assertion で落ちる。
 
 ---
 

@@ -6,7 +6,9 @@ How to take reviewer issues, pull requests, and publisher proof comments into a 
 
 A single pull request usually mixes correct fact fixes, wording preferences, and claims that no longer match the source. Split it and rule on each point. Adopting or rejecting the whole request wastes the correct half.
 
-Record three outcomes only: adopted, adopted with change, rejected. "Adopted with change" needs the reason for the change, or the reviewer reads it as a silent override.
+Record three outcomes only: rejected with reason, adopted with change and reason, adopted. Put the original point (labelled quote or summary) beside the response. No source edit needed does not mean no typeset correction needed. Keep point IDs and mechanically counted totals.
+
+Answer later comments first in a separate batch with separate IDs and adoption totals. For a deletion proposal that would remove a required concept, preserve a shorter explanation and record it as adopted with change.
 
 ## Merge a contributor's pull request rather than retyping it
 
@@ -139,7 +141,9 @@ For every rejected point, give the primary source, quote the sentence, and expla
 
 For every adopted point, name what changed and, where the wording differs from the proposal, why. Common reasons: the proposal broke an established form used elsewhere in the book, or its politeness level did not match the surrounding prose.
 
-Group related requests into one commit when they share a topic, and reference that commit from each reply so the reviewer can see the result.
+Group related changes by topic. Pin delivery links to one published revision containing the current manuscript and matching generated outputs. Check both source/revision agreement and remote artifact existence before saying delivered. Use the original-to-delivery comparison for the full change set, and previous-delivery-to-delivery for a later batch; do not point at a draft branch or an old revision as current.
+
+After posting, read back the returned comment ID and compare the approved body, point IDs, decisions, and links. Normalize line endings and Markdown table alignment padding/separator widths only; keep cell content unchanged. A readback failure is not proof of a failed post: resolve its state before retrying. Record the posting URL and sent state only after confirmation.
 
 ## Widen the scope before applying
 
@@ -164,7 +168,7 @@ Padded Markdown tables with mixed-width text break when one cell changes, and ha
 
 ## Close the loop
 
-Reply, then close; a fixed-but-open issue reads as ignored.
+Reply, then close a completed tracked fix. Keep a publisher proof thread open while typesetting, author decisions, or verification are still pending; posting a delivery reply alone does not finish that thread.
 
 Before closing, regenerate affected question digests and counts and run the manuscript gates. A reference URL change must preserve support for the answer and use a reachable, specific source. Compare each question's reference format separately from the chapter's supplementary reference heading when aligning books. If an explicitly requested source triggers a duplicate limit, report that conflict; do not substitute a weaker source or relax the gate merely to pass.
 

@@ -104,6 +104,14 @@ async function processInChunks(data: unknown[]) {
 - `tabs.captureVisibleTab()` は `activeTab`（ユーザー操作時）か `<all_urls>` 相当の host 権限が必要で、Base64 の data URL を返す。
 - フルページ撮影でスクロール→撮影を繰り返すと呼び出し頻度上限に当たる。各撮影の間隔を空け、固定ヘッダーの重複や遅延読み込み画像を考慮して結合する。
 
+## ローカル companion（localhost）との接続
+
+- 接続先が複数ある場合（例: エディタ拡張と単体 Node 版）は既定ポートを分け、`/health` に種別（`bridge: "vscode" | "standalone"`）を返させる。拡張は優先順に短い timeout で `/health` を probe し、最初に通った先を使う。固定モードも用意する。
+- 解決は「候補リスト + 注入した probe」の純関数にし、優先・フォールバック・全滅・固定モードを単体テストする。
+- 解決済み URL は `chrome.storage` に保存し、UI・別モジュール・SW が同じ値を読む。モジュールごとにポート設定を読むと、一部の fetch だけ別ポートへ行く。
+- 実行中の切断は `fetch` の `TypeError`（到達不能）だけで再解決する。中断や HTTP エラーでは再解決せず、失敗した送信は自動再送しない（二重実行防止）。
+- 同じ契約を二重実装するなら、共有ソースの同一性・上限定数・既定ポート・`/health` 種別を検証するスクリプトをリリース gate に入れる。自動起動する companion の既定作業フォルダはホーム全体にせず専用フォルダにする。
+
 ## 外部リソース
 
 - [WXT Messaging](https://wxt.dev/guide/essentials/messaging)
