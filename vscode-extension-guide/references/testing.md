@@ -111,6 +111,8 @@ for (const folderArgs of [[extensionDevelopmentPath], []]) {
 
 Treat the archive patch as test infrastructure with static guards: assert cache containment, the single-candidate product lookup, and both workspace/empty-window launches. The main-process log can still print a harmless instance-mutex warning; completion is decided by extension-host assertions and exit code.
 
+A user-level `~/.vscode/argv.json` (for example `enable-proposed-api`) also applies to the test host, so tests asserting "no permission" fail only on a machine where the entry exists. Pin the host version in your runner config when features need a minimum VS Code version, and for a local run remove the entry temporarily, restore the original bytes in `finally`, and verify the file hash afterwards; never leave the edited file behind.
+
 ## Terminal Readiness and Owned Cleanup
 
 - Diagnose `terminal.shellIntegration`, its `cwd`, and `terminal.state.shell` separately. Active integration does not guarantee a detected shell type; log only readiness flags and an allowlisted shell label, not commands, output or environment values.
