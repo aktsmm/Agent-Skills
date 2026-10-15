@@ -41,6 +41,7 @@ Minimum items to verify:
 - [ ] Before a new detection rule becomes a blocking gate, was its precision measured against the real corpus, and were low-precision signals demoted to a report-only lane? (Measured Gate)
 - [ ] If scheduled execution references a local runtime asset, are the live binding and fallback snapshot both checked for drift?
 - [ ] If current state shares a file with history, is current state parsed from explicit schema boundaries rather than whole-file keyword search?
+- [ ] When an agent's inline output schema is deduplicated into a pointer, does the agent still return the same typed object (keys and types, not a prose placeholder), and does each shared schema have one named SSOT? (Contract Pointer)
 ```
 
 ---
