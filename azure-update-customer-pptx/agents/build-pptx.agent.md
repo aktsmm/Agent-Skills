@@ -24,9 +24,9 @@ user-invocable: false
 
 ## Permissions
 
-- ✅ `run_in_terminal`（PowerShell スクリプト実行）
-- ✅ `read_file` / `create_file`（JSON 入出力）
-- ❌ `runSubagent`（Orchestrator 専用）
+- ✅ shell 実行（PowerShell スクリプト実行）
+- ✅ ファイル読み取り / 作成（JSON 入出力）
+- ❌ サブエージェント起動（Orchestrator 専用）
 
 ---
 
@@ -37,7 +37,7 @@ user-invocable: false
 & "$BasePath\scripts\Build-CustomerPptx.ps1" -DateFolder "{日付フォルダ}"
 ```
 
-> **このスクリプトを `run_in_terminal` で実行すること。手動でスライドを挿入しない。**
+> **このスクリプトを shell 実行ツールで実行すること。手動でスライドを挿入しない。**
 
 ## 📁 ログ・一時ファイルの出力先（必須）
 
@@ -78,7 +78,7 @@ if (-not (Test-Path $logsDir)) { New-Item $logsDir -ItemType Directory | Out-Nul
 
 ### Phase 1: Build スクリプト実行（必須）
 
-以下のスクリプトを `run_in_terminal` で実行し、テンプレートへのスライド挿入を行う。
+以下のスクリプトを shell 実行ツールで実行し、テンプレートへのスライド挿入を行う。
 
 ```powershell
 & "$BasePath\scripts\Build-CustomerPptx.ps1" -DateFolder "{日付フォルダ}"

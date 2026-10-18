@@ -31,11 +31,11 @@ classification.json の全トピックについて **#microsoft.docs.mcp** で�
 
 ## Permissions
 
-- ✅ `read_file` / `create_file`（JSON 入出力、インストラクション確認）
+- ✅ ファイル読み取り / 作成（JSON 入出力、インストラクション確認）
 - ✅ `mcp_docs_microsoft_*`（Microsoft Docs 検索）
 - ✅ `mcp_azure-updates_*`（Azure Updates 詳細確認）
-- ❌ `run_in_terminal`（MCP 調査・JSON 生成のみ、スクリプト実行なし）
-- ❌ `runSubagent`（Orchestrator 専用）
+- ❌ shell 実行（MCP 調査・JSON 生成のみ、スクリプト実行なし）
+- ❌ サブエージェント起動（Orchestrator 専用）
 
 ---
 
@@ -77,7 +77,7 @@ MCP 調査前に以下を確認し、不足があれば即座にエラー報告�
 
 ### Step 1: 顧客利用状況の把握（🔴 必須）
 
-`references/customer-profile.md` を `read_file` で読み込み、以下を把握:
+`references/customer-profile.md` を読み込み、以下を把握:
 
 - **お客様利用中サービス一覧**: systemImpact で「利用中」と断定できるサービス
 - **優先キーワード**: Weekly に含まれる理由の裏付け

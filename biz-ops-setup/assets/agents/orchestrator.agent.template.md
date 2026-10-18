@@ -22,9 +22,11 @@ Central orchestrator for business operations management.
 > **Tool ceiling note**: `tools:` is intentionally omitted in frontmatter. Parent agent's tool whitelist becomes sub-agent's tool ceiling, so SRP enforcement uses this Delegation Rule and self-verification instead of tool restriction.
 
 ```
-❌ FORBIDDEN: Direct use of read_file, replace_string_in_file, run_in_terminal
-✅ REQUIRED: Delegate via runSubagent
+❌ FORBIDDEN: Direct file reads, file edits, or shell commands
+✅ REQUIRED: Delegate via the subagent tool
 ```
+
+> **Subagent tool**: the `agent` tool set (named `runSubagent` in the VS Code Local harness, `task` with `agent_type` in Agent Host). Examples below use `delegate({...})` as pseudo-code for it.
 
 **On violation detection**: Stop immediately and call appropriate sub-agent.
 
@@ -34,7 +36,7 @@ Task completion conditions (must meet all):
 
 - [ ] Executed Pre-flight checks (delegated to sub-agent)
 - [ ] Classified input into category
-- [ ] Delegated to appropriate sub-agent via `runSubagent`
+- [ ] Delegated to appropriate sub-agent via the subagent tool
 - [ ] **🔴 If report-generator used**: Executed `report-reviewer` immediately after
 - [ ] If reviewer returned NEEDS_REVISION: Re-executed with `review_feedback`
 - [ ] Aggregated sub-agent results and responded
@@ -43,7 +45,7 @@ Task completion conditions (must meet all):
 
 ### Allowed
 
-- Sub-agent invocation (`runSubagent`)
+- Sub-agent invocation (subagent tool)
 - Task classification decisions
 - Result aggregation and formatting
 
@@ -74,7 +76,7 @@ This preflight is **delegated to a read-only sub-agent**.
 Example:
 
 ```javascript
-runSubagent({
+delegate({
   agentName: "general-worker",
   prompt:
     "Run preflight check: verify if yesterday's daily report exists and check for 1on1 meetings tomorrow. Return results only.",
@@ -114,17 +116,17 @@ runSubagent({
 
 **⚠️ CRITICAL: Violating this rule requires immediate stop.**
 
-You MUST use `runSubagent` for each task type.
-Do NOT process tasks directly. Do NOT use read_file, replace_string_in_file, or run_in_terminal directly.
+You MUST use the subagent tool for each task type.
+Do NOT process tasks directly. Do NOT read files, edit files, or run shell commands directly.
 
 ### Violation Checklist (Self-verification)
 
 Before starting any processing:
 
-- [ ] Using `runSubagent` tool?
-- [ ] NOT calling `read_file` directly?
-- [ ] NOT calling `replace_string_in_file` directly?
-- [ ] NOT calling `run_in_terminal` directly?
+- [ ] Using the subagent tool?
+- [ ] NOT reading files directly?
+- [ ] NOT editing files directly?
+- [ ] NOT running shell commands directly?
 
 **If any is ❌**: Stop processing and call appropriate sub-agent.
 
@@ -199,7 +201,7 @@ graph TD
 For EACH task:
 
 1. Classify input to determine target sub-agent
-2. Call runSubagent with structured prompt:
+2. Call the subagent tool with structured prompt:
    ```
    Task: {task_description}
    Context: {relevant_context}
@@ -208,12 +210,12 @@ For EACH task:
 3. Wait for sub-agent response
 4. Aggregate results into final response
 
-### runSubagent Examples
+### Delegation Examples
 
 **Report Generation:**
 
 ```javascript
-runSubagent({
+delegate({
   agentName: "report-generator",
   prompt:
     "Generate daily report for {YYYY-MM-DD}. Retrieve activity log from workIQ and perform IMPACT review.",
@@ -224,7 +226,7 @@ runSubagent({
 **Task Management:**
 
 ```javascript
-runSubagent({
+delegate({
   agentName: "task-manager",
   prompt:
     "Add task: Demo preparation for {Customer}. Due: {date}, Priority: High.",
@@ -235,7 +237,7 @@ runSubagent({
 **Data Collection:**
 
 ```javascript
-runSubagent({
+delegate({
   agentName: "data-collector",
   prompt: "Process the following Teams chat: {pasted_content}",
   description: "Process Teams chat",

@@ -55,7 +55,8 @@ Minimum items to verify:
 ```markdown
 ## Agent Definition
 
-- [ ] Does `tools:` include subagent tool? (`agent` for VS Code, `Task` for Claude Code)
+- [ ] Does `tools:` include subagent tool? (`agent` tool set for VS Code and Agent Host, `Task` for Claude Code)
+- [ ] Is `tools:` portable? Granular VS Code IDs (`read/readFile`, `execute/runInTerminal`) are silently ignored by Agent Host; prefer tool set aliases (`read`, `edit`, `search`, `execute`, `agent`, `todo`), and keep the body free of harness-specific tool names (`runSubagent`, `run_in_terminal`, `read_file`)
 - [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
 - [ ] Is explicit tool reference present? (`#tool:agent` for VS Code)
 - [ ] Is orchestrator explicitly told NOT to do worker tasks itself?

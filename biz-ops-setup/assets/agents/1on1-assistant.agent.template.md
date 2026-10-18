@@ -1,14 +1,7 @@
 ---
 name: 1on1-assistant
 description: "1on1準備エージェント: 上司との定期1on1の準備資料自動生成・アクションアイテム抽出"
-tools:
-  [
-    "read/readFile",
-    "edit/editFiles",
-    "search/fileSearch",
-    "search/textSearch",
-    "workiq/*",
-  ]
+tools: [read, edit, search, "workiq/*"]
 ---
 
 # 1on1 Assistant

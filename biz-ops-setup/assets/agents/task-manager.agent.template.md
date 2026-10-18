@@ -1,14 +1,7 @@
 ---
 name: task-manager
 description: "Task management agent: Task creation, updates, classification, and progress tracking"
-tools:
-  [
-    "read/readFile",
-    "edit/editFiles",
-    "search/textSearch",
-    "search/fileSearch",
-    "todos",
-  ]
+tools: [read, edit, search, todo]
 ---
 
 # Task Manager

@@ -10,6 +10,8 @@ Use for independent tasks (sectioning) or several independent judgments on the s
 
 An orchestrator with the `agent` tool set (`agent/runSubagent`) can issue several subagent calls in one turn; they run concurrently and all results return before the orchestrator continues. Each subagent has its own context window, but **not** its own file system, terminal, or COM session.
 
+On Agent Host (Copilot CLI harness), issue several `task` calls (`agent_type`, `prompt`) in one block, or use `mode: background`; the pseudo-code below uses the Local harness `runSubagent` form.
+
 ### Safety Requirements
 
 Before parallelizing, verify **all three conditions**:

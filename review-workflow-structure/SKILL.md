@@ -37,11 +37,11 @@ metadata:
 
 ## Rubric SSOT
 
-ワークスペースに `.github/skills/agentic-workflow-guide/` がある場合は、判定基準を次に委譲する。
+ワークスペースの `.github/skills/` または `~/.copilot/skills/` に `agentic-workflow-guide` がある場合は、判定基準を次に委譲する（`<skills-root>` は見つかった側）。
 
-- `.github/skills/agentic-workflow-guide/SKILL.md`
-- `.github/skills/agentic-workflow-guide/references/review-checklist.md`
-- `.github/skills/agentic-workflow-guide/references/design-principles.md`
+- `<skills-root>/agentic-workflow-guide/SKILL.md`
+- `<skills-root>/agentic-workflow-guide/references/review-checklist.md`
+- `<skills-root>/agentic-workflow-guide/references/design-principles.md`
 
 ワークスペースにワークフロー設計レビュー専用 rubric の instruction がある場合は、`applyTo` が今回の入口へ match しなくてもそれも rubric として読む。
 
@@ -54,7 +54,7 @@ rubric SSOT が無い場合、または最終 sanity check では、次だけを
 - Placement / SSOT: always-loaded、path-scoped、task prompt、skill、agent、docs の置き場が正しいか。
 - Always-On Boundary: `copilot-instructions.md` と `AGENTS.md` が短い入口に留まり、catalog / workflow map / reference list を昇格させていないか。
 - Primitive / SRP: prompt / instruction / skill / agent / hook の選択が最小で、1 agent が 1 責務か。
-- Frontmatter / Placement: `.instructions.md` / `.agent.md` / `SKILL.md` の supported fields、`applyTo` 過大（絞る提案は対象 instruction の全文を読み、除外されるファイルの編集に効く規則が無いことを確認してから出す）、`.github/agents/` 直下配置を確認する。agent は本文の tool reference が frontmatter `tools` と整合しているかも確認する。
+- Frontmatter / Placement: `.instructions.md` / `.agent.md` / `SKILL.md` の supported fields、`applyTo` 過大（絞る提案は対象 instruction の全文を読み、除外されるファイルの編集に効く規則が無いことを確認してから出す）、`.github/agents/` 直下配置を確認する。agent は本文の tool reference が frontmatter `tools` と整合しているかも確認する。両 harness（VS Code Local / Agent Host）で使う資産は、`tools:` が個別 ID（`read/readFile` 等）だけで harness により無視されないか（tool set 別名 `read` / `edit` / `search` / `execute` / `agent` / `todo` が portable）、本文が `runSubagent` / `run_in_terminal` / `read_file` など harness 固有のツール名に依存していないかも見る。
 - Deterministic Offload: extract / count / validate / diff / format / parse / lint が LLM loop に混ざっていないか。既存 script / CLI がある処理を agent が UI・手作業で書き、SSOT の script 経路と手順が矛盾していないか。
 - Reference Integrity: 相対 Markdown link の実在に加え、`#anchor` と `セクション N` / `section N` / `§N` の散文ポインタが対象の見出しへ解決するか。ファイル実在だけを PASS にしない。機械検査では code span / fenced code 内の記法例、`URL` / `path` などの placeholder target を除外する。
 - Context Compression / Preservation: 記述なしでも正常・例外・停止時の判断が変わらない一般論・自明な説明・装飾・metadataの言い換え・重複は、圧縮より先に削除候補にする。判断に必要なユーザー固有事実・ID・パス・方針・根拠・Example・非自明な手順、承認範囲・未検証要件・停止／復旧条件、運用メタコメントは保持する。

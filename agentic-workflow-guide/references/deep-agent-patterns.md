@@ -93,7 +93,7 @@ tools: ["search", "web/fetch", "agent", "edit/editFiles", "todo"]
 
 Research sub-agents can be launched in parallel by placing multiple `runSubagent` (or `#tool:agent`) calls in the same tool-call block. This significantly reduces total execution time when perspectives are independent.
 
-> **Note**: `run_in_terminal` and `semantic_search` cannot be called in parallel. `runSubagent`, `read_file`, `grep_search`, `file_search` can.
+> **Note (Local harness tool names)**: `run_in_terminal` and `semantic_search` cannot be called in parallel. `runSubagent`, `read_file`, `grep_search`, `file_search` can. On Agent Host, issue several `task` calls in one block (or use `mode: background`) and keep a single shell call at a time.
 
 ### File Collision Avoidance
 

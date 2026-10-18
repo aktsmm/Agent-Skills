@@ -221,6 +221,8 @@ Use #tool:web when external documentation is required.
 
 `githubRepo` / `githubTextSearch` はカテゴリなしの ID。Local の subagent では todo と `vscode/askQuestions` は使えない。
 
+**Portable な書き方**: Agent Host（Copilot CLI harness）は認識できない tool 名を黙って無視するため、上表の個別 ID だけの `tools:` は harness によってツールが 0 件になり得る。両 harness で使う資産は tool set 別名（`read` / `edit` / `search` / `execute` / `agent` / `web` / `todo`）で書き、本文の手順は `read_file` / `run_in_terminal` / `runSubagent` のような harness 固有のツール名ではなく「ファイル読み取り」「shell 実行」「サブエージェント起動」と能力で記述する。MCP は `<server>/*` で指定する。
+
 ## Agent Body Structure
 
 ### Built-in Aligned Minimal Template

@@ -1,8 +1,7 @@
 ---
 name: work-inventory
 description: "Work inventory agent: Work analysis, time allocation, improvement proposals, and manager PR support"
-tools:
-  ["read/readFile", "edit/editFiles", "search/textSearch", "search/fileSearch"]
+tools: [read, edit, search]
 ---
 
 # Work Inventory

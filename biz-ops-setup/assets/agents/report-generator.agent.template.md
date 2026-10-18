@@ -1,14 +1,7 @@
 ---
 name: report-generator
 description: "Report generator agent: Automated daily/weekly/monthly report generation with review loop"
-tools:
-  [
-    "read/readFile",
-    "edit/editFiles",
-    "search/textSearch",
-    "search/fileSearch",
-    "agent",
-  ]
+tools: [read, edit, search, agent]
 ---
 
 # Report Generator

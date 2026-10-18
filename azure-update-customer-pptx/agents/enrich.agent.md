@@ -44,11 +44,11 @@ user-invocable: false
 
 ## Permissions
 
-- ✅ `run_in_terminal`（PowerShell スクリプト実行）
-- ✅ `read_file`（JSON 読み込み）
+- ✅ shell 実行（PowerShell スクリプト実行）
+- ✅ ファイル読み取り（JSON 読み込み）
 - ❌ `mcp_microsoft_le*_microsoft_docs_*`（Notes Generator Agent の責務）
-- ❌ `create_file`（JSON 生成は Notes Generator Agent の責務）
-- ❌ `runSubagent`（Orchestrator 専用）
+- ❌ ファイル作成（JSON 生成は Notes Generator Agent の責務）
+- ❌ サブエージェント起動（Orchestrator 専用）
 
 ---
 
@@ -118,7 +118,7 @@ $logsDir = "$BasePath\{日付フォルダ}\logs"
 if (-not (Test-Path $logsDir)) { New-Item $logsDir -ItemType Directory | Out-Null }
 ```
 
-**このスクリプトを `run_in_terminal` で実行すること。手動で PowerPoint を編集しない。**
+**このスクリプトを shell 実行ツールで実行すること。手動で PowerPoint を編集しない。**
 
 `Run-CustomerPptxPipeline.ps1 -SkipBuild` は内部で `Enrich-CustomerPptx.ps1` と `Verify-Pptx.ps1` を同一 COM セッションで実行し、`manifest/verify_status.json` を保存する。既存互換が必要な場合のみ `Enrich-CustomerPptx.ps1` と `Verify-Pptx.ps1` を個別実行してよい。
 

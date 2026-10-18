@@ -1,15 +1,7 @@
 ---
 name: general-worker
 description: "汎用ワーカー: 特定カテゴリに該当しないタスクを処理"
-tools:
-  [
-    "read/readFile",
-    "edit/editFiles",
-    "search/fileSearch",
-    "search/textSearch",
-    "execute/runInTerminal",
-    "workiq/*",
-  ]
+tools: [read, edit, search, execute, "workiq/*"]
 ---
 
 # General Worker

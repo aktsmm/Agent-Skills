@@ -27,11 +27,11 @@ Prepare Agent が生成した `region_info.json` を **#microsoft.docs.mcp** で
 
 ## Permissions
 
-- ✅ `read_file` / `create_file`（JSON 入出力）
+- ✅ ファイル読み取り / 作成（JSON 入出力）
 - ✅ `mcp_docs_microsoft_*`（Microsoft Docs 検索・リージョン確認）
 - ✅ `mcp_azure-updates_*`（Azure Updates 詳細確認）
-- ❌ `run_in_terminal`（MCP 検証のみ、スクリプト実行なし）
-- ❌ `runSubagent`（Orchestrator 専用）
+- ❌ shell 実行（MCP 検証のみ、スクリプト実行なし）
+- ❌ サブエージェント起動（Orchestrator 専用）
 
 ---
 

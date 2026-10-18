@@ -20,11 +20,11 @@ metadata:
 
 ## When to Use
 
-- 使う: agent / prompt / instruction / AGENTS が scripts / hooks / validators / CLI を参照している workflow を確認したいとき
+- 使う: agent / skill / instruction / AGENTS が scripts / hooks / validators / CLI を参照している workflow を確認したいとき
 - 使う: `dry-run -> apply -> verify`、I/O schema、冪等性、重複防止、cleanup、error handling が実装と一致しているか見たいとき
 - 使う: scripts の冗長な処理、重複関数、長すぎる分岐、不要な手順を見つけて安全に整理したいとき
 - 使う: workflow が「設計上は良い」が、実スクリプトや実行手順まで噛み合っているか不安なとき
-- 使わない: agent / instruction / prompt の構造・SSOT だけを見たいとき。その場合は `/review-workflow-structure` を使う
+- 使わない: agent / instruction / skill の構造・SSOT だけを見たいとき。その場合は `/review-workflow-structure` を使う
 - 使わない: 通常のコード品質レビューだけをしたいとき。その場合は通常の review として扱う
 
 ## Default Behavior
@@ -40,8 +40,8 @@ metadata:
 
 ワークスペース内に存在する場合は、次を補助 SSOT として読む。
 
-- `.github/skills/agentic-workflow-guide/SKILL.md`
-- `.github/skills/agentic-workflow-guide/references/review-checklist.md`
+- `.github/skills/agentic-workflow-guide/SKILL.md`（なければ `~/.copilot/skills/` 側）
+- `.github/skills/agentic-workflow-guide/references/review-checklist.md`（同上）
 - `.github/instructions/**.instructions.md` のうち対象 script / workflow に apply されるもの
 - `AGENTS.md` / `.github/copilot-instructions.md` / 関連 `.agent.md` / 関連 skill
 

@@ -1,8 +1,7 @@
 ---
 name: data-collector
 description: "Data collection agent: Information gathering from various sources, normalization, and automatic customer routing"
-tools:
-  ["read/readFile", "edit/editFiles", "search/textSearch", "search/fileSearch"]
+tools: [read, edit, search]
 ---
 
 # Data Collector

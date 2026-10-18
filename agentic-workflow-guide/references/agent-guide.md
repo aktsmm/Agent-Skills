@@ -17,6 +17,7 @@ Practical guide for using subagent tools in VS Code Copilot and Claude Code.
 > **Platform Note (2026/10 verified)**:
 >
 > - **VS Code Copilot (Local harness)**: Put the `agent` tool set in `tools:` (individual tool id: `agent/runSubagent`) and reference it as `#tool:agent` in the body
+> - **VS Code Agent Host (Copilot CLI harness)**: Subagents are launched with the `task` tool (`agent_type`, `mode: sync|background`); VS Code tool ids such as `agent/runSubagent` in `tools:` are not guaranteed to apply, so verify delegation in the destination harness
 > - **Claude Code**: Use `Task` in `tools:`
 > - Do not write the old flat name `tools: ["runSubagent"]` in new docs
 

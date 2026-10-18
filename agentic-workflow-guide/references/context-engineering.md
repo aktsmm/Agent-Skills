@@ -247,13 +247,14 @@ Always-applied instructions (`copilot-instructions.md`, `AGENTS.md`, `applyTo`-m
 
 ### Loading Locations (VS Code Copilot)
 
-| Scope     | Path                                           |
-| --------- | ---------------------------------------------- |
-| User      | VS Code profile user data `prompts/` folder    |
-| Workspace | `.github/copilot-instructions.md`, `AGENTS.md` |
-| Workspace | `.github/instructions/**/*.instructions.md`    |
-| Workspace | `.github/prompts/*.prompt.md`                  |
-| Workspace | `.github/agents/*.agent.md`                    |
+| Scope     | Path                                                                                                |
+| --------- | --------------------------------------------------------------------------------------------------- |
+| User      | Agent Host: `~/.copilot/{copilot-instructions.md,instructions,skills,agents}`                       |
+| User      | Local harness only: VS Code profile user data `prompts/` folder                                     |
+| Workspace | `.github/copilot-instructions.md`, `AGENTS.md`                                                      |
+| Workspace | `.github/instructions/**/*.instructions.md`                                                         |
+| Workspace | `.github/prompts/*.prompt.md` (Local harness only; Agent Host does not load prompt files)           |
+| Workspace | `.github/agents/*.agent.md`                                                                         |
 
 Check what actually loaded via Chat view right-click > Diagnostics.
 
@@ -263,7 +264,7 @@ Duplicate content across global and workspace scopes doubles token cost.
 
 - [ ] Each file contains only user-specific / AI-unknowable information
 - [ ] No duplicate content between global and workspace scopes
-- [ ] All `.prompt.md` files have a `description` frontmatter
+- [ ] All `.prompt.md` files (Local harness) and `SKILL.md` files have a `description` frontmatter
 - [ ] Stale IDs, paths, or settings removed
 - [ ] Long-lived attached addenda are pruned by lifecycle state:
   - Delete only items whose outcome is verified.

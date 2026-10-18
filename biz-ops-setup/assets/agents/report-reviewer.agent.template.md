@@ -1,7 +1,7 @@
 ---
 name: report-reviewer
 description: "Report review agent: Evaluate reports from results-oriented perspective and propose improvements"
-tools: ["read/readFile", "search/textSearch", "search/fileSearch"]
+tools: [read, search]
 ---
 
 # Report Reviewer

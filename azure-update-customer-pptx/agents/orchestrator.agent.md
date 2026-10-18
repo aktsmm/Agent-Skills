@@ -16,7 +16,7 @@ description: 顧客向け Azure Update PowerPoint 作成ワークフローの全
 ```
 Orchestrator の責務:
   ✅ タスクの分解・計画
-  ✅ サブエージェントへの委譲（runSubagent）
+  ✅ サブエージェントへの委譲（サブエージェント起動ツール。`agent` ツールセット、Agent Host では `task`）
   ✅ Gate 結果の確認と次ステップ判断
   ✅ エラー時のリカバリ判断
   ✅ MCP 事前確認（接続チェックのみ。調査は Worker へ委譲）
@@ -57,7 +57,7 @@ Orchestrator の責務:
 
 **ワークフロー開始時に開始時刻を記録し、完了レポートに所要時間を表示すること。**
 
-> ℹ️ これは Orchestrator が直接 `run_in_terminal` を使う**唯一の例外**。対象は `status.json` の計測フィールドのみで、manifest JSON や PPTX の生成・編集は行わない。
+> ℹ️ これは Orchestrator が直接 shell 実行ツールを使う**唯一の例外**。対象は `status.json` の計測フィールドのみで、manifest JSON や PPTX の生成・編集は行わない。
 
 ### 手順
 
@@ -103,7 +103,7 @@ Orchestrator の責務:
 
 ### Step 1/4: 準備（Prepare エージェントへ委譲）
 
-**runSubagent で呼び出す:**
+**サブエージェント起動ツールで呼び出す:**
 
 ```
 prompt: |
@@ -113,9 +113,9 @@ prompt: |
   日付フォルダ: {日付フォルダ}
 
   タスク:
-  1. 必読インストラクションを確認（read_file）
+  1. 必読インストラクションを確認（ファイル読み取り）
   2. ソースファイルを全件列挙
-  3. 🔴 `run_in_terminal` で `Prepare-CustomerPptx.ps1 -DateFolder {日付フォルダ}` を実行
+  3. 🔴 shell 実行ツールで `Prepare-CustomerPptx.ps1 -DateFolder {日付フォルダ}` を実行
   4. classification.json の keypoint を AI で精査・修正
   5. リージョン情報を #microsoft.docs.mcp で初期判定
   6. manifest フォルダに JSON 出力
@@ -151,7 +151,7 @@ description: "Prepare: 解凍・分析・分類"
 > | Build PPTX      | classification.json + .pptx | output.pptx               | あり    | なし |
 > | Notes Generator | classification.json         | notes.json                | なし    | なし |
 
-**3 つの runSubagent を同時に呼び出す:**
+**3 つのサブエージェントを同時に呼び出す（同一ターンで 3 回起動）:**
 
 #### 2a. Review エージェント
 
@@ -188,7 +188,7 @@ prompt: |
   日付フォルダ: {日付フォルダ}
 
   タスク:
-  1. 🔴 `run_in_terminal` で `Build-CustomerPptx.ps1 -DateFolder {日付フォルダ}` を実行
+  1. 🔴 shell 実行ツールで `Build-CustomerPptx.ps1 -DateFolder {日付フォルダ}` を実行
   2. スライド数が期待値と一致することを確認
   3. セクション構成を確認
   4. Gate 2 検証を実行
@@ -246,7 +246,7 @@ agentName: "Notes Generator"
 > ⚠️ **前提**: Step 2 の全 3 エージェントが完了していること。
 > notes.json・region_info_reviewed.json・output.pptx が全て揃ってから呼び出す。
 
-**runSubagent で呼び出す:**
+**サブエージェント起動ツールで呼び出す:**
 
 ```
 prompt: |
@@ -261,8 +261,8 @@ prompt: |
 
   タスク:
   1. notes.json・region_info_reviewed.json・classification.json の存在を確認
-  2. 🔴 `run_in_terminal` で `Enrich-CustomerPptx.ps1 -DateFolder {日付フォルダ}` を実行
-  3. 🔴 `run_in_terminal` で `Verify-Pptx.ps1 -PptxPath {出力ファイルパス}` を実行
+  2. 🔴 shell 実行ツールで `Enrich-CustomerPptx.ps1 -DateFolder {日付フォルダ}` を実行
+  3. 🔴 shell 実行ツールで `Verify-Pptx.ps1 -PptxPath {出力ファイルパス}` を実行
   4. exit code が 0 でない場合はエラー内容を報告
 
   完了後、以下の形式で報告してください:
@@ -285,7 +285,7 @@ agentName: "Enrich"
 
 ### Step 4/4: 完成（Finalize エージェントへ委譲）
 
-**runSubagent で呼び出す:**
+**サブエージェント起動ツールで呼び出す:**
 
 ```
 prompt: |
@@ -374,7 +374,7 @@ classification.json の分類変更が必要な場合:
 
 | リソース             | 用途                       |
 | -------------------- | -------------------------- |
-| `runSubagent` ツール | サブエージェントへの委譲   |
+| サブエージェント起動ツール | サブエージェントへの委譲   |
 | サブエージェント定義 | 各ステップの詳細な作業手順 |
 | Gate 検証結果        | 次ステップへの進行可否判断 |
 

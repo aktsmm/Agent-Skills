@@ -27,9 +27,9 @@ PowerPoint COM で編集完了後、最終検証を行い、対象ファイル�
 
 ## Permissions
 
-- ✅ `run_in_terminal`（PowerShell スクリプト実行、PowerPoint 起動）
-- ✅ `read_file`（JSON 読み込み）
-- ❌ `runSubagent`（Orchestrator 専用）
+- ✅ shell 実行（PowerShell スクリプト実行、PowerPoint 起動）
+- ✅ ファイル読み取り（JSON 読み込み）
+- ❌ サブエージェント起動（Orchestrator 専用）
 
 ---
 
