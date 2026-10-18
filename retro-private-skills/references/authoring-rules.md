@@ -9,6 +9,7 @@
 - Do not add generic or obvious process advice; prefer gotchas, verification checks, and failure-avoidance rules that change future behavior.
 - Preserve non-obvious decision criteria, gotchas, done criteria, and failure-avoidance rules.
 - Do not repeat the same `Learning / Evidence / Impact` in different wording.
+- Classify every learning so none stays unprocessed. An out-of-scope learning is `handoff` when its recommended destination is confirmed and `確認待ち` otherwise, never `見送り` merely for being out of scope. A `review-only` proposal is `提案のみ`, never reported as reflected.
 
 ## Apply Details
 
@@ -23,6 +24,7 @@ Use this compact report:
 # Retro: [Title]
 - Target: <private-repo>/.github/skills/<skill>/...
 - Learnings: <what changed behavior>
+- Outcomes: <each learning -> 反映済み / 既存で充足 / 見送り / handoff / 確認待ち / 承認待ち / 提案のみ>
 - Changes: <files changed>
 - Commit: <hash or none>
 - Gate: pass / stop reason

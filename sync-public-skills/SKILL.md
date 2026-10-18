@@ -10,7 +10,7 @@ metadata:
 
 # sync-public-skills
 
-private skill repo（SSOT）から public / EMU private / GIM internal へ、行き先ごとに安全な skill だけを同期する。CLI（`.copilot`、prompt 不可）向けの自己完結 SKILL。VS Code では同名 prompt を使う。
+private skill repo（SSOT）から public / EMU private / GIM internal へ、行き先ごとに安全な skill だけを同期する。自己完結 SKILL。
 
 ## Scope
 
@@ -57,6 +57,7 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 - `.skill-meta.json` は local-only metadata として、dirty 判定 / stage / push / public diff から除外する
 - shared file（`.github/skills/README.md`、`assets/**`、自動生成の `.github/skills/LICENSE`）は skill commit と分離する。broad sync 後に `LICENSE` だけ generated drift が残ったら内容を確認し、意図どおりなら sync/index commit へ分ける
 - sync-only 実行中は README / assets / index / SKILL 本文を編集しない
+- broad の前に、public にだけある assets の削除予定を確認する。README が参照する asset は削除せず、private source へ戻すか、参照ごと廃止するかを確認する
 - public safety audit: 想定外の skill 漏れ込みや、想定外の削除が出たら停止して原因を確認する
 - Stop for ambiguous remotes, unconfirmed selected content, unexpected deletion or audit failure. Complete explicitly authorized all-mode intake/private push before distribution; snapshot primary-only rejects selected dirty/unpushed content. Preserve unrelated dirty; broad/all retains branch/clean/current/classification.
 - 手動コピーや一時 sync script を作らず、正式 runner の `Sync-AndPush.ps1` とその scope parameter を使う
@@ -107,6 +108,7 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 - **Verification cost**: measured on the sync suite, fixture rebuilds and pwsh-spawning integration tests dominate (about 100s for 42 tests); isolation and fetch cost seconds. For small skill edits run the targeted checks plus `Invoke-Pester -ExcludeTag Integration`, and run the full suite once before committing runner/backend changes. Call `Update-PublicSkillsReadme.ps1 -Check` once; it can leave a stale non-zero `$LASTEXITCODE`, so reset it before reuse.
 - **Formatter drift**: relevant alignment belongs with the owning skill's bounded change; unrelated whitespace drift is a separate normalization change after verification. Do not blanket-stage other authoring or require a separate commit for every formatting line.
 - **Push rejected / divergence**: push前にfetchしてahead/behindを再計算する。双方にcommitがあれば変更pathの重複を調べ、競合がなければnormal mergeで同期する。stale tracking refのままrebaseやpushへ進まない
+- **Public checkout behind**: public側の手元checkoutがremoteより遅れてscriptが止まったら、cleanかつahead 0を確認して`git pull --ff-only`で最新化し、同じ引数で再実行する。dirty・ahead・divergenceがあれば停止する
 - **`HEAD.lock` rename failure**: 同じ失敗が2回続いたら`n`で停止し、HEAD・status・diff・rebase metadata・lock所有を確認する。未commit変更を保護し、`reset --hard`やlock一括削除はしない。HEADが不変でindex/worktreeだけがfetched remoteと一致すると証明できる場合だけ対象をHEADへ戻し、HEADをdetachしないverified mergeへ切り替える
 - **Git Data API transient failure**: blob/tree/commit/ref APIは共通retryと空SHA fail-fastを通す。ref更新後にremote treeを再取得し、stale path削除と完全一致を確認する
 - **Internal full mirror only**: internal subset指定は未選択Skillを削除し得るため拒否する。distribution configの全集合だけをdesired setとして使う

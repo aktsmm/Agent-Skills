@@ -1,7 +1,7 @@
 ---
 name: "retro-private-skills"
-description: "Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for ~/.copilot personal assets, VS Code User Data assets, or workspace/repository assets. Use when: skill retro, private skill authoring, skill repository fix, create or update SKILL.md."
-argument-hint: "反映したい学び、対象 skill 名、private repo path、mode（safe-auto / review-only / dry-run）"
+description: "Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for editing ~/.copilot personal assets or workspace/repository assets (workspace and ~/.copilot skills may be read as intake sources). Use when: skill retro, private skill authoring, skill repository fix, create or update SKILL.md, workspace skill intake."
+argument-hint: "反映したい学び、対象 skill 名、workspace skill path（intake 時）、private repo path、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -17,7 +17,7 @@ Reflect reusable learnings from a session, incident, diff, error, or prompt into
 - User says: **private skill retro**, **private skill repo**, **skill repo authoring**, **private skill fix**, **retro private skills**, `/retro-private-skills`
 - User provides Learnings / Evidence / Impact and wants them reflected into reusable Skill behavior
 - User wants to create or update private repo `SKILL.md` / `references/*`
-- A prior attempt wrote to `~/.copilot/instructions`, `copilot-instructions.md`, VS Code User Data prompts, or local `.copilot` skills, and the user wants the private repo Skill version instead
+- A prior attempt wrote to `~/.copilot/instructions`, `copilot-instructions.md`, or local `.copilot` skills, and the user wants the private repo Skill version instead
 
 ## Inputs
 
@@ -38,7 +38,6 @@ Never write to these targets for this workflow unless the user explicitly asks t
 - `~/.copilot/copilot-instructions.md`
 - `~/.copilot/skills/**`
 - `~/.copilot/m-skills/**`
-- VS Code User Data prompts or instructions
 - workspace `.github/**`, `AGENTS.md`, or repository-specific instructions
 - memories, public sync output or remote targets other than the verified private origin authorized by safe-auto
 
@@ -46,7 +45,7 @@ If the best target appears to be an instruction, prompt, memory, or agent, stop 
 
 ## Intake Pre-Step (optional)
 
-Intake is a separate, explicit pre-step for mirroring local Copilot skills. Skip it for a normal retro. When requested, follow [Private Skill Intake Workflow](references/intake-workflow.md); only that pre-step may write under `<private-repo>/copilot-skills/**`, while curated authoring remains under `.github/skills/<skill>/`.
+Intake is a separate, explicit pre-step that brings existing skills into the private repo from a local Copilot skill mirror or from a workspace's `.github/skills/<skill>`. Skip it for a normal retro. When requested, follow [Private Skill Intake Workflow](references/intake-workflow.md); only the mirror pre-step may write under `<private-repo>/copilot-skills/**`, while curated authoring remains under `.github/skills/<skill>/`.
 
 ## Private Repo Resolution
 
@@ -79,6 +78,7 @@ After resolution, verify that `.github/skills/` exists. If not, stop with `priva
    4c. **Multi-learning case**: when one incident produces several independent learnings with different owning skills, split them and update each owning skill in the same retro turn. Do not force all learnings into the first plausible skill. Example: deck artifact folder design belongs to planning/workspace skills, while generation/editing mechanics belong to automation skills.
 5. If no existing skill owns the behavior and the learning is reusable as a workflow, create a new private skill folder.
 6. If the learning is workspace/customer/project-specific, abstract it before writing; if it cannot be safely abstracted, stop with `scope 不一致` and suggest a workspace-scoped record or workflow instead.
+7. A `scope 不一致` or hand-off stop applies only to that learning; continue independent in-scope learnings. Stop the whole run only when overall safety is unresolved. For an out-of-scope learning, name the recommended destination and why, and confirm it exists; if unconfirmed, report `確認待ち` and the missing information instead of switching to a forbidden target.
 
 ## Edit Rules
 
@@ -116,7 +116,7 @@ Choose exactly one:
 
 ### 4. Bloat Check
 
-After editing, delete unnecessary, self-evident or duplicate text before shortening, only if normal/exception/stop decisions stay unchanged; compact remaining detail or move it to `references/`. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected.
+After editing, delete unnecessary, self-evident or duplicate text before shortening, only if normal/exception/stop decisions stay unchanged; compact remaining detail or move it to `references/`. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected. Measure body characters before and after with the same newline handling; report the diff and why replacement was not enough only on a net increase. Never create a history file per run.
 
 ### 5. Validate
 

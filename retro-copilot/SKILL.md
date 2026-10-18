@@ -1,6 +1,6 @@
 ---
 name: retro-copilot
-description: "Run a retro for personal global ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Not for workspace/repository assets, VS Code User Data assets, or a private skills repository. Triggers on retro, retrospective, incident learning, error analysis, copilot setup, instructions update, インシデント, and 知見反映."
+description: "Run a retro for personal global ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Not for workspace/repository assets or a private skills repository. Triggers on retro, retrospective, incident learning, error analysis, copilot setup, instructions update, インシデント, and 知見反映."
 argument-hint: "エラーログ、diff、会話要約、既存 .copilot 資産、またはインシデント内容"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -18,7 +18,6 @@ metadata:
 - 使う: `~/.copilot/copilot-instructions.md`、`~/.copilot/instructions/**`、`~/.copilot/skills/**`、`~/.copilot/agents/**`、`~/.copilot/hooks/**` へ反映すべき運用知見があるとき
 - 使わない: typo など軽微修正のみ / 環境固有問題のみ
 - 使わない: workspace / repository 固有の内容（workspace/repository assets 向けの retro workflow へ渡す）
-- 使わない: VS Code User Data の内容（VS Code User Data assets 向けの retro workflow へ渡す）
 - 使わない: private skills repository の `.github/skills/**`（private skills repository 向けの retro workflow へ渡す）
 
 ## Core Rules
@@ -31,6 +30,7 @@ metadata:
 - Match committed implementation, not local drafts; defer unsupported operations rather than inventing capabilities.
 - List up to three scoped read-only follow-ups: authoring/private-push/distribution gaps. Honor holds and visibility; never widen actions or audits from a suggestion.
 - 他スコープの内容なら自分で編集せず handoff する
+- `~/.copilot` は作業コピーなので直接編集してよい。ただし正本（skills は private skills repository、instructions は公開 instructions repository）へ戻す同期は別途必要で、managed な skill は更新で上書きされ得る。反映後の Review Checkpoint で同期要否を示す
 
 ## Workflow
 
@@ -44,7 +44,7 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
   - エラーログ、diff/commit、会話履歴、ターミナル履歴、既存 `.copilot` 資産
 - 既定の反映スコープ
   - `~/.copilot` 配下の個人グローバルカスタマイズ資産を優先する
-  - workspace / repository や VS Code User Data へ反映すべき知見はこの skill では扱わず、handoff を提案する。workspace handoff は host が提供する active workspace を指定し、外部の新規プロジェクトフォルダを作成・提案しない
+  - workspace / repository へ反映すべき知見はこの skill では扱わず、handoff を提案する。workspace handoff は host が提供する active workspace を指定し、外部の新規プロジェクトフォルダを作成・提案しない
 - ターミナル観点
   - Exit Code != 0
   - Ctrl+C（中断）
@@ -75,12 +75,12 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
   - memory に残す必要がある依頼は、この skill では実行せず別タスクとして明示確認する
 - Scope Gate
   - `~/.copilot` 配下の資産に置くべき内容か確認する
-  - workspace / repository や VS Code User Data に置くべき内容なら、この skill では反映せず handoff を提案する
+  - workspace / repository に置くべき内容なら、この skill では反映せず handoff を提案する
 - Gate（全必須）
   - 永続化する知見は再利用可能なルールに抽象化されている
   - 証拠は必要最小限で、機微情報を含まない
   - `~/.copilot` 配下に置くべき内容か確認済み
-  - Self-Contained: 追加内容が他 file への hard reference や workspace 固有値に依存せず、`~/.copilot` 単体で機能する（ツール制約も尊重: 例 Copilot CLI は prompt 不可なので primitive は SKILL を選ぶ）
+  - Self-Contained: 追加内容が他 file への hard reference や workspace 固有値に依存せず、`~/.copilot` 単体で機能する（ツール制約も尊重: 例 Agent Host は `*.prompt.md` を読まないので primitive は SKILL を選ぶ）
   - No Memory Targets Gate を通過済み
 
 ## Refactor Context Rules
@@ -111,7 +111,6 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
   - 例外（複数反映を許可）: 複数 file が独立して owning すべき cross-cutting 原則（例: tool-platform 制約、Self-Contained gate、cwd discipline）は、該当する全 file に 1 行ずつ追加してよい。各コピーは独立 SSOT として、他 file への hard reference に依存せず単体で機能する形にする。同じ長いブロックをコピーせず、各 file には 1 行の判断だけを入れる
 - 反映禁止
   - workspace / repository の `AGENTS.md`、`.github/**`、workspace docs
-  - VS Code User Data の `*.prompt.md` / `*.instructions.md` / `*.agent.md`
   - `/memories/**`、user memory、session memory、repo memory
   - `command-history-state.json`、`session-store.db`、`vscode.session.metadata.cache.json`
   - `session-state/**`、`logs/**`、`pkg/**`、`crash-context/**`、`restart/**` のようなランタイム生成物やキャッシュ
@@ -123,7 +122,7 @@ Context -> Extract -> Safety & Scope Gate -> Decide Action & Target -> Validate 
 ## Decision Rules
 
 - instructions は原則、skills はタスク手順、agents は役割分離、hooks は決定的自動化の棲み分けで選ぶ
-- handoff 先: workspace / repository、VS Code User Data、private skills repository の知見は、そのスコープ向けの retro workflow へ渡す（このスキルでは編集しない）
+- handoff 先: workspace / repository、private skills repository の知見は、そのスコープ向けの retro workflow へ渡す（このスキルでは編集しない）
 - 最小差分で反映する
 
 ## Output Requirements

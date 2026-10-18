@@ -9,6 +9,7 @@ Detailed Git handling for `safe-auto`. The inline gate in `SKILL.md` stays autho
 - Verify the push would send only local private-skill repo commits. Never run public sync, release, tag, force push, or push to a public repo without explicit user instruction.
 - Treat dirty primary changes as authoring/intake material. Commit by owning skill; combine its related small edits and relevant formatting in one commit. Keep unrelated skills/paths separate and untouched.
 - Before any `git add` / `git commit` / `git push`, set the working directory to the private repo root explicitly (`Set-Location <private-repo>` or `git -C <private-repo>`). Do not rely on inherited cwd from a previous tool call. After `commit` / `push`, re-confirm `git status --short --branch` to detect cwd mismatches early.
+- If a rebase conflicts, keeping both sides is only a temporary resolution. Before push, merge duplicated points, resolve MUST / prohibition / default-mode contradictions, and confirm each `SKILL.md` frontmatter is unique. If a contradiction cannot be resolved, do not push and stop.
 
 ## Resolve and Inspect
 

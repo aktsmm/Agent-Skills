@@ -60,7 +60,7 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 
 1. Create the output folder.
 2. Create independent HTML files. Do not pack multiple patterns into one HTML.
-3. Render with Playwright. Prefer Python Playwright if available. A helper script is provided: [render_infographics.py](./scripts/render_infographics.py).
+3. Render with Playwright. Prefer Python Playwright if available. A helper script is provided: [render_infographics.py](./scripts/render_infographics.py). If Playwright MCP blocks `file://`, serve the output folder with `python -m http.server <port>`.
 4. Use viewport-size clipping, not `fullPage`, when decorative elements can overflow the poster. `fullPage` may capture off-canvas decoration and create white margins.
 5. Use `domcontentloaded` plus a short fixed wait if external fonts make `load` or `networkidle` hang.
 6. Use `device_scale_factor=1` when the PNG must be the stated size. Use `2` only when high-density output is desired and the larger pixel dimensions are acceptable.
@@ -69,6 +69,7 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 9. Inspect at the target embed width as well as full size. A 1200px image that is readable full-size can become illegible when embedded near 360px on mobile.
 10. If any PNG has overlap, clipping, unreadable text, wrong order, unexpected margins, wrong pixel size, or excessive density, fix the HTML or renderer, render again, and re-check that PNG.
 11. Do not send final until all PNGs have completed `inspect -> fix if needed -> rerender -> re-inspect`.
+12. Clean up after finishing: stop any HTTP server, move stray PNGs from the workspace root into the output folder, keep the source HTML, and delete temporary render scripts unless they are deliverables.
 
 ## Visual QA Checklist
 
@@ -76,7 +77,7 @@ Turn a conversation summary, topic, file, skill, or workflow into 2-3 polished i
 - No content is clipped at the image edge.
 - No unintended white margins or oversized canvas from screenshot capture.
 - Pixel dimensions match the promised output size unless high-density output was explicitly chosen.
-- Step numbers and visual order match DOM / reading order.
+- Step numbers and visual order match DOM / reading order. CSS grid `grid-column` / `grid-row` fixed placement ignores DOM order and is a common cause of scrambled numbering.
 - In named comparison plots, label points near their marks or connect them visibly to names at the target embed width; do not make readers decode numbered points from a distant legend alone.
 - Card text fits without cramped line breaks.
 - Contrast is readable on the final PNG, not just in HTML.

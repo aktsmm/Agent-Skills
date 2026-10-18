@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Deck</title>
+<style>
+@page { size: 1280px 720px; margin: 0 }
+* { box-sizing: border-box }
+body { margin: 0; font-family: "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif; color: #243a5e }
+.page { width: 1280px; height: 720px; position: relative; overflow: hidden; break-after: page; page-break-after: always }
+.page:last-child { break-after: auto; page-break-after: auto }
+.bar { height: 14px; background: linear-gradient(90deg, #0078d4 0 70%, #50e6ff 70% 85%, #243a5e 85%) }
+.foot { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; padding: 0 96px; display: flex; justify-content: space-between; align-items: center; background: #243a5e; color: #e6eef9; font-size: 16px }
+
+/* cover / ending: white field, brand blue accents, navy footer band */
+.cover, .end { background: #fff }
+.cover .body, .end .body { position: absolute; inset: 14px 0 56px 0; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(120deg, #fff 0 55%, #eaf3fc 55%) }
+.cover .body { padding: 0 96px }
+.end .body { align-items: center }
+.eyebrow { font-size: 22px; font-weight: 600; color: #0078d4; letter-spacing: .06em; margin-bottom: 12px }
+.cover h1 { font-size: 68px; line-height: 1.2; margin: 0 0 28px }
+.sub { font-size: 28px; font-weight: 600; color: #0078d4 }
+.end h1 { font-size: 64px; margin: 0 0 12px }
+
+/* content slide: title block, info strip, cards, footer */
+.slide { padding: 20px 34px 14px; display: flex; flex-direction: column; gap: 6px; --fs: 15px }
+.title { font-size: 34px; font-weight: 700; line-height: 1.25 }
+.title small { display: block; font-size: 20px; font-weight: 600; color: #3d4a5c }
+.strip { display: flex; gap: 8px }
+.strip .c { flex: 1; border: 1.5px solid #c9d4e6; border-radius: 6px; padding: 3px 10px; font-size: var(--fs); line-height: 1.35 }
+.strip .c b.l { display: block; font-size: 12.5px; color: #5b6777; font-weight: 600 }
+.cols { display: flex; gap: 14px; flex: 1; min-height: 0 }
+.main { flex: 1.9; display: flex; flex-direction: column; gap: 5px; min-width: 0 }
+.side { flex: 1; min-width: 0 }
+.card { border: 1.5px solid #b8c7dc; border-radius: 8px; padding: 6px 12px; background: #fff }
+.card h3 { margin: 0 0 3px; font-size: 16px; color: #0b6bcb }
+ul { margin: 0; padding-left: 20px; font-size: var(--fs); line-height: 1.38 }
+.ft { display: flex; justify-content: space-between; font-size: 12.5px; color: #6b778a; border-top: 1px solid #dde3ec; padding-top: 6px; margin-top: auto }
+.ft a { color: #0b5cad; text-decoration: underline }
+</style>
+</head>
+<body>
+<section class="page cover"><div class="bar"></div><div class="body"><div class="eyebrow">EYEBROW</div><h1>タイトル</h1><div class="sub">対象期間 / 件数</div></div><div class="foot"><span>作成日</span><span>出典</span></div></section>
+
+<section class="page slide" data-key="s1" style="--fs:15px">
+  <div class="title">スライドの主張を 1 行で<small>― 補足の 1 行</small></div>
+  <div class="strip"><div class="c"><b class="l">誰に関係するか</b><b>対象</b></div><div class="c"><b class="l">嬉しい点</b>内容</div><div class="c"><b class="l">対応の要否</b>内容</div></div>
+  <div class="cols"><div class="main"><div class="card"><h3>見出し</h3><ul><li>要点</li></ul></div></div><div class="side"><div class="card"><h3>用語ミニ解説</h3></div></div></div>
+  <div class="ft"><div><a href="https://example.com/">出典リンク</a></div><div>分類 ｜ ID</div></div>
+</section>
+
+<section class="page end"><div class="bar"></div><div class="body"><h1>以上</h1><div class="sub">タイトル</div></div><div class="foot"><span>Created by 〜</span><span>出典</span></div></section>
+</body>
+</html>

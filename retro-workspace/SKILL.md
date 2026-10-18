@@ -1,6 +1,6 @@
 ---
 name: retro-workspace
-description: Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Not for ~/.copilot personal assets, VS Code User Data assets, or a private skills repository. Use when running a workspace/repo retro from CLI or Scout. Detects whether a project folder exists and, if not, asks before creating one. Triggers on "retro workspace", "repo retro", "workspace cleanup", "ワークスペース知見反映".
+description: Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Not for ~/.copilot personal assets or a private skills repository. Use when running a workspace/repo retro. Detects whether a project folder exists and, if not, asks before creating one. Triggers on "retro workspace", "repo retro", "workspace cleanup", "ワークスペース知見反映".
 argument-hint: "反映したい学び、エラーログ/git diff/会話要約、対象 workspace、mode（safe-auto / review-only / dry-run）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -10,14 +10,14 @@ metadata:
 
 # retro-workspace
 
-インシデント・会話から再利用可能な知見を抽出し、現在の workspace / repository の設計資産・automation 資産へ最小差分で反映する CLI / Scout 向け SKILL。VS Code では同名 prompt を使う。判定とフローはこの SKILL 内で完結させ、他の skill / prompt に委譲しない。
+インシデント・会話から再利用可能な知見を抽出し、現在の workspace / repository の設計資産・automation 資産へ最小差分で反映する SKILL。判定とフローはこの SKILL 内で完結させ、他の skill に委譲しない。
 
 ## When to Use
 
 - 使う: バグ解決後 / 再発時 / workspace 設計ギャップ発見時
 - 使う: 既存手順より安全・再現可能・高速な script / task / helper へ昇格すべき改善を見つけたとき
-- 使う: `.github/**`、`AGENTS.md`、repo 固有 instructions / prompts / agents / hooks、scripts、tasks への反映
-- 使わない: typo のみ / 環境固有問題のみ / `~/.copilot` personal assets / VS Code User Data assets / private skills repository の `.github/skills/**`（いずれもそのスコープ向けの retro workflow へ渡す）
+- 使う: `.github/**`、`AGENTS.md`、repo 固有 instructions / agents / hooks、scripts、tasks への反映
+- 使わない: typo のみ / 環境固有問題のみ / `~/.copilot` personal assets / private skills repository の `.github/skills/**`（いずれもそのスコープ向けの retro workflow へ渡す）
 
 ## 入力
 
@@ -25,7 +25,7 @@ metadata:
 
 ## Workspace 検出（反映先決定）
 
-CLI / Scout は VS Code のアクティブ workspace を常に取得できない。知見抽出の前に反映先を決める。
+実行環境によっては active workspace を取得できない場合がある。知見抽出の前に反映先を決める。
 
 1. ユーザーまたは host context が workspace path を明示している場合: repo marker の有無を問わず、その folder を反映先にする。CWD や外部の新規プロジェクト候補で上書きしない
 2. 明示 workspace path がない場合: CWD かその親に `.git` / `.github/` / `AGENTS.md` のいずれかがあれば、その repo ルートを反映先にする
@@ -43,7 +43,7 @@ CLI / Scout は VS Code のアクティブ workspace を常に取得できない
 
 - 反映先は `AGENTS.md`、`.github/**`、repo 固有 scripts / tasks / helpers に限定する
 - secret / 認証情報 / 個人情報 / 顧客情報 / ローカル絶対パス / 端末固有値 / `/memories/**` は反映しない
-- User Data / `~/.copilot` は scope 不一致として停止する
+- `~/.copilot` は scope 不一致として停止する
 - `.github/skills/**` は直接編集せず、SKILL 向きなら提案して停止する
 
 ## Edit Rules

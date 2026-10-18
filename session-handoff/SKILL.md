@@ -65,7 +65,7 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 
 - Put the paste-ready handoff itself in one fenced `markdown` block so the user can copy it without surrounding commentary.
 - Start the block with a self-identifying line: it is a handoff note from another session, and the current agent should first acknowledge and summarize the state plus present A/B next-action choices.
-- Do not instruct the next agent to start work immediately. Tell it to wait for explicit user approval before editing files, running commands, or operating external services.
+- Do not instruct the next agent to start work immediately. Tell it to wait for explicit user approval before editing files, running commands, or operating external services. Skip this gate only when the latest user instruction explicitly says the next session must run a specific task right away; a target name, a candidate list, a TODO, or a recommendation is not grounds to skip it.
 - Avoid wording that sounds like a request to create another handoff, such as starting only with `次のセッションでは...`.
 - Prefer bullets over narrative history.
 - Include exact commands only when they are safe and likely to be rerun.
@@ -76,7 +76,8 @@ When a pasted note points at a draft that was never saved to a file, the text ma
 - Suggest one model display name verified in the current environment plus a one-line reason. Mark it advisory: the next session rechecks availability before selecting it. Write `unspecified` when you cannot verify one.
 - Do not infer model availability from session history alone; an absent model was not observed in that history, not proven unavailable.
 - Include no more than one `Next Candidates` section.
-- Include prohibited actions and stop conditions near the top when user safety or external systems are involved.
+- Include prohibited actions and stop conditions near the top when user safety or external systems are involved. List every unapproved high-risk operation under Must NOT by default, including ones not otherwise named: publish, push, delete, deploy, send, purchase, history rewrite, auth or permission change, production update, stopping a shared process.
+- When another session owns, or may own, the same target, state the observation point for its completion, the read-only commands and tools the next session may use, and the shared queues, schedulers, and single-writer resources it must not touch.
 - End with the expected stop condition or done criteria.
 
 ## References
