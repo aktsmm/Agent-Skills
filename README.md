@@ -80,7 +80,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [retro-workspace](retro-workspace/) | Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Not for ~/.copilot personal assets o... |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
 | [review-workflow-runtime](review-workflow-runtime/) | ワークフロー定義と参照 scripts/hooks/validators を横断し、実行時ロジック・I/O・冪等性・冗長処理・検証ゲートをレビューし、低リスク修正まで行う |
-| [review-workflow-structure](review-workflow-structure/) | ワークフロー設計資産としての agent / instruction / prompt / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する |
+| [review-workflow-structure](review-workflow-structure/) | ワークフロー設計資産としての agent / instruction / skill / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する |
 | [rewrite-x-post](rewrite-x-post/) | Use when: 短い日常文、下書き、思いつき、愚痴、感想、作業ログ、近況を、本人らしさを残したX投稿候補へリライトする。ニュース起点の投稿生成は generate-news-x-posts を使う |
 | [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree |
 | [session-handoff](session-handoff/) | Create a compact handoff note so a new chat/session can first acknowledge the current state before work resumes |

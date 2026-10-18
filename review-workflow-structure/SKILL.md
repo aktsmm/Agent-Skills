@@ -1,6 +1,6 @@
 ---
 name: review-workflow-structure
-description: "ワークフロー設計資産としての agent / instruction / prompt / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する"
+description: "ワークフロー設計資産としての agent / instruction / skill / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する"
 disable-model-invocation: true
 argument-hint: "対象パス、review 観点、all / 徹底的 などの範囲指定"
 user-invocable: true
@@ -73,7 +73,7 @@ rubric SSOT が無い場合、または最終 sanity check では、次だけを
 
 自動修正してよいもの: 明示対象の prompt 圧縮、リンク切れ修正、supported frontmatter への小修正、未参照であることを確認した孤立コメントの削除。
 
-自動修正しないもの: `AGENTS.md` / `copilot-instructions.md` へ metadata 目的だけで YAML frontmatter を追加する変更、generated marker の削除判断が未検証の変更、Global prompt を workspace prompt へ複製する変更、大規模 agent rewrite、公開同期、履歴改変。
+自動修正しないもの: `AGENTS.md` / `copilot-instructions.md` へ metadata 目的だけで YAML frontmatter を追加する変更、generated marker の削除判断が未検証の変更、Global の skill / instruction を workspace へ複製する変更、大規模 agent rewrite、公開同期、履歴改変。
 
 `review-only` / `read-only` は `fix` より優先する。競合指定時は変更せず、競合を報告する。
 

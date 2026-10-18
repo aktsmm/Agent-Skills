@@ -37,9 +37,17 @@ If native Rubber Duck returns findings about unrelated worktree changes despite 
 
 Do not present fallback output as built-in Rubber Duck output.
 
-## VS Code
+## VS Code Agent Host (Copilot CLI harness)
 
-You (the main conversation) are the **producer** and keep owning the plan, code, and tests. The **critic** is a separate read-only subagent run via `runSubagent`, ideally on a different model family. Do not delegate the whole task to the subagent — only the review of your current checkpoint.
+You (the main conversation) are the **producer** and keep owning the plan, code, and tests. The **critic** is a read-only subagent started with the `task` tool, using a read-only agent type such as `code-review`, on a different model family. Do not delegate the whole task to the subagent — only the review of your current checkpoint.
+
+- Put the packet in a file and name its exact path in the `task` prompt; a read-only agent can read it, and a long inline packet is avoided.
+- Pass `model` explicitly. When `model` is omitted the subagent can inherit the producer's model, which silently produces a same-family critic.
+- **Model discovery**: read the `Found N models:` line in `%APPDATA%\Code\logs\<timestamp>\agenthost.log` (newest folder), and the `Changing model to:` line for the producer's own model. Do not probe with an invalid `model` value: in this harness an unknown model name did not error and the call still ran on a default model (measured 2026-10-18), so it yields no list and no proof that the requested model was used.
+- Display names in the log (for example `GPT-6.1 Sol`) are not always the identifier `task` accepts; use the lowercase hyphenated form, and treat an unverified family as unconfirmed rather than assuming it.
+- Verify the critic stayed read-only the same way as in the VS Code section below.
+
+## VS Code (Local harness) and keep owning the plan, code, and tests. The **critic** is a separate read-only subagent run via `runSubagent`, ideally on a different model family. Do not delegate the whole task to the subagent — only the review of your current checkpoint.
 
 Keep companion `.agent.md` files outside this skill. If the user later asks for click-selected reviewer agents, treat that as a separate customization request with its own scope, plan, and verification.
 

@@ -36,6 +36,7 @@ Default to workspace only when the behavior should be shared through version con
 
 - If the request starts with "always", it is usually an instruction.
 - If the request starts with "when I type /", it is usually a skill (skills appear as slash commands). Prompt files are deprecated for Agent Host sessions and work only with the Local harness; prefer migrating them to skills.
+- When migrating a prompt, set `disable-model-invocation: true` so it runs only when typed as `/name` and the model never loads it on its own; `user-invocable: true` is the default and may be omitted. A converter (including VS Code's Convert Prompt to Skills) keeps `name`, `description` and `argument-hint` but drops `agent`, `model` and `tools`, so recheck any prompt that relied on them and move a needed role or tool boundary to a custom agent.
 - If the request needs scripts, templates, or structured references, lean toward a skill.
 - If the request is about a specialist persona or safe tool boundaries, lean toward a custom agent.
 - If a prompt only lists tools to make them available, remove `tools:`. Prompt-level `tools:` narrows availability; it does not request tools opportunistically.
