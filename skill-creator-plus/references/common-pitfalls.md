@@ -41,6 +41,11 @@ description: "Use when: reviewing skills"
 
 Do not add `argument-hint`, `user-invocable`, or `disable-model-invocation` unless they change behavior.
 
+Invocation fields on a skill:
+
+- `disable-model-invocation: true` makes it slash/manual-only (the model never loads it on its own). `user-invocable: false` makes it model-only background knowledge hidden from the `/` menu. Choose one deliberately; both default to normal behavior and may be omitted.
+- `argument-hint` is the input hint shown when the skill is typed as `/name`. A manual-only skill is chosen by reading that hint, so give it a concrete one (inputs, optional flags); a model-triggered skill benefits less.
+
 Keep local validators aligned with the current Agent Skills fields. Validate
 field types, UTF-8 input, and folder/name equality. Require author metadata only
 for locally authored license profiles; imported third-party skills can have a
@@ -48,7 +53,7 @@ different metadata contract.
 
 ### Host-Specific Frontmatter
 
-Fields such as `context: fork` can be supported by a host without belonging to
+`context: fork` (run the skill in a subagent) is experimental and its behavior may change: store it only when the skill already works inline, and never rely on it for correctness. Fields such as `context: fork` can be supported by a host without belonging to
 the Agent Skills common specification. Keep the body, references, and scripts
 portable, declare the supported hosts in `compatibility`, and document the
 fallback for hosts that ignore the extension. A host-aware validator does not

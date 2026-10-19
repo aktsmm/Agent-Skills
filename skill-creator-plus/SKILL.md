@@ -134,7 +134,7 @@ Use [primitive choice](references/customization-primitives.md), [structure](refe
 - [ ] Scope is decided before file creation
 - [ ] SKILL.md created and under 150 lines
 - [ ] Frontmatter has name + description with trigger conditions
-- [ ] Manually used skills have `argument-hint`
+- [ ] Manually used skills (especially `disable-model-invocation: true`) have `argument-hint`
 - [ ] `user-invocable` is set intentionally
 - [ ] Optional fields are added only when they change behavior
 - [ ] Details moved to references/ (Progressive Disclosure)

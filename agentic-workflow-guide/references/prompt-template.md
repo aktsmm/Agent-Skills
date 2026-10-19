@@ -69,7 +69,7 @@ VS Code validates frontmatter strictly. Only use supported fields — unsupporte
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `.prompt.md`       | `agent`, `argument-hint`, `description`, `model`, `name`, `tools` | `author`, `copyright`, `license` etc. are **NOT** supported |
 | `.instructions.md` | `name`, `description`, `applyTo`                                  | All other fields are **NOT** supported                      |
-| `SKILL.md`         | `name`, `description`, `license`, `metadata`                      | Supports nested `metadata:` block                           |
+| `SKILL.md`         | `name`, `description`, `argument-hint`, `user-invocable`, `disable-model-invocation`, `license`, `metadata` (host-specific: `context: fork` experimental, `compatibility`, `allowed-tools`) | Nested `metadata:` block. `disable-model-invocation: true` = manual-only (give it `argument-hint`); `user-invocable: false` = model-only |
 
 ### Recommended `.prompt.md` frontmatter shapes
 

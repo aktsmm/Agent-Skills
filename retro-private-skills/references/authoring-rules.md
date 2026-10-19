@@ -13,7 +13,7 @@
 
 ## Apply Details
 
-- For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them.
+- For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them. Decide manual-only (`disable-model-invocation: true`) vs model-only (`user-invocable: false`) deliberately; a manual-only skill needs a concrete `argument-hint`. Treat `context: fork` as experimental (add only with an inline fallback).
 - Verify table/formatter drift; group relevant formatting with the owning skill's small change. Separate unrelated normalization; never blanket-stage or split one bounded improvement into repeated pushes.
 
 ## Report Template

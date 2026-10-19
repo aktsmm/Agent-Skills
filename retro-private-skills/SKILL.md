@@ -124,7 +124,7 @@ Before final response:
 
 - Check changed paths are all under `<private-repo>/.github/skills/`.
 - Check no forbidden target was changed.
-- Parse YAML frontmatter for every changed `SKILL.md`, even one-line edits. Check `name` against the folder, `description` triggers and `argument-hint` against the current use case, and `user-invocable`, `license`, and `metadata.author` against repo conventions; metadata lint alone cannot detect a stale hint.
+- Parse YAML frontmatter for every changed `SKILL.md`, even one-line edits. Check `name` against the folder, `description` triggers and `argument-hint` against the current use case, and `user-invocable`, `disable-model-invocation` (manual-only needs `argument-hint`), `license`, and `metadata.author` against repo conventions; metadata lint alone cannot detect a stale hint.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added. Scan added lines or the staged target content; do not scan unchanged diff context, which can trigger false positives on pre-existing terms.
 - Commit/push intended private skill changes in safe-auto only when scope is clear, all changed paths are intended, and remote/scope checks pass. Done means the execution checkout is clean with ahead/behind `0/0`; original unrelated dirty is preserved and reported, not a completion blocker.
 - List up to three read-only candidates: dirty -> Retro; pending private commits -> ahead-range review; committed public-safe gap -> separately requested sync. Honor holds/visibility; never expand operations or offer private/internal/denied content for public sync.

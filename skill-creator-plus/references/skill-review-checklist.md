@@ -9,6 +9,7 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Frontmatter has name + description?
 - [ ] Self-authored skills have confirmed license + `metadata.author`?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
+- [ ] Manual-only skill (`disable-model-invocation: true`) has a concrete `argument-hint`? Is `context: fork` treated as experimental with an inline fallback?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
 - [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere? No other skill is named or used as SSOT?
 - [ ] Every script, path, and CLI flag mentioned in SKILL.md exists in the skill and matches the script's argument parser?
