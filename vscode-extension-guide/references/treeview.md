@@ -58,6 +58,7 @@ The `TreeDataProvider` / `createTreeView` API follows the official [Tree View gu
 - For labels that age without data changes, refresh only while `TreeView.visible` is true. Apply the initial `treeView.visible` value after listener registration, stop timers when hidden, and cancel them again during disposal.
 - Activity Bar SVGs should use `currentColor` rather than a fixed stroke/fill so light, dark, and high-contrast themes remain readable.
 - With `canSelectMany: true`, VS Code passes the selected items as an array in the second command argument, and a menu command that reads a second parameter as options or a target silently breaks. Validate that parameter in every existing command on that view (reject arrays) and guard it with a test that no menu command reads a second parameter as options.
+- A secondary or read-only root shown in the same tree needs a distinct `contextValue` for its groups (for example `readOnlyKind`) so mutation menus never match. The command handler must also refuse non-actionable input itself, including a plain-object or retained item for a read-only, stale, or other-root group, by re-resolving it against current state: `instanceof` checks and `when` clauses only guard tree clicks. Keep such roots out of install, update and generated-output paths, and test the handler with executable plain-object arguments.
 
 ## Runtime Contract Tests
 
