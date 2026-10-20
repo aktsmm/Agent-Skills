@@ -95,6 +95,8 @@ you created, preserving the user's working tree.
 
 If a release test asserts the extension version inside docs or spec files (README, CHANGELOG, a `FULL_SPECIFICATION`-style file), bump **every** one of them together with `package.json`. A single doc lagging the package version fails the release gate even when the build itself is correct, so update the version in all asserted files before tagging.
 
+Before the release commit, scan release docs (CHANGELOG, release notes, READMEs, nls files) for control characters other than tab/CR/LF. Text written through a PowerShell double-quoted string turns a backtick plus a letter into one (for example `` `a `` becomes BEL), which silently deletes the Markdown code span; add that scan to the repo's changelog/doc hygiene test.
+
 ### Local Preview Packages
 
 An unpublished local VSIX often has no repository URL or license file yet. If its README uses relative links (for example, a language switch or local image), `vsce` can reject packaging because it cannot rewrite those links. For a local-only preview:

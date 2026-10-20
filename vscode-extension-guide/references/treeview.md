@@ -57,6 +57,7 @@ The `TreeDataProvider` / `createTreeView` API follows the official [Tree View gu
 - Use distinct `contextValue` values for item capabilities (for example, `item` and `itemWithAlias`) and match them in `view/item/context` `when` clauses. Hide commands that require a selected item from the Command Palette with a `menus.commandPalette` entry such as `{ "command": "myExt.itemAction", "when": "false" }`.
 - For labels that age without data changes, refresh only while `TreeView.visible` is true. Apply the initial `treeView.visible` value after listener registration, stop timers when hidden, and cancel them again during disposal.
 - Activity Bar SVGs should use `currentColor` rather than a fixed stroke/fill so light, dark, and high-contrast themes remain readable.
+- With `canSelectMany: true`, VS Code passes the selected items as an array in the second command argument, and a menu command that reads a second parameter as options or a target silently breaks. Validate that parameter in every existing command on that view (reject arrays) and guard it with a test that no menu command reads a second parameter as options.
 
 ## Runtime Contract Tests
 

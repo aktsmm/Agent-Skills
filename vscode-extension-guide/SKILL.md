@@ -106,6 +106,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 - transfer するのは専有した非 `SharedArrayBuffer` だけにし、transfer 後は送信側の view を使わない（同じ backing store の view はすべて detach される）。`Buffer` は pool を共有し得るので、offset 付き view や所有が曖昧な buffer は必要範囲だけを別 buffer へ copy して渡す。
 - worker や別プロセスから受け取った結果をそのまま cache / 表示しない。許可キー検査は `Reflect.ownKeys`、必須キーの存在確認は `Object.hasOwn` で行う（`Object.keys` は非列挙の own property を見逃し、`in` や素の property 参照は継承値を通す）。
 - 例外の `Error.name` や `FileSystemError.code` をそのままログ / UI へ出さない。既知 code の allowlist へ正規化し、未知は単一の汎用 code に落とす。path や token が名前に混ざるケースを防げる。
+- キャッシュや共有ファイル（別拡張が書く index など）から読んだ表示用の値は、使う地点で型を確認し、長さに上限を付ける。非文字列で `replace` 等が例外になる。正規化関数は冪等にし（切り詰めた後に trim する）、先に再現テストを赤にしてから直す。
 
 ### Manifest / Docs / Localization
 

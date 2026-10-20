@@ -180,6 +180,7 @@ npx @vscode/vsce ls
 | 症状                   | 原因                             | 解決策                                    |
 | ---------------------- | -------------------------------- | ----------------------------------------- |
 | 設定が効かない         | 設定キーがコードと不一致         | package.json と getConfiguration() を統一 |
+| フォルダ単位の値が届かない / 未設定を検出できない | resource スコープの設定を resource なしで読んだ。`get()` は未設定でも manifest の既定値を返す | `getConfiguration(section, workspaceFolderUri)` で読み、ユーザーが設定したかの判定は `inspect()` で行う |
 | コマンドが見つからない | コマンドIDがpackage.jsonと不一致 | 全箇所で同じIDを使用                      |
 
 ### 命名一貫性チェック
