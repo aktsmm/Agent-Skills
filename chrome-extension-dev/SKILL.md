@@ -1,6 +1,6 @@
 ---
 name: chrome-extension-dev
-description: "Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script', 'service worker'."
+description: "Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法、ストア公開（CWS API v2 での提出自動化を含む）をカバー。Use when: ブラウザ拡張機能を作成・修正・公開する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script', 'service worker', 'side panel', 'Chrome Web Store 公開', 'CWS 提出'."
 argument-hint: "作りたい拡張機能、困っている API、対象ファイル"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -19,6 +19,7 @@ metadata:
 - Content Script / Service Worker の実装
 - Chrome API（tabs, storage, cookies等）の使用
 - Manifest V3 への対応・移行
+- Chrome Web Store への公開・更新提出（API v2 でコマンド化する場合を含む）
 
 ## 推奨技術スタック（2025/2026）
 
@@ -97,13 +98,14 @@ project/
 
 ## Key References
 
-| トピック         | リファレンス                                           |
-| ---------------- | ------------------------------------------------------ |
-| Chrome API 詳細  | [references/chrome-api.md](references/chrome-api.md)   |
-| Manifest V3      | [references/manifest-v3.md](references/manifest-v3.md) |
-| テスト           | [references/testing.md](references/testing.md)         |
-| 公開             | [references/publishing.md](references/publishing.md)   |
-| よくあるパターン | [references/patterns.md](references/patterns.md)       |
+| トピック                    | リファレンス                                           |
+| --------------------------- | ------------------------------------------------------ |
+| Chrome API 詳細             | [references/chrome-api.md](references/chrome-api.md)   |
+| Manifest V3                 | [references/manifest-v3.md](references/manifest-v3.md) |
+| テスト                      | [references/testing.md](references/testing.md)         |
+| 公開                        | [references/publishing.md](references/publishing.md)   |
+| 提出の自動化（CWS API v2）  | [references/cws-api-v2.md](references/cws-api-v2.md)   |
+| よくあるパターン            | [references/patterns.md](references/patterns.md)       |
 
 ## Done Criteria
 

@@ -11,6 +11,7 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Description clearly states WHEN to use (trigger conditions)?
 - [ ] Manual-only skill (`disable-model-invocation: true`) has a concrete `argument-hint`? Is `context: fork` treated as experimental with an inline fallback?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
+- [ ] Every reference users can ask for is reachable from SKILL.md (Key References row, plus trigger words in `description` / `When to Use`)? A reference with no entry link is never loaded.
 - [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere? No other skill is named or used as SSOT?
 - [ ] Every script, path, and CLI flag mentioned in SKILL.md exists in the skill and matches the script's argument parser?
 - [ ] references/ reviewed too, not only SKILL.md? Stale facts and duplication accumulate there.
@@ -44,6 +45,8 @@ Checklist for reviewing and improving SKILL.md files.
 ```
 ❌ Bad: 400-line SKILL.md with all details inline
 ✅ Good: 120-line SKILL.md + references/detailed-guide.md
+❌ Bad: detail moved out but SKILL.md has no link or trigger words (the reference is never loaded)
+✅ Good: one Key References row + trigger words in `description`
 ```
 
 ## Content Quality

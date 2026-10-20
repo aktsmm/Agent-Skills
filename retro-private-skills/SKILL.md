@@ -112,7 +112,7 @@ Choose exactly one:
 - Edit only under `<private-repo>/.github/skills/<skill>/`.
 - Keep the diff focused and small.
 - New-skill frontmatter and formatter-drift handling: see [Authoring Rules](references/authoring-rules.md#apply-details).
-- Add `references/` only when detail would bloat `SKILL.md`.
+- Add `references/` only when detail would bloat `SKILL.md`, and link each new reference from the entry (one Key References row, plus trigger words in `description` / `When to Use` when users can ask for the capability). Never defer that link for entry-size reasons; detail stays in the reference.
 
 ### 4. Bloat Check
 

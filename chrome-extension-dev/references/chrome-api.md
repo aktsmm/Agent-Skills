@@ -79,7 +79,7 @@ async function setupOffscreenDocument(path: string) {
 ## chrome.sidePanel
 
 - Chrome 114+、`sidePanel` 権限と manifest の `side_panel.default_path`。
-- `sidePanel.open()`（Chrome 116+）はユーザー操作（アクションのクリック、ショートカット、コンテキストメニュー、拡張ページ/コンテンツスクリプトでのジェスチャー）に応じてのみ呼べる。`windowId` か `tabId` のどちらかが必須。
+- `sidePanel.open()`（Chrome 116+）はユーザー操作（アクションのクリック、ショートカット、コンテキストメニュー、拡張ページ/コンテンツスクリプトでのジェスチャー）に応じてのみ呼べる。`windowId` か `tabId` のどちらかが必須。`contextMenus.onClicked` では対象メニューの判定だけ同期で行い、`storage` 読込などの `await` より先に呼ぶ（初回にパネルが出ない報告があり、`await` 後の呼び出しが原因という仮説は実機未確認だが、先頭に置くコストはない）。
 - アクションアイコンで開くなら `sidePanel.setPanelBehavior({ openPanelOnActionClick: true })`。
 - タブ単位の有効/無効やパス切替は `setOptions({ tabId, path, enabled })`。
 

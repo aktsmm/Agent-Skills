@@ -86,6 +86,8 @@ Example: a skill with a 150-line cap keeps its hard rule list, blocking gate lis
 | Misuse-prevention decision points | Long examples           |
 | Minimal review gates              | Link collections        |
 
+Moving detail out does not mean skipping the entry. For every reference that carries a capability users can ask for, keep its trigger words (`description` / `When to Use`) and one Key References row in `SKILL.md`; without them the reference is never loaded. The entry cost is one line, so entry size is not a reason to defer that link. The Entry File Note below covers always-loaded files, which still take only a one-line pointer.
+
 ## Entry File Note
 
 For always-loaded entry files such as `copilot-instructions.md` and `AGENTS.md`, a short body is not enough.

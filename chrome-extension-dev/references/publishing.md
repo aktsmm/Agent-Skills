@@ -159,7 +159,7 @@ Google 経由で商標侵害を申し立てると、7 日以内に是正しな�
 
 `wxt.config.ts`（または `package.json`）の version を上げ、`npm run zip` → Dashboard の「パッケージ」で新 ZIP をアップロード → 送信。審査中は掲載情報を編集できない（下記 Artifact Hygiene）。
 
-API v2 は OAuth ではなく GCP サービスアカウント（client email + private key）と publisher ID（`publish-extension init`）で認証する。設定前は Dashboard で提出できる: 専用プロファイルのブラウザーを `--remote-debugging-port` 付きで起動し（既存セッションは使わない）、ログインだけユーザーに依頼 → Package → 「新しいパッケージをアップロード」→ ダイアログの「ファイルを選択」（file chooser）→ ドラフトの version 確認 → 掲載情報タブの「審査のため送信」を1回 → 確認ダイアログ（自動公開 checkbox は既定のまま）→ 一覧で version と「審査待ち」を確認。終了後はそのブラウザーとプロファイルを削除する。公開中の版は公開ページ（`chromewebstore.google.com/detail/<id>`）の manifest version からも確認できる。
+提出の自動化（API v2・サービスアカウント。構築、認証、エンドポイント、dry-run 既定のスクリプト規則、API 不可時の Dashboard 提出）は [cws-api-v2.md](cws-api-v2.md) を参照する。
 
 ---
 
@@ -172,7 +172,7 @@ API v2 は OAuth ではなく GCP サービスアカウント（client email + p
 - CWS publish が止まった場合でも、ZIP と SHA256 を GitHub Release に残して再開可能にする。
 - 審査中、認証、権限、duplicate など外部状態で publish だけ止まる場合は、ZIP / SHA256 / version / commit / tag / upload の状態を分けて記録し、再開条件を明記する。
 - ブロッカー解消後の再開では、**最新タグの ZIP を rollup 提出**する。ブロック時点の古い ZIP を蘇生せず、間に積まれた patch をまとめて出す（実例: v0.1.11→v0.1.15 で 4 版分を一括公開）。
-- `publish-extension` が `400 "Publish condition not met: You may not edit or publish an item that is in review."` で失敗する場合は、前回の draft が審査キュー残留中。先に `?projection=DRAFT` で stuck している `crxVersion` を確認し、Dashboard UI から `more_vert` → 審査をキャンセル → 確認ダイアログで取り下げる。ステータスバッジが「公開済み」に戻り次第 `publish-extension` を再実行できる。
+- `publish-extension` が `400 "Publish condition not met: You may not edit or publish an item that is in review."` で失敗する場合は、前回の draft が審査キュー残留中。先に `?projection=DRAFT` で stuck している `crxVersion` を確認し、Dashboard UI から `more_vert` → 審査をキャンセル → 確認ダイアログで取り下げる（API v2 なら `:cancelSubmission`。どちらも承認後）。ステータスバッジが「公開済み」に戻り次第 `publish-extension` を再実行できる。
 - 同じ制限は UI 側にも出る。審査中は保存と提出の操作が無効化され、掲載情報を一切編集できない。解除条件は「審査完了」か「審査キャンセル」の 2 つだけ。ロケール追加や文言修正を提出直後にやる前提で計画しない。先に入れるか、次の update に回す。
 - publish 後の CWS API 確認は item endpoint に `?projection=DRAFT` を付ける。`crxVersion` が対象版で `itemError` が 0 件なら API 側の確認は通過扱いにし、`uploadState: NOT_FOUND` だけで失敗判定や再アップロードをしない。
 - `itemError` が null 要素だけを返すことがあるため、配列長だけで失敗判定しない。API 応答が疎または stale な場合、CLI の upload/publish 成功、DRAFT の対象版、Dashboard の package/status を突合する。
@@ -180,7 +180,7 @@ API v2 は OAuth ではなく GCP サービスアカウント（client email + p
 
 ## 自動パブリッシング
 
-WXT 標準の `wxt submit` を使う（[WXT Publishing](https://wxt.dev/guide/essentials/publishing)）。初回の掲載作成は手動で行う必要がある。
+WXT 標準の `wxt submit` を使う（[WXT Publishing](https://wxt.dev/guide/essentials/publishing)）。初回の掲載作成は手動で行う必要がある。ただし以下は v1.1 の OAuth 資格情報（`CHROME_REFRESH_TOKEN`）を使う構成で、Chrome の v1.1 は 2026-10-15 に停止済み。Chrome へは上のサービスアカウント方式を使い、導入済みの CLI が v2 のサービスアカウント認証に対応すると確認できるまで依存しない。Edge / Firefox は別経路。
 
 ```bash
 npx wxt submit init          # secrets を対話設定し .env.submit を作成（commit しない）
