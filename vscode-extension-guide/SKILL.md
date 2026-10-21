@@ -142,4 +142,4 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 ### 通知の一元管理
 
-通知は共通helperへ集約し、設定値をruntimeで既知enumへ正規化する。重複抑止、ログとの分離、action、securityの設計は [Notification Normalization](references/notification-normalization.md) を参照する。
+通知は共通helperへ集約し、設定値をruntimeで既知enumへ正規化する。重複抑止、ログとの分離、action、security、起動時の繰り返し失敗の一度きり通知の設計は [Notification Normalization](references/notification-normalization.md) を参照する。
