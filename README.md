@@ -60,6 +60,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [humanize-writing](humanize-writing/) | Remove AI-generated tone and make writing sound more human in Japanese and English |
 | [integrate-external-knowledge](integrate-external-knowledge/) | Use when: 他案件、会議メモ、チャット、資料、URLから再利用可能な知見を抽出し、指定フォーカスまたは現在のworkspace目的に合わせて既存ナレッジへ整理・統合する |
 | [local-media-transcription](local-media-transcription/) | Transcribe local MP4/M4A/MP3/WAV/WEBM audio or video with ffmpeg and Whisper, then optionally produce diarized transcripts, customer-facing meeting minutes, action items, and PP... |
+| [microsoft-forms-builder](microsoft-forms-builder/) | Create and configure Microsoft Forms surveys through an owned browser session (Playwright over CDP): title, description, text/choice questions, free-text 'Other', required flags... |
 | [microsoft-graph-gateway](microsoft-graph-gateway/) | Route Microsoft Graph work from VS Code |
 | [ocr-super-surya](ocr-super-surya/) | GPU-optimized OCR using Surya |
 | [opportunity-factory](opportunity-factory/) | Run a reusable opportunity-to-artifact workflow: discover unmet needs, set up workspace factories, schedule recurring commander/worker/reporter prompts, batch-refine many items,... |

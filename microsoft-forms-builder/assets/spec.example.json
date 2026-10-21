@@ -1,0 +1,31 @@
+{
+  "title": "Example Survey (delete me)",
+  "description": [
+    "This is a sample pre-survey.",
+    "Please answer by the due date."
+  ],
+  "questions": [
+    { "type": "text", "title": "Your name", "required": true },
+    {
+      "type": "choice",
+      "title": "Experience",
+      "required": true,
+      "multiple": false,
+      "options": ["None", "Some", "Daily"]
+    },
+    {
+      "type": "choice",
+      "title": "Topics of interest",
+      "required": false,
+      "multiple": true,
+      "options": ["Basics", "Examples", "Security"],
+      "other": true
+    },
+    {
+      "type": "text",
+      "title": "Anything else you would like to tell us?",
+      "required": false,
+      "long": true
+    }
+  ]
+}
