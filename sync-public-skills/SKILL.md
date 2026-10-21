@@ -90,7 +90,7 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 ## Workflow
 
 1. private / public / script、必要なら EMU / GIM repo を解決し、`primary`・branch / remote・ahead/behind・dirty 状態を確認する
-2. Check capabilities and selected readiness/classification/content diff. Only capable primary-only defers unselected authoring; legacy/broad/all retains full stop gates. Never skip selected license, secret, deletion or mirror checks.
+2. Check capabilities and selected readiness/classification/content diff. Preview read-only first with the bundled `scripts/Preview-SyncDiff.ps1` (pending diff per public-safe skill from tracked blobs, leaks, stale directories, unclassified skills); it is skill-bundled, unlike the private-repo-root scripts. Only capable primary-only defers unselected authoring; legacy/broad/all retains full stop gates. Never skip selected license, secret, deletion or mirror checks.
 3. `all` 指定時は、`Commit-DirtySkills.ps1`のdry-run→`-Apply`でskill単位にcommitする。skill以外のdirtyはNot Doneに残し、同期scriptはprivate dirtyを暗黙commitしない
    - In safe-auto all, verify private origin/visibility and the entire ahead range, isolate unrelated dirty, integrate behind/divergence, validate and push only the authorized intake commits before sync. If isolation or scope cannot be established, stop that pre-step; never let `-SkipDevPush` hide pending commits.
    - Legacy/broad distribution must execute from a verified clean/current checkout with its Process source env temporarily aligned and restored afterward; otherwise hold distribution, not unrelated authoring.
