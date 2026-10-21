@@ -50,7 +50,7 @@ These gate the output. They are here, not in a reference, because a reference ma
 - **Images ride in a `data:` URI on an `<img>`, or in allowlisted inline SVG.** Nothing else may carry a resource — not CSS `url()`, not `srcset`, not `<object>`, `<embed>`, `<iframe>`, `<video>`, `<link>`, and never `srcdoc`.
 - **No web fonts.** System font stack only. Glyphs will differ across machines; say so rather than claiming pixel fidelity.
 - **Do not generate brand logos or trademarks.**
-- **Never write a customer name, tenant name, subscription id, or internal hostname into the output.**
+- **Never write a customer name, tenant name, subscription id, or internal hostname into the output.** Exception: when the user explicitly asks for the customer's name in the title of a deck meant for that same customer, put it in the title and `<title>` only, never in the body, notes, `alt` or images; the other identifiers stay forbidden.
 - **No working notes in audience-facing text** (e.g. "unverified", "checked against docs"); turn open points into questions for the audience.
 - **Before embedding a screenshot or an image of unknown provenance, ask: "is this sanitized for publication?"** On "no" or "not sure", stop and mask it first ([mask_image.py](scripts/mask_image.py)). A text scan cannot see a name rendered inside an image, so this judgement stays with the user. Re-ask if the image changes. Permission to use a screenshot is not that answer: crop or mask first, show the result, then ask.
 - **Prefer the active workspace's instructions** for colour and formatting when they exist; otherwise use this skill's defaults.
