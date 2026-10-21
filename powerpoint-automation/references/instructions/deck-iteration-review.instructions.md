@@ -24,7 +24,7 @@ Before handoff:
 1. Export every slide to images from the actual final PPTX.
 2. Inspect the images, not only extracted text. Automated checks must never prefill a manual-review PASS; keep it pending until images are actually inspected, then record reviewed slides and the artifact hash separately from machine results.
 3. Scan visible and hidden slides, table cells, nested groups and notes for old terms, placeholders and literal escape sequences. Record matches by stable slide/topic ID; retained matches need explicit approval, not just a reviewer name.
-4. Reconcile expected topic IDs, section/story order and embedded media against the final deck; equal counts and complete notes do not prove that every slide body was populated.
+4. Reconcile expected topic IDs, section/story order (section names and `SlidesCount` read through COM `SectionProperties`, not only the XML) and embedded media against the final deck; equal counts and complete notes do not prove that every slide body was populated.
 5. Fix visible issues, regenerate/export, and inspect the affected slides again.
 6. Derive results from current artifact-bound evidence, not old logs or fixed review flags. Record content approval, artifact readiness and successful opening separately; only then attempt to open the final PPTX for the user.
 
@@ -33,6 +33,7 @@ Before handoff:
 For each slide, explicitly check:
 
 - **Density**: no slide should look like a few small words floating in large empty boxes.
+- **Table growth**: a rendered table grows past its declared height when cells wrap, and python-pptx heights cannot show it. Compare each table's rendered bottom (COM `Shape.Top + Height`) with the top of the next shapes (source label, memo box, page number). Long IDs such as 16-digit numbers wrap mid-number in narrow columns; give the column about 3.3 in at 16 pt or put the number on its own line.
 - **Readability**: body text should normally be 14-18 pt; avoid shrinking text to fit.
 - **Reflow after font changes**: if body text is enlarged, resize cards or simplify content; do not merely force 14pt into the old boxes.
 - **Box utilization**: if a card is large, fill it with useful examples, inputs/outputs, outcomes, or decision criteria.

@@ -36,7 +36,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [browser-bookmark-organizer](browser-bookmark-organizer/) | Safely audit, classify, deduplicate, and reorganize bookmarks or favorites in Google Chrome and Microsoft Edge while preserving intentional toolbar shortcuts, signed-in profiles... |
 | [browser-max-automation](browser-max-automation/) | Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, durable file downloads, re... |
 | [check-github-activity](check-github-activity/) | 現在または指定したGitHubリポジトリの新しいIssue、Pull Request、コメント、レビュー指摘をread-onlyで確認し、対応要否ごとに要約する。Use when: 新着Issue確認、新しいPR確認、コメント確認、レビュー返信確認、GitHub更新確認。 |
-| [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法をカバー。Use when: ブラウザ拡張機能を作成・修正する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser extension', 'WXT', 'content script'... |
+| [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法、ストア公開（CWS API v2 での提出自動化を含む）をカバー。Use when: ブラウザ拡張機能を作成・修正・公開する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser ext... |
 | [code-review-multi-angle](code-review-multi-angle/) | 差分、PR、選択範囲、指定ファイルを多角的にレビューし、既定は read-only、明示指示があれば critic review 後に修正と検証まで行う。日常コードレビューの入口で、`fix` 指定で Fix now / Guard now / Block に分けて最小修正・同根 Sweep・検証まで閉じる |
 | [code-review-security](code-review-security/) | 差分、PR、選択範囲、指定ファイルをセキュリティ観点で read-only レビューし、rubber duck / critic review で確認してから高信頼の脆弱性を報告する |
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |

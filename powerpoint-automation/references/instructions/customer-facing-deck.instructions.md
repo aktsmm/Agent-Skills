@@ -6,7 +6,7 @@ Use these rules when creating or revising decks intended to be shown directly to
 
 - Slide surfaces must contain only audience-ready content.
 - Do not show internal talk tracks, "avoid saying" guidance, dry-run findings, validation notes, file-purpose labels, or implementation/debug notes on visible slides.
-- Never print internal-state wording on a slide (未確認 / 記載なし / 要確認 / 推定 / 未発表 / 判定保留). Verify and state the fact, or omit the element (for example, draw no region stamp when it cannot be confirmed). Gate it with a forbidden-phrase check over all rendered text.
+- Never print internal-state wording on a slide (未確認 / 記載なし / 要確認 / 推定 / 未発表 / 判定保留). Verify and state the fact, or omit the element (for example, draw no region stamp when it cannot be confirmed). Gate it with a forbidden-phrase check over all rendered text and every package XML part (notes, docProps, hidden slides); a template can carry co-author names in `ppt/authors.xml` and `ppt/changesInfos/*`, so drop those relationships before external sharing.
 - Put presenter guidance and supporting detail in notes, but keep conditions that change an answer visible with its claim. Exclude material the recipient may not receive from the whole file; hidden slides and notes are not access controls.
 - Speaker note citations must include usable URLs, not just source names. Example: `Source: Microsoft Scout overview - https://...`.
 - A presenter-only slide may be hidden or moved into notes only if its contents may also be received by the audience; otherwise keep it in a separate restricted file.
@@ -29,7 +29,8 @@ Use these rules when creating or revising decks intended to be shown directly to
 ## Source and URL Handling
 
 - Each visible URL must be a real PowerPoint hyperlink, not plain text.
-- Use neutral source labels for customer-facing decks. Avoid internal or overly personal labels unless the user wants them.
+- Use neutral source labels for customer-facing decks. Avoid internal or overly personal labels unless the user wants them. Do not cite internal threads, search summaries or verification caveats in a source label; state only delivered facts (for example, "mail sent to <customer> on <date>") and keep confidence notes in the internal notes and handoff report.
+- Do not put decorative lead sentences under titles (for example, "we will ask about ..." or "we introduce ..."); put the confirmation and consultation items in table rows.
 - Verify hyperlink count after generation.
 - For detail links, prefer the Japanese (`ja-jp`) page when it exists, cap them at about three official pages, and never pad with unrelated product landing pages.
 - When slides are rendered from HTML/PDF, detect overflow by geometry (card bottom vs footer top, scrollHeight vs clientHeight), shrink the font in steps, and split detail panels to a continuation page only as a last resort. When merging pages made by different generators, normalise the page size first (Chrome writes 1280x720 px as 960x540 pt) and inspect the merged file's page sizes.

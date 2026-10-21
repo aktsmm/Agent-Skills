@@ -25,6 +25,8 @@ Because sizes are proportional, **shrinking text to make content fit is not an o
 
 Rough vertical capacity per slide at the default scale: one heading plus about six short lines, or a table of five rows, or three cards. An eyebrow or chapter label consumes another line; a five-row table that fits without it can overflow once it is added.
 
+An inline SVG spans the full 86cqw content width, so its height is 86cqw × viewBox height ÷ width: under an `h2` only about 38cqw remains, so keep the viewBox no taller than ~0.44 × its width (900×380 fit). Text inside scales with that width; keep `font-size` ≥ 14 in a 900-unit viewBox. `<img>` `width`/`height` attributes are fixed pixels, not `cqw`: about 560px keeps a screenshot under a heading and caption.
+
 ## Density classes
 
 The default scale suits title and divider slides. Put one class on a slide `<section>` to scale its text; titles and body scale separately, and the top padding is already tight.

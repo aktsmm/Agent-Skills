@@ -82,6 +82,8 @@ A `runSubagent` critic does not see the producer's conversation, but it is not a
 
 An unexplained delta after dispatch means the round is contaminated. Identify what the critic created or changed, restore only that without clobbering pre-existing edits, and re-run against the original artifact or a write-incapable route before reconciling any finding from that round.
 
+In a workspace shared with other live sessions, a fingerprint delta can come from them. Attribute each delta by name, content and timestamp against the critic's task: an unrelated delta is reported as unattributed and does not invalidate the round, while a delta inside the reviewed artifact set does. A read-only exploration agent can still be given an explicit `model`, which gives a read-only critic on a chosen family.
+
 A write-incapable exploration subagent removes the risk but usually cannot reach documentation or web tools, so a fact-checking lane may still need a write-capable critic. Choose per lane, not per session.
 
 Treat the isolation as conversation isolation only. Anything that must bind the critic belongs in the packet, and anything the producer's own instruction files push toward is a bias the critic may quietly share — which is the blind spot a different model family was chosen to avoid.
