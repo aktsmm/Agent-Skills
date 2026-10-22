@@ -51,6 +51,8 @@ private skill repo（SSOT）から public / EMU private / GIM internal へ、行
 ## Gates（公開前に必ず確認）
 
 - public / internal / denied / copilot-deniedの分類SSOTは `scripts/skill-distribution.json`。`publicCopilotSkills` は空を維持し、promptやSKILL本文へ現在の一覧を複製しない
+- 公開承認が未取得・不明なら、Askツールで対象・理由・監査に基づく推奨方針・公開/保留/非公開の選択肢・既存公開への影響を示して確認する。ツール不在・無回答時は未承認の公開と影響する同期を止め、保留を永久的なdenyへ変換しない。
+- 既存公開Skillの統合・改名・内容変更でも、承認待ちだけを理由に `publicSkills` から外す、`deniedSkills` に入れる、公開版を削除する操作は禁止。公開済み版を維持し未承認の更新は止める。選択的保留をrunnerが保証できなければ影響する同期を停止する。実漏洩は別途incident recoveryへ進む。
 - `dirty` は sync 必要性ではなく、未確定 authoring の gate として扱う。通常 sync の要否は private source path と public / EMU / GIM destination path の content diff で判定する。content diff は **tracked file を基準**にし、raw な filesystem hash 比較だけで判断しない。両 repo で untracked な build 生成物（`__pycache__/*.pyc` 等）が phantom diff として出て、pending 集合が実際の倍近くに見える。候補が出たら `git ls-files` で tracked かどうかを確認してから対象に含める
 - 実行前に `Mode / Selected Skills / 選択外の public diff` を示す。対象が明示されていれば `primary-only`、`all` / `broad` なら broad とし、会話の流れだけで primary を推測しない
 - primary が明示されている場合、既定の確認範囲は primary とその同期経路に限定する。全 skill 棚卸し、全 duplicate、全 copilot-skills license audit は `all` / `broad` / `audit` / `棚卸し` が明示された場合だけ行う

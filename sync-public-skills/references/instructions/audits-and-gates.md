@@ -8,6 +8,8 @@ Broad/all compares all native skills with distribution config and stops on unkno
 
 Before execution, verify the applicable scope and committed runner capabilities. Ask public/internal/denied classification only for selected unknowns; never infer permission from naming or history. "Not this run" removes that skill from the selection without changing permanent policy or blocking independently safe targets.
 
+- Separate a concrete publication restriction from missing consent. For selected new, merged, renamed or changed content awaiting consent, use the Ask tool with the affected skill, evidence/reason, recommended choice, publish / hold this update / make nonpublic options, and the effect on any existing public version. Recommend publication only after the content/license audit passes; do not re-ask already authorized unchanged scope.
+- Consent-only holds never justify moving an existing public skill to denied or deleting its public version. Keep the published version unchanged and defer the unapproved update. If the runner cannot preserve it while excluding that update, stop the affected sync rather than changing classification or silently broad-syncing. Missing Ask tools or no answer leave that hold unresolved, not permanent deny. For example, a merged public skill awaiting approval retains its published version; a fresh secret exposure instead enters Incident Recovery.
 - 検知された skill は以下のいずれかへ分類してから再実行する
   - **public-safe**→ `publicSkills`へ追記する。Copilot-Skills Public Audit Gateを先に通す
   - **internal-only**→ `internalSkills`へname / audience / internalOnlyを追記する。public denylistへ自動統合されGIM/EMUへmirrorされる
