@@ -70,6 +70,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [powerpoint-automation](powerpoint-automation/) | Convert web articles or blog posts into slides through a content.json pipeline, translate or rebuild existing PPTX files onto a template, and edit an already-open PowerPoint dec... |
 | [powerpoint-planning](powerpoint-planning/) | Plan high-quality PowerPoint presentations before file creation or editing |
 | [project-workspace](project-workspace/) | Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a pro... |
+| [prompt-to-skill-reconcile](prompt-to-skill-reconcile/) | Prompt ファイル (.prompt.md) から Skill へ移行した後に、ワークスペース内の instructions / agents / README / Skill 本文 / スクリプトに残る旧 Prompt 前提の参照と運用手順を点検し、承認後に最小修正する。Use when: Prompt から Skill に移行した、migrat... |
 | [receipt-expense-workflow](receipt-expense-workflow/) | Company expense receipt workflow. OCR, rename, sort, summarize, and prepare receipt images/PDFs/videos for D365 expense mapping and attachment |
 | [receipt-tax-ocr](receipt-tax-ocr/) | Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos... |
 | [record-work-notes](record-work-notes/) | Use when: 作業メモ、事象別ログ、調査・相談・確認・実装・トラブル対応の経緯を残す。会話と作業結果を既存記録へ整理し、継続案件・時系列・出典・残事項を追える形で保存する |
