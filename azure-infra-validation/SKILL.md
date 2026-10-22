@@ -1,6 +1,6 @@
 ---
 name: azure-infra-validation
-description: "Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs. Use when creating verification environments, provisioning hub-and-spoke VNets, VPN Gateway or ExpressRoute-adjacent validation labs, checking subscription/tenant access, debugging Azure deployment constraints, comparing before/after route behavior, or cleaning up lab resources. Triggers on 'Azure 検証', '検証環境', 'PoC', 'sandbox', 'lab', 'Azure CLI で構築', 'VPN Gateway', 'VNet peering', 'BGP', 'route validation', 'summarizedGatewayPrefixes', 'デプロイして検証', 'インフラ検証'."
+description: "Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs. Use when creating verification environments, provisioning hub-and-spoke VNets, VPN Gateway or ExpressRoute-adjacent validation labs, checking subscription/tenant access, debugging Azure deployment constraints, comparing before/after route behavior, or cleaning up lab resources. Triggers on 'Azure 検証', '検証環境', 'PoC', 'sandbox', 'lab', 'Azure CLI で構築', 'VPN Gateway', 'VNet peering', 'BGP', 'route validation', 'summarizedGatewayPrefixes', 'デプロイして検証', 'インフラ検証', 'Application Gateway', 'AppGW 書き換え', 'リダイレクト検証', 'NSG が自動付与'."
 argument-hint: "tenant ID, subscription ID, target topology, validation goal, cost/cleanup expectation"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -122,6 +122,7 @@ Detailed steps: [references/validation-runbook.md](references/validation-runbook
 - [ ] 再収束時間または瞬断有無を、Activity Log だけでなく polling 証跡で説明できる
 - [ ] 結果を `Answer/` や `reports/` に反映した
 - [ ] cleanup 方針を残した
+- [ ] HTTP 層の検証（Application Gateway、リダイレクト、書き換え）では、サブネット NSG の許可と手元 PC の経路を先に確認し、手元で不安定なら Azure 内クライアントで判定した（[references/lab-client-path-and-policy.md](references/lab-client-path-and-policy.md)）
 
 ## Output Shape
 
@@ -144,3 +145,4 @@ Detailed steps: [references/validation-runbook.md](references/validation-runbook
 
 - [references/validation-runbook.md](references/validation-runbook.md)
 - [references/output-template.md](references/output-template.md)
+- [references/lab-client-path-and-policy.md](references/lab-client-path-and-policy.md): 手元 PC の経路不安定時の Azure 内クライアント、ポリシー自動付与 NSG、Public IP の機能登録、Application Gateway の書き換え・リダイレクト検証の確認項目
