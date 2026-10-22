@@ -44,6 +44,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [create-test-request](create-test-request/) | Use when: 会話・設計資料・回答文書から検証タスクを抽出し、別workspaceへ渡すテスト依頼文を作成する。受け手は最初に理解内容と実施項目を返し、承認後に検証する |
 | [customer-workspace](customer-workspace/) | Set up and operate customer workspaces: route customer updates, record meetings, track questions and actions, manage workstreams, and prepare handoffs |
 | [drawio-diagram-forge](drawio-diagram-forge/) | Generate draw.io editable diagrams (.drawio, .drawio.svg) from text, images, or Excel. Orchestrates 3-agent workflow (Analysis → Manifest → SVG generation) with quality gates |
+| [duck-critic](duck-critic/) | Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes |
 | [evaluate-waza-copilot-customizations](evaluate-waza-copilot-customizations/) | Waza で個人（~/.copilot）/ ワークスペース / 任意パスの instructions / agents / skills をセットアップ、static/runtime 評価、gate 単体実行、結果要約、report 更新まで行う。 |
 | [explain-release-changes](explain-release-changes/) | 前回リリース以降の変更を、コードを知らない人にも伝わる説明文にする。Use when: リリースノートを一般向けに書き直したい、今回の変更を人に説明したい、ブログ/SNS/社内共有向けに変更点を紹介したい、機能の移植元（姉妹repo・参考OSS等）を明記して伝えたい |
 | [export-copilot-session-dialogue](export-copilot-session-dialogue/) | Interaction flow: セッション中の対話フロー・使用ツール・手順を構造化して出力。Use when: dialogue, tool flow, handoff, 手順再現。作業ログは export-session-log、再利用知見は export-knowledge を使う |
