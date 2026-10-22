@@ -78,10 +78,15 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [refine-product-100](refine-product-100/) | プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode では品質 gate 後に配布と公開状態確認まで進める |
 | [report-poc-to-requester](report-poc-to-requester/) | Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマ... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
+| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for editing ~/.copilot personal assets or worksp... |
+| [retro-user](retro-user/) | Reflect verified incident or session learnings into personal Copilot or Codex instructions and configuration. Invoke explicitly for Retro User, user-wide retrospective, 個人設定の知見反... |
+| [retro-workspace](retro-workspace/) | Reflect reusable learnings into the selected workspace's authorized instructions and automation assets, such as AGENTS.md, copilot-instructions.md, scoped instructions, scripts,... |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
 | [review-workflow-runtime](review-workflow-runtime/) | ワークフロー定義と参照 scripts/hooks/validators を横断し、実行時ロジック・I/O・冪等性・冗長処理・検証ゲートをレビューし、低リスク修正まで行う |
+| [review-workflow-structure](review-workflow-structure/) | ワークフロー設計資産としての agent / instruction / skill / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する |
 | [rewrite-x-post](rewrite-x-post/) | Use when: 短い日常文、下書き、思いつき、愚痴、感想、作業ログ、近況を、本人らしさを残したX投稿候補へリライトする。ニュース起点の投稿生成は generate-news-x-posts を使う |
 | [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree |
+| [session-handoff](session-handoff/) | Create a compact handoff note for another session. Use for セッションを閉じる, 引き継ぎを作る, 伝言を作る, create/export a handoff, or resume later. Do not create another handoff when a pasted note... |
 | [share-session-learnings](share-session-learnings/) | Use when: 今の一連の作業で得た改善点・反省点を、他セッションや別 repo へ渡す共有メモにしたい。命令文ではない叙述の報告として書き、横展開の実装はしない |
 | [single-html-forge](single-html-forge/) | Generate a single self-contained HTML file — a horizontal slide deck, a vertical-scroll explainer document, or a fixed-canvas summary image — with zero external runtime dependen... |
 | [skill-creator-plus](skill-creator-plus/) | Create or review a reusable skill (SKILL.md) that packages a workflow, and decide whether the request should be a skill instead of a prompt, instruction, agent, or hook |
@@ -95,6 +100,8 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [vscode-extension-guide](vscode-extension-guide/) | Guide for creating VS Code extensions and plugins from scratch through Marketplace publication |
 | [web-accessibility](web-accessibility/) | Build and review accessible web products using WCAG 2.2 AA |
 | [write-tests](write-tests/) | コードを分析し、テストを段階的に生成・実行 |
+| [x-post-research](x-post-research/) | Research public X posts from keywords, hashtags, OR queries, domains, or known post URLs, then verify linked primary sources, official docs, repositories, benchmarks, and releva... |
+| [x-twitter-browser-ops](x-twitter-browser-ops/) | X/Twitter browser analysis and explicitly approved mutations. Use for follower/following/mutual/verified analysis, X saved-post folder management, content/profile operations, or... |
 <!-- public-skills-table:end -->
 
 ## Usage / 使い方

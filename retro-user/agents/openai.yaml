@@ -1,0 +1,6 @@
+interface:
+  display_name: "Retro User"
+  short_description: "Reflect evidence into personal Copilot or Codex customization"
+  default_prompt: "Use $retro-user to reflect these verified learnings into the selected host's user-level customization, preserving its scope and approval boundaries."
+policy:
+  allow_implicit_invocation: false
