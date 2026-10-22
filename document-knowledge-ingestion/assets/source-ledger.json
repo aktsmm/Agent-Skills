@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "sources": [{ "id": "source-a" }],
+  "documents": [
+    {
+      "id": "document-a",
+      "source_id": "source-a",
+      "relative_path": "chapter.md",
+      "role": "original",
+      "status": "pending",
+      "reason": "Template record: replace with an observed source before ingestion"
+    }
+  ],
+  "notes": [],
+  "ocr": []
+}
