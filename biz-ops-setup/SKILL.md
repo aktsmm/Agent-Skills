@@ -90,6 +90,7 @@ Use the deployed task-manager, data-collector, and report-generator for their re
 
 - Select external rechecks from current owner-relevant actions, due dates, and changed evidence or restart conditions. Do not reopen completed details or expand unchanged blocked items into queries; count candidates and actual calls separately.
 - Retain original query/response evidence and its acquisition time. Saving or copying evidence is not a new query; unknown acquisition time must stay explicit.
+- Derived views (summaries, dashboards, status tables) go stale silently. When a source record changes, including a new ledger row or a decision stated in chat, update every derived view in the same turn. Before answering from a view, compare the sources' modification times with the view's last-updated stamp, and reconcile the sources first when they are newer.
 - Where independent review is required, retain a separate reviewer's original verdict against the exact artifact version. Producer self-assessment or validation PASS is not approval; quality approval does not make incomplete data complete. Substantive post-review changes require another review.
 
 ## Review / Handoff
