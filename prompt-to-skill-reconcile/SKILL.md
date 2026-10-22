@@ -2,6 +2,7 @@
 name: prompt-to-skill-reconcile
 description: "Prompt ファイル (.prompt.md) から Skill へ移行した後に、ワークスペース内の instructions / agents / README / Skill 本文 / スクリプトに残る旧 Prompt 前提の参照と運用手順を点検し、承認後に最小修正する。Use when: Prompt から Skill に移行した、migration 後の参照修正、.github/prompts 前提の記述が残っていないか確認、移行後の整合チェック。移行そのものの実行や Skill の新規設計には使わない。"
 argument-hint: "対象ワークスペース、移行した Prompt / Skill の範囲（省略時は Git 差分から推定）"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:

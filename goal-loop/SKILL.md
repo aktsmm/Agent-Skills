@@ -2,6 +2,7 @@
 name: goal-loop
 description: "Run an explicit end-to-end goal loop with frozen Scope/criteria, worker delegation, external verification, evaluator review, and bounded retries. Use when the user asks for 'goal-loop', 'ゴールまで回す', '必ずやり遂げる', 'loop until done', 'until it actually works', or an orchestrator + evaluator loop. Do not use for ordinary planning, casual advice, reviews, or small single-file fixes."
 argument-hint: "達成したいゴール（成果物・終了条件・制約があれば一緒に）"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:

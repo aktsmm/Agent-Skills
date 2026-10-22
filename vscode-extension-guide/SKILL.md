@@ -62,6 +62,11 @@ mkdir -p artifacts/vsix
 npx @vscode/vsce package --out artifacts/vsix/my-extension-1.0.0.vsix
 ```
 
+In PowerShell, replace `mkdir -p artifacts/vsix` with
+`New-Item -ItemType Directory -Force -Path 'artifacts\vsix'`; keep the other
+build/package commands. Choose shell syntax from the execution environment,
+not the agent host.
+
 Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository root, and prune old local builds on a schedule so release artifacts do not pile up.
 
 ## Done Criteria

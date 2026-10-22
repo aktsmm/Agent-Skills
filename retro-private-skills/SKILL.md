@@ -2,6 +2,7 @@
 name: "retro-private-skills"
 description: "Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for editing ~/.copilot personal assets or workspace/repository assets (workspace and ~/.copilot skills may be read as intake sources). Use when: skill retro, private skill authoring, skill repository fix, create or update SKILL.md, workspace skill intake."
 argument-hint: "反映したい学び、対象 skill 名、workspace skill path（intake 時）、private repo path、mode（safe-auto / review-only / dry-run）"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:

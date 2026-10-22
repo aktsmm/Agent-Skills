@@ -2,6 +2,7 @@
 name: "permission-max"
 description: "Reduce repeated permission prompts across Microsoft Scout, Copilot CLI, and host tool confirmations with user-approved settings and explicit before/after verification. Use when users ask for permission max, fewer approval prompts, shell allow-list expansion, autoApprove, or diagnosis of repeated Read/Write/PowerShell confirmations."
 argument-hint: "権限確認を減らしたい実行環境、Scout/Copilot CLI/ホスト側の症状"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:

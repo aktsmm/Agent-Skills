@@ -2,6 +2,7 @@
 name: ai-cli-benchmark
 description: "Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, prompt-cache diagnosis, cache read/write analysis, fresh-process latency measurement, token-cost comparison, or when a benchmark must separate provider caching from local CLI caches."
 argument-hint: "比較対象、dataset/prompt、model、測定回数、cache観測条件、出力先"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:

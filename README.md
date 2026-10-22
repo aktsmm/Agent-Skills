@@ -33,8 +33,8 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [azure-update-customer-pptx](azure-update-customer-pptx/) | Build a customer-facing Azure Update PowerPoint from Azure Updates MCP results, including customer classification, Japan region stamps, UPDATE Points, speaker notes, and Verify-... |
 | [biz-ops-setup](biz-ops-setup/) | Set up or operate a business operations workspace for activity reports, tasks, and customer routing; workIQ is optional |
 | [book-writing-workspace](book-writing-workspace/) | Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support |
-| [browser-bookmark-organizer](browser-bookmark-organizer/) | Safely audit, classify, deduplicate, and reorganize bookmarks or favorites in Google Chrome and Microsoft Edge while preserving intentional toolbar shortcuts, signed-in profiles... |
-| [browser-max-automation](browser-max-automation/) | Visible browser automation using Playwright MCP, CLI, and CDP without interrupting the user's foreground work. Use for navigation, forms, screenshots, durable file downloads, re... |
+| [browser-bookmark-organizer](browser-bookmark-organizer/) | Safely audit, classify, deduplicate, and reorganize Chrome or Edge browser bookmarks/favorites while preserving toolbar shortcuts, active profiles, and observable sync state. Us... |
+| [browser-max-automation](browser-max-automation/) | Visible browser automation using available Playwright, CLI, CDP, or computer-use tools with scoped actions and durable verification. Use for navigation, forms, screenshots, down... |
 | [check-github-activity](check-github-activity/) | 現在または指定したGitHubリポジトリの新しいIssue、Pull Request、コメント、レビュー指摘をread-onlyで確認し、対応要否ごとに要約する。Use when: 新着Issue確認、新しいPR確認、コメント確認、レビュー返信確認、GitHub更新確認。 |
 | [chrome-extension-dev](chrome-extension-dev/) | Chrome/ブラウザ拡張機能開発の包括的ガイド。WXTフレームワーク、Manifest V3、Chrome API、テスト手法、ストア公開（CWS API v2 での提出自動化を含む）をカバー。Use when: ブラウザ拡張機能を作成・修正・公開する時。Triggers on 'ブラウザ拡張機能', 'Chrome拡張', 'browser ext... |
 | [code-review-multi-angle](code-review-multi-angle/) | 差分、PR、選択範囲、指定ファイルを多角的にレビューし、既定は read-only、明示指示があれば critic review 後に修正と検証まで行う。日常コードレビューの入口で、`fix` 指定で Fix now / Guard now / Block に分けて最小修正・同根 Sweep・検証まで閉じる |
@@ -44,7 +44,6 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [create-test-request](create-test-request/) | Use when: 会話・設計資料・回答文書から検証タスクを抽出し、別workspaceへ渡すテスト依頼文を作成する。受け手は最初に理解内容と実施項目を返し、承認後に検証する |
 | [customer-workspace](customer-workspace/) | Set up and operate customer workspaces: route customer updates, record meetings, track questions and actions, manage workstreams, and prepare handoffs |
 | [drawio-diagram-forge](drawio-diagram-forge/) | Generate draw.io editable diagrams (.drawio, .drawio.svg) from text, images, or Excel. Orchestrates 3-agent workflow (Analysis → Manifest → SVG generation) with quality gates |
-| [duck-critic](duck-critic/) | Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes |
 | [evaluate-waza-copilot-customizations](evaluate-waza-copilot-customizations/) | Waza で個人（~/.copilot）/ ワークスペース / 任意パスの instructions / agents / skills をセットアップ、static/runtime 評価、gate 単体実行、結果要約、report 更新まで行う。 |
 | [explain-release-changes](explain-release-changes/) | 前回リリース以降の変更を、コードを知らない人にも伝わる説明文にする。Use when: リリースノートを一般向けに書き直したい、今回の変更を人に説明したい、ブログ/SNS/社内共有向けに変更点を紹介したい、機能の移植元（姉妹repo・参考OSS等）を明記して伝えたい |
 | [export-copilot-session-dialogue](export-copilot-session-dialogue/) | Interaction flow: セッション中の対話フロー・使用ツール・手順を構造化して出力。Use when: dialogue, tool flow, handoff, 手順再現。作業ログは export-session-log、再利用知見は export-knowledge を使う |
@@ -76,10 +75,9 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [record-work-notes](record-work-notes/) | Use when: 作業メモ、事象別ログ、調査・相談・確認・実装・トラブル対応の経緯を残す。会話と作業結果を既存記録へ整理し、継続案件・時系列・出典・残事項を追える形で保存する |
 | [refactor-context](refactor-context/) | 指定スコープの instruction / agent / skill をコンテキスト最適化する。単一ファイルも複数ファイル群の MECE 横断レビューも扱う。構造レビューは review-workflow-structure の担当 |
 | [refine-product-100](refine-product-100/) | プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode では品質 gate 後に配布と公開状態確認まで進める |
+| [report-poc-to-requester](report-poc-to-requester/) | Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマ... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
-| [retro-copilot](retro-copilot/) | Run a retro for personal global ~/.copilot assets and turn incident learnings into updates for copilot-instructions, instructions, skills, agents, and hooks. Not for workspace/r... |
 | [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for editing ~/.copilot personal assets or worksp... |
-| [retro-workspace](retro-workspace/) | Reflect reusable learnings into the current workspace / repository design and automation assets (.github/**, AGENTS.md, repo scripts/tasks). Not for ~/.copilot personal assets o... |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
 | [review-workflow-runtime](review-workflow-runtime/) | ワークフロー定義と参照 scripts/hooks/validators を横断し、実行時ロジック・I/O・冪等性・冗長処理・検証ゲートをレビューし、低リスク修正まで行う |
 | [review-workflow-structure](review-workflow-structure/) | ワークフロー設計資産としての agent / instruction / skill / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する |

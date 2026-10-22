@@ -38,7 +38,10 @@ Separate stable login/home URLs from:
 - post-payment, post-registration, or print-session pages
 
 Replace a transient URL only when a stable official landing/sign-in URL is
-clear. Keep the original in the dry-run plan for audit and recovery.
+clear and the replacement is authorized. Do not open a state-changing or
+credential-bearing transient URL merely to test it. Keep necessary original
+recovery data only in the private local backup; redact secret-bearing URL parts
+from shared plans and reports.
 
 ## Duplicate Rules
 

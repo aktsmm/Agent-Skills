@@ -1,6 +1,6 @@
 ---
 name: browser-bookmark-organizer
-description: "Safely audit, classify, deduplicate, and reorganize bookmarks or favorites in Google Chrome and Microsoft Edge while preserving intentional toolbar shortcuts, signed-in profiles, and sync state. Use when asked to organize browser bookmarks/favorites, clean duplicate bookmarks, redesign bookmark folders, classify login/reference/self-hosted links, or fix an overgrown bookmark tree."
+description: "Safely audit, classify, deduplicate, and reorganize Chrome or Edge browser bookmarks/favorites while preserving toolbar shortcuts, active profiles, and observable sync state. Use for browser bookmark cleanup, duplicate bookmarks, folder redesign, or login/reference/self-hosted link classification. Not for X saved posts."
 argument-hint: "対象ブラウザー（Chrome / Edge）、やりたいこと（棚卸し / 整理 / 重複削除）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -40,6 +40,11 @@ cleanup unless the user separately requests those scopes.
    non-empty folder as cleanup.
 8. Treat URL replacement as a new deduplication event; recheck duplicates after
    canonicalizing transient URLs.
+9. Apply only the authorized plan; audit approval is not delete approval.
+   Keep backups private and scoped to bookmarks, not unrelated profile data.
+10. Verify current tool documentation and available manager/API controls;
+    references do not prove CDP, DevTools, or native input is available.
+    If no supported route can perform the task, stop at audit/plan.
 
 → Recovery details: [references/safety-and-recovery.md](references/safety-and-recovery.md)
 
@@ -48,15 +53,16 @@ cleanup unless the user separately requests those scopes.
 ### 1. Identify the Correct Profile
 
 Confirm browser, profile display name, profile directory, signed-in account, and
-bookmark sync state in the normal UI. Do not infer the profile from a process
-list alone. Capture the currently open manager page:
+observable bookmark sync state in the normal UI. Report unavailable checks;
+do not infer the profile from a process list alone. Use a task-owned manager tab
+when supported, preserving existing tabs and foreground:
 
 - Chrome: `chrome://bookmarks`
 - Edge: `edge://favorites`
 
 ### 2. Audit Before Designing
 
-Read the complete tree to its lowest level and capture:
+Inventory the tree to its lowest accessible level and capture:
 
 - URL/folder counts, exact duplicate groups, empty folders, maximum depth
 - direct toolbar/root bookmarks and their relative order
@@ -64,6 +70,8 @@ Read the complete tree to its lowest level and capture:
 - mixed login/action, reference/memo, owned-service, and archive content
 
 Do not use `date_last_used` as deletion evidence when it is missing or sparse.
+Mark incomplete coverage; visible rows alone do not prove a complete tree.
+Do not infer baseline counts or paths from the example log template.
 
 ### 3. Freeze User Intent
 
@@ -95,7 +103,9 @@ them, and compensate with exact paths, titles, and URLs.
 Avoid a parallel root such as `整理済み` / `Organized`; integrate into one
 taxonomy to prevent double management. For a large plan, obtain a rubber-duck
 review before mutation, focusing on data loss, reversibility, MECE quality,
-toolbar preservation, and browser/profile safety.
+toolbar preservation, and browser/profile safety. If independent review is
+unavailable or unauthorized, report the unresolved requirement and stop before
+the affected large or destructive changes.
 
 ### 5. Execute in the Active Profile
 
@@ -103,30 +113,33 @@ Use stable IDs from the live tree and browser-owned APIs where available. Run a
 small pilot, verify persisted state, then use short batches. Reacquire UI or API
 state between batches rather than trusting stale wrappers or success markers.
 
-Prefer automation that does not physically move the user's mouse. If GUI input
-would interfere with other work, use focus/keyboard, CDP, or API operations and
-restore the prior foreground window.
+Prefer supported API/element actions that preserve the user's mouse and
+foreground. Native keyboard/window controls must actually be available. If
+activation is necessary, explain the bounded step first; restore focus only
+when the user has not meanwhile switched tasks.
 
 → Browser-specific execution: [references/chrome-edge-execution.md](references/chrome-edge-execution.md)
 
 ### 6. Verify the Persisted Result
 
-Re-read the live tree and prove:
+Re-read the live tree within the verified coverage and compare with the approved plan:
 
-- expected URL count, zero unintended duplicates, zero empty folders
+- expected URL count and no unintended duplicates or empty folders; retain
+  explicitly approved exceptions
 - maximum depth meets the agreed target
 - direct toolbar/root order is preserved
 - every obsolete folder was empty before removal
 - title/URL updates persisted and did not create duplicates
-- the intended profile remains signed in and bookmark sync is healthy
+- observable signed-in profile and sync health, with unavailable checks marked
 - no password, cookie, session, or unrelated profile data changed
 
-Close DevTools/automation surfaces and return the user to the normal bookmark
-manager. Report exact before/after counts and any intentionally retained
-ambiguities.
+Close only task-owned surfaces, not the user's existing manager or shared last
+tab. Report verified before/after counts, coverage limitations, intentionally
+retained items, unknown outcomes, and the recovery artifact.
 
 ## References
 
 - [Classification model](references/classification-model.md)
 - [Chrome and Edge execution](references/chrome-edge-execution.md)
 - [Safety and recovery](references/safety-and-recovery.md)
+- [Provenance](PROVENANCE.md)

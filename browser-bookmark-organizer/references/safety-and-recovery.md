@@ -8,6 +8,9 @@ Before mutation, always create:
 2. A structured JSON tree when the active browser context safely exposes the
    bookmark API, including IDs, titles, URLs, parent IDs, indexes, and children.
 
+Verify that the native export exists, parses, and covers the expected URL/folder
+scope. A successful click or an empty export is insufficient.
+
 If API access is unavailable, do not install a temporary extension or edit
 profile files solely to obtain IDs. Use the HTML export plus an explicit
 path/title/URL dry-run plan, and state that operation-level reversal is limited.
@@ -23,13 +26,17 @@ Record baseline:
 
 Store backups outside the browser profile directory. Do not store credentials,
 cookies, tokens, password databases, or full session data with the bookmark
-backup.
+backup. Do not upload these private exports.
 
 ## Recovery Hierarchy
 
-1. Reverse the latest known operations through the bookmark API when available.
-2. Re-import the HTML export into the same active profile if operation-level
-   reversal is insufficient.
+1. Re-read current state, then reverse known confirmed operations through a
+   supported manager/API route when possible.
+2. If operation-level reversal is insufficient, explain the actual merge,
+   duplicate, and folder-placement effects before considering an HTML import
+   into the same active profile. Import is not an exact restore. Obtain
+   authorization for a recovery scope change; reconcile with current bookmarks
+   and verify counts/order rather than blindly importing.
 3. Stop and involve the user before any whole-profile recovery.
 
 Do not launch a copied profile to "test" recovery: profile copies can be treated
@@ -46,7 +53,8 @@ Stop mutation immediately when:
 - a supposedly empty folder contains children
 - unrelated passwords, sessions, cookies, or browser settings appear affected
 
-Preserve the latest tree snapshot and operation log before attempting recovery.
+Preserve the latest scoped tree snapshot and operation log before attempting
+recovery. Do not continue cleanup to conceal an incident.
 
 ## Deletion Gate
 
