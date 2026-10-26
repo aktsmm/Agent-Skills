@@ -3,6 +3,7 @@ name: analyze-copilot-sessions
 description: "Analyze historical VS Code GitHub Copilot Chat sessions by model, reasoning effort, AIU, time, reliability, workflow behavior, and external quality evidence, or safely prune workspace-scoped local chat history by age. Use for session analysis, repeated-task retrospectives, model evaluation, cost/performance analysis, and old session cleanup."
 argument-hint: "session IDs, log paths, metrics JSON, task/workload unit, quality evidence, and analysis focus"
 user-invocable: true
+disable-model-invocation: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

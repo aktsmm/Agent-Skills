@@ -3,6 +3,7 @@ name: session-handoff
 description: "Create a compact handoff note for another session. Use for セッションを閉じる, 引き継ぎを作る, 伝言を作る, create/export a handoff, or resume later. Do not create another handoff when a pasted note asks the current agent to resume work."
 argument-hint: "引き継ぐ作業、完了条件、再開先へ渡す制約"
 user-invocable: true
+disable-model-invocation: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)

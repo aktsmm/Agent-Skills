@@ -3,6 +3,7 @@ name: opportunity-factory
 description: "Run a reusable opportunity-to-artifact workflow: discover unmet needs, set up workspace factories, schedule recurring commander/worker/reporter prompts, batch-refine many items, optionally use SQLite state, build small artifacts, review quality, and track outcomes. Use when the user wants to repeatedly create apps, games, products, content, or experiments from market/user needs."
 argument-hint: "対象ドメイン、成果物タイプ、制約、今回の入力"
 user-invocable: true
+disable-model-invocation: true
 license: CC BY-NC-SA 4.0
 metadata:
   author: yamapan (https://github.com/aktsmm)
