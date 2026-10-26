@@ -60,7 +60,7 @@ Run Python Playwright from an interpreter that has it installed; set `PYTHONUTF8
 - Match type tiles with exact names: collapsed question cards also contain "テキスト".
 - Added options come pre-filled ("オプション 3"); a plain option named "その他" is not the free-text "Other".
 - New questions inherit the previous required switch; the script sets it explicitly.
-- Leaving the page right after the last edit can lose it; wait for "保存済み", then reopen and verify.
+- Leaving the page right after the last edit can lose it. The header can already read "保存済み" before a new edit registers, so after changing text wait with `wait_saved(page, expect=<snippet of the new text>)`, then reopen and verify (an existing form's description edit was lost this way).
 - The built-in "Other" must be added after the other options; it always renders last.
 
 More selectors, failure signatures and the delete recipe: [UI notes](references/ui-notes.md).

@@ -60,7 +60,10 @@ def sign_in(page, account):
     tile = page.get_by_text(account)
     if tile.count():
         tile.first.click()
-        page.wait_for_timeout(12000)
+        for _ in range(30):  # the redirect after the click can take longer than a fixed wait
+            if "login.microsoftonline.com" not in page.url:
+                break
+            page.wait_for_timeout(1000)
     assert "login.microsoftonline.com" not in page.url, "sign-in not completed; ask the user to sign in in this window"
 
 
@@ -193,16 +196,18 @@ def card_labels(page):
     )
 
 
-def wait_saved(page, deadline_ms=20000):
-    """Navigating away right after the last edit can drop it; wait for the header to say 'saved'."""
+def wait_saved(page, deadline_ms=20000, expect=None):
+    """Navigating away right after the last edit can drop it; wait for the header to say 'saved'.
+    The header can already read 'saved' before a new edit registers, so pass `expect` (a snippet of the
+    new text) after changing text: the header label must contain it too."""
     end = deadline_ms
     while end > 0:
         label = page.get_by_role("button", name=re.compile("^" + L["form_title"])).first.get_attribute("aria-label") or ""
-        if label.endswith(L["saved"]):
+        if label.endswith(L["saved"]) and (expect is None or expect in label):
             return
         page.wait_for_timeout(1000)
         end -= 1000
-    raise AssertionError("form was not reported as saved")
+    raise AssertionError("form was not reported as saved" + (f" with the expected text {expect!r}" if expect else ""))
 
 
 def verify_questions(page, fid, spec):

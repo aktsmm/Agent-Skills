@@ -25,7 +25,7 @@ Observed on forms.cloud.microsoft with the ja-JP UI in Edge, driven by Python Pl
 | Wrong tile clicked ("単一行テキスト" card)                | Substring name match                            | `exact=True`                                   |
 | Options 3+ read "オプション 3業務で…"                     | New option is pre-filled                        | Ctrl+A before typing                           |
 | Delete click by number fails                              | The button is named "削除 <text>"               | Use the text                                   |
-| Last edit missing after navigating away                   | Autosave race                                   | `wait_saved()`, then reopen and read back      |
+| Last edit missing after navigating away                   | Autosave race; the header already read "保存済み" before the edit registered | `wait_saved(page, expect=<new text snippet>)`, then reopen and read back |
 | Two empty untitled forms appear                           | "new form" clicked twice (also by a text match) | Click once; delete only forms this run created |
 | Japanese text unreadable in the console                   | PowerShell pipe encoding                        | `PYTHONUTF8=1`, write results to a UTF-8 file  |
 
@@ -37,7 +37,15 @@ A fresh profile lands on the account picker. Choosing the entry marked "Windows 
 
 - "すべてのユーザーが回答可能" means anonymous, no sign-in. External respondents cannot answer under the organisation-only default.
 - Verify with `browser.new_context()` (no cookies): the response URL must stay on `forms.cloud.microsoft`, show the title and the expected number of question items. A real submission is not made.
+- Respondent DOM for finer checks: `[data-automation-id=questionItem]` per question, a `requiredStar` inside required ones, one `input[type=radio]` per option of a single-choice question.
 - A collapsed "N. 質問のタイトル …" label proves title, type and required flag only; it does not show the options. Option text is asserted while typing.
+
+## Editing the text of an existing form
+
+- Open the design page, click the header button "フォームのタイトル …", then use the textboxes "フォームのタイトル" / "フォームの説明". Select all, delete, then type line by line with Shift+Enter; an empty line gives a blank line.
+- Bold: before each line compare `document.queryCommandState('bold')` with the wanted state and press Ctrl+B when they differ. The respondent view then shows `<b>` (computed weight 700).
+- A bare `https://…` in the description becomes a clickable link in the respondent view.
+- Finish with `wait_saved(page, expect=<snippet>)` and a cookie-less read-back of the respondent page.
 
 ## Delete recipe (own test forms only)
 

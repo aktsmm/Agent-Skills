@@ -63,6 +63,11 @@ metadata:
 - Before sending a meeting update, preview its recipient, new time, and exact
   message. Use a concise generic explanation; do not disclose private calendar
   details in the update or a follow-up chat.
+- Adding attendees to an event (UI or API update) sends invitations
+  immediately. Save the event without attendees first, add only user-approved
+  recipients, keep the Teams meeting off unless requested (Outlook on the web
+  turns it on once an attendee is added), then read back the event and the sent
+  item.
 
 ## Recover an Existing Google API Connection
 
