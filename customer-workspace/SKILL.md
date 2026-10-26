@@ -2,6 +2,7 @@
 name: customer-workspace
 description: "Set up and operate customer workspaces: route customer updates, record meetings, track questions and actions, manage workstreams, and prepare handoffs. Use when creating or maintaining a customer workspace, processing meeting notes or updates, reviewing next actions, or preparing a handoff. Triggers: customer workspace, 顧客ワークスペース, inbox 追加, 議事録管理, 案件更新, 宿題管理, 引き継ぎ."
 argument-hint: "Customer workspace name or an existing-workspace task (meeting, update, follow-up, handoff)"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
