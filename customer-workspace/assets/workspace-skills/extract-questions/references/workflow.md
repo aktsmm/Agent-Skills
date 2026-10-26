@@ -1,7 +1,3 @@
----
-description: 会議ログから質問事項・確認事項・宿題を抽出して保存する
----
-
 # 質問事項抽出（会議ログ → Questions）
 
 ## 概要
@@ -59,7 +55,7 @@ description: 会議ログから質問事項・確認事項・宿題を抽出し�
 
 ### Step 4.5: 回答を埋めるときのファクトチェック（技術仕様・課金・モデル・リリース状況に関する質問のみ必須）
 
-Microsoft / Azure / Microsoft 365 / Copilot の **仕様・制限・課金・モデル名・GA / Preview / Retirement** に関する主張は、会議中の言質や記憶をそのまま回答に使わず、`microsoftdocs` MCP または `Fact Checker` subagent で公式 Docs / release notes に裏取りしてから書く。
+Microsoft / Azure / Microsoft 365 / Copilot の **仕様・制限・課金・モデル名・GA / Preview / Retirement** に関する主張は、会議中の言質や記憶をそのまま回答に使わず、利用可能な公式ドキュメント検索・取得ツールで公式 Docs / release notes に裏取りしてから書く。確認できない回答は `要確認` のまま残す。
 
 - モデル名を固定して言わない（Microsoft 側で予告なく差し替える契約条項がある）。「現時点で X を underlying model として使用」と表現する。
 - **公式 SLA / 限値がない数値**（「インデックス更新は X 週間」「コストは Y 円」等）は **体感・公式保証なし** と明記する。

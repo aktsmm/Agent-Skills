@@ -1,7 +1,3 @@
----
-description: Daily report auto-generation from activity logs
-agent: report-generator
----
 
 # Prompt: Daily Report Generator
 

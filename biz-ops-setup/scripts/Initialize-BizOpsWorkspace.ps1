@@ -52,7 +52,7 @@ $folders = @(
     "_datasources",
     "_workiq",
     ".github\agents",
-    ".github\prompts"
+    ".github\skills"
 )
 
 foreach ($folder in $folders) {
@@ -284,8 +284,8 @@ Write-Host ""
 Write-Host "✅ Workspace initialization complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "📋 Next Steps:" -ForegroundColor Cyan
-Write-Host "   1. Copy agent templates from skill assets to .github/agents/" -ForegroundColor White
-Write-Host "   2. Copy prompt templates from skill assets to .github/prompts/" -ForegroundColor White
+Write-Host "   1. Run Deploy-BizOpsTemplates.ps1 -WorkspacePath `"$WorkspacePath`"" -ForegroundColor White
+Write-Host "   2. Verify agents in .github/agents/ and four report skills in .github/skills/" -ForegroundColor White
 Write-Host "   3. Create copilot-instructions.md with customer mappings" -ForegroundColor White
 Write-Host "   4. Configure _datasources/external-paths.md (if using external folders)" -ForegroundColor White
 Write-Host "   5. Copy holiday file to _workiq/$Country-holidays.md" -ForegroundColor White

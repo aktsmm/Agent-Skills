@@ -46,8 +46,8 @@
 │
 └── .github/
     ├── agents/               # Agent definitions
-    ├── prompts/              # Prompt templates
-    ├── skills/               # Skills
+    ├── skills/               # Four manual report skill packages
+    │   └── {report-skill}/   # SKILL.md, references/report-contract.md, LICENSE.txt
     └── copilot-instructions.md
 ```
 

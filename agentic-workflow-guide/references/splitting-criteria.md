@@ -26,7 +26,8 @@ Before escalating into agent design, confirm that the ask is not better served b
 
 | If the need is...          | Prefer...   |
 | -------------------------- | ----------- |
-| One slash-invoked task     | Prompt      |
+| One slash-invoked task (Agent Host) | Skill |
+| One slash-invoked task (explicit Local-only compatibility) | Prompt |
 | Always-on guidance         | Instruction |
 | Reusable packaged workflow | Skill       |
 | Persona or delegation      | Agent       |

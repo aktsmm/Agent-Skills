@@ -296,15 +296,15 @@ Else:
 
 ---
 
-## MANDATORY: Prompt Reference
+## MANDATORY: Report Contract Reference
 
-When generating reports, follow the corresponding prompt file:
+Before date checks or collection, read and follow the corresponding report contract. Its report-specific output, evidence/preflight, PTO, and weekend/holiday rules take precedence over generic guidance elsewhere in this agent. This does not change tool permissions or the mandatory reviewer/approval process (maximum 3 iterations).
 
-| Report Type | Prompt File                                | Output                                            |
+| Report Type | Report Contract                            | Output                                            |
 | ----------- | ------------------------------------------ | ------------------------------------------------- |
-| Daily       | `.github/prompts/daily-report.prompt.md`   | `ActivityReport/{YYYY-MM}/daily/{YYYY-MM-DD}.md`  |
-| Weekly      | `.github/prompts/weekly-report.prompt.md`  | `ActivityReport/{YYYY-MM}/weekly/{YYYY}-W{WW}.md` |
-| Monthly     | `.github/prompts/monthly-report.prompt.md` | `ActivityReport/{YYYY-MM}/{YYYY-MM}.md`           |
+| Daily       | `.github/skills/daily-report/references/report-contract.md`   | `ActivityReport/{YYYY-MM}/daily/{YYYY-MM-DD}.md`  |
+| Weekly      | `.github/skills/weekly-report/references/report-contract.md`  | `ActivityReport/{YYYY-MM}/weekly/{YYYY}-W{WW}.md` |
+| Monthly     | `.github/skills/monthly-report/references/report-contract.md` | `ActivityReport/{YYYY-MM}/{YYYY-MM}.md`           |
 
 ---
 

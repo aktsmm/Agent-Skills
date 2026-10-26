@@ -63,7 +63,7 @@ Collect the following information:
 # Phase 2: Create folder structure
 .\scripts\Initialize-BizOpsWorkspace.ps1 -WorkspacePath "<workspace-path>" -Customers @("contoso")
 
-# Phase 3: Deploy agents and prompts
+# Phase 3: Deploy agents and report skills
 .\scripts\Deploy-BizOpsTemplates.ps1 -WorkspacePath "<workspace-path>"
 ```
 
@@ -74,7 +74,7 @@ Collect the following information:
 | Type    | Count | Examples                                                          |
 | ------- | ----- | ----------------------------------------------------------------- |
 | Agents  | 9     | orchestrator, report-generator, task-manager, availability-finder |
-| Prompts | 4     | daily-report, weekly-report, monthly-report                       |
+| Skills  | 4     | daily-report, weekly-report, monthly-report, review-report        |
 | Folders | 7     | ActivityReport/, Customers/, Tasks/, \_inbox/                     |
 
 ## Operate an Existing Workspace
@@ -83,7 +83,7 @@ Collect the following information:
 | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | New activity                              | Store the source once: confirmed customer items in `Customers/{id}/_inbox/`, confirmed internal items in `_internal/_inbox/`, and unresolved items in `_inbox/`; link from summaries instead of copying it. |
 | Task update                               | Keep `Tasks/active.md` or `Tasks/completed.md` as the overall index; link to details in `Customers/{id}/tasks.md` for confirmed customer tasks, and sync both task records and `DASHBOARD.md` together.     |
-| Daily, weekly, or monthly report          | Read existing reports and `_datasources/` configuration; collect available dated evidence, mark unavailable sources explicitly, then use the matching report prompt.                                        |
+| Daily, weekly, or monthly report          | Invoke the matching deployed report skill; it dispatches the complete report contract and user arguments to the configured report-generator, preserving evidence gates and independent review.              |
 | Ambiguous customer or project association | Keep the original input unclassified and ask for confirmation before creating a customer or project folder.                                                                                                 |
 
 Use the deployed task-manager, data-collector, and report-generator for their respective workflows. Keep original evidence authoritative; reports and indexes summarize or link instead of copying source content. workIQ is optional and missing data is not evidence of no activity. `Customers/{id}/` is a lightweight BizOps record, not a full per-customer workspace; do not run any other workspace initializer (such as a dedicated customer workspace setup) inside it. Link to a separately managed customer workspace when one exists. Do not treat a customer project thread as a separate project workspace unless the user explicitly requests one.
@@ -99,7 +99,7 @@ Read `DASHBOARD.md`, `Tasks/active.md`, recent `ActivityReport/` entries, and on
 
 ## Done Criteria
 
-- Setup: folders, agents, prompts, mappings, daily activity roots, and report preflight are verified without replacing existing records (see [agent list](references/agent-list.md)).
+- Setup: folders, agents, four report skills with contracts/licenses, mappings, daily activity roots, and report preflight are verified without replacing existing records (see [agent list](references/agent-list.md)).
 - Operate: the owning task or activity record and relevant index reflect the input; reports identify their evidence and any unavailable sources.
 - Review / Handoff: the current status, owner, next action, and unresolved questions are traceable to existing records.
 

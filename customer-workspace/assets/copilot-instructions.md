@@ -44,28 +44,9 @@
 2. `attachments.md` に出どころ・機密区分・関連議事録を記録し、既存または新規の議事録から原文へリンクする。
 3. 原文の保存とリンク付けが完了してから、原文を根拠に回答・変換・タスク抽出を行う。既存の要約済み議事録だけを根拠にしない。
 
-### 判定フロー
-
-```mermaid
-graph TD
-    A[ユーザー入力] --> B{明確なコマンド/質問?}
-    B -->|Yes| C[通常応答]
-    B -->|No| D{Teams AI議事録?}
-    D -->|Yes| E[議事録変換 + meeting-notes 作成]
-    D -->|No| F{会議メモ/議事録素材?}
-    F -->|Yes| G[meeting-notes 作成 + 質問抽出]
-    F -->|No| H{情報の断片?}
-    H -->|Yes| I[inbox に追記]
-    H -->|No| C
-  E --> J{案件に紐付く?}
-  G --> J
-  I --> J
-  J -->|既存案件が1件| K[案件更新を記録]
-  J -->|新規・複数・曖昧| L[候補台帳へ保留して確認]
-  J -->|紐付かない| M[記録のみで完了]
-```
-
 ### 判定基準
+
+該当する処理の前に、下記「ワークスペース運用スキル」の対応する `SKILL.md` を読む。通常の質問には通常応答し、運用スキルを無関係な会話へ適用しない。
 
 | パターン                                        | 判定           | 処理                      |
 | ----------------------------------------------- | -------------- | ------------------------- |
@@ -136,12 +117,14 @@ graph TD
 
 ---
 
-## 関連プロンプト
+## ワークスペース運用スキル
 
-- `inbox.prompt.md` - インボックス追記の詳細ルール
-- `convert-meeting-minutes.prompt.md` - 議事録変換
-- `extract-questions.prompt.md` - 質問事項抽出
-- `triage-workstream-update.prompt.md` - 案件更新の振り分け
+- [inbox](skills/inbox/SKILL.md) - 情報の追記。明示呼び出しは `/inbox`。
+- [convert-meeting-minutes](skills/convert-meeting-minutes/SKILL.md) - 議事録変換と質問・宿題の抽出。明示呼び出しは `/convert-meeting-minutes`。
+- [extract-questions](skills/extract-questions/SKILL.md) - 質問事項抽出。明示呼び出しは `/extract-questions`。
+- [triage-workstream-update](skills/triage-workstream-update/SKILL.md) - 案件更新の振り分け。明示呼び出しは `/triage-workstream-update`。
+
+各スキルは関連入力から自動選択でき、詳細手順は同梱の `references/workflow.md` に置く。
 
 ---
 
@@ -174,7 +157,7 @@ graph TD
 - 会議素材フォルダには、必要に応じて `attachments.md` を置き、file / source / sensitivity / description / related note を記録する。
 - 拡張子と実体を確認する。`.pptx` が OLE/旧 Office 実体なら `.ppt` として整理し、内容確認は COM も使う。
 - PDF は全ページ、PowerPoint は全スライドを確認してから要点メモへ反映する。途中ページや冒頭だけで完了扱いにしない。
-- ルート直下の受領候補確認には、必要に応じて customer-workspace skill の `scripts/Test-ReceivedMaterialPlacement.ps1` を使う。このスクリプトは read-only の監査だけを行う。
+- ルート直下の受領候補確認は read-only で行い、ファイルの移動やリネームは対象一覧を示して確認後に実行する。
 
 ---
 

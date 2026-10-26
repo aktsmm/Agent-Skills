@@ -1,7 +1,3 @@
----
-description: Weekly report generation from daily reports and activity logs
-agent: report-generator
----
 
 # Prompt: Weekly Report Generator
 

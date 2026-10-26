@@ -31,16 +31,20 @@ All templates are in `assets/` folder. Copy to workspace during setup.
 
 `Deploy-BizOpsTemplates.ps1` deploys every `agents/*.template.md`, so the table and the folder must stay in sync.
 
-### Prompt Templates
+### Report Skill Packages
 
-| Template File                               | Deploy To                                  | Purpose               |
-| ------------------------------------------- | ------------------------------------------ | --------------------- |
-| `prompts/daily-report.prompt.template.md`   | `.github/prompts/daily-report.prompt.md`   | Daily report format   |
-| `prompts/weekly-report.prompt.template.md`  | `.github/prompts/weekly-report.prompt.md`  | Weekly report format  |
-| `prompts/monthly-report.prompt.template.md` | `.github/prompts/monthly-report.prompt.md` | Monthly report format |
-| `prompts/review-report.prompt.template.md`  | `.github/prompts/review-report.prompt.md`  | IMPACT report review  |
+| # | Source Package | Deploy To | Configured Agent |
+|---|----------------|-----------|------------------|
+| 1 | `workspace-skills/daily-report/` | `.github/skills/daily-report/` | report-generator |
+| 2 | `workspace-skills/weekly-report/` | `.github/skills/weekly-report/` | report-generator |
+| 3 | `workspace-skills/monthly-report/` | `.github/skills/monthly-report/` | report-generator |
+| 4 | `workspace-skills/review-report/` | `.github/skills/review-report/` | report-reviewer |
 
-> Prompt files load only in the VS Code Local agent; Agent Host sessions do not load them. Keep the report agents usable directly (`@report-generator`, `@report-reviewer`) instead of relying on the prompts as the only entry point.
+Each manual-only package contains `SKILL.md`, `references/report-contract.md`, and `LICENSE.txt`. Invoke `/daily-report YYYY-MM-DD`, `/weekly-report YYYY-MM-DD` (week containing that date), `/monthly-report YYYY-MM`, or `/review-report <report-path> <daily|weekly|monthly> [focus]`. The wrapper dispatches the complete contract and user arguments to the configured agent; missing agents or required host capabilities are explicit stop conditions, not permission to run inline. Direct agent entry remains supported and must load the corresponding contract. The reviewer cannot edit reports or collect new data.
+
+Legacy prompt files were VS Code Local-only and are not loaded by Agent Host. Deployment no longer creates them and does not remove existing customized files.
+
+Isolated regression: run `python scripts\test_report_skill_deployment.py` from this setup skill directory with PowerShell 7 and PyYAML available. It exercises init/deploy in owned scratch directories without work services.
 
 ### Configuration Templates
 

@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-    Deploy agent and prompt templates to workspace
+    Deploy agent templates and report skills to workspace
 
 .DESCRIPTION
-    Copies all agent and prompt templates from skill assets to the target workspace.
+    Copies agent templates and complete report skill packages to the target workspace.
     Optionally customizes customer mappings.
 
 .PARAMETER WorkspacePath
@@ -60,6 +60,27 @@ Write-Host ""
 
 $assetsPath = Join-Path $SkillPath "assets"
 
+# Validate the complete report entry points before creating any destination files.
+$reportSkills = @("daily-report", "weekly-report", "monthly-report", "review-report")
+$skillsSource = Join-Path $assetsPath "workspace-skills"
+$requiredResources = @(
+    "agents\report-generator.agent.template.md",
+    "agents\report-reviewer.agent.template.md",
+    "_datasources\daily-activity-sources.template.json",
+    "scripts\collect_daily_activity.py"
+)
+foreach ($name in $reportSkills) {
+    foreach ($resource in @("SKILL.md", "references\report-contract.md", "LICENSE.txt")) {
+        $requiredResources += "workspace-skills\$name\$resource"
+    }
+}
+foreach ($resource in $requiredResources) {
+    $source = Join-Path $assetsPath $resource
+    if (-not (Test-Path -LiteralPath $source -PathType Leaf) -or (Get-Item -LiteralPath $source).Length -eq 0) {
+        throw "Missing or empty required report resource: $resource"
+    }
+}
+
 # ============================================
 # 1. Deploy Agent Templates
 # ============================================
@@ -97,55 +118,61 @@ if (Test-Path $reportGenTemplate) {
 }
 
 # ============================================
-# 2. Deploy Prompt Templates
+# 2. Deploy Report Skills
 # ============================================
 
 Write-Host ""
-Write-Host "📝 Deploying prompts..." -ForegroundColor Yellow
+Write-Host "Deploying report skills..." -ForegroundColor Yellow
 
-$promptsSource = Join-Path $assetsPath "prompts"
-$promptsTarget = Join-Path $WorkspacePath ".github\prompts"
+$skillsTarget = Join-Path $WorkspacePath ".github\skills"
 
-if (-not (Test-Path $promptsTarget)) {
-    New-Item -ItemType Directory -Path $promptsTarget -Force | Out-Null
+if (-not (Test-Path -LiteralPath $skillsTarget)) {
+    New-Item -ItemType Directory -Path $skillsTarget -Force | Out-Null
 }
 
-$promptFiles = Get-ChildItem -Path $promptsSource -Filter "*.template.md" -ErrorAction SilentlyContinue
-foreach ($file in $promptFiles) {
-    $targetName = $file.Name -replace "\.template\.md$", ".md"
-    $targetPath = Join-Path $promptsTarget $targetName
-    
-    if (-not (Test-Path $targetPath)) {
-        Copy-Item -Path $file.FullName -Destination $targetPath
-        Write-Host "   ✅ Deployed: $targetName" -ForegroundColor Green
-    } else {
-        Write-Host "   ⏭️ Exists: $targetName" -ForegroundColor Gray
+foreach ($name in $reportSkills) {
+    $packageSource = Join-Path $skillsSource $name
+    $packageTarget = Join-Path $skillsTarget $name
+    foreach ($file in Get-ChildItem -LiteralPath $packageSource -Recurse -File) {
+        $relativePath = [System.IO.Path]::GetRelativePath($packageSource, $file.FullName)
+        $targetPath = Join-Path $packageTarget $relativePath
+        if (-not (Test-Path -LiteralPath $targetPath)) {
+            New-Item -ItemType Directory -Path (Split-Path $targetPath -Parent) -Force | Out-Null
+            Copy-Item -LiteralPath $file.FullName -Destination $targetPath
+            Write-Host "   Deployed: $name\$relativePath" -ForegroundColor Green
+        } else {
+            Write-Host "   Exists: $name\$relativePath" -ForegroundColor Gray
+        }
     }
 }
 
-# Create prompts README
-$promptsReadme = Join-Path $promptsTarget "README.md"
-if (-not (Test-Path $promptsReadme)) {
+# Create the report skill index without replacing an existing workspace index.
+$skillsReadme = Join-Path $skillsTarget "README.md"
+if (-not (Test-Path -LiteralPath $skillsReadme)) {
     @'
-# Prompts
+# Report Skills
 
-Prompt templates for report generation.
+Four manual-only report entry points. Each package includes its report contract and license.
 
-## Available Prompts
+## Available Skills
 
-| Prompt | Description |
-|--------|-------------|
-| daily-report.prompt.md | Daily activity report generation |
-| weekly-report.prompt.md | Weekly summary generation |
-| monthly-report.prompt.md | Monthly overview generation |
-| review-report.prompt.md | IMPACT framework report review |
+| # | Skill | Configured Agent | Contract |
+|---|-------|------------------|----------|
+| 1 | /daily-report | report-generator | [Daily](daily-report/references/report-contract.md) |
+| 2 | /weekly-report | report-generator | [Weekly](weekly-report/references/report-contract.md) |
+| 3 | /monthly-report | report-generator | [Monthly](monthly-report/references/report-contract.md) |
+| 4 | /review-report | report-reviewer | [Review](review-report/references/report-contract.md) |
 
 ## Usage
 
-Use with corresponding agent:
-- Reports: `@report-generator`
-- Review: `@report-reviewer`
-'@ | Out-File -FilePath $promptsReadme -Encoding utf8
+Invoke `/daily-report YYYY-MM-DD`, `/weekly-report YYYY-MM-DD` (week containing that date),
+`/monthly-report YYYY-MM`, or `/review-report <report-path> <daily|weekly|monthly> [focus]`.
+The skill dispatches the complete contract and user arguments to the named configured agent.
+If that agent or required host capabilities are unavailable, stop explicitly; never run inline.
+The reviewer is read-only and does not collect new data.
+
+Legacy prompt files are not generated or removed; existing customized files remain untouched.
+'@ | Out-File -FilePath $skillsReadme -Encoding utf8
     Write-Host "   ✅ Created: README.md" -ForegroundColor Green
 }
 
@@ -262,11 +289,13 @@ Write-Host ""
 
 # Count deployed files
 $agentCount = (Get-ChildItem (Join-Path $WorkspacePath ".github\agents") -Filter "*.agent.md" -ErrorAction SilentlyContinue).Count
-$promptCount = (Get-ChildItem (Join-Path $WorkspacePath ".github\prompts") -Filter "*.prompt.md" -ErrorAction SilentlyContinue).Count
+$skillCount = @($reportSkills | Where-Object {
+    Test-Path -LiteralPath (Join-Path $skillsTarget "$_\SKILL.md") -PathType Leaf
+}).Count
 
 Write-Host "📊 Summary:" -ForegroundColor Cyan
 Write-Host "   Agents: $agentCount" -ForegroundColor White
-Write-Host "   Prompts: $promptCount" -ForegroundColor White
+Write-Host "   Report skills: $skillCount" -ForegroundColor White
 Write-Host ""
 Write-Host "📋 Next Steps:" -ForegroundColor Cyan
 Write-Host "   1. Review and customize copilot-instructions.md" -ForegroundColor White

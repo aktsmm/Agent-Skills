@@ -1,0 +1,42 @@
+{
+  "normalization": "UTF-8 without BOM; CRLF -> LF; retain every body character after the closing frontmatter line",
+  "license": "CC BY-NC-SA 4.0",
+  "author": "yamapan (https://github.com/aktsmm)",
+  "license_sha256": "431f46b88a60469b866b766edfa995d4175fc8fa6d613b7c0dbd0903664fa490",
+  "reports": {
+    "daily-report": {
+      "source": "assets/prompts/daily-report.prompt.template.md (git HEAD verified before removal)",
+      "description": "Daily report auto-generation from activity logs",
+      "agent": "report-generator",
+      "body_chars": 12977,
+      "body_sha256": "9c228ea3e0351adba1010e519a701f250d7ba6543ea3bbd47356779ab06d3ea1"
+    },
+    "weekly-report": {
+      "source": "assets/prompts/weekly-report.prompt.template.md (git HEAD verified before removal)",
+      "description": "Weekly report generation from daily reports and activity logs",
+      "agent": "report-generator",
+      "body_chars": 5799,
+      "body_sha256": "febd9d75a6d9385ccd16b9567b2db7de51a5b52e51e59317417bdebcc4322ec2"
+    },
+    "monthly-report": {
+      "source": "assets/prompts/monthly-report.prompt.template.md (git HEAD verified before removal)",
+      "description": "Monthly report generation from weekly reports and activity logs",
+      "agent": "report-generator",
+      "body_chars": 6963,
+      "body_sha256": "ec941631fa2e377ea8c9edf1f76232e91bea2765c83c9c6f1e086fe2c86fe4f4"
+    },
+    "review-report": {
+      "source": "assets/prompts/review-report.prompt.template.md (git HEAD verified before removal)",
+      "description": "Report review using IMPACT framework (results-oriented evaluation and improvement)",
+      "agent": "report-reviewer",
+      "body_chars": 7487,
+      "body_sha256": "0a695545189718f772b71b628e92c1046e1cf959f6db950526ebb75b65209dc5"
+    }
+  },
+  "unchanged_assets": {
+    "assets/agents/report-reviewer.agent.template.md": "9ca45691e1b9ad2316c31c514e84df84d9d180291df000e3e0721f31e65d42f6",
+    "assets/copilot-instructions.template.md": "bd12428016ff9bf28bce51df75e43942128335106f340f6c07135085bd048989",
+    "assets/scripts/collect_daily_activity.py": "7c58d344c29653f97def483aa9cf8e548ee2ae1bf31c072ef38baa9b2f544165"
+  },
+  "generator_outside_contract_sha256": "45612c9c80213066b421d4c47dbfab54ec7ccfef64615fb55796137d98c0a445"
+}

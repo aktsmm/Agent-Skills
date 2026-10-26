@@ -8,7 +8,7 @@ Use for multi-step, costly, hard-to-reverse, or ambiguous work. Skip for one-lin
 
 ## VS Code Implementation
 
-- Built-in `plan` agent: set `agent: plan` in a prompt file, or hand off from a custom planner agent with `handoffs` (see [handoffs-guide.md](../handoffs-guide.md)).
+- Use the built-in `plan` agent directly, or hand off from a custom planner agent with `handoffs` (see [handoffs-guide.md](../handoffs-guide.md)). Setting `agent: plan` in a `.prompt.md` file is Local-harness compatibility only; it does not provide an Agent Host entry.
 - Collect approval or missing inputs with `vscode/askQuestions` in one batch, not per phase.
 - Track execution with the `todos` tool so progress survives long sessions.
 - Planner agents should be read-only (`tools: ["read", "search", "web"]`) so planning cannot mutate files before approval.

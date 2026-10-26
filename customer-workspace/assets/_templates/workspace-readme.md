@@ -10,11 +10,18 @@
 
 - `README.md`: this overview and entry point
 - `workspace-summary.md`: handoff-ready summary and source-of-truth map
-- `.github/prompts/`: prompts for inbox, meeting notes, and question extraction
+- `.github/skills/`: on-demand workspace skills for inbox, meeting notes, questions, and workstream updates
 - `_templates/`: reusable document templates
 - `_knowledge/`: opt-in ledger for reusable generic learnings, patterns, and gotchas
 - `research-reports/`: generated research notes, comparison memos, report drafts, and demo specification notes
 - Optional material folders: `_received/`, `_working/`, `_provided/` for customer originals, internal edits, and customer-facing copies
+
+## Workspace Skills
+
+- [inbox](.github/skills/inbox/SKILL.md): `/inbox`
+- [convert-meeting-minutes](.github/skills/convert-meeting-minutes/SKILL.md): `/convert-meeting-minutes`
+- [extract-questions](.github/skills/extract-questions/SKILL.md): `/extract-questions`
+- [triage-workstream-update](.github/skills/triage-workstream-update/SKILL.md): `/triage-workstream-update`
 
 ## First Checks
 

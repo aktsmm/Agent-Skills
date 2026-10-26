@@ -10,9 +10,9 @@ Collect customer list, optional external folders, holiday region, and workIQ ava
 
 Create the standard workspace folders: `ActivityReport/`, `Customers/`, `Tasks/`, `_inbox/`, `_datasources/`, `_workiq/`, and `.github/` customization folders.
 
-## Phase 3: Agents and Prompts
+## Phase 3: Agents and Report Skills
 
-Deploy the bundled agents from `assets/agents/` (orchestrator, report-generator, report-reviewer, task-manager, data-collector, work-inventory, 1on1-assistant, availability-finder, general-worker) and the daily, weekly, monthly, and review-report prompts from `assets/prompts/`. Prompt files load only in the VS Code Local agent, so keep the matching agents usable on their own.
+Deploy the bundled agents from `assets/agents/` (orchestrator, report-generator, report-reviewer, task-manager, data-collector, work-inventory, 1on1-assistant, availability-finder, general-worker). Copy each complete package from `assets/workspace-skills/` to `.github/skills/`: daily-report, weekly-report, monthly-report, and review-report, including `SKILL.md`, `references/report-contract.md`, and `LICENSE.txt`. The manual entry points must dispatch to their configured report-generator or read-only report-reviewer; stop if unavailable rather than running inline. Do not generate legacy prompt files.
 
 ## Phase 4: Customer Workspaces
 

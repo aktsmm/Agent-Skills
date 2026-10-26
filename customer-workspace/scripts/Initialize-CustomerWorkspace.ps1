@@ -21,7 +21,7 @@
     ワークスペースのパス（デフォルト: カレントディレクトリ）
 
 .PARAMETER Force
-    既存の管理対象設定、プロンプト、テンプレートを変更することを許可します。
+    既存の管理対象設定、運用スキル、テンプレートを変更することを許可します。
 
 .EXAMPLE
     .\Initialize-CustomerWorkspace.ps1 -CustomerName "ABC株式会社様"
@@ -54,8 +54,13 @@ $ErrorActionPreference = "Stop"
 
 $managedPaths = @(
     ".github\copilot-instructions.md",
+    ".github\skills",
     ".github\prompts",
-    "_templates"
+    "_templates",
+    "workspace-summary.md",
+    "_customer\profile.md",
+    "_inbox",
+    "workstreams"
 )
 $existingManagedPaths = @($managedPaths | Where-Object {
     Test-Path -LiteralPath (Join-Path $WorkspacePath $_)
@@ -63,7 +68,7 @@ $existingManagedPaths = @($managedPaths | Where-Object {
 
 if ($existingManagedPaths -and -not $Force) {
     $paths = $existingManagedPaths -join ", "
-    throw "Existing workspace assets detected: $paths. Review and add missing assets manually, or rerun with -Force only when overwriting generated prompts and templates is intentional."
+    throw "Existing workspace assets detected: $paths. Review and add missing assets manually, or rerun with -Force only when overwriting generated skills and templates is intentional."
 }
 
 # スキルのルートパスを取得
@@ -71,6 +76,23 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillRoot = Split-Path -Parent $ScriptDir
 $AssetsPath = Join-Path $SkillRoot "assets"
 $TemplatesPath = Join-Path $AssetsPath "_templates"
+$WorkspaceSkillsPath = Join-Path $AssetsPath "workspace-skills"
+$workspaceSkills = @("inbox", "convert-meeting-minutes", "extract-questions", "triage-workstream-update")
+
+foreach ($name in $workspaceSkills) {
+    foreach ($relative in @("SKILL.md", "LICENSE.txt", "references\workflow.md")) {
+        $requiredPath = Join-Path $WorkspaceSkillsPath "$name\$relative"
+        if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+            throw "Required workspace skill asset not found: $requiredPath"
+        }
+    }
+    foreach ($template in @("meeting-minutes.md", "internal-memo.md")) {
+        $requiredPath = Join-Path $WorkspaceSkillsPath "convert-meeting-minutes\assets\$template"
+        if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+            throw "Required workspace skill asset not found: $requiredPath"
+        }
+    }
+}
 
 function Expand-TemplateContent {
     param(
@@ -99,7 +121,7 @@ Write-Host "   ワークスペース: $WorkspacePath" -ForegroundColor Gray
 # フォルダ構造の作成
 $folders = @(
     ".github",
-    ".github\prompts",
+    ".github\skills",
     "_inbox",
     "_questions",
     "_knowledge",
@@ -149,20 +171,12 @@ if (Test-Path $copilotInstructionsPath) {
     Write-Host "   📝 作成: .github/copilot-instructions.md" -ForegroundColor Green
 }
 
-# プロンプトファイルのコピー
-$prompts = @(
-    "inbox.prompt.md",
-    "convert-meeting-minutes.prompt.md",
-    "extract-questions.prompt.md",
-    "triage-workstream-update.prompt.md"
-)
-foreach ($prompt in $prompts) {
-    $src = Join-Path $AssetsPath $prompt
-    $dst = Join-Path $WorkspacePath ".github\prompts\$prompt"
-    if (Test-Path $src) {
-        Copy-Item $src $dst -Force
-        Write-Host "   📝 作成: .github/prompts/$prompt" -ForegroundColor Green
-    }
+# 運用スキルと同梱リソースを配置する
+foreach ($name in $workspaceSkills) {
+    $src = Join-Path $WorkspaceSkillsPath $name
+    $dst = Join-Path $WorkspacePath ".github\skills"
+    Copy-Item -LiteralPath $src -Destination $dst -Recurse -Force
+    Write-Host "   作成: .github/skills/$name/SKILL.md" -ForegroundColor Green
 }
 
 # テンプレートのコピー
@@ -234,7 +248,7 @@ if (-not (Test-Path $inboxPath)) {
     $inboxContent = @"
 # $currentYearMonth インボックス
 
-> 💡 ``/prompt inbox`` で追記。タグで検索可能。
+> ``/inbox`` で追記。タグで検索可能。
 
 ---
 
@@ -249,7 +263,7 @@ if (-not (Test-Path $questionsPath)) {
     $questionsContent = @"
 # $currentYearMonth 質問・アクション
 
-> 💡 ``/prompt extract-questions`` で会議ログから抽出して追記。
+> ``/extract-questions`` で会議ログから抽出して追記。
 
 ---
 
@@ -295,10 +309,9 @@ Write-Host "✅ ワークスペースセットアップ完了!" -ForegroundColor
 Write-Host ""
 Write-Host "📁 作成されたファイル:" -ForegroundColor Cyan
 Write-Host "   - .github/copilot-instructions.md（自動判定ルール）"
-Write-Host "   - .github/prompts/inbox.prompt.md（インボックス）"
-Write-Host "   - .github/prompts/convert-meeting-minutes.prompt.md（議事録変換）"
-Write-Host "   - .github/prompts/extract-questions.prompt.md（質問抽出）"
-Write-Host "   - .github/prompts/triage-workstream-update.prompt.md（案件更新の振り分け）"
+foreach ($name in $workspaceSkills) {
+    Write-Host "   - .github/skills/$name/SKILL.md"
+}
 Write-Host "   - README.md（開始案内）"
 Write-Host "   - workspace-summary.md（引き継ぎサマリ）"
 Write-Host "   - _inbox/$currentYearMonth.md（インボックス）"
@@ -312,4 +325,4 @@ Write-Host ""
 Write-Host "🎯 使い方:" -ForegroundColor Cyan
 Write-Host "   1. 情報を貼るだけ → 自動でインボックスに蓄積"
 Write-Host "   2. Teams AI議事録を貼る → 自動で議事録変換"
-Write-Host "   3. /prompt inbox で明示的にインボックス追記"
+Write-Host "   3. /inbox で明示的にインボックス追記"

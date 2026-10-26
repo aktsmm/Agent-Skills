@@ -1,7 +1,3 @@
----
-description: Report review using IMPACT framework (results-oriented evaluation and improvement)
-agent: report-reviewer
----
 
 # Prompt: Report Review with IMPACT Framework
 

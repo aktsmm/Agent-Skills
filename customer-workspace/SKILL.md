@@ -22,7 +22,7 @@ Set up or operate customer workspaces without confusing setup artifacts with liv
 
 ## Choose a Mode First
 
-Inspect the workspace before choosing an action. Treat it as existing when it contains any managed record such as `.github/copilot-instructions.md`, `.github/prompts/`, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, or `workstreams/`.
+Inspect the workspace before choosing an action. Treat it as existing when it contains any managed record such as `.github/copilot-instructions.md`, `.github/skills/`, legacy prompt files, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, or `workstreams/`.
 An aggregate operations workspace may contain a lightweight `Customers/{id}/` profile, task list, inbox, and meetings. Do not initialize a full customer workspace over those records; ask for a separate target if dedicated customer management is needed.
 
 | Mode             | Use when                                      | First action                                                           |
@@ -50,9 +50,10 @@ An aggregate operations workspace may contain a lightweight `Customers/{id}/` pr
   -KeyContacts "John Doe (Infra Lead)"
 ```
 
-If PowerShell is unavailable, manually create the same folders and copy only the required prompt and template files from `assets/`.
+If PowerShell is unavailable, create the same folders, copy each complete `assets/workspace-skills/<name>/` into `.github/skills/<name>/` including bundled resources, and render `assets/copilot-instructions.md` and the required templates with the supplied routing facts. Do not create prompt files.
 
-Use setup only when the managed structure is absent. The initializer stops by default when managed assets exist; use `-Force` only for an explicitly approved replacement of generated prompts and templates.
+Use setup only when the managed structure is absent. The initializer stops by default when managed assets exist; use `-Force` only for an explicitly approved replacement of generated skills and templates.
+Setup creates four workspace-local operating skills, their resources, and routing instructions; it does not create prompt files. Keep this setup entry manual-only while local operating skills remain eligible for automatic selection.
 
 ## Setup Intake
 
@@ -138,9 +139,10 @@ Before calling meeting notes done:
 
 ## Assets
 
-> **Note**: `assets/` 配下の prompt / instruction / template は、新しい顧客ワークスペースを初期化するときの **コピー元** として使う scaffolding 用ファイル。ホスト workspace の `.github/prompts/` や `.github/copilot-instructions.md` とは独立に進化させてよい（同期は必須ではない）。ホスト側で機能追加した場合に scaffolding にも反映したいときは、明示的にこのフォルダへ back-port する。
+`assets/` contains scaffold sources, not live customer records. Generated workspace skills, instructions, and templates may evolve independently; back-port improvements only when explicitly requested.
 
 - `assets/_templates/`: next-actions, knowledge ledger, attachments, and workspace templates
-- `assets/*.prompt.md`: inbox, meeting-note conversion, and question extraction prompts. Prompt files load only in the VS Code Local agent (not Agent Host sessions), so the routing rules in `copilot-instructions.md` must work without them.
-- `assets/copilot-instructions.md`: generated workspace auto-routing rules
+- `assets/workspace-skills/`: four self-contained operating skills, bundled workflows, licenses, and meeting templates
+- `assets/copilot-instructions.md`: workspace routing rules and local skill catalog
+- `scripts/Test-CustomerWorkspaceSetup.ps1`: isolated scaffold, resource, and existing-record protection checks
 - `scripts/Test-ReceivedMaterialPlacement.ps1` - Read-only root audit for unclassified received-material candidates
