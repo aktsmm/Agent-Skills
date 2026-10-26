@@ -52,6 +52,7 @@ metadata:
 ### Step 4: 検証（Feedback Loop）
 
 - テストを実行して全て PASS するか確認
+- 表示文言を検証するテストが複数 locale を持つ製品では、各 locale で実行する（英語文言だけを期待する assertion は他 locale で落ちる）
 - VS Code の task 実行（`runTask`）は使わない（確認待ちを避けるため、`powershell` で非対話・単発で実行する）
 - テスト実行は `execute/runInTerminal` を利用可（非対話・単発・timeout 指定を推奨）
 - 失敗したらその場で修正

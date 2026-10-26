@@ -60,6 +60,8 @@ No-Edit の指定は、この skill 全体の修正・Guard 成果物追加・st
 | `Guard now` | 本修正は不可だが test / static guard / docs / checklist でリスク低減可能 | 最低 1 つの成果物を追加し、残理由を書く |
 | `Block` | 破壊的、外部公開、本番データ、仕様判断、権限不足 | 不足入力、試した代替、次の確認を明記 |
 
+姉妹拡張・他リポとの合意待ちを理由に `Block` へ送る前に、相手側の現行実装を読む。必要な契約が相手側に既にあれば同じ契約で実装し、完了後に issue で連絡する。相手側の変更が要る場合だけ `Block`。
+
 Retry は同一原因 3 回まで。超えたら、試した代替と失敗理由を添えて `Block` に再分類する。
 
 既存の test / lint / build 失敗は、依頼範囲との関係で分類する。依頼範囲内なら `Fix now`、無関係なら `Guard now` として証跡を残し、対象範囲の修正を続ける。原因不明で安全に進めない場合だけ `Block` にする。
@@ -113,7 +115,7 @@ Priority: P0 = 主要機能破壊・データ損失・情報露出 / P1 = 導線
 
 1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。
 2. Review: Coverageを分類し、Openを `Fix now / Guard now / Block` に分ける。
-3. Implement/Sweep: 既存パターンに合わせて最小修正し、同根gapを検索してまとめて直す。
+3. Implement/Sweep: 既存パターンに合わせて最小修正し、同根gapを検索してまとめて直す。新たに外部 API 呼び出しを足したら、ループ・バッチでの呼び出し回数を自己レビューし、共有できる結果は共有する（rate limit）。
 4. Test/Verify: 回帰testやguardを追加し、diagnostics → lint → typecheck → test → buildをartifact/state/exit codeまで確認する。
 5. Docs/Cleanup: README、help、CHANGELOG、用語を同期し、一時資材、dead code、terminalを片付ける。
 6. Close: `Fix now`を0にし、残件は条件を満たす `Guard now / Block` へ再分類する。
