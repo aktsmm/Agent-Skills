@@ -96,6 +96,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [sync-copilot-customizations](sync-copilot-customizations/) | ~/.copilot の instructions と agents を、公開 repo（Agent-Customization）の .github へ安全に同期する。syncToGlobal の分類と機密監査を通し、公開前に差分を提示して承認を取る。skill は対象外（private skills repo の retro / sync 系を使う） |
 | [sync-public-skills](sync-public-skills/) | Synchronize curated Agent Skills across approved repositories with policy checks and verification |
 | [teams-desktop-automation](teams-desktop-automation/) | Prepare and verify Microsoft Teams desktop chat drafts with Windows UI Automation, stopping before send. Use for Teamsチャット下書き, デスクトップTeams操作, 宛先確認, メッセージ入力, or when Teams Web/CD... |
+| [teams-photo-export](teams-photo-export/) | Export photos and inline images from Microsoft Teams chats or channel threads into dated local folders |
 | [tweet-x-csa-microsoft](tweet-x-csa-microsoft/) | セッション内容を CSA ペルソナ（日本マイクロソフト Cloud Solution Architect）視点で X 投稿用にフォーマル変換。Microsoft / Azure 中心、絵文字なし、ハッシュタグ付き。ニュース起点の投稿生成は generate-news-x-posts、短文リライトは rewrite-x-post を使う |
 | [update-slide-json-pdf](update-slide-json-pdf/) | Design and build a one-update-one-slide pipeline that stores each slide as schema-validated JSON, renders it to a PDF page with HTML + headless Chrome, and lets a static site me... |
 | [video-watch](video-watch/) | Prepare video URLs or local video files for GitHub Copilot analysis by extracting captions, sampled frames, contact sheets, and a prompt packet |
