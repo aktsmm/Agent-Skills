@@ -23,6 +23,7 @@ Examples:
 
 import argparse
 import json
+import os
 import sys
 import subprocess
 from pathlib import Path
@@ -200,7 +201,10 @@ def run_phase(phase: str, base_name: str, tracer: WorkflowTracer,
         if pptx_file:
             print(f"\n🎉 PPTX generated: {pptx_file}")
             print(f"   Opening in PowerPoint...")
-            subprocess.run(["start", pptx_file], shell=True)
+            # Use the OS file-association API directly instead of a shell
+            # command, so pptx_file is never interpreted by a shell and
+            # cannot be used for command injection.
+            os.startfile(pptx_file)
         
         return True
     
