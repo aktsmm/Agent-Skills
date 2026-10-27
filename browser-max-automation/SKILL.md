@@ -57,7 +57,7 @@ Browser automation through the current runtime's supported controls.
 4. Read back the durable result before retrying or moving to the next item.
 ```
 
-Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read. Never batch input or editing actions (typing, key presses, clicks that change the draft) into one parallel call group: they interleave and corrupt the text; run them one at a time and read the field back.
+Keep one working control route instead of repeatedly switching MCP/CLI/CDP. Batch independent reads and return compact results; use full snapshots or screenshots at meaningful visual checkpoints, not after every read. Never batch input or editing actions (typing, key presses, clicks that change the draft) into one parallel call group: they interleave and corrupt the text; run them one at a time and read the field back. A control missing from a static HTTP or markdown fetch is not evidence it is missing from the page: registration widgets, login-gated parts and script-rendered parts need the rendered DOM or a screenshot before you report them absent.
 
 For coordinate-based actions, use a current screenshot and map any crop/scale to the input coordinate frame. Re-observe after navigation, scrolling, resize, or modal/layout changes. Inspect unknown branches, permission prompts, and consequential-action boundaries before continuing; do not batch past them. See [OpenAI computer use guidance](https://developers.openai.com/api/docs/guides/tools-computer-use#run-safely).
 

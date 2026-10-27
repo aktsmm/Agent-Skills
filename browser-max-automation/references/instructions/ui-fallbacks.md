@@ -112,6 +112,14 @@ A read-back only proves transient UI state. Re-verify after the form's own save 
 
 Never assume a radio group starts empty. A group can arrive with a non-default option pre-selected, so read the whole group's state before deciding whether you need to change anything.
 
+## Date inputs with a popup datepicker
+
+A masked or datepicker-backed date field can corrupt `fill()`: filling two adjacent date inputs left the second as the typed text concatenated with the picker's own value (`26/12/252026/12/25`). After filling, read every date input's value back; if one is wrong, pick the day in the open calendar instead of typing again, then re-read before saving.
+
+## Drop target rejects the drop
+
+`browser_drop` failing with "its dragover handler did not call preventDefault()" means the element is not a drop zone (for example a plain `<textarea>`). Do not retry or dispatch synthetic drag events; find the page's own upload control (such as an "image → change" dialog with a file input behind a Choose File button) and use the normal file chooser route.
+
 ## Element sits outside the real viewport
 
 Canvas-like widgets (org charts, diagram editors, graph views) lay children out around a centred root, so a target can resolve with a valid rect at a NEGATIVE `left` or a `top` past the window height. `Input.dispatchMouseEvent` at those coordinates lands on nothing and returns success, so the click looks like it worked.
