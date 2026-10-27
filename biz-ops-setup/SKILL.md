@@ -85,6 +85,7 @@ Collect the following information:
 | Task update                               | Keep `Tasks/active.md` or `Tasks/completed.md` as the overall index; link to details in `Customers/{id}/tasks.md` for confirmed customer tasks, and sync both task records and `DASHBOARD.md` together.     |
 | Daily, weekly, or monthly report          | Invoke the matching deployed report skill; it dispatches the complete report contract and user arguments to the configured report-generator, preserving evidence gates and independent review.              |
 | Ambiguous customer or project association | Keep the original input unclassified and ask for confirmation before creating a customer or project folder.                                                                                                 |
+| Meeting transcript, VTT, or AI note; a manager's goal or evaluation guidance | Verify the file belongs to the target meeting and mark AI-note-only items provisional; record goal axes once as a workspace instruction and store the official role definition verbatim. Details: [references/meeting-and-goal-inputs.md](references/meeting-and-goal-inputs.md). |
 
 Use the deployed task-manager, data-collector, and report-generator for their respective workflows. Keep original evidence authoritative; reports and indexes summarize or link instead of copying source content. workIQ is optional and missing data is not evidence of no activity. `Customers/{id}/` is a lightweight BizOps record, not a full per-customer workspace; do not run any other workspace initializer (such as a dedicated customer workspace setup) inside it. Link to a separately managed customer workspace when one exists. Do not treat a customer project thread as a separate project workspace unless the user explicitly requests one.
 
@@ -113,3 +114,4 @@ Read `DASHBOARD.md`, `Tasks/active.md`, recent `ActivityReport/` entries, and on
 | Holidays         | [references/holidays.md](references/holidays.md)                                   |
 | Daily Evidence   | [references/daily-activity-collection.md](references/daily-activity-collection.md) |
 | Data Sources     | [references/external-datasources.md](references/external-datasources.md)           |
+| Meeting / Goal   | [references/meeting-and-goal-inputs.md](references/meeting-and-goal-inputs.md)     |
