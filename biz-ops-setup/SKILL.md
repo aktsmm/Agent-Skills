@@ -1,6 +1,6 @@
 ---
 name: biz-ops-setup
-description: "Set up or operate a business operations workspace for activity reports, tasks, and customer routing; workIQ is optional. Use when initializing BizOps, processing ongoing business updates, reviewing reports or tasks, or preparing an operations handoff. Triggers: business-operations-workspace, BizOps, 業務管理ワークスペース, レポート管理, タスク管理, 業務引き継ぎ."
+description: "Set up or operate a business operations workspace for activity reports, tasks, and customer routing; workIQ is optional. Use when initializing BizOps, processing ongoing business updates, reviewing reports or tasks, tracking upcoming-event reminders and post-event follow-ups, or preparing an operations handoff. Triggers: business-operations-workspace, BizOps, 業務管理ワークスペース, レポート管理, タスク管理, リマインド, 業務引き継ぎ."
 argument-hint: "作りたい業務ワークスペース、必要機能、管理したい対象"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -86,6 +86,7 @@ Collect the following information:
 | Daily, weekly, or monthly report          | Invoke the matching deployed report skill; it dispatches the complete report contract and user arguments to the configured report-generator, preserving evidence gates and independent review.              |
 | Ambiguous customer or project association | Keep the original input unclassified and ask for confirmation before creating a customer or project folder.                                                                                                 |
 | Meeting transcript, VTT, or AI note; a manager's goal or evaluation guidance | Verify the file belongs to the target meeting and mark AI-note-only items provisional; record goal axes once as a workspace instruction and store the official role definition verbatim. Details: [references/meeting-and-goal-inputs.md](references/meeting-and-goal-inputs.md). |
+| Dated future event (meeting, visit, deadline), or a request for reminders or "how did it go" checks | Register it in the upcoming-events ledger without waiting to be asked; a scheduled read-only run reminds before and researches results after. Details: [references/upcoming-events.md](references/upcoming-events.md). |
 
 Use the deployed task-manager, data-collector, and report-generator for their respective workflows. Keep original evidence authoritative; reports and indexes summarize or link instead of copying source content. workIQ is optional and missing data is not evidence of no activity. `Customers/{id}/` is a lightweight BizOps record, not a full per-customer workspace; do not run any other workspace initializer (such as a dedicated customer workspace setup) inside it. Link to a separately managed customer workspace when one exists. Do not treat a customer project thread as a separate project workspace unless the user explicitly requests one.
 
@@ -115,3 +116,4 @@ Read `DASHBOARD.md`, `Tasks/active.md`, recent `ActivityReport/` entries, and on
 | Daily Evidence   | [references/daily-activity-collection.md](references/daily-activity-collection.md) |
 | Data Sources     | [references/external-datasources.md](references/external-datasources.md)           |
 | Meeting / Goal   | [references/meeting-and-goal-inputs.md](references/meeting-and-goal-inputs.md)     |
+| Upcoming Events  | [references/upcoming-events.md](references/upcoming-events.md)                     |

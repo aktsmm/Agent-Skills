@@ -285,6 +285,35 @@ function Get-DestinationFolder {
     return Join-Path $base "_inbox"
 }
 
+function Get-SafeDestinationFile {
+    param(
+        [string]$DestinationFolder,
+        [PSCustomObject]$FileInfo
+    )
+
+    $destFile = Join-Path $DestinationFolder $FileInfo.FileName
+    if (-not (Test-Path -LiteralPath $destFile)) { return $destFile }
+
+    $srcHash = (Get-FileHash -LiteralPath $FileInfo.FullPath).Hash
+    if ($srcHash -eq (Get-FileHash -LiteralPath $destFile).Hash) { return $destFile }
+
+    # 内容が違う既存ファイルは上書きせず、外部パス由来の文脈付き名で保存する
+    $segments = $FileInfo.RelativePath -split '[\\/]+' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    $context = (@($segments | Select-Object -SkipLast 1 | Select-Object -Last 3) -join "_")
+    if (-not $context) { $context = "external" }
+    $context = $context -replace '[<>:"/\\|?*]', '_'
+    $baseName = [System.IO.Path]::GetFileNameWithoutExtension($FileInfo.FileName)
+    $extension = [System.IO.Path]::GetExtension($FileInfo.FileName)
+    $candidate = Join-Path $DestinationFolder "$context`_$baseName$extension"
+    $index = 2
+    while (Test-Path -LiteralPath $candidate) {
+        if ((Get-FileHash -LiteralPath $candidate).Hash -eq $srcHash) { return $candidate }
+        $candidate = Join-Path $DestinationFolder "$context`_$baseName-$index$extension"
+        $index++
+    }
+    return $candidate
+}
+
 function Sync-ToBizOps {
     param(
         [PSCustomObject]$FileInfo
@@ -297,12 +326,12 @@ function Sync-ToBizOps {
         New-Item -Path $destFolder -ItemType Directory -Force | Out-Null
     }
     
-    $destFile = Join-Path $destFolder $FileInfo.FileName
+    $destFile = Get-SafeDestinationFile -DestinationFolder $destFolder -FileInfo $FileInfo
     
     # 差分チェック（既存ファイルとの比較）
-    if (Test-Path $destFile) {
-        $srcHash = (Get-FileHash $FileInfo.FullPath).Hash
-        $dstHash = (Get-FileHash $destFile).Hash
+    if (Test-Path -LiteralPath $destFile) {
+        $srcHash = (Get-FileHash -LiteralPath $FileInfo.FullPath).Hash
+        $dstHash = (Get-FileHash -LiteralPath $destFile).Hash
         if ($srcHash -eq $dstHash) {
             Write-Host "  ✓ 変更なし（ハッシュ一致）" -ForegroundColor Gray
             return $false
@@ -310,7 +339,10 @@ function Sync-ToBizOps {
     }
     
     # コピー実行
-    Copy-Item -Path $FileInfo.FullPath -Destination $destFile -Force
+    Copy-Item -LiteralPath $FileInfo.FullPath -Destination $destFile -Force -ErrorAction Stop
+    if ((Get-FileHash -LiteralPath $FileInfo.FullPath).Hash -ne (Get-FileHash -LiteralPath $destFile).Hash) {
+        throw "同期後のハッシュが一致しません: $destFile"
+    }
     Write-Host "  ✅ 同期完了: $destFile" -ForegroundColor Green
     return $true
 }

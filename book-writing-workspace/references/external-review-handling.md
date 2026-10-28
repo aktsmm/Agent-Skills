@@ -141,6 +141,8 @@ For every rejected point, give the primary source, quote the sentence, and expla
 
 For every adopted point, name what changed and, where the wording differs from the proposal, why. Common reasons: the proposal broke an established form used elsewhere in the book, or its politeness level did not match the surrounding prose.
 
+When the publisher typesets separately, the page count and page numbers of the author's local review PDF mean nothing to them. Identify each change by chapter and section title, before/after wording, the pinned revision and a per-file comparison link; quote printed folios only from the publisher's own proof.
+
 Group related changes by topic. Pin delivery links to one published revision containing the current manuscript and matching generated outputs. Check both source/revision agreement and remote artifact existence before saying delivered. Use the original-to-delivery comparison for the full change set, and previous-delivery-to-delivery for a later batch; do not point at a draft branch or an old revision as current.
 
 After posting, read back the returned comment ID and compare the approved body, point IDs, decisions, and links. Normalize line endings and Markdown table alignment padding/separator widths only; keep cell content unchanged. A readback failure is not proof of a failed post: resolve its state before retrying. Record the posting URL and sent state only after confirmation.
@@ -165,6 +167,12 @@ Pick the surviving form from an external orthography standard first and manuscri
 ## Applying fixes without breaking aligned tables
 
 Padded Markdown tables with mixed-width text break when one cell changes, and hand-counting spaces fails on wide characters. Compute display width (wide characters = 2 columns), repad every row including the separator to the widest cell per column, and verify that all row widths are equal. Recompute after every edit pass, because shortening the longest cell shrinks the whole column.
+
+## Fold in product changes published after the manuscript froze
+
+For a late factual refresh (preview to GA, rename, new option), take facts only from public primary sources: the vendor changelog, the documentation repository history and release notes. Never copy internal material the user pastes, such as unreleased tier names, mappings or plan limits, into the manuscript or its reply. A name that appears only in public release notes may be stated as an observation plus one short "may change" clause; do not assert a rename or a mapping the vendor has not published.
+
+Scope each edit to what the source states (for example one surface of a feature rather than the whole feature), and add a reachable reference URL for it at the chapter end. Edit the smallest wording that changes, mirror it into the matching keypoints, and give the publisher the cutoff question and the before/after text, not a build summary.
 
 ## Close the loop
 

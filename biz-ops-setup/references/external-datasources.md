@@ -171,3 +171,7 @@ Add external data source references to the data source table (uncomment template
 ## External Folder Sync, Check Commands, and Output
 
 Sync modes, update detection, auto task extraction, and per-user path variables are owned by `assets/_datasources/external-folders.template.md`. Git and file-system check commands are owned by `assets/external-paths.template.md`. Report external results as a table of source, this-period count, and total.
+
+- A user's "the customer's external folder" means the configured external folder, not the workspace's customer record folder. When asked to record customer information, update the workspace record and the external folder's inbox (append a dated section at the end; never regenerate a large mixed-line-ending file) in the same turn. Exclude internal-only facts (contract values, evaluation content, internal support policy) from the external side, and mark unverified sources.
+- The sync script never overwrites a differing file; it saves a suffixed copy (`-2`). After a real sync, compare each new copy line by line: replace the existing file when the external copy is a superset, delete the copy when it is an older version lacking workspace additions, and report only unclassifiable differences. Leftover copies are re-detected on every check.
+- A scheduled check can run the script with the dry-run and no-cursor-update switches for every configured folder and write a summary; keep real sync and cursor updates manual or report-triggered.
