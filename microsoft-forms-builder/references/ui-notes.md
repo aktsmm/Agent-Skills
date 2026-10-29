@@ -46,6 +46,14 @@ A fresh profile lands on the account picker. Choosing the entry marked "Windows 
 - Bold: before each line compare `document.queryCommandState('bold')` with the wanted state and press Ctrl+B when they differ. The respondent view then shows `<b>` (computed weight 700).
 - A bare `https://…` in the description becomes a clickable link in the respondent view.
 - Finish with `wait_saved(page, expect=<snippet>)` and a cookie-less read-back of the respondent page.
+- UI-helper route (no API): open `DESIGN + id`, wait about 8 s, `close_copilot_draft_panel`, then `set_title_desc` (replaces the whole description), `add_spec_question(page, n, q)` with `n` = next question number, and `replace_text(page, title_box(page, n), text)` to reword an existing question (click its collapsed card first). Reload and read the page body to verify; `wait_saved(expect=...)` can raise although the edit was applied, so check the reloaded body before repeating the edit.
+- A new form's editor URL can stay on `action=Create` for longer than 30 s before the `id` appears (seen once, tenant under load). Do not click "new form" again: keep waiting (`create_form` timeout 90 s) or attach to the open editor tab and resume with the same helpers.
+
+## Changing an existing form (internal API) and the collaborator link
+
+- Adding a question works from the design tab: `POST /formapi/api/forms('<id>')/questions` with the antiforgery header, a client-made `id` (`r` + 32 hex), `title` and `formsProRTQuestionTitle`, a numeric `order`, `type` (`Question.Choice` / `Question.TextField`) and `questionInfo` as a JSON string (201 on success). For "choose up to N" use `ChoiceType: 2`, `ChoiceRestrictionType: "AtMost"`, `ChoiceMaxBoundary: N`; a subtitle needs `ShowSubtitle: true`.
+- Move a question with `PATCH` on `/questions('<qid>')` and a new `order` between its neighbours. Verify wording and order on the respondent page, not from the API reply.
+- Collaborator link: "…" → 共同作業または複製 → 共同作業者の追加. The dropdown has three scopes: any work/school account (default, includes other organisations), link-holding users of the owner's organisation, specific users. Pick the narrowest the owner approves, then reload and read the scope and link back from the pane.
 
 ## Delete recipe (own test forms only)
 

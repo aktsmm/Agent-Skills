@@ -1,6 +1,6 @@
 ---
 name: book-writing-workspace
-description: "Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support. Use when organizing a book manuscript repo, defining or reviewing target readers, standardizing chapter/section files, setting writing/review agents, handling publisher proof comments, or assessing an existing writing workspace. Triggers on book writing workspace, reader persona, reader audience, 読者ペルソナ, persona SSOT, technical book project, 執筆ワークスペース, manuscript workflow, Re:VIEW workspace, proof PDF, annotated proof, publisher proof comments, 校正, 校正注釈, and 初校."
+description: "Operate a reusable technical book manuscript workspace with writing structure, reader persona SSOT, review rules, and optional Markdown to Re:VIEW/PDF support. Use when organizing a book manuscript repo, defining or reviewing target readers, standardizing chapter/section files, setting writing/review agents, handling publisher proof comments, or assessing an existing writing workspace. Triggers on book writing workspace, reader persona, reader audience, 読者ペルソナ, persona SSOT, technical book project, 執筆ワークスペース, manuscript workflow, Re:VIEW workspace, proof PDF, annotated proof, publisher proof comments, 校正, 校正注釈, 初校, 入稿後の修正, and late-stage revision."
 argument-hint: "本のテーマ、原稿リポジトリ名、使いたい執筆フロー"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -50,6 +50,7 @@ When the workspace already exists, do not stop at setup-oriented advice. This sk
 10. Treating an author-introduction page as part of the publication contract: keep its author order, display names, roles, confirmed profiles, and links aligned with the structure map, metadata, cover, and colophon. Do not invent missing biography details; track provisional text until the author confirms it, and visually verify cover wrapping when the author count changes.
 11. Enabling Re:VIEW/PDF support only when the project needs reproducible output.
 12. Freezing a release candidate and running the release-readiness gates before delivery or publication.
+13. Reviewing late-stage fact updates or trims against the pinned handover commit, one chapter at a time with owner approval per item; see [references/late-stage-revision.md](references/late-stage-revision.md).
 
 ## Bootstrap Workflow
 
@@ -111,6 +112,7 @@ Metadata, migration, converter verification, and sync-back rules live in referen
 | Re:VIEW / PDF tips   | [references/review-pdf-tips.md](references/review-pdf-tips.md)                   |
 | Screenshot capture   | [references/screenshot-capture.md](references/screenshot-capture.md)             |
 | Release readiness    | [references/release-readiness-review.md](references/release-readiness-review.md) |
+| Late-stage revision  | [references/late-stage-revision.md](references/late-stage-revision.md)           |
 
 ## Optional Build Pipeline
 

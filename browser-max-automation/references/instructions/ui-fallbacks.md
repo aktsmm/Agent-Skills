@@ -62,6 +62,8 @@ Intercept it instead of letting the OS dialog open:
 4. `DOM.setFileInputFiles({backendNodeId, files: [path]})`.
 5. `Page.setInterceptFileChooserDialog({enabled: false})`.
 
+With Playwright over CDP, `expect_file_chooser` + `set_files(path)` is simpler, but a ~30 MB file exceeds the default 30 s timeout (the call fails and nothing is uploaded); pass `timeout=` of several minutes (420000 worked for 29 MB into a SharePoint library via "作成またはアップロード" → "ファイルのアップロード"). Confirm by listing the folder, not by the absence of an error.
+
 For raw CDP-controlled download buttons, set `Browser.setDownloadBehavior({behavior: 'allow', downloadPath: <dir>, eventsEnabled: true})` before clicking. Do not override download behavior underneath a Playwright-controlled context; use its download API instead.
 
 With Playwright MCP, a chooser opened inside `browser_run_code_unsafe` becomes MCP modal state instead of reaching the script's `waitForEvent('filechooser')`; finish it with `browser_file_upload`. Its allowed-root check compares the drive letter case literally, so pass the path in the same case as the reported root (for example `c:\...`). The allowed roots depend on the harness: the VS Code Playwright MCP accepts files under the open workspace (no copy needed), while another harness's MCP may reject the same path as outside its roots (try the path first; retry once with the allowed root's exact spelling (a drive-letter case difference such as `C:\` vs `c:\` is rejected too), copy to an allowed root only after a rejection, and verify the copy's hash against the original). Some apps (e.g. D365) ignore `setInputFiles` on the hidden input and only accept the chooser route; verify the app's own "selected file" field before continuing.
@@ -97,6 +99,8 @@ Background/minimized rendering can contribute to actionability timeouts, but it 
 Keep ordinary scoped click/fill as the default. Only choose JS click as the single recovery when its semantics are acceptable and any prior write is known not to have applied. Synthetic events are not equivalent to trusted input. Verify durable state; an ambiguous timeout stops writes rather than triggering another click method or automatic foreground activation.
 
 A broad locator (for example `aria-label*="Attach"`) can start matching extra elements after the page state changes (a "Remove attachment" button appears once a file is attached) and then fails with a strict-mode violation. Pin the exact `aria-label` or role name.
+
+A first-visit "New Feature" tour dialog leaves a backdrop that intercepts every click (the log names a `DialogSurface__backdrop`) while its own Close button may not match by role; Escape dismisses it. Fluent-style forms expose selects as `role=combobox` with options in a `[role=listbox]` (match options there, not by page-wide text), and a consent checkbox whose label text opens a terms dialog is ticked by the dialog's accept button, so `check()` on the input fails until the terms are accepted. Accept terms only when the user has authorised that specific consent.
 
 ## Text locator matches hidden or whitespace-shifted rows
 

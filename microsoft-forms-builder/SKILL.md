@@ -38,7 +38,7 @@ Build a survey in Microsoft Forms from a question spec. Forms has no public API 
 3. Start the session: `scripts/browser_session.ps1 -Action Start`.
 4. `python scripts/build_form.py spec.json --account <work account on the picker>`. It creates the form, fills it, waits for "saved", reopens it and compares titles and required flags. Exit code 3 means the read-back failed.
 5. External respondents approved: `python scripts/build_form.py spec.json --only-share <form id>` (sets "anyone can respond", turns on a short URL, opens it in a cookie-less context). Report `anonymousOk`.
-6. Report the response URL (short URL when it exists), the sharing scope, and what was not checked (no test submission is made). Then `browser_session.ps1 -Action Stop`.
+6. Report the response URL (short URL when it exists), the sharing scope, and what was not checked (no test submission is made). Then `browser_session.ps1 -Action Stop`. If more edits are likely (user is still iterating on wording or questions), keep the session running and stop it only at the end: every `Start` uses a fresh profile, so each restart costs the user another sign-in.
 
 Run Python Playwright from an interpreter that has it installed; set `PYTHONUTF8=1` and write Japanese output to a UTF-8 file, because the PowerShell pipe garbles it.
 

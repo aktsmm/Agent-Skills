@@ -78,7 +78,7 @@ def create_form(ctx, page):
         new = info.value
     except PWTimeout:
         new = page
-    new.wait_for_url(re.compile(r"DesignPage.*[?&]id="), timeout=30000)
+    new.wait_for_url(re.compile(r"DesignPage.*[?&]id="), timeout=90000)
     new.wait_for_timeout(5000)
     return new
 
