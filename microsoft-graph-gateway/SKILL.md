@@ -38,7 +38,7 @@ This skill does not try to abstract all of Microsoft Graph into a fixed checklis
 
 ### Write Routing
 
-- Use Microsoft Graph for all writes.
+- Use Microsoft Graph for all writes. Chat-message `mentions` reject a personal Microsoft account (`PersonalMicrosoftAccountUser is not supported in Mentions`, HTTP 400); those users are missing from tenant directory lookups and have empty display names in chat members. Post without a real mention and address them by bold `@name` in the body, or add the mention in the Teams UI, and say so in the report.
 - Treat send, create, update, move, upload, reply, assign, and respond operations as writes.
 - Require explicit confirmation before any write.
 - Keep delete actions disabled by default or behind a stronger confirmation step.
