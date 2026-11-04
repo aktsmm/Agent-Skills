@@ -35,6 +35,7 @@ This skill does not try to abstract all of Microsoft Graph into a fixed checklis
   - precise properties, `$select`, `$filter`, `$expand`, or API version control
   - Teams, Planner, To Do, directory, or permission-oriented data
   - schema, permission, throttling, batching, delta, or webhook behavior
+- Directory reads (`/users`, `/users/{id}/manager`) worked with an Azure CLI Graph token in a corporate tenant; `/users/<mail>/manager` returns 404 when mail differs from the UPN, so resolve the id with `/users?$filter=mail eq '<address>'` (URL-encoded) first and walk `/users/{id}/manager`. Do not assume the same token can read mail or files.
 
 ### Write Routing
 

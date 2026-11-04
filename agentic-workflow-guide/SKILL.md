@@ -78,6 +78,8 @@ Prefer the lowest level (L0 prompt → L1 + instructions → L2 single agent →
 - Multiple responsibilities in one agent
 - Context > 70%
 
+Check each delegated agent's tool list against what you ask it to produce: an agent without file create/edit tools cannot save a deliverable. Ask it to return the full file text in one code block (no summary) and save it in the parent.
+
 Threshold details: [references/splitting-criteria.md](references/splitting-criteria.md)
 
 ## Review Gates
