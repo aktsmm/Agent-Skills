@@ -9,7 +9,7 @@ Checklist for reviewing and improving SKILL.md files.
 - [ ] Frontmatter has name + description?
 - [ ] Self-authored skills have confirmed license + `metadata.author`?
 - [ ] Description clearly states WHEN to use (trigger conditions)?
-- [ ] Manual-only skill (`disable-model-invocation: true`) has a concrete `argument-hint`? Is `context: fork` treated as experimental with an inline fallback?
+- [ ] Manual-only skill (`disable-model-invocation: true`) has a concrete `argument-hint`? For `context: fork`, are host support, VS Code's `github.copilot.chat.skillTool.enabled`, actual forked execution, and an inline fallback checked?
 - [ ] Detailed content moved to references/ (Progressive Disclosure)?
 - [ ] Every reference users can ask for is reachable from SKILL.md (Key References row, plus trigger words in `description` / `When to Use`)? A reference with no entry link is never loaded.
 - [ ] Self-contained? Knowledge is bundled, not just linked to workspace files that break when copied elsewhere? No other skill is named or used as SSOT?

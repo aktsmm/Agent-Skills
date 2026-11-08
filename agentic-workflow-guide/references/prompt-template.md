@@ -56,7 +56,7 @@ description: One-line summary of what this prompt does
 
 ## Frontmatter Constraints
 
-VS Code validates frontmatter strictly. Only use supported fields — unsupported fields cause validation errors.
+Validate frontmatter for the file type and intended harness. These common authoring fields are not an exhaustive cross-client schema; absence from a table is not proof of non-support.
 
 - Review missing required fields and unsupported properties separately. Missing-field-only checks miss real validation failures.
 - If repo-local authoring rules disagree with the current platform support matrix, treat that as contract drift and fix the rule before bulk-editing prompts.
@@ -65,11 +65,13 @@ VS Code validates frontmatter strictly. Only use supported fields — unsupporte
 - The opening `---` must be the very first bytes in the file. Any stray characters or BOM-like garbage before it can prevent the prompt from being discovered in the slash prompt picker.
 - `agent` is optional for `.prompt.md`. If omitted, VS Code uses the current agent (or `agent` when `tools` is set). Values: `ask`, `agent`, `plan`, or a custom agent name. Use `agent: ask` or `agent: plan` only when the prompt should avoid autonomous edit/execute behavior.
 
-| File type          | Supported fields                                                  | Notes                                                       |
+| File type          | Common fields                                                     | Notes                                                       |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `.prompt.md`       | `agent`, `argument-hint`, `description`, `model`, `name`, `tools` | `author`, `copyright`, `license` etc. are **NOT** supported |
-| `.instructions.md` | `name`, `description`, `applyTo`                                  | All other fields are **NOT** supported                      |
-| `SKILL.md`         | `name`, `description`, `argument-hint`, `user-invocable`, `disable-model-invocation`, `license`, `metadata` (host-specific: `context: fork` experimental, `compatibility`, `allowed-tools`) | Nested `metadata:` block. `disable-model-invocation: true` = manual-only (give it `argument-hint`); `user-invocable: false` = model-only |
+| `.instructions.md` | `name`, `description`, `applyTo` | Check feature-specific fields separately; see activation below |
+| `SKILL.md` | `name`, `description`, `argument-hint`, `user-invocable`, `disable-model-invocation`; optional format/host fields: `license`, `metadata`, `compatibility`, `allowed-tools`, `context` | `disable-model-invocation: true` = manual-only (give it a hint); `user-invocable: false` = model-only. `context: fork` requires host support and VS Code's `github.copilot.chat.skillTool.enabled` ([skill reference](https://code.visualstudio.com/docs/agent-customization/agent-skills#_skillmd-file-format)) |
+
+For `.instructions.md`, `applyTo` is an optional string with no default pattern, not a required field. Local can load by `description`; omitting both leaves manual attachment, and description does not add a condition to `applyTo`. Claude `.claude/rules` uses a `paths` array; omitted `paths` means general guidance. Feature-specific `excludeAgent` is not a VS Code harness selector. Check the [instruction reference](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_file-syntax) and its linked GitHub support matrix before adding or rejecting fields.
 
 ### Recommended `.prompt.md` frontmatter shapes
 

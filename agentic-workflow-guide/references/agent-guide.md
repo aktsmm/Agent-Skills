@@ -30,8 +30,8 @@ The `agent` tool launches an independent agent with a **clean context window** t
 | Aspect        | Description                                                                           |
 | ------------- | ------------------------------------------------------------------------------------- |
 | **Context**   | Each sub-agent has its own context window (isolated from main)                        |
-| **Execution** | Synchronous - main agent waits for result (NOT async/background)                      |
-| **Stateless** | One-shot execution - no follow-up conversation possible                               |
+| **Execution** | Harness-dependent: Local calls may be synchronous; Copilot `task` supports sync/background |
+| **Follow-up** | Harness-dependent: Copilot exposes `read_agent` / `write_agent` for supported resumable agents |
 | **Return**    | Only final summary returns to main agent                                              |
 | **Parallel**  | ✅ Supported (2026/01+) - multiple sub-agents can run in parallel                     |
 | **Nesting**   | ⚠️ Off by default (see [Pitfall 3](#pitfall-3-nested-sub-agent-calls-off-by-default)) |
@@ -73,7 +73,9 @@ When a workflow matches these scenarios or the thresholds in [splitting-criteria
 
 ## How to Invoke
 
-### Enabling agent
+### Enabling agent (Local examples)
+
+The examples below use Local's `agent` / `agentName` contract, not Copilot's native `task` parameters. In Copilot, discover the current tool inventory and adapt the body and result capture as well as YAML: `agents:` is unsupported and does not enforce a child allowlist. Missing `runSubagent` alone is not evidence that delegation is unavailable. See [harness-specific fields](agent-template.md#for-agentmd-files).
 
 **Option 1: Tool Picker**
 
@@ -320,7 +322,7 @@ Return as:
 - Recommendation: (1 sentence)
 ```
 
-### Pitfall 5: Named Custom Agent Not Invoked
+### Pitfall 5: Named Custom Agent Not Invoked (Local)
 
 ❌ **Problem:** The orchestrator names a worker agent but a generic subagent runs instead, or the call fails
 
@@ -328,7 +330,7 @@ Return as:
 
 **Solution:** Use the exact name, check the coordinator's `agents` list, and confirm in Chat view > right-click > Diagnostics that the worker loaded without errors.
 
-### Pitfall 6: Custom Agent as Sub-agent
+### Pitfall 6: Custom Agent as Sub-agent (Local)
 
 Custom agents can run as subagents without any extra setting (the old `chat.customAgentInSubagent.enabled` setting is no longer needed).
 
@@ -347,36 +349,34 @@ Custom agents can run as subagents without any extra setting (the old `chat.cust
 - `disable-model-invocation: true` blocks subagent invocation, but explicitly listing the agent in a coordinator's `agents` overrides it
 - `agents: [...]` on the coordinator restricts allowed workers (`['*']` or omitted = all, `[]` = none); include `agent` in its `tools`
 - `infer:` は deprecated。`user-invocable` / `disable-model-invocation` を使用すること
-- Model order: explicit `model` in the call > worker's `model` > main model. A model above the main model's cost tier makes the subagent fail
-- Sub-agent cannot access main session history; ask-question and todo tools are unavailable to Local subagents
+- Local model order: explicit call `model` > custom worker's `model` > conditional Auto (`chat.subagents.defaultToAuto`) > main model. Auto defaults off and falls back to the main model if unavailable. Explicit/agent-configured choices are checked against the main model's cost tier; Auto routing is not subject to that fixed ceiling. BYOK subagents keep that model unless another is specified. Do not infer Copilot precedence from this Local order.
+- Local subagents do not inherit main conversation history; ask-question and todo tools are unavailable. See [current subagent behavior](https://code.visualstudio.com/docs/agents/run/subagents#_select-the-model-for-a-subagent).
 
-### Pitfall 7: Restricting Orchestrator's tools Breaks Sub-agents
+### Pitfall 7: Confusing Generic and Custom Worker Tools (Local)
 
-❌ **Problem:** Orchestrator の `tools:` から `edit` を外してSRPを強制 → サブエージェント（Writer等）が `edit` を使えなくなる
+A generic Local subagent inherits the parent's instructions and selected tools. A named custom worker can override tools; the parent's list is not a universal worker ceiling. The [official example](https://code.visualstudio.com/docs/agents/run/subagents#_delegate-implementation-to-a-worker) pairs an agent-only coordinator with an editing worker:
 
-**Reality:** custom agent を指定しない汎用サブエージェントは、親の instructions と選択済みツールを継承する（公式 docs）。そのため親の `tools:` が実質的な上限になる。custom agent の worker は自分の `tools:` で上書きできると docs にあるが、親の制限を超えられるかは未検証のため、親で外したツールを worker に期待しない。
-
-```
-❌ Wrong: Orchestratorで edit を制限
+```yaml
+# coordinator.agent.md — Local
 ---
 name: Orchestrator
-tools: ["agent", "read", "todo"]  # edit がない
+description: Coordinate implementation through a named worker
+tools: ['agent']
+agents: ['Writer']
 ---
-→ Writer サブエージェントが edit/editFiles を使えない!
-
-✅ Correct: tools を省略（全ツール利用可）
----
-name: Orchestrator
-description: サブエージェントに作業を委譲
----
-→ サブエージェントは全ツールを使える
 ```
 
-**Solution:**
+```yaml
+# writer.agent.md — Local
+---
+name: Writer
+description: Implement the delegated change
+user-invocable: false
+tools: ['edit', 'read', 'search']
+---
+```
 
-- Orchestrator は `tools:` を**省略**する（= 全ツール利用可、agent-template.md推奨）
-- SRP の強制は `tools:` ではなく、**プロンプト内の MANDATORY 指示**で行う
-- `tools:` 制限は Worker エージェント（末端）に対してのみ適用する
+Omitting the coordinator's `tools` remains valid when inheriting tools enabled in the picker is intentional; it does not guarantee all tools exist. Choose generic inheritance or a named worker explicitly and verify its effective capabilities. Copilot uses native `task`, not Local's `agents` allowlist; check its runtime rather than importing this contract.
 
 ---
 

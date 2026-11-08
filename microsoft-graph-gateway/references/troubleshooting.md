@@ -32,6 +32,21 @@ What to do:
 2. Re-sign in with a tenant-approved app registration.
 3. Retry a read first, then retry the write.
 
+## Gateway Returns `Access denied for <verb> path`
+
+Symptom:
+
+- A WorkIQ MCP call returns `statusCode 400` with `Access denied for POST path: ...` (observed for `/shares/.../workbook/worksheets/add` and `/me/drive/items/<id>/createLink`; a workbook `usedRange` GET was denied too), while mail/chat writes through the same gateway succeeded.
+
+Meaning:
+
+- The gateway's path allowlist refuses that endpoint; it is not a token or consent failure. The same file may also open read-only in Excel for the web (`閲覧限定`, sheet-add button disabled) when it is owned by another team.
+
+What to do:
+
+1. Do not retry or swap routes to bypass it. Report the denied path.
+2. For a file you do not own, deliver the need through a new file you own (copy only the requested rows and columns) and share it (create the link in the signed-in browser when allowed, otherwise ask the user), rather than editing the original.
+
 ## External Or Personal Teams Accounts Return No Directory User
 
 Symptom:

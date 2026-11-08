@@ -35,7 +35,7 @@ Minimum items to verify:
 - [ ] Is there any possibility of infinite loops?
 - [ ] Are related files (references, scripts) simple and minimal? (DRY)
 - [ ] Are deterministic steps offloaded to scripts / IR / hooks instead of LLM loops? (Deterministic Offload)
-- [ ] Are frontmatter fields checked against the current file-type support matrix, not just repo-local convention? (Frontmatter Hygiene)
+- [ ] Are fields and model identifiers checked against the intended harness's current schema/completions, including unsupported allowlists and body tool references, rather than repo convention or `target` changes that only silence warnings? (Harness Hygiene)
 - [ ] Are sub-review / sub-agent findings (file sizes, line ranges, duplication claims, missing sections) verified against the actual code by grep / read before being acted on? (Sub-Review Verification)
 - [ ] Do delegated workers distinguish `executed with 0 results` from `not run`, `blocked`, and `failed`?
 - [ ] Before a new detection rule becomes a blocking gate, was its precision measured against the real corpus, and were low-precision signals demoted to a report-only lane? (Measured Gate)
@@ -55,10 +55,10 @@ Minimum items to verify:
 ```markdown
 ## Agent Definition
 
-- [ ] Does `tools:` include subagent tool? (`agent` tool set for VS Code and Agent Host, `Task` for Claude Code)
-- [ ] Is `tools:` portable? Granular VS Code IDs (`read/readFile`, `execute/runInTerminal`) are silently ignored by Agent Host; prefer tool set aliases (`read`, `edit`, `search`, `execute`, `agent`, `todo`), and keep the body free of harness-specific tool names (`runSubagent`, `run_in_terminal`, `read_file`)
+- [ ] Is delegation exposed and permitted in this harness? (Local: `agent` / `agent/runSubagent`; Copilot: native `task`; Claude Code: discover current tool)
+- [ ] Are tool entries and body references valid in the destination harness? Unsupported VS Code IDs are not proof of missing tools; Copilot `agents:` is not a child allowlist.
 - [ ] Are instructions MANDATORY ("MUST use") not permissive ("can use")?
-- [ ] Is explicit tool reference present? (`#tool:agent` for VS Code)
+- [ ] Is any explicit tool reference valid for this harness? (`#tool:agent` is a Local example, not portable syntax)
 - [ ] Is orchestrator explicitly told NOT to do worker tasks itself?
 
 ## Sub-agent Prompts
@@ -73,7 +73,7 @@ Minimum items to verify:
 - [ ] ❌ "You can use sub-agents if needed" (too vague)
 - [ ] ❌ Assuming parallel sub-agent execution without checking the harness (see [deep-agent-patterns.md](deep-agent-patterns.md#parallel-execution))
 - [ ] ❌ Orchestrator reading files directly instead of delegating
-- [ ] ❌ Missing subagent tool in tools: property (`agent` tool set; required when `agents:` is set)
+- [ ] ❌ Local `agents:` without the `agent` tool, or relying on that unsupported list to restrict Copilot children
 - [ ] ❌ Nested sub-agent calls without `chat.subagents.allowInvocationsFromSubagents` (VS Code Local: off by default, max depth 5)
 
 ## Correct Pattern Example
@@ -126,8 +126,8 @@ Minimum items to verify:
 ```markdown
 ## File-Type Frontmatter Validation
 
-- [ ] Are required fields checked per file type (`description`, `applyTo`, `name`, etc.)?
-- [ ] Are unsupported properties checked per file type, not just missing required fields?
+- [ ] Are required fields checked by file type and harness, without requiring optional `applyTo` (which has no default pattern)?
+- [ ] Are unsupported properties verified against current docs/schema, not inferred from absence in a summary table?
 - [ ] Are repo-local authoring rules consistent with the current platform support matrix?
 - [ ] If local rules and platform-supported keys conflict, is that drift called out explicitly before bulk edits?
 - [ ] Is there a mechanical scan for both missing and unsupported keys?

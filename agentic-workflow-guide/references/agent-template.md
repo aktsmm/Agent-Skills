@@ -14,32 +14,34 @@ Standard structure and specification for `.agent.md` and `.prompt.md` files.
 
 ### For `.agent.md` files
 
+Identify the intended harness before selecting fields or model syntax. Shared `.github/agents` storage does not imply shared semantics.
+
 ```yaml
 ---
 name: <agent-name> # Optional: defaults to the file name
-description: <description> # Recommended: routing surface for pickers and subagent discovery
-argument-hint: <hint> # Optional: chat input hint
-model: <model-name> # Optional: string or prioritized array
-tools: [...] # Optional: tool / tool set allowlist
-agents: [...] # Optional: allowed subagents ('*' = all, [] = none)
-handoffs: [...] # Optional: objects with label/agent/prompt/send(/model)
-user-invocable: true # Optional: show in agents dropdown (default: true)
-disable-model-invocation: false # Optional: block subagent invocation (default: false)
-target: vscode # Optional: vscode | github-copilot
+description: <description> # Required for Copilot
+model: <verified-model-identifier> # Optional: string or prioritized array
+tools: [...] # Optional: allowlist using this harness's inventory
+user-invocable: true
+disable-model-invocation: false
+target: github-copilot # Editor interpretation only; does not switch the session harness
 ---
 ```
 
-> **Model note:** In VS Code, subagents inherit the parent's model unless `.agent.md` sets `model:` or the caller specifies one (highest priority). A requested model cannot exceed the parent's cost tier. Use only exact names verified locally. Within the chosen family and tier, pick the newest generation in the live list. [VS Code Docs](https://code.visualstudio.com/docs/agents/run/subagents#_select-the-model-for-a-subagent)
+| Setting | Local (`target: vscode`) | Copilot / Agent Host (`target: github-copilot`) |
+| --- | --- | --- |
+| `model` | Verified display name, including vendor where needed | Runtime model ID; exact provider-qualified ID for BYOK |
+| `agents` | Allowed subagents; omit / `['*']` = all, `[]` = none | Unsupported; not an enforced allowlist |
+| `handoffs`, `argument-hint` | Supported | Unsupported |
+| Delegation | `agent` tool set / `agent/runSubagent` | Native `task`; verify exposed tools |
 
-When fallback matters, `model:` can be an ordered array and the first available model is used. Use only model display names verified in the current environment.
+Use model completions for the intended harness, not a scheduler's display name or metadata ID alone. Keep provider/profile identity; do not construct an ID from a friendly name. An ordered `model` array selects the first available entry only when fallback is authorized. Within the chosen family/tier, prefer the newest verified generation.
 
-```yaml
-model: ["<verified-model-name-1>", "<verified-model-name-2>"]
-```
+Check parent defaults, scheduler overrides and child dispatch separately: omitted child `model` is not proof of parent inheritance, and Local cost-tier rules are not a universal Agent Host constraint. Observe effective model and native parent/child linkage before claiming a switch worked; saved YAML and a clean diff prove only configuration. Do not add a no-op paid probe where the first authorized bounded call can supply that evidence.
 
-`handoffs` は文字列配列ではなく、`label`・`agent`・`prompt`・`send` を持つオブジェクト配列で定義する。
+For Local only, `handoffs` uses objects with `label`, `agent`, `prompt`, `send` and optional `model`. A Local `agents` list requires the `agent` tool and can explicitly allow an agent with `disable-model-invocation: true`. Do not set `target: vscode` merely to hide a Copilot warning or remove an allowlist without assessing the lost restriction.
 
-`agents` は親 agent が呼び出せる subagent 名の制限。省略または `'*'` で全許可、`[]` で禁止。指定する場合は `tools` に `agent` を含める。親の `agents` に明示した agent は、その agent の `disable-model-invocation: true` を上書きして呼び出せる。
+Source: [VS Code custom agent reference](https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference) (harness compatibility and model preferences); verify against the installed version.
 
 ### ⚠️ 非標準フィールド禁止（バリデーションエラーの原因）
 
@@ -90,7 +92,7 @@ Do not add `tools:` to `.prompt.md` by default. Prompt-level `tools:` is an allo
 | `mode:`                                                | ❌ Deprecated | `.prompt.md`          | `agent:` (see below)                                                                           |
 | `infer:`                                               | ❌ Deprecated | `.agent.md`           | `user-invocable:` and `disable-model-invocation:` (see below)                                  |
 | `.chatmode.md`                                         | ❌ Old name   | file                  | Rename to `.agent.md`                                                                          |
-| `chat.agentFilesLocations` / `chat.modeFilesLocations` | ❌ Deprecated | settings (Local only) | Move files to supported locations (see [vscode-agent-placement.md](vscode-agent-placement.md)) |
+| `chat.modeFilesLocations` | ❌ Deprecated | legacy settings | Prefer native agent folders; `chat.agentFilesLocations` remains supported and forwards agents to Agent Host (see [placement](vscode-agent-placement.md)) |
 
 **`infer:` Migration Guide:**
 
@@ -202,7 +204,7 @@ Use #tool:agent for each independent file review.
 Use #tool:web when external documentation is required.
 ```
 
-> **⚠️ Orchestrator の tools 制限に注意**: custom agent を指定しない汎用サブエージェントは親の選択済みツールを継承するため、親の `tools:` から `edit` を外すと Writer 等も `edit` を使えないことがある。custom agent の worker は自分の `tools:` を持てるが、親の制限を超えられるかは未検証。Orchestrator の `tools:` は必要な範囲を残し、SRP はプロンプトの指示で担保する。詳細は [agent-guide.md の Pitfall 7](agent-guide.md#pitfall-7-restricting-orchestrators-tools-breaks-sub-agents) を参照。
+> **Local worker tools**: Generic subagents inherit the parent's selected tools; named custom workers can override them. An agent-only coordinator can delegate editing to a custom worker. Choose the boundary deliberately and verify effective capabilities; do not infer a universal parent ceiling. See [Pitfall 7](agent-guide.md#pitfall-7-confusing-generic-and-custom-worker-tools-local) and the [official example](https://code.visualstudio.com/docs/agents/run/subagents#_delegate-implementation-to-a-worker).
 
 ### ⚠️ tools フィールドの注意事項
 
@@ -390,7 +392,7 @@ For long-running tasks, maintain visibility:
 name: orchestrator
 description: Coordinates workflow and delegates to specialist agents
 # Omit tools for orchestrators unless a hard allowlist is intentional.
-# Parent tool allowlists become ceilings for worker agents.
+# Local generic workers inherit selected tools; named custom workers can override them.
 ---
 ```
 
@@ -441,11 +443,11 @@ Use `<server-name>/*` format to include all tools from an MCP server.
 
 - VS Code: Chat view を右クリック → Diagnostics（読み込まれた agents / prompts / instructions / skills とエラー）、または Agent Debug Logs
 - Claude Code: [Claude Code subagents](https://code.claude.com/docs/en/sub-agents)
-- GitHub Copilot cloud agent (`target: github-copilot`): [Custom Agents Configuration - GitHub Docs](https://docs.github.com/en/copilot/reference/custom-agents-configuration)
+- Copilot harness: [VS Code harness compatibility](https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference#_harness-compatibility). Copilot cloud agent has a separate [GitHub configuration reference](https://docs.github.com/en/copilot/reference/custom-agents-configuration); `target` is not a cloud-execution switch.
 
 ## Handoffs (Agent Transitions)
 
-Handoffs enable guided sequential workflows between agents with suggested next steps.
+Local-only `handoffs` enable guided sequential workflows between agents with suggested next steps; these fields are not supported by Copilot.
 
 ### When to Use
 

@@ -1,8 +1,6 @@
 # Hooks Guide
 
-Hooks are deterministic lifecycle automation for agent sessions. VS Code hooks are Preview; this guide follows the **Local harness** ([VS Code hooks docs](https://code.visualstudio.com/docs/agent-customization/hooks), verified 2026-10).
-
-The selected harness (Local / Copilot / Claude / Codex on Agent Host) owns events, payloads, and output decisions. A shared file such as `.github/hooks/*.json` does not make behavior identical across harnesses; test in the destination harness before reusing a hook.
+Hooks are deterministic lifecycle automation (VS Code Preview). The examples below retain the **legacy Local** format, not a new Copilot schema. Use the [current Copilot workflow](https://code.visualstudio.com/docs/agent-customization/hooks) for new hooks. Harness selection, not model selection or a shared `.github/hooks` location, determines events, payloads, and decisions.
 
 Use hooks when workflow behavior must run, block, ask, or inject context at a known event. Do not use hooks for guidance that can remain conversational.
 
@@ -38,13 +36,13 @@ If the requirement includes "always block", "must ask", "auto-run", or "inject a
 | `.claude/settings.json`, `.claude/settings.local.json` | Workspace, Claude format (needs `chat.useClaudeHooks`; matchers ignored) |
 | `~/.copilot/hooks/*.json`                              | User                                                                     |
 | `~/.claude/settings.json`                              | User, Claude format (needs `chat.useClaudeHooks`)                        |
-| `hooks:` in `.agent.md` frontmatter                    | Custom agent only (Preview, Local only)                                  |
+| `hooks:` in `.agent.md` frontmatter                    | Agent-scoped; Local and Copilot support it (see below)                    |
 
 `chat.useHooks` (default on) controls Local hook execution; `chat.hookFilesLocations` adds or disables locations. These settings do not configure Agent Host harnesses.
 
 Prefer workspace hooks for team policy. Keep personal automation outside the repo when it should not be shared.
 
-## Lifecycle Events
+## Lifecycle Events (Local)
 
 | Event              | Trigger                                                                      |
 | ------------------ | ---------------------------------------------------------------------------- |
@@ -57,7 +55,7 @@ Prefer workspace hooks for team policy. Keep personal automation outside the rep
 | `SubagentStop`     | Subagent is about to stop                                                    |
 | `Stop`             | Current agent execution is about to stop (not necessarily the whole session) |
 
-## Minimal Shape
+## Minimal Shape (Local)
 
 ```json
 {
@@ -75,7 +73,7 @@ Prefer workspace hooks for team policy. Keep personal automation outside the rep
 
 Native format uses PascalCase event names and `command`, OS overrides (`windows`, `linux`, `osx`), and `timeout`. The hook receives JSON on stdin and may write JSON to stdout to add context or block/ask; see the [Local hooks reference](https://code.visualstudio.com/docs/agents/reference/hooks-reference) for the full schema and exit codes.
 
-### Agent-scoped hooks (Preview, Local only)
+### Agent-scoped hooks (Local example)
 
 ```yaml
 ---
@@ -87,7 +85,17 @@ hooks:
 ---
 ```
 
-They run in addition to user/workspace hooks, require `chat.useHooks` and a trusted workspace, and a subagent's `Stop` hook fires as `SubagentStop`.
+In Local, these add to user/workspace hooks, require `chat.useHooks` and workspace trust, and a subagent's `Stop` fires as `SubagentStop`. Copilot also supports agent-scoped hooks; VS Code preserves their scope during conversion, including plugin-provided agents. Do not move them to repo/plugin-wide hooks as a migration shortcut.
+
+### Copilot migration gate
+
+Check the [Copilot contract](https://docs.github.com/en/copilot/reference/hooks-reference) and [migration procedure](https://code.visualstudio.com/docs/agent-customization/migrate-customizations#_migrate-hooks):
+
+- `preToolUse` supplies `toolName`/`toolArgs`; the `PreToolUse` alias supplies snake_case fields and can use Claude-style tool names. Neither guarantees old Local arguments. Local ignores matcher values; verify destination matching.
+- Copilot command hooks use `timeoutSec`, with `command`, platform `bash`/`powershell`, or shell-free `exec`/`args`. Resolve script paths, `cwd`, and `env` dependencies on the runtime host; do not assume editor variables or copy secret values.
+- Local `chat.useHooks`/`chat.hookFilesLocations` do not disable/configure Copilot. Preserve disabled state in destination sources and check duplicate user/repo/plugin hooks before enabling.
+- Copilot command `preToolUse` errors deny the call, but timeouts fall through to normal permissions, including policy hooks. Other events/HTTP hooks differ; test failures, not only success. `ask` needs an interactive approval flow.
+- Verify the scoped event and intended denial in a trusted destination session before relying on it; editor schema validation is not execution proof.
 
 ## Decision Heuristic
 

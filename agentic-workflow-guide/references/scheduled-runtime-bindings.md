@@ -43,7 +43,7 @@ On an optimistic-concurrency rejection, re-read the task before exactly one retr
 
 ### Role Routing And Bounded Pilots
 
-- A scheduler's controller model is not necessarily its design, implementation or image-review worker. Verify that the consumed prompt resolves a role policy and dispatches each worker with an explicit model in a separate context; keep requested and host-reported effective identity separate, with unavailable metadata marked unknown.
+- Resolve scheduler overrides, agent parent defaults and child dispatch independently; metadata IDs/display names and Copilot runtime provider-qualified IDs are not interchangeable. Verify that the consumed prompt dispatches each worker with its approved explicit model in a separate context; keep requested and host-reported effective identity separate, with unavailable metadata marked unknown.
 - Pilot a new allocation on a bounded scope before broad rollout. When both rubric and model are suspect, freeze inputs and compare both factors, including defective cases and scoped controls; store measured results separately from configuration readback. Preserve unrelated workflows and concurrent setting changes.
 - Reserve comparison calls durably before dispatch and count failed/timed-out attempts against the total and per-run caps. After interruption, reconcile receipts and resume only undispatched cases; an unknown outcome is not permission to repeat a call or invent a result.
 - Cache completed reviews by source hash, image/input hashes, rubric version, role and model. Skip expensive worker dispatch for unchanged or ineligible work, but include the scheduled controller's remaining overhead in cost estimates.
@@ -56,7 +56,7 @@ On an optimistic-concurrency rejection, re-read the task before exactly one retr
 - Split the check from the work. A frequent watcher task on a cheap model runs a read-only, deterministic check script. Only when work exists does it start the expensive controller task through the scheduler.
   - The script decides, not the model, and the watcher takes no lease.
   - Keep a sparse fallback schedule on the controller.
-  - Escalate by starting a task, not by calling a subagent, because a child cannot exceed its parent's cost tier.
+  - When the harness imposes a parent/child cost-tier ceiling, escalate through an authorized independent task, not a child; verify that ceiling rather than assuming it applies to every harness.
   - A watcher run still pays the fixed context, so trim always-loaded instructions too.
 - Before ending a run while workers continue, verify two things:
   - Each worker survives the host session ending, because it runs in its own console or process group and is not attached to the chat terminal.

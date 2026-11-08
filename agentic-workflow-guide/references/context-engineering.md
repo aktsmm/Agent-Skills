@@ -234,7 +234,7 @@ For always-loaded workspace entry files such as `.github/copilot-instructions.md
 
 **Reduce token cost of definition files that are loaded into every session.**
 
-Always-applied instructions (`copilot-instructions.md`, `AGENTS.md`, `applyTo`-matched `.instructions.md`) and the selected agent's body are sent with every request; prompt files load only when invoked. Verbose always-loaded files waste tokens before the task even starts.
+Project instructions can be persistent context; targeted `.instructions.md` files are conditional, not all sent on every request. Copilot uses `applyTo` for files it works with; Local can attach matching file context or load instructions on demand by `description`. Prompt files load only when invoked in Local. Keep persistent guidance lean; discovery alone does not prove inclusion.
 
 ### What to Keep vs. Remove
 
@@ -256,9 +256,9 @@ Always-applied instructions (`copilot-instructions.md`, `AGENTS.md`, `applyTo`-m
 | Workspace | `.github/prompts/*.prompt.md` (Local harness only; Agent Host does not load prompt files)           |
 | Workspace | `.github/agents/*.agent.md`                                                                         |
 
-Check what actually loaded via Chat view right-click > Diagnostics.
+Nested `AGENTS.md` discovery differs: Copilot follows applicable file paths; Codex builds a root-to-working-directory chain; Local requires `chat.useAgentsMdFile` and experimental `chat.useNestedAgentsMdFiles`. Markdown links do not guarantee inclusion (`chat.includeReferencedInstructions` defaults off in Local). Attach or explicitly read required evidence and verify References/tool activity or Agent Debug Logs. See [instruction activation](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_discovery-and-activation).
 
-Duplicate content across global and workspace scopes doubles token cost.
+Duplicate included content across user and workspace scopes wastes context.
 
 ### Checklist
 

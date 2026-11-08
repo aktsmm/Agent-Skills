@@ -53,11 +53,9 @@ different metadata contract.
 
 ### Host-Specific Frontmatter
 
-`context: fork` (run the skill in a subagent) is experimental and its behavior may change: store it only when the skill already works inline, and never rely on it for correctness. Fields such as `context: fork` can be supported by a host without belonging to
-the Agent Skills common specification. Keep the body, references, and scripts
-portable, declare the supported hosts in `compatibility`, and document the
-fallback for hosts that ignore the extension. A host-aware validator does not
-prove strict common-spec compliance.
+`context: fork` runs a skill in a dedicated subagent on supporting hosts, not necessarily every Agent Skills client. In VS Code, enable `github.copilot.chat.skillTool.enabled` and verify actual forked execution ([official prerequisite](https://code.visualstudio.com/docs/agent-customization/agent-skills#_run-a-skill-in-a-forked-context)). Keep the skill working inline and never depend on fork for correctness; hosts may ignore the extension. A passing YAML validator does not prove execution or common-spec compliance. Declare supported hosts in `compatibility`; keep the body/resources portable.
+
+Validate each file type against its intended harness, not a global frontmatter ban. `argument-hint` is valid in `SKILL.md` even though Copilot custom agents do not support it. Absence from a summary table alone is not evidence that a field is unsupported; see the [skill format](https://code.visualstudio.com/docs/agent-customization/agent-skills#_skillmd-file-format).
 
 ### Accidental Prompt Tool Restrictions
 

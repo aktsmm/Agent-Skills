@@ -36,10 +36,12 @@ This skill does not try to abstract all of Microsoft Graph into a fixed checklis
   - Teams, Planner, To Do, directory, or permission-oriented data
   - schema, permission, throttling, batching, delta, or webhook behavior
 - Directory reads (`/users`, `/users/{id}/manager`) worked with an Azure CLI Graph token in a corporate tenant; `/users/<mail>/manager` returns 404 when mail differs from the UPN, so resolve the id with `/users?$filter=mail eq '<address>'` (URL-encoded) first and walk `/users/{id}/manager`. Do not assume the same token can read mail or files.
+- A file behind a sharing link can be read without knowing its drive: base64url-encode the full link (`u!` prefix, `=` stripped, `/`→`_`, `+`→`-`) and read `/shares/<id>/driveItem` for metadata and `/shares/<id>/driveItem/content` through the blob download (the file may be label-encrypted OLE, not zip). Reads do not imply write access.
 
 ### Write Routing
 
 - Use Microsoft Graph for all writes. Chat-message `mentions` reject a personal Microsoft account (`PersonalMicrosoftAccountUser is not supported in Mentions`, HTTP 400); those users are missing from tenant directory lookups and have empty display names in chat members. Post without a real mention and address them by bold `@name` in the body, or add the mention in the Teams UI, and say so in the report.
+- `POST /chats` with `chatType: oneOnOne` for an existing pair returns the existing chat (201 with the old `createdDateTime`); use its id to post.
 - Treat send, create, update, move, upload, reply, assign, and respond operations as writes.
 - Require explicit confirmation before any write.
 - Keep delete actions disabled by default or behind a stronger confirmation step.

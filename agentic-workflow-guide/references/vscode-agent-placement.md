@@ -32,7 +32,7 @@
 | GitHub organization                      | `github.copilot.chat.organizationCustomAgents.enabled` で検出 |
 
 - Agent Host セッション（Copilot 等）は user agent を VS Code profile ではなく host のフォルダー（上表）から読む。profile 内の旧 user agent は migration が必要。
-- `chat.agentFilesLocations` / `chat.modeFilesLocations` は非推奨（Local agent のみ参照）。追加パスやサブフォルダ指定に使わず、上表の場所へ移す。
+- `chat.agentFilesLocations` remains supported; VS Code forwards configured agents to Agent Host. Only `chat.modeFilesLocations` is deprecated. Prefer native folders for portability: independent Copilot CLI/app clients do not inherit editor search settings. See the [current location contract](https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference#_local-harness-locations-and-migration).
 - monorepo で親 repo の agent を使うには `chat.useCustomizationsInParentRepositories` を有効にする。
 
 ### ファイル拡張子
@@ -42,7 +42,9 @@
 | `.github/agents/` | `.agent.md` または `.md`（どちらも認識される） |
 | `.claude/agents/` | `.md`（Claude Code 互換）                      |
 
-## アクセス制御（3段階）
+## アクセス制御（Local の allowlist）
+
+`user-invocable` and `disable-model-invocation` also apply in Copilot, but `agents` and its explicit-list override below are Local-only. Copilot does not enforce that allowlist; `target: vscode` changes editor interpretation, not the running harness. See [harness compatibility](https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference#_harness-compatibility).
 
 ### frontmatter プロパティ
 
@@ -82,7 +84,7 @@ disable-model-invocation: true
 
 `target` は非推奨ではない（`vscode` / `github-copilot`）。GitHub Copilot cloud agent 向けに `mcp-servers` を使うときは `target: github-copilot`。
 
-## Orchestrator + Workers パターン
+## Orchestrator + Workers パターン（Local）
 
 ```yaml
 # orchestrator.agent.md
@@ -114,7 +116,7 @@ tools: ["search", "execute"]
 - `agents: ['*']` または省略で全許可
 - agent 名は大文字小文字を区別する（`name` と完全一致）
 
-## トラブルシューティング
+## トラブルシューティング（Local）
 
 | 症状                             | 原因                      | 対処                          |
 | -------------------------------- | ------------------------- | ----------------------------- |
