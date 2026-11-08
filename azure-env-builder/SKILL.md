@@ -110,3 +110,4 @@ az deployment group create --resource-group <rg> --template-file main.bicep
 - [ ] MCP tools fetched latest info
 - [ ] Bicep files generated
 - [ ] `az deployment group what-if` succeeded
+- [ ] Verify live app/data-path readiness; a successful resource deployment or `Running` state alone is insufficient

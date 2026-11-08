@@ -6,7 +6,7 @@
 - `Public IPs must have zones configured`: recreate Standard Public IPs with zones.
 - VNet overlap: reassign spoke address spaces.
 - `useRemoteGateways` fails early: apply it only after the hub gateway is complete.
-- MFA / tenant mismatch: switch tenant or re-login before deployment.
+- On MFA-policy ARM denial, verify `aud` / `tid` and `amr` / `acrs` claims for that exact request without exposing the token; do not infer missing RBAC from another audience/tenant or bypass MFA.
 
 ## Phase Detail
 

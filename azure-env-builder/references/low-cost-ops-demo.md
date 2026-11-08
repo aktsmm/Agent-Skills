@@ -7,6 +7,7 @@ Use these patterns when building demo environments for Azure operations, RCA, al
 - Start with **1 demo resource group + 1 minimal app + 1-2 alerts + short-retention logs**.
 - Prefer Azure Container Apps Consumption for low-cost app demos, especially when App Service plan creation fails because regional or subscription VM quota is unavailable.
 - Avoid always-on VMs, AKS, and always-on databases unless the demo specifically requires runtime compute.
+- Flex without always-ready avoids its baseline, not all idle costs; storage, network, and diagnostics can still accrue. Check subscription-specific credits and usage before calling it free.
 - Tag demo resource groups and resources with `purpose`, `costProfile`, `owner`, and `demo` so cleanup is obvious.
 - Keep Log Analytics retention short and avoid verbose logs or high-frequency alert rules.
 

@@ -63,7 +63,7 @@ Azure の障害調査、切り分け、初動確認、復旧確認を read-only 
 
 ## Decision Points
 
-- Auth blocked: report MFA/Conditional Access status and prefer normal browser login when device code is blocked.
+- Auth blocked: report MFA/Conditional Access status and prefer normal browser login when device code is blocked. On Azure MFA-policy denial, verify `aud` / `tid` and `amr` / `acrs` claims for that request without exposing the token; do not infer missing RBAC from another audience/tenant.
 - Resource Graph gaps: child resources may be missing; construct child IDs and query `az resource show --ids` directly.
 - Recovered Resource Health: do not call it ongoing once `Resolved` and current `Available` are confirmed.
 - Run Command RBAC: do not imply guest execution is possible without `Microsoft.Compute/virtualMachines/runCommand/action` or equivalent role evidence.
