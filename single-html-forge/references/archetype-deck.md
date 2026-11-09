@@ -96,7 +96,7 @@ They are hidden in the deck and surfaced only in the overlay.
 
 **The deck runtime has no separate presenter window.** Populating a second window needs `document.write` or `innerHTML`, which the runtime invariants forbid — that is the same restriction that makes the closed-world check sound. A same-window overlay gives the same information without reopening that surface.
 
-A second-window presenter view exists only in the review wrapper built by `build_review_viewer.py`, which is outside the verifier.
+A second-window presenter view exists only in the review wrapper built by `build_review_viewer.py`, which is outside the verifier. Its presenter and audience windows synchronize both slides and reveal steps.
 
 ## Outline layout
 

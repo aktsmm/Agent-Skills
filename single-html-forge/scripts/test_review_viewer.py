@@ -10,6 +10,7 @@ except ImportError:  # pragma: no cover
     sync_playwright = None
 
 SKEL = Path(__file__).resolve().parent.parent / "assets" / "skeletons" / "deck-outline-skeleton.html"
+MOTION_SKEL = Path(__file__).resolve().parent.parent / "assets" / "skeletons" / "deck-motion-skeleton.html"
 
 
 @unittest.skipIf(sync_playwright is None, "playwright is not installed")
@@ -376,6 +377,64 @@ class ReviewViewerTest(unittest.TestCase):
                 pres.click("#prev")
                 main.wait_for_function("document.querySelector('#where').textContent.includes('2 / 3')")
                 pres.wait_for_function("document.querySelector('#clock').textContent !== ''")
+                browser.close()
+
+    def test_presenter_synchronizes_slide_steps_in_both_directions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "review.html"
+            build_review_viewer.build(MOTION_SKEL, out)
+            with sync_playwright() as pw:
+                browser = pw.chromium.launch()
+                context = browser.new_context(viewport={"width": 1400, "height": 800})
+                main = context.new_page()
+                errors = []
+                main.on("pageerror", lambda error: errors.append(str(error)))
+                main.goto(out.as_uri())
+                main.wait_for_function("document.querySelectorAll('#list button').length === 3")
+                main.click("#list button:nth-child(2)")
+                main.frames[1].wait_for_selector('[data-slide-id="s2"].is-active')
+                main.click("#next")
+                main.frames[1].wait_for_selector('html[data-shf-current-step="1"]')
+                pres = context.new_page()
+                pres.on("pageerror", lambda error: errors.append(str(error)))
+                pres.goto(out.as_uri() + "#presenter")
+                pres.wait_for_function("document.querySelectorAll('#list button').length === 3")
+                pres.frames[1].wait_for_selector('[data-slide-id="s2"].is-active')
+                pres.frames[1].wait_for_selector('html[data-shf-current-step="1"]')
+                pres.click("#next")
+                main.frames[1].wait_for_selector('html[data-shf-current-step="2"]')
+                pres.click("#prev")
+                main.frames[1].wait_for_selector('html[data-shf-current-step="1"]')
+                main.click("#prev")
+                pres.frames[1].wait_for_selector('html[data-shf-current-step="0"]')
+                main.click("#next")
+                pres.frames[1].wait_for_selector('html[data-shf-current-step="1"]')
+                pres.click("#next")
+                pres.click("#next")
+                main.frames[1].wait_for_selector('[data-slide-id="s3"].is-active')
+                main.click("#prev")
+                pres.frames[1].wait_for_selector('[data-slide-id="s2"].is-active')
+                pres.frames[1].wait_for_selector('html[data-shf-current-step="2"]')
+                main.click("#list button:nth-child(1)")
+                pres.frames[1].wait_for_selector('[data-slide-id="s1"].is-active')
+                pres.frames[1].locator('[data-shf-action="next"]').click()
+                main.frames[1].wait_for_selector('[data-slide-id="s2"].is-active')
+                main.frames[1].wait_for_selector('html[data-shf-current-step="0"]')
+                main.evaluate("""() => {
+                    window.testChannel = new BroadcastChannel(
+                        Object.keys(localStorage).find(k => k.startsWith('review-sync:')).replace('review-sync:', 'shf-slide:')
+                    );
+                    window.testChannel.postMessage({id: 's2', step: 2, sender: 'test-reorder', sequence: 2});
+                }""")
+                pres.frames[1].wait_for_selector('html[data-shf-current-step="2"]')
+                main.evaluate("""() => {
+                    window.testChannel.postMessage({id: 's2', step: 1, sender: 'test-reorder', sequence: 1});
+                    window.testChannel.postMessage({id: 's2', step: 999, sender: 'test-invalid', sequence: 1});
+                    window.testChannel.close();
+                }""")
+                pres.wait_for_timeout(200)
+                self.assertEqual(pres.frames[1].locator("html").get_attribute("data-shf-current-step"), "2")
+                self.assertEqual(errors, [])
                 browser.close()
 
     def test_panel_closes_reopens_and_toggles_with_shortcut(self):

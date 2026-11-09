@@ -222,6 +222,12 @@ __PDF_BLOCK__<script>
     var s = d && d.querySelector("#shf-root > [data-slide-id].is-active");
     return s ? s.getAttribute("data-slide-id") : null;
   }
+  function currentPosition() {
+    var d = deckDoc(), root = d && d.documentElement, id = currentId();
+    if (!root || !id) return null;
+    var n = Number(root.getAttribute("data-shf-current-step"));
+    return { id: id, step: Number.isInteger(n) && n >= 0 ? n : 0 };
+  }
 
   function matches(s) {
     var e = data[s.id];
@@ -291,19 +297,58 @@ __PDF_BLOCK__<script>
     if (btn) btn.click();
     syncNow();
   }
+  var lastPosition = null, applyingRemote = false, sequence = 0;
+  var sender = Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+  var received = Object.create(null);
   function syncNow() {
-    var id = currentId();
-    if (id && id !== shown) show(id);
+    var pos = currentPosition();
+    if (!pos) return;
+    if (pos.id !== shown) show(pos.id);
+    if (!lastPosition || pos.id !== lastPosition.id || pos.step !== lastPosition.step) {
+      lastPosition = pos;
+      if (!applyingRemote) announce(pos);
+    }
   }
 
   var bc = null;
-  try { bc = new BroadcastChannel("shf-slide:__KEY__"); bc.onmessage = function (e) { onRemote(e.data && e.data.id); }; } catch (e) { bc = null; }
-  window.addEventListener("storage", function (e) { if (e.key === SYNC_KEY && e.newValue) onRemote(e.newValue.split("|")[0]); });
-  function announce(id) {
-    if (bc) bc.postMessage({ id: id });
-    try { localStorage.setItem(SYNC_KEY, id + "|" + Date.now()); } catch (e) {}
+  try { bc = new BroadcastChannel("shf-slide:__KEY__"); bc.onmessage = function (e) { onRemote(e.data); }; } catch (e) { bc = null; }
+  window.addEventListener("storage", function (e) {
+    if (e.key !== SYNC_KEY || !e.newValue) return;
+    try { onRemote(JSON.parse(e.newValue)); } catch (err) { onRemote({ id: e.newValue.split("|")[0], step: 0 }); }
+  });
+  function announce(pos) {
+    var message = { id: pos.id, step: pos.step, sender: sender, sequence: ++sequence };
+    if (bc) bc.postMessage(message);
+    try { localStorage.setItem(SYNC_KEY, JSON.stringify(message)); } catch (e) {}
   }
-  function onRemote(id) { if (id && id !== shown && indexOf(id) >= 0) go(id); }
+  function onRemote(pos) {
+    if (!pos || typeof pos.id !== "string" || indexOf(pos.id) < 0 ||
+        !Number.isInteger(pos.step) || pos.step < 0) return;
+    if (typeof pos.sender === "string" && Number.isSafeInteger(pos.sequence) && pos.sequence > 0) {
+      if (pos.sequence <= (received[pos.sender] || 0)) return;
+      received[pos.sender] = pos.sequence;
+    }
+    var d = deckDoc(), slide = d && [].find.call(d.querySelectorAll("#shf-root > [data-slide-id]"), function (node) {
+      return node.getAttribute("data-slide-id") === pos.id;
+    });
+    if (!slide) return;
+    var max = [].reduce.call(slide.querySelectorAll("[data-shf-step]"), function (n, node) {
+      return Math.max(n, Number(node.getAttribute("data-shf-step")) || 0);
+    }, 0);
+    if (pos.step > max) return;
+    applyingRemote = true;
+    try {
+      if (currentId() !== pos.id) go(pos.id);
+      var current = currentPosition();
+      while (current && current.id === pos.id && current.step !== pos.step) {
+        var before = current.step;
+        step(pos.step > before ? 1 : -1);
+        current = currentPosition();
+        if (!current || current.step === before) break;
+      }
+      syncNow();
+    } finally { applyingRemote = false; }
+  }
 
   function show(id) {
     shown = id;
@@ -322,7 +367,6 @@ __PDF_BLOCK__<script>
     updateSummary();
     try { localStorage.setItem(LAST_KEY, id); } catch (err) {}
     if (!PRES) { try { history.replaceState(null, "", "#" + id); } catch (err) {} }
-    announce(id);
   }
   function store() {
     if (!shown) return;
@@ -857,15 +901,20 @@ __PDF_BLOCK__<script>
     if (side && side.getAttribute("aria-expanded") === "true") side.click();
     readSlides();
     var rootEl = d && d.getElementById("shf-root");
-    if (rootEl && window.MutationObserver) new MutationObserver(syncNow).observe(rootEl, { subtree: true, attributes: true, attributeFilter: ["class", "hidden"] });
+    if (rootEl && window.MutationObserver) new MutationObserver(syncNow).observe(d.documentElement, { subtree: true, attributes: true, attributeFilter: ["class", "hidden", "data-shf-current-step"] });
     var want = null;
     var h = location.hash.replace(/^#/, "");
     if (h && h !== "presenter") want = /^\d+$/.test(h) ? (slides[parseInt(h, 10) - 1] || {}).id : h;
     if (!want) {
-      try { want = PRES ? (localStorage.getItem(SYNC_KEY) || "").split("|")[0] : localStorage.getItem(LAST_KEY); } catch (e) { want = null; }
+      try {
+        var saved = PRES ? localStorage.getItem(SYNC_KEY) : null;
+        if (saved) {
+          try { onRemote(JSON.parse(saved)); } catch (err) { onRemote({ id: saved.split("|")[0], step: 0 }); }
+        } else want = localStorage.getItem(LAST_KEY);
+      } catch (e) { want = null; }
     }
     if (want && indexOf(want) >= 0 && want !== currentId()) go(want);
-    var id = currentId(); if (id) show(id);
+    syncNow();
     try { frame.contentWindow.focus(); } catch (e) {}
   });
   window.setInterval(function () {
