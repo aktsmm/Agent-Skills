@@ -6,6 +6,6 @@
 2. `workstreams/README.md` と各案件 README の名称、判定キーワード、現在の範囲を照合する。
 3. 一意に一致した場合は、短い入力の原文を `_inbox/` に残し、必要に応じて `workstreams/{workstream-id}/updates/YYYY-MM-DD_{topic}.md` に要約を作成する。案件 README の状態、現在のボール、更新履歴、オープンアクションを同時に更新する。
 4. 会議メモは `meeting-notes/` を原本にし、案件 README には関連ファイルへのリンクと会議による案件状態の変更だけを追記する。
-5. 新規、複数該当、または低確信の場合は `workstreams/_candidates.md` に `candidate` として記録し、案件フォルダを作らずに、名称、範囲、関連案件の確認を求める。
+5. 新規、複数該当、または低確信の場合は `workstreams/_candidates.md` に `candidate` として記録し、案件フォルダを作らずに、名称、範囲、関連案件の確認を求める。ユーザーの常時承認があり、顧客要望と提供根拠（LA・オーダー発行など）が揃った候補は、案件化して `promoted` とリンクを残し事後報告する（詳細は portfolio rules）。
 
 案件の状態は `candidate`、`not-started`、`in-progress`、`blocked`、`done`、`dropped` を使う。`blocked` には、現在のボールと次に状態が進む条件を必ず記録する。

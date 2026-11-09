@@ -17,7 +17,7 @@ workstreams/
 
 ## Create a Workstream
 
-- Create a folder only after the user confirms the workstream name and scope.
+- Create a folder only after the user confirms the workstream name and scope. Exception: if the user has granted standing approval to execute next steps unprompted and the candidate has a confirmed driver (customer request plus delivery basis such as an issued LA/order), promote it with the proposed name and scope, mark the candidate `promoted` with a link, and report the name and scope afterward.
 - Use a lowercase kebab-case ID. Do not put customer names, people, external case IDs, or dates in the folder name.
 - Start from `workstream-readme.md`. Record a named current owner, status, open actions, timeline, source links, and routing keywords.
 - Do not create a workstream for a one-off question or an unconfirmed idea. Record it in `_candidates.md` first.
