@@ -1,7 +1,7 @@
 ---
 name: ai-cli-benchmark
-description: "Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, prompt-cache diagnosis, cache read/write analysis, fresh-process latency measurement, token-cost comparison, or when a benchmark must separate provider caching from local CLI caches."
-argument-hint: "比較対象、dataset/prompt、model、測定回数、cache観測条件、出力先"
+description: "Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, generation-limit diagnosis, prompt-cache diagnosis, cache read/write analysis, fresh-process latency measurement, token-cost comparison, or when a benchmark must separate provider caching from local CLI caches."
+argument-hint: "比較対象、dataset/prompt、model、測定回数、応答上限/全体予算、cache観測条件、出力先"
 disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -26,6 +26,25 @@ metadata:
 - OpenAI prompt cacheは手動消去できない。GPT-5.6以降をResponses APIから直接呼ぶ場合だけ、explicit-only modeでbreakpointを置かず、そのrequestのcache writeを避けられる。CLIへ推測適用しない。
 - nonceはuser prompt全体の一致を避ける補助であり、その前のhidden system / agent prefixのcache readを防がない。
 
+## Generation Limits
+
+- Separate model context/output ceilings, per-response caps, request/job
+  deadlines, and authorized cumulative budgets. Check actual counted input
+  and effective wire settings, including whether reasoning shares the output
+  cap. Check each parent/child session's input/history plus output against
+  its own context; aggregate accounting must still include internal, child,
+  title, and retry requests.
+- Leave room for required tool/test/follow-up turns. Arithmetic fit is not
+  evidence that the task can finish: use the first selected real task as the
+  pilot, not an extra unrelated generation probe. Keep actual usage separate
+  from conservative reservations; unknown usage is not zero.
+- On length/budget termination, preserve the original run and earliest
+  refusal/finish reason. Report completion separately from independent quality;
+  termination alone is not a quality failure. Reconcile existing debits and
+  remaining work before a corrected cohort; do not retry unchanged limits,
+  reset the cumulative ledger, or enlarge a separately authorized ceiling
+  without approval. Record changed limits rather than pooling old/new cohorts.
+
 ## Workflow
 
 1. **Freeze the task**
@@ -36,7 +55,7 @@ metadata:
    - API直呼びとCLI起動込み時間を`model speed`として並べない。
 3. **Isolate each CLI**
    - repo外のowned temp directory、fresh process、一時`COPILOT_HOME` / auth-only `CODEX_HOME`を使う。
-   - custom instructions、tools、MCP、session reuseを無効にし、secretを子processとlogへ渡さない。
+   - custom instructions、tools、MCP、session reuseは比較条件に必要なものだけ固定して残し、他は無効にする。secretを子processとlogへ渡さない。
 4. **Observe cache; do not assume control**
    - 必要ならprompt先頭へ一意nonceを入れ、nonce本体ではなくhashだけ保存する。
    - zero-cache-read gateは診断用。失敗はprovider cacheの観測であり、benchmark失敗として隠さない。
@@ -70,7 +89,7 @@ metadata:
 - [ ] cache read/writeを別fieldで保存する。
 - [ ] 測定境界とaccuracyを一緒に報告する。
 - [ ] 複数runなしの速度差へ因果を割り当てない。
-- [ ] benchmark JSON validatorがPASSする。
+- [ ] benchmark JSON validatorがPASSする（shape/cache検査と実課題の完走証拠は別）。
 
 ## References
 
