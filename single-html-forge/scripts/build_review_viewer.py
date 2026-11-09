@@ -65,6 +65,9 @@ textarea:focus { outline: 2px solid var(--accent); }
 #panelhead { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
 #panelhead h1 { flex: 1; }
 #panelhead button { padding: 2px 8px; }
+#themes { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+#themes button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+body.pres #themes { display: none; }
 #stale { display: none; padding: 6px 8px; border-left: 3px solid #b45309; background: #fff7ed; font-size: 12px; border-radius: 4px; }
 #stale.on { display: block; }
 #stale button { margin-top: 4px; }
@@ -109,7 +112,7 @@ body.pres #app { --panel: 46vw; }
 <div id="split" role="separator" aria-orientation="vertical" aria-label="スライドとコメント欄の境界" tabindex="0" title="ドラッグで幅を変更（ダブルクリックで初期化）"></div>
 <aside id="panel">
 <header>
-<div id="panelhead"><h1>コメント</h1><button type="button" id="savepdf" hidden title="埋め込み済みの PDF を保存（ブラウザーの印刷設定に依存しない）">PDF 保存</button><button type="button" id="pv" title="発表者ビューを別ウィンドウで開く（メモ・次のスライド・タイマー）">発表者ビュー</button><button type="button" id="fs" title="全画面で発表（コメント欄を隠す）">発表（全画面）</button><button type="button" id="close" aria-label="コメント欄を閉じる" title="コメント欄を閉じる（Alt+C）">×</button></div>
+<div id="panelhead"><h1>コメント</h1><span id="themes" role="group" aria-label="配色"></span><button type="button" id="savepdf" hidden title="埋め込み済みの PDF を保存（ブラウザーの印刷設定に依存しない）">PDF 保存</button><button type="button" id="pv" title="発表者ビューを別ウィンドウで開く（メモ・次のスライド・タイマー）">発表者ビュー</button><button type="button" id="fs" title="全画面で発表（コメント欄を隠す）">発表（全画面）</button><button type="button" id="close" aria-label="コメント欄を閉じる" title="コメント欄を閉じる（Alt+C）">×</button></div>
 <div id="where">読み込み中</div>
 <div id="summary"></div>
 <div id="nav"><button type="button" id="prev">前</button><button type="button" id="next">次</button><button type="button" id="grid" title="スライド一覧（G）">一覧</button><label>移動 <input type="number" id="jump" min="1" aria-label="スライド番号へ移動"></label></div>
@@ -812,8 +815,37 @@ __PDF_BLOCK__<script>
     });
   }
 
+  // Colour presets override the deck's own shf-theme tokens at view time only; the deck file is not modified.
+  var THEME_KEY = "review-theme:__KEY__";
+  var PRESETS = [
+    { id: "deck", label: "既定", vars: null },
+    { id: "light", label: "ライト", vars: { accent: "#0067b8", bg: "#ffffff", fg: "#1b1f27", muted: "#5b6472", surface: "#f6f8fb", line: "#d7dde6" } },
+    { id: "navy", label: "ネイビー", vars: { accent: "#2bc4b4", bg: "#0b1f3a", fg: "#eef3f8", muted: "#a9bdd2", surface: "#12305a", line: "#2a4a75" } },
+    { id: "charcoal", label: "チャコール", vars: { accent: "#f2a63b", bg: "#1f2023", fg: "#f3efe8", muted: "#b7ad9d", surface: "#2b2c30", line: "#45464c" } }
+  ];
+  var themeBox = $("themes"), themeBase = null;
+  function savedTheme() { try { return localStorage.getItem(THEME_KEY) || "deck"; } catch (e) { return "deck"; } }
+  function applyTheme(id, persistIt) {
+    var d = deckDoc(), el = d && d.getElementById("shf-theme"), p = null;
+    PRESETS.forEach(function (x) { if (x.id === id) p = x; });
+    if (!el || !p) return;
+    if (themeBase === null) themeBase = el.textContent;
+    el.textContent = p.vars ? themeBase + ":root{" + Object.keys(p.vars).map(function (k) { return "--shf-color-" + k + ":" + p.vars[k]; }).join(";") + "}" : themeBase;
+    [].forEach.call(themeBox.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", b.dataset.theme === id ? "true" : "false"); });
+    if (persistIt) { try { localStorage.setItem(THEME_KEY, id); } catch (e) {} }
+  }
+  PRESETS.forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button"; b.dataset.theme = p.id; b.textContent = p.label; b.setAttribute("aria-pressed", "false");
+    b.title = "スライドの配色を切り替え（保存されます）";
+    b.addEventListener("click", function () { applyTheme(p.id, true); });
+    themeBox.appendChild(b);
+  });
+
   frame.addEventListener("load", function () {
     var d = deckDoc();
+    themeBase = null;
+    applyTheme(savedTheme(), false);
     installOutlineSplitter(d);
     if (d) {
       installDeckTools(d);

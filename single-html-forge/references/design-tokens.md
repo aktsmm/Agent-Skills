@@ -53,6 +53,8 @@ Relative luminance per channel: `c/255`, then `c<=0.03928 ? c/12.92 : ((c+0.055)
 
 The default accent `#0067b8` on white is about 5.6:1, so it is safe for body text. Lighten it much and it stops being.
 
+Deck CSS v11 and later draw the bottom control bar and the settings panel from the theme (`--shf-color-bg`, `--shf-color-fg`, `--shf-color-surface`, `--shf-color-line`), so a dark theme gets a dark bar. Older versions fixed the bar to light grey, which made themed buttons unreadable on a dark theme. Inline SVG colours are literal and do not follow the theme, including the review viewer's colour presets, so pick SVG fills that read on both light and dark backgrounds.
+
 ## Reusing a look
 
 The `<style id="shf-theme">` block is the design system — everything else is hash-pinned — so carrying that block into the next artifact carries the palette and spacing with it. Keep it beside the artifacts when a series has to match, and derive the palette once rather than per file. It does not make two artifacts identical: archetype, markup, viewport and the fonts the machine resolves all still differ, and glyphs never match exactly across machines ([japanese-typography.md](japanese-typography.md)).
