@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" data-shf-archetype="deck" data-shf-layout="outline" class="shf-outline-off" data-shf-runtime="8" data-shf-css="12">
+<html lang="ja" data-shf-archetype="deck" data-shf-layout="outline" class="shf-outline-off" data-shf-runtime="8" data-shf-css="13">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -430,8 +430,16 @@ html[data-shf-layout="outline"].shf-outline-off #shf-root {
     height: auto;
   }
   body {
-    background: #fff;
+    background: var(--shf-color-bg);
     display: block;
+  }
+  html,
+  body,
+  #shf-root,
+  [data-slide-id],
+  [data-shf-print-slide] {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
   #shf-root {
     width: 100%;
@@ -726,6 +734,7 @@ html[data-shf-layout="outline"].shf-outline-off #shf-root {
     height: 100vh;
     container-type: size;
     break-after: page;
+    background: var(--shf-color-bg);
   }
   [data-shf-print-slide]:last-child {
     break-after: auto;

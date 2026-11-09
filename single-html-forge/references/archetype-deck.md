@@ -188,6 +188,8 @@ Current deck CSS sets a 16in x 9in page with zero margins. Tier 2 and PDF export
 
 The `print` button in the chrome calls the browser's own print dialog, so a recipient can save a PDF without any tooling. It is the only path available to someone who just opened the file, and it disappears in the printed output along with the rest of the chrome.
 
+Print pages carry the theme background and request exact colour (CSS v13+), so a dark theme prints as it looks on screen even with the dialog's "Background graphics" off; earlier versions printed light text on white. `http(s)` links stay clickable in the exported PDF (checked with a link-annotation count), while a `#fragment` link needs a visible target on a printed page or finalization stops.
+
 ## Common mistakes
 
 - Writing paragraphs instead of lines. A deck is read at a distance.
