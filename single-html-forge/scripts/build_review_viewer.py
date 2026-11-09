@@ -100,7 +100,7 @@ body.pres #notes { flex: 1; overflow: auto; border-bottom: 0; }
 body.pres #notesBody { font-size: 20px; max-height: none; }
 body.pres #app { --panel: 46vw; }
 @media print { @page { size: 16in 9in; margin: 0; } }
-@media (max-width: 900px) { #app { --panel: 40vh; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 10px var(--panel); } #panel { border-left: 0; overflow: auto; } textarea { min-height: 90px; } #split { cursor: row-resize; } #split::after { inset: 3px calc(50% - 24px); } }
+@media (max-width: 640px) { #app { --panel: 40vh; grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 10px var(--panel); } #panel { border-left: 0; overflow: auto; } textarea { min-height: 90px; } #split { cursor: row-resize; } #split::after { inset: 3px calc(50% - 24px); } }
 </style>
 </head>
 <body>
@@ -587,7 +587,7 @@ __PDF_BLOCK__<script>
   }
 
   var split = $("split");
-  var stackedQuery = window.matchMedia("(max-width: 900px)");
+  var stackedQuery = window.matchMedia("(max-width: 640px)");
   function splitKey() { return stackedQuery.matches ? "review-split-h" : "review-split-w"; }
   function setPanel(px) {
     var stacked = stackedQuery.matches;
