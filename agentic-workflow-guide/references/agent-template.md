@@ -195,7 +195,7 @@ Use these aliases first:
 | Subagent | `agent`         |
 | Todo     | `todo`          |
 
-Avoid raw runtime tool IDs in `.agent.md` frontmatter. Names such as `read_file`, `grep_search`, and `semantic_search` are chat/runtime tool identifiers, not portable custom-agent tool names, and they trigger validation errors.
+Treat authored tool references and runtime registration names as separate inventories. A successful native tool call does not validate that name in frontmatter; use destination-harness completions/inventory, supported aliases, and configured MCP server names. Neither a familiar prefix nor success in another client proves availability.
 
 Body から特定ツールを明示したい場合は `#tool:<name>` 参照を使う。
 
@@ -206,7 +206,7 @@ Use #tool:web when external documentation is required.
 
 > **Local worker tools**: Generic subagents inherit the parent's selected tools; named custom workers can override them. An agent-only coordinator can delegate editing to a custom worker. Choose the boundary deliberately and verify effective capabilities; do not infer a universal parent ceiling. See [Pitfall 7](agent-guide.md#pitfall-7-confusing-generic-and-custom-worker-tools-local) and the [official example](https://code.visualstudio.com/docs/agents/run/subagents#_delegate-implementation-to-a-worker).
 
-### ⚠️ tools フィールドの注意事項
+### Local の tools フィールド
 
 **個別ツールは `category/toolName` 形式で指定する。** 旧フラット名やカテゴリ違いは利用不可として黙って無視される。
 
@@ -223,7 +223,13 @@ Use #tool:web when external documentation is required.
 
 `githubRepo` / `githubTextSearch` はカテゴリなしの ID。Local の subagent では todo と `vscode/askQuestions` は使えない。
 
-**Portable な書き方**: Agent Host（Copilot CLI harness）は認識できない tool 名を黙って無視するため、上表の個別 ID だけの `tools:` は harness によってツールが 0 件になり得る。両 harness で使う資産は tool set 別名（`read` / `edit` / `search` / `execute` / `agent` / `web` / `todo`）で書き、本文の手順は `read_file` / `run_in_terminal` / `runSubagent` のような harness 固有のツール名ではなく「ファイル読み取り」「shell 実行」「サブエージェント起動」と能力で記述する。MCP は `<server>/*` で指定する。
+**Portable な書き方**: 上表は Local の例であり Copilot の許可リストではない。両 harness で使う資産は対応済みの tool set 別名を優先し、本文は内部 tool 名でなく能力で記述する。MCP は実際の構成名による `<server>/*` を使い、namespace 内の変更系操作にも役割の禁止事項を適用する。警告を消すためだけに `tools: ['*']` へ広げない。
+
+### Migration Verification
+
+- Parse the original and revised YAML without repairing whitespace first; inspect body references as well as frontmatter. Replacing Local handoffs or memory must preserve explicit approval, no-rerun, persistence and user-controlled transition rules.
+- Check unknown-tool Hints in the destination editor, not just error counts. If the diagnostic tool omits that severity, validate against the destination inventory and report the UI check as unverified. Report editor schema acceptance and standalone CLI warnings separately; `target` does not make them equivalent.
+- Freeze the installed definition before a representative run. Exercise planning-only, approved execution, completed/no-rerun and read-only paths where applicable; verify the exact saved output schema and a subsequent read of the same file. An edited definition invalidates that run's evidence; rerun affected cases, not unchanged agents.
 
 ## Agent Body Structure
 

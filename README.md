@@ -20,7 +20,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | Skill | Description / 説明 |
 | --- | --- |
 | [agentic-workflow-guide](agentic-workflow-guide/) | Design, review, and debug agent workflows, and decide when a request should use a prompt, instruction, skill, agent, or hook before escalating to multi-agent design. Use for .ag... |
-| [ai-cli-benchmark](ai-cli-benchmark/) | Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, pr... |
+| [ai-cli-benchmark](ai-cli-benchmark/) | Design, run, and review fair performance, token, and cost comparisons across GitHub Copilot CLI, Codex CLI, and direct model APIs. Use for AI CLI benchmark, Copilot vs Codex, ge... |
 | [analyze-copilot-sessions](analyze-copilot-sessions/) | Analyze historical VS Code GitHub Copilot Chat sessions by model, reasoning effort, AIU, time, reliability, workflow behavior, and external quality evidence, or safely prune wor... |
 | [animated-infographic](animated-infographic/) | Create reproducible animated infographic GIFs from structured data or measured results, with audience-language labels, explicit timing semantics, representative-frame QA, and a... |
 | [archify](archify/) | Create polished, validated architecture, workflow, sequence, data-flow, and lifecycle/state diagrams as explorable standalone HTML with inline SVG, dark/light themes, optional t... |

@@ -85,7 +85,7 @@ Threshold details: [references/splitting-criteria.md](references/splitting-crite
 ## Review Gates
 
 - [ ] Primitive choice is simpler than agent if possible
-- [ ] Placement fits; entry files stay thin; fields, model IDs and delegation tools match the intended harness and runtime ([checklist](references/review-checklist.md)).
+- [ ] Placement fits; entry files stay thin; authored fields/tools match the destination inventory, runtime behavior is tested separately, and unobserved editor Hints remain unverified ([checklist](references/review-checklist.md)).
 - [ ] Delete unnecessary or self-evident text, including rationale sentences that do not change a decision, before shortening, only if normal/exception/stop decisions stay unchanged; then consider merge / split / move before additions. Preserve evidence, nontrivial procedures, scope, required examples, metadata, approvals, unverified requirements and failure/recovery conditions; age alone does not obsolete history, and unsaved notes stay protected.
 - [ ] Single responsibility per agent is preserved
 - [ ] Errors can be detected and stopped early

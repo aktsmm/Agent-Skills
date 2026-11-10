@@ -35,7 +35,7 @@ Minimum items to verify:
 - [ ] Is there any possibility of infinite loops?
 - [ ] Are related files (references, scripts) simple and minimal? (DRY)
 - [ ] Are deterministic steps offloaded to scripts / IR / hooks instead of LLM loops? (Deterministic Offload)
-- [ ] Are fields and model identifiers checked against the intended harness's current schema/completions, including unsupported allowlists and body tool references, rather than repo convention or `target` changes that only silence warnings? (Harness Hygiene)
+- [ ] Are authored fields/tools checked against the destination schema/inventory, separately from runtime names and CLI success, without using `target` or all-tool grants just to silence warnings? (Harness Hygiene)
 - [ ] Are sub-review / sub-agent findings (file sizes, line ranges, duplication claims, missing sections) verified against the actual code by grep / read before being acted on? (Sub-Review Verification)
 - [ ] Do delegated workers distinguish `executed with 0 results` from `not run`, `blocked`, and `failed`?
 - [ ] Before a new detection rule becomes a blocking gate, was its precision measured against the real corpus, and were low-precision signals demoted to a report-only lane? (Measured Gate)
@@ -131,6 +131,8 @@ Minimum items to verify:
 - [ ] Are repo-local authoring rules consistent with the current platform support matrix?
 - [ ] If local rules and platform-supported keys conflict, is that drift called out explicitly before bulk edits?
 - [ ] Is there a mechanical scan for both missing and unsupported keys?
+- [ ] Does diagnostic evidence include unknown-tool Hints, or explicitly leave that UI check unverified when only errors/warnings were retrieved?
+- [ ] Do immutable-definition smoke cases preserve approval, no-rerun and read-only transitions, with the exact output schema and same-file post-write read-back verified where applicable?
 - [ ] For `.prompt.md`, is `tools:` omitted unless the prompt deliberately needs an allowlisted tool set?
 - [ ] If a prompt references an agent, does it avoid overriding that agent's tools accidentally?
 - [ ] Before narrowing or moving an instruction's `applyTo`, was the whole instruction read, and was each rule checked against the files that would stop loading it?

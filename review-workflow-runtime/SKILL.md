@@ -103,7 +103,7 @@ metadata:
 - Python: 構文確認、該当テスト、`--help`、安全な dry-run
 - PowerShell: `[scriptblock]::Create((Get-Content -Raw -Encoding UTF8 <file>))`
 - Node: package scripts、typecheck、lint、dry-run 相当
-- 各検査を `PASS` / `FAIL` / `NOT_RUN` で記録し、実行できない場合は理由と代替確認を明記する
+- 各検査を `PASS` / `FAIL` / `NOT_RUN` で記録し、未実行理由と代替確認を明記する。診断の取得対象 severity を確認し、error 0件を Hint 0件、CLI 成功をエディターの tool 指定名の妥当性へ昇格させない
 - deterministic な検査を限定 read や目視で代替した場合、その項目を `PASS` に昇格させない
 - 必須検査が `NOT_RUN`、必須ファイルが read 不可、または coverage が不足する場合は修正を止め、総合判定を `INCOMPLETE` とする
 - 一時 validator、IR、log を作った場合は検証後に削除する
