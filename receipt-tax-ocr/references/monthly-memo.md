@@ -15,6 +15,7 @@ This memo format is optimized for Japanese sole-proprietor or side-business expe
 
 - Create the memo when adding the first receipt for the month
 - Append to the existing memo if it already exists
+- A later clarification updates the existing transaction row, linked filename, totals, and pending status together; do not append a second expense. Keep unrelated unresolved funding facts pending and distinguish evidence-file count from transaction count.
 
 ## 補助画像 vs 対象外
 

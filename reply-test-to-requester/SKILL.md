@@ -1,5 +1,5 @@
 ---
-name: report-poc-to-requester
+name: reply-test-to-requester
 description: "Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマリ・証跡のフルパス. Builds a paste-ready report with conclusion first, results per item, remaining work, cleanup and cost, and the full paths of the evidence. Does not run or re-run validation."
 disable-model-invocation: true
 argument-hint: "対象の検証フォルダー（省略時は会話の主題の検証）と、宛先の想定や強調したい点"
@@ -8,7 +8,7 @@ metadata:
   author: aktsmm
 ---
 
-# Report PoC To Requester
+# Reply Test To Requester
 
 PoC の結果を、依頼主へそのまま貼れる報告文に整える。検証の実行や追試はしない。材料は対象検証の成果物と今回の会話だけ。
 
@@ -38,6 +38,7 @@ PoC の結果を、依頼主へそのまま貼れる報告文に整える。検�
 - 否定結果（できない・出ない）は「段階（呼ぶ・読む・書く等）×環境×試した種別・回数」に分ける。1回・1種別の観測は「試した範囲では」と限定し、「できなかった」と一括で断定しない。
 - 実測・本人の申告・仮説・未確認を区別する。検証用環境の反映遅れなど環境の注意は前提に書き、未達を製品の制約と断定しない。
 - 本文に入れない: 実ID（テナント・サブスクリプション・リソース）、秘密値、個人のメールアドレス、ローカル絶対パス、差し込み欄（`<…>`）、コードフェンス。
+- 対象条件を代用で検証した場合（ライセンスを外した代役ユーザー、検証用テナントなど）は、代用の内容と、対象条件の結果と断定しない旨を前提に書き、残りの確認条件を「残っていること」に入れる。
 - 費用は「概算」と「未計測」を区別し、課金が続く資源は名前と日額を書く。作成物は「作ったもの・手動保持・削除はご指示後」と残存を明記する。
 - 本人の業務アカウントなど実環境を使った場合は、変更の有無（作成なし等）と後片付けを書く。
 - 画面証跡に業務名・通知などが写るものがあれば、外部共有前の確認を注記する。

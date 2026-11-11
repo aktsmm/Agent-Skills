@@ -98,6 +98,10 @@ Background/minimized rendering can contribute to actionability timeouts, but it 
 
 Keep ordinary scoped click/fill as the default. Only choose JS click as the single recovery when its semantics are acceptable and any prior write is known not to have applied. Synthetic events are not equivalent to trusted input. Verify durable state; an ambiguous timeout stops writes rather than triggering another click method or automatic foreground activation.
 
+Page-coordinate mouse input (`page.mouse`) takes CSS pixels, but a saved screenshot can be scaled by the device pixel ratio. Take coordinates from `bounding_box()` or divide image coordinates by the ratio; a click at image coordinates silently lands on the wrong control.
+
+A "Copy link" button that writes the clipboard needs a real mouse press (hover, short wait, down/up) and an origin clipboard permission. Over CDP, grant it first (`Browser.grantPermissions` with clipboard read/write for that origin), then read the OS clipboard and confirm the value is a link before using it. Never log or save a secret-bearing link.
+
 A broad locator (for example `aria-label*="Attach"`) can start matching extra elements after the page state changes (a "Remove attachment" button appears once a file is attached) and then fails with a strict-mode violation. Pin the exact `aria-label` or role name.
 
 A first-visit "New Feature" tour dialog leaves a backdrop that intercepts every click (the log names a `DialogSurface__backdrop`) while its own Close button may not match by role; Escape dismisses it. Fluent-style forms expose selects as `role=combobox` with options in a `[role=listbox]` (match options there, not by page-wide text), and a consent checkbox whose label text opens a terms dialog is ticked by the dialog's accept button, so `check()` on the input fails until the terms are accepted. Accept terms only when the user has authorised that specific consent.

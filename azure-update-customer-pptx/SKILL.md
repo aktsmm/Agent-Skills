@@ -101,6 +101,8 @@ Template setup is intentionally separate from regular generation. See [Template 
 ## Gotchas
 
 - Close the target deck before any COM write, and re-apply all sections after any Weekly rebuild. Details and other COM pitfalls: [Validation Rules › COM Write Gotchas](references/validation-rules.md#com-write-gotchas).
+- **Source slides**: Match by stable update ID and reuse supplied slides unchanged; defer missing slides rather than invent a mismatched fallback unless the user approves.
+- **Approved replacement**: OLE/MIP wrapping alone does not show an approved same-path copy will fail. Never strip source protection; after approval, follow the per-file backup plan, copy the verified PPTX/PDF, then verify content/page mapping. PDF backup is optional; never bypass a DLP refusal.
 - Preflight PASS means ready, not running. Report execution from current launch/progress evidence; after interruption, reconcile owned processes and artifact hashes before restarting. See [Resume Evidence](references/pre-check.md#resume-evidence).
 
 ## Validation

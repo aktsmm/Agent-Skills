@@ -1,7 +1,7 @@
 ---
 name: receipt-tax-ocr
 description: "Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos. Use for 領収書, レシート, receipt, OCR, リネーム, 確定申告, 勘定科目, 経費, subscription receipts, or payment-method change history. Not for company/D365 travel expense claims."
-argument-hint: "Receipt files or service, period, payment-method change, and save scope"
+argument-hint: "Receipt files or service, period, payment-method change, save scope, or receipt corrections"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -35,15 +35,17 @@ metadata:
 - **Multiple categories** → Use the primary one, hint at others in note
 - **Only surviving evidence is non-expense** → Cart screens, canceled bookings, and other non-expense screenshots should not be treated as 補助画像 when they are the only remaining evidence. Record them in the monthly memo table as `対象外` with amount and reason.
 - **Multiple items in one image** → When one screenshot contains multiple products, tickets, books, or shipping supplies, keep one file but add item-by-item breakdown notes in the monthly memo.
+- **Duplicate evidence** → Compare incoming and saved records by transaction date, vendor, amount, and receipt/order number, not hashes alone. Different photos, card slips, and receipts can represent one transaction; retain originals as main/supplemental evidence and count the transaction once. Matching amounts alone do not prove duplication.
 
 ## Procedure
 
 1. Identify local receipt files or the requested service, period, and save scope
 2. Extract native PDF text before OCR; extract date, vendor, amount, currency, and transaction type
-3. Determine the accounting category, asking the user if unclear
-4. Present a rename/move dry-run, obtain confirmation, then execute using the standard format
-5. Create or update the monthly memo file
-6. Show a summary table of old → new filenames
+3. Reconcile duplicate evidence and determine the accounting category; ask only unresolved material facts and continue independent confirmed items
+4. Present a rename/move dry-run and execute after confirmation; reuse explicit approval for the same scope without asking again. A check-only or preview request does not authorize moves
+5. Save/rename the originals and update the monthly memo; do not stop at the candidate list for an authorized organization request
+6. Apply later purpose/person corrections to the same files, memo links, totals, and pending labels; prefer the user's clarification over tentative handwriting interpretation
+7. Verify destination files, unchanged original hashes, valid memo links, and non-duplicated totals; show old → new filenames, final classifications, and destination links, distinguishing organization from ledger entry
 
 ## References
 

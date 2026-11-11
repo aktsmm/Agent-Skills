@@ -63,6 +63,22 @@ What to do:
 2. Add or verify membership in the Teams UI. Decide whether to share chat history before adding; it cannot be changed afterwards.
 3. Read the member count and the system message back after adding.
 
+## `assignLicense` Keeps Returning `TransactionConcurrencyConflict`
+
+Symptom:
+
+- `POST /users/{id}/assignLicense` fails repeatedly with `TransactionConcurrencyConflict` for the same user, even after waiting and retrying. Observed on a demo tenant; a retry on the third user also conflicted.
+
+Meaning:
+
+- A concurrent change on that user's license record is blocking the write. The cause was not identified, so do not assume throttling.
+
+What to do:
+
+1. Stop after a few spaced retries and make the same change in the admin center UI.
+2. Read the license set back from Graph before any test that depends on it. UI changes took tens of minutes to appear in Graph here, and a request that reported success could still read back the old state.
+3. For license-dependent behavior tests, judge only responses produced after the readback shows the new state, and restore the original set when done.
+
 ## Useful Helpers
 
 - [Get-GraphGatewayRunnerStatus.ps1](../scripts/Get-GraphGatewayRunnerStatus.ps1)

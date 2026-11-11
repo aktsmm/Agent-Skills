@@ -78,7 +78,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [record-work-notes](record-work-notes/) | Use when: 作業メモ、事象別ログ、調査・相談・確認・実装・トラブル対応の経緯を残す。会話と作業結果を既存記録へ整理し、継続案件・時系列・出典・残事項を追える形で保存する |
 | [refactor-context](refactor-context/) | 指定スコープの instruction / agent / skill をコンテキスト最適化する。単一ファイルも複数ファイル群の MECE 横断レビューも扱う。構造レビューは review-workflow-structure の担当 |
 | [refine-product-100](refine-product-100/) | プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode では品質 gate 後に配布と公開状態確認まで進める |
-| [report-poc-to-requester](report-poc-to-requester/) | Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマ... |
+| [reply-test-to-requester](reply-test-to-requester/) | Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマ... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
 | [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for editing ~/.copilot personal assets or worksp... |
 | [retro-user](retro-user/) | Reflect verified incident or session learnings into personal Copilot or Codex instructions and configuration. Invoke explicitly for Retro User, user-wide retrospective, 個人設定の知見反... |
