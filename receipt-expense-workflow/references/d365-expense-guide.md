@@ -207,7 +207,7 @@ Expense line の Description は **Edit expense** dialog で編集するのを�
 
 ### Submit Gate
 
-Submit前にreport番号、合計、approver、全lineのCategory / Description / policy compliant / `Receipts attached = Yes`、report-level receiptの重複なしを確認する。明示許可後にSubmitし、確認dialogの追加必須項目を満たしてから確定する。完了条件はDraft表示の消失と、一覧上の対象reportが `In review` など送信後statusへ遷移したこと。
+Save and verify `Draft` unless the user explicitly approves submitting this report (e.g.「このレポートを提出まで」). Organizing, registering, resuming or acknowledging setup is not approval; another report's approval does not carry over. Present the report ID/title, count/total, approver, required fields, policy and line-level receipt/report-level duplicate checks for review; without approval stop at Draft. After approval and passed checks, Submit, complete the confirmation dialog and verify that exact report reaches `In review` or another submitted status in the report list.
 
 ### Read-Only Report Checker
 

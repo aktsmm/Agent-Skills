@@ -52,6 +52,8 @@ These are required checks for a new or changed execution route, not claims of co
 
 ## Native File Chooser (button opens OS picker, no reachable input)
 
+If an extension rejects local-file uploads, preserve the draft and ask the user to enable "Allow access to file URLs"; do not bypass the refusal with native input, raw CDP or private APIs. After settings change, re-inventory and rebind the same verified extension/profile and target URL (numeric browser IDs can change), then read durable draft/upload state before resuming. Setup acknowledgement is not submission approval. If URL enforcement stops the turn, stop all UI input and report the blocker.
+
 Some flows (e.g. a multi-step "アップロード" wizard) only reveal the `input[type=file]` after a button click that ALSO opens the OS file picker. The native picker blocks the renderer, so any later `Runtime.evaluate` hangs until it is dismissed.
 
 Intercept it instead of letting the OS dialog open:

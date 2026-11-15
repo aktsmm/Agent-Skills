@@ -67,7 +67,7 @@ In PowerShell, replace `mkdir -p artifacts/vsix` with
 build/package commands. Choose shell syntax from the execution environment,
 not the agent host.
 
-Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository root, and prune old local builds on a schedule so release artifacts do not pile up.
+Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository root, and prune old local builds on a schedule so release artifacts do not pile up. `artifacts/` can already hold tracked files: delete only the VSIX you created, never the directory (check `git ls-files artifacts` first).
 
 ## Done Criteria
 

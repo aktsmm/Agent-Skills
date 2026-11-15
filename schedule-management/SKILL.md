@@ -38,8 +38,10 @@ metadata:
   labels, availability, and visibility. Do not perform a location-only or
   notes-only update that can discard other fields.
 - Put the official facility name and postal-code address in both the location
-  field and the event notes. Research a missing address from a reliable source
-  before writing it.
+  field and the event notes. Never write an address or postal code from memory:
+  confirm it on the facility's official page (search the raw HTML when the text
+  view omits it) and use the official URL. If it cannot be confirmed, leave it
+  out and flag it as unverified.
 - Keep a user-selected source of truth for every event. Prefer the official
   Google Calendar API for Google writes; recover the existing connection below
   before proposing setup. Browser fallback requires explicit approval. TimeTree
@@ -93,6 +95,8 @@ metadata:
    tentative holds before offering date/time choices or recommendations. Include
    travel margins and flag unknown store hours. Resolve ambiguous holds, then
    offer viable alternatives; wait for the user's selection before moving events.
+   A provisional hold for the same occasion (e.g. 【仮】 / [候補]) in any
+   destination is updated in place, not duplicated.
    Setting `showAs=free` or transparency never resolves a real booking conflict.
 3. Resolve missing facility addresses and format a shared location string as
    `施設名｜〒郵便番号 住所`. Copy it into the notes as `場所` and `住所`.
@@ -112,6 +116,8 @@ metadata:
    copies. For TimeTree, use visible UI and the requested label, not an
    undocumented API. Match screenshots to their service/calendar before
    diagnosing missing events.
+   If one service is down (e.g. Graph 5xx), finish the others, retry the failed
+   one later, and report each destination's state separately.
 6. Read back title, start/end, location, notes, privacy, reminders, and category
    or label from each destination; confirm the old slot no longer contains the moved event.
    Restore missing fields before reporting completion. Name each service/calendar

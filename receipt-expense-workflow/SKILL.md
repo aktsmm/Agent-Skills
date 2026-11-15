@@ -111,6 +111,8 @@ python receipt_sorter.py --project "202602_Domestic_Trip" --input "incoming\unas
 
 ## D365 Expense Integration
 
+- Save D365 work as `Draft` unless this report has explicit submission approval (e.g.「このレポートを提出まで」). Otherwise show the verified draft for review and stop; setup acknowledgements do not authorize `Submit`.
+
 OCR 後のファイルを D365 Expense に添付する運用はこの skill の重要ユースケースだが、カテゴリ表と添付手順は本体から分離する。
 
 - Report 作成 / metadata 編集

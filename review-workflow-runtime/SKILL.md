@@ -77,6 +77,7 @@ metadata:
 ### 3. Idempotency and Safety
 
 - 再実行で重複作成、二重投入、二重送信、二重削除が起きないか
+- cleanup 対象が既にない状態を、実際の error policy で検証する。PowerShell 5.1 では native stderr が `ErrorActionPreference=Stop` により終了コード確認前に例外化し得るため、期待した「不在」と認証・取得失敗を区別するか
 - 既存 state / artifact / ID を確認してから mutation するか
 - destructive operation は明示 flag や confirmation を要求するか
 - secret、token、local absolute path、個人環境値を出力や成果物へ混ぜないか
@@ -101,7 +102,7 @@ metadata:
 
 - Markdown link / referenced path の存在確認
 - Python: 構文確認、該当テスト、`--help`、安全な dry-run
-- PowerShell: `[scriptblock]::Create((Get-Content -Raw -Encoding UTF8 <file>))`
+- PowerShell: 対象バージョンで構文確認し、安全な fixture で主要分岐と .NET API を実行する。5.1 の API が 7 でも使えると仮定せず、構文 PASS だけで互換性を保証しない。実行できない runtime は `NOT_RUN` とする
 - Node: package scripts、typecheck、lint、dry-run 相当
 - 各検査を `PASS` / `FAIL` / `NOT_RUN` で記録し、未実行理由と代替確認を明記する。診断の取得対象 severity を確認し、error 0件を Hint 0件、CLI 成功をエディターの tool 指定名の妥当性へ昇格させない
 - deterministic な検査を限定 read や目視で代替した場合、その項目を `PASS` に昇格させない

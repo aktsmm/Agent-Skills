@@ -143,6 +143,8 @@ Persist raw output only when later audit or re-reading is necessary. Return its 
 
 For narrow checks, constrain the target, fields, count, and range before each command or tool call, then filter, limit, or summarize at the source. Run these checks directly instead of delegating them.
 
+Project tool results to primitive fields before JSON serialization and check the serialized byte size. Windows PowerShell `Get-Content` strings can retain provider properties such as `PSDrive` and `PSProvider`; nested `ConvertTo-Json` can expand these into a huge object graph. For report text, use `[IO.File]::ReadAllText()` and explicitly selected scalar fields instead of serializing provider objects or increasing `-Depth`.
+
 ### Pattern
 
 Keep lightweight references (file paths, queries, links), load specific data only when needed (search first, then read the matching range), and discard it after use.
