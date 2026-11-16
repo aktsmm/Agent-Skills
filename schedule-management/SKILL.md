@@ -53,6 +53,10 @@ metadata:
   when browser reopening is authorized, re-establish a clean target and verify
   the signed-in calendar before requesting login. Authenticate only after an
   actual login state, then re-read the target calendar and check duplicates.
+- When holds come from a shared availability sheet, confirm which row is the
+  user's if names are close, block only the stated available window for a
+  conditional mark, and keep work holds in the work calendar until the user
+  approves copying them elsewhere (see `references/portability.md`).
 - If an image or message does not establish a time, duration, location, target
   calendar, or whether the event is confirmed, ask only for the missing detail.
 - Check OOF first; exclude full-day OOF dates unless an explicit exception is
@@ -86,6 +90,14 @@ metadata:
   confirm the intended calendar, user access, and sharing before writing.
   Report failures per route, not as proof that no integration exists.
 
+## Key References
+
+| Need | File |
+|---|---|
+| Google upsert (service account, idempotent key) | `scripts/google_calendar_upsert.py` |
+| TimeTree create and readback (dedicated CDP browser) | `scripts/start-calendar-browser.ps1`, `scripts/timetree_create_event.py` |
+| Environment variables, secrets, TimeTree gotchas, availability sheets, migration to another harness | `references/portability.md` |
+
 ## Workflow
 
 1. Extract the event's title, actual time, duration, place, notes, confirmation
@@ -114,7 +126,7 @@ metadata:
      unconfirmed appointment as provisional.
 5. Update existing event IDs in every approved destination; create only missing
    copies. For TimeTree, use visible UI and the requested label, not an
-   undocumented API. Match screenshots to their service/calendar before
+   undocumented API; the bundled script does this and reads the event back. Match screenshots to their service/calendar before
    diagnosing missing events.
    If one service is down (e.g. Graph 5xx), finish the others, retry the failed
    one later, and report each destination's state separately.
