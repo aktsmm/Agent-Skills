@@ -20,7 +20,11 @@ Use when a deck is rebuilt every cycle from the previous one. The failure mode i
 
 ## Emphasis
 
-Use one accent treatment (bold plus a single colour) for two things only: what changed since last cycle (decisions, replies, closures, new items) and the one or two key facts per slide (dates, cautions, headline results). Do not colour everything. Also mark the small token that tells look-alike items apart (for example a `-stg` suffix in a host or app name), wherever it appears: table cells, diagram boxes and questions. Add a one-line legend to the slide's source line.
+Use one accent treatment (bold plus a single colour) for two things only: what changed since last cycle (decisions, replies, closures, new items) and the one or two key facts per slide (dates, cautions, headline results). Do not colour everything. Also mark the small token that tells look-alike items apart (for example a `-stg` suffix in a host or app name), wherever it appears: table cells, diagram boxes and questions. Do not add a legend ("red = key point") or boilerplate disclaimers to source lines; the emphasis is self-evident and the repeated notes add noise. Keep only a source line that names the actual source and confirmation date; omit the line when it would be empty.
+
+## Consultation slides
+
+A slide titled as a consultation must ask for a decision. A list of fact-check questions with explanatory notes reads as a checklist. Title mixed slides "confirmation and consultation", and give each row the presenter's recommendation (for example "start in the same environment; is that acceptable?") rather than only background.
 
 ## Incorporating verification results or a hand-off request
 
