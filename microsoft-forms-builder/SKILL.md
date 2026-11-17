@@ -1,6 +1,6 @@
 ---
 name: microsoft-forms-builder
-description: "Create and configure Microsoft Forms surveys through an owned browser session (Playwright over CDP): title, description, text/choice questions, free-text 'Other', required flags, external-respondent sharing, short URL and an anonymous-access check. Use for Microsoft Forms, forms.cloud.microsoft, アンケート作成, 事前アンケート, 事前ヒアリングフォーム, Forms の共有範囲, 短縮URL, or building a survey from a question table. Not for reading or analysing responses, quizzes, Power Automate flows or Forms Pro."
+description: "Create and configure Microsoft Forms surveys through an owned browser session (Playwright over CDP): title, description, text/choice questions, free-text 'Other', required flags, external-respondent sharing, short URL and an anonymous-access check; also read existing response data read-only for aggregation (references/reading-responses.md). Use for Microsoft Forms, forms.cloud.microsoft, アンケート作成, 事前アンケート, 事前ヒアリングフォーム, Forms の共有範囲, 短縮URL, building a survey from a question table, or アンケート結果の集計・回答の確認. Not for quizzes, Power Automate flows or Forms Pro."
 argument-hint: "アンケートのタイトル・設問表（または spec.json）、回答者（社内/社外）、使うサインインアカウント"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -15,12 +15,13 @@ Build a survey in Microsoft Forms from a question spec. Forms has no public API 
 ## When to Use
 
 - 「Forms でアンケートを作って」「事前アンケートを Forms にして」「共有範囲を外部にして」「短縮 URL がほしい」
+- 「アンケート結果を見て」「回答を集計して」: read-only の手順は [Reading Responses](references/reading-responses.md)。
 - A question table (Markdown, Excel, chat) must become a live Microsoft Form.
 - An existing form must become answerable by external users, with a verified anonymous link.
 
 ## Not the Best Fit
 
-- Reading, exporting or analysing responses, quizzes, branching/sections, rating/date/ranking/file-upload questions (the scripts only build text and choice questions), Power Automate. Do those by hand or with another route.
+- Statistical analysis or exports of responses beyond the read-only aggregate in [Reading Responses](references/reading-responses.md), quizzes, branching/sections, rating/date/ranking/file-upload questions (the scripts only build text and choice questions), Power Automate. Do those by hand or with another route.
 - Credentials, MFA and tokens stay with the user. Never type them, and never read a sign-in page's secrets.
 
 ## Safety Gates

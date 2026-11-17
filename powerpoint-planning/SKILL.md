@@ -21,6 +21,7 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 - コンサル風の高密度資料、明るい社内資料、読み物として成立するビジネス資料を設計したいとき
 - ローカル PowerPoint、手作業制作、Copilot Chat、PowerPoint for the web / Edit with Copilot に渡すブリーフやプロンプトを作るとき
 - 生成済みスライドが AI っぽい、章立てが弱い、視線誘導がない、主張が薄いとき
+- 定例・月次の資料を前回版から作り直すとき（持ち越しの更新、前回の経緯、更新点の強調）
 
 ## When Not to Use
 
@@ -75,10 +76,11 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 - Do not shrink text to hide overload; reduce wording, split the slide, or simplify the layout.
 - For customer-facing, executive-facing, legal, brand, pricing, staffing, timeline, commitment, or customer-specific content, require human review before final use.
 - On customer-facing slides, never leave internal-state wording (未確認 / 記載なし / 要確認 / 推定): verify and state it, or omit the element.
-- For recurring decks (periodic meeting or status decks rebuilt from the previous cycle): re-verify every carried-over status, question, and source date against the primary source (ticket mails, calendar, forms results) before reuse. Replace a question already answered since last cycle with the answer. Mark what changed since last time (decisions, replies, closures, new items) with one accent treatment such as bold plus a single colour, only on key facts, and add a one-line legend in the slide's source line.
+- For recurring decks (periodic meeting or status decks rebuilt from the previous cycle): re-verify carried-over statuses, questions and source dates against primary sources, drop topics closed by a prior decision, add a one-line recap per topic, attach a summary to every case ID, and mark changes and key points with one accent plus a legend. Details: [references/recurring-decks.md](references/recurring-decks.md).
 
 ## References
 
 - Structure and storyline: [references/structure-and-storyline.md](references/structure-and-storyline.md)
 - Prompting and execution: [references/prompting-and-execution.md](references/prompting-and-execution.md)
 - Review and revision: [references/review-and-revision.md](references/review-and-revision.md)
+- Recurring decks (carry-over refresh, recap, emphasis, verification results): [references/recurring-decks.md](references/recurring-decks.md)

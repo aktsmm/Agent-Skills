@@ -126,7 +126,7 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 - [references/instructions/customer-facing-deck.instructions.md](references/instructions/customer-facing-deck.instructions.md)
 - [references/instructions/deck-iteration-review.instructions.md](references/instructions/deck-iteration-review.instructions.md)
 
-Use [Implementation Patterns](references/IMPLEMENTATION_PATTERNS.md) for shape diagrams, template XML, SlideMaster edits, visual QA, hyperlinks, RefURL, locks, centering, corruption recovery, and media embedding.
+Use [Implementation Patterns](references/IMPLEMENTATION_PATTERNS.md) for shape diagrams (including sizing), generated text conventions (accent markup, CJK/Latin spacing), template XML, SlideMaster edits, visual QA, hyperlinks, RefURL, locks, centering, corruption recovery, and media embedding.
 
 ## Done Criteria
 
