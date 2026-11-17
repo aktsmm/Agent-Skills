@@ -46,6 +46,7 @@ Rules:
 - Use plain, descriptive section titles.
 - Add section divider slides when they improve pacing, even if the slide count increases.
 - Make Agenda and divider slides visually distinct from content slides.
+- A divider carries the section number, plain title and one-line purpose, plus the full section list with the current position marked, so the audience sees where they are. Sections of a single slide are candidates to skip; tell the user that dividers raise the slide count.
 - Do not use dense card/table layouts for navigation slides.
 
 ## Customer Proposal Fit Gate
