@@ -113,7 +113,7 @@ Priority: P0 = 主要機能破壊・データ損失・情報露出 / P1 = 導線
 
 ## Fix Cycle
 
-1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。
+1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。着手前に `git fetch` し、既定branchとの `merge-base` と ahead/behind を確認する。共通祖先が無い・大きく behind なら手元checkoutは古い系統とみなし、そこから push/release しない。ローカル専用の未反映commitは破棄せず、最新のremote先端のworktreeへcherry-pickしてPR化する（force push禁止）。
 2. Review: Coverageを分類し、Openを `Fix now / Guard now / Block` に分ける。
 3. Implement/Sweep: 既存パターンに合わせて最小修正し、同根gapを検索してまとめて直す。新たに外部 API 呼び出しを足したら、ループ・バッチでの呼び出し回数を自己レビューし、共有できる結果は共有する（rate limit）。
 4. Test/Verify: 回帰testやguardを追加し、diagnostics → lint → typecheck → test → buildをartifact/state/exit codeまで確認する。
@@ -134,7 +134,7 @@ prompt / instruction / skill / hook / reusable script 自体に再発要因が�
 
 1. versionの公開済み有無を確認し、既存ならpatch以上を上げ、metadata、lockfile、表示、CHANGELOG、release notesを同期する。
 2. typecheck、lint、test、audit後にbuild/packし、artifactの存在・サイズ・時刻とtarball内容を確認する。stash/checkout/一括編集のあとは `git ls-files --eol -m` で改行を確認し、最終のbuild/packの前に作業コピーの改行規約を戻す。
-3. 明示release intentがある場合だけ commit → push → publish → GitHub Releaseへ進む。
+3. 明示release intentがある場合だけ commit → push → publish → GitHub Releaseへ進む。draft作成にenvironment承認ゲートがある場合も、明示release intentでのみ承認し、公開前にdraft資産のSHA256SUMS・APIのdigest・updater feedを照合する。
 4. registry/APIと掲載ページでversion、tag、Release、添付を確認し、送信成功と公開反映を区別する。stale表示だけで再publishしない。
 5. 各工程を個別報告し、認証・審査・権限不足は `Block` にする。必須gate達成後はstate同期とcleanupだけ行い、新しい監査を足さない。
 
