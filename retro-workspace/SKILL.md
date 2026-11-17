@@ -1,6 +1,6 @@
 ---
 name: retro-workspace
-description: "Reflect reusable learnings into the selected workspace's authorized instructions and automation assets, such as AGENTS.md, copilot-instructions.md, scoped instructions, scripts, and tasks. Use only for an explicit workspace/repo retro request: retro workspace, repo retro, ワークスペース知見反映. Not for user-wide settings, installed Skill mirrors, or reusable Skill authoring."
+description: "Reflect reusable learnings into the selected workspace's authorized instructions and automation assets, such as AGENTS.md, copilot-instructions.md, scoped instructions, scripts, tasks, and manual-only (disable-model-invocation) workspace skills. Use only for an explicit workspace/repo retro request: retro workspace, repo retro, ワークスペース知見反映. Not for user-wide settings, installed Skill mirrors, or reusable Skill authoring."
 argument-hint: "反映したい学び、エラーログ/git diff/会話要約、対象 workspace、mode（safe-auto / review-only / dry-run）"
 disable-model-invocation: true
 user-invocable: true
@@ -42,10 +42,10 @@ metadata:
 
 ## Scope Gate
 
-- 反映先は選択workspaceの承認済み指示・automation資産（例: `AGENTS.md`、`.github/copilot-instructions.md`、個別 `.instructions.md`、repo scripts/tasks）に限定する。ホスト名で反映先を固定せず、適用範囲と依頼で決める。他ホストの資産やoverride fileへ勝手に広げない
+- 反映先は選択workspaceの承認済み指示・automation資産（例: `AGENTS.md`、`.github/copilot-instructions.md`、個別 `.instructions.md`、repo scripts/tasks、明示呼び出し専用の workspace skill）に限定する。ホスト名で反映先を固定せず、適用範囲と依頼で決める。他ホストの資産やoverride fileへ勝手に広げない
 - secret / 認証情報 / 個人情報 / 顧客情報 / ローカル絶対パス / 端末固有値 / `/memories/**` は反映しない
 - user-wide configuration と installed Skill mirrors はホストを問わずscope不一致として停止する
-- `.github/skills/**` は直接編集せず、SKILL 向きなら提案して停止する
+- 選択workspaceの `.github/skills/<skill>/` は、frontmatter が `disable-model-invocation: true`（明示呼び出し専用。旧 prompt file の後継）の skill だけ、既存 workspace 資産と同様に編集してよい。それ以外の skill は直接編集せず、SKILL 向きなら提案して停止する。編集前に frontmatter を読んで判定し、frontmatter 自体（`name`・`description`・`disable-model-invocation`）は変更しない
 - このworkflowから公開・配布は行わない
 
 ## Edit Rules
@@ -67,7 +67,7 @@ metadata:
 
 ### 0. Pre-Flight Inventory
 
-知見抽出に入る前に、反映先候補を inventory する。どの `.instructions.md` / `tasks.json` / `scripts/` / `AGENTS.md` が受け皿になりそうか、適用される scope gate は何かを先に見る。これで scope を早めに定め、複数ファイルへの分散反映や既存資産との重複を防ぐ。
+知見抽出に入る前に、反映先候補を inventory する。どの `.instructions.md` / `tasks.json` / `scripts/` / `AGENTS.md` / 明示呼び出し専用 skill が受け皿になりそうか、適用される scope gate は何かを先に見る。これで scope を早めに定め、複数ファイルへの分散反映や既存資産との重複を防ぐ。
 
 ### 1. 知見抽出
 
