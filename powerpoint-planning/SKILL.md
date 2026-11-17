@@ -75,6 +75,7 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 - Do not shrink text to hide overload; reduce wording, split the slide, or simplify the layout.
 - For customer-facing, executive-facing, legal, brand, pricing, staffing, timeline, commitment, or customer-specific content, require human review before final use.
 - On customer-facing slides, never leave internal-state wording (未確認 / 記載なし / 要確認 / 推定): verify and state it, or omit the element.
+- For recurring decks (periodic meeting or status decks rebuilt from the previous cycle): re-verify every carried-over status, question, and source date against the primary source (ticket mails, calendar, forms results) before reuse. Replace a question already answered since last cycle with the answer. Mark what changed since last time (decisions, replies, closures, new items) with one accent treatment such as bold plus a single colour, only on key facts, and add a one-line legend in the slide's source line.
 
 ## References
 

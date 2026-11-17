@@ -22,6 +22,16 @@
 10. Compare: recapture routes/status, compare route count and summarization, and separate control-plane completion from route/metric impact.
 11. Cleanup or Persist: delete one-shot labs or record why they remain.
 
+## CLI and Lab Observations
+
+- Do not merge stderr into JSON output (`2>&1`): CLI extensions print warnings that break `ConvertFrom-Json`. Redirect stderr to a temp file and read stdout only.
+- Judge `az provider register` by an independent read-back (`az provider show` / `list`), not by its acceptance output. Separate `Registering` from `Registered`; if the acceptance output is unexpected, read back before resending.
+- For SKU availability, read `restrictions` per region (`az vm list-skus --all`). `NotAvailableForSubscription` means pick another region or SKU; do not treat quota and restriction as the same thing.
+- Run Command needs outbound connectivity to return results; a private subnet needs NAT or an equivalent egress path.
+- To test host-based routing from inside a VNet, use `curl --resolve` with the URL host as SNI and a separate `-H "Host: ..."` to cross SNI and Host; trust a self-signed chain explicitly with `--cacert` and report that this differs from browser trust. Observed on an internal Container Apps environment: internal-only ingress returned HTTP 404 over HTTP and a TLS reset over HTTPS, and an unbound hostname got a TLS reset. Treat these as observations, not documented behavior.
+- Single observation: `az containerapp create --yaml` returned HTTP 400 while an ARM REST PUT with typed JSON succeeded. Try REST on a repeat failure; do not assume the cause.
+- Retail Prices API: filter by exact product name (a VM series and a similarly named Cloud Services product differ in price), and record "unit price not retrievable" instead of estimating when a region has no result.
+
 ## Ready Rules
 
 - Do not continue before `Succeeded`, `READY`, or `Connected` is observed.
