@@ -31,3 +31,9 @@ A slide titled as a consultation must ask for a decision. A list of fact-check q
 - Replace "not yet verified" wording with the verified content. Reproduce the customer's own names and addresses in diagrams; never reuse the verification environment's diagram as is.
 - Customer-facing body, source line and notes must not contain the verification environment's identifiers, cost, retention or deletion plans, internal history, personal names, or checking notes and confidence labels ("unconfirmed", "to be checked", "confirmed"). For things not verified write "this varies by environment; please confirm beforehand". Confidence labels belong in the completion report.
 - Put supporting detail, likely questions with answers, and the source URLs in the speaker notes as `参照: <URL>` lines. Scan the generated manuscript for the forbidden wording before handing over.
+
+## Notes the presenter can speak from, and visuals
+
+- When the presenter is not the subject expert, 30-200 character notes are not enough. Write each slide's notes as: what to say (order), what to ask the audience, terms in plain words, likely questions with answers, and source URLs. Give each section divider a note on how to run that section. Answers that rest on the author's judgement rather than a source are flagged to the presenter in the report, not in the customer-facing deck.
+- A term in the body that the audience may not know (a setting name, a protocol detail) gets its own short supplementary slide with a diagram, placed right after the slide that uses it, rather than a longer table cell. Skip the diagram if no accurate one can be drawn.
+- Add visual weight with the vendor's official icon set on diagram boxes, section dividers and a small top-right slide icon. Use only icons whose meaning matches; where the set has none (another vendor's product), omit the icon instead of substituting.
