@@ -15,6 +15,7 @@ Use when a deck is rebuilt every cycle from the previous one. The failure mode i
 - Put a one-line recap of the previous cycle ("last time: ...") in the lead or first table row of each topic slide. A topic slide whose link to a carry-over item is not visible forces the presenter to explain it.
 - Write a case or ticket ID together with a short summary wherever the ID appears (title, agenda, source line, table). An ID alone is meaningless to readers.
 - Open a multi-event workstream (training, surveys, follow-up sessions) with one summary slide: a dated timeline of actions and results, then the detail slides.
+- Gloss jargon and acronyms where they first appear (product names, abbreviations, version names such as sensor v2/v3, internal terms). When one clause is not enough, add a short term-list slide or a "what is X" row at the start of the section, including the practical consequence (for example how a migration is actually performed). Check product behavior against official documentation before writing it, and do not invent a gloss for an internal term; ask instead. If the audience reader cannot say what a term means, the slide is not done.
 - For survey results show when it ran (distribution date, deadline), the respondent count and the headline numbers. When a feedback form is shared across audiences, filter to the audience by organisation and date, exclude test submissions, list the distinct organisation spellings before filtering, and report only aggregates and paraphrased themes (no per-person quotes or names).
 
 ## Emphasis
