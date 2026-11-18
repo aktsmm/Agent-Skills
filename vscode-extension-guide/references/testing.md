@@ -60,6 +60,8 @@ verify immutable binding reuse. Assert one dispatch per explicit request, typed
 numeric/string values, unchanged shared settings, and no credential copies.
 This proves the host/request route, not real-provider network inference or
 proposed-only message support; test those separately with authorized accounts.
+Requested IDs and echoed usage metadata do not prove backend identity; absent
+attributable runtime evidence, report it as unverified.
 
 | Change area                                   | Extra checks                                                                                                                                                                                                                                         |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
