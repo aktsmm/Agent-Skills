@@ -64,10 +64,11 @@ the learning workflow, not the write permissions of different hosts.
    ownership and writability. Prefer the most specific existing file/section.
    Instructions hold principles, Skills task procedures, agents role separation,
    and hooks deterministic behavior. Explain the target choice.
-4. **Run the safety gate.** Check reusable abstraction, minimal non-sensitive
-   evidence, no duplicate/conflicting rule, no forbidden target, and a
-   self-contained result that does not require another file or local environment
-   to remain available. Respect the actual host's primitive/tool support.
+4. **Run the safety gate.** Check the proposed rule against one different case
+   where it should apply and one nearby case where it must not. Narrow it or
+   hand it off if either check fails. Keep only non-sensitive evidence and
+   reject duplicate/conflicting rules, forbidden targets, dependencies on local
+   files or environment, and primitives the selected host does not support.
 5. **Inspect before writing.** Read current content; preserve comments, unrelated
    changes, types and unsaved notes. After interruption or an uncertain write,
    reconcile current state before retrying the mutation. If the edit tool is

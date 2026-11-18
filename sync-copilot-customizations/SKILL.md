@@ -1,7 +1,7 @@
 ---
 name: sync-copilot-customizations
-description: "~/.copilot の instructions と agents を、公開 repo（Agent-Customization）の .github へ安全に同期する。syncToGlobal の分類と機密監査を通し、公開前に差分を提示して承認を取る。skill は対象外（private skills repo の retro / sync 系を使う）"
-argument-hint: "対象（instructions / agents / 両方）、mode（review-only / apply）、対象 repo path（省略時は環境変数）"
+description: "~/.copilot の instructions、手動参照メモ、agents を、公開 repo（Agent-Customization）の .github へ安全に同期する。syncToGlobal の分類と機密監査を通し、公開前に差分を提示して承認を取る。skill は対象外（private skills repo の retro / sync 系を使う）"
+argument-hint: "対象（instructions / references / agents）、mode（review-only / apply）、対象 repo path（省略時は環境変数）"
 disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -23,9 +23,11 @@ metadata:
 | 同期元 | 同期先（公開 repo） |
 | --- | --- |
 | `$HOME/.copilot/instructions/*.instructions.md` | `.github/instructions/<category>/`（repo 側の既存 mirror path） |
+| `$HOME/.copilot/references/*.instructions.md` | `.github/instructions/<existing category>/`（同名の既存 mirror path） |
 | `$HOME/.copilot/agents/*.agent.md` | `.github/agents/` |
 
-- 同期元は 1 フォルダごと（再帰しない）。`instructions` と `agents` は別々に実行する
+- 同期元は 1 フォルダごと（再帰しない）。`instructions`、`references`、`agents` は別々に実行する
+- `references` の instruction は手動参照用のため、公開 repo では既存の同名 instruction mirror を更新する。新規 category が必要なら同期前に確認する
 - 対象外: `~/.copilot/copilot-instructions.md`、skills（private skills repo の retro / sync 系が担当）、`mcp-config.json` などの設定ファイル
 - repo / GitHub repo は `$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR` / `$env:SYNC_USER_CUSTOMIZATIONS_GITHUB_REPO`。未設定または path 不在なら確認する
 
@@ -55,6 +57,7 @@ metadata:
 
 ```powershell
 & "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1" -Source "$HOME\.copilot\instructions"
+& "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1" -Source "$HOME\.copilot\references"
 & "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1" -Source "$HOME\.copilot\agents"
 ```
 

@@ -94,7 +94,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [single-html-forge](single-html-forge/) | Generate a single self-contained HTML file — a horizontal slide deck, a vertical-scroll explainer document, or a fixed-canvas summary image — with zero external runtime dependen... |
 | [skill-creator-plus](skill-creator-plus/) | Create or review a reusable skill (SKILL.md) that packages a workflow, and decide whether the request should be a skill instead of a prompt, instruction, agent, or hook |
 | [skill-finder](skill-finder/) | Search, install, and manage Agent Skills locally and from GitHub, then help decide whether the task really needs a skill or another customization primitive |
-| [sync-copilot-customizations](sync-copilot-customizations/) | ~/.copilot の instructions と agents を、公開 repo（Agent-Customization）の .github へ安全に同期する。syncToGlobal の分類と機密監査を通し、公開前に差分を提示して承認を取る。skill は対象外（private skills repo の retro / sync 系を使う） |
+| [sync-copilot-customizations](sync-copilot-customizations/) | ~/.copilot の instructions、手動参照メモ、agents を、公開 repo（Agent-Customization）の .github へ安全に同期する。syncToGlobal の分類と機密監査を通し、公開前に差分を提示して承認を取る。skill は対象外（private skills repo の retro / sync... |
 | [sync-public-skills](sync-public-skills/) | Synchronize curated Agent Skills across approved repositories with policy checks and verification |
 | [teams-desktop-automation](teams-desktop-automation/) | Prepare and verify Microsoft Teams desktop chat drafts with Windows UI Automation, stopping before send. Use for Teamsチャット下書き, デスクトップTeams操作, 宛先確認, メッセージ入力, or when Teams Web/CD... |
 | [teams-photo-export](teams-photo-export/) | Export photos and inline images from Microsoft Teams chats or channel threads into dated local folders |
