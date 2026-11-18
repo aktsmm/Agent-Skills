@@ -120,7 +120,7 @@ Priority: P0 = 主要機能破壊・データ損失・情報露出 / P1 = 導線
 5. Docs/Cleanup: README、help、CHANGELOG、用語を同期し、一時資材、dead code、terminalを片付ける。
 6. Close: `Fix now`を0にし、残件は条件を満たす `Guard now / Block` へ再分類する。
 
-未解決項目が残る場合は、安全条件を再評価し、`Guard now` / `Block` に再分類してから current run を閉じる。再分類できない `Fix now` が残る場合は未完了として明記し、完了宣言しない。
+未解決項目が残る場合は、安全条件を再評価し、`Guard now` / `Block` に再分類してから current run を閉じる。再分類できない `Fix now` が残る場合は未完了として明記し、完了宣言しない。ただし自分で実装・接続・検証できる `Fix now`（部品は作ったが入口に未接続、など）は未完了報告で止まらず同じ run で入口への接続と実経路の確認まで続ける。止まってよいのは `Block` 条件だけで、単体テストが通っただけの未接続部品は完了にしない。
 
 Subagent は、大規模 repo / 複数観点 Sweep / 長いログ解析で read-only 調査に限定して使う。使わない場合は理由を最終報告に残す。
 
