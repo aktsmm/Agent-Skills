@@ -1,8 +1,7 @@
 ---
 name: customer-workspace
-description: "Set up and operate customer workspaces: route customer updates, record meetings, track questions and actions, manage workstreams, and prepare handoffs. Use when creating or maintaining a customer workspace, processing meeting notes or updates, reviewing next actions, or preparing a handoff. Triggers: customer workspace, 顧客ワークスペース, inbox 追加, 議事録管理, 案件更新, 宿題管理, 引き継ぎ."
-argument-hint: "Customer workspace name or an existing-workspace task (meeting, update, follow-up, handoff)"
-disable-model-invocation: true
+description: "Set up dedicated customer workspaces and coordinate meeting notes, actions, and workstreams for ongoing customer accounts. Use for 顧客ワークスペースの作成, 顧客案件の棚卸し・引き継ぎ, 議事録と宿題・案件台帳の一括反映, or customer record maintenance without a matching workspace-local workflow. Not for general questions, standalone PoC workspaces, or single updates already covered by a local workflow."
+argument-hint: "顧客名と作成先、または既存の顧客ワークスペースで行う作業（議事録・案件整理・引き継ぎ）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -11,23 +10,17 @@ metadata:
 
 # Customer Workspace
 
-Set up or operate customer workspaces without confusing setup artifacts with live records.
-
-## When to Use
-
-- Creating a per-customer workspace.
-- Operating an existing workspace: inbox updates, meeting notes, questions, actions, workstreams, or handoffs.
-- Adding customer-information routing or meeting-note workflows.
-- Reviewing the current owner, next action, and source records before a handoff.
+For routine intake, minutes, questions, or single-workstream updates, follow the workspace's established workflow when one applies; do not process the same input twice. Use this procedure for setup, cross-record coordination, and handoffs, or to maintain records when no local workflow covers the request.
 
 ## Choose a Mode First
 
-Inspect the workspace before choosing an action. Treat it as existing when it contains any managed record such as `.github/copilot-instructions.md`, `.github/skills/`, legacy prompt files, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, or `workstreams/`.
+Resolve the customer workspace from the request or active workspace; if ambiguous, confirm the target before writing. Generic workspace files alone do not identify a customer workspace.
+Protect existing managed assets such as `.github/copilot-instructions.md`, `.github/skills/`, legacy prompt files, `workspace-summary.md`, `_customer/profile.md`, `_inbox/`, and `workstreams/`.
 An aggregate operations workspace may contain a lightweight `Customers/{id}/` profile, task list, inbox, and meetings. Do not initialize a full customer workspace over those records; ask for a separate target if dedicated customer management is needed.
 
 | Mode             | Use when                                      | First action                                                           |
 | ---------------- | --------------------------------------------- | ---------------------------------------------------------------------- |
-| Setup            | No managed structure exists                   | Create the scaffold and capture routing facts.                         |
+| Setup            | New setup requested, target clear, and no managed structure exists | Create the scaffold and capture routing facts.              |
 | Operate          | A managed workspace receives new information  | Update the canonical record for the input.                             |
 | Review / Handoff | Status, ownership, or continuity is requested | Read current indexes first and report sources, owner, and next action. |
 
@@ -52,8 +45,8 @@ An aggregate operations workspace may contain a lightweight `Customers/{id}/` pr
 
 If PowerShell is unavailable, create the same folders, copy each complete `assets/workspace-skills/<name>/` into `.github/skills/<name>/` including bundled resources, and render `assets/copilot-instructions.md` and the required templates with the supplied routing facts. Do not create prompt files.
 
-Use setup only when the managed structure is absent. The initializer stops by default when managed assets exist; use `-Force` only for an explicitly approved replacement of generated skills and templates.
-Setup creates four workspace-local operating skills, their resources, and routing instructions; it does not create prompt files. Keep this setup entry manual-only while local operating skills remain eligible for automatic selection.
+Automatic selection does not authorize setup. Run the initializer only for a requested setup with a clear target. It stops by default when managed assets exist; use `-Force` only for an explicitly approved replacement of generated skills and templates.
+Setup creates four workspace-local operating skills, their resources, and routing instructions; it does not create prompt files.
 
 ## Setup Intake
 
@@ -116,8 +109,8 @@ Before calling meeting notes done:
 - Omit credentials and token-bearing image URLs from saved source text. After saving, ask for a Teams meeting/recap/recording URL if absent; record supplied links without asking again, and distinguish link capture from full-content verification.
 - Extract open questions and work needing follow-up into `_questions/{YYYY-MM}.md` and `next-actions/` in the same operation.
 - Keep local paths, internal links, internal speculation, and commercial terms out of customer-shareable content.
-- Default to one working meeting note. Do not create `*_internal.md` solely for unverified technical details; separate only on explicit request or when sensitive material cannot remain in a clearly marked internal section.
-- Customer highlights contain only confirmed items and split cross-side coordination into one `双方 (両者で調整)` bucket. Apply [Meeting Minutes Rules](references/meeting-minutes-rules.md) for details.
+- Keep one working note. Use `*_internal.md` for a clearly internal meeting, on request, or when an internal section cannot safely contain sensitive material; not merely for unverified details.
+- Where sharing is allowed, highlights contain only confirmed items and use one `双方 (両者で調整)` bucket. Keep requested WorkIQ context source-linked and separate from decisions. Apply [Meeting Minutes Rules](references/meeting-minutes-rules.md).
 
 ---
 
