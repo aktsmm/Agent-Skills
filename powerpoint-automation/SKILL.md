@@ -1,7 +1,7 @@
 ---
 name: powerpoint-automation
-description: Convert web articles or blog posts into slides through a content.json pipeline, translate or rebuild existing PPTX files onto a template, and edit an already-open PowerPoint deck with COM Automation (RefURL, overflow review). Use for article-to-slides conversion, deck translation, template-based rebuilds, or live COM editing of an open deck. Not for simply reading, inspecting, or lightly editing a .pptx file. Triggers on 記事をスライド化, スライド翻訳, 開いているパワポを編集, COM自動化, RefURL, content.json.
-argument-hint: "変換したい URL・PPTX・テンプレート、または編集内容"
+description: Create a new PPTX from a manuscript, outline, or content.json; convert articles into slides, translate or rebuild a deck, or edit an open deck with COM. Use for actual PPTX production or live COM editing, not outline-only requests or simple PPTX inspection or light edits. Triggers on 原稿からPPTXを作る, パワポの初稿を作る, 記事をスライド化, スライド翻訳, 開いているパワポを編集, COM自動化, RefURL.
+argument-hint: "原稿・構成案・JSON・URL・PPTX、任意のテンプレート、または COM 編集内容"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -10,10 +10,9 @@ metadata:
 
 # PowerPoint Automation
 
-AI-powered PPTX generation using Orchestrator-Workers pattern.
-
 ## When to Use
 
+- 原稿・構成案・JSON から新しい PPTX を作りたいとき
 - Web 記事やブログをスライド化したいとき
 - 既存 PPTX を翻訳・再構成したいとき
 - 開いている PPTX を COM Automation で直接編集したいとき
@@ -41,6 +40,10 @@ Edit the currently open PowerPoint deck with COM Automation and verify RefURL, n
 ```
 
 ## Workflow
+
+**原稿・構成案・JSON から PPTX を新規作成**: ファイル生成が依頼されているときは、[PLAN の新規作成ルート](references/instructions/plan-phase.instructions.md#new-pptx-from-a-manuscript-outline-or-json) → `content.json` → BUILD → REVIEW。抽出・翻訳は必要な場合だけ行う。
+
+**記事・既存資料の変換**:
 
 ```text
 TRIAGE → PLAN → PREPARE_TEMPLATE → EXTRACT → TRANSLATE → BUILD → REVIEW → DONE
@@ -111,7 +114,7 @@ Role definitions and handoffs are in [references/AGENTS.md](references/AGENTS.md
 - **Editable diagrams**: Generated images are optional design references, not editable output. Rebuild text, shapes and connectors from approved content.json with suitable licensed icon assets; preserve diagram relationships. Keep photos/screenshots as images; no ASCII art or full-slide rasterization as a substitute for editable slides.
 - **Grid-first placement**: Initialize positions on a consistent layout grid, refine against actual slide renders, and remove temporary grid overlays from final exports.
 - **Appendix URLs use Title - URL**: 参考 URL の表示形式は統一する
-- **Review content and visuals separately**: 生成後は見た目レビューだけでなく、公式情報との正確性レビュー、URL hyperlink 数、notes 数、placeholder/internal wording を確認する
+- **Review content and visuals separately**: 生成後は、公式情報との整合、ハイパーリンク・ノートの件数、仮文言・内部文言を確認する。日程表では、年を含む開催日の順序を保存済み PPTX の行まで照合する。明示的な不掲載内容は原稿・生成入力から除き、指定範囲内のスライド本文・ノート等に言い換えも残っていないことを確認する。
 
 ## Reference Map
 

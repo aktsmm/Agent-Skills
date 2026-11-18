@@ -46,7 +46,7 @@ except ImportError:
 
 
 # Schema path
-SCHEMA_PATH = Path(__file__).parent.parent / "workspace" / "content.schema.json"
+SCHEMA_PATH = Path(__file__).resolve().parents[1] / "references" / "schemas" / "content.schema.json"
 
 # Validation thresholds
 MAX_TITLE_LENGTH = 80

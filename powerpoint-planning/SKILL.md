@@ -41,8 +41,8 @@ PowerPoint 資料の上流設計 Skill。目的、読者、ストーリーライ
 1. **Brief**: テーマ、読者、利用シーン、読後アクション、避ける表現、希望枚数、参考資料、mode を確認する。
 2. **Source Handling**: 情報を確認済み事実、仮説、推奨、未確認、human review required に分ける。数字、価格、日付、顧客事実、契約条件を勝手に作らない。
 3. **Section Architecture**: スライド単位の前に、3-5 個程度の章立て、Agenda、必要な section divider、まとめを設計する。
-4. **Slide Planning**: 各スライドの title、lead sentence、primary message、evidence、supporting detail、quiet note、layout、visual entry point、reading path を決める。
-5. **Prompt / Brief Output**: ローカル PowerPoint、手作業制作、Copilot Chat、Edit with Copilot、または別の制作実行フローで使える制作ブリーフを出す。
+4. **Slide Planning**: 各スライドの title、lead sentence、primary message、evidence、supporting detail、quiet note、layout、visual entry point、reading path を決める。日程表では、指定の並べ方がなければ種類をまたいで開催日（年を含む）の昇順とし、日付未定や別資料は後ろに置く。
+5. **Prompt / Brief Output**: ローカル PowerPoint、手作業制作、Copilot Chat、Edit with Copilot などで使える制作ブリーフを出す。明示的な不掲載指示は対象範囲（本文・ノート等）を添えて引き継ぎ、断りがなければ別表現やノートへの移動で復活させない。
 6. **Review / Revision**: 生成後は章立て、主張、視線誘導、文字サイズ、カード余白、AI っぽさ、事実性をレビューし、slide-specific revision prompt を作る。
 
 ゼロから起こす資料、多論点の資料、顧客レビューや意思決定を挟む資料では、Workflow 2-4 の中間成果物を 1 つのメモに混ぜず、planning 用フォルダに 4 ファイルへ分けて保存する。詳細は [references/structure-and-storyline.md](references/structure-and-storyline.md) の Planning Artifacts を参照する。

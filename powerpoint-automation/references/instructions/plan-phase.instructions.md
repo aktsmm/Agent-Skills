@@ -4,6 +4,15 @@
 
 ---
 
+## New PPTX from a Manuscript, Outline, or JSON
+
+1. **PLAN**: Present a recommended method and approximate slide count for confirmation. Ask about audience, purpose, or design only when the answer changes the plan; do not re-ask known requirements or reconfirm a plan already approved. Offer user-facing choices (e.g.「標準デザインで初稿」or「指定テンプレートに合わせる」), not library names.
+   - **Simple draft**: Use `create_ja_pptx.py` for supported text-first layouts when no design is prescribed. A divider slide is not a PowerPoint section.
+   - **Specified design**: When a template or design must be preserved, prepare and verify its layouts and use `create_from_template.py` if it supports the required features. Do not substitute the simple draft route without approval.
+   - **Required features**: Check builder support for native tables, editable diagrams, PowerPoint sections, hidden slides, and other requirements. If the proposed builder cannot preserve them, confirm a compatible method. If none is available, stop and offer a custom build or a reduced scope for approval; never silently drop features.
+2. **BUILD**: Map agreed content into the [bundled schema](../schemas/content.schema.json); retain stable topic-to-slide mapping and separate visible text from permitted notes. [Validate the input](../SCRIPTS.md#quality-assurance); do not build if schema validation fails or did not run. Schema validity does not prove builder support. Use `--no-signature` with the Python builders unless the approved plan includes a signature. Use the next unused versioned `.pptx` path on every build; never overwrite a previous draft or a hand-edited deck.
+3. **REVIEW**: Check slide count, order, text, required links and features against the plan. Compare all output notes against the approved notes, including on hidden or template-derived slides; reject extras. Render every slide for overflow and overlap before handoff, even for a draft. If rendering is unavailable, state that visual QA is pending; do not report the deck as verified.
+
 ## Items to Confirm (Web/Blog Source)
 
 1. **Detail level/slide count**: Detailed / Standard / Summary version
