@@ -1,6 +1,6 @@
 ---
 name: vscode-extension-guide
-description: "Guide for creating VS Code extensions and plugins from scratch through Marketplace publication. Use when developing a VS Code extension/plugin, adding commands or keybindings, building TreeView or Webview UI, publishing to Marketplace, or troubleshooting activation and packaging issues."
+description: "Guide for creating VS Code extensions and plugins from scratch through Marketplace publication. Use when developing a VS Code extension/plugin, adding commands or keybindings, building TreeView or Webview UI, publishing to Marketplace, implementing update/reinstall flows that replace user-owned files, or troubleshooting activation and packaging issues."
 argument-hint: "作りたい拡張機能、追加したい機能、困っている点"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -98,6 +98,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 | Publishing          | [references/publishing.md](references/publishing.md)                                                                |
 | Troubleshooting     | [references/troubleshooting.md](references/troubleshooting.md)                                                      |
 | Notifications       | [references/notification-normalization.md](references/notification-normalization.md)                                |
+| Safe Replace        | [references/safe-replace.md](references/safe-replace.md)                                                            |
 
 ## Best Practices
 
@@ -117,8 +118,13 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 - `package.json` の commands、views、configuration、menus を変えたら、コード上の command ID / setting key と同時に確認する。
 - Marketplace 表示や設定説明をローカライズしている拡張では、`package.nls.json` と対象言語の `package.nls.*.json` を同じ変更で更新する。
+- 実行時の UI 文言（通知・確認ダイアログ・エラー）は、拡張の runtime i18n（`vscode.l10n.t` / `bundle.l10n` か専用の i18n module）に置く。`package.nls*.json` は manifest の `%key%` 専用で、実行時に JSON import しない。`rootDir` 外の JSON import や、テスト loader の `esModuleInterop` が必要になった時点で規約逸脱のサイン。
 - In `markdownDescription`, use native setting references such as `` `#editor.wordWrap#` ``, not `[label](#editor.wordWrap#)`: the latter can leave a trailing hash in the Settings `@id:` filter. Guard each locale's syntax and verify the resolved target.
 - 設定の並び順や説明を変えたら README の設定表、manifest consistency test、release notes の必要有無までまとめて見る。
+
+### Replacing user-owned files
+
+- Update / reinstall / overwrite flows stage and verify the new copy, swap it in with rollback, and keep the backup when rollback fails; never delete first. Content-comparison caps must degrade, not refuse. Steps, scope of the guarantee and tests: [references/safe-replace.md](references/safe-replace.md).
 
 ### Language Model Tools
 

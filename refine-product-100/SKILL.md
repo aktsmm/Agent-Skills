@@ -70,7 +70,7 @@ Retry は同一原因 3 回まで。超えたら、試した代替と失敗理�
 
 - 永続先は `.git/info/refine-product-state.md` だけ。Run Ledger / Handoff はチャット出力とし、`.github/` や代替logを作らない。
 - 前回状態は、ユーザー指定state → local state → 直近Run Ledger/Handoffの順に読む。最新の実測を優先し、完了済み操作を旧Blockやtodoだけで再実行しない。
-- Executableではlocal stateを確定時点ごとにcompact rewriteする。No-Editまたは`.git/`なしでは作らず、`Local State: skipped`と理由を記録する。
+- Executableではlocal stateを確定時点ごとにcompact rewriteする。No-Editまたは`.git/`なしでは作らず、`Local State: skipped`と理由を記録する。直前にviewしたstateを削除してcreateすると、Test-PathがFalseでも「既に存在」と返ることがある。1回だけ再試行し、shell書き込みへ迂回しない。
 - 構成は `Current Snapshot / Last Run Detail / Open Items / Recent Runs / Do Not Repeat / Next Focus Candidates / Guard or Block` に限定する。
 - 上限は Last Run 25行、Recent Runs 5件、Open/Do Not Repeat/Guard各10件、Next Focus 3件、全体160行または16KB。超過前に古いrunを1行へ圧縮する。
 - 未解決項目は圧縮前に `OPEN|GUARD|BLOCK-YYYYMMDD-NN` でupsertし、閉じたIDを再利用しない。
@@ -113,7 +113,7 @@ Priority: P0 = 主要機能破壊・データ損失・情報露出 / P1 = 導線
 
 ## Fix Cycle
 
-1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。着手前に `git fetch` し、既定branchとの `merge-base` と ahead/behind を確認する。共通祖先が無い・大きく behind なら手元checkoutは古い系統とみなし、そこから push/release しない。ローカル専用の未反映commitは破棄せず、最新のremote先端のworktreeへcherry-pickしてPR化する（force push禁止）。
+1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。着手前に `git fetch` し、既定branchとの `merge-base` と ahead/behind を確認する。共通祖先が無い・大きく behind なら手元checkoutは古い系統とみなし、そこから push/release しない。ローカル専用の未反映commitは破棄せず、最新のremote先端のworktreeへcherry-pickしてPR化する（force push禁止）。同じ作業ツリーに前回 run 由来の未commit差分が残っていれば、新しい軸へ進む前にその差分を旧挙動と既存規約に照合する。上限や拒否条件の追加、実装に合わせて書き換えられたtest期待、規約から外れた配置は回帰の兆候として先に直す。
 2. Review: Coverageを分類し、Openを `Fix now / Guard now / Block` に分ける。
 3. Implement/Sweep: 既存パターンに合わせて最小修正し、同根gapを検索してまとめて直す。新たに外部 API 呼び出しを足したら、ループ・バッチでの呼び出し回数を自己レビューし、共有できる結果は共有する（rate limit）。
 4. Test/Verify: 回帰testやguardを追加し、diagnostics → lint → typecheck → test → buildをartifact/state/exit codeまで確認する。
