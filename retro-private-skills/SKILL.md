@@ -1,6 +1,6 @@
 ---
 name: "retro-private-skills"
-description: "Reflect reusable learnings into a private Agent Skills repository, align affected skills' frontmatter with their workflows, and commit/push in safe-auto. Use for private skill retro, private SKILL.md or frontmatter fixes, or explicit skill intake. Not for editing installed skills or live workspace or user-wide assets."
+description: "Reflect reusable learnings into a private Agent Skills repository, align affected skills' frontmatter with their workflows, keep the generated skills index README current, and commit/push in safe-auto. Use for private skill retro, private SKILL.md or frontmatter fixes, or explicit skill intake. Not for editing installed skills or live workspace or user-wide assets."
 argument-hint: "反映したい知見・変更内容、対象スキル、取り込み元（intake 時）、任意: private repo パス、safe-auto / review-only / dry-run"
 disable-model-invocation: true
 user-invocable: true
@@ -32,6 +32,7 @@ Allowed write targets are limited to:
 - `<private-repo>/.github/skills/<skill>/references/*`
 - `<private-repo>/.github/skills/<skill>/scripts/*`
 - `<private-repo>/.github/skills/<skill>/assets/*`
+- `<private-repo>/.github/skills/README.md`, only by regenerating it with the repo's own generator (see Apply)
 
 Never write to these targets for this workflow unless the user explicitly asks to improve that exact asset:
 
@@ -110,6 +111,7 @@ Choose exactly one:
 
 - Edit only under `<private-repo>/.github/skills/<skill>/`.
 - For each affected skill, even when only bundled files change, check its entry's `description` (what it does, when it applies and where it stops) and `argument-hint` (actual inputs, modes, and optionality) against the resulting workflow. Correct mismatches in the same diff, including a missing hint for a user-invocable skill; leave aligned fields and unrelated skills alone. In review-only or dry-run, propose corrections without edits. Do not change invocation flags just to fix wording.
+- Skills index: after skill edits, if the repo ships a README generator with a check mode, run the check; when stale (including drift that predates this run), regenerate with the generator, never by hand, and commit it separately from the skill commit. Details: [Authoring Rules](references/authoring-rules.md#apply-details).
 - New-skill frontmatter and formatter-drift handling: see [Authoring Rules](references/authoring-rules.md#apply-details).
 - Add `references/` only when detail would bloat `SKILL.md`, and link each new reference from the entry (one Key References row, plus trigger words in `description` / `When to Use` when users can ask for the capability). Never defer that link for entry-size reasons; detail stays in the reference.
 
@@ -123,6 +125,7 @@ Before final response:
 
 - Check changed paths are all under `<private-repo>/.github/skills/`.
 - Check no forbidden target was changed.
+- Re-run the README generator check; a stale skills index at completion is a failed gate, not a note for the next run.
 - Parse YAML frontmatter for every affected skill entry. Check `name` against its folder and invocation flags, `license`, and `metadata.author` against repo conventions. Syntax validation does not replace the workflow fit check in Apply.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added. Scan added lines or the staged target content; do not scan unchanged diff context, which can trigger false positives on pre-existing terms.
 - Commit/push intended private skill changes in safe-auto only when scope is clear, all changed paths are intended, and remote/scope checks pass. Done means the execution checkout is clean with ahead/behind `0/0`; original unrelated dirty is preserved and reported, not a completion blocker.

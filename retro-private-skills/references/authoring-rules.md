@@ -14,6 +14,7 @@
 ## Apply Details
 
 - For new skills, create at minimum `SKILL.md` with frontmatter: `name`, `description`, `argument-hint`, `user-invocable`, `license`, and `metadata.author` when the repo convention uses them. Decide manual-only (`disable-model-invocation: true`) vs model-only (`user-invocable: false`) deliberately; a manual-only skill needs a concrete `argument-hint`. Treat `context: fork` as experimental (add only with an inline fallback).
+- Skills index README: it is a generated shared file, so edit it only via the repo's generator (commonly a script under `<private-repo>/scripts/` with a check flag). Check once after skill edits; if stale, regenerate, review the diff rows, then confirm the check passes. Commit it on its own (`docs(skills): refresh skill index`), never mixed into a skill commit, and never hand-edit rows. Stale descriptions of other skills are expected carry-over, not a reason to skip. If no generator exists, skip and say so in the report.
 - Verify table/formatter drift; group relevant formatting with the owning skill's small change. Separate unrelated normalization; never blanket-stage or split one bounded improvement into repeated pushes.
 
 ## Report Template
@@ -26,6 +27,7 @@ Use this compact report:
 - Learnings: <what changed behavior>
 - Outcomes: <each learning -> 反映済み / 既存で充足 / 見送り / handoff / 確認待ち / 承認待ち / 提案のみ>
 - Changes: <files changed>
+- Index: <README regenerated / already current / no generator>
 - Commit: <hash or none>
 - Gate: pass / stop reason
 ```
