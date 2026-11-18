@@ -42,7 +42,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |
 | [context-to-video](context-to-video/) | Turn any context (blog URL, pasted article, PR diff, meeting notes, release notes, raw prompt) into a narrated explainer mp4 with slides, subtitles, and optionally a talking-hea... |
 | [create-test-request](create-test-request/) | Use when: 会話・設計資料・回答文書から検証タスクを抽出し、別workspaceへ渡すテスト依頼文を作成する。受け手は最初に理解内容と実施項目を返し、承認後に検証する |
-| [customer-workspace](customer-workspace/) | Set up and operate customer workspaces: route customer updates, record meetings, track questions and actions, manage workstreams, and prepare handoffs |
+| [customer-workspace](customer-workspace/) | Set up dedicated customer workspaces and coordinate meeting notes, actions, and workstreams for ongoing customer accounts. Use for 顧客ワークスペースの作成, 顧客案件の棚卸し・引き継ぎ, 議事録と宿題・案件台帳の一括反映,... |
 | [document-knowledge-ingestion](document-knowledge-ingestion/) | Read multiple local documents deeply and preserve a source-linked Markdown knowledge library. Use for consolidating notes, books, PDFs, presentations, and screenshots across fol... |
 | [drawio-diagram-forge](drawio-diagram-forge/) | Generate draw.io editable diagrams (.drawio, .drawio.svg) from text, images, or Excel. Orchestrates 3-agent workflow (Analysis → Manifest → SVG generation) with quality gates |
 | [duck-critic](duck-critic/) | Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes |
@@ -69,7 +69,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [peer-feedback](peer-feedback/) | 同僚への半期ピアフィードバック下書きを自動生成する。workIQ で 1:1 チャット・グループチャット・メンション・共通会議・メール・SPO の履歴を収集し、6項目テンプレートに沿ってポジティブかつプロモーション志向で起票する。Use when: ピアフィードバック, フィードバック下書き, 同僚評価, 半期フィードバック, 360度フィードバック。 |
 | [permission-max](permission-max/) | Reduce repeated permission prompts across Microsoft Scout, Copilot CLI, and host tool confirmations with user-approved settings and explicit before/after verification |
 | [power-automate-ops](power-automate-ops/) | Operate and verify Microsoft Power Automate cloud flows in the browser, and migrate them between environments |
-| [powerpoint-automation](powerpoint-automation/) | Convert web articles or blog posts into slides through a content.json pipeline, translate or rebuild existing PPTX files onto a template, and edit an already-open PowerPoint dec... |
+| [powerpoint-automation](powerpoint-automation/) | Create a new PPTX from a manuscript, outline, or content.json; convert articles into slides, translate or rebuild a deck, or edit an open deck with COM. Use for actual PPTX prod... |
 | [powerpoint-planning](powerpoint-planning/) | Plan high-quality PowerPoint presentations before file creation or editing |
 | [project-workspace](project-workspace/) | Create and manage topic-specific project workspaces for validation, investigation, PoC, comparison, or workstreams, including meeting notes in an existing project. Use for a pro... |
 | [prompt-to-skill-reconcile](prompt-to-skill-reconcile/) | Prompt ファイル (.prompt.md) から Skill へ移行した後に、ワークスペース内の instructions / agents / README / Skill 本文 / スクリプトに残る旧 Prompt 前提の参照と運用手順を点検し、承認後に最小修正する。Use when: Prompt から Skill に移行した、migrat... |
@@ -80,7 +80,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [refine-product-100](refine-product-100/) | プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode では品質 gate 後に配布と公開状態確認まで進める |
 | [reply-test-to-requester](reply-test-to-requester/) | Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマ... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
-| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository with scoped safety gates and same-run private commit/push. Not for editing ~/.copilot personal assets or worksp... |
+| [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository, align affected skills' frontmatter with their workflows, and commit/push in safe-auto. Use for private skill r... |
 | [retro-user](retro-user/) | Reflect verified incident or session learnings into personal Copilot or Codex instructions and configuration. Invoke explicitly for Retro User, user-wide retrospective, 個人設定の知見反... |
 | [retro-workspace](retro-workspace/) | Reflect reusable learnings into the selected workspace's authorized instructions and automation assets, such as AGENTS.md, copilot-instructions.md, scoped instructions, scripts,... |
 | [review-security-structure](review-security-structure/) | Review owned or authorized code for security using structure-first evidence: AST/structure maps, call graphs, complexity, Source/Sink flow, and defensive findings |
