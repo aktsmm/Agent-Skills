@@ -1,7 +1,7 @@
 ---
 name: sync-copilot-customizations
 description: "~/.copilot の instructions、手動参照メモ、agents を、公開 repo（Agent-Customization）の .github へ安全に同期する。syncToGlobal の分類と機密監査を通し、公開前に差分を提示して承認を取る。skill は対象外（private skills repo の retro / sync 系を使う）"
-argument-hint: "対象（instructions / references / agents）、mode（review-only / apply）、対象 repo path（省略時は環境変数）"
+argument-hint: "mode（review-only / apply）、対象フォルダ（instructions / references / agents、省略時は 3 つとも）、対象 repo path（省略時は環境変数）"
 disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -26,7 +26,7 @@ metadata:
 | `$HOME/.copilot/references/*.instructions.md` | `.github/instructions/<existing category>/`（同名の既存 mirror path） |
 | `$HOME/.copilot/agents/*.agent.md` | `.github/agents/` |
 
-- 同期元は 1 フォルダごと（再帰しない）。`instructions`、`references`、`agents` は別々に実行する
+- 同期元は `instructions` / `references` / `agents` の各 1 階層（再帰しない）。`-Source` 省略で 3 フォルダをまとめて対象にし、存在しないフォルダは飛ばす。同じファイル名が複数フォルダにあると script が停止する
 - `references` の instruction は手動参照用のため、公開 repo では既存の同名 instruction mirror を更新する。新規 category が必要なら同期前に確認する
 - 対象外: `~/.copilot/copilot-instructions.md`、skills（private skills repo の retro / sync 系が担当）、`mcp-config.json` などの設定ファイル
 - repo / GitHub repo は `$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR` / `$env:SYNC_USER_CUSTOMIZATIONS_GITHUB_REPO`。未設定または path 不在なら確認する
@@ -53,15 +53,14 @@ metadata:
 ## Workflow
 
 1. 準備: repo の branch / origin（GitHub repo 名と照合）/ ahead-behind / dirty を確認する。script が無い・古いときは、clean を確認して fetch + fast-forward してから実行する（手作業で再実装しない）
-2. dry-run: 引数なしで実行する。`-Source` を必ず明示する（script の既定値は旧 `%APPDATA%\Code\User\prompts` で、空のフォルダ）
+2. dry-run: 引数なしで実行する（`-Source` 省略で `~/.copilot` の 3 フォルダが対象）。`dirty` / `sources:` 行が出ない古い script は、clean を確認して fast-forward で更新する。一部のフォルダだけ対象にするときは配列で渡す（`pwsh -File` はカンマ区切りを 1 つの文字列にするため `-Command` を使う）
 
 ```powershell
-& "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1" -Source "$HOME\.copilot\instructions"
-& "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1" -Source "$HOME\.copilot\references"
-& "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1" -Source "$HOME\.copilot\agents"
+& "$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1"
+pwsh -NoProfile -Command "& '$env:SYNC_USER_CUSTOMIZATIONS_REPO_DIR\scripts\Sync-UserCustomizations.ps1' -Source @('$HOME\.copilot\instructions','$HOME\.copilot\agents')"
 ```
 
-3. 確認: 結果を提示する。`-Source` に指定したフォルダ以外の repo 資産は「削除候補（報告のみ）」に並ぶが、同期元が違うだけなので削除しない。`needs-review` と実値らしい監査ヒットがあれば、ここで止める
+3. 確認: 結果を提示する。削除候補（報告のみ）は、どの同期元にも無い repo 資産だけが並ぶ。`-Source` で一部のフォルダだけを指定した場合は、指定外フォルダの mirror も並ぶが、同期元が違うだけなので削除しない。`needs-review` と実値らしい監査ヒットがあれば、ここで止める
 4. 承認後、同じコマンドに `-Apply` を付けて実行する。変更候補だけを明示パスで stage して commit・push し、remote == HEAD まで script が検証する。push が rejected なら fetch して ahead-behind と変更 path を確認し、競合がなければ取り込んでから再送する
 5. 完了確認: remote SHA = HEAD、clean、除外ファイルが公開されていないことを確認する。中断後は既存 commit と remote を照合し、反映済みの操作を再実行しない
 
