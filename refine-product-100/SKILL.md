@@ -113,7 +113,7 @@ Priority: P0 = 主要機能破壊・データ損失・情報露出 / P1 = 導線
 
 ## Fix Cycle
 
-1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。着手前に `git fetch` し、既定branchとの `merge-base` と ahead/behind を確認する。共通祖先が無い・大きく behind なら手元checkoutは古い系統とみなし、そこから push/release しない。ローカル専用の未反映commitは破棄せず、最新のremote先端のworktreeへcherry-pickしてPR化する（force push禁止）。同じ作業ツリーに前回 run 由来の未commit差分が残っていれば、新しい軸へ進む前にその差分を旧挙動と既存規約に照合する。上限や拒否条件の追加、実装に合わせて書き換えられたtest期待、規約から外れた配置は回帰の兆候として先に直す。
+1. Context/Health: entry point、instruction、前回state、検証手段を読み、baseline failureと今回由来を分ける。不安定なテストは、変更前と変更後で同じ実行を複数回測り、落ちるテストの偏りで切り分ける（毎回違うテストが落ちるなら時間依存を疑い、最終ツリーでの完全通過を証跡にする）。着手前に `git fetch` し、既定branchとの `merge-base` と ahead/behind を確認する。共通祖先が無い・大きく behind なら手元checkoutは古い系統とみなし、そこから push/release しない。ローカル専用の未反映commitは破棄せず、最新のremote先端のworktreeへcherry-pickしてPR化する（force push禁止）。同じ作業ツリーに前回 run 由来の未commit差分が残っていれば、新しい軸へ進む前にその差分を旧挙動と既存規約に照合する。上限や拒否条件の追加、実装に合わせて書き換えられたtest期待、規約から外れた配置は回帰の兆候として先に直す。複数面にまたがる大きい未commit差分は、release 前に面ごと（並行・回復／UI・tool 入口／通知・観測）に独立の read-only review を通す。作者自身の全テスト通過は、配線漏れ・後始末漏れ・競合を証明しない。
 2. Review: Coverageを分類し、Openを `Fix now / Guard now / Block` に分ける。
 3. Implement/Sweep: 既存パターンに合わせて最小修正し、同根gapを検索してまとめて直す。新たに外部 API 呼び出しを足したら、ループ・バッチでの呼び出し回数を自己レビューし、共有できる結果は共有する（rate limit）。
 4. Test/Verify: 回帰testやguardを追加し、diagnostics → lint → typecheck → test → buildをartifact/state/exit codeまで確認する。
