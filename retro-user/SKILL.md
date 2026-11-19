@@ -71,10 +71,7 @@ the learning workflow, not the write permissions of different hosts.
    files or environment, and primitives the selected host does not support.
 5. **Inspect before writing.** Read current content; preserve comments, unrelated
    changes, types and unsaved notes. After interruption or an uncertain write,
-   reconcile current state before retrying the mutation. If the edit tool is
-   blocked by eDLP (`os error 449`) on an external-drive source, stage a copy on
-   the internal drive, edit, `Copy-Item` back and compare hashes; stop after two
-   failed staged writes instead of bypassing the control.
+   reconcile current state before retrying the mutation.
 6. **Integrate minimally.** Delete only unnecessary, self-evident or duplicate
    text whose removal preserves normal/exception/stop decisions; then merge,
    compact, move detail, and add missing guidance. Preserve evidence, URLs,
