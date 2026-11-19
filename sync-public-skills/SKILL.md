@@ -101,8 +101,8 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
    - legacy primary-only: retain the old gates or hand off the runner update when relaxed behavior is required; never substitute broad to bypass a selected-scope stop.
    - capability-verified primary-only: `Sync-AndPush.ps1 -PrimarySkills <skill-name...> -SourceCommit <audited-full-sha> -ExpectedSourceOrigin <approved-origin-url> -Message "sync: <skill summary>" -SkipDevPush`
    - broad: `Sync-AndPush.ps1 -Message "sync: <summary>" -SkipDevPush -ExcludeCopilotSkills <監査で確定した除外名>`
-   - EMU private: `Sync-AndPush.ps1 -SyncEmu [-EmuDryRun]`
-   - GIM internal: `Sync-AndPush.ps1 -SyncInternal [-InternalDryRun]`
+   - EMU private: `Sync-AndPush.ps1 -SyncEmu [-EmuDryRun]`（dry-run は EMU 側だけ。broad public sync は本番実行、Gotchas 参照）
+   - GIM internal: `Sync-AndPush.ps1 -SyncInternal [-InternalDryRun]`（同上）
 5. Confirm only the approved destination set changed. Primary-only never pushes private source; any separately requested private push must have a scoped ahead range, clean execution checkout and integrated remote updates.
 6. Git の `master = origin/master` だけで完了としない。publicはlocal source/destination hashとremote到達を確認し、GIM/EMUはremote treeのpath集合とblob SHAを確認する。`Missing / Mismatch / Extra = 0`になるまで完了扱いにしない
 
@@ -117,6 +117,7 @@ Destination 別の判定（公開可否 / 除外リスト / repo visibility / se
 - **`HEAD.lock` rename failure**: 同じ失敗が2回続いたら`n`で停止し、HEAD・status・diff・rebase metadata・lock所有を確認する。未commit変更を保護し、`reset --hard`やlock一括削除はしない。HEADが不変でindex/worktreeだけがfetched remoteと一致すると証明できる場合だけ対象をHEADへ戻し、HEADをdetachしないverified mergeへ切り替える
 - **Git Data API transient failure**: blob/tree/commit/ref APIは共通retryと空SHA fail-fastを通す。ref更新後にremote treeを再取得し、stale path削除と完全一致を確認する
 - **Internal full mirror only**: internal subset指定は未選択Skillを削除し得るため拒否する。distribution configの全集合だけをdesired setとして使う
+- **`-EmuDryRun` / `-InternalDryRun` are not whole-run dry runs**: with `-SyncEmu` / `-SyncInternal` the runner still performs the broad public sync for real before the destination step, so pending public-safe commits of unselected skills are pushed to public. Preview with `scripts/Preview-SyncDiff.ps1` (read-only) instead, confirm no public diff is pending (or accept it), then run the real destination sync once.
 - **Skill rename**: フォルダ名と `name`、distribution config、README / LICENSE index を同じ変更で揃え、旧フォルダを消す broad sync で反映する（primary-only は旧フォルダを消さない）。配布先でインストール済みの旧名コピーは更新で解決できず保留・要修復になり得るため、完了報告で新名の再インストールと旧フォルダ削除を案内する
 - **All Mode rollback**: tracked metadata、cross-root rename、commit失敗で停止する。commit途中の失敗は元HEADへ戻し、差分をunstagedで保持する
 
