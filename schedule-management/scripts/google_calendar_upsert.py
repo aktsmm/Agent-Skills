@@ -6,6 +6,7 @@ auth client and is never printed.
 """
 import argparse
 import os
+import re
 import sys
 
 from google.oauth2 import service_account
@@ -25,6 +26,8 @@ ap.add_argument("--notes", default="")
 ap.add_argument("--visibility", default="private", choices=["default", "public", "private"])
 ap.add_argument("--tentative", action="store_true", help="status=tentative and show as free")
 args = ap.parse_args()
+if not re.fullmatch(r"[a-v0-9]{5,1024}", args.key):
+    sys.exit("--key must be 5-1024 chars of a-v and 0-9 only")
 
 sa = os.environ.get("GOOGLE_CALENDAR_SA_JSON")
 cal = os.environ.get("GOOGLE_CALENDAR_ID")

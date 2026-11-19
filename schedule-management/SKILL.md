@@ -1,7 +1,7 @@
 ---
 name: schedule-management
-description: "Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree. Use when the user asks to add, change, move, organize, synchronize, or check a schedule, travel, hotel, appointment, or calendar event."
-argument-hint: "予定の内容、日時、場所、登録先、公開範囲、または変更内容"
+description: "Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree, and propose meeting time windows from the user's calendar. Use when the user asks to add, change, move, organize, synchronize, or check a schedule, travel, hotel, appointment, or calendar event, or to offer candidate times."
+argument-hint: "予定の内容、日時、場所、登録先、公開範囲、または変更内容。候補枠の依頼は対象期間と所要時間"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -74,6 +74,16 @@ metadata:
   recipients, keep the Teams meeting off unless requested (Outlook on the web
   turns it on once an attendee is added), then read back the event and the sent
   item.
+- To offer time candidates for an external meeting whose length is flexible,
+  read the user's calendar for the target dates and split events into fixed
+  (others invited) and movable (user-only prep, follow-up, learning or
+  personal blocks). Offer windows longer than the meeting so the invitee picks
+  a start inside one, order them by fewest moves, and list the movable blocks
+  each window would displace. Move nothing until a window is chosen. State what
+  is unverified (invitee availability; multi-day assignment notices that
+  free/busy does not show) and keep internal block titles out of the
+  invitee-facing message. If every attendee's availability is readable or the
+  invitee requires a fixed length, offer fixed-length slots instead.
 
 ## Recover an Existing Google API Connection
 
@@ -126,7 +136,9 @@ metadata:
      unconfirmed appointment as provisional.
 5. Update existing event IDs in every approved destination; create only missing
    copies. For TimeTree, use visible UI and the requested label, not an
-   undocumented API; the bundled script does this and reads the event back. Match screenshots to their service/calendar before
+   undocumented API; the bundled script does this and reads the event back.
+   After any TimeTree timeout or partial failure, count same-title events
+   before retrying; a blind retry creates duplicates. Match screenshots to their service/calendar before
    diagnosing missing events.
    If one service is down (e.g. Graph 5xx), finish the others, retry the failed
    one later, and report each destination's state separately.
@@ -142,11 +154,18 @@ metadata:
 ## Privacy Routing
 
 - For a private event, set the requested privacy level in each private calendar.
-- For a provisional hold that may be visible to others, use a neutral title such
+- For a provisional hold that may be visible to others and whose purpose is personal or sensitive, use a neutral title such
   as `調整中（仮）` and leave the location blank; record its purpose only in an
   approved event body or comment. Set Outlook sensitivity to `normal` only when
   the user has confirmed that their sharing settings expose titles and locations
   but not the detailed body.
+- For a provisional hold on a work calendar (for example candidate windows for a
+  work meeting), use a descriptive title prefixed `【仮】` (purpose and window),
+  sensitivity `normal`, `showAs=tentative` and no attendees; a neutral title or
+  private flag only hides what the user needs to see. Outlook colours come from
+  categories, not from `showAs`, so apply an existing colour category when the
+  user asks for a colour (list the master categories first; do not rename or
+  create one without approval, and say which was used).
 - For a shared calendar, use a generic blocker without names or notes only when
   the user explicitly asks for a dummy event. Add its location only when the user
   explicitly requests it.

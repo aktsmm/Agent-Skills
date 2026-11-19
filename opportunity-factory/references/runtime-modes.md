@@ -145,6 +145,7 @@ Use this when the VS Code Copilot Scheduler extension is installed and the facto
 Settings and task options to verify:
 
 - Task scope is workspace, not global, unless intentionally shared.
+- A workspace-scoped task binds to the folder open in the VS Code window that creates it, and `workspacePath` cannot be set or updated afterwards. Create tasks from a window opened on the target workspace, read `workspacePath` back, and if it differs delete the task and stop.
 - Prompt templates point to local `.github/prompts/*.md`, the configured global prompts folder, or inline prompt text.
 - **Verify per-task model selection on the installed version.** Recent versions accept a per-task model id from the extension's own model list; older ones resolved the editor's current default, so model choice had to happen inside the prompt via subagents with an explicit model.
 - Read the task back after setting the model, and record the adapter version and observed model-resolution behavior in the setup output.

@@ -17,6 +17,7 @@ Template paths in that workflow are relative to this skill directory.
 - Record transcript coverage and label uncertain names, dates, prices, support boundaries, and commitments `要確認`; keep cited WorkIQ context separate from meeting decisions.
 - Extract open questions into `_questions/` and actionable follow-ups into `next-actions/` in the same operation; do not invent commitments.
 - Follow the sharing boundary before creating customer-shareable highlights; exclude internal paths, speculation, and commercial terms.
+- When a meeting-prep memo has grown large (about 25KB) by the time the meeting is processed, save a full backup first and verify its hash, rebuild the memo with only the current-state sections, and fold each prep-time status into the post-meeting table as a one-line column. Keep headings that other files link to by anchor, and check that kept lines match the backup verbatim and that relative links still resolve.
 - When a workspace-specific template exists in `_templates/`, preserve that format; otherwise use the bundled [meeting](assets/meeting-minutes.md) or [internal memo](assets/internal-memo.md) template.
 
 Done means the note, question/action records, and relevant workstream links agree; a captured meeting URL is not proof of full-content verification.

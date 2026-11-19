@@ -87,7 +87,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [review-workflow-runtime](review-workflow-runtime/) | ワークフロー定義と参照 scripts/hooks/validators を横断し、実行時ロジック・I/O・冪等性・冗長処理・検証ゲートをレビューし、低リスク修正まで行う |
 | [review-workflow-structure](review-workflow-structure/) | ワークフロー設計資産としての agent / instruction / skill / AGENTS を横断レビューし、SSOT・整合性・構造の問題を検出する |
 | [rewrite-x-post](rewrite-x-post/) | Use when: 短い日常文、下書き、思いつき、愚痴、感想、作業ログ、近況を、本人らしさを残したX投稿候補へリライトする。ニュース起点の投稿生成は generate-news-x-posts を使う |
-| [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree |
+| [schedule-management](schedule-management/) | Plan, create, update, and verify personal calendar events across Outlook, Google Calendar, and TimeTree, and propose meeting time windows from the user's calendar |
 | [screenpresso-troubleshoot](screenpresso-troubleshoot/) | Screenpresso のシステム音声録音エラーを調査し、64 ビット側の wavemapper 登録欠落時だけ復旧する。Screenpresso の音が録れない、システム音声録音エラー、BadDeviceId calling waveOutOpen の調査・復旧を依頼されたときに使う。 |
 | [session-handoff](session-handoff/) | Create a compact handoff note for another session. Use for セッションを閉じる, 引き継ぎを作る, 伝言を作る, create/export a handoff, or resume later. Do not create another handoff when a pasted note... |
 | [share-session-learnings](share-session-learnings/) | Use when: 今の一連の作業で得た改善点・反省点を、他セッションや別 repo へ渡す共有メモにしたい。命令文ではない叙述の報告として書き、横展開の実装はしない |

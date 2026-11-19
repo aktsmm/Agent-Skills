@@ -3,7 +3,8 @@
 Env: TIMETREE_CALENDAR_URL (e.g. https://timetreeapp.com/calendars/<id>),
      CALENDAR_BROWSER_CDP (default http://127.0.0.1:9331).
 Start the browser first with start-calendar-browser.ps1. Requires: playwright (Python).
-Aborts when an event with the same title already exists in that month (no duplicates).
+Aborts when the title already exists in that month, aborts without saving if the form times do not match,
+and never retries a save: after Save it requires exactly one match and exits non-zero otherwise.
 Notes: the UI is English; Label is left at the calendar default (e.g. Soft violet).
 """
 import argparse
@@ -33,30 +34,51 @@ def fmt(t):
     return f"{h % 12 or 12}:{m:02d} {'AM' if h < 12 else 'PM'}"
 
 
+MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+          "August", "September", "October", "November", "December"]
+
+
 def pick_time(page, idx, value):
     page.locator("input").nth(idx).click()
-    page.wait_for_timeout(700)
+    page.wait_for_timeout(900)
     opts = page.get_by_text(value, exact=True)
     for i in range(opts.count()):
         box = opts.nth(i).bounding_box()
-        if box and box["x"] > 600:  # the visible dropdown item, not hidden copies
+        if box and box["width"] > 100:  # the dropdown item, not small month-cell labels
             opts.nth(i).click()
             break
-    page.wait_for_timeout(700)
+    page.wait_for_timeout(900)
+
+
+def open_month(page, year, month):
+    """Open the monthly view and wait until the header shows the requested month."""
+    page.goto(f"{base}/monthly/{year}/{month}")
+    want = f"{MONTHS[month - 1]}, {year}"
+    for _ in range(14):
+        page.wait_for_timeout(1500)
+        if want in page.evaluate("document.body.innerText"):
+            # The header renders before the events do; counting too early gives a false 0.
+            page.wait_for_timeout(5000)
+            return
+        page.get_by_role("button", name="Next month").click()
+    sys.exit(f"Could not open {want}")
+
+
+def count_title(page):
+    return page.evaluate("document.body.innerText").count(args.title)
 
 
 y, mo, _ = args.date.split("-")
 with sync_playwright() as pw:
     page = pw.chromium.connect_over_cdp(cdp).contexts[0].pages[0]
 
-    page.goto(f"{base}/monthly/{y}/{int(mo)}")
-    page.wait_for_timeout(3000)
-    if args.title in page.evaluate("document.body.innerText"):
+    open_month(page, int(y), int(mo))
+    if count_title(page):
         sys.exit("A same-title event already exists this month; update it instead.")
 
-    # A fresh navigation drops a restored unsaved draft from an earlier run.
+    # A fresh navigation can still restore an unsaved draft: verify every field below.
     page.goto(f"{base}/events/new?date={args.date}")
-    page.wait_for_timeout(3000)
+    page.wait_for_timeout(3500)
     page.get_by_placeholder("Event title (required)").fill(args.title)
     vals = page.evaluate("[...document.querySelectorAll('input')].map(e=>e.value)")
     idx = [i for i, v in enumerate(vals) if v.endswith(("AM", "PM"))]
@@ -71,13 +93,19 @@ with sync_playwright() as pw:
         page.get_by_role("button", name="OK").click()  # the modal blocks Save until closed
         page.wait_for_timeout(800)
     got = page.evaluate("[...document.querySelectorAll('input')].map(e=>e.value)")
+    times = [v for v in got if v.endswith(("AM", "PM"))]
     print("form:", [v for v in got if v and v != "on"][:6])
+    if times[:2] != [fmt(args.start), fmt(args.end)]:
+        sys.exit(f"Form times {times[:2]} differ from the request; nothing was saved.")
     page.get_by_role("button", name="Save").click(timeout=8000)
-    page.wait_for_timeout(2500)
-
-    page.goto(f"{base}/monthly/{y}/{int(mo)}")
     page.wait_for_timeout(3000)
-    page.get_by_text(args.title, exact=False).first.click()
+
+    # Never re-run after this point: the event is already saved even if readback fails.
+    open_month(page, int(y), int(mo))
+    n = count_title(page)
+    if n != 1:
+        sys.exit(f"Expected exactly 1 event after saving, found {n}; check and delete duplicates by hand.")
+    page.get_by_text(args.title, exact=True).first.click()
     page.wait_for_timeout(1500)
     text = page.evaluate("document.body.innerText")
     print("readback:", text[text.find("Event details"):][:400].replace("\n", " | "))
