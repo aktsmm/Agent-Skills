@@ -29,6 +29,7 @@ Before execution, verify the applicable scope and committed runner capabilities.
 
 - 行き先は user-owned private repo（`SYNC_INTERNAL_SKILLS_EMU_REPO`）。既定セットは GIM internal と同じ `InternalSkills`
 - EMU repo の visibility が `PRIVATE` または `INTERNAL` であることを確認する。`PUBLIC` なら停止する
+- アクティブな `gh` アカウントが EMU 所有者でない場合、`gh repo view <emu-repo>` は `Could not resolve to a Repository` になるが、repo 不在ではなくアカウント不一致。global の account switch はせず、同じコマンドだけ `GH_TOKEN`（EMU アカウントの `gh auth token --user <emu-account>`）を一時設定して実行し、直後に unset する。token は表示・保存しない。runner の本番実行は自前で account を切替・復元する
 - user-owned private は EMU 全員に自動公開されない。全員利用が要件なら org-owned internal（GIM）が必要で、作成可否を確認する
 - EMU sync 先にも secret / 顧客情報 / 個人メール / 具体 TPID / ローカル絶対パスを入れない。例は placeholder にする
 - `gh` で pull/push 権限が確認できるのに `git clone` が `Repository not found` になる場合は、repo 不在ではなく Git credential transport の不一致として扱い、clone に固執せず Contents / Git Data API で更新する
