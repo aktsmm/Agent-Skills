@@ -2,7 +2,7 @@
 
 ## Edit Rules
 
-- Before writing a new rule, check whether the repository already implements the same decision in scripts, generated assets, or another skill. A rule that contradicts working code makes the next run "fix" assets that were already correct.
+- Before writing a new rule, check whether the repository already implements the same decision in scripts, generated assets, or another skill. A rule that contradicts working code makes the next run "fix" assets that were already correct. A constraint tied to one machine or host (drive/DLP policy, installed CLI, account setup) normally belongs in the user's host-level instruction, not a portable skill: check for an existing one and, if present, do not copy it; if absent, report it as a handoff candidate instead of writing it here.
 - A single negative observation is not a rule. Before writing "the feature is absent here", rule out authentication state, activation, mode and environment; otherwise record the observation's conditions rather than an absolute.
 - Compaction targets the minimum information the model needs to act; human readability is secondary.
 - Use this refactor order: delete text unnecessary for normal/exception/stop decisions -> merge/compact needed text -> move long detail to `references/` -> add missing guidance. Age alone does not obsolete history; confirm its original is preserved before removal and retain unsaved notes.
