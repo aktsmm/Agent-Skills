@@ -57,6 +57,8 @@ metadata:
   user's if names are close, block only the stated available window for a
   conditional mark, and keep work holds in the work calendar until the user
   approves copying them elsewhere (see `references/portability.md`).
+- When creating an event that belongs to an existing series (for example numbered preparation blocks), read a sibling event first and set its colour category in the same write; a new event does not inherit it, and an uncoloured one is a defect. Read the category back.
+- A natural-language calendar answer can silently omit entries (it may state a result cap). For free-time or conflict decisions, read the date range directly with selected fields and a page size, narrow the range if it caps, and treat an unread range as unverified; never infer missing items from titles.
 - If an image or message does not establish a time, duration, location, target
   calendar, or whether the event is confirmed, ask only for the missing detail.
 - Check OOF first; exclude full-day OOF dates unless an explicit exception is
