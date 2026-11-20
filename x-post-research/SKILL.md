@@ -1,7 +1,7 @@
 ---
 name: x-post-research
-description: "Research public X posts from keywords, hashtags, OR queries, domains, or known post URLs, then verify linked primary sources, official docs, repositories, benchmarks, and relevant media. Use for X で調べて, X の反応, ハッシュタグ調査, キーワードで X 検索, launch reactions, or source-backed research notes. Not for posting, account operations, private posts, or continuous monitoring."
-argument-hint: "検索クエリまたは投稿 URL、必要なら時間窓・件数・保存先"
+description: "Research public X posts from keywords, hashtags, OR queries, domains, or known post URLs, then verify linked primary sources, official docs, repositories, benchmarks, and relevant media. Use for X で調べて, X の反応・返信・引用, ハッシュタグ調査, キーワードで X 検索, launch reactions, or source-backed research notes. Not for posting, account operations, private posts, or continuous monitoring."
+argument-hint: "検索クエリまたは投稿 URL（返信・引用も指定可）、必要なら時間窓・件数・保存先"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -31,8 +31,9 @@ Use FxTwitter, a third-party service separate from X's official API, to discover
 2. Encode query and cursor independently; never interpolate unescaped input into shell commands. Validate HTTP status, JSON `code: 200`, and response shape: search `results[]`, lookup a usable `status`, not an unavailable placeholder.
 3. Pass `cursor.bottom` as the next `cursor` only within the total budget. Stop at the bound, absent/repeated cursor, or no new relevant results. Requested `count` is a page size, not guaranteed coverage.
 4. Verify returned dates and handles, including `since:`, `until:`, or `from:` filters when supported. Split misleading compound `OR`/quoted queries into focused phrases and check relevance locally. An official page title can help discover reactions linking to it.
-5. On 429, honor `Retry-After` and retry at most once within the budget. Stop that route on other errors or repeated failure. A 404 on every search query while the known-post lookup still returns 200 means the search endpoint is down (observed 2026-11): go to step 6 instead of varying queries.
-6. If unavailable or page context is necessary, use available web search or an authorized browser session for public posts. Inspect actual tool capabilities; do not assume live search, script evaluation, or response observation exists. A signed-in browser session can run X's own search (`q=<tag> since:<date> until:<date>`, latest tab) and scroll for more results; image files are fetched from the media URL with `?format=jpg&name=large`. Keep browser work in task-owned tabs, preserve unrelated work, and close only owned tabs. Never bypass an explicit refusal/access restriction; stop on login challenges or repeated access failures.
+5. On 429, honor `Retry-After` and retry at most once within the budget. On other errors or repeated failure, stop that route. If search returns 404 but known-post lookup works, switch routes rather than testing more query variants; do not infer an outage for the entire provider.
+6. If unavailable or page context is necessary, use web search or an authorized browser for public posts. Verify available controls; use and close only task-owned tabs. For keywords, use X's **Latest** search with date bounds where useful. On a normal sign-in gate, pause for the user to sign in on the verified browser page; resume only once the intended X view renders. Do not collect credentials or bypass a challenge, refusal, or restriction. Stop on repeated access failures.
+7. For replies and quotes to a known post, inspect its rendered conversation and `/quotes` view. If incomplete, try **Latest** search with `conversation_id:<post-id>` for replies or `from:<known-handle> <distinctive-term>` for a known quote. `url:<post-id>` may return only the original. Verify the quoted ID or reply chain from the post or public lookup (`quote.id` or `replying_to.status` when present). Count direct replies, nested replies, and quotes separately; compare with displayed counters without assuming completeness.
 
 ## Analyze and verify
 
@@ -41,7 +42,7 @@ Use FxTwitter, a third-party service separate from X's official API, to discover
 3. Sort popularity candidates by observed likes/reposts/views after deduplication and record the observation date. Engagement is discovery evidence, not correctness.
 4. Follow primary docs, announcements, repositories, datasets, and benchmarks. Distinguish implemented behavior from roadmap/planned features, author benchmarks from independent measurements, and source claims from your inference.
 5. Separate evidence: A = primary artifact plus measurement; B = primary artifact; C = post demo/self-report; D = idea. Attribute video-only claims to the video; do not call implementation, accuracy, tokens, or costs independently verified.
-6. Inspect media before describing it: X Article title/blocks/citations, full-resolution images, and captions or representative video frames as needed. Do not infer unseen content. Preserve attribution/reuse conditions and avoid unnecessary redistribution.
+6. Inspect media before describing it: X Article title/blocks/citations, full-resolution images (`?format=jpg&name=large` when supported), and captions or representative video frames as needed. Do not infer unseen content. Preserve attribution/reuse conditions and avoid unnecessary redistribution.
 7. Prefer the minimum frames showing the claim (before/operation/after). Avoid irrelevant browser chrome, stale star counts, and pre-implementation cards with no value beyond a source link. Label author-added annotations clearly or omit misleading images.
 8. If reporting repository counts, verify approximately against current repository evidence and label estimates; never promote a truncated repository name or old card into confirmed evidence.
 
@@ -54,7 +55,7 @@ Use FxTwitter, a third-party service separate from X's official API, to discover
 
 ## Done criteria
 
-- Finite scope, relevance, HTTP/JSON shape, and deduplication were checked without credentials or account mutations.
+- Finite scope, relevance, HTTP/JSON shape where applicable, and deduplication were checked without handling credentials or mutating accounts.
 - Important claims have primary evidence or explicit uncertainty; popularity, self-reports, and measurements remain distinct.
 - Chat is sufficient for simple requests; requested artifacts parse/open and media provenance is retained when applicable.
 - Actual coverage, original URLs, fallback, and stop conditions are reported.
