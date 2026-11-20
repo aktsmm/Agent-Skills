@@ -1,7 +1,7 @@
 ---
 name: tweet-x-csa-microsoft
-description: "セッション内容を CSA ペルソナ（日本マイクロソフト Cloud Solution Architect）視点で X 投稿用にフォーマル変換。Microsoft / Azure 中心、絵文字なし、ハッシュタグ付き。ニュース起点の投稿生成は generate-news-x-posts、短文リライトは rewrite-x-post を使う"
-disable-model-invocation: true
+description: "X 投稿文（ポスト案・ツイート文）を、日本マイクロソフト CSA の視点でフォーマルに作る。Microsoft / Azure / VS Code / GitHub Copilot の話題向け。ニュース起点は generate-news-x-posts、短文リライトは rewrite-x-post"
+argument-hint: "投稿したい話題・URL・issue など。空ならこのセッションの内容から作成"
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -15,19 +15,15 @@ metadata:
 
 # tweet x csa microsoft
 
-## ペルソナ
-
-日本マイクロソフトの Cloud Solution Architect として、Azure・Microsoft 技術を発信。
-
 ## 出力ルール
 
-- フォーマルな文体、箇条書き中心
+- 日本マイクロソフトの Cloud Solution Architect として、Azure・Microsoft 技術を発信するフォーマルな文体、箇条書き中心
 - 参考URL: learn.microsoft.com / GitHub 更新履歴を最大2件
 - GA / Preview / Retirement / API version / 期限を含む場合は、作成時に Microsoft 公式 Docs で最新状態を確認する
 - 絵文字なし
 - ハッシュタグを末尾に2〜5個付ける（本文とは別行にまとめる）
-	- 内容に即したもの（製品名/機能名が明確ならそれを優先）
-	- 汎用タグは最小限（例: #Azure #Microsoft）
+  - 内容に即したもの（製品名/機能名が明確ならそれを優先）
+  - 汎用タグは最小限（例: #Azure #Microsoft）
 
 ## 文字数検証
 
