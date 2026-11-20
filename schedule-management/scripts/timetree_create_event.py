@@ -9,6 +9,7 @@ Notes: the UI is English; Label is left at the calendar default (e.g. Soft viole
 """
 import argparse
 import os
+import re
 import sys
 
 from playwright.sync_api import sync_playwright
@@ -51,18 +52,20 @@ def pick_time(page, idx, value):
 
 
 def open_month(page, year, month):
-    """Open the monthly view and wait until the header shows the requested month."""
+    """Open the monthly view and step with Prev/Next until the header shows the requested month."""
     page.goto(f"{base}/monthly/{year}/{month}")
-    want = f"{MONTHS[month - 1]}, {year}"
-    for _ in range(14):
+    want = (year, month)
+    for _ in range(40):
         page.wait_for_timeout(1500)
-        if want in page.evaluate("document.body.innerText"):
-            # The header renders before the events do; counting too early gives a false 0.
-            page.wait_for_timeout(5000)
-            return
-        page.get_by_role("button", name="Next month").click()
-    sys.exit(f"Could not open {want}")
-
+        m = re.search(r"(%s), (\d{4})" % "|".join(MONTHS), page.evaluate("document.body.innerText"))
+        if m:
+            cur = (int(m.group(2)), MONTHS.index(m.group(1)) + 1)
+            if cur == want:
+                # The header renders before the events do; counting too early gives a false 0.
+                page.wait_for_timeout(5000)
+                return
+            page.get_by_role("button", name="Next month" if cur < want else "Previous month").click()
+    sys.exit(f"Could not open {MONTHS[month - 1]}, {year}")
 
 def count_title(page):
     return page.evaluate("document.body.innerText").count(args.title)
@@ -80,8 +83,16 @@ with sync_playwright() as pw:
     page.goto(f"{base}/events/new?date={args.date}")
     page.wait_for_timeout(3500)
     page.get_by_placeholder("Event title (required)").fill(args.title)
-    vals = page.evaluate("[...document.querySelectorAll('input')].map(e=>e.value)")
-    idx = [i for i, v in enumerate(vals) if v.endswith(("AM", "PM"))]
+    # The form remembers the last All-day setting; timed events need it off.
+    for _ in range(2):
+        vals = page.evaluate("[...document.querySelectorAll('input')].map(e=>e.value)")
+        idx = [i for i, v in enumerate(vals) if v.endswith(("AM", "PM"))]
+        if len(idx) >= 2:
+            break
+        page.locator("input[type=checkbox]").first.evaluate("e=>e.click()")  # a text click does not toggle it
+        page.wait_for_timeout(1000)
+    if len(idx) < 2:
+        sys.exit("Could not switch off All-day; nothing was saved.")
     pick_time(page, idx[0], fmt(args.start))
     pick_time(page, idx[1], fmt(args.end))
     if args.location:
