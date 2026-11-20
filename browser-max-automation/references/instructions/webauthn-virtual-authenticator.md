@@ -52,6 +52,8 @@ CDP の `WebAuthn` domain で仮想認証機を使う承認済みフロー。認
 - **attach 先タブを正しく選ぶ**。仮想認証機は attach した page target でしか効かない。assertion 用は `#pk-btn` を持つ login タブ、register 用は `sw_page=RegPasskey` のような登録 URL のタブを最優先で掴む。同一サービスで認証済みドメイン (`site2.example.com`) と未認証 login ドメイン (`login.example.com`) のタブが共存しがちで、認証済み側に attach すると assertion ボタンが見つからず OS 生体認証 (Windows Hello / Touch ID) に fallback する。tab 解決は `期待 URL を含むタブ最優先 → 既存タブを navigate → 新規タブで開く` の順で fallback する
 - **attach と `#pk-btn` click は同じ helper context で連続実行する**。「ready で停止して click は外部 (MCP / 手動 / 別 prompt) に委任」する設計は、login タブ取り違えと CDP target lifetime で簡単に壊れる。同じ WebSocket 内で `Runtime.evaluate` → URL change poll まで完結させる
 - **登録上限**: 登録が上限で拒否されたら停止する。古いcredentialを自動削除せず、所有者と復旧手段を確認し、削除対象の明示承認後だけUIで削除する。
+- **登録で既存の同種 credential が置き換わるサイトがある**（X の 1 回の観測: 「パスキーを管理」に `Web` と `iPhone` があり、仮想認証機で追加すると削除操作なしに旧 `Web` が消えた）。登録前に既存 credential の種別・追加日を控えて置き換わる可能性を伝え、登録後に一覧を読み直して消えた項目を報告する。パスワード再入力は本人が行う。
+- **ログイン検証は別の一時プロファイルと空きポートで行い、認証済みセッションには触れない**。X では保存 credential を `addCredential` した新規プロファイルでユーザー名を入力しても、パスワード画面になりパスキー確認は出なかった（2 回）。`signCount` の増加かログイン成立を確認するまで、無人の再ログインができるとは報告せず、未確認として本人のログインへ戻す。
 - **既存 CDP セッション**: ポート接続成功だけでは所有を証明しない。他のcontrollerが同じtargetを使用中なら操作を停止し、owned targetに限定する。
 
 ## Credential JSON 永続化
