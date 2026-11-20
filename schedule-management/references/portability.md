@@ -33,3 +33,10 @@ What another environment needs to run `schedule-management` end to end.
 - Treat a cell marked partially available with a stated limit (for example "after 18:00") as available only inside that limit and block just that window; note the original range in the notes.
 - Register provisional holds with a leading `【仮】`, showAs tentative, no attendees and no location.
 - Work-related holds go to the work calendar first; ask before copying them to personal calendars.
+
+## Recurring Events
+
+- Outlook (Graph): recurrence pattern `relativeMonthly` with `index: second` and `daysOfWeek: [monday]`, range `noEnd`; the series master carries the recurrence, instances show `null`.
+- Google: `recurrence: ["RRULE:FREQ=MONTHLY;BYDAY=2MO"]` on the first occurrence; list with `singleEvents` to check the expansion.
+- TimeTree: the Repeat menu offers `2nd Monday each month`; editing a series then asks `Edit this event only` or `Edit all repeating events`, so choose deliberately.
+- None of them can skip holidays: write the skip rule in the body and tell the user.

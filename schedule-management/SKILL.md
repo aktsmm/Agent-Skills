@@ -57,7 +57,7 @@ metadata:
   user's if names are close, block only the stated available window for a
   conditional mark, and keep work holds in the work calendar until the user
   approves copying them elsewhere (see `references/portability.md`).
-- When creating an event that belongs to an existing series (for example numbered preparation blocks), read a sibling event first and set its colour category in the same write; a new event does not inherit it, and an uncoloured one is a defect. Read the category back.
+- When creating an event that belongs to an existing series (for example numbered preparation blocks), read a sibling event first and set its colour category in the same write; a new event does not inherit it, and an uncoloured one is a defect. Read the category back. With no sibling, choose the category by `references/labels.md`.
 - A natural-language calendar answer can silently omit entries (it may state a result cap). For free-time or conflict decisions, read the date range directly with selected fields and a page size, narrow the range if it caps, and treat an unread range as unverified; never infer missing items from titles.
 - If an image or message does not establish a time, duration, location, target
   calendar, or whether the event is confirmed, ask only for the missing detail.
@@ -109,6 +109,8 @@ metadata:
 | Google upsert (service account, idempotent key) | `scripts/google_calendar_upsert.py` |
 | TimeTree create and readback (dedicated CDP browser) | `scripts/start-calendar-browser.ps1`, `scripts/timetree_create_event.py` |
 | Environment variables, secrets, TimeTree gotchas, availability sheets, migration to another harness | `references/portability.md` |
+| Which category or label to give an event (by purpose and color) | `references/labels.md` |
+| Flight, leave and overlapping all-day banner patterns | `references/event-patterns.md` |
 
 ## Workflow
 
@@ -129,19 +131,26 @@ metadata:
      before the actual departure. Use
      `HH:MM発｜移動（出発駅 → 到着駅／新幹線）` as the title and record
      carrier, service number, and actual departure/arrival in notes. Apply the
-     purple `移動` category in Outlook and the `Soft violet` label in TimeTree.
+     purple travel category in Outlook (`references/labels.md`) and the
+     `Soft violet` label in TimeTree.
    - **Hotel:** use a one-hour check-in block. Put the check-in time in the title
      as `HH:MM チェックイン｜ホテル名`, apply the same purple travel label, and
      include hotel name, address, check-in, and check-out in notes.
    - **Appointment:** when a travel buffer is requested, block the requested
      buffer while keeping the confirmed appointment time in notes. Mark an
      unconfirmed appointment as provisional.
+    - **Flight:** the Travel title with airline and flight number, starting at the
+     user's stated airport lead time; departure in the departure airport's local
+     time, with the JST conversion in notes (`references/event-patterns.md`).
+    - **Leave:** an all-day out-of-office block titled `年休予定 | <purpose>` with
+     no category; its end date is the day after the last day in Google and
+     Outlook. Keep one all-day banner per purpose (`references/event-patterns.md`).
 5. Update existing event IDs in every approved destination; create only missing
    copies. For TimeTree, use visible UI and the requested label, not an
    undocumented API; the bundled script does this and reads the event back.
    After any TimeTree timeout or partial failure, count same-title events
-   before retrying; a blind retry creates duplicates. Match screenshots to their service/calendar before
-   diagnosing missing events.
+   before retrying; a blind retry creates duplicates. Match screenshots to
+   their service/calendar before diagnosing missing events.
    If one service is down (e.g. Graph 5xx), finish the others, retry the failed
    one later, and report each destination's state separately.
 6. Read back title, start/end, location, notes, privacy, reminders, and category
@@ -167,7 +176,11 @@ metadata:
   private flag only hides what the user needs to see. Outlook colours come from
   categories, not from `showAs`, so apply an existing colour category when the
   user asks for a colour (list the master categories first; do not rename or
-  create one without approval, and say which was used).
+  create one without approval, and say which was used; the owner's scheme is in
+  `references/labels.md`).
+- Edit-capable or token URLs (for example a Forms collaborator link) go into an
+  event body only with the owner's explicit OK and only on an event with no
+  attendees; warn that adding attendees or sharing the calendar later exposes them.
 - For a shared calendar, use a generic blocker without names or notes only when
   the user explicitly asks for a dummy event. Add its location only when the user
   explicitly requests it.
