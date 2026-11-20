@@ -121,6 +121,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 - 実行時の UI 文言（通知・確認ダイアログ・エラー）は、拡張の runtime i18n（`vscode.l10n.t` / `bundle.l10n` か専用の i18n module）に置く。`package.nls*.json` は manifest の `%key%` 専用で、実行時に JSON import しない。`rootDir` 外の JSON import や、テスト loader の `esModuleInterop` が必要になった時点で規約逸脱のサイン。
 - In `markdownDescription`, use native setting references such as `` `#editor.wordWrap#` ``, not `[label](#editor.wordWrap#)`: the latter can leave a trailing hash in the Settings `@id:` filter. Guard each locale's syntax and verify the resolved target.
 - 設定の並び順や説明を変えたら README の設定表、manifest consistency test、release notes の必要有無までまとめて見る。
+- Turning a limit (timeout, cap) into an opt-in or changing its default: add an explicit on/off setting and keep the old behavior for a user who had set the old value (for a machine-scoped setting only `inspect().globalValue` counts; resolve both in one shared function, and give test stub configs an `inspect`). Keep a bound on the part no setting covers (for example before the message is sent) and clear it once the work starts; never pass `undefined` to `setTimeout`, it fires almost at once. Carry which limit fired as a typed field and build the localized message at the UI layer, naming a setting only when it is on. Prove the wiring at the entry point (the request omits the limit when off) with a mutation probe, not only a resolver unit test.
 
 ### Replacing user-owned files
 
