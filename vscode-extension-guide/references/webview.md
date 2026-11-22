@@ -65,6 +65,14 @@ when unrelated history updates should not conflict; revision-based callers may
 intentionally use a stricter whole-store check. Reset must load a fresh baseline
 and disclose that unsaved input is discarded.
 
+When a command or notification button can open an editor that already holds
+unsaved input, pass an explicit protect flag and compare against the form's
+baseline before replacing it: reopening the same task keeps the form, a different
+task asks through a host-side confirmation first. Compare text with newlines
+normalized (a CRLF file read must not look dirty), and tag template, file and save
+results with a form generation or revision so a late result cannot overwrite what
+was typed. A programmatically filled field is not user input, so it needs no prompt.
+
 ```javascript
 let editingTaskSnapshot = null;
 let editingTaskNormalizedSnapshot = null;

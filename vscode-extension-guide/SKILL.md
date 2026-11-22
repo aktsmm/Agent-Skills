@@ -113,6 +113,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 - worker や別プロセスから受け取った結果をそのまま cache / 表示しない。許可キー検査は `Reflect.ownKeys`、必須キーの存在確認は `Object.hasOwn` で行う（`Object.keys` は非列挙の own property を見逃し、`in` や素の property 参照は継承値を通す）。
 - 例外の `Error.name` や `FileSystemError.code` をそのままログ / UI へ出さない。既知 code の allowlist へ正規化し、未知は単一の汎用 code に落とす。path や token が名前に混ざるケースを防げる。
 - キャッシュや共有ファイル（別拡張が書く index など）から読んだ表示用の値は、使う地点で型を確認し、長さに上限を付ける。非文字列で `replace` 等が例外になる。正規化関数は冪等にし（切り詰めた後に trim する）、先に再現テストを赤にしてから直す。
+- 存在しないかもしれないファイルに対して、先に実パス解決で境界（ルート内か）を判定しない。Windows CI の一時パスは 8.3 短縮名で、存在する側だけ展開され不一致になる。ファイルを開いた後に判定し、ENOENT は「無い」、それ以外の読取失敗は「不明」と分ける。
 
 ### Manifest / Docs / Localization
 
@@ -130,6 +131,7 @@ Keep local `.vsix` archives under `artifacts/vsix/` instead of the repository ro
 
 ### Language Model Tools
 
+- Treat the tool count as a budget: do not create many tools. Some agent harnesses cap how many tools they expose, and every schema consumes context. Expose one read-only query tool plus one `action`-based mutation tool per feature, reuse the existing handlers behind a thin dispatcher, and remove the old IDs with a migration note (README and CHANGELOG). A saved approval covers the whole merged tool, including delete and run: keep each confirmation in one handler (not both `prepareInvocation` and `invoke`) and make validation errors name the offending field.
 - Extension-provided LM Tools need strong `modelDescription` intent phrases. Prefer `Use when the user asks to ...` plus natural-language verbs for create/update/delete/toggle paths, and add a manifest/doc guard so future wording changes do not silently weaken agent-mode tool selection.
 - For configuration from VS Code Chat, prefer native LM Tools when no external client is required; do not call them an external MCP server. Share validated domain operations with the GUI, expose only necessary actions, and use explicit enable/disable values rather than retry-sensitive toggles.
 - Keep `prepareInvocation` side-effect free and request confirmation for mutations or sensitive disclosure. Revalidate input, cancellation, trust and the queried revision inside the locked write after confirmation. Host approval UI/policies still apply; custom confirmation text is not a bypass. Never accept secret values through tool arguments or silently widen execution permissions.

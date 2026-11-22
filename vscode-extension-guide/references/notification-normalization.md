@@ -12,6 +12,9 @@ The helper should:
 
 Keep the concrete TypeScript implementation aligned with the extension's existing logger, localization, and command APIs. Validate success, warning, error, duplicate suppression, and action-button paths with the extension's normal test framework.
 
+- Mark an error as user-notified (a `WeakSet`, so primitives are wrapped in an `Error` that keeps the original as `cause`) and make the notifier itself return early for a marked error. An outer catch that re-sends a failure the inner path already reported shows it twice; assert the warning count, and give each test a fresh error object because marks persist on identity.
+- A warning for a failed run names the task and puts a recovery action (open that task's settings) beside the copy action. Dedupe state for automatic runs keys on the failure's details (for example the missing-file set), is bypassed by manual runs, is cleared by any unrelated failure or success so a returning block warns again, and a late notification rejection may clear it only when the stored entry is still the one it created.
+
 ## Recurring Failures (startup and background refresh)
 
 - Classify a failure by a typed error `kind`, never by message text: messages are localized, so text matching sorts one failure differently per language.
