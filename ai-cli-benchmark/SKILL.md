@@ -51,8 +51,8 @@ metadata:
    - dataset、expected labels、prompt、schema、input order、model、reasoningを固定し、hashを取る。
    - accuracyと性能を同時に比較する場合、同じ合格条件を全providerへ適用する。
 2. **Define measurement boundaries**
-   - `one request`、`serial total`、`fresh-process end to end`を区別する。
-   - API直呼びとCLI起動込み時間を`model speed`として並べない。
+   - `one request`、`serial total`、`fresh-process end to end`を区別する。実測した入力処理（prefill）・生成（decode）の速度、初回応答時間、仕事全体の時間を、単位と試行数つきで個別に示す。
+   - API直呼びとCLI起動込み時間を`model speed`として並べない。初回応答の始点・終点（送信から最初の非空API本文までなど）を明記し、API本文の到達とCLI画面の初回表示を区別する。
 3. **Isolate each CLI**
    - repo外のowned temp directory、fresh process、一時`COPILOT_HOME` / auth-only `CODEX_HOME`を使う。
    - custom instructions、tools、MCP、session reuseは比較条件に必要なものだけ固定して残し、他は無効にする。secretを子processとlogへ渡さない。
@@ -79,7 +79,7 @@ metadata:
 
 - `cache write`はcache hitではない。readと分け、該当modelの料金区分で費用を計算する。
 - `uncached run`ではなく、観測どおり`cache read 0 run`または`cache-observed run`と書く。
-- CLI version、model、reasoning、prompt hash、nonce hash、fresh-process条件、測定境界、usage schemaを記載する。
+- CLI version、model、reasoning、prompt hash、nonce hash、fresh-process条件、測定境界、usage schemaを記載する。仕事全体の比較には、要求回数・出力量の差と独立採点の結果を添える。
 - cache read 0でも将来のwriteやhidden prefixの制御を保証しない。
 
 ## Done Criteria

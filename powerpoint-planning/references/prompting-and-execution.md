@@ -10,13 +10,14 @@ Use this reference when producing a production brief or prompt for local PowerPo
 - Slide count or density target
 - Section architecture
 - Storyline
-- Slide-by-slide instructions
+- Slide-by-slide instructions. For an existing deck, map source slide numbers to keep, condense, replace, move to appendix, or omit. If the brief calls for a separate audience or use case, specify which original stays read-only and the single maintained output name and location. For a plan-only request, propose both without creating or editing the deck.
+- Demo placement, when requested: tie each clip to the adjacent slide’s claim and specify what to show, target duration, and what evidence makes it usable. While validation is pending, hand off test criteria separately; request recording and embedding only in the agreed scope, based on verified behavior. Do not treat storyboard approval as validation.
 - Style mode
 - Design direction
 - Typography requirements
 - Page-level emphasis instructions
 - Anti-AI-slide requirements
-- Source handling rules
+- Source handling rules. For customer-facing FAQs, use approved internal material to identify recurring questions and public primary sources to substantiate answers. Keep unsupported answers, unresolved discrepancies, and internal sources in the planning notes, not in the customer deck.
 - Image generation instructions when needed
 - Human review conditions
 
