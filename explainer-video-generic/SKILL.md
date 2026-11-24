@@ -1,7 +1,7 @@
 ---
 name: explainer-video-generic
 description: |
-  Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on the local machine: brief -> storyboard -> HTML animation -> MP4 -> TTS narration + BGM. Works for any topic and any product or company, in Japanese, English or other languages. Use for "make an explainer video", "turn this deck/article into a video", "add narration and BGM to this silent video", "add explanations to this demo recording", "make a motion-graphics video", "make a translated version of this video", "change scene 3 of the video". Do NOT use for slide decks themselves (pptx), still images, audio-only podcasts, live-action editing, or summarizing/transcribing existing videos. Starts with a short multiple-choice brief (audience, length, tone, voice) and waits for plan approval before building.
+  Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on the local machine: brief -> storyboard -> HTML animation -> MP4 -> TTS narration + BGM. Works for any topic and any product or company, in Japanese, English or other languages. Use for "make an explainer video", "turn this deck/article into a video", "add narration and BGM to this silent video", "add explanations to this demo recording", "make a motion-graphics video", "make a translated version of this video", "change scene 3 of the video". Do NOT use for slide decks themselves (pptx), still images, audio-only podcasts, live-action editing, or summarizing/transcribing existing videos. Starts with a short multiple-choice brief (audience, length, tone, voice, music energy) and waits for plan approval before building; reviews the narration's pronunciation before delivery.
   日本語: 「解説動画を作って」「動画化して」「この資料/記事/ニュースを動画に」「デモ録画に解説とナレーションを付けて」「動画の英語版/日本語版を作って」。HTML/Canvas のモーショングラフィックスで、TTS は edge-tts / OpenAI / Azure / VOICEVOX / 任意コマンドから選べる。
 argument-hint: "題材・元ネタ(資料/URL/メモ/デモ録画)、視聴者、長さ目安、言語(ja/en等)、声(TTS)、出力先"
 user-invocable: true
@@ -38,12 +38,14 @@ request
 | File | Role |
 |---|---|
 | `assets/template_engine.html` | Editor/engine template. Only `VIDEO`, `C`, `SCENES` are edited. Playback, timing, SRT/VTT/TXT export, in-browser MP4 export included. English UI, Japanese UI via `VIDEO.uiLang: 'ja'` |
-| `assets/readings.ja.tsv`, `readings.en.tsv` | Pronunciation fixes applied to the TTS script only (auto-picked by `VIDEO.lang`); add project-specific names in a separate `readings_extra.tsv` |
+| `assets/readings.ja.tsv`, `readings.en.tsv` | Pronunciation fixes applied to the TTS script only (auto-picked by `VIDEO.lang`); add project-specific names in a separate `readings_extra.tsv`. `assets/risky.ja.tsv` lists context-dependent kanji for the pronunciation review |
 | `scripts/check_env.py` | Verifies python/numpy/ffmpeg/node/Playwright/browser/TTS deps and prints fixes |
 | `scripts/render.mjs` | `check`, `still`, `sheet` (contact sheet), `mp4` |
 | `scripts/narration.py` | `prepare`, `synth` (per-line TTS), `split` (external batch audio), `fit` |
-| `scripts/mix.py` | silent MP4 + narration WAVs + BGM -> MP4 with audio + SRT |
-| `scripts/icons.py` | `import` (user icon set), `extract` (pptx), `fetch` (web), `sheet`, `embed` |
+| `scripts/mix.py` | silent MP4 + narration WAVs + BGM (`auto`/`pad` calm, `pop`/`tech` upbeat, or a file) -> MP4 with audio + SRT |
+| `scripts/bgm_styles.py` | Upbeat synthesized BGM loops used by `mix.py --bgm pop\|tech` |
+| `scripts/review_narration.py` | Pronunciation review: risky words per line, optional ASR check (Whisper is just one example), `listen.wav` of the lines to hear |
+| `scripts/icons.py` | `import` (user icon set), `extract` (pptx), `fetch` (web, product page icon), `sheet`, `embed` (refuses empty SVGs) |
 | `scripts/clip_sheet.py` | Contact sheets of demo recordings (pattern C) |
 | `references/hearing-plan.md` | Brief questions, production-plan template |
 | `references/storyboard.md` | How to write the storyboard + template |
@@ -131,7 +133,7 @@ Create `$W/{slug}_brief.md` from [references/production-brief.md](references/pro
 2. Edit per [references/engine-guide.md](references/engine-guide.md): `VIDEO` (title, **unique slug with date**, `lang`, `uiLang`), `C`, `SCENES`. Do not touch section 2 (engine).
 3. Copy narration verbatim from the storyboard. Anchor captions and animation to narration lines: `at: 'L0'`, `L(i)`, so timing survives the later fit to audio.
 4. Remove the sample scenes and the word "Sample".
-5. **Logos/icons**: follow [references/icons.md](references/icons.md): user's set first, then web fetch with license notes; view the contact sheet; `icons.py embed`; draw with `oi(ctx, 'id', cx, cy, size)`.
+5. **Logos/icons (use the official ones actively)**: list every product/service/company named on screen or in narration and give each its real logo/icon, from the sources in [references/icons.md](references/icons.md) (user's set, vendor icon set, product page icon; license notes recorded). Generic line icons `icon()` are only for abstract concepts (approve, person, search), never for a named product. Do not give up after one source: try each source in order before falling back, and say which names fell back. View the contact sheet; `icons.py embed`; draw with `oi(ctx, 'id', cx, cy, size)`.
 6. **Date**: use the user's local date for `VIDEO.slug` suffix and `VIDEO.date`; end with an "as of {date}" line.
 
 ### Step 5: Check (all must pass before continuing)
@@ -160,6 +162,9 @@ node "$S/scripts/render.mjs" check "$W/{slug}.html"
 3. `synth` prints seconds and a pace column; look at lines flagged "unusual pace".
 4. `fit` writes the real durations into the HTML (`--keep` to never shorten, `--gap/--tail` to change pacing). For a scene that should show something after the last line, set `hold: seconds` on the scene.
 5. Audio from another tool: `prepare` -> synthesize `batchNN_turns.json` yourself -> `split --audio batch01=file.mp3` -> `fit`.
+6. **Review the pronunciation** before the final MP4, in two layers (details and limits in `narration-bgm.md`):
+   - **Self-review (always)**: read every `tts` line in `narr/lines.json` yourself and, for each kanji word with more than one reading (人, 行, 方, 後, 何, 生, 大人, 一言, counters, names, numbers/dates), decide the reading the voice will most likely produce versus the one the context needs. Do not trust the script's word list to be complete. Register every doubtful or wrong case in `readings_extra.tsv` as the surrounding phrase (e.g. `人が<TAB>ひとが`), not the bare character.
+   - **Script check**: `python "$S/scripts/review_narration.py" --work "$W/narr" --listen-wav "$W/narr/listen.wav"` (ASR optional). Fix misreadings via `readings_extra.tsv`, re-`synth`, `fit`.
 
 ### Step 7: Render the silent MP4
 
@@ -173,15 +178,16 @@ Rendering takes roughly 1.3-2x the video length (more with embedded recordings).
 ### Step 8: Mix BGM and finish
 
 ```bash
-python "$S/scripts/mix.py" --video "$W/{slug}.mp4" --placement "$W/narr/placement.json" --out "$W/{Title}_YYYYMMDD.mp4" [--bgm auto|none|file.mp3] [--lang en]
+python "$S/scripts/mix.py" --video "$W/{slug}.mp4" --placement "$W/narr/placement.json" --out "$W/{Title}_YYYYMMDD.mp4" [--bgm auto|pad|pop|tech|none|file.mp3] [--lang en]
 ```
 
-Default BGM is a synthesized pad (no copyright concerns); a user-supplied file is allowed (user holds the rights; never fetch commercial music). BGM ducks 8 dB under speech, final mix -16 LUFS, SRT written next to the MP4 (long lines are split into cues).
+Default BGM is a calm synthesized pad (no copyright concerns); `pop` / `tech` are upbeat synthesized loops for a livelier tone (ask in the brief); a user-supplied file is allowed (user holds the rights; never fetch commercial music). BGM ducks 8 dB under speech, final mix -16 LUFS, SRT written next to the MP4 (long lines are split into cues).
 
 ### Step 9: Verify and deliver
 
 - Probe the result (H.264 1920x1080 30 fps, AAC 48 kHz stereo, duration equals the HTML total): `mix.py` prints it. **Prove the audio is audible, not just present**: `ffmpeg -i out.mp4 -af volumedetect -vn -f null -` (mean about -20 dB) and `-af ebur128` (about -16 LUFS); a stream that exists can still be silent.
-- Extract 3-4 frames from the **final** MP4 and look at them (captions, highlights, logos).
+- Extract 3-4 frames from the **final** MP4 and look at them (captions, highlights, logos). Check that each named product shows its real icon (no generic glyph standing in) and list any that fell back.
+- Report which narration lines were checked by `review_narration.py` and which a person has listened to; do not call the pronunciation verified from an ASR pass alone.
 - Copy deliverables to `./output/` (or the user's folder): MP4, SRT, editable HTML, contact sheet, plus storyboard and plan (and brief for pattern B). Remove outdated dated versions unless asked to keep them, and remove your temporary files (not the user's).
 - Report with **absolute paths**, what was verified, and what was assumed. Say explicitly which file has the sound (the MP4) and that the editable HTML preview is silent. Mention sources used and anything the user should double-check.
 
@@ -191,9 +197,10 @@ Default BGM is a synthesized pad (no copyright concerns); a user-supplied file i
 - **People and sensitive news**: stick to what the primary source and reputable outlets state; do not repeat unverified allegations or private details; no speculation about guilt or motives.
 - **Finance**: state "news summary, not investment advice"; never predict prices.
 - **"Demo"**: call a scene a demo only if it shows a real screen recording; mark diagrams of screens "illustrative screen".
+- **Naming and attribution**: product named in full (never a generic noun alone); claims attributed to the owner ("Microsoft recommends"), sources in the storyboard, no on-screen source line unless asked. See `references/storyboard.md`.
 - **Logos/icons**: nominative use only (to identify the company), unmodified, with the source/license recorded. Do not imply endorsement. Ask before publishing branded material externally.
 - **Music/voices**: synthesized BGM by default; do not imitate a real person's voice.
-- **Privacy**: TTS backends other than local ones send the narration text to a third party.
+- **Privacy**: TTS backends other than local ones send the narration text to a third party. Real-environment screenshots are masked before embedding (see `references/demo-recording.md`).
 
 ## Placement (so agents discover the skill)
 

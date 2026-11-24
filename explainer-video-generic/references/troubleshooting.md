@@ -21,7 +21,10 @@ Locked-down machines may block public package registries (npm/PyPI). Use the org
 |---|---|---|
 | Robotic narration | a simple local synthesizer was used | use `narration.py synth` with edge/openai/azure/voicevox |
 | `synth` fails with HTTP 403 (edge) | the unofficial endpoint changed; old edge-tts | `pip install -U edge-tts`; otherwise switch backend |
-| Name or acronym mispronounced | missing reading | add to `readings_extra.tsv`, re-run `prepare` + `synth` (only that line is re-synthesized) |
+| Name or acronym mispronounced | missing reading | add to `readings_extra.tsv`, re-run `prepare` + `synth` (only that line is re-synthesized); find these before delivery with `review_narration.py` |
+| `synth` used a different voice than chosen | older flow ignored `prepare --voice`; or `--voice` omitted on another backend | check the `voice:` line printed by `synth`; pass `--voice` to both |
+| Embedded icon is invisible | an empty SVG (no shapes) | `icons.py embed` refuses it; fetch another source, view `icons.py sheet` |
+| BGM feels sleepy | default pad is calm | `mix.py --bgm pop` or `--bgm tech` |
 | Audio of a different length than the scene | audio not fitted yet | run `fit`, re-run `check`, re-render |
 | `check`: NaN | arithmetic in `draw` (divide by zero, undefined) | fix the scene and second reported |
 | `check`: text outside the safe area | line too long / near the edge | shorten, use `maxW`, move inward |

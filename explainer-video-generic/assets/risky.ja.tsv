@@ -1,0 +1,19 @@
+# Context-dependent Japanese words a TTS voice may misread. Format: regex<TAB>note (the intended reading). Matched text must appear in the transcript.
+# Keep this short: only words where the wrong reading is plausible. Add project-specific cases to a copy if needed.
+人(?=[がはをにのもとでだへ、。])	ひと (not にん)
+一人	ひとり
+二人	ふたり
+大人	おとな (not だいにん)
+今日	きょう
+昨日	きのう
+明日	あした
+上手	じょうず
+下手	へた
+行番号	ぎょうばんごう
+行う	おこなう
+行って	いって/おこなって (context)
+方(?=[がはをにのもと、。])	かた/ほう (context)
+何(?=[がをにのかで])	なに/なん (context)
+後(?=[でにはの、。])	あと/ご (context)
+生(?=[まきや])	う/い/なま (context)
+辛い	つらい/からい (context)

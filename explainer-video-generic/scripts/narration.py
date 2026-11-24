@@ -166,7 +166,7 @@ def cmd_prepare(a):
         cur.append(ln); cur_sec += e; cur_chars += len(ln['tts'])
     if cur:
         batches.append(cur)
-    manifest = {'title': tm['title'], 'slug': tm['slug'], 'lang': lang, 'voice': voice, 'batches': []}
+    manifest = {'title': tm['title'], 'slug': tm['slug'], 'lang': lang, 'voice': voice, 'voice_set': bool(a.voice), 'batches': []}
     for bi, b in enumerate(batches, 1):
         name = f'{prefix}{bi:02d}' if prefix != 'batch' else f'batch{bi:02d}'
         for ln in b:
@@ -333,9 +333,13 @@ def cmd_synth(a):
     lines = json.load(open(lj, encoding='utf-8'))
     man = json.load(open(os.path.join(a.work, 'manifest.json'), encoding='utf-8'))
     lang = man.get('lang', 'en')
-    voice = a.voice or default_voice(a.backend, lang)
+    # a voice chosen with `prepare --voice` is kept; otherwise the backend/language default applies
+    voice = a.voice or (man.get('voice') if man.get('voice_set') else None) or default_voice(a.backend, lang)
     if not voice:
         sys.exit('Set --voice for this backend/language.')
+    if man.get('voice_set') and a.voice and a.voice != man.get('voice'):
+        print(f"NOTE: --voice {a.voice} overrides the voice given to prepare ({man.get('voice')}).")
+    print(f"voice: {voice} ({a.backend})")
     fn, ext = BACKENDS[a.backend]
     wavdir = os.path.join(a.work, 'wav'); os.makedirs(wavdir, exist_ok=True)
     cache_p = os.path.join(a.work, 'synth_cache.json')

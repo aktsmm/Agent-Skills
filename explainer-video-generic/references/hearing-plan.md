@@ -26,7 +26,7 @@ Use the agent's question tool (multiple choice with a recommended default first)
 | 1 | Who is the audience? | Executives / decision makers; practitioners; general public; internal team; learners |
 | 2 | Length and count? | One video, 2-3 min; short (<= 1 min); one video, ~5 min; series of several |
 | 3 | Tone? | Calm and professional; bright and upbeat; technical with many diagrams; match the reference |
-| 4 | Voice and music? | Female voice + subtle BGM; male voice + subtle BGM; voice only; no audio (captions only) |
+| 4 | Voice and music? | Female voice + subtle BGM; male voice + subtle BGM; upbeat BGM (`pop`/`tech`, for a lively tone); voice only; no audio (captions only) |
 | 5 | Where will it be used? | Public / customer-facing (no confidential data); internal only |
 | 6 | Language? | Same as the request; English; Japanese; both |
 | 7 | Must include / avoid? | Nothing special; free text |

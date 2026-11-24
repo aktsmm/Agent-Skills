@@ -7,6 +7,7 @@ Record the real product screen, then add callouts, highlight frames and narratio
 - Record in segments of about 2 minutes; some agents/uploaders cap attachments (often ~200 MB). Name them in order (`01_request.mp4`, `02_plan.mp4`, ...).
 - Cut or speed up waiting time afterwards; do not show or mention processing time itself.
 - Keep personal names and real customer data off the screen (use a demo tenant/dataset).
+- Screenshots or recordings taken from a real environment: blur account/tenant/subscription/resource names, internal IPs and other-chat titles before embedding, state the masking in the on-screen note, and keep unmasked originals out of the deliverable folder.
 
 ## 2. Read the clips
 

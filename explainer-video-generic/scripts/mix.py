@@ -2,10 +2,10 @@
 """Mix narration (per-line WAVs) and background music into a silent MP4, and write an SRT subtitle file.
 
   python mix.py --video video.mp4 --placement narr/placement.json --out "Title_20261124.mp4"
-                [--bgm auto|none|music.mp3] [--duck-db 8] [--bgm-db -30] [--lufs -16] [--split-mb 190] [--lang en]
+                [--bgm auto|pad|pop|tech|none|music.mp3] [--duck-db 8] [--bgm-db -30] [--lufs -16] [--split-mb 190] [--lang en]
 
 - Narration is placed at the start times in placement.json (written by narration.py fit).
-- BGM defaults to a small synthesized pad (no copyright concerns). Pass a file to loop/cut it instead (you must hold the rights).
+- BGM: `auto`/`pad` = soft synthesized pad (92 BPM, calm); `pop` = bright 120 BPM; `tech` = driving 128 BPM (all generated, no copyright concerns). Pass a file to loop/cut it instead (you must hold the rights).
 - BGM ducks under the narration; the final mix is normalized to -16 LUFS / -1.5 dBTP.
 - The video stream is copied (no re-encode). Audio is AAC 48 kHz stereo 192 kbps. faststart.
 - Subtitles use the on-screen wording (before readings) and the real audio timing.
@@ -203,8 +203,12 @@ def main():
     if a.bgm == 'none':
         bgm = np.zeros((n, 2), np.float32)
     else:
-        if a.bgm == 'auto':
+        if a.bgm in ('auto', 'pad'):
             bgm = synth_bgm(vdur)
+        elif a.bgm in ('pop', 'tech'):
+            import bgm_styles
+            b = bgm_styles.loop(a.bgm)
+            bgm = np.tile(b, (int(np.ceil(n / len(b))), 1))[:n]
         else:
             b = decode(a.bgm)
             reps = int(np.ceil(n / len(b))) if len(b) else 1

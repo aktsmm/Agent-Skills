@@ -8,7 +8,9 @@
   fetch   : download from the web and record source + license in icons/ATTRIBUTION.json
       python icons.py fetch --out icons --simple nvidia,openai --color brand     # Simple Icons (CC0 artwork)
       python icons.py fetch --out icons --url nvidia=https://example.com/logo.svg  # any direct SVG/PNG URL
+      python icons.py fetch --out icons --page product=https://product.example.com/  # the icon a product's own page declares
       python icons.py fetch --out icons --search nvidia                            # look up Simple Icons slugs
+  (SVGs with no drawable shapes, e.g. placeholder exports, are flagged on fetch and refused by embed)
   sheet   : render a labeled contact sheet PNG of a folder (open it and CHECK every icon before use)
       python icons.py sheet --dir icons --out iconsheet.png
   embed   : write images into VIDEO.images of the HTML as data URIs (one self-contained file)
@@ -43,6 +45,24 @@ def log_attribution(out, entry):
     cur = json.load(open(p, encoding='utf-8')) if os.path.exists(p) else []
     cur = [e for e in cur if e.get('name') != entry['name']] + [entry]
     json.dump(cur, open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+
+def svg_shape_count(data):
+    """Drawable shapes in an SVG. 0 means a placeholder/broken export that renders as nothing (a valid-looking file of a few KB)."""
+    s = data.decode('utf-8', 'ignore') if isinstance(data, bytes) else data
+    return len(re.findall(r'<(?:path|circle|rect|ellipse|polygon|polyline|line|text|image)\b', s))
+
+
+def page_icon_urls(page_url):
+    """Icon links declared by a product's own page: <link rel="icon|shortcut icon|apple-touch-icon" href=...>, SVG first."""
+    html = http_get(page_url).decode('utf-8', 'ignore')
+    out = []
+    for tag in re.findall(r'<link\b[^>]*>', html, re.I):
+        if re.search(r'rel=["\'][^"\']*icon[^"\']*["\']', tag, re.I):
+            m = re.search(r'href=["\']([^"\']+)["\']', tag, re.I)
+            if m:
+                out.append(urllib.request.urljoin(page_url, m.group(1)))
+    return sorted(out, key=lambda u: not u.lower().split('?')[0].endswith('.svg'))
 
 
 # ------------------------------------------------------------------ import
@@ -158,6 +178,13 @@ def cmd_fetch(a):
         for e in hits[:25]:
             print(f"  slug={e.get('slug') or re.sub(r'[^a-z0-9]', '', e['title'].lower())}  title={e['title']}  brand={e.get('hex')}")
         return
+    for item in a.page or []:
+        name, pu = item.split('=', 1)
+        urls = page_icon_urls(pu)
+        if not urls:
+            print(f'  {name}: no <link rel="icon"> found on {pu}'); continue
+        a.url = (a.url or []) + [f'{name}={urls[0]}']
+        print(f'  {name}: page declares {len(urls)} icon link(s); using {urls[0]}')
     for item in a.url or []:
         name, u = item.split('=', 1)
         data = http_get(u)
@@ -165,7 +192,10 @@ def cmd_fetch(a):
         ext = ext if ext in IMG_EXT else ('.svg' if data.lstrip()[:5] in (b'<svg ', b'<?xml') or b'<svg' in data[:300] else '.png')
         fn = slug(name) + ext
         open(os.path.join(a.out, fn), 'wb').write(data)
-        log_attribution(a.out, {'name': name, 'file': fn, 'source': u, 'license': a.license or 'UNVERIFIED: check the site terms / brand guidelines before publishing', 'fetched': today})
+        empty = ext == '.svg' and svg_shape_count(data) == 0
+        if empty:
+            print(f'  WARNING {fn}: the SVG has no drawable shapes (placeholder / broken export). Do not use it; look for another source.')
+        log_attribution(a.out, {'name': name, 'file': fn, 'source': u, 'license': a.license or 'UNVERIFIED: check the site terms / brand guidelines before publishing', 'fetched': today, **({'unusable': 'empty SVG'} if empty else {})})
         print(f'Downloaded {name} -> {fn} (record: {a.license or "license unverified"})')
     if a.simple:
         data = si_data(a.out) if a.color == 'brand' else []
@@ -235,7 +265,10 @@ def cmd_embed(a):
         k, p = item.split('=', 1)
         ext = os.path.splitext(p)[1].lower()
         if ext == '.svg':
-            out[k] = 'data:image/svg+xml;base64,' + base64.b64encode(normalize_svg(open(p, 'rb').read())).decode()
+            raw = open(p, 'rb').read()
+            if svg_shape_count(raw) == 0:
+                sys.exit(f'{p}: the SVG has no drawable shapes (placeholder / broken export). Not embedded; use another source.')
+            out[k] = 'data:image/svg+xml;base64,' + base64.b64encode(normalize_svg(raw)).decode()
         else:
             try:
                 from PIL import Image
@@ -274,6 +307,7 @@ def main():
     p = sub.add_parser('fetch'); p.add_argument('--out', required=True); p.add_argument('--simple', help='comma-separated Simple Icons names/slugs')
     p.add_argument('--color', help="'brand' (Simple Icons brand color), a hex like 76B900, or 'none'"); p.add_argument('--url', nargs='+', help='NAME=URL (direct SVG/PNG)')
     p.add_argument('--license', help='license/terms note to record for --url downloads'); p.add_argument('--search', help='search Simple Icons slugs')
+    p.add_argument('--page', nargs='+', help="NAME=PAGE_URL: take the icon a product's own page declares (<link rel=\"icon\">)")
     p = sub.add_parser('sheet'); p.add_argument('--dir', required=True); p.add_argument('--out', required=True)
     p = sub.add_parser('embed'); p.add_argument('--html', required=True); p.add_argument('--map', nargs='+', required=True); p.add_argument('--max-png', type=int, default=360)
     a = ap.parse_args()

@@ -17,8 +17,8 @@ Diagrams read better with the real logo or icon of the product/company than with
    python "$S/scripts/icons.py" fetch --out "$W/icons" --simple nvidia,openai --color brand
    ```
    `--color brand` tints with the brand color from the Simple Icons data; a hex like `76B900` also works.
-4. **Product-specific icons** not in any set: the product's favicon/SVG from its official site or official GitHub organization.
-5. **Nothing found**: use the template's line icons `icon()` and say so in the report. Do not draw look-alike logos.
+4. **Product-specific icons** not in any set: the icon the product's own page declares (`python "$S/scripts/icons.py" fetch --out "$W/icons" --page NAME=https://product.example.com/` reads its `<link rel="icon">`, SVG first), or the official GitHub organization's assets.
+5. **Nothing found**: use the template's line icons `icon()` and say so in the report. Do not draw look-alike logos, and do not stand in a generic robot/agent glyph for a named product while a better source is untried.
 
 Every fetched icon is recorded in `$W/icons/ATTRIBUTION.json` (name, file, source URL, license note, date). Keep it with the deliverables.
 
@@ -36,6 +36,7 @@ python "$S/scripts/icons.py" embed --html "$W/{slug}.html" --map nvidia="$W/icon
 ## Rules
 
 - **View the contact sheet before use.** Make sure no icon carries the wrong name, and do not stand in a parent or related product's icon for the labeled product.
+- **Check that an SVG draws anything.** A file of a few KB can be an empty placeholder (valid XML, no path/circle/rect); `fetch` warns and `embed` refuses SVGs with no drawable shapes. Icon indexes and mirrors of portal assets are prone to this: render before trusting one.
 - **Do not redraw, imitate, recolor (except the single-color brand tint), crop, flip or rotate** official marks; keep the aspect ratio. Follow the owner's brand guidelines (clear space, minimum size).
 - **Do not call an icon "official" unless it came from the owner's own assets.** Report where each came from.
 - Show the product name in text near the logo.

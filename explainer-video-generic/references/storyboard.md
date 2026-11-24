@@ -13,6 +13,9 @@ The storyboard is the blueprint: when, what is on screen, what is said. The qual
 - **Keep it short**: 1.5-4 minutes; split longer material into episodes.
 - **Match the reference** if the user supplied one.
 - **No facts beyond the source.** Mark invented illustrations "(example)". Put dates on figures. Product/feature claims need an official-documentation URL under Sources; preview/beta features get a "preview" caption.
+- **Icons from the start.** In each scene's Screen note, name the real icon each product/service uses (and its source); mark "no icon found" only after trying every source in `icons.md`.
+- **Name the product in full.** Use its official full name at first mention and keep the distinguishing part afterwards ("SRE agent", not "the agent"); never shorten to a generic noun other products share. Apply it to narration, captions, section labels and subtitles. Ask the user for the localized official name if unsure.
+- **Attribute to the owner, not the document site.** Narrate "Microsoft recommends ..." rather than "the docs site says ..."; the document title and URL go under Sources. Show an on-screen source line only when the user asks for one.
 - **Numbers on screen** are rendered from data in the HTML (e.g. chart points), so they match the narration exactly.
 
 ## Fix the meaning of colors

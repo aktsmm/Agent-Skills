@@ -4,6 +4,18 @@
 # Numbers and dates: put the exact text from the script on the left and the full reading on the right
 # (e.g. 2026年3月<TAB>にせんにじゅうろくねん さんがつ).
 HTML	エイチティーエムエル
+SRE	エスアールイー
+VM	ブイエム
+PDF	ピーディーエフ
+SVG	エスブイジー
+URL	ユーアールエル
+IP	アイピー
+OS	オーエス
+DNS	ディーエヌエス
+VPN	ブイピーエヌ
+NAT	ナット
+SLA	エスエルエー
+SLO	エスエルオー
 MP4	エムピーフォー
 MP3	エムピースリー
 BGM	ビージーエム
