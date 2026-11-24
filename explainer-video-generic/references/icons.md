@@ -35,7 +35,7 @@ python "$S/scripts/icons.py" embed --html "$W/{slug}.html" --map nvidia="$W/icon
 
 ## Rules
 
-- **View the contact sheet before use.** Make sure no icon carries the wrong name.
+- **View the contact sheet before use.** Make sure no icon carries the wrong name, and do not stand in a parent or related product's icon for the labeled product.
 - **Do not redraw, imitate, recolor (except the single-color brand tint), crop, flip or rotate** official marks; keep the aspect ratio. Follow the owner's brand guidelines (clear space, minimum size).
 - **Do not call an icon "official" unless it came from the owner's own assets.** Report where each came from.
 - Show the product name in text near the logo.

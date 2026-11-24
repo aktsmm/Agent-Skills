@@ -12,7 +12,7 @@ The storyboard is the blueprint: when, what is on screen, what is said. The qual
 - **Timing comes from the narration**: about 6.5 characters/s for Japanese/Chinese, about 2.5 words/s for English/Latin scripts, plus pauses. The real TTS audio later replaces these estimates.
 - **Keep it short**: 1.5-4 minutes; split longer material into episodes.
 - **Match the reference** if the user supplied one.
-- **No facts beyond the source.** Mark invented illustrations "(example)". Put dates on figures.
+- **No facts beyond the source.** Mark invented illustrations "(example)". Put dates on figures. Product/feature claims need an official-documentation URL under Sources; preview/beta features get a "preview" caption.
 - **Numbers on screen** are rendered from data in the HTML (e.g. chart points), so they match the narration exactly.
 
 ## Fix the meaning of colors

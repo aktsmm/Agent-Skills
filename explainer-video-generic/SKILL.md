@@ -1,7 +1,7 @@
 ---
 name: explainer-video-generic
 description: |
-  Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on the local machine: brief -> storyboard -> HTML animation -> MP4 -> TTS narration + BGM. Works for any topic and any product or company, in Japanese, English or other languages. Use for "make an explainer video", "turn this deck/article into a video", "add narration and BGM to this silent video", "add explanations to this demo recording", "make a motion-graphics video", "make a translated version of this video". Do NOT use for slide decks themselves (pptx), still images, audio-only podcasts, live-action editing, or summarizing/transcribing existing videos. Starts with a short multiple-choice brief (audience, length, tone, voice) and waits for plan approval before building.
+  Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on the local machine: brief -> storyboard -> HTML animation -> MP4 -> TTS narration + BGM. Works for any topic and any product or company, in Japanese, English or other languages. Use for "make an explainer video", "turn this deck/article into a video", "add narration and BGM to this silent video", "add explanations to this demo recording", "make a motion-graphics video", "make a translated version of this video", "change scene 3 of the video". Do NOT use for slide decks themselves (pptx), still images, audio-only podcasts, live-action editing, or summarizing/transcribing existing videos. Starts with a short multiple-choice brief (audience, length, tone, voice) and waits for plan approval before building.
   日本語: 「解説動画を作って」「動画化して」「この資料/記事/ニュースを動画に」「デモ録画に解説とナレーションを付けて」「動画の英語版/日本語版を作って」。HTML/Canvas のモーショングラフィックスで、TTS は edge-tts / OpenAI / Azure / VOICEVOX / 任意コマンドから選べる。
 argument-hint: "題材・元ネタ(資料/URL/メモ/デモ録画)、視聴者、長さ目安、言語(ja/en等)、声(TTS)、出力先"
 user-invocable: true
@@ -53,6 +53,7 @@ request
 | `references/icons.md` | Finding and using logos and icons (own set, web, license notes) |
 | `references/production-brief.md` | Optional production-brief document (pattern B) |
 | `references/demo-recording.md` | Building from demo recordings (pattern C) |
+| `references/revisions.md` | Revising a finished video: request -> shortest command path |
 | `references/prompts.md` | Ready-made prompts for agents without this skill |
 | `references/troubleshooting.md` | Limits and common failures |
 
@@ -114,7 +115,7 @@ Details, questions and the plan template: [references/hearing-plan.md](reference
 
 ### Step 1b: Read the source
 
-Read documents fully (not only titles). For news/finance/current-events topics, research with primary sources first (company/agency releases), cross-check key numbers in at least two independent outlets, record dates, and prefer wording the source itself uses. Pattern C: `python "$S/scripts/clip_sheet.py" "$W/clips/*.mp4" --out "$W/sheets"` and read the sheets ([references/demo-recording.md](references/demo-recording.md)).
+Read documents fully (not only titles). For news/finance/current-events topics, research with primary sources first (company/agency releases), cross-check key numbers in at least two independent outlets, record dates, and prefer wording the source itself uses. For product or feature claims, verify against the vendor's official documentation and list the URLs under the storyboard's Sources; label preview/beta/unreleased features as such on screen. Pattern C: `python "$S/scripts/clip_sheet.py" "$W/clips/*.mp4" --out "$W/sheets"` and read the sheets ([references/demo-recording.md](references/demo-recording.md)).
 
 ### Step 2: Storyboard
 
@@ -189,6 +190,7 @@ Default BGM is a synthesized pad (no copyright concerns); a user-supplied file i
 - **Facts**: only from the source; attribute contested statements to who said them; put dates on time-sensitive figures; use an "as of" line.
 - **People and sensitive news**: stick to what the primary source and reputable outlets state; do not repeat unverified allegations or private details; no speculation about guilt or motives.
 - **Finance**: state "news summary, not investment advice"; never predict prices.
+- **"Demo"**: call a scene a demo only if it shows a real screen recording; mark diagrams of screens "illustrative screen".
 - **Logos/icons**: nominative use only (to identify the company), unmodified, with the source/license recorded. Do not imply endorsement. Ask before publishing branded material externally.
 - **Music/voices**: synthesized BGM by default; do not imitate a real person's voice.
 - **Privacy**: TTS backends other than local ones send the narration text to a third party.
