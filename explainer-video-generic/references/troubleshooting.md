@@ -29,6 +29,7 @@ Locked-down machines may block public package registries (npm/PyPI). Use the org
 | `split` pace column extreme | wrong cut positions | compare with the script; re-synthesize that batch; `--skip-head` if a title is read first |
 | Previous video's timing/captions show up in the editor | same `VIDEO.slug` (browser autosave) | change the slug; press "Reset" in the editor |
 | In-browser export yields a tiny/black MP4 | tab in the background / asset restrictions | keep the tab in front, pick assets under "Asset files", or use `render.mjs mp4` |
+| "There is no audio" | the editable HTML (or the silent MP4) was played; only the final MP4 from `mix.py` has narration/BGM | play the final `{Title}_YYYYMMDD.mp4`; confirm with `ffmpeg -i out.mp4 -af volumedetect -vn -f null -` (mean about -20 dB) |
 | Browser says MP4 export unsupported | old browser | current Chrome/Edge |
 | 4K export falls back to Full HD | the machine cannot encode 4K H.264 | use `render.mjs mp4 --scale 2` |
 | `render.mjs`: no usable browser | no Chromium found | `npx playwright install chromium` or set `XV_CHROME` |

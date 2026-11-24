@@ -110,7 +110,7 @@ Details, questions and the plan template: [references/hearing-plan.md](reference
 1. **Read** the request/attachments first; skim the source for size and structure. If a file cannot be read (encrypted, blocked), say so and ask for another copy.
 2. **Brief**: ask the still-open items (max 4) in **one** multiple-choice round using the agent's question tool (e.g. `ask_user`), else one short numbered message. Put the recommended default first. **Always include the checkpoint question.**
 3. **Plan**: write `$W/{slug}_plan.md` (goal, spec, outline, checkpoints, defaults used, deliverables) and summarize it in chat. State clearly that the deliverable is an MP4 with audio and where you will pause.
-4. **Get approval** before the storyboard. If the user says "just do it", show a short plan anyway, then proceed (still ask for a topic if there is no source or theme).
+4. **Get approval** before the storyboard. A supplied topic or "go ahead" does not waive the brief and plan; only an explicit "no questions / just do it / decide for me" does. Then show a short plan anyway and proceed (still ask for a topic if there is no source or theme), and say in the report that the brief was skipped at the user's request.
 
 ### Step 1b: Read the source
 
@@ -179,10 +179,10 @@ Default BGM is a synthesized pad (no copyright concerns); a user-supplied file i
 
 ### Step 9: Verify and deliver
 
-- Probe the result (H.264 1920x1080 30 fps, AAC 48 kHz stereo, duration equals the HTML total): `mix.py` prints it; loudness check: `ffmpeg -i out.mp4 -af ebur128 -f null -`.
+- Probe the result (H.264 1920x1080 30 fps, AAC 48 kHz stereo, duration equals the HTML total): `mix.py` prints it. **Prove the audio is audible, not just present**: `ffmpeg -i out.mp4 -af volumedetect -vn -f null -` (mean about -20 dB) and `-af ebur128` (about -16 LUFS); a stream that exists can still be silent.
 - Extract 3-4 frames from the **final** MP4 and look at them (captions, highlights, logos).
 - Copy deliverables to `./output/` (or the user's folder): MP4, SRT, editable HTML, contact sheet, plus storyboard and plan (and brief for pattern B). Remove outdated dated versions unless asked to keep them, and remove your temporary files (not the user's).
-- Report with **absolute paths**, what was verified, and what was assumed. Mention sources used and anything the user should double-check.
+- Report with **absolute paths**, what was verified, and what was assumed. Say explicitly which file has the sound (the MP4) and that the editable HTML preview is silent. Mention sources used and anything the user should double-check.
 
 ## Content and rights rules
 
