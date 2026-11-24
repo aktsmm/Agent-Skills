@@ -1,0 +1,36 @@
+# Pronunciation readings applied to the TTS script only (screen text and subtitles are never changed).
+# Format: surface<TAB>reading. Longer surface forms are applied first. Lines starting with # are comments.
+# Per-project additions go in a separate file passed with --readings (it overrides this file).
+# Numbers and dates: put the exact text from the script on the left and the full reading on the right
+# (e.g. 2026年3月<TAB>にせんにじゅうろくねん さんがつ).
+HTML	エイチティーエムエル
+MP4	エムピーフォー
+MP3	エムピースリー
+BGM	ビージーエム
+MCP	エムシーピー
+RAG	ラグ
+LLM	エルエルエム
+API	エーピーアイ
+SaaS	サース
+PaaS	パース
+IaaS	イアース
+KPI	ケーピーアイ
+ROI	アールオーアイ
+FAQ	エフエーキュー
+SQL	エスキューエル
+CPU	シーピーユー
+GPU	ジーピーユー
+PC	ピーシー
+DX	ディーエックス
+IT	アイティー
+AI	エーアイ
+ID	アイディー
+Web	ウェブ
+UI	ユーアイ
+EPS	イーピーエス
+CEO	シーイーオー
+CFO	シーエフオー
+# Commonly misread Japanese (examples)
+止める	とめる
+止まる	とまる
+止めて	とめて

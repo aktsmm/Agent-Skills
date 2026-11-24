@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample: How an explainer video is made - Explainer Video Editor</title>
+<style>
+  :root { --navy:#0B1F3A; --sub:#4A5A73; --line:#D9DEE6; --bg:#F3F5F8; --acc:#2563EB; --ng:#C2410C; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:"Inter","Segoe UI","Helvetica Neue","Arial","Yu Gothic UI","Meiryo UI","Hiragino Sans","Noto Sans CJK JP","Noto Sans",sans-serif; color:var(--navy); background:var(--bg); }
+  header { padding:10px 18px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:baseline; gap:14px; }
+  header h1 { font-size:18px; margin:0; }
+  header small { color:var(--sub); }
+  main { display:grid; grid-template-columns: minmax(0,1fr) 400px; gap:14px; padding:14px; }
+  #left { min-width:0; }
+  #stageWrap { background:#000; border-radius:8px; overflow:hidden; }
+  #stage { width:100%; height:auto; display:block; aspect-ratio:16/9; }
+  .row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:8px 0; }
+  button, select, input[type=number] { font:inherit; font-size:13px; }
+  button { border:1px solid var(--line); background:#fff; border-radius:6px; padding:5px 10px; cursor:pointer; }
+  button.primary { background:var(--acc); color:#fff; border-color:var(--acc); }
+  button:disabled { opacity:.5; cursor:default; }
+  #seek { flex:1; min-width:200px; }
+  #timeline { position:relative; height:34px; background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  #timeline .band { position:absolute; top:0; bottom:0; border-right:1px solid var(--line); font-size:11px; padding:3px 5px; overflow:hidden; white-space:nowrap; cursor:pointer; }
+  #timeline .band:nth-child(odd) { background:#EEF3FB; }
+  #timeline .line { position:absolute; top:22px; width:2px; height:10px; background:#7C3AED; }
+  #playhead { position:absolute; top:0; bottom:0; width:2px; background:#C2410C; pointer-events:none; }
+  #side { background:#fff; border:1px solid var(--line); border-radius:8px; padding:12px; font-size:13px; max-height:calc(100vh - 90px); overflow:auto; }
+  #side h2 { font-size:14px; margin:14px 0 6px; border-left:4px solid var(--acc); padding-left:6px; }
+  #side h2:first-child { margin-top:0; }
+  table { border-collapse:collapse; width:100%; }
+  td, th { border-bottom:1px solid var(--line); padding:4px 3px; text-align:left; vertical-align:middle; }
+  td input { width:62px; }
+  .ok { color:#15803D; } .ng { color:var(--ng); font-weight:600; }
+  #msg { white-space:pre-wrap; background:#F8FAFC; border:1px solid var(--line); border-radius:6px; padding:6px; min-height:36px; font-size:12px; }
+  progress { width:100%; }
+  .note { color:var(--sub); font-size:12px; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header><h1 id="ttl">Sample: How an explainer video is made</h1><small id="meta"></small></header>
+<main>
+  <div id="left">
+    <div id="stageWrap"><canvas id="stage" width="1920" height="1080"></canvas></div>
+    <div class="row">
+      <button id="btnPlay" class="primary">&#9654; Play</button>
+      <button id="btnPrev" data-i="prev">&#9664; Prev scene</button>
+      <button id="btnNext" data-i="next">Next scene &#9654;</button>
+      <input id="seek" type="range" min="0" max="100" step="0.01" value="0">
+      <span id="clock">0:00.0 / 0:00.0</span>
+    </div>
+    <div id="timeline"><div id="playhead"></div></div>
+    <div class="row">
+      <label><input type="checkbox" id="optCap" checked> <span data-i="optCap">Captions</span></label>
+      <label><input type="checkbox" id="optSubs"> <span data-i="optSubs">Narration subtitles</span></label>
+      <label><input type="checkbox" id="optGuide" checked> <span data-i="optGuide">Production guides</span></label>
+      <label><input type="checkbox" id="optSpeech"> <span data-i="optSpeech">Browser voice preview (timing check only)</span></label>
+    </div>
+    <p class="note" data-i="keys">Keys: Space = play/pause, Left/Right = +/-1 s, [ ] = previous/next scene. Edits are auto-saved in this browser.</p>
+  </div>
+  <aside id="side">
+    <h2 data-i="hScenes">Scenes and timing</h2>
+    <table id="sceneTable"><thead><tr><th>#</th><th data-i="thScene">Scene</th><th data-i="thDur">Dur (s)</th><th data-i="thEst">Est.</th><th data-i="thStatus">Status</th></tr></thead><tbody></tbody></table>
+    <div class="row">
+      <button id="btnFit" data-i="btnFit">Auto-fit durations to narration</button>
+      <button id="btnReset" data-i="btnReset">Reset</button>
+    </div>
+    <p class="note" id="fitNote"></p>
+
+    <h2 data-i="hAssets">Asset files</h2>
+    <p class="note" data-i="assetNote">If the video uses video/image assets and you open this HTML by double-clicking, MP4 export may stall. Pick the asset files here to export reliably.</p>
+    <input type="file" id="assetPicker" multiple accept="video/*,image/*">
+
+    <h2 data-i="hExport">Export</h2>
+    <div class="row">
+      <select id="expRes"><option value="1" data-i="res1">Full HD (1920x1080)</option><option value="2" data-i="res2">4K (3840x2160)</option></select>
+      <select id="expRange"><option value="all" data-i="rAll">Whole video</option><option value="test" data-i="rTest">Test (0-5 s)</option><option value="scene" data-i="rScene">Current scene only</option></select>
+    </div>
+    <div class="row">
+      <label><input type="checkbox" id="expCap" checked> <span data-i="expCap">Include captions</span></label>
+      <label><input type="checkbox" id="expSubs"> <span data-i="expSubs">Burn in narration subtitles</span></label>
+    </div>
+    <div class="row">
+      <button id="btnMp4" class="primary" data-i="btnMp4">Export MP4 (silent)</button>
+      <button id="btnCancel" data-i="btnCancel" disabled>Cancel</button>
+    </div>
+    <progress id="prog" max="1" value="0"></progress>
+    <div class="row">
+      <button id="btnSrt">SRT</button>
+      <button id="btnVtt">VTT</button>
+      <button id="btnTxt" data-i="btnTxt">Narration script TXT</button>
+      <button id="btnTiming" data-i="btnTiming">Timing JSON</button>
+      <button id="btnPng" data-i="btnPng">Current frame PNG</button>
+    </div>
+    <div class="row">
+      <button id="btnSaveSet" data-i="btnSaveSet">Save adjustments (JSON)</button>
+      <label class="note"><span data-i="load">Load</span> <input type="file" id="setPicker" accept=".json"></label>
+    </div>
+    <div id="msg"></div>
+  </aside>
+</main>
+
+<script>
+/* =====================================================================
+   Explainer-video editor (template).
+   Edit section 1 ("Video content": VIDEO, C, SCENES) and leave section 2 (engine) alone.
+   ===================================================================== */
+
+/* ---------- 1-a. Video settings ---------- */
+const VIDEO = {
+  title: 'Sample: How an explainer video is made',   // shown in the editor header; basis of file names
+  slug:  'xv-sample',        // [a-z0-9-] plus the creation date (e.g. nvidia-update-20261124). MUST be unique per video (autosave key + export file names)
+  date:  '',                 // creation date text for the closing "as of" line (e.g. 'November 24, 2026')
+  lang:  'en',               // narration language: 'en' | 'ja' | 'zh' | 'ko' | 'es' ... (BCP-47 prefix; drives timing estimates, TTS defaults, preview voice)
+  uiLang: 'en',              // editor UI language: 'en' | 'ja'
+  fps:   30,
+  images: {},                // logos/icons as data URIs: filled by scripts/icons.py embed. Draw with img() / oi()
+};
+
+/* ---------- 1-b. Colors (fix each color's meaning and keep it) ---------- */
+const C = {
+  bg:'#F7F9FC', panel:'#FFFFFF', line:'#D9DEE6', navy:'#0B1F3A', sub:'#4A5A73', muted:'#B8C0CC',
+  blue:'#2563EB', blueL:'#DBEAFE', green:'#15803D', greenL:'#DCFCE7', purple:'#7C3AED', purpleL:'#EDE9FE',
+  orange:'#EA580C', orangeL:'#FFEDD5', gold:'#C9A227', goldL:'#FBF3D5',
+};
+
+/* ---------- 1-c. Scenes ----------
+   duration   : scene length in seconds (overwritten by FIT once narration audio exists)
+   narration  : [{ at: seconds, text: 'line' }]   at = seconds inside the scene (a rough target is fine)
+   captions   : [{ at: seconds | 'L1' (start of narration line 1), main:'caption', sub:'detail' }]
+   media      : [{ id, src, from: scene-second playback starts, start: source offset, rate: speed }]  (optional)
+   hold       : seconds to keep after the last narration line (optional; floor when fitting to audio)
+   draw(ctx,t): t = seconds inside the scene. L(i) = start second of narration line i (0-based)
+--------------------------------------------------------------------- */
+const SCENES = [
+  {
+    id: 's1', title: 'The question', duration: 13,
+    narration: [
+      { at: 0.8, text: 'You have the material, but the message still does not land. Sound familiar?' },
+      { at: 6.5, text: 'Add motion and a voice, and the same content becomes far easier to understand.' },
+    ],
+    captions: [
+      { at: 'L0', main: 'The material is there, but it does not land', sub: '' },
+      { at: 'L1', main: 'Motion and voice change how it is received', sub: '' },
+    ],
+    draw(ctx, t) {
+      bg(ctx);
+      act(ctx, 'Question');
+      // left: a static document
+      const a1 = IN(t, 0.3, 0.6);
+      fx(ctx, a1, 20, () => {
+        rbox(ctx, 360, 230, 420, 520, { fill: C.panel, stroke: C.line, r: 18, shadow: true });
+        icon(ctx, 'doc', 570, 380, 120, C.sub);
+        for (let k = 0; k < 5; k++) rbox(ctx, 420, 500 + k * 42, 300 - (k % 2) * 80, 14, { fill: C.line, r: 7 });
+        text(ctx, 'Document', 570, 290, { size: 34, weight: 700, color: C.sub });
+      });
+      // right: a viewer; the arrow stalls at first, then reaches
+      const reach = IN(t, L(1) + 0.4, 0.8);
+      fx(ctx, IN(t, 2.0, 0.6), 20, () => {
+        icon(ctx, 'person', 1440, 470, 150, C.navy);
+        bubble(ctx, 1440, 300, reach > 0.5 ? 'Got it!' : '...?', { color: reach > 0.5 ? C.green : C.muted });
+      });
+      const reachLen = lerp(0.45, 1, reach) * IN(t, 1.6, 0.8);
+      arrow(ctx, 820, 490, 1320, 490, { color: reach > 0.5 ? C.blue : C.muted, lw: 8, progress: reachLen, dash: reach > 0.5 ? null : [18, 14] });
+      fx(ctx, reach, 0, () => {
+        icon(ctx, 'video', 1070, 400, 70, C.blue);
+        icon(ctx, 'mic', 1150, 400, 60, C.purple);
+      });
+    },
+  },
+  {
+    id: 's2', title: 'Five steps', duration: 26,
+    narration: [
+      { at: 0.6, text: 'An explainer video comes together in five steps.' },
+      { at: 4.0, text: 'First, turn the source material into a storyboard: what is on screen and what is said, scene by scene.' },
+      { at: 11.8, text: 'Next, build the animation in HTML from the storyboard and render it to MP4.' },
+      { at: 18.8, text: 'Finally, add narration and background music, and it is done.' },
+    ],
+    captions: [
+      { at: 'L0', main: 'Five steps to a finished video', sub: '' },
+      { at: 'L1', main: '1 Source  ->  2 Storyboard', sub: 'Decide the screen and the words, scene by scene' },
+      { at: 'L2', main: '3 Build in HTML  ->  4 Render to MP4', sub: '' },
+      { at: 'L3', main: '5 Add narration and music', sub: '' },
+    ],
+    draw(ctx, t) {
+      bg(ctx);
+      act(ctx, 'Flow');
+      const steps = [
+        { label: 'Source', sub: 'docs, notes', ic: 'doc', col: C.sub, on: L(1) },
+        { label: 'Storyboard', sub: 'screen + words', ic: 'board', col: C.purple, on: L(1) + 1.6 },
+        { label: 'HTML', sub: 'animation', ic: 'code', col: C.blue, on: L(2) },
+        { label: 'MP4', sub: 'silent video', ic: 'video', col: C.blue, on: L(2) + 3.0 },
+        { label: 'Narration', sub: 'plus music', ic: 'mic', col: C.green, on: L(3) },
+      ];
+      const x0 = 250, gap = 355, y = 470;
+      steps.forEach((s, k) => {
+        const x = x0 + k * gap;
+        const appear = IN(t, 0.5 + k * 0.35, 0.5);
+        const lit = IN(t, s.on, 0.5);
+        fx(ctx, appear, 24, () => {
+          rbox(ctx, x - 140, y - 150, 280, 300, { fill: lit > 0.5 ? C.panel : '#F1F4F8', stroke: lit > 0.5 ? s.col : C.line, lw: lit > 0.5 ? 4 : 2, r: 22, shadow: lit > 0.5 });
+          icon(ctx, s.ic, x, y - 50, 96, lit > 0.5 ? s.col : C.muted);
+          text(ctx, s.label, x, y + 60, { size: 30, weight: 700, color: lit > 0.5 ? C.navy : C.muted });
+          text(ctx, s.sub, x, y + 120, { size: 24, weight: 500, color: C.sub });
+          text(ctx, String(k + 1), x - 110, y - 120, { size: 28, weight: 800, color: lit > 0.5 ? s.col : C.muted });
+        });
+        if (k < steps.length - 1) arrow(ctx, x + 150, y, x + gap - 150, y, { color: C.muted, lw: 5, head: 14, progress: IN(t, steps[k + 1].on - 0.3, 0.5) });
+      });
+      // highlight the storyboard
+      const hi = IN(t, L(1) + 2.2, 0.5) * OUT(t, L(2) - 0.4, 0.4);
+      if (hi > 0) fx(ctx, hi, 0, () => {
+        rbox(ctx, x0 + gap - 160, y - 170, 320, 340, { stroke: C.gold, lw: 6, r: 28 });
+        chip(ctx, 'Most important', x0 + gap, y - 205, { fill: C.gold, color: '#fff', size: 26 });
+      });
+    },
+  },
+  {
+    id: 's3', title: 'Takeaway', duration: 10, hold: 2.5,
+    narration: [
+      { at: 0.6, text: 'The storyboard matters most.' },
+      { at: 4.0, text: 'With a solid blueprint, the finished video almost takes care of itself.' },
+    ],
+    captions: [
+      { at: 'L0', main: 'Storyboard = the blueprint of the video', sub: '' },
+      { at: 'L1', main: 'A good blueprint makes a good video', sub: '' },
+    ],
+    draw(ctx, t) {
+      bg(ctx);
+      act(ctx, 'Takeaway');
+      fx(ctx, IN(t, 0.4, 0.7), 30, () => {
+        icon(ctx, 'board', 960, 330, 170, C.purple);
+        text(ctx, 'Storyboard', 960, 500, { size: 64, weight: 800, color: C.navy });
+      });
+      const items = ['Scene-by-scene script', 'On-screen motion', 'Captions'];
+      items.forEach((s, k) => {
+        fx(ctx, IN(t, L(1) + 0.3 + k * 0.5, 0.5), 18, () => {
+          const x = 560 + k * 400;
+          icon(ctx, 'check', x - 150, 640, 44, C.green);
+          text(ctx, s, x - 115, 640, { size: 32, weight: 600, color: C.navy, align: 'left' });
+        });
+      });
+      note(ctx, 'Sample video');
+    },
+  },
+];
+
+/* =====================================================================
+   2. Engine (leave alone)
+   ===================================================================== */
+/*FIT-BEGIN*/const FIT = null;/*FIT-END*/
+
+const W = 1920, H = 1080;
+const SAFE = { x: 96, y: 54 };
+const XF = 0.5;               // crossfade between scenes (seconds)
+const CPS = 6.5;              // reading speed for CJK text (characters/second); Latin text is estimated in words (see estDur)
+const FONT = '"Inter","Segoe UI","Helvetica Neue","Arial","Yu Gothic UI","Meiryo UI","Hiragino Sans","Noto Sans CJK JP","Noto Sans CJK SC","Noto Sans CJK KR","Noto Sans","Noto Sans JP",sans-serif';
+const STORE_KEY = 'xv:' + VIDEO.slug + ':v1';
+
+/* ---------- UI strings (English is the default written into the HTML; add a language by adding a dictionary) ---------- */
+const EN = {
+  play: '\u25B6 Play', stop: '\u275A\u275A Pause',
+  safeArea: (id, s) => `[${id}] text is outside the safe area: "${s}"`,
+  renderErr: (id, m) => `[${id}] render error: ${m}`,
+  waitAsset: id => 'Waiting for asset: ' + id,
+  nanInf: nm => nm + ' got NaN/Infinity',
+  errAt: (id, t, m) => `[${id}] ${t} s: ${m}`,
+  overflow: (id, k, sec, what) => `[${id}] narration line ${k} is expected to overrun by ${sec} s (${what})`,
+  nextLine: 'the next line', sceneEnd: 'the end of the scene',
+  overflowShort: k => `line ${k} overruns`,
+  fitLocked: 'Durations are locked to the synthesized narration audio. ', unlock: 'Edit by hand',
+  fitUnlocked: 'Editing durations that were fitted to audio. Save adjustments before re-attaching audio.',
+  fitEstimate: 'Durations are estimates (about 6.5 characters or 2.6 words per second). They lock to the real audio once narration is synthesized.',
+  autoFitDone: 'Adjusted line starts and scene durations to the estimated narration length.',
+  reset: 'Restored the default durations.',
+  meta: (t, n, f) => `${t} total, ${n} scenes, ${f}fps`,
+  exporting: 'Exporting. Keep this tab in the foreground.',
+  exported: (name, mb, sec, codec, took) => `Exported: ${name}\n${mb} MB, ${sec} s, ${codec}, took ${took} s.`,
+  fell1080: '\nThis machine cannot encode 4K H.264, so Full HD was used.',
+  cancelled: 'Cancelled.',
+  noH264: 'This browser cannot export MP4. Use a current Chrome or Edge.',
+  tainted: 'Export was blocked by asset-loading restrictions. Re-select the files under "Asset files" and try again.',
+  failed: m => 'Export failed: ' + m,
+  loaded: 'Adjustments loaded.', loadFail: m => 'Could not load: ' + m,
+  assets: n => `Replaced ${n} asset(s).`,
+  scriptHead: (s, t) => `## ${s} (from ${t})`,
+};
+const JA = {
+  play: '\u25B6 再生', stop: '\u275A\u275A 停止',
+  prev: '\u25C0 前のシーン', next: '次のシーン \u25B6', optCap: 'テロップ', optSubs: 'ナレーション字幕', optGuide: '制作用ガイド', optSpeech: '仮ナレーション（ブラウザの音声・確認用）',
+  keys: 'キー操作：スペース＝再生/停止、← →＝1 秒移動、[ ]＝前後のシーン。調整内容はこのブラウザに自動保存されます。',
+  hScenes: 'シーンと尺', thScene: 'シーン', thDur: '尺(秒)', thEst: '読み', thStatus: '状態', btnFit: 'セリフに合わせて尺を自動調整', btnReset: '既定に戻す',
+  hAssets: '素材ファイル', assetNote: '動画・画像の素材を使っている場合、HTML をダブルクリックで開くと MP4 書き出しが止まることがあります。ここで素材ファイルを選ぶと確実に書き出せます。',
+  hExport: '書き出し', res1: 'フル HD（1920×1080）', res2: '4K（3840×2160）', rAll: '全編', rTest: '試し書き出し（0〜5 秒）', rScene: '今のシーンだけ',
+  expCap: 'テロップを含める', expSubs: 'ナレーション字幕を焼き込む', btnMp4: 'MP4（無音）を書き出す', btnCancel: '中止',
+  btnTxt: 'ナレーション原稿 TXT', btnTiming: 'タイミング JSON', btnPng: '今の画面 PNG', btnSaveSet: '調整内容を保存（JSON）', load: '読み込む',
+  safeArea: (id, s) => `[${id}] 文字がセーフエリアの外に出ています: 「${s}」`,
+  renderErr: (id, m) => `[${id}] 描画エラー: ${m}`, waitAsset: id => '素材の読み込み待ち: ' + id, nanInf: nm => nm + ' に NaN/Infinity', errAt: (id, t, m) => `[${id}] ${t} 秒: ${m}`,
+  overflow: (id, k, sec, what) => `[${id}] ${k} 行目のセリフが ${sec} 秒はみ出す見込み（${what}まで）`, nextLine: '次のセリフ', sceneEnd: 'シーンの終わり', overflowShort: k => `${k} 行目がはみ出す`,
+  fitLocked: '尺は合成した音声に合わせて固定されています。 ', unlock: '手で調整する', fitUnlocked: '音声に合わせた尺から変更中です。音声を付け直す前に「調整内容を保存」してください。',
+  fitEstimate: '尺は目安（1 秒あたり約 6.5 文字／2.6 語）で計算しています。音声を合成すると実際の長さに合わせて固定されます。',
+  autoFitDone: 'セリフの長さの目安に合わせて、セリフの開始位置とシーンの尺を調整しました。', reset: '既定の尺に戻しました。',
+  meta: (t, n, f) => `総尺 ${t}・${n} シーン・${f}fps`, exporting: '書き出し中です。このタブを前面に出したままお待ちください。',
+  exported: (name, mb, sec, codec, took) => `書き出しました：${name}\n${mb} MB・${sec} 秒・${codec}・${took} 秒かかりました。`, fell1080: '\nこの PC は 4K の書き出しに対応していないため、フル HD で書き出しました。',
+  cancelled: '中止しました。', noH264: 'このブラウザでは MP4 の書き出しに対応していません。最新版の Chrome か Edge で開いてください。',
+  tainted: '素材の読み込み制限で書き出せませんでした。「素材ファイル」で動画・画像を選び直してから、もう一度お試しください。', failed: m => '書き出しに失敗しました：' + m,
+  loaded: '調整内容を読み込みました。', loadFail: m => '読み込めませんでした：' + m, assets: n => `${n} 件の素材を差し替えました。`,
+  scriptHead: (s, t) => `■ ${s}（${t}〜）`,
+};
+const DICT = { en: EN, ja: JA };
+function tr(key, ...a) { const d = DICT[VIDEO.uiLang] || EN; const v = key in d ? d[key] : EN[key]; return typeof v === 'function' ? v(...a) : (v == null ? key : v); }
+function applyUiLang() {
+  if (!DICT[VIDEO.uiLang] || VIDEO.uiLang === 'en') return;
+  document.documentElement.lang = VIDEO.uiLang;
+  document.querySelectorAll('[data-i]').forEach(el => { const v = JA[el.dataset.i]; if (typeof v === 'string') el.textContent = v; });
+}
+
+/* ---------- Math ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const eio = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const eo = x => 1 - Math.pow(1 - x, 3);
+function P(t, a, d) { if (!(d > 0)) return t >= a ? 1 : 0; return clamp((t - a) / d); }
+function IN(t, a, d = 0.5) { return eo(P(t, a, d)); }
+function OUT(t, a, d = 0.4) { return 1 - P(t, a, d); }
+let CUR = { i: 0, id: '', dur: 0, lines: [], ends: [] };
+function L(i) { const v = CUR.lines[i]; return v == null ? 0 : v; }
+function LE(i) { const v = CUR.ends[i]; return v == null ? L(i) : v; }
+function typed(str, t, a, cps = 18) { const n = Math.floor(Math.max(0, t - a) * cps); return String(str).slice(0, n); }
+
+/* ---------- Drawing helpers ---------- */
+function bg(ctx, col) { ctx.fillStyle = col || C.bg; ctx.fillRect(0, 0, W, H); }
+function fx(ctx, alpha, dy, fn) { if (!(alpha > 0.001)) return; ctx.save(); ctx.globalAlpha *= clamp(alpha); ctx.translate(0, (1 - clamp(alpha)) * (dy || 0)); fn(); ctx.restore(); }
+function rrPath(ctx, x, y, w, h, r, cont) { r = Math.max(0, Math.min(r || 0, w / 2, h / 2)); if (!cont) ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function rbox(ctx, x, y, w, h, o = {}) {
+  ctx.save(); rrPath(ctx, x, y, w, h, o.r == null ? 12 : o.r);
+  if (o.shadow) { ctx.shadowColor = 'rgba(11,31,58,0.12)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8; }
+  if (o.fill) { ctx.fillStyle = o.fill; ctx.fill(); }
+  ctx.shadowColor = 'transparent';
+  if (o.stroke) { ctx.strokeStyle = o.stroke; ctx.lineWidth = o.lw || 2; if (o.dash) ctx.setLineDash(o.dash); ctx.stroke(); }
+  ctx.restore();
+}
+function line(ctx, x1, y1, x2, y2, o = {}) { ctx.save(); ctx.strokeStyle = o.color || C.line; ctx.lineWidth = o.lw || 3; ctx.lineCap = 'round'; if (o.dash) ctx.setLineDash(o.dash); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.restore(); }
+function arrow(ctx, x1, y1, x2, y2, o = {}) {
+  const u = o.progress == null ? 1 : clamp(o.progress); if (u <= 0.001) return;
+  const x = lerp(x1, x2, u), y = lerp(y1, y2, u), col = o.color || C.sub, lw = o.lw || 4, hd = o.head || 16;
+  line(ctx, x1, y1, x, y, { color: col, lw, dash: o.dash });
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  ctx.save(); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * hd * 0.4, y + Math.sin(ang) * hd * 0.4);
+  ctx.lineTo(x - Math.cos(ang - 0.5) * hd, y - Math.sin(ang - 0.5) * hd); ctx.lineTo(x - Math.cos(ang + 0.5) * hd, y - Math.sin(ang + 0.5) * hd); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+const WARN = new Map();
+function warn(key, msg) { if (!WARN.has(key)) WARN.set(key, msg); }
+function wrapLine(ctx, s, maxW) {
+  const out = []; let cur = '';
+  const noHead = '、。，．・：；？！」』）】〉》ー…';
+  // Latin words stay whole (with trailing spaces); every CJK character is its own token.
+  const toks = String(s).match(/[^\s\u3000-\u9fff\uff00-\uffef]+\s*|\s+|[\u3000-\u9fff\uff00-\uffef]|./gsu) || [];
+  for (const tk of toks) {
+    const nx = cur + tk;
+    if (ctx.measureText(nx.trimEnd()).width > maxW && cur) {
+      if (noHead.includes(tk)) { out.push(nx); cur = ''; continue; }
+      out.push(cur.trimEnd()); cur = tk.trimStart();
+    } else cur = nx;
+  }
+  if (cur) out.push(cur.trimEnd()); return out;
+}
+function text(ctx, str, x, y, o = {}) {
+  const s = o.size || 44, wgt = o.weight || 600, al = o.align || 'center', lh = o.lineH || 1.35;
+  ctx.save(); ctx.font = `${wgt} ${s}px ${FONT}`; ctx.fillStyle = o.color || C.navy; ctx.textAlign = al; ctx.textBaseline = 'middle';
+  if (o.alpha != null) ctx.globalAlpha *= clamp(o.alpha);
+  let lines = String(str).split('\n'); if (o.maxW) lines = lines.flatMap(l => wrapLine(ctx, l, o.maxW));
+  const y0 = o.top ? y : y - (lines.length - 1) * s * lh / 2;
+  lines.forEach((ln, k) => {
+    ctx.fillText(ln, x, y0 + k * s * lh);
+    const w = ctx.measureText(ln).width; const left = al === 'center' ? x - w / 2 : al === 'right' ? x - w : x;
+    const m = ctx.getTransform(); const sx = m.a || 1; const L0 = m.e / sx + left, R0 = L0 + w;
+    if (L0 < SAFE.x - 1 || R0 > W - SAFE.x + 1) warn(CUR.id + ':' + ln, tr('safeArea', CUR.id, ln.slice(0, 24)));
+  });
+  ctx.restore(); return lines.length;
+}
+function chip(ctx, label, x, y, o = {}) {
+  const s = o.size || 26; ctx.save(); ctx.font = `700 ${s}px ${FONT}`; const w = ctx.measureText(label).width + s * 1.2; ctx.restore();
+  rbox(ctx, x - w / 2, y - s * 0.85, w, s * 1.7, { fill: o.fill || C.blueL, stroke: o.stroke, r: s * 0.85 });
+  text(ctx, label, x, y + 1, { size: s, weight: 700, color: o.color || C.blue });
+}
+function bubble(ctx, x, y, label, o = {}) {
+  const s = o.size || 36; ctx.save(); ctx.font = `700 ${s}px ${FONT}`; const w = ctx.measureText(label).width + s * 1.6; ctx.restore();
+  const h = s * 2.1; rbox(ctx, x - w / 2, y - h / 2, w, h, { fill: '#fff', stroke: o.color || C.sub, lw: 3, r: h / 2, shadow: true });
+  ctx.save(); ctx.fillStyle = '#fff'; ctx.strokeStyle = o.color || C.sub; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - 14, y + h / 2 - 2); ctx.lineTo(x, y + h / 2 + 22); ctx.lineTo(x + 14, y + h / 2 - 2); ctx.fill(); ctx.stroke(); ctx.restore();
+  text(ctx, label, x, y, { size: s, weight: 700, color: o.color || C.sub });
+}
+function act(ctx, label) { rbox(ctx, SAFE.x, 62, 8, 40, { fill: C.blue, r: 4 }); text(ctx, label, SAFE.x + 26, 82, { size: 30, weight: 700, color: C.sub, align: 'left' }); }
+function note(ctx, s) { text(ctx, s, W - SAFE.x, H - 34, { size: 22, weight: 500, color: C.sub, align: 'right' }); }
+function focus(ctx, x, y, w, h, a = 1, col) { fx(ctx, a, 0, () => { ctx.save(); ctx.fillStyle = 'rgba(11,31,58,0.45)'; ctx.beginPath(); ctx.rect(0, 0, W, H); rrPath(ctx, x, y, w, h, 14, true); ctx.fill('evenodd'); ctx.restore(); rbox(ctx, x, y, w, h, { stroke: col || C.gold, lw: 6, r: 14 }); }); }
+
+/* Line icons: doc chat mail calendar folder db person people cloud gear check shield chart search agent globe lock bolt laptop video mic music code board spark (use logos/official icons via img()/oi() when you have them) */
+function icon(ctx, kind, x, y, size, col) {
+  const s = size / 100; ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.strokeStyle = col || C.navy; ctx.fillStyle = col || C.navy; ctx.lineWidth = 6; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const R = (a, b, c, d, r) => { rrPath(ctx, a, b, c, d, r); ctx.stroke(); };
+  const Lp = pts => { ctx.beginPath(); ctx.moveTo(pts[0], pts[1]); for (let k = 2; k < pts.length; k += 2) ctx.lineTo(pts[k], pts[k + 1]); ctx.stroke(); };
+  const Ci = (a, b, r, fill) => { ctx.beginPath(); ctx.arc(a, b, r, 0, Math.PI * 2); fill ? ctx.fill() : ctx.stroke(); };
+  switch (kind) {
+    case 'doc': Lp([-30, -45, 15, -45, 35, -25, 35, 45, -30, 45, -30, -45]); Lp([15, -45, 15, -25, 35, -25]); Lp([-18, -5, 22, -5]); Lp([-18, 12, 22, 12]); Lp([-18, 29, 8, 29]); break;
+    case 'chat': R(-45, -38, 90, 60, 16); Lp([-20, 22, -28, 42, 0, 22]); break;
+    case 'mail': R(-45, -30, 90, 60, 8); Lp([-45, -26, 0, 8, 45, -26]); break;
+    case 'calendar': R(-42, -36, 84, 78, 10); Lp([-42, -14, 42, -14]); Lp([-20, -46, -20, -28]); Lp([20, -46, 20, -28]); for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) Ci(-22 + c * 22, 6 + r * 18, 4, true); break;
+    case 'folder': Lp([-45, -30, -12, -30, -4, -20, 45, -20, 45, 35, -45, 35, -45, -30]); break;
+    case 'db': ctx.beginPath(); ctx.ellipse(0, -30, 38, 12, 0, 0, Math.PI * 2); ctx.stroke(); Lp([-38, -30, -38, 30]); Lp([38, -30, 38, 30]); ctx.beginPath(); ctx.ellipse(0, 30, 38, 12, 0, 0, Math.PI); ctx.stroke(); ctx.beginPath(); ctx.ellipse(0, 0, 38, 12, 0, 0, Math.PI); ctx.stroke(); break;
+    case 'person': Ci(0, -22, 18); ctx.beginPath(); ctx.arc(0, 45, 36, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke(); break;
+    case 'people': Ci(-18, -20, 14); Ci(20, -14, 12); ctx.beginPath(); ctx.arc(-18, 40, 28, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke(); ctx.beginPath(); ctx.arc(22, 40, 22, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); break;
+    case 'cloud': ctx.beginPath(); ctx.arc(-20, 8, 20, Math.PI * 0.5, Math.PI * 1.5); ctx.arc(0, -12, 24, Math.PI * 1.1, Math.PI * 1.9); ctx.arc(24, 6, 22, Math.PI * 1.5, Math.PI * 0.5); ctx.closePath(); ctx.stroke(); break;
+    case 'gear': Ci(0, 0, 16); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; Lp([Math.cos(a) * 28, Math.sin(a) * 28, Math.cos(a) * 42, Math.sin(a) * 42]); } Ci(0, 0, 30); break;
+    case 'check': Ci(0, 0, 42); Lp([-20, 0, -5, 16, 22, -14]); break;
+    case 'shield': Lp([0, -45, 38, -30, 34, 10, 0, 45, -34, 10, -38, -30, 0, -45]); Lp([-14, 0, -3, 12, 16, -10]); break;
+    case 'chart': Lp([-42, -42, -42, 42, 42, 42]); [[-26, 20], [-6, 0], [14, -20]].forEach(([a, h]) => R(a, h, 14, 42 - h - 6, 3)); break;
+    case 'search': Ci(-8, -8, 26); Lp([12, 12, 38, 38]); break;
+    case 'agent': R(-38, -30, 76, 62, 18); Ci(-14, 0, 6, true); Ci(14, 0, 6, true); Lp([0, -30, 0, -44]); Ci(0, -48, 5, true); break;
+    case 'globe': Ci(0, 0, 40); ctx.beginPath(); ctx.ellipse(0, 0, 16, 40, 0, 0, Math.PI * 2); ctx.stroke(); Lp([-40, 0, 40, 0]); break;
+    case 'lock': R(-30, -6, 60, 48, 8); ctx.beginPath(); ctx.arc(0, -10, 18, Math.PI, 0); ctx.stroke(); Lp([-18, -10, -18, -6]); Lp([18, -10, 18, -6]); break;
+    case 'bolt': ctx.beginPath(); ctx.moveTo(8, -45); ctx.lineTo(-24, 6); ctx.lineTo(0, 6); ctx.lineTo(-8, 45); ctx.lineTo(24, -6); ctx.lineTo(0, -6); ctx.closePath(); ctx.stroke(); break;
+    case 'laptop': R(-34, -32, 68, 46, 6); Lp([-46, 26, 46, 26]); break;
+    case 'video': R(-44, -32, 88, 64, 10); ctx.beginPath(); ctx.moveTo(-10, -16); ctx.lineTo(18, 0); ctx.lineTo(-10, 16); ctx.closePath(); ctx.fill(); break;
+    case 'mic': R(-14, -44, 28, 56, 14); ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI); ctx.stroke(); Lp([0, 28, 0, 44]); Lp([-16, 44, 16, 44]); break;
+    case 'music': Lp([-12, 28, -12, -36, 30, -46, 30, 18]); Ci(-24, 30, 12, true); Ci(18, 20, 12, true); break;
+    case 'code': Lp([-18, -26, -44, 0, -18, 26]); Lp([18, -26, 44, 0, 18, 26]); Lp([8, -36, -8, 36]); break;
+    case 'board': R(-44, -36, 88, 72, 8); Lp([-14, -36, -14, 36]); Lp([16, -36, 16, 36]); Lp([-44, 0, 44, 0]); break;
+    case 'spark': ctx.beginPath(); ctx.moveTo(0, -44); ctx.quadraticCurveTo(6, -6, 44, 0); ctx.quadraticCurveTo(6, 6, 0, 44); ctx.quadraticCurveTo(-6, 6, -44, 0); ctx.quadraticCurveTo(-6, -6, 0, -44); ctx.fill(); break;
+    default: R(-40, -40, 80, 80, 12); ctx.font = `600 22px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(kind).slice(0, 6), 0, 0);
+  }
+  ctx.restore();
+}
+
+/* ---------- Assets (video, images) ---------- */
+const MEDIA = {};   // id -> { el, spec }
+const IMAGES = {};  // id -> Image
+SCENES.forEach(S => (S.media || []).forEach(m => {
+  if (MEDIA[m.id]) return;
+  const el = document.createElement('video'); el.muted = true; el.playsInline = true; el.preload = 'auto'; el.crossOrigin = 'anonymous'; el.src = m.src;
+  MEDIA[m.id] = { el, spec: m };
+}));
+Object.entries(VIDEO.images || {}).forEach(([id, src]) => { const im = new Image(); im.crossOrigin = 'anonymous'; im.src = src; IMAGES[id] = im; });
+function fitRect(sw, sh, x, y, w, h, mode) { const r = mode === 'cover' ? Math.max(w / sw, h / sh) : Math.min(w / sw, h / sh); const dw = sw * r, dh = sh * r; return [x + (w - dw) / 2, y + (h - dh) / 2, dw, dh]; }
+function media(ctx, id, x, y, w, h, o = {}) {
+  const m = MEDIA[id]; ctx.save(); rrPath(ctx, x, y, w, h, o.r == null ? 12 : o.r); ctx.clip();
+  if (m && m.el.readyState >= 2 && m.el.videoWidth) { ctx.fillStyle = '#000'; ctx.fillRect(x, y, w, h); const [a, b, c, d] = fitRect(m.el.videoWidth, m.el.videoHeight, x, y, w, h, o.fit); ctx.drawImage(m.el, a, b, c, d); }
+  else { ctx.fillStyle = '#E5E9F0'; ctx.fillRect(x, y, w, h); ctx.restore(); text(ctx, tr('waitAsset', id), x + w / 2, y + h / 2, { size: 28, color: C.sub }); return; }
+  ctx.restore(); if (o.stroke !== false) rbox(ctx, x, y, w, h, { stroke: o.stroke || C.line, lw: 3, r: o.r == null ? 12 : o.r });
+}
+function img(ctx, id, x, y, w, h, o = {}) {
+  const im = IMAGES[id]; if (!im || !im.complete || !im.naturalWidth) { rbox(ctx, x, y, w, h, { fill: '#E5E9F0', r: 10 }); return; }
+  const [a, b, c, d] = fitRect(im.naturalWidth, im.naturalHeight, x, y, w, h, o.fit); ctx.save(); if (o.alpha != null) ctx.globalAlpha *= o.alpha; ctx.drawImage(im, a, b, c, d); ctx.restore();
+}
+function oi(ctx, id, cx, cy, size, alpha) { img(ctx, id, cx - size / 2, cy - size / 2, size, size, alpha == null ? {} : { alpha }); }  // place an embedded icon/logo by center and size
+function mediaTime(spec, t) { const d = spec._el ? spec._el.duration : NaN; let v = (spec.start || 0) + Math.max(0, t - (spec.from || 0)) * (spec.rate || 1); if (isFinite(d)) v = Math.min(v, Math.max(0, d - 0.04)); return v; }
+
+/* ---------- Timing (FIT, saved overrides, defaults) ---------- */
+let OVR = loadStore();
+function loadStore() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) { return {}; } }
+function saveStore() { try { localStorage.setItem(STORE_KEY, JSON.stringify(OVR)); } catch (e) {} }
+const fitLocked = () => !!(FIT && !OVR.unlockFit);
+let DUR = [], LAT = [], LEND = [], START = [], TOTAL = 0;
+function chars(s) { return Array.from(String(s).replace(/[\s、。，．・：；！？「」『』（）()…ー\-,.!?:;"'“”‘’]/g, '')).length; }
+function estDur(s) { const str = String(s); const ascii = (str.match(/[\x20-\x7E]/g) || []).length; if (ascii > str.length * 0.6) { const words = str.trim().split(/\s+/).length; return words / 2.6; } return chars(str) / CPS; }
+function rebuild() {
+  DUR = []; LAT = []; LEND = []; START = []; TOTAL = 0;
+  SCENES.forEach((S, i) => {
+    let d = S.duration, ats = (S.narration || []).map(n => n.at), ends = null;
+    if (FIT && FIT.scenes && FIT.scenes[S.id] && (fitLocked())) { const f = FIT.scenes[S.id]; d = f.duration; if (f.lines) ats = f.lines.map(x => x.at); if (f.lines) ends = f.lines.map(x => x.at + x.dur); }
+    else if (OVR.scenes && OVR.scenes[S.id]) { const o = OVR.scenes[S.id]; if (o.duration) d = o.duration; if (o.lines) ats = o.lines.slice(0, ats.length).concat(ats.slice(o.lines.length)); }
+    if (!ends) ends = (S.narration || []).map((n, k) => ats[k] + estDur(n.text));
+    START.push(TOTAL); DUR.push(d); LAT.push(ats); LEND.push(ends); TOTAL += d;
+  });
+  TOTAL = Math.round(TOTAL * 1000) / 1000;
+}
+function locate(T) { T = clamp(T, 0, Math.max(0, TOTAL - 1e-6)); for (let i = SCENES.length - 1; i >= 0; i--) if (T >= START[i] - 1e-9) return { i, t: T - START[i] }; return { i: 0, t: T }; }
+function capAt(S, i, c) { if (typeof c.at === 'string' && c.at[0] === 'L') { const v = LAT[i][parseInt(c.at.slice(1), 10)]; return v == null ? 0 : v; } return c.at || 0; }
+
+/* ---------- Drawing one frame ---------- */
+let CHECK = false;
+function drawScene(ctx, i, t, alpha, opts) {
+  const S = SCENES[i]; CUR = { i, id: S.id, dur: DUR[i], lines: LAT[i], ends: LEND[i] };
+  ctx.save(); ctx.globalAlpha = alpha;
+  try { S.draw(ctx, t); } catch (e) { if (CHECK) throw e; console.error(e); warn('err:' + S.id + e.message, tr('renderErr', S.id, e.message)); }
+  if (opts.captions !== false) drawCaption(ctx, i, t);
+  ctx.restore();
+}
+function drawCaption(ctx, i, t) {
+  const caps = (SCENES[i].captions || []).map(c => ({ c, at: capAt(SCENES[i], i, c) })).filter(x => x.at <= t).sort((a, b) => a.at - b.at);
+  if (!caps.length) return; const { c, at } = caps[caps.length - 1]; if (c.until != null && t > c.until) return;
+  const a = IN(t, at, 0.4); if (a <= 0.001) return;
+  fx(ctx, a, 16, () => {
+    ctx.save(); ctx.font = `700 44px ${FONT}`; const w1 = ctx.measureText(c.main || '').width; ctx.font = `500 28px ${FONT}`; const w2 = c.sub ? ctx.measureText(c.sub).width : 0; ctx.restore();
+    const w = Math.min(W - SAFE.x * 2, Math.max(w1, w2) + 90), h = c.sub ? 128 : 92, y = 958 - h / 2;
+    rbox(ctx, W / 2 - w / 2, y, w, h, { fill: 'rgba(255,255,255,0.94)', stroke: C.line, r: 18, shadow: true });
+    text(ctx, c.main || '', W / 2, c.sub ? y + 44 : y + h / 2, { size: 44, weight: 700, color: C.navy });
+    if (c.sub) text(ctx, c.sub, W / 2, y + 94, { size: 28, weight: 500, color: C.sub });
+  });
+}
+function drawSubs(ctx, T) {
+  const { i, t } = locate(T); const N = SCENES[i].narration || []; let k = -1;
+  for (let j = 0; j < N.length; j++) if (LAT[i][j] <= t && t <= LEND[i][j] + 0.2) k = j;
+  if (k < 0) return; const s = N[k].text;
+  ctx.save(); ctx.font = `600 30px ${FONT}`; const lines = wrapLine(ctx, s, 1500); ctx.restore();
+  const h = 20 + lines.length * 42; rbox(ctx, 180, 1060 - h - 4, W - 360, h, { fill: 'rgba(11,31,58,0.78)', r: 10 });
+  lines.forEach((ln, k2) => text(ctx, ln, W / 2, 1060 - h + 26 + k2 * 42, { size: 30, weight: 600, color: '#fff' }));
+}
+function drawGuides(ctx, T) {
+  const { i, t } = locate(T);
+  ctx.save(); ctx.strokeStyle = 'rgba(194,65,12,0.35)'; ctx.setLineDash([10, 8]); ctx.lineWidth = 2; ctx.strokeRect(SAFE.x, SAFE.y, W - SAFE.x * 2, H - SAFE.y * 2); ctx.restore();
+  text(ctx, `${SCENES[i].id} ${SCENES[i].title}  ${t.toFixed(1)}s / ${DUR[i].toFixed(1)}s`, W - SAFE.x, 30, { size: 20, weight: 600, color: 'rgba(194,65,12,0.8)', align: 'right' });
+}
+function renderFrame(ctx, T, opts = {}) {
+  ctx.save(); bg(ctx); const { i, t } = locate(T);
+  if (i > 0 && t < XF && opts.crossfade !== false) { drawScene(ctx, i - 1, DUR[i - 1] + t, 1, opts); drawScene(ctx, i, t, eio(t / XF), opts); }
+  else drawScene(ctx, i, t, 1, opts);
+  if (opts.subs) drawSubs(ctx, T);
+  if (!opts.clean) drawGuides(ctx, T);
+  ctx.restore();
+}
+
+/* ---------- Asset sync ---------- */
+function activeMedia(T) {
+  const { i, t } = locate(T); const out = [];
+  const add = (k, tt) => (SCENES[k].media || []).forEach(m => { const M = MEDIA[m.id]; if (M) { m._el = M.el; out.push({ el: M.el, time: mediaTime(m, tt), rate: m.rate || 1 }); } });
+  add(i, t); if (i > 0 && t < XF) add(i - 1, DUR[i - 1] + t); return out;
+}
+function seekEl(el, time) {
+  return new Promise(res => {
+    if (el.readyState >= 2 && Math.abs(el.currentTime - time) < 0.004) return res();
+    let done = false; const fin = () => { if (done) return; done = true; el.removeEventListener('seeked', fin); res(); };
+    el.addEventListener('seeked', fin); try { el.currentTime = time; } catch (e) { fin(); } setTimeout(fin, 4000);
+  });
+}
+async function syncForRender(T) { const list = activeMedia(T); Object.values(MEDIA).forEach(M => { if (!M.el.paused) M.el.pause(); }); await Promise.all(list.map(x => seekEl(x.el, x.time))); }
+function syncForPlay(T, playing) {
+  const list = activeMedia(T); const act = new Set(list.map(x => x.el));
+  Object.values(MEDIA).forEach(M => { if (!act.has(M.el) && !M.el.paused) M.el.pause(); });
+  list.forEach(x => { x.el.playbackRate = x.rate; if (!playing) { if (Math.abs(x.el.currentTime - x.time) > 0.05) x.el.currentTime = x.time; if (!x.el.paused) x.el.pause(); return; }
+    if (Math.abs(x.el.currentTime - x.time) > 0.25) x.el.currentTime = x.time; if (x.el.paused) x.el.play().catch(() => {}); });
+}
+async function waitAssets() {
+  await (document.fonts ? document.fonts.ready : Promise.resolve());
+  const vids = Object.values(MEDIA).map(M => new Promise(res => { if (M.el.readyState >= 2) return res(); M.el.addEventListener('loadeddata', res, { once: true }); M.el.addEventListener('error', res, { once: true }); setTimeout(res, 15000); }));
+  const ims = Object.values(IMAGES).map(im => new Promise(res => { if (im.complete) return res(); im.onload = im.onerror = res; setTimeout(res, 15000); }));
+  await Promise.all(vids.concat(ims));
+}
+
+/* ---------- MP4 (WebCodecs H.264 + built-in MP4 muxer) ---------- */
+const MP4 = (() => {
+  const enc = new TextEncoder();
+  const u8 = n => new Uint8Array([n & 255]);
+  const u16 = n => { const b = new Uint8Array(2); new DataView(b.buffer).setUint16(0, n); return b; };
+  const u32 = n => { const b = new Uint8Array(4); new DataView(b.buffer).setUint32(0, n >>> 0); return b; };
+  const u64 = n => { const b = new Uint8Array(8); const v = new DataView(b.buffer); v.setUint32(0, Math.floor(n / 4294967296)); v.setUint32(4, n >>> 0); return b; };
+  const zeros = n => new Uint8Array(n);
+  const s4 = s => enc.encode(s);
+  const cat = parts => { let n = 0; for (const p of parts) n += p.length; const o = new Uint8Array(n); let q = 0; for (const p of parts) { o.set(p, q); q += p.length; } return o; };
+  const box = (type, ...parts) => { const body = cat(parts.flat()); return cat([u32(body.length + 8), s4(type), body]); };
+  const full = (type, ver, flags, ...parts) => box(type, u8(ver), u8(flags >> 16), u8(flags >> 8), u8(flags), ...parts);
+  const matrix = () => [0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000].map(u32);
+  function mux({ width, height, fps, avcC, samples }) {
+    const n = samples.length, ts = fps * 1000, delta = 1000, durTs = n * delta, durMs = Math.round(n / fps * 1000);
+    const ftyp = box('ftyp', s4('isom'), u32(512), s4('isom'), s4('iso2'), s4('avc1'), s4('mp41'));
+    const keys = []; samples.forEach((s, k) => { if (s.key) keys.push(k + 1); });
+    const dataLen = samples.reduce((a, s) => a + s.data.length, 0);
+    const build = off => {
+      const stco = off + dataLen > 4294967295 ? full('co64', 0, 0, u32(1), u64(off)) : full('stco', 0, 0, u32(1), u32(off));
+      const avc1 = box('avc1', zeros(6), u16(1), u16(0), u16(0), zeros(12), u16(width), u16(height), u32(0x00480000), u32(0x00480000), u32(0), u16(1), zeros(32), u16(0x0018), u16(0xFFFF), box('avcC', avcC), box('pasp', u32(1), u32(1)));
+      const stbl = box('stbl', full('stsd', 0, 0, u32(1), avc1), full('stts', 0, 0, u32(1), u32(n), u32(delta)), full('stss', 0, 0, u32(keys.length), ...keys.map(u32)),
+        full('stsc', 0, 0, u32(1), u32(1), u32(n), u32(1)), full('stsz', 0, 0, u32(0), u32(n), ...samples.map(s => u32(s.data.length))), stco);
+      const minf = box('minf', full('vmhd', 0, 1, zeros(8)), box('dinf', full('dref', 0, 0, u32(1), full('url ', 0, 1))), stbl);
+      const mdia = box('mdia', full('mdhd', 0, 0, u32(0), u32(0), u32(ts), u32(durTs), u16(0x55C4), u16(0)), full('hdlr', 0, 0, u32(0), s4('vide'), zeros(12), s4('VideoHandler'), u8(0)), minf);
+      const tkhd = full('tkhd', 0, 3, u32(0), u32(0), u32(1), u32(0), u32(durMs), zeros(8), u16(0), u16(0), u16(0), u16(0), ...matrix(), u32(width * 65536), u32(height * 65536));
+      const mvhd = full('mvhd', 0, 0, u32(0), u32(0), u32(1000), u32(durMs), u32(0x00010000), u16(0x0100), zeros(10), ...matrix(), zeros(24), u32(2));
+      return box('moov', mvhd, box('trak', tkhd, mdia));
+    };
+    const big = dataLen + 16 > 4294967295;
+    const mdatHdr = big ? cat([u32(1), s4('mdat'), u64(dataLen + 16)]) : cat([u32(dataLen + 8), s4('mdat')]);
+    let moov = build(0); moov = build(ftyp.length + moov.length + mdatHdr.length);
+    return new Blob([ftyp, moov, mdatHdr, ...samples.map(s => s.data)], { type: 'video/mp4' });
+  }
+  return { mux };
+})();
+const PROFILES = [
+  { s: 2, codec: 'avc1.640033', br: 16e6 }, { s: 2, codec: 'avc1.4d0033', br: 16e6 },
+  { s: 1, codec: 'avc1.640028', br: 8e6 }, { s: 1, codec: 'avc1.4d0028', br: 8e6 }, { s: 1, codec: 'avc1.42e028', br: 8e6 },
+];
+async function pickProfile(scale) {
+  if (typeof VideoEncoder === 'undefined') return null;
+  for (const p of PROFILES.filter(p => p.s <= scale)) {
+    const cfg = { codec: p.codec, width: W * p.s, height: H * p.s, bitrate: p.br, framerate: VIDEO.fps, avc: { format: 'avc' } };
+    try { const r = await VideoEncoder.isConfigSupported(cfg); if (r && r.supported) return { p, cfg }; } catch (e) {}
+  }
+  return null;
+}
+async function exportMp4({ scale = 1, from = 0, to = TOTAL, opts = {}, onProgress = () => {}, signal } = {}) {
+  const pick = await pickProfile(scale); if (!pick) throw new Error('H264_NOT_SUPPORTED');
+  const { p, cfg } = pick; const cv = document.createElement('canvas'); cv.width = cfg.width; cv.height = cfg.height; const cx = cv.getContext('2d', { alpha: false });
+  const samples = []; let avcC = null, err = null;
+  const encd = new VideoEncoder({ output: (chunk, meta) => { if (meta && meta.decoderConfig && meta.decoderConfig.description && !avcC) { const d = meta.decoderConfig.description; avcC = new Uint8Array(d.buffer ? d.buffer.slice(d.byteOffset, d.byteOffset + d.byteLength) : d); } const b = new Uint8Array(chunk.byteLength); chunk.copyTo(b); samples.push({ data: b, key: chunk.type === 'key' }); }, error: e => { err = e; } });
+  encd.configure(Object.assign({}, cfg, { latencyMode: 'quality' }));
+  const fps = VIDEO.fps, f0 = Math.round(from * fps), f1 = Math.round(to * fps);
+  for (let f = f0; f < f1; f++) {
+    if (signal && signal.aborted) { encd.close(); throw new Error('CANCELLED'); } if (err) throw err;
+    const T = f / fps; await syncForRender(T);
+    cx.setTransform(p.s, 0, 0, p.s, 0, 0); renderFrame(cx, T, Object.assign({ clean: true }, opts));
+    const vf = new VideoFrame(cv, { timestamp: Math.round((f - f0) * 1e6 / fps), duration: Math.round(1e6 / fps) });
+    encd.encode(vf, { keyFrame: (f - f0) % (fps * 2) === 0 }); vf.close();
+    while (encd.encodeQueueSize > 6) await new Promise(r => setTimeout(r, 2));
+    if ((f - f0) % 15 === 0) { onProgress((f - f0) / (f1 - f0)); await new Promise(r => setTimeout(r, 0)); }
+  }
+  await encd.flush(); encd.close(); if (err) throw err; if (!avcC) throw new Error('NO_AVCC');
+  onProgress(1); return { blob: MP4.mux({ width: cfg.width, height: cfg.height, fps, avcC, samples }), profile: p, frames: samples.length };
+}
+
+/* ---------- Text exports ---------- */
+function allLines() { const out = []; SCENES.forEach((S, i) => (S.narration || []).forEach((n, k) => out.push({ scene: S.id, sceneTitle: S.title, idx: k, text: n.text, at: LAT[i][k], abs: START[i] + LAT[i][k], end: START[i] + LEND[i][k] }))); return out; }
+function tc(s, sep) { s = Math.max(0, s); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = Math.floor(s) % 60, ms = Math.round((s - Math.floor(s)) * 1000); const p = (v, n = 2) => String(v).padStart(n, '0'); return `${p(h)}:${p(m)}:${p(x)}${sep}${p(Math.min(ms, 999), 3)}`; }
+function makeSrt(vtt) { const L2 = allLines(); let o = vtt ? 'WEBVTT\n\n' : ''; L2.forEach((l, k) => { const nx = L2[k + 1]; const end = Math.min(l.end + 0.2, nx ? nx.abs - 0.05 : TOTAL); o += (vtt ? '' : (k + 1) + '\n') + tc(l.abs, vtt ? '.' : ',') + ' --> ' + tc(Math.max(end, l.abs + 0.5), vtt ? '.' : ',') + '\n' + l.text + '\n\n'; }); return vtt ? o : o.replace(/\n/g, '\r\n'); }
+function makeTxt() { let o = VIDEO.title + '\n\n'; SCENES.forEach((S, i) => { o += tr('scriptHead', `${S.id} ${S.title}`, tc(START[i], ',').slice(3, 8)) + '\n'; (S.narration || []).forEach(n => { o += n.text + '\n'; }); o += '\n'; }); return o; }
+function timingJson() { return { title: VIDEO.title, slug: VIDEO.slug, lang: VIDEO.lang || 'en', fps: VIDEO.fps, total: TOTAL, fit: !!(FIT && fitLocked()), scenes: SCENES.map((S, i) => ({ id: S.id, title: S.title, start: START[i], duration: DUR[i], hold: S.hold || 0, lines: (S.narration || []).map((n, k) => ({ idx: k, at: LAT[i][k], abs: START[i] + LAT[i][k], estEnd: START[i] + LAT[i][k] + estDur(n.text), text: n.text })) })) }; }
+function download(data, name, type) { const blob = data instanceof Blob ? data : new Blob([data], { type: type || 'text/plain;charset=utf-8' }); const u = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 60000); }
+function baseName() { return VIDEO.slug; }
+
+/* ---------- Checks ---------- */
+function checkAll(step = 0.1) {
+  const errors = [], cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx = cv.getContext('2d');
+  const bad = v => typeof v === 'number' && !isFinite(v);
+  ['fillRect', 'strokeRect', 'moveTo', 'lineTo', 'arc', 'arcTo', 'ellipse', 'fillText', 'translate', 'scale', 'quadraticCurveTo', 'bezierCurveTo', 'rect', 'drawImage'].forEach(nm => { const f = cx[nm].bind(cx); cx[nm] = (...a) => { if (a.some(bad)) throw new Error(tr('nanInf', nm)); return f(...a); }; });
+  WARN.clear(); CHECK = true;
+  for (let T = 0; T < TOTAL; T += step) { try { renderFrame(cx, T, { clean: true }); } catch (e) { const { i } = locate(T); errors.push(tr('errAt', SCENES[i].id, T.toFixed(1), e.message)); if (errors.length > 30) break; } }
+  CHECK = false;
+  const warnings = Array.from(WARN.values());
+  SCENES.forEach((S, i) => (S.narration || []).forEach((n, k) => { const nextAt = k + 1 < LAT[i].length ? LAT[i][k + 1] : DUR[i]; const end = LEND[i][k]; if (end > nextAt - (k + 1 < LAT[i].length ? 0.15 : 0.3)) warnings.push(tr('overflow', S.id, k + 1, (end - nextAt).toFixed(1), k + 1 < LAT[i].length ? tr('nextLine') : tr('sceneEnd'))); }));
+  return { ok: errors.length === 0 && warnings.length === 0, total: TOTAL, errors, warnings, scenes: SCENES.map((S, i) => ({ id: S.id, title: S.title, start: START[i], duration: DUR[i] })) };
+}
+
+/* ---------- UI ---------- */
+const stage = document.getElementById('stage'), sctx = stage.getContext('2d');
+let T = 0, playing = false, lastTs = 0, spokenKey = '';
+const $ = id => document.getElementById(id);
+function say(s) { $('msg').textContent = s; }
+function fmt(s) { const m = Math.floor(s / 60), x = s - m * 60; return `${m}:${x.toFixed(1).padStart(4, '0')}`; }
+function viewOpts() { return { clean: !$('optGuide').checked, captions: $('optCap').checked, subs: $('optSubs').checked }; }
+function draw() { renderFrame(sctx, T, viewOpts()); $('clock').textContent = `${fmt(T)} / ${fmt(TOTAL)}`; $('seek').value = TOTAL ? (T / TOTAL * 100) : 0; $('playhead').style.left = (TOTAL ? T / TOTAL * 100 : 0) + '%'; }
+function speak(T0, T1) {
+  if (!$('optSpeech').checked || !window.speechSynthesis) return;
+  allLines().forEach(l => { const key = l.scene + ':' + l.idx; if (l.abs >= T0 && l.abs < T1 && spokenKey !== key) { spokenKey = key; const u = new SpeechSynthesisUtterance(l.text); u.lang = ({ ja: 'ja-JP', en: 'en-US', zh: 'zh-CN', ko: 'ko-KR' })[VIDEO.lang] || VIDEO.lang || 'en-US'; speechSynthesis.cancel(); speechSynthesis.speak(u); } });
+}
+function loop(ts) { if (!playing) return; const dt = lastTs ? (ts - lastTs) / 1000 : 0; lastTs = ts; const T0 = T; T = Math.min(TOTAL, T + dt); speak(T0, T); syncForPlay(T, true); draw(); if (T >= TOTAL) { setPlay(false); } else requestAnimationFrame(loop); }
+function setPlay(v) { playing = v; $('btnPlay').textContent = v ? tr('stop') : tr('play'); if (v) { if (T >= TOTAL - 0.01) T = 0; lastTs = 0; requestAnimationFrame(loop); } else { syncForPlay(T, false); if (window.speechSynthesis) speechSynthesis.cancel(); } }
+function jump(v) { T = clamp(v, 0, TOTAL); syncForPlay(T, playing); draw(); }
+function buildTimeline() {
+  const tl = $('timeline'); tl.querySelectorAll('.band,.line').forEach(e => e.remove());
+  SCENES.forEach((S, i) => { const b = document.createElement('div'); b.className = 'band'; b.style.left = (START[i] / TOTAL * 100) + '%'; b.style.width = (DUR[i] / TOTAL * 100) + '%'; b.textContent = `${S.id} ${S.title}`; b.title = `${S.title} (${DUR[i].toFixed(1)} s)`; b.onclick = () => jump(START[i] + 0.01); tl.insertBefore(b, $('playhead')); });
+  allLines().forEach(l => { const m = document.createElement('div'); m.className = 'line'; m.style.left = (l.abs / TOTAL * 100) + '%'; m.title = l.text; tl.insertBefore(m, $('playhead')); });
+}
+function buildTable() {
+  const tb = $('sceneTable').querySelector('tbody'); tb.innerHTML = ''; const res = checkNarrOnly();
+  SCENES.forEach((S, i) => {
+    const tr = document.createElement('tr'); const est = (S.narration || []).reduce((a, n) => a + estDur(n.text), 0);
+    const st = res[S.id] ? `<span class="ng">${res[S.id]}</span>` : '<span class="ok">OK</span>';
+    tr.innerHTML = `<td>${i + 1}</td><td>${S.title}</td><td><input type="number" step="0.1" min="1" value="${DUR[i].toFixed(1)}" ${fitLocked() ? 'disabled' : ''}></td><td>${est.toFixed(1)}s</td><td>${st}</td>`;
+    tr.querySelector('input').onchange = e => { const v = parseFloat(e.target.value); if (v > 0) { OVR.scenes = OVR.scenes || {}; OVR.scenes[S.id] = Object.assign({}, OVR.scenes[S.id], { duration: v }); saveStore(); refresh(); } };
+    tb.appendChild(tr);
+  });
+  $('fitNote').innerHTML = FIT ? (fitLocked() ? tr('fitLocked') + ' <button id="btnUnlock">' + tr('unlock') + '</button>' : tr('fitUnlocked')) : tr('fitEstimate');
+  const ub = $('btnUnlock'); if (ub) ub.onclick = () => { OVR.unlockFit = true; saveStore(); refresh(); };
+  $('btnFit').disabled = fitLocked();
+}
+function checkNarrOnly() { const o = {}; SCENES.forEach((S, i) => (S.narration || []).forEach((n, k) => { const nextAt = k + 1 < LAT[i].length ? LAT[i][k + 1] : DUR[i]; if (LEND[i][k] > nextAt - 0.15) o[S.id] = tr('overflowShort', k + 1); })); return o; }
+function autoFit() {
+  OVR.scenes = OVR.scenes || {};
+  SCENES.forEach((S, i) => { const N = S.narration || []; if (!N.length) return; const lines = []; let tt = Math.max(0.6, N[0].at);
+    N.forEach((n, k) => { if (k > 0) tt = Math.max(n.at, lines[k - 1] + estDur(N[k - 1].text) + 0.45); lines.push(Math.round(tt * 10) / 10); });
+    const end = lines[lines.length - 1] + estDur(N[N.length - 1].text) + 0.9; OVR.scenes[S.id] = { duration: Math.max(Math.round(end * 10) / 10, 3), lines }; });
+  saveStore(); refresh(); say(tr('autoFitDone'));
+}
+function refresh() { rebuild(); $('seek').max = 100; buildTimeline(); buildTable(); $('meta').textContent = tr('meta', fmt(TOTAL), SCENES.length, VIDEO.fps); draw(); }
+let abortCtl = null;
+async function onExport() {
+  const scale = parseInt($('expRes').value, 10), rg = $('expRange').value; const { i } = locate(T);
+  const from = rg === 'test' ? 0 : rg === 'scene' ? START[i] : 0, to = rg === 'test' ? Math.min(5, TOTAL) : rg === 'scene' ? START[i] + DUR[i] : TOTAL;
+  setPlay(false); abortCtl = new AbortController(); $('btnMp4').disabled = true; $('btnCancel').disabled = false; say(tr('exporting'));
+  const t0 = performance.now();
+  try {
+    const r = await exportMp4({ scale, from, to, opts: { captions: $('expCap').checked, subs: $('expSubs').checked }, signal: abortCtl.signal, onProgress: u => { $('prog').value = u; } });
+    const name = `${baseName()}_${rg === 'all' ? 'FULL' : rg === 'test' ? 'TEST' : SCENES[i].id}_${W * r.profile.s}x${H * r.profile.s}_${VIDEO.fps}fps.mp4`;
+    download(r.blob, name); say(tr('exported', name, (r.blob.size / 1048576).toFixed(1), (r.frames / VIDEO.fps).toFixed(1), r.profile.codec, ((performance.now() - t0) / 1000).toFixed(0)) + (scale === 2 && r.profile.s === 1 ? tr('fell1080') : ''));
+  } catch (e) {
+    console.error(e);
+    say(e.message === 'CANCELLED' ? tr('cancelled') : e.message === 'H264_NOT_SUPPORTED' ? tr('noH264') : /tainted|insecure|SecurityError/i.test(String(e)) ? tr('tainted') : tr('failed', e.message));
+  } finally { $('btnMp4').disabled = false; $('btnCancel').disabled = true; $('prog').value = 0; }
+}
+function bindUi() {
+  $('btnPlay').textContent = tr('play'); applyUiLang();
+  $('btnPlay').onclick = () => setPlay(!playing);
+  $('btnPrev').onclick = () => { const { i, t } = locate(T); jump(t > 0.5 ? START[i] : START[Math.max(0, i - 1)]); };
+  $('btnNext').onclick = () => { const { i } = locate(T); if (i + 1 < SCENES.length) jump(START[i + 1] + 0.01); };
+  $('seek').oninput = e => jump(parseFloat(e.target.value) / 100 * TOTAL);
+  ['optCap', 'optSubs', 'optGuide'].forEach(id => $(id).onchange = draw);
+  $('btnFit').onclick = autoFit;
+  $('btnReset').onclick = () => { OVR = {}; saveStore(); refresh(); say(tr('reset')); };
+  $('btnMp4').onclick = onExport; $('btnCancel').onclick = () => abortCtl && abortCtl.abort();
+  $('btnSrt').onclick = () => download(makeSrt(false), baseName() + '.srt');
+  $('btnVtt').onclick = () => download(makeSrt(true), baseName() + '.vtt', 'text/vtt;charset=utf-8');
+  $('btnTxt').onclick = () => download(makeTxt(), baseName() + '_script.txt');
+  $('btnTiming').onclick = () => download(JSON.stringify(timingJson(), null, 2), baseName() + '_timing.json', 'application/json');
+  $('btnPng').onclick = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; renderFrame(c.getContext('2d'), T, { clean: true, captions: $('optCap').checked }); c.toBlob(b => download(b, `${baseName()}_${T.toFixed(1)}s.png`), 'image/png'); };
+  $('btnSaveSet').onclick = () => download(JSON.stringify(Object.assign({ slug: VIDEO.slug }, OVR), null, 2), baseName() + '_settings.json', 'application/json');
+  $('setPicker').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { const o = JSON.parse(await f.text()); delete o.slug; OVR = o; saveStore(); refresh(); say(tr('loaded')); } catch (er) { say(tr('loadFail', er.message)); } };
+  $('assetPicker').onchange = e => { let n = 0; for (const f of e.target.files) { const url = URL.createObjectURL(f);
+      Object.values(MEDIA).forEach(M => { if (M.spec.src.split('/').pop() === f.name) { M.el.removeAttribute('crossorigin'); M.el.src = url; n++; } });
+      Object.entries(VIDEO.images || {}).forEach(([id, src]) => { if (src.split('/').pop() === f.name) { IMAGES[id].src = url; n++; } }); }
+    say(tr('assets', n)); setTimeout(draw, 500); };
+  document.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.code === 'Space') { e.preventDefault(); setPlay(!playing); } else if (e.key === 'ArrowLeft') jump(T - 1); else if (e.key === 'ArrowRight') jump(T + 1);
+    else if (e.key === '[') $('btnPrev').onclick(); else if (e.key === ']') $('btnNext').onclick(); });
+}
+
+/* ---------- Automation hooks (used by scripts/render.mjs for checks and export) ---------- */
+rebuild();
+window.__XV = {
+  ready: waitAssets().then(() => true),
+  info: () => ({ title: VIDEO.title, slug: VIDEO.slug, fps: VIDEO.fps, total: TOTAL, fit: !!FIT, scenes: SCENES.map((S, i) => ({ id: S.id, title: S.title, start: START[i], duration: DUR[i] })) }),
+  check: step => checkAll(step),
+  timing: () => timingJson(),
+  srt: () => makeSrt(false),
+  txt: () => makeTxt(),
+  async frames(T0, n, scale = 1, opts = {}, type = 'image/jpeg', q = 0.92) {
+    const cv = this._cv || (this._cv = document.createElement('canvas')); cv.width = W * scale; cv.height = H * scale; const cx = cv.getContext('2d', { alpha: false });
+    const out = []; for (let k = 0; k < n; k++) { const t = T0 + k / VIDEO.fps; if (t >= TOTAL) break; await syncForRender(t); cx.setTransform(scale, 0, 0, scale, 0, 0); renderFrame(cx, t, Object.assign({ clean: true }, opts)); out.push(cv.toDataURL(type, q)); }
+    return out;
+  },
+  async sheet(times, cols = 4, opts = {}) {
+    const tw = 480, th = 270, rows = Math.ceil(times.length / cols); const sh = document.createElement('canvas'); sh.width = cols * tw; sh.height = rows * (th + 30); const sx = sh.getContext('2d');
+    sx.fillStyle = '#fff'; sx.fillRect(0, 0, sh.width, sh.height); const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx = cv.getContext('2d');
+    for (let k = 0; k < times.length; k++) { const t = clamp(times[k], 0, TOTAL - 0.01); await syncForRender(t); renderFrame(cx, t, Object.assign({ clean: true }, opts)); const x = (k % cols) * tw, y = Math.floor(k / cols) * (th + 30); sx.drawImage(cv, x, y, tw, th); const { i } = locate(t); sx.fillStyle = '#0B1F3A'; sx.font = `600 18px ${FONT}`; sx.fillText(`${t.toFixed(1)}s ${SCENES[i].id} ${SCENES[i].title}`, x + 8, y + th + 21); }
+    return sh.toDataURL('image/png');
+  },
+  exportMp4,
+};
+if (!new URLSearchParams(location.search).has('render')) { bindUi(); window.__XV.ready.then(refresh); refresh(); }
+if (typeof module !== 'undefined') module.exports = { SCENES, VIDEO };
+</script>
+</body>
+</html>

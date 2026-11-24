@@ -1,0 +1,9 @@
+# Pronunciation readings for English narration, applied to the TTS script only.
+# Format: surface<TAB>replacement text (spell it the way it should be spoken). Lines starting with # are comments.
+# Most neural voices read common acronyms correctly; add entries only for words you hear mispronounced.
+# Example entries (uncomment or copy into a per-project file passed with --readings):
+# GPU	G P U
+# SQL	sequel
+# nginx	engine X
+# Kubernetes	koo-ber-NET-eez
+MP4	M P 4
