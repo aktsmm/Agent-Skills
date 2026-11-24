@@ -21,6 +21,12 @@ if (contentFrame) {
 }
 ```
 
+## File Upload Inside an OOPIF
+
+- Observed with a Copilot space "add file" panel inside a `reactblade` frame: `Page.setInterceptFileChooserDialog` on the frame session never emitted `Page.fileChooserOpened` (the wait timed out), yet the panel already had an `input[type=file]` in its DOM.
+- After opening the panel, call `DOM.querySelectorAll` for `input[type=file]` in the frame session and `DOM.setFileInputFiles` with that `nodeId`; the panel listed the file name and size. Then click the app's own confirm button and re-read the list to confirm.
+- Frames of hidden tabs report `visibilityState: hidden` and `innerWidth: 0`; choose the visible frame with a non-zero width before acting.
+
 ## Trusted Event Boundary
 
 - Some `openBlade()` transitions require a trusted user event.

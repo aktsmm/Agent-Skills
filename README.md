@@ -28,7 +28,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [azure-advisor-report](azure-advisor-report/) | Generate Azure environment monthly report (Markdown + PowerPoint) from Azure Advisor and Cost Management API |
 | [azure-env-builder](azure-env-builder/) | [Alpha] Experimental Azure environment builder for infrastructure and deployment design |
 | [azure-infra-validation](azure-infra-validation/) | Build and validate Azure infrastructure in a lab or sandbox using Azure CLI and official Microsoft docs |
-| [azure-screenshot-mask](azure-screenshot-mask/) | Mosaic environment-sensitive areas (tenant name, user avatar, subscription name / ID, resource group, internal hostnames) on Azure Portal screenshots before publishing to blogs,... |
+| [azure-screenshot-mask](azure-screenshot-mask/) | Mosaic (or, when a requester wants answers kept readable, fill with labeled light gray only the values of) environment-sensitive areas (tenant name, user avatar, subscription na... |
 | [azure-troubleshooting](azure-troubleshooting/) | Investigate Azure incidents and service degradations with a read-only workflow using Azure CLI, Resource Health, Activity Log, metrics, resource logs, and official Microsoft docs |
 | [azure-update-customer-pptx](azure-update-customer-pptx/) | Build a customer-facing Azure Update PowerPoint from Azure Updates MCP results, including customer classification, Japan region stamps, UPDATE Points, speaker notes, and Verify-... |
 | [biz-ops-setup](biz-ops-setup/) | Set up or operate a business operations workspace for activity reports, tasks, and customer routing; workIQ is optional |
@@ -48,6 +48,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [duck-critic](duck-critic/) | Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes |
 | [evaluate-waza-copilot-customizations](evaluate-waza-copilot-customizations/) | Waza で個人（~/.copilot）/ ワークスペース / 任意パスの instructions / agents / skills をセットアップ、static/runtime 評価、gate 単体実行、結果要約、report 更新まで行う。 |
 | [explain-release-changes](explain-release-changes/) | 前回リリース以降の変更を、コードを知らない人にも伝わる説明文にする。Use when: リリースノートを一般向けに書き直したい、今回の変更を人に説明したい、ブログ/SNS/社内共有向けに変更点を紹介したい、機能の移植元（姉妹repo・参考OSS等）を明記して伝えたい |
+| [explainer-video-generic](explainer-video-generic/) | Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on... |
 | [export-copilot-session-dialogue](export-copilot-session-dialogue/) | Interaction flow: セッション中の対話フロー・使用ツール・手順を構造化して出力。Use when: dialogue, tool flow, handoff, 手順再現。作業ログは export-session-log、再利用知見は export-knowledge を使う |
 | [export-knowledge](export-knowledge/) | Reusable learnings: セッション中の再利用知見を構造化し、ドメイン別（microsoft / copilot など）に振り分けて出力。Use when: knowledge, lessons learned, 知見化。作業ログは export-session-log、対話再現は export-copilot-session-dialo... |
 | [export-session-log](export-session-log/) | Export the current chat session as a structured Markdown work timeline or blog-draft seed |

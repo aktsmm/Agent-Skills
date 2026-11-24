@@ -143,4 +143,4 @@ Use [Implementation Patterns](references/IMPLEMENTATION_PATTERNS.md) for shape d
 - visual QA はレンダー画像で行い、修正後に該当スライドを再確認している
 - 表は本文 16pt 以上を原則とし、header は中央揃え・中段揃えで視認性を確認している
 - build 後に overflow / consistency / hyperlink をレビューできている
-- 画像の QR は全て書き出してデコードし、期待 URL と照合している（回ごとに宛先が変わる QR は旧版のまま残りやすい。リンク文字列だけの確認では画像側の取り違えを検出できない）
+- 画像の QR は全て書き出してデコードし、期待 URL と照合している（回ごとに宛先が変わる QR は旧版のまま残りやすい。リンク文字列だけの確認では画像側の取り違えを検出できない。1920x1080 以上で書き出す。長い URL の QR は 1600x900 では読めないことがある）

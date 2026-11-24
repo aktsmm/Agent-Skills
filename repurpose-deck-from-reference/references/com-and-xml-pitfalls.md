@@ -141,3 +141,21 @@ with zipfile.ZipFile(SRC) as zin, zipfile.ZipFile(TMP, "w", zipfile.ZIP_DEFLATED
             data = re.sub(r"<p:bg>.*?</p:bg>", "", data.decode(), flags=re.S).encode()
         zout.writestr(item, data)
 ```
+
+## 7. QR・スクリーンショットを図形のまま差し替える（アニメーション保護）
+
+### 症状
+
+QR や画像を「図形を削除 → add_picture」で差し替えると、その図形を参照するアニメーション（最後に現れる QR など）が外れる。
+
+### 回避
+
+図形は残し、画像パートだけ差し替える。`get_or_add_image_part` で新しい画像を登録し、`a:blip` の `r:embed` を向け直す（共有された旧画像パートは書き換えない）。
+
+```python
+_, rid = slide.part.get_or_add_image_part(BytesIO(png_bytes))
+picture._element.blipFill.blip.set(
+    "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed", rid)
+```
+
+差し替えた QR は、スライドを 1920x1080 以上で書き出してデコードし、期待 URL と照合する（長い URL の QR は 1600x900 では読めないことがある）。

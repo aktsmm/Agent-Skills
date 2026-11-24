@@ -52,6 +52,7 @@ COPY → RESEARCH → PLAN → WIPE → BUILD → SCREENSHOTS → QA → POLISH
 - **Primary source over memory.** 仕様・対象プラン・価格は memory に頼らず必ず一次情報を `web_fetch`。例: GitHub Copilot app の対象プランは公式 README で "Pro / Pro+ / Max / Business / Enterprise" と最新化されている。
 - **Section list = raw XML.** `python-pptx` は PowerPoint セクションをサポートしない。`presentation.xml` に `p14:sectionLst` を直接挿入する。**`&` は必ず `&amp;` にエスケープ**しないと COM 開けない。
 - **Layout consistency before content polish.** 18 枚作って 6 セクション正しく入る、ページ番号通る、フッター揃う、を先に確認してからコンテンツ詳細を直す。
+- **Hide, don't delete; ask for what only the user knows.** 参照 deck の個人ネタ・前回固有のスライド（雑談、おすすめ紹介、近況など）を、依頼なしに削除しない。使わないものは `show="0"` で非表示にして残し、非表示・削除した枚を報告する（参照側で非表示だった枚はコピーにも引き継がれるので、表示すべきものは明示的に戻す）。一次情報で埋められない回固有の内容（紹介する店・小ネタ・コメント）は、旧版の内容を残さず、作る前にユーザーへ確認ツールで聞く。
 
 ## Hard Gotchas
 

@@ -1,6 +1,6 @@
 ---
 name: azure-screenshot-mask
-description: "Mosaic environment-sensitive areas (tenant name, user avatar, subscription name / ID, resource group, internal hostnames) on Azure Portal screenshots before publishing to blogs, Qiita, Medium, slides, or demos. Use when sanitizing screenshots, masking env info, or preparing portal captures for public sharing. Keywords: Azure Portal, screenshot, mask, mosaic, sanitize, tenant, subscription, public publishing, blur, redact."
+description: "Mosaic (or, when a requester wants answers kept readable, fill with labeled light gray only the values of) environment-sensitive areas (tenant name, user avatar, subscription name / ID, resource group, internal hostnames) on Azure Portal screenshots before publishing to blogs, Qiita, Medium, slides, or demos. Use when sanitizing screenshots, masking env info, or preparing portal captures for public sharing. Keywords: Azure Portal, screenshot, mask, mosaic, gray fill, sanitize, tenant, subscription, public publishing, blur, redact."
 argument-hint: "対象スクリーンショット (PNG / フォルダ) と、追加でマスクしたい領域があれば領域名や座標"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -24,6 +24,8 @@ Azure Portal のスクリーンショットに残る環境固有情報を、公�
 - **右上のテナント表示はほぼ常に対象**。viewport 1912 px の Azure Portal なら右端 `(W-320, 0, W, 44)` のストリップで覆える
 - **本文中の subscription 名 / ID / RG 名は座標が画面ごとに違う**。事前に値の有無を見て、必要な領域だけ追加で渡す
 - **モザイクは元データを破壊する**。再撮りや再生成に備えて `.bak.png` を残せる手段を用意する
+- **レビュー済みの配布セットを、自動再生成で丸ごと置き換えない**。OCR は語を分割して読む（`vm-host` と `route-client` など）ため、語単位の正規表現は見逃す。再生成するなら全枚を再 OCR と目視で再レビューしてから差し替える。粗さが気になるときは、先に生画像との差分率を測って対象を絞る（[Advanced](references/advanced-masking.md#coarseness-check-and-rebuild)）
+- **依頼元が「読めること優先」「値だけ隠す」と指定したら、ブロック モザイクでなく薄いグレー塗り＋ラベルで値だけ隠す**。隠す対象と見せる対象を先に確認し、`_v2` 等の別名で保存する（[Labeled Gray Fill](references/advanced-masking.md#labeled-gray-fill-requester-style)）
 - **資源名そのものもマスク対象になりうる**。ラボ用に作った短命リソース名でも、ユニークな文字列は特定可能。本文で明示していても、画像内では先頭数文字だけ残してマスクするのが安全
 
 ## What To Mask (Checklist)
