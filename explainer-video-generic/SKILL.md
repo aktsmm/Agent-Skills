@@ -54,7 +54,7 @@ request
 | `references/tts-backends.md` | edge-tts / OpenAI / Azure / VOICEVOX / custom command / external audio |
 | `references/icons.md` | Finding and using logos and icons (own set, web, license notes) |
 | `references/production-brief.md` | Optional production-brief document (pattern B) |
-| `references/demo-recording.md` | Building from demo recordings (pattern C) |
+| `references/demo-recording.md` | Building from demo recordings and real-product screenshots (masking scope, zoom) |
 | `references/revisions.md` | Revising a finished video: request -> shortest command path |
 | `references/prompts.md` | Ready-made prompts for agents without this skill |
 | `references/troubleshooting.md` | Limits and common failures |
@@ -70,9 +70,9 @@ request
 |---|---|---|
 | A. From material (default) | explainers, concept videos, news summaries, training intros | source -> storyboard -> HTML |
 | B. With a production brief | monthly refreshes, strict design rules, reproducible builds | storyboard -> **production brief (Markdown)** -> HTML |
-| C. From demo recordings | product demos with real screens | analyze clips -> storyboard -> HTML embedding the clips (callouts, highlight frames) |
+| C. From demo recordings or real screenshots | product demos with real screens | analyze clips/screens -> storyboard -> HTML embedding the clips or screenshots (callouts, highlight frames, zoom) |
 
-Default to A. "Monthly/brief" -> B. Recording files supplied -> C.
+Default to A. "Monthly/brief" -> B. Recording files or real-product screenshots supplied -> C.
 
 ## Decisions to collect (Step 1)
 
@@ -135,6 +135,7 @@ Create `$W/{slug}_brief.md` from [references/production-brief.md](references/pro
 4. Remove the sample scenes and the word "Sample".
 5. **Logos/icons (use the official ones actively)**: list every product/service/company named on screen or in narration and give each its real logo/icon, from the sources in [references/icons.md](references/icons.md) (user's set, vendor icon set, product page icon; license notes recorded). Generic line icons `icon()` are only for abstract concepts (approve, person, search), never for a named product. Do not give up after one source: try each source in order before falling back, and say which names fell back. View the contact sheet; `icons.py embed`; draw with `oi(ctx, 'id', cx, cy, size)`.
 6. **Date**: use the user's local date for `VIDEO.slug` suffix and `VIDEO.date`; end with an "as of {date}" line.
+7. **Real screenshots**: move them where it helps, hold them where it matters. Use zoom/pan (`zoomFrame`, [references/engine-guide.md](references/engine-guide.md)) to push into the part each narration line is about, but let the frame rest (no motion) while the viewer must read a prompt, result or table; move again only when the narration moves on. Masking scope: [references/demo-recording.md](references/demo-recording.md).
 
 ### Step 5: Check (all must pass before continuing)
 
@@ -144,7 +145,7 @@ node "$S/scripts/render.mjs" sheet "$W/{slug}.html" --out "$W/sheet.png"      # 
 node "$S/scripts/render.mjs" still "$W/{slug}.html" --t 12.5 --out "$W/f.png" # full-size frame
 ```
 
-`check` renders every 0.1 s and reports render errors, NaN, text outside the safe area and narration expected to overrun. Open `sheet.png` with the agent's image viewer and look for overlaps, empty areas, unreadable text. If "motion preview" is a checkpoint, hand `sheet.png` to the user and wait.
+`check` renders every 0.1 s and reports render errors, NaN, text outside the safe area and narration expected to overrun. Open `sheet.png` with the agent's image viewer and look for overlaps, empty areas, unreadable text. For zoomed screenshots also render `still` frames at each zoom keyframe time (the sheet only shows 3 frames per scene) and confirm the target is framed and readable. If "motion preview" is a checkpoint, hand `sheet.png` to the user and wait.
 
 ### Step 6: Narration (fit timing to real audio)
 
@@ -200,7 +201,7 @@ Default BGM is a calm synthesized pad (no copyright concerns); `pop` / `tech` ar
 - **Naming and attribution**: product named in full (never a generic noun alone); claims attributed to the owner ("Microsoft recommends"), sources in the storyboard, no on-screen source line unless asked. See `references/storyboard.md`.
 - **Logos/icons**: nominative use only (to identify the company), unmodified, with the source/license recorded. Do not imply endorsement. Ask before publishing branded material externally.
 - **Music/voices**: synthesized BGM by default; do not imitate a real person's voice.
-- **Privacy**: TTS backends other than local ones send the narration text to a third party. Real-environment screenshots are masked before embedding (see `references/demo-recording.md`).
+- **Privacy**: TTS backends other than local ones send the narration text to a third party. Real-environment screenshots are masked before embedding, with the scope agreed with the owner (see `references/demo-recording.md`).
 
 ## Placement (so agents discover the skill)
 

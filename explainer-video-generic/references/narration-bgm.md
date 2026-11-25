@@ -35,7 +35,7 @@ python "$S/scripts/narration.py" fit   --html "$W/{slug}.html" --work "$W/narr"
 ## Readings (pronunciation)
 
 - Screen text and subtitles stay as written; **only the TTS script** is rewritten (`assets/readings.<lang>.tsv`, auto-picked).
-- Per-project additions go in `readings_extra.tsv` (`written<TAB>spoken`), passed with `--readings`; they override the defaults. Longer surface forms are applied first.
+- Per-project additions go in `readings_extra.tsv` (`written<TAB>spoken`), passed with `--readings`; they override the defaults. Longer surface forms are applied first. Several videos in one project share **one** file passed to every `prepare` (rebuild scripts included): a per-video copy silently drops entries added elsewhere (a phrase such as 人が went back to the wrong reading after a rebuild), so after any rebuild read the "changed by readings" list for the expected entries.
 - Latin surface forms match on word boundaries; replacements touching CJK text get no extra spaces.
 - A voice given to `prepare --voice` is kept by `synth`; `synth --voice` overrides it (a note is printed). Without either, the backend/language default (a female voice for ja) applies, so check the `voice:` line `synth` prints.
 - After `prepare`, read the "changed by readings" list and the warnings about leftover Latin words (ja) or acronyms (other languages). When unsure how a name is read, ask the user before synthesizing, then add it.

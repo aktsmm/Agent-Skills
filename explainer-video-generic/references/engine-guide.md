@@ -84,6 +84,31 @@ The `/*FIT-BEGIN*/ ... /*FIT-END*/` line is rewritten by `narration.py fit`. Do 
 
 For a new shape, use Canvas 2D directly inside `draw`, or add a helper to section 1.
 
+### Zoom motion on a screenshot
+
+Add to section 1. Keyframes are `[time, centerX, centerY, zoom]` in the image's own pixels; each move takes 0.9 s; the image keeps the frame's aspect ratio. Anchor times to `L(i)`.
+
+```js
+const ez = x => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+function zoomState(nw, nh, kfs, t) {
+  let s = [nw / 2, nh / 2, 1];
+  for (const [kt, cx, cy, z] of kfs) {
+    if (t >= kt + 0.9) s = [cx, cy, z];
+    else if (t >= kt) { const p = ez((t - kt) / 0.9); s = [s[0] + (cx - s[0]) * p, s[1] + (cy - s[1]) * p, s[2] + (z - s[2]) * p]; break; }
+    else break;
+  }
+  return s;
+}
+function zoomFrame(ctx, id, nw, nh, X, Y, W, H, kfs, t) {
+  rbox(ctx, X - 8, Y - 8, W + 16, H + 16, { fill: '#111', stroke: C.line, r: 12, shadow: true });
+  const im = IMAGES[id]; if (!im || !im.complete || !im.naturalWidth) return;
+  const [cx, cy, z] = zoomState(nw, nh, kfs, t), sw = nw / z, sh = nh / z, k = im.naturalWidth / nw;
+  const sx = Math.min(Math.max(cx - sw / 2, 0), nw - sw), sy = Math.min(Math.max(cy - sh / 2, 0), nh - sh);
+  ctx.save(); ctx.beginPath(); ctx.rect(X, Y, W, H); ctx.clip(); ctx.drawImage(im, sx * k, sy * k, sw * k, sh * k, X, Y, W, H); ctx.restore();
+}
+// fx(ctx, IN(t, 0.3, 0.7), 20, () => zoomFrame(ctx, 'shot', 1576, 874, 100, 130, 1180, 654, [[L(1) + 0.2, 890, 490, 2.0], [L(2) + 5, 788, 437, 1]], t));
+```
+
 ## Video assets (demo recordings)
 
 - `from` = scene second playback starts; `start` = offset into the clip; `rate` = speed (1.5-2 to skip waiting).
