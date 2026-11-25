@@ -33,6 +33,7 @@ Use the agent's question tool (multiple choice with a recommended default first)
 | * | **Where should I pause for your approval?** (after the plan) | Storyboard only, then build to MP4 (recommended); storyboard and motion preview; no pauses; motion preview only |
 
 - The checkpoint question (*) is **always asked**; choose the other three from 1-7 by importance.
+- **Forks come first.** If the request can reasonably go two ways (self-contained video vs a series with "next" teasers, real recordings vs illustrated screens, how much of a real environment to mask, which of two claims to lead with), ask it in this round instead of picking one and fixing it later; put forks ahead of the generic items 1-7. Recommended default for the first: each video stands alone (see `storyboard.md`).
 - Items 5-7 can be defaulted from context; list them in the plan under "defaults used" (default: public-safe, language of the request, nothing special).
 - Ask once. After the answers, do not ask more; go to the plan.
 - If there is no source at all, also ask what the topic/material is. Without an answer, stop; do not guess.

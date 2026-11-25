@@ -84,7 +84,7 @@ Default to A. "Monthly/brief" -> B. Recording files or real-product screenshots 
 7. **Checkpoints**: where to pause for approval (default: storyboard only, then build through to MP4).
 8. **Brand assets**: logos, icons, colors (optional; otherwise find them, see `references/icons.md`).
 
-Do not ask what the request or attachments already answer. Ask the remaining important items **once, as multiple choice** (see `references/hearing-plan.md`).
+Do not ask what the request or attachments already answer. Ask the remaining important items **once, as multiple choice** (see `references/hearing-plan.md`); when the request could reasonably go two ways, ask that fork first instead of choosing silently.
 
 ## Procedure
 

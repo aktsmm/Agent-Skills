@@ -6,7 +6,7 @@ The storyboard is the blueprint: when, what is on screen, what is said. The qual
 
 - **Open with a question**, the viewer's situation or the news itself; do not open with a feature list.
 - **Show structure in the middle**: diagrams, flows, comparisons, timelines, charts, built up by motion. One idea per screen.
-- **Close with the takeaway and the next step** (and the "as of" line for time-sensitive topics).
+- **Each video stands alone.** Close it on the takeaway and what it actually showed (what a person still verifies), plus the "as of" line for time-sensitive topics; do not end on a planned next demo or an untested capability. Teasers for unperformed work read as promises and blur what is verified. Build the follow-up as its own video once it has been shown; in a series, each episode must still make sense by itself.
 - **Analogies help** for technical topics (a library index, a parcel route).
 - **10-30 seconds per scene, 2-5 narration lines**, each line 1-2 sentences.
 - **Timing comes from the narration**: about 6.5 characters/s for Japanese/Chinese, about 2.5 words/s for English/Latin scripts, plus pauses. The real TTS audio later replaces these estimates.
