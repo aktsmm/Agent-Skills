@@ -52,7 +52,7 @@ Render it to MP4 with audio and background music like <reference video>: no play
 ```
 Using the attached video (HTML + storyboard) as the template, make episode 0 (3-5 minutes) for <customer/topic>.
 1. Research <topic> from the supplied material and public sources and verify key facts in primary sources.
-2. Write a storyboard in the same style, starting from the viewer's situation, not the product.
+2. Write a storyboard in the same look, with the opening <title + summary / question / conclusion first / ...> and a title card / agenda if wanted, not a feature list.
 3. After I approve the storyboard, produce the video with narration and BGM.
 It will be shown externally: no confidential data and no private individuals' names.
 ```

@@ -84,7 +84,7 @@ Default to A. "Monthly/brief" -> B. Recording files or real-product screenshots 
 7. **Checkpoints**: where to pause for approval (default: storyboard only, then build through to MP4).
 8. **Brand assets**: logos, icons, colors (optional; otherwise find them, see `references/icons.md`).
 
-Do not ask what the request or attachments already answer. Ask the remaining important items **once, as multiple choice** (see `references/hearing-plan.md`); when the request could reasonably go two ways, ask that fork first instead of choosing silently.
+Do not ask what the request or attachments already answer. Ask the remaining important items **once, as multiple choice** (see `references/hearing-plan.md`), including the **opening** (3-4 options tailored to this source, recommended first, plus whether to add a title card / agenda; never default every video to a question opening); when the request could reasonably go two ways, ask that fork first instead of choosing silently.
 
 ## Procedure
 
@@ -110,7 +110,7 @@ Use `python3` instead of `python` where that is the interpreter name. Run steps 
 Details, questions and the plan template: [references/hearing-plan.md](references/hearing-plan.md).
 
 1. **Read** the request/attachments first; skim the source for size and structure. If a file cannot be read (encrypted, blocked), say so and ask for another copy.
-2. **Brief**: ask the still-open items (max 4) in **one** multiple-choice round using the agent's question tool (e.g. `ask_user`), else one short numbered message. Put the recommended default first. **Always include the checkpoint question.**
+2. **Brief**: ask the still-open items (max 4) in **one** multiple-choice round using the agent's question tool (e.g. `ask_user`), else one short numbered message. Put the recommended default first. **Always include the checkpoint question and the opening-style question.**
 3. **Plan**: write `$W/{slug}_plan.md` (goal, spec, outline, checkpoints, defaults used, deliverables) and summarize it in chat. State clearly that the deliverable is an MP4 with audio and where you will pause.
 4. **Get approval** before the storyboard. A supplied topic or "go ahead" does not waive the brief and plan; only an explicit "no questions / just do it / decide for me" does. Then show a short plan anyway and proceed (still ask for a topic if there is no source or theme), and say in the report that the brief was skipped at the user's request.
 

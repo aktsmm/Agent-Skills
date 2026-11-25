@@ -4,7 +4,7 @@ The storyboard is the blueprint: when, what is on screen, what is said. The qual
 
 ## Principles
 
-- **Open with a question**, the viewer's situation or the news itself; do not open with a feature list.
+- **Open the way agreed in the brief**, including any title card / agenda scene (see `hearing-plan.md`). Never default to a question opening; do not open with an unframed feature list.
 - **Show structure in the middle**: diagrams, flows, comparisons, timelines, charts, built up by motion. One idea per screen.
 - **Each video stands alone.** Close it on the takeaway and what it actually showed (what a person still verifies), plus the "as of" line for time-sensitive topics; do not end on a planned next demo or an untested capability. Teasers for unperformed work read as promises and blur what is verified. Build the follow-up as its own video once it has been shown; in a series, each episode must still make sense by itself.
 - **Analogies help** for technical topics (a library index, a parcel route).
