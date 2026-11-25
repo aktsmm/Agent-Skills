@@ -1,6 +1,6 @@
 ---
 name: customer-workspace
-description: "Set up dedicated customer workspaces and coordinate meeting notes, actions, and workstreams for ongoing customer accounts. Use for 顧客ワークスペースの作成, 顧客案件の棚卸し・引き継ぎ, 議事録と宿題・案件台帳の一括反映, or customer record maintenance without a matching workspace-local workflow. Not for general questions, standalone PoC workspaces, or single updates already covered by a local workflow."
+description: "Set up dedicated customer workspaces and coordinate meeting notes, actions, and workstreams for ongoing customer accounts. Use for 顧客ワークスペースの作成, 顧客案件の棚卸し・引き継ぎ, 議事録と宿題・案件台帳の一括反映, 会議前の準備メモ, or customer record maintenance without a matching workspace-local workflow. Not for general questions, standalone PoC workspaces, or single updates already covered by a local workflow."
 argument-hint: "顧客名と作成先、または既存の顧客ワークスペースで行う作業（議事録・案件整理・引き継ぎ）"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -89,6 +89,7 @@ Separate immutable originals, internal edits and shareable copies; use `_receive
 | Clear update for one confirmed workstream | Update its README with the source link and state change.                                         |
 | New, ambiguous, or multi-workstream input | Record it in `workstreams/_candidates.md` and ask for confirmation.                              |
 | Time-bounded follow-up                    | Track it in `next-actions/`; use `ongoing/` only when no next-meeting date is known.             |
+| Pre-meeting preparation                   | Build one prep memo in the next-actions `research/` folder per [Meeting Prep Rules](references/meeting-prep-rules.md). |
 | Status review or handoff                  | Read `workspace-summary.md`, the portfolio, active actions, and open questions before reporting. |
 
 Keep source records authoritative: summaries and workstreams link to meeting notes and inbox entries instead of duplicating them.
@@ -100,6 +101,7 @@ Keep source records authoritative: summaries and workstreams link to meeting not
 - Put customer-agreed homework, self-initiated proposals, and supplementary research in separate `next-actions/` folders. Task headers link back to their meeting source, while customer-shareable meeting tables exclude local task paths.
 - Use only `candidate`, `not-started`, `in-progress`, `blocked`, `done`, or `dropped`. Before assigning `not-started` or `done`, inspect task-linked external work locations; workspace absence does not prove a deliverable is missing. When external progress and artifacts confirm completion, update the canonical action record and indexes in the same operation. Do not copy external artifacts unless the material lifecycle requires it. A `blocked` record names the current owner and its transition condition.
 - When the customer record also lives in a linked external case folder, reflect each progress, decision, schedule or answered requirement there in the same turn without being asked, following that folder's own rules (raw item to the month's inbox, answered items checked off in the month's questions, current state and next dates in the summary). Never copy internal figures (hours, contracts, amounts) there, check off only items the customer actually answered, and note unverified provenance.
+- When work is delegated to another session or tool, record the request (what, sent time, `未受領`) on the owning board. On receipt, import the result per [Customer Material Lifecycle](references/material-lifecycle.md) before summarizing it.
 - Create `pj_{topic}/` only when the topic spans multiple meetings and meets the detailed project-thread split conditions.
 
 ## Meeting Notes Quality Gate
@@ -129,6 +131,7 @@ Before calling meeting notes done:
 - [Workstream Portfolio Rules](references/workstream-portfolio-rules.md)
 - [Knowledge Ledger Rules](references/knowledge-ledger-rules.md)
 - [Customer Material Lifecycle](references/material-lifecycle.md)
+- [Meeting Prep Rules](references/meeting-prep-rules.md)
 - [Project Thread Rules](references/project-threads.md)
 
 ## Assets

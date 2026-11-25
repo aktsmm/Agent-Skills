@@ -68,6 +68,7 @@ handoffを受け取ったエージェントへ、最初の応答ではtoolを実
 ### Environment and Safety Boundary
 
 - 対象tenant、subscription、resource group、resource、region、SKU。未取得値は`<要確認>`。
+- 認証が必要なことだけを理由に、アカウントや環境を検証範囲から外さない。ユーザー本人がサインインする確認点を入れて含める（パスワード・MFAは本人のみ）。
 - read-onlyで確認できる項目と、変更を伴う項目を分ける。
 - 明示承認なしで禁止する操作: resource作成・変更・削除、deploy、権限付与、network/DNS変更、public access変更、secret取得・表示、共有process操作、push。
 - secretは環境変数・既存認証session・Key Vault等から取得し、保存・表示しない。
