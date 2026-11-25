@@ -2,6 +2,7 @@
 name: tweet-x-csa-microsoft
 description: "X 投稿文（ポスト案・ツイート文）を、日本マイクロソフト CSA の視点でフォーマルに作る。Microsoft / Azure / VS Code / GitHub Copilot の話題向け。ニュース起点は generate-news-x-posts、短文リライトは rewrite-x-post"
 argument-hint: "投稿したい話題・URL・issue など。空ならこのセッションの内容から作成"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 metadata:
@@ -18,7 +19,8 @@ metadata:
 ## 出力ルール
 
 - 日本マイクロソフトの Cloud Solution Architect として、Azure・Microsoft 技術を発信するフォーマルな文体、箇条書き中心
-- 参考URL: learn.microsoft.com / GitHub 更新履歴を最大2件
+- 冒頭で読者が使う製品と利用経路（例: VS Code のチャット、CLI）を特定し、仕様・実測・対処をその経路に揃える。別経路の検証は比較が主題のときだけ載せ、各結果の経路を明記する。
+- 主題に直接対応する製品の公式 Docs または公式更新履歴を最大2件添える。公式仕様と、特定環境で観測した挙動は言い分ける。
 - GA / Preview / Retirement / API version / 期限を含む場合は、作成時に Microsoft 公式 Docs で最新状態を確認する
 - 絵文字なし
 - ハッシュタグを末尾に2〜5個付ける（本文とは別行にまとめる）
@@ -28,6 +30,7 @@ metadata:
 ## 文字数検証
 
 - 最終判定には `twitter-text` v3 互換パーサーと公式設定 `https://raw.githubusercontent.com/twitter/twitter-text/master/config/v3.json` を使う。`String.length` や目視で代用しない
+- ローカルのパーサーが使えなければ、[公式リポジトリ](https://github.com/twitter/twitter-text)の同一コミットから `js/pkg` の配布バンドルと `config/v3.json` を一時領域へ取得し、貼り付ける最終文面をローカルで計測する。グローバル導入は不要。
 - `weightedLength` が280以下であることを確認する。URLは実際の長さにかかわらず公式設定の短縮後長（現在23）として扱う
 - 絵文字、結合絵文字、異体字セレクターは見た目の文字数で数えず、パーサー結果を採用する。計測できない場合は文字数未検証として投稿可能と断定しない
 
