@@ -100,6 +100,7 @@ metadata:
 
 可能な範囲で read-only / deterministic な確認を実行する。
 
+- 検証ゲートが対象なら、安全な fixture で実際の入口に不合格入力を渡し、想定の診断と後続処理前の停止を確認する。単体 validator の失敗だけで、呼び出し側も止まるとは判定しない。
 - Markdown link / referenced path の存在確認
 - Python: 構文確認、該当テスト、`--help`、安全な dry-run
 - PowerShell: 対象バージョンで構文確認し、安全な fixture で主要分岐と .NET API を実行する。5.1 の API が 7 でも使えると仮定せず、構文 PASS だけで互換性を保証しない。実行できない runtime は `NOT_RUN` とする

@@ -126,6 +126,7 @@ Before final response:
 - Check no forbidden target was changed.
 - Re-run the README generator check; a stale skills index at completion is a failed gate, not a note for the next run.
 - Parse YAML frontmatter for every affected skill entry. Check `name` against its folder and invocation flags, `license`, and `metadata.author` against repo conventions. Syntax validation does not replace the workflow fit check in Apply.
+- For each affected entry, count the YAML-decoded `description`: require a non-empty string, recommend at most 600 characters, and fail above 1,023 (curated repo policy, not the Agent Skills limit of 1,024). Apply this check even when only bundled files changed.
 - Check no obvious secret, customer data, tenant ID, or local absolute path was added. Scan added lines or the staged target content; do not scan unchanged diff context, which can trigger false positives on pre-existing terms.
 - Commit/push intended private skill changes in safe-auto only when scope is clear, all changed paths are intended, and remote/scope checks pass. Done means the execution checkout is clean with ahead/behind `0/0`; original unrelated dirty is preserved and reported, not a completion blocker.
 - List up to three read-only candidates: dirty -> Retro; pending private commits -> ahead-range review; committed public-safe gap -> separately requested sync. Honor holds/visibility; never expand operations or offer private/internal/denied content for public sync.

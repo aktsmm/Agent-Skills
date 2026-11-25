@@ -110,6 +110,8 @@ When improving an existing skill, use this order:
 
 Use the smallest viable frontmatter: `name`, `description`, and only behavior-changing optional fields. `name` must match the folder and `description` must include trigger conditions.
 
+Count the YAML-decoded `description`, not its bytes or source lines. The Agent Skills limit is 1,024 characters. For the curated repo policy, run `python scripts/quick_validate.py --curated-description <skill-dir>` from this Skill's folder: up to 600 is recommended; 601–1,023 warns without failing; 1,024 or more fails.
+
 Frontmatter details and silent failures: [references/common-pitfalls.md](references/common-pitfalls.md)
 
 ## SKILL.md Guidelines

@@ -47,6 +47,7 @@ metadata:
 - Always-On Boundary: `copilot-instructions.md` と `AGENTS.md` が短い入口に留まり、catalog / workflow map / reference list を昇格させていないか。
 - Primitive / SRP: prompt / instruction / skill / agent / hook の選択が最小で、1 agent が 1 責務か。
 - Activation Evidence: `description` / `applyTo` / 常時ロード / 手動呼び出しは対象hostの仕様で判定し、仕様確認と実際の読込検証を分ける。未検証の挙動をhost共通と断定しない。
+  - Skill が対象なら YAML 解析後の `description` を測り、host の上限と repo が明示した推奨値・上限を区別する。手動専用なら `/` 候補への表示・明示起動と、自動で読み込まれないことを別々に確認する。
 - Frontmatter / Placement: `.instructions.md` / `.agent.md` / `SKILL.md` の supported fields（skill は `disable-model-invocation: true` の手動専用に `argument-hint` があるか、実験的な `context: fork` に依存していないかも確認）、`applyTo` 過大（絞る提案は対象 instruction の全文を読み、除外されるファイルの編集に効く規則が無いことを確認してから出す）、`.github/agents/` 直下配置を確認する。agent は本文の tool reference が frontmatter `tools` と整合しているかも確認する。両 harness（VS Code Local / Agent Host）で使う資産は、`tools:` が個別 ID（`read/readFile` 等）だけで harness により無視されないか（tool set 別名 `read` / `edit` / `search` / `execute` / `agent` / `todo` が portable）、本文が `runSubagent` / `run_in_terminal` / `read_file` など harness 固有のツール名に依存していないかも見る。
 - Deterministic Offload: extract / count / validate / diff / format / parse / lint が LLM loop に混ざっていないか。既存 script / CLI がある処理を agent が UI・手作業で書き、SSOT の script 経路と手順が矛盾していないか。
 - Reference Integrity: 相対 Markdown link の実在に加え、`#anchor` と `セクション N` / `section N` / `§N` の散文ポインタが対象の見出しへ解決するか。廃止・改名する資産はファイル名と拡張子なしの名称でも現行参照を確認し、移管先へ付け替える。履歴は現行参照と区別する。ファイル実在だけを PASS にしない。機械検査では code span / fenced code 内の記法例、`URL` / `path` などの placeholder target を除外する。

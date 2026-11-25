@@ -132,5 +132,5 @@ Source policy:
 - [ ] Skill vs non-skill fit checked first
 - [ ] Search query returns results
 - [ ] Tool and network requirements surfaced before install
-- [ ] Skill installed to local directory (if requested)
+- [ ] After installation, verify discovery in the intended host separately from file placement. If missing, check the YAML-decoded `description` against the host limit and inspect invocation flags; distinguish intentionally hidden skills from discovery failures. Report issues without silently rewriting imported metadata.
 - [ ] Index updated successfully (if requested)

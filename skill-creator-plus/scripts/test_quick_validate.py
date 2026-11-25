@@ -1,6 +1,8 @@
 import tempfile
 import unittest
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 from init_skill import init_skill
@@ -40,6 +42,49 @@ class QuickValidateTests(unittest.TestCase):
             valid, message = validate_skill(skill_dir)
 
             self.assertTrue(valid, message)
+
+    def test_curated_description_cli_counts_decoded_yaml_characters(self):
+        validator = Path(__file__).with_name("quick_validate.py")
+        for size, exit_code, diagnostic in (
+            (600, 0, None),
+            (601, 0, "600 or fewer is recommended"),
+            (1023, 0, "600 or fewer is recommended"),
+            (1024, 1, "maximum is 1023"),
+        ):
+            with self.subTest(size=size), tempfile.TemporaryDirectory() as tmpdir:
+                # The literal block keeps an internal newline but strips the final one.
+                value = "\u52d5" * 300 + "\n  " + "\u753b" * (size - 301)
+                skill_dir = self.write_skill(
+                    Path(tmpdir),
+                    "description-boundary",
+                    f"name: description-boundary\ndescription: |-\n  {value}\nlicense: MIT",
+                )
+                result = subprocess.run(
+                    [sys.executable, "-B", str(validator), "--curated-description", str(skill_dir)],
+                    capture_output=True,
+                    text=True,
+                    encoding="utf-8",
+                    check=False,
+                )
+                self.assertEqual(result.returncode, exit_code, result.stdout + result.stderr)
+                if diagnostic:
+                    self.assertIn(f"description-boundary: 'description' is {size} characters", result.stdout)
+                    self.assertIn(diagnostic, result.stdout)
+                else:
+                    self.assertNotIn("'description' is", result.stdout)
+
+    def test_standard_description_limit_is_unchanged(self):
+        for size in (1024, 1025):
+            with self.subTest(size=size), tempfile.TemporaryDirectory() as tmpdir:
+                skill_dir = self.write_skill(
+                    Path(tmpdir),
+                    "standard-limit",
+                    f"name: standard-limit\ndescription: {'a' * size}\nlicense: MIT",
+                )
+                valid, message = validate_skill(skill_dir)
+                self.assertEqual(valid, size == 1024, message)
+                if not valid:
+                    self.assertIn("'description' is 1025 characters; maximum is 1024", message)
 
     def test_rejects_non_string_compatibility(self):
         with tempfile.TemporaryDirectory() as tmpdir:

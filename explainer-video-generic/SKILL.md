@@ -1,9 +1,8 @@
 ---
 name: explainer-video-generic
-description: |
-  Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on the local machine: brief -> storyboard -> HTML animation -> MP4 -> TTS narration + BGM. Works for any topic and any product or company, in Japanese, English or other languages. Use for "make an explainer video", "turn this deck/article into a video", "add narration and BGM to this silent video", "add explanations to this demo recording", "make a motion-graphics video", "make a translated version of this video", "change scene 3 of the video". Do NOT use for slide decks themselves (pptx), still images, audio-only podcasts, live-action editing, or summarizing/transcribing existing videos. Starts with a short multiple-choice brief (audience, length, tone, voice, music energy) and waits for plan approval before building; reviews the narration's pronunciation before delivery.
-  日本語: 「解説動画を作って」「動画化して」「この資料/記事/ニュースを動画に」「デモ録画に解説とナレーションを付けて」「動画の英語版/日本語版を作って」。HTML/Canvas のモーショングラフィックスで、TTS は edge-tts / OpenAI / Azure / VOICEVOX / 任意コマンドから選べる。
+description: "Create a narrated explainer video (MP4) with captions, BGM and SRT from documents, articles, research or demo recordings. Use to turn a deck into a video, make motion graphics, add narration or commentary to a recording, translate a video or revise a scene. Not for slide decks themselves, still images, podcasts, live-action editing or video summaries/transcripts. 日本語: 「解説動画を作って」「動画化して」「資料・記事・ニュースを動画に」「デモ録画に解説とナレーションを付けて」「動画の英語版・日本語版を作って」「動画のシーンを直して」。"
 argument-hint: "題材・元ネタ(資料/URL/メモ/デモ録画)、視聴者、長さ目安、言語(ja/en等)、声(TTS)、出力先"
+disable-model-invocation: true
 user-invocable: true
 license: CC BY-NC-SA 4.0
 compatibility: Needs Python 3.9+ (numpy), Node.js 18+ with Playwright and a Chromium-family browser, and ffmpeg. Run scripts/check_env.py first. Works in GitHub Copilot (CLI / VS Code / cloud agent), Codex, Claude Code and any agent that supports Agent Skills and can run shell commands.

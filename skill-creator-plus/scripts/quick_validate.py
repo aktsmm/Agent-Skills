@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
-import sys
 from pathlib import Path
 
 try:
@@ -28,6 +28,9 @@ ALLOWED_PROPERTIES = {
     "metadata",
 }
 LEGACY_EVIDENCE_FILES = ("LICENSE.txt", "LICENSE", "COPYING", "NOTICE")
+STANDARD_DESCRIPTION_MAX = 1024
+CURATED_DESCRIPTION_MAX = 1023
+CURATED_DESCRIPTION_RECOMMENDED = 600
 
 
 def validate_frontmatter(skill_path: Path) -> tuple[dict | None, str | None]:
@@ -49,7 +52,7 @@ def validate_frontmatter(skill_path: Path) -> tuple[dict | None, str | None]:
     return frontmatter, None
 
 
-def validate_common_fields(skill_path: Path, frontmatter: dict) -> str | None:
+def validate_common_fields(skill_path: Path, frontmatter: dict, *, description_max: int) -> str | None:
     unexpected = set(frontmatter) - ALLOWED_PROPERTIES
     if unexpected:
         return f"Unexpected key(s) in SKILL.md frontmatter: {', '.join(sorted(unexpected))}"
@@ -62,8 +65,10 @@ def validate_common_fields(skill_path: Path, frontmatter: dict) -> str | None:
     if name != skill_path.name:
         return f"Name '{name}' must match parent directory '{skill_path.name}'"
     description = frontmatter.get("description")
-    if not isinstance(description, str) or not description.strip() or len(description) > 1024:
-        return "Missing or invalid 'description' in frontmatter"
+    if not isinstance(description, str) or not description.strip():
+        return f"{skill_path.name}: 'description' must be a non-empty string"
+    if len(description) > description_max:
+        return f"{skill_path.name}: 'description' is {len(description)} characters; maximum is {description_max}"
     if "<" in description or ">" in description:
         return "Description cannot contain angle brackets (< or >)"
     for field in ("user-invocable", "disable-model-invocation"):
@@ -150,21 +155,35 @@ def validate_manifest(skill_path: Path, frontmatter: dict) -> tuple[bool, str]:
     return True, "Skill is valid!"
 
 
-def validate_skill(skill_path: str | Path) -> tuple[bool, str]:
+def validate_skill(skill_path: str | Path, *, curated_description: bool = False) -> tuple[bool, str]:
     skill_path = Path(skill_path)
     frontmatter, error = validate_frontmatter(skill_path)
     if error:
         return False, error
-    error = validate_common_fields(skill_path, frontmatter)
+    description_max = CURATED_DESCRIPTION_MAX if curated_description else STANDARD_DESCRIPTION_MAX
+    error = validate_common_fields(skill_path, frontmatter, description_max=description_max)
     if error:
         return False, error
-    return validate_manifest(skill_path, frontmatter)
+    valid, message = validate_manifest(skill_path, frontmatter)
+    length = len(frontmatter["description"])
+    if valid and curated_description and length > CURATED_DESCRIPTION_RECOMMENDED:
+        message += (
+            f"\nWarning: {skill_path.name}: 'description' is {length} characters; "
+            f"{CURATED_DESCRIPTION_RECOMMENDED} or fewer is recommended."
+        )
+    return valid, message
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python quick_validate.py <skill_directory>")
-        raise SystemExit(1)
-    valid, message = validate_skill(sys.argv[1])
+    parser = argparse.ArgumentParser(description="Validate Skill frontmatter and license evidence.")
+    parser.add_argument("skill_directory", type=Path)
+    parser.add_argument(
+        "--curated-description",
+        action="store_true",
+        help=f"Apply the curated description policy: recommend {CURATED_DESCRIPTION_RECOMMENDED}, "
+        f"allow up to {CURATED_DESCRIPTION_MAX} characters.",
+    )
+    args = parser.parse_args()
+    valid, message = validate_skill(args.skill_directory, curated_description=args.curated_description)
     print(message)
     raise SystemExit(0 if valid else 1)
