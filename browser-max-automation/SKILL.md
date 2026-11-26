@@ -1,6 +1,6 @@
 ---
 name: browser-max-automation
-description: Visible browser automation using available Playwright, CLI, CDP, or computer-use tools with scoped actions and durable verification. Use for navigation, forms, screenshots, downloads, existing-session reuse, or iframe, modal, file chooser, passkey, and CDP troubleshooting. Preserve foreground work where the selected route supports it; announce necessary activation.
+description: Visible browser automation using available Playwright, CLI, CDP, or computer-use tools with scoped actions and durable verification. Use for navigation, forms, screenshots, downloads, existing-session reuse, or iframe, modal, file chooser, passkey, CDP troubleshooting, or saved screenshots of an isolated VS Code. Preserve foreground work where the selected route supports it; announce necessary activation.
 argument-hint: "自動化したい URL、操作内容、使いたいモード"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -43,7 +43,7 @@ Browser automation through the current runtime's supported controls.
 | Existing headed browser + MCP/CDP         | Authentication or interactive exploration matters | Verify profile, owned target, and non-activation behavior          |
 | Playwright CLI or saved Playwright script | A stable workflow will repeat                     | Reuse the session; explicitly request headed mode for new launches |
 | Direct CDP WebSocket                      | A verified lower-level route is needed            | Pin target ID; do not bypass ownership or recovery limits          |
-| Available computer-use controls          | Supported browser controls cannot reach a necessary UI | Verify owned window and current screenshot; announce required foreground activation, never promise background input |
+| Available computer-use controls          | Supported browser controls cannot reach a necessary UI | Verify owned window and current screenshot; announce required foreground activation, never promise background input. These tools usually return images only and cannot save files: for saved screenshots of Electron/VS Code, use CDP instead |
 
 既存ブラウザ CDP の起動、profile 確認、port drift、認証 URL encode、スクリーンショット取得は [references/instructions/cdp-existing-browser.md](references/instructions/cdp-existing-browser.md) を参照する。
 直接 WebSocket CDP の起動フラグ、`websocket-client` 接続、SPA hash navigation、virtual scroll 操作は [references/instructions/cdp-direct-websocket.instructions.md](references/instructions/cdp-direct-websocket.instructions.md) を参照する。
@@ -131,6 +131,7 @@ Playwright MCP の `file:` 拒否（`http.server` で配信）と破綻しやす
 | Azure Portal iframe / OOPIF                                        | [references/instructions/azure-portal.md](references/instructions/azure-portal.md)                                           |
 | Angular Material forms                                             | [references/instructions/angular-material.md](references/instructions/angular-material.md)                                   |
 | Hidden upload, VS Code Web, evaluate+fetch, UI fallback            | [references/instructions/ui-fallbacks.md](references/instructions/ui-fallbacks.md)                                           |
+| Isolated VS Code desktop screenshots / Copilot Chat demo capture via CDP (computer-use cannot save files) | [references/instructions/vscode-desktop-cdp-capture.md](references/instructions/vscode-desktop-cdp-capture.md) |
 | Unsaved editor / draft tab safety                                  | [references/instructions/unsaved-form-tabs.md](references/instructions/unsaved-form-tabs.md)                                 |
 | Windows subprocess stability (PIPE deadlock, SIGINT, tree kill)    | [references/instructions/windows-subprocess-cdp.md](references/instructions/windows-subprocess-cdp.md)                       |
 

@@ -15,7 +15,7 @@
 
 The first slide carries `class="is-active"`; every other slide carries `hidden`. The runtime keeps them in sync from there.
 
-`data-slide-id` values are the edit handles. Keep them stable across revisions so "change slide 4" stays unambiguous.
+`data-slide-id` values are the edit handles. Keep them stable across revisions so "change slide 4" stays unambiguous. When generating from a build script, keep the slide order, the outline chapters and the visible counter in one place (an ordered id list): a count or chapter list maintained separately goes stale when a slide is added.
 
 ## Sizing
 
@@ -38,7 +38,7 @@ The default scale suits title and divider slides. Put one class on a slide `<sec
 | `shf-d-ref`   | ×0.66 / ×0.80  | source and link lists                           |
 | `shf-d-large` | ×1.15 / ×1.10  | sparse or closing slides                        |
 
-The capacity figures below are for the default scale; scale them by the factor. Inline SVG diagrams and `shf-callout` need no extra CSS. A slide that overflows still fails Tier 2: change the class or split it. Add `shf-nw` to a `td`, `th` or `span` to keep a short label (a role, a date range) on one line; the other columns then absorb the wrapping.
+The capacity figures below are for the default scale; scale them by the factor. Inline SVG diagrams and `shf-callout` need no extra CSS. A slide that overflows still fails Tier 2: change the class or split it. Add `shf-nw` to a `td`, `th` or `span` to keep a short label (a role, a date range) on one line; the other columns then absorb the wrapping. Put it on the first-column cells and their `th` from the start: a narrow label column otherwise breaks mid-word.
 
 ## How much text fits on a line
 

@@ -6,7 +6,7 @@ Assign one category per event, deciding by who is involved and how much it matte
 
 1. Travel (flight, train, hotel) → purple.
 2. Private (gym, clinic, leisure) → green.
-3. A customer attends, or the owner is the main speaker or presenter (including an internal meeting) → red.
+3. A customer attends, or the owner is the main speaker or presenter (including an internal meeting), or the owner is on duty for a customer (on-call or standby shifts, even when no customer is in a meeting) → red.
 4. Work done for a customer that is not customer-facing: an internal meeting with others, or the owner's own preparation or verification block (【準備】【検証】) → orange.
 5. Work done alone that is not for a specific customer (learning time, self-study, watching a session) → yellow.
 6. Any other internal recurring meeting, 1:1, V-TEAM, or relationship meeting (1:3, career talk) → blue (lowest priority).
@@ -15,7 +15,7 @@ Assign one category per event, deciding by who is involved and how much it matte
 
 | Color | Category name | Typical events |
 |---|---|---|
-| Red | 🔴 顧客・メイン | customer deliveries, workshops, hearings, customer events, talks, internal meetings the owner leads |
+| Red | 🔴 顧客・メイン | customer deliveries, workshops, hearings, customer events, talks, internal meetings the owner leads, on-call or standby shifts |
 | Orange | 🟠 顧客のための準備・社内会議 | internal customer-case meetings, rehearsals, reviews, 【準備】【検証】 blocks |
 | Yellow | 🟡 個人ワーク・研修 | Learning Time, self-study, general solo work |
 | Blue | 🔵 内部定例・1on1・V-TEAM | team syncs, V-TEAM, 1:1, 1:3, career conversations |

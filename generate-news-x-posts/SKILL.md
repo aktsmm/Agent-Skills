@@ -170,6 +170,7 @@ AIが伸びる。
 ## 文字数検証
 
 - 最終判定には `twitter-text` v3 互換パーサーと公式設定 `https://raw.githubusercontent.com/twitter/twitter-text/master/config/v3.json` を使う。`String.length` や目視で代用しない
+- ローカルのパーサーが使えなければ、[公式リポジトリ](https://github.com/twitter/twitter-text)の同一コミットから `js/pkg` の配布バンドルと `config/v3.json` を一時領域へ取得し、貼り付ける最終文面をローカルで計測する。グローバル導入は不要。
 - 1投稿は `weightedLength` が280以下であることを確認する。URLは実際の長さにかかわらず公式設定の短縮後長（現在23）として扱う
 - 絵文字、結合絵文字、異体字セレクターは見た目の文字数で数えず、パーサー結果を採用する。計測できない場合は文字数未検証として投稿可能と断定しない
 
