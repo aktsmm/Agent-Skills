@@ -65,6 +65,7 @@ metadata:
 - preflight、apply、verify、cleanup の順序が実行可能か
 - user confirmation が必要な判断と、自動実行してよい判断が分かれているか
 - retry / resume / partial failure の扱いがあるか
+- 検知・同期 script は、一部の取得に失敗したとき `ok` や同期日・watermark の前進にならないか、可視性や信号の種類（コメント・返信・ラベル・レビュー）で対象が黙って欠けないかを、独立した経路の件数と照合して確認したか
 
 ### 2. Script Contract
 

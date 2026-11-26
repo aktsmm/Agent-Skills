@@ -30,6 +30,7 @@ metadata:
 
 - read-onlyで実行する。Issue/PRの作成・編集・close、コメント、review、merge、pushを行わない
 - GitHub MCPが利用できる場合は、現在ユーザーを確認してから対象repoを取得する。利用できなければ認証済み`gh` CLIへフォールバックする
+- `gh api --paginate`は`--slurp`と`--jq`を併用できない（集計は別途pipeで行う）。`gh search --jq`は`--`より前に置く（後ろだと検索語になり0件に見える）
 - open項目だけでなく、期間内に更新・コメントされたclosed/merged項目も確認する
 - 「新しい」は作成日時だけでなく、期間内のコメント、review、state変更、再open、mergeを含む
 - bot通知、ユーザー自身の進捗コメント、同内容の重複通知は分離し、対応必要件数へ混ぜない

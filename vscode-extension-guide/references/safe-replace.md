@@ -15,11 +15,19 @@ Use when a feature overwrites a folder or file set the user may have edited: rei
 
 ## Comparison details
 
-- Hash file contents, but above the size/count caps degrade to size + mtime. A cap that refuses to compare turns into "this item can never update" and also breaks retry.
+- Hash file contents in memory up to a threshold (about 20 MiB). Above it, still compare: stream the hash against upstream, compare size + mtime (ns) between two looks at the same file, and stream the content once more right before the swap, because a same-size, same-mtime rewrite passes the stamp check. A cap that refuses to compare turns into "this item can never update" and also breaks retry; keep an absolute cap only where the download holds a whole file in memory, and report it as skipped, not failed.
 - Do not hash inode, device or link count: they differ across filesystems (exFAT, network drives, sync clients) and create false conflicts without adding safety.
 - Exclude user-editable metadata (custom descriptions, enable/disable toggles) from the content baseline. Merge it into the staged metadata right before the swap, then read the moved-aside copy's metadata after the rename; a mismatch means the change was lost, so restore.
 - While reading a file for the snapshot, confirm size and mtime did not change during the read.
 - Git tree modes: treat `100644` and `100755` as ordinary files when the installer copies bytes only; refuse symlinks (`120000`) and submodules (`160000`). Refusing `100755` makes every script-bearing folder permanently non-updatable.
+
+## Rollback, bookkeeping and carried items
+
+- Record each created file as owned right after the copy, before verifying it, including a partial copy. A file missing from the ownership list makes rollback refuse with an unowned entry and leaves a half-built target.
+- Retry a transient lock (EPERM / EBUSY / EACCES, a few short backoffs, nothing else) when removing the recovery record or other bookkeeping after a verified swap. Antivirus and indexers hold files briefly on Windows, and a throw there reports a finished update as failed.
+- An environment probe that gates the update (the share query below) gets a timeout and one retry; a second failure stops before any write with a reason naming the probe, not a generic failure.
+- Child items the user installed separately inside the target (own metadata, not in upstream) are not local edits. Copy them byte for byte into the staged copy after verifying them and before the staged snapshot, so ownership, rollback and cleanup cover them. Stop before staging when the new upstream uses their path or drops their parent folder.
+- One reason code per cause (a hard link is not "too large"), with text per UI language asserted by a table test.
 
 ## Scope of the guarantee
 
@@ -39,6 +47,6 @@ When a "shared or network location" check lists Windows shares (`Win32_Share`), 
 
 ## Tests
 
-Inject a failure at each boundary (backup rename, placement rename, cancellation after the backup, failed rollback) and assert the old bytes and metadata are identical afterwards. Also cover a save during the backup rename, an oversized file, a dirty document, a declined confirmation, same-name items in different roots, and a legacy install without a recorded source.
+Inject a failure at each boundary (backup rename, placement rename, cancellation after the backup, failed rollback) and assert the old bytes and metadata are identical afterwards. Fire an injection only on the first matching call: rollback reuses the same copy primitive, so an always-failing injection breaks the restore and reports recovery-required instead of rolled-back. Also cover a save during the backup rename, an oversized file, a dirty document, a declined confirmation, same-name items in different roots, and a legacy install without a recorded source.
 
 Stubbed tests miss environment assumptions. Before calling an updater done, run it once end to end against a real public repository (an older commit installed into a temporary workspace, detected, updated, compared byte for byte with upstream, re-checked as unchanged) and confirm no staging folder remains. Such a run found the stock-share and executable-mode defects above.
