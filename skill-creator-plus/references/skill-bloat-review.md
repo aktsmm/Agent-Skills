@@ -53,6 +53,7 @@ Use this order every time:
 - A workspace entry file such as `copilot-instructions.md` starts acting like a full operations manual
 - Persona rules, routing rules, and domain workflow rules are mixed in one always-loaded file
 - An always-loaded entry file becomes a Markdown-linked directory of rules, agents, or docs
+- A wide table reference looks huge because a formatter pads cells to align columns. Measure with runs of spaces collapsed before deciding to split: one case dropped from 58k to 19k characters with identical content. Compact the padding (verify equality ignoring whitespace) and exclude that file from the formatter, otherwise the next save re-expands it
 
 ## Hard Line Limits
 
