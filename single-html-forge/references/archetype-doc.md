@@ -66,3 +66,4 @@ A `PDF として保存` button sits at the bottom of the sidebar and calls the b
 - A nav entry whose `data-shf-navlink` does not match any section `id`.
 - Citations in the body that have no entry in the list, or entries nobody cites. Both pass Tier 1 today, so read them.
 - Walls of text. The component blocks in `component-patterns.md` exist so the eye has somewhere to rest.
+- A procedure with screenshots written as one block per step with no fixed shape. Give every step the same four fields (who, where, what to do, what is shown) and one image, so a reader can find the step again. Put a step that only the administrator performs apart from the operator's steps, and say who acts at the top of each. Embed only images already masked for the recipient; a caption cannot remove what the pixels show.

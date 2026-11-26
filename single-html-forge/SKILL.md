@@ -1,6 +1,6 @@
 ---
 name: single-html-forge
-description: "Generate a single self-contained HTML file — a horizontal slide deck, a vertical-scroll explainer document, or a fixed-canvas summary image — with zero external runtime dependencies, then verify it mechanically. Use when the user asks for HTMLスライド, 単一HTMLスライド, single-file HTML presentation, ブラウザーで開く説明資料, HTML 説明資料, HTMLサマリ画像, or self-contained HTML, or wants to hand someone a deck or explainer that opens anywhere without PowerPoint. Also use to embed images into such a file or to re-check an existing one. Does not output PPTX."
+description: "Generate a single self-contained HTML file — a horizontal slide deck, a vertical-scroll explainer document, or a fixed-canvas summary image — with zero external runtime dependencies, then verify it mechanically. Use when the user asks for HTMLスライド, 単一HTMLスライド, single-file HTML presentation, ブラウザーで開く説明資料, HTML 説明資料, 画像付き手順書のHTML, HTMLサマリ画像, or self-contained HTML, or wants to hand someone a deck or explainer that opens anywhere without PowerPoint. Also use to embed images into such a file or to re-check an existing one. Does not output PPTX."
 argument-hint: "作りたい内容と、deck / doc / poster のどれか"
 user-invocable: true
 license: CC BY-NC-SA 4.0
@@ -16,6 +16,7 @@ One HTML file. No CDN, no build step, no external fetch at runtime. Opens the sa
 
 - "HTMLスライドを作って" / "単一HTMLで資料にして" / "ブラウザーで開ける説明資料にして" / "サマリ画像を1枚"
 - Handing a deck or explainer to someone who should not need PowerPoint
+- A screenshot-based procedure or runbook for another party, delivered as one HTML file: use `doc`. Do not convert Markdown with a library and inline hand-written CSS; that skips the verifier (image decoding and size limits, link checks) and leaves the visual check to a glance.
 - Embedding images into a self-contained HTML artifact
 - Re-verifying or editing an artifact this skill produced
 
