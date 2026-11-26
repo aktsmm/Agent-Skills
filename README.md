@@ -41,14 +41,14 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [code-review-security](code-review-security/) | 差分、PR、選択範囲、指定ファイルをセキュリティ観点で read-only レビューし、rubber duck / critic review で確認してから高信頼の脆弱性を報告する |
 | [code-simplifier](code-simplifier/) | Guide for simplifying and refining code after coding sessions |
 | [context-to-video](context-to-video/) | Turn any context (blog URL, pasted article, PR diff, meeting notes, release notes, raw prompt) into a narrated explainer mp4 with slides, subtitles, and optionally a talking-hea... |
-| [create-test-request](create-test-request/) | Use when: 会話・設計資料・回答文書から検証タスクを抽出し、別workspaceへ渡すテスト依頼文を作成する。受け手は最初に理解内容と実施項目を返し、承認後に検証する |
+| [create-test-request](create-test-request/) | Use when: 会話・設計資料・回答文書から検証タスクを抽出し、別workspaceへ渡すテスト依頼文を作成する。検証後の報告・主要証跡のコピー先と、専用検証環境で許可する変更範囲を確認する。受け手は理解内容と実施項目を返し、承認後に検証する |
 | [customer-workspace](customer-workspace/) | Set up dedicated customer workspaces and coordinate meeting notes, actions, and workstreams for ongoing customer accounts. Use for 顧客ワークスペースの作成, 顧客案件の棚卸し・引き継ぎ, 議事録と宿題・案件台帳の一括反映,... |
 | [document-knowledge-ingestion](document-knowledge-ingestion/) | Read multiple local documents deeply and preserve a source-linked Markdown knowledge library. Use for consolidating notes, books, PDFs, presentations, and screenshots across fol... |
 | [drawio-diagram-forge](drawio-diagram-forge/) | Generate draw.io editable diagrams (.drawio, .drawio.svg) from text, images, or Excel. Orchestrates 3-agent workflow (Analysis → Manifest → SVG generation) with quality gates |
 | [duck-critic](duck-critic/) | Run a Duck Critic producer-critic loop: you (main) keep producing the plan/code/tests and gate your own work at checkpoints with a different-model critic, revising until it passes |
 | [evaluate-waza-copilot-customizations](evaluate-waza-copilot-customizations/) | Waza で個人（~/.copilot）/ ワークスペース / 任意パスの instructions / agents / skills をセットアップ、static/runtime 評価、gate 単体実行、結果要約、report 更新まで行う。 |
 | [explain-release-changes](explain-release-changes/) | 前回リリース以降の変更を、コードを知らない人にも伝わる説明文にする。Use when: リリースノートを一般向けに書き直したい、今回の変更を人に説明したい、ブログ/SNS/社内共有向けに変更点を紹介したい、機能の移植元（姉妹repo・参考OSS等）を明記して伝えたい |
-| [explainer-video-generic](explainer-video-generic/) | Turn source material (documents, notes, web research, demo recordings, news) into a narrated explainer video (MP4) with captions, background music and an SRT file, end to end on... |
+| [explainer-video-generic](explainer-video-generic/) | Create a narrated explainer video (MP4) with captions, BGM and SRT from documents, articles, research or demo recordings. Use to turn a deck into a video, make motion graphics,... |
 | [export-copilot-session-dialogue](export-copilot-session-dialogue/) | Interaction flow: セッション中の対話フロー・使用ツール・手順を構造化して出力。Use when: dialogue, tool flow, handoff, 手順再現。作業ログは export-session-log、再利用知見は export-knowledge を使う |
 | [export-knowledge](export-knowledge/) | Reusable learnings: セッション中の再利用知見を構造化し、ドメイン別（microsoft / copilot など）に振り分けて出力。Use when: knowledge, lessons learned, 知見化。作業ログは export-session-log、対話再現は export-copilot-session-dialo... |
 | [export-session-log](export-session-log/) | Export the current chat session as a structured Markdown work timeline or blog-draft seed |
@@ -78,7 +78,7 @@ GitHub Copilot と Claude 向けの Agent Skills コレクションです。
 | [receipt-tax-ocr](receipt-tax-ocr/) | Organize receipt images and subscription invoice/receipt PDFs for Japanese sole-proprietor or side-business bookkeeping: extract evidence, rename files, and update monthly memos... |
 | [record-work-notes](record-work-notes/) | Use when: 作業メモ、事象別ログ、調査・相談・確認・実装・トラブル対応の経緯を残す。会話と作業結果を既存記録へ整理し、継続案件・時系列・出典・残事項を追える形で保存する |
 | [refactor-context](refactor-context/) | 指定した instruction / agent / skill の重複・矛盾・冗長性と配置を整理する。単一ファイルや workspace / user 横断のコンテキスト最適化に使い、新規 workflow の設計・構築は扱わない |
-| [refine-product-100](refine-product-100/) | プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode では品質 gate 後に配布と公開状態確認まで進める |
+| [refine-product-100](refine-product-100/) | プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode、または Issue 解消の run では、品質 gate 後に配布と公開状態確認、Issue クローズまで進める |
 | [reply-test-to-requester](reply-test-to-requester/) | Use when the user asks to turn a finished or paused PoC / validation into a report for the requester: 依頼主向けレポート, 検証結果のご報告, 依頼元への返信, コピペできる報告文, summary-for-requester, 試したこと・結果・サマ... |
 | [repurpose-deck-from-reference](repurpose-deck-from-reference/) | Build a new-topic PPTX by reusing an existing reference deck's template (layouts / footers / fonts / palette) while replacing all content from primary sources |
 | [retro-private-skills](retro-private-skills/) | Reflect reusable learnings into a private Agent Skills repository, align affected skills' frontmatter with their workflows, keep the generated skills index README current, and c... |

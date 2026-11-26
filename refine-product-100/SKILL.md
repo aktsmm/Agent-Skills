@@ -1,6 +1,6 @@
 ---
 name: refine-product-100
-description: "プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode では品質 gate 後に配布と公開状態確認まで進める"
+description: "プロダクトを反復実行で最高品質へ近づける。前回サマリーを読み、重複観点を避けて自律的に改善軸を選び、各回で具体改善・検証・記録まで行う。明示 release mode、または Issue 解消の run では、品質 gate 後に配布と公開状態確認、Issue クローズまで進める"
 disable-model-invocation: true
 argument-hint: "対象、重点観点、モード（例: current workspace / all / quick / plan / review / release）"
 user-invocable: true
@@ -47,6 +47,7 @@ No-Edit の指定は、この skill 全体の修正・Guard 成果物追加・st
 
 - `release` / `deploy` / `publish` または同義の明示依頼だけを full release intent とする。単語が文脈に出ただけ、`release-prep`、`準備だけ`、`publishしない` は実行承認にしない。
 - repo、単一配布物、manifest上の package/version、公開先が一意なら、品質 gate 後に commit / tag / push / publish / GitHub Release / verification まで再確認なしで進める。
+- 本人が「release と Issue クローズは毎回言わなくてもやる」と指示済みなら、open な Issue を解消する修正を含む run は、上の条件を満たす限り mode 指定がなくても release まで進め、最後に「release しますか」と聞いて止めない。Issue を解消しない run には広げない。
 - 配布対象、version、公開先、権限が不明、または破壊的履歴操作が必要なら `Block` として確認する。
 - `Fix now` がある状態では配布せず、各配布工程を個別に `done / skipped / blocked` で報告する。
 
@@ -136,7 +137,8 @@ prompt / instruction / skill / hook / reusable script 自体に再発要因が�
 2. typecheck、lint、test、audit後にbuild/packし、artifactの存在・サイズ・時刻とtarball内容を確認する。stash/checkout/一括編集のあとは `git ls-files --eol -m` で改行を確認し、最終のbuild/packの前に作業コピーの改行規約を戻す。
 3. 明示release intentがある場合だけ commit → push → publish → GitHub Releaseへ進む。draft作成にenvironment承認ゲートがある場合も、明示release intentでのみ承認し、公開前にdraft資産のSHA256SUMS・APIのdigest・updater feedを照合する。
 4. registry/APIと掲載ページでversion、tag、Release、添付を確認し、送信成功と公開反映を区別する。stale表示だけで再publishしない。
-5. 各工程を個別報告し、認証・審査・権限不足は `Block` にする。必須gate達成後はstate同期とcleanupだけ行い、新しい監査を足さない。
+5. 公開確認後、release で解消した Issue へ、release / Marketplace 等へのリンク・確認済み・未確認を分けた結果をコメントし、`gh issue close --reason completed` で閉じる。コミットの `Closes #N` による自動クローズが先に起きた場合は、コメントのみ追加し、state と comment 数を読み戻す。部分公開・未照合では閉じない。
+6. 各工程を個別報告し、認証・審査・権限不足は `Block` にする。必須gate達成後はstate同期とcleanupだけ行い、新しい監査を足さない。
 
 ## Prompt-only Handoff
 
